@@ -20,9 +20,14 @@ const Index = () => {
               <button onClick={() => scrollToSection('how-it-works')} className="text-white/90 hover:text-white transition-colors duration-200 hover:scale-105 transform">How It Works</button>
               <button onClick={() => scrollToSection('pricing')} className="text-white/90 hover:text-white transition-colors duration-200 hover:scale-105 transform">Pricing</button>
             </div>
-            <button className="bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-lg hover:bg-white/20 transition-all duration-300 hover:scale-105 transform">
-              Get Started
-            </button>
+            <div className="flex items-center space-x-4">
+              <Link 
+                to="/auth" 
+                className="bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-lg hover:bg-white/20 transition-all duration-300 hover:scale-105 transform"
+              >
+                Login / Sign Up
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
