@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -5,7 +6,6 @@ import {
   Users,
   Clock,
   ScrollText,
-  Settings,
   FolderKanban,
   GanttChartSquare,
   UserSquare2,
@@ -88,20 +88,15 @@ const navigationItems = [
         url: "/project-resourcing",
         icon: GanttChartSquare,
       },
-      {
-        title: "Office Settings",
-        url: "/office-settings",
-        icon: Flag,
-      },
     ],
   },
   {
     label: "System",
     items: [
       {
-        title: "Settings",
-        url: "/settings",
-        icon: Settings,
+        title: "Office Settings",
+        url: "/office-settings",
+        icon: Flag,
       },
     ],
   },
