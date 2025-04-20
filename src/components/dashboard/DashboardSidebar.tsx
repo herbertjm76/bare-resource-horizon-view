@@ -106,27 +106,27 @@ export function DashboardSidebar() {
   return (
     <Sidebar 
       className="backdrop-blur-lg 
-        bg-[hsl(210,15%,20%)] 
+        bg-sidebar 
         bg-opacity-80
         border-r 
-        border-[hsl(210,10%,30%)]"
+        border-sidebar-border"
     >
       <SidebarContent>
         <SidebarGroup>
           <div className="flex items-center justify-between px-4 py-2">
-            <p className="text-lg font-semibold text-[hsl(210,10%,90%)]">Bare Resource</p>
-            <SidebarTrigger className="md:hidden text-[hsl(210,10%,90%)] hover:bg-[hsl(210,10%,30%)]" />
+            <p className="text-lg font-semibold text-sidebar-foreground">Bare Resource</p>
+            <SidebarTrigger className="md:hidden text-sidebar-foreground hover:bg-sidebar-accent" />
           </div>
           {navigationItems.map((section) => (
             <div key={section.label} className="mb-6">
-              <SidebarGroupLabel className="text-[hsl(210,10%,70%)]">{section.label}</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-sidebar-foreground/70">{section.label}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {section.items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
                         asChild
-                        className="text-[hsl(210,10%,80%)] hover:text-[hsl(210,10%,90%)] hover:bg-[hsl(210,10%,30%)] rounded-md"
+                        className="text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent rounded-md"
                       >
                         <Link to={item.url} className="flex items-center gap-2 w-full p-2">
                           <item.icon className="h-4 w-4" />
