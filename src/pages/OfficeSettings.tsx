@@ -10,6 +10,7 @@ import { LocationsTab } from '@/components/settings/LocationsTab';
 import { RolesTab } from '@/components/settings/RolesTab';
 import { RatesTab } from '@/components/settings/RatesTab';
 import { HolidaysTab } from '@/components/settings/HolidaysTab';
+import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 
 const OfficeSettings = () => {
   return (
@@ -29,52 +30,54 @@ const OfficeSettings = () => {
                 This will help personalize your resource management and planning experience.
               </p>
             </div>
-            <Tabs defaultValue="areas" className="w-full">
-              <TabsList className="grid grid-cols-6 w-full">
-                <TabsTrigger value="areas" className="flex items-center gap-2">
-                  <Flag className="h-4 w-4" />
-                  <span>Project Areas</span>
-                </TabsTrigger>
-                <TabsTrigger value="stages" className="flex items-center gap-2">
-                  <Layers className="h-4 w-4" />
-                  <span>Stages</span>
-                </TabsTrigger>
-                <TabsTrigger value="countries" className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>Countries</span>
-                </TabsTrigger>
-                <TabsTrigger value="roles" className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  <span>Roles</span>
-                </TabsTrigger>
-                <TabsTrigger value="rates" className="flex items-center gap-2">
-                  <Currency className="h-4 w-4" />
-                  <span>Rates</span>
-                </TabsTrigger>
-                <TabsTrigger value="holidays" className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <span>Holidays</span>
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="areas" className="mt-6">
-                <CountriesTab />
-              </TabsContent>
-              <TabsContent value="stages" className="mt-6">
-                <StagesTab />
-              </TabsContent>
-              <TabsContent value="countries" className="mt-6">
-                <LocationsTab />
-              </TabsContent>
-              <TabsContent value="roles" className="mt-6">
-                <RolesTab />
-              </TabsContent>
-              <TabsContent value="rates" className="mt-6">
-                <RatesTab />
-              </TabsContent>
-              <TabsContent value="holidays" className="mt-6">
-                <HolidaysTab />
-              </TabsContent>
-            </Tabs>
+            <OfficeSettingsProvider>
+              <Tabs defaultValue="areas" className="w-full">
+                <TabsList className="grid grid-cols-6 w-full">
+                  <TabsTrigger value="areas" className="flex items-center gap-2">
+                    <Flag className="h-4 w-4" />
+                    <span>Project Areas</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="stages" className="flex items-center gap-2">
+                    <Layers className="h-4 w-4" />
+                    <span>Stages</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="countries" className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>Countries</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="roles" className="flex items-center gap-2">
+                    <Briefcase className="h-4 w-4" />
+                    <span>Roles</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="rates" className="flex items-center gap-2">
+                    <Currency className="h-4 w-4" />
+                    <span>Rates</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="holidays" className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span>Holidays</span>
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="areas" className="mt-6">
+                  <CountriesTab />
+                </TabsContent>
+                <TabsContent value="stages" className="mt-6">
+                  <StagesTab />
+                </TabsContent>
+                <TabsContent value="countries" className="mt-6">
+                  <LocationsTab />
+                </TabsContent>
+                <TabsContent value="roles" className="mt-6">
+                  <RolesTab />
+                </TabsContent>
+                <TabsContent value="rates" className="mt-6">
+                  <RatesTab />
+                </TabsContent>
+                <TabsContent value="holidays" className="mt-6">
+                  <HolidaysTab />
+                </TabsContent>
+              </Tabs>
+            </OfficeSettingsProvider>
           </div>
         </div>
       </div>
@@ -83,4 +86,3 @@ const OfficeSettings = () => {
 };
 
 export default OfficeSettings;
-

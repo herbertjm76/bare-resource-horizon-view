@@ -18,27 +18,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-// Sample data - in a real app this would come from the database
-const mockRates = [
-  { id: "1", type: "role", name: "Project Manager", value: 150 },
-  { id: "2", type: "role", name: "Senior Architect", value: 125 },
-  { id: "3", type: "location", name: "New York", value: 140 },
-  { id: "4", type: "location", name: "London", value: 135 }
-];
-
-const mockRoles = [
-  { id: "1", name: "Project Manager" },
-  { id: "2", name: "Senior Architect" },
-  { id: "3", name: "Junior Architect" },
-  { id: "4", name: "BIM Coordinator" }
-];
-
-const mockLocations = [
-  { id: "1", name: "New York" },
-  { id: "2", name: "London" },
-  { id: "3", name: "Tokyo" }
-];
+import { useOfficeSettings, Rate } from "@/context/OfficeSettingsContext";
 
 const formSchema = z.object({
   type: z.enum(["role", "location"]),
@@ -49,9 +29,9 @@ const formSchema = z.object({
 type RateFormValues = z.infer<typeof formSchema>;
 
 export const RatesTab = () => {
-  const [rates, setRates] = useState(mockRates);
+  const { roles, locations, rates, setRates } = useOfficeSettings();
   const [open, setOpen] = useState(false);
-  const [editingRate, setEditingRate] = useState<(typeof mockRates)[0] | null>(null);
+  const [editingRate, setEditingRate] = useState<Rate | null>(null);
 
   const form = useForm<RateFormValues>({
     resolver: zodResolver(formSchema),
@@ -72,10 +52,10 @@ export const RatesTab = () => {
     }
   };
 
-  const handleEdit = (rate: typeof mockRates[0]) => {
+  const handleEdit = (rate: Rate) => {
     const entityId = rate.type === "role" 
-      ? mockRoles.find(r => r.name === rate.name)?.id || ""
-      : mockLocations.find(l => l.name === rate.name)?.id || "";
+      ? roles.find(r => r.name === rate.name)?.id || ""
+      : locations.find(l => l.name === rate.name)?.id || "";
     
     setEditingRate(rate);
     form.reset({
@@ -88,8 +68,8 @@ export const RatesTab = () => {
 
   const onSubmit = (values: RateFormValues) => {
     const entityName = values.type === "role"
-      ? mockRoles.find(r => r.id === values.entityId)?.name || ""
-      : mockLocations.find(l => l.id === values.entityId)?.name || "";
+      ? roles.find(r => r.id === values.entityId)?.name || ""
+      : locations.find(l => l.id === values.entityId)?.name || "";
 
     if (editingRate) {
       // Update existing rate
@@ -255,12 +235,12 @@ export const RatesTab = () => {
                       </FormControl>
                       <SelectContent>
                         {rateType === 'role' 
-                          ? mockRoles.map((role) => (
+                          ? roles.map((role) => (
                               <SelectItem key={role.id} value={role.id}>
                                 {role.name}
                               </SelectItem>
                             ))
-                          : mockLocations.map((location) => (
+                          : locations.map((location) => (
                               <SelectItem key={location.id} value={location.id}>
                                 {location.name}
                               </SelectItem>

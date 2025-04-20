@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,14 +16,7 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-// Simulated DB
-const mockRoles = [
-  { id: "1", name: "Project Manager", code: "PM" },
-  { id: "2", name: "Senior Architect", code: "SA" },
-  { id: "3", name: "Junior Architect", code: "JA" },
-  { id: "4", name: "BIM Coordinator", code: "BIM" }
-];
+import { useOfficeSettings, Role } from "@/context/OfficeSettingsContext";
 
 const formSchema = z.object({
   name: z.string().min(1, "Role name is required"),
@@ -30,10 +24,9 @@ const formSchema = z.object({
 });
 
 type RoleFormValues = z.infer<typeof formSchema>;
-type Role = typeof mockRoles[0];
 
 export const RolesTab = () => {
-  const [roles, setRoles] = useState<Role[]>(mockRoles);
+  const { roles, setRoles } = useOfficeSettings();
   const [open, setOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
   const [editMode, setEditMode] = useState(false);
