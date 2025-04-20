@@ -3,10 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
-import type { Profile } from '@/integrations/supabase/types';
+import type { Database } from '@/integrations/supabase/types';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardStats } from '@/components/dashboard/DashboardStats';
 import { TeamManagement } from '@/components/dashboard/TeamManagement';
+
+// Create a proper Profile type based on the database schema
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Dashboard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);

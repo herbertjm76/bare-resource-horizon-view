@@ -3,7 +3,10 @@ import React from 'react';
 import { ClipboardCopy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import type { Profile } from '@/integrations/supabase/types';
+import { Database } from '@/integrations/supabase/types';
+
+// Create a proper Profile type based on the database schema
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 interface TeamManagementProps {
   teamMembers: Profile[];
