@@ -7,6 +7,8 @@ import type { Database } from '@/integrations/supabase/types';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardStats } from '@/components/dashboard/DashboardStats';
 import { TeamManagement } from '@/components/dashboard/TeamManagement';
+import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { toast } from 'sonner';
 
 // Create a proper Profile type based on the database schema
@@ -133,19 +135,24 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
-      <div className="max-w-6xl mx-auto">
-        <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
-        <DashboardStats />
-        {(profile?.role === 'owner' || profile?.role === 'admin') && (
-          <TeamManagement 
-            teamMembers={teamMembers} 
-            inviteUrl={inviteUrl}
-            userRole={profile.role}
-          />
-        )}
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <DashboardSidebar />
+        <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
+          <div className="max-w-6xl mx-auto">
+            <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
+            <DashboardStats />
+            {(profile?.role === 'owner' || profile?.role === 'admin') && (
+              <TeamManagement 
+                teamMembers={teamMembers} 
+                inviteUrl={inviteUrl}
+                userRole={profile.role}
+              />
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
