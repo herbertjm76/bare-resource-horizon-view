@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
+import OfficeSettings from "./pages/OfficeSettings";
 import Auth from "./pages/Auth";
 import Join from "./pages/Join";
 import { CompanyProvider } from "./context/CompanyContext";
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/projects" element={<Projects />} />
+            <Route path="/office-settings" element={<OfficeSettings />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/join" element={<Join />} />
             <Route path="/join/:inviteCode" element={<Join />} />

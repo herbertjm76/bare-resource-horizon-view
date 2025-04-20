@@ -3,7 +3,13 @@ import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Flag, Layers, MapPin, Briefcase, DollarSign, Calendar } from 'lucide-react';
+import { Flag, Layers, MapPin, Briefcase, Currency, Calendar } from 'lucide-react';
+import { CountriesTab } from '@/components/settings/CountriesTab';
+import { StagesTab } from '@/components/settings/StagesTab';
+import { LocationsTab } from '@/components/settings/LocationsTab';
+import { RolesTab } from '@/components/settings/RolesTab';
+import { RatesTab } from '@/components/settings/RatesTab';
+import { HolidaysTab } from '@/components/settings/HolidaysTab';
 
 const OfficeSettings = () => {
   return (
@@ -35,7 +41,7 @@ const OfficeSettings = () => {
                   <span>Roles</span>
                 </TabsTrigger>
                 <TabsTrigger value="rates" className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4" />
+                  <Currency className="h-4 w-4" />
                   <span>Rates</span>
                 </TabsTrigger>
                 <TabsTrigger value="holidays" className="flex items-center gap-2">
@@ -44,22 +50,22 @@ const OfficeSettings = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="countries" className="mt-6">
-                Countries content coming soon...
+                <CountriesTab />
               </TabsContent>
               <TabsContent value="stages" className="mt-6">
-                Stages content coming soon...
+                <StagesTab />
               </TabsContent>
               <TabsContent value="locations" className="mt-6">
-                Locations content coming soon...
+                <LocationsTab />
               </TabsContent>
               <TabsContent value="roles" className="mt-6">
-                Roles content coming soon...
+                <RolesTab />
               </TabsContent>
               <TabsContent value="rates" className="mt-6">
-                Rates content coming soon...
+                <RatesTab />
               </TabsContent>
               <TabsContent value="holidays" className="mt-6">
-                Holidays content coming soon...
+                <HolidaysTab />
               </TabsContent>
             </Tabs>
           </div>
