@@ -1,11 +1,12 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, Flag } from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import { Plus, Edit, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogFooter,
   DialogDescription
@@ -16,21 +17,18 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
+import allCountries from "@/lib/allCountries.json";
 
-// List of all countries for searching in the dropdown (no emojis in list display)
-import allCountries from "@/lib/allCountries.json"; // We'll create this helper with all countries
-
-// Get flag emoji from ISO country code
+// Utility to get flag emoji from ISO country code
 const flagEmoji = (countryCode: string) =>
   countryCode && countryCode.length === 2
-    ? String.fromCodePoint(...[...countryCode.toUpperCase()].map(c=>127397+c.charCodeAt(0)))
-    : null; // return null if invalid
+    ? String.fromCodePoint(...[...countryCode.toUpperCase()].map(c => 127397 + c.charCodeAt(0)))
+    : null;
 
 const formSchema = z.object({
   city: z.string().min(1, "City is required"),
   code: z.string().length(2, "Country code is required"),
-  country: z.string().min(1, "Country is required"),
-  emoji: z.string().optional()
+  country: z.string().min(1, "Country is required")
 });
 type LocationFormValues = z.infer<typeof formSchema>;
 type Location = {
@@ -53,8 +51,7 @@ export const LocationsTab = () => {
     defaultValues: {
       city: "",
       code: "",
-      country: "",
-      emoji: ""
+      country: ""
     }
   });
 
@@ -63,21 +60,20 @@ export const LocationsTab = () => {
     form.reset({
       city: location.city,
       code: location.code,
-      country: location.country,
-      emoji: location.emoji
+      country: location.country
     });
     setOpen(true);
   };
 
   const handleSelect = (id: string) => {
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  }
+  };
 
   const handleBulkDelete = () => {
     setLocations(locations.filter(row => !selected.includes(row.id)));
     setSelected([]);
     setEditMode(false);
-  }
+  };
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
@@ -88,8 +84,8 @@ export const LocationsTab = () => {
   };
 
   const onSubmit = (values: LocationFormValues) => {
-    const emojiVal = values.emoji && values.emoji.trim() !== "" ? values.emoji : flagEmoji(values.code) || "";
     const countryObj = allCountries.find(c => c.code === values.code);
+    const emojiVal = flagEmoji(values.code) || "";
     const newEntry: Location = {
       id: editingLocation ? editingLocation.id : Date.now().toString(),
       city: values.city,
@@ -110,7 +106,7 @@ export const LocationsTab = () => {
   // For searching in the dropdown
   const [countrySearch, setCountrySearch] = useState("");
   const filteredCountries = allCountries.filter(country =>
-    country.name.toLowerCase().includes(countrySearch.toLowerCase()) || 
+    country.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
     country.code.toLowerCase().includes(countrySearch.toLowerCase())
   );
 
@@ -149,17 +145,13 @@ export const LocationsTab = () => {
           {locations.length > 0 ? (
             <div className="grid gap-4">
               {locations.map((row) => (
-                <div 
+                <div
                   key={row.id}
                   className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"}`}
                   style={editMode && selected.includes(row.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    {row.emoji ? (
-                      <span className="text-2xl">{row.emoji}</span>
-                    ) : (
-                      <span className="text-2xl">{flagEmoji(row.code)}</span>
-                    )}
+                    <span className="text-2xl">{flagEmoji(row.code)}</span>
                     <span className="font-medium">{row.city}, {row.country} <span className="text-xs text-muted-foreground ml-1">({row.code})</span></span>
                   </div>
                   {editMode ? (
@@ -190,7 +182,7 @@ export const LocationsTab = () => {
           <DialogHeader>
             <DialogTitle>{editingLocation ? 'Edit' : 'Add'} Location</DialogTitle>
             <DialogDescription>
-              Choose a country (searchable), specify city. The flag is auto-assigned by country, but can be customized.
+              Choose a country (searchable), specify city. The flag is auto-assigned by country.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -219,7 +211,7 @@ export const LocationsTab = () => {
                             form.setValue("code", code);
                             form.setValue("country", c ? c.name : code);
                             field.onChange(code);
-                            setCountrySearch(""); // clear the search box after select
+                            setCountrySearch("");
                           }}
                         >
                           <option value="">Select a country...</option>
@@ -248,31 +240,16 @@ export const LocationsTab = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="emoji"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Icon (optional)</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          placeholder={flagEmoji(form.watch("code")) || ""}
-                          {...field}
-                          maxLength={2}
-                          className="w-20"
-                          disabled={!form.watch("code")}
-                        />
-                        <span className="text-2xl">{form.watch("emoji") ? form.watch("emoji") : flagEmoji(form.watch("code"))}</span>
-                        <span className="text-xs text-muted-foreground">
-                          Defaults to country flag. You may enter another emoji, or leave blank for flag.
-                        </span>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {/* Display flag for selected country */}
+              {form.watch("code") && (
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-semibold">Icon:</span>
+                  <span className="text-2xl">{flagEmoji(form.watch("code"))}</span>
+                  <span className="text-xs text-muted-foreground">
+                    (Flag icon is auto-set. No manual choice.)
+                  </span>
+                </div>
+              )}
               <DialogFooter>
                 <Button type="submit">{editingLocation ? 'Update' : 'Add'} Location</Button>
               </DialogFooter>
