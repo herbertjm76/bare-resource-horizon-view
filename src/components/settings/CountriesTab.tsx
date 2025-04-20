@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogFooter,
   DialogDescription
@@ -41,18 +41,19 @@ const regionMap: { [code: string]: string } = {
   SG: "Asia",
   AU: "Oceania"
 };
+// Added emoji property to countries
 const countries = [
-  { code: "US", name: "United States" },
-  { code: "GB", name: "United Kingdom" },
-  { code: "JP", name: "Japan" },
-  { code: "SG", name: "Singapore" },
-  { code: "DE", name: "Germany" },
-  { code: "FR", name: "France" },
-  { code: "IN", name: "India" },
-  { code: "CN", name: "China" },
-  { code: "BR", name: "Brazil" },
-  { code: "CA", name: "Canada" },
-  { code: "AU", name: "Australia" },
+  { code: "US", name: "United States", emoji: "🇺🇸" },
+  { code: "GB", name: "United Kingdom", emoji: "🇬🇧" },
+  { code: "JP", name: "Japan", emoji: "🇯🇵" },
+  { code: "SG", name: "Singapore", emoji: "🇸🇬" },
+  { code: "DE", name: "Germany", emoji: "🇩🇪" },
+  { code: "FR", name: "France", emoji: "🇫🇷" },
+  { code: "IN", name: "India", emoji: "🇮🇳" },
+  { code: "CN", name: "China", emoji: "🇨🇳" },
+  { code: "BR", name: "Brazil", emoji: "🇧🇷" },
+  { code: "CA", name: "Canada", emoji: "🇨🇦" },
+  { code: "AU", name: "Australia", emoji: "🇦🇺" },
 ];
 
 function getRegion(code: string) {
@@ -153,13 +154,13 @@ export const CountriesTab = () => {
   };
 
   const handleSelect = (id: string) => {
-    setSelected(selected => selected.includes(id) ? selected.filter(x=>x!==id) : [...selected, id]);
+    setSelected(selected => selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
   };
 
   const onSubmit = async (values: ProjectAreaFormValues) => {
     setLoading(true);
     setError(null);
-    const emoji = countries.find(c => c.code === values.code)?.emoji ?? null; // Not used, but left for future
+    const emoji = countries.find(c => c.code === values.code)?.emoji ?? null; // Now works correctly
     const regionVal = values.region || getRegion(values.code);
 
     if (editing) {
@@ -170,13 +171,14 @@ export const CountriesTab = () => {
           code: values.code,
           city: values.city,
           country: countries.find(c => c.code === values.code)?.name || "",
+          emoji
         })
         .eq("id", editing.id);
       if (error) setError("Failed to update area.");
       else {
         setAreas(
           areas.map(area => area.id === editing.id
-            ? { ...area, ...values, country: countries.find(c => c.code === values.code)?.name || "" }
+            ? { ...area, ...values, country: countries.find(c => c.code === values.code)?.name || "", emoji }
             : area
           )
         );
@@ -189,6 +191,7 @@ export const CountriesTab = () => {
           code: values.code,
           city: values.city,
           country: countries.find(c => c.code === values.code)?.name || "",
+          emoji
         })
         .select()
         .single();
@@ -233,66 +236,71 @@ export const CountriesTab = () => {
             <div className="text-center text-destructive">{error}</div>
           ) : (
             <>
-            <div className="text-sm text-muted-foreground mb-4">
-              Track which cities and regions you operate projects in. Each region is colored by spectrum; backgrounds are auto-generated.
-            </div>
-            {editMode && (
-              <div className="flex items-center gap-2 mb-2">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  disabled={selected.length === 0}
-                  onClick={handleBulkDelete}
-                >
-                  <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
-                </Button>
-                <span className="text-xs text-muted-foreground">{selected.length} selected</span>
+              <div className="text-sm text-muted-foreground mb-4">
+                Track which cities and regions you operate projects in. Each region is colored by spectrum; backgrounds are auto-generated.
               </div>
-            )}
-            {areas.length > 0 ? (
-              <div className="grid gap-4">
-                {areas.map((area, idx) => {
-                  const region = getRegion(area.code);
-                  const bg = pastelColorForArea(region, idx);
-                  return (
-                    <div 
-                      key={area.id}
-                      className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"}`}
-                      style={editMode && selected.includes(area.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span
-                          className="font-bold px-3 py-1 rounded text-base"
-                          style={{ background: bg }}
-                        >
-                          {area.code}
-                        </span>
-                        <span className="font-medium">{area.city}</span>
-                        <span className="bg-muted-foreground/10 px-2 py-0.5 rounded text-xs text-muted-foreground ml-2">
-                          {area.region}
-                        </span>
+              {editMode && (
+                <div className="flex items-center gap-2 mb-2">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    disabled={selected.length === 0}
+                    onClick={handleBulkDelete}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
+                  </Button>
+                  <span className="text-xs text-muted-foreground">{selected.length} selected</span>
+                </div>
+              )}
+              {areas.length > 0 ? (
+                <div className="grid gap-4">
+                  {areas.map((area, idx) => {
+                    const region = getRegion(area.code);
+                    const bg = pastelColorForArea(region, idx);
+                    return (
+                      <div
+                        key={area.id}
+                        className={`flex items-center justify-between p-3 border rounded-md ${editMode ? "ring-2" : ""}`}
+                        style={editMode && selected.includes(area.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span
+                            className="font-bold px-3 py-1 rounded text-base"
+                            style={{ background: bg }}
+                          >
+                            {area.code}
+                          </span>
+                          <span className="font-medium">{area.city}</span>
+                          <span className="bg-muted-foreground/10 px-2 py-0.5 rounded text-xs text-muted-foreground ml-2">
+                            {area.region}
+                          </span>
+                          {area.emoji && (
+                            <span className="ml-2" aria-label={`${area.country} flag`} role="img">
+                              {area.emoji}
+                            </span>
+                          )}
+                        </div>
+                        {editMode ? (
+                          <input
+                            type="checkbox"
+                            className="w-4 h-4 accent-purple-600"
+                            checked={selected.includes(area.id)}
+                            onChange={() => handleSelect(area.id)}
+                          />
+                        ) : (
+                          <Button variant="ghost" size="sm" onClick={() => handleEdit(area)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
-                      {editMode ? (
-                        <input
-                          type="checkbox"
-                          className="w-4 h-4 accent-purple-600"
-                          checked={selected.includes(area.id)}
-                          onChange={() => handleSelect(area.id)}
-                        />
-                      ) : (
-                        <Button variant="ghost" size="sm" onClick={() => handleEdit(area)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            ) : (
-              <div className="text-center p-4 border rounded-md border-dashed">
-                No project areas yet. Click "Add Area" to get started.
-              </div>
-            )}
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="text-center p-4 border rounded-md border-dashed">
+                  No project areas yet. Click "Add Area" to get started.
+                </div>
+              )}
             </>
           )}
         </div>
@@ -380,6 +388,3 @@ export const CountriesTab = () => {
     </Card>
   );
 };
-
-// File is above 300 lines. This file is getting too long! Consider breaking it into smaller components.
-
