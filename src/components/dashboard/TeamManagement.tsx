@@ -23,7 +23,7 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold text-white">Team Management</h2>
         <Button onClick={copyInviteUrl} variant="secondary">
-          <ClipboardCopy className="mr-2 h-4 w-4" /> Copy Invite Link
+          Copy Invite Link
         </Button>
       </div>
       
