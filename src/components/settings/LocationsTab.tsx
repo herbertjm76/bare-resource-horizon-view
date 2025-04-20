@@ -19,6 +19,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import allCountries from "@/lib/allCountries.json";
 
+// --- Emoji/Icon picker dialog helper ---
+const emojiList = [
+  "🇺🇸", "🇬🇧", "🇯🇵", "🇵🇭", "🇩🇪", "🌍", "🌆", "🌏", "🌇", "🏙️", "🗺️", "🌐", "🏝️", "🏖️", "🗾", "🏔️", "⛱️", "🏚️", "🏨", "🏢", "🏬", "🏠", "🏕️", "⛩️", "🕌", "🏛️", "🇨🇳", "🇸🇬", "🇮🇳", "🇫🇷", "🇮🇹", "🇨🇦"
+];
+
 // Utility to get flag emoji from ISO country code
 const flagEmoji = (countryCode: string) =>
   countryCode && countryCode.length === 2
@@ -28,7 +33,8 @@ const flagEmoji = (countryCode: string) =>
 const formSchema = z.object({
   city: z.string().min(1, "City is required"),
   code: z.string().length(2, "Country code is required"),
-  country: z.string().min(1, "Country is required")
+  country: z.string().min(1, "Country is required"),
+  emoji: z.string().optional(),
 });
 type LocationFormValues = z.infer<typeof formSchema>;
 type Location = {
@@ -46,12 +52,17 @@ export const LocationsTab = () => {
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
 
+  // --- For emoji picker modal ---
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerTargetId, setPickerTargetId] = useState<string | null>(null);
+
   const form = useForm<LocationFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       city: "",
       code: "",
-      country: ""
+      country: "",
+      emoji: "",
     }
   });
 
@@ -60,7 +71,8 @@ export const LocationsTab = () => {
     form.reset({
       city: location.city,
       code: location.code,
-      country: location.country
+      country: location.country,
+      emoji: location.emoji || "",
     });
     setOpen(true);
   };
@@ -83,9 +95,32 @@ export const LocationsTab = () => {
     }
   };
 
+  // LOCATION ICON PICKER (click flag or icon)
+  const openPicker = (id: string) => {
+    setPickerTargetId(id);
+    setPickerOpen(true);
+  };
+  const handlePickerSelect = (emoji: string) => {
+    if (!pickerTargetId) {
+      setPickerOpen(false);
+      return;
+    }
+    setLocations(
+      locations.map(loc =>
+        loc.id === pickerTargetId
+          ? { ...loc, emoji }
+          : loc
+      )
+    );
+    setPickerOpen(false);
+    setPickerTargetId(null);
+  };
+
+  // Submit: flag auto-assigned, unless user picks custom
   const onSubmit = (values: LocationFormValues) => {
     const countryObj = allCountries.find(c => c.code === values.code);
-    const emojiVal = flagEmoji(values.code) || "";
+    const flag = flagEmoji(values.code) || "";
+    const emojiVal = values.emoji || flag;
     const newEntry: Location = {
       id: editingLocation ? editingLocation.id : Date.now().toString(),
       city: values.city,
@@ -103,7 +138,7 @@ export const LocationsTab = () => {
     setEditingLocation(null);
   };
 
-  // For searching in the dropdown
+  // Country search in the dropdown (no emoji in the dropdown)
   const [countrySearch, setCountrySearch] = useState("");
   const filteredCountries = allCountries.filter(country =>
     country.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
@@ -151,7 +186,15 @@ export const LocationsTab = () => {
                   style={editMode && selected.includes(row.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">{flagEmoji(row.code)}</span>
+                    {/* Emoji/Icon is clickable for picker */}
+                    <button
+                      type="button"
+                      className="text-2xl focus:outline-none hover:scale-110 transition-transform"
+                      title="Click to change icon"
+                      onClick={() => openPicker(row.id)}
+                    >
+                      {row.emoji || flagEmoji(row.code)}
+                    </button>
                     <span className="font-medium">{row.city}, {row.country} <span className="text-xs text-muted-foreground ml-1">({row.code})</span></span>
                   </div>
                   {editMode ? (
@@ -176,13 +219,13 @@ export const LocationsTab = () => {
           )}
         </div>
       </CardContent>
-      {/* Dialog for add/edit */}
+      {/* Add/Edit Dialog */}
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{editingLocation ? 'Edit' : 'Add'} Location</DialogTitle>
             <DialogDescription>
-              Choose a country (searchable), specify city. The flag is auto-assigned by country.
+              Choose a country (searchable), specify city. The icon defaults to the country flag, but can be changed after creation.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -193,7 +236,7 @@ export const LocationsTab = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Country</FormLabel>
-                    {/* Searchable Dropdown */}
+                    {/* Searchable Dropdown (NO emoji!) */}
                     <FormControl>
                       <div>
                         <Input
@@ -240,13 +283,13 @@ export const LocationsTab = () => {
                   </FormItem>
                 )}
               />
-              {/* Display flag for selected country */}
+              {/* Display flag for selected country (not clickable here) */}
               {form.watch("code") && (
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold">Icon:</span>
-                  <span className="text-2xl">{flagEmoji(form.watch("code"))}</span>
+                  <span className="text-2xl">{form.watch("emoji") || flagEmoji(form.watch("code"))}</span>
                   <span className="text-xs text-muted-foreground">
-                    (Flag icon is auto-set. No manual choice.)
+                    (Icon defaults to the country flag. Can be changed after creation.)
                   </span>
                 </div>
               )}
@@ -257,6 +300,31 @@ export const LocationsTab = () => {
           </Form>
         </DialogContent>
       </Dialog>
+      {/* Icon/Emoji Picker Dialog */}
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Choose an Icon or Emoji</DialogTitle>
+            <DialogDescription>
+              Click an emoji below to set as icon for this location.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-6 gap-3 py-2">
+            {emojiList.map(emoji => (
+              <button
+                key={emoji}
+                className="text-2xl p-2 rounded hover:scale-110 transition-all bg-muted"
+                type="button"
+                onClick={() => handlePickerSelect(emoji)}
+                aria-label={emoji}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
+
