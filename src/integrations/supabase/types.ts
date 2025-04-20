@@ -48,6 +48,100 @@ export type Database = {
         }
         Relationships: []
       }
+      office_project_stages: {
+        Row: {
+          created_at: string | null
+          id: string
+          office_id: string
+          stage_name: string
+          stage_order: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          office_id: string
+          stage_name: string
+          stage_order: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          office_id?: string
+          stage_name?: string
+          stage_order?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "office_project_stages_office_id_fkey"
+            columns: ["office_id"]
+            isOneToOne: false
+            referencedRelation: "offices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      office_staff_rates: {
+        Row: {
+          created_at: string | null
+          hourly_rate: number
+          id: string
+          office_id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          hourly_rate: number
+          id?: string
+          office_id: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          hourly_rate?: number
+          id?: string
+          office_id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "office_staff_rates_office_id_fkey"
+            columns: ["office_id"]
+            isOneToOne: false
+            referencedRelation: "offices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offices: {
+        Row: {
+          country: string
+          created_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          country: string
+          created_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          country?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -92,6 +186,175 @@ export type Database = {
           },
         ]
       }
+      project_resources: {
+        Row: {
+          created_at: string | null
+          hours: number
+          id: string
+          project_id: string
+          staff_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          hours: number
+          id?: string
+          project_id: string
+          staff_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          hours?: number
+          id?: string
+          project_id?: string
+          staff_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_resources_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_resources_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_stages: {
+        Row: {
+          created_at: string | null
+          fee: number
+          id: string
+          project_id: string
+          stage_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          fee: number
+          id?: string
+          project_id: string
+          stage_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          fee?: number
+          id?: string
+          project_id?: string
+          stage_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_stages_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_team_composition: {
+        Row: {
+          created_at: string | null
+          id: string
+          number_of_people: number
+          project_id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          number_of_people: number
+          project_id: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          number_of_people?: number
+          project_id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_team_composition_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          code: string
+          country: string
+          created_at: string | null
+          current_stage: Database["public"]["Enums"]["project_stage"]
+          id: string
+          name: string
+          office_id: string
+          project_manager_id: string | null
+          status: Database["public"]["Enums"]["project_status"]
+          target_profit_percentage: number
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          country: string
+          created_at?: string | null
+          current_stage?: Database["public"]["Enums"]["project_stage"]
+          id?: string
+          name: string
+          office_id: string
+          project_manager_id?: string | null
+          status?: Database["public"]["Enums"]["project_status"]
+          target_profit_percentage: number
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          country?: string
+          created_at?: string | null
+          current_stage?: Database["public"]["Enums"]["project_stage"]
+          id?: string
+          name?: string
+          office_id?: string
+          project_manager_id?: string | null
+          status?: Database["public"]["Enums"]["project_status"]
+          target_profit_percentage?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_office_id_fkey"
+            columns: ["office_id"]
+            isOneToOne: false
+            referencedRelation: "offices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_project_manager_id_fkey"
+            columns: ["project_manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -106,6 +369,8 @@ export type Database = {
       }
     }
     Enums: {
+      project_stage: "BD" | "SD" | "DD" | "CD" | "CMP"
+      project_status: "In Progress" | "On Hold" | "Complete" | "Planning"
       user_role: "owner" | "admin" | "member"
     }
     CompositeTypes: {
@@ -222,6 +487,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      project_stage: ["BD", "SD", "DD", "CD", "CMP"],
+      project_status: ["In Progress", "On Hold", "Complete", "Planning"],
       user_role: ["owner", "admin", "member"],
     },
   },
