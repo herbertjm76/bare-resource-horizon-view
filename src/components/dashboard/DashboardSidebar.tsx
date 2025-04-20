@@ -88,6 +88,11 @@ const navigationItems = [
         url: "/project-resourcing",
         icon: GanttChartSquare,
       },
+      {
+        title: "Office Settings",
+        url: "/office-settings",
+        icon: Flag,
+      },
     ],
   },
   {
@@ -97,11 +102,6 @@ const navigationItems = [
         title: "Settings",
         url: "/settings",
         icon: Settings,
-      },
-      {
-        title: "Office Settings",
-        url: "/office-settings",
-        icon: Flag,
       },
     ],
   },

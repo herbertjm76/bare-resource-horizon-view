@@ -120,9 +120,10 @@ export const CountriesTab = () => {
   const onSubmit = (values: ProjectAreaFormValues) => {
     const regionVal = values.region || getRegion(values.code);
     const newArea: ProjectArea = {
-      ...values,
-      region: regionVal,
-      id: editing ? editing.id : Date.now().toString()
+      id: editing ? editing.id : Date.now().toString(),
+      code: values.code,
+      city: values.city,
+      region: regionVal
     };
     if (editing) {
       setAreas(areas.map(area => area.id === editing.id ? newArea : area));
@@ -296,4 +297,3 @@ export const CountriesTab = () => {
 };
 
 // File is above 290 lines. This file is getting too long! Consider breaking it into smaller components.
-

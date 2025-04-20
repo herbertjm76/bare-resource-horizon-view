@@ -112,8 +112,9 @@ export const LocationsTab = () => {
     const emojiVal = values.emoji && values.emoji.trim() !== "" ? values.emoji : flagEmoji(values.code);
     const countryObj = countries.find(c => c.code === values.code);
     const newEntry: Country = {
-      ...values,
       id: editingCountry ? editingCountry.id : Date.now().toString(),
+      city: values.city,
+      code: values.code,
       country: countryObj ? countryObj.name : values.country,
       emoji: emojiVal
     };
@@ -281,4 +282,3 @@ export const LocationsTab = () => {
 };
 
 // File is above 270 lines. This file is getting too long! Please consider breaking it into smaller components for maintainability.
-
