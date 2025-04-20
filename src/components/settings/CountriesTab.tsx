@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,41 @@ const countryRegions: Record<string, string[]> = {
   "Egypt": ["Africa", "North Africa", "Middle East"],
   "Saudi Arabia": ["Middle East"],
   "United Arab Emirates": ["Middle East"]
+};
+
+// Add the missing getContinentByCountryCode function
+const getContinentByCountryCode = (countryCode: string): string => {
+  // Map of country code prefixes to continents
+  const continentMap: Record<string, string> = {
+    'AF': 'Africa',
+    'AS': 'Asia',
+    'EU': 'Europe',
+    'NA': 'North America',
+    'SA': 'South America',
+    'OC': 'Oceania',
+    'AN': 'Antarctica'
+  };
+  
+  // For simplicity, we'll use the first two letters of the country code
+  // to determine the continent in cases where we don't have specific mapping
+  const country = allCountries.find(c => c.code === countryCode);
+  if (!country) return "";
+  
+  // Check if the country is specifically mapped
+  for (const [countryName, regions] of Object.entries(countryRegions)) {
+    if (country.name === countryName && regions.length > 0) {
+      return regions[0];
+    }
+  }
+  
+  // Use continent map as fallback
+  for (const [prefix, continent] of Object.entries(continentMap)) {
+    if (countryCode.startsWith(prefix)) {
+      return continent;
+    }
+  }
+  
+  return "";
 };
 
 function getPastelColor(index: number) {
