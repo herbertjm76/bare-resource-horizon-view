@@ -17,7 +17,10 @@ export type Rate = {
 
 export type Location = {
   id: string;
-  name: string;
+  city: string;
+  country: string;
+  code: string;
+  emoji?: string;
 };
 
 // Initial data
@@ -28,10 +31,10 @@ const initialRoles = [
   { id: "4", name: "BIM Coordinator", code: "BIM" }
 ];
 
-const initialLocations = [
-  { id: "1", name: "New York" },
-  { id: "2", name: "London" },
-  { id: "3", name: "Tokyo" }
+const initialLocations: Location[] = [
+  { id: "1", city: "New York", country: "United States", code: "US", emoji: "🇺🇸" },
+  { id: "2", city: "London", country: "United Kingdom", code: "GB", emoji: "🇬🇧" },
+  { id: "3", city: "Tokyo", country: "Japan", code: "JP", emoji: "🇯🇵" }
 ];
 
 const initialRates = [

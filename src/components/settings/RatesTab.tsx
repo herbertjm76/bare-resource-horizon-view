@@ -55,7 +55,7 @@ export const RatesTab = () => {
   const handleEdit = (rate: Rate) => {
     const entityId = rate.type === "role" 
       ? roles.find(r => r.name === rate.name)?.id || ""
-      : locations.find(l => l.name === rate.name)?.id || "";
+      : locations.find(l => l.city === rate.name)?.id || "";
     
     setEditingRate(rate);
     form.reset({
@@ -69,7 +69,7 @@ export const RatesTab = () => {
   const onSubmit = (values: RateFormValues) => {
     const entityName = values.type === "role"
       ? roles.find(r => r.id === values.entityId)?.name || ""
-      : locations.find(l => l.id === values.entityId)?.name || "";
+      : locations.find(l => l.id === values.entityId)?.city || "";
 
     if (editingRate) {
       // Update existing rate
@@ -104,7 +104,7 @@ export const RatesTab = () => {
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground mb-4">
-            Set standard rates for different roles in your office.
+            Set standard rates for different roles and locations in your office.
           </div>
           
           {rates.length > 0 ? (
@@ -242,7 +242,7 @@ export const RatesTab = () => {
                             ))
                           : locations.map((location) => (
                               <SelectItem key={location.id} value={location.id}>
-                                {location.name}
+                                {location.city}, {location.country} ({location.code})
                               </SelectItem>
                             ))
                         }
@@ -287,3 +287,4 @@ export const RatesTab = () => {
     </Card>
   );
 };
+// File is above 290 lines. This file is getting too long! If you’d like, ask me to refactor it for better maintainability.
