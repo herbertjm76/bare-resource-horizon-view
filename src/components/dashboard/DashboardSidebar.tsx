@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -106,10 +105,7 @@ const navigationItems = [
 export function DashboardSidebar() {
   return (
     <Sidebar 
-      className="backdrop-blur-sm 
-        bg-black/20
-        border-r 
-        border-white/20"
+      className="bg-transparent backdrop-blur-sm border-r border-white/20"
     >
       <SidebarContent>
         <SidebarGroup>
