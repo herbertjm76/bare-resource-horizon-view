@@ -37,12 +37,26 @@ const formSchema = z.object({
 });
 
 type ProjectAreaFormValues = z.infer<typeof formSchema>;
+
+// Define a comprehensive type for the area objects
 type ProjectArea = {
   id: string;
   code: string;
   city?: string;
   region: string;
   country: string;
+};
+
+// Define the raw database type to handle what actually comes from the DB
+type DatabaseLocation = {
+  id: string;
+  code: string;
+  city: string | null;
+  country: string;
+  created_at: string;
+  emoji: string | null;
+  updated_at: string;
+  region?: string | null; // Make region optional since it might not exist in all records
 };
 
 export const CountriesTab = () => {
@@ -72,13 +86,14 @@ export const CountriesTab = () => {
         setAreas([]);
       } else {
         // Transform the data to include region, handling cases where it might be missing
-        setAreas((data || []).map(loc => ({
+        const transformedAreas = (data as DatabaseLocation[] || []).map(loc => ({
           id: loc.id,
           code: loc.code,
           city: loc.city ?? "",
-          region: loc.region ?? "", // Handle potentially missing region property
+          region: loc.region ?? "", // Handle the potentially missing region property
           country: loc.country,
-        })));
+        }));
+        setAreas(transformedAreas);
       }
       setLoading(false);
     };
@@ -161,13 +176,14 @@ export const CountriesTab = () => {
 
       if (error) setError("Failed to add area.");
       else if (data) {
-        setAreas([...areas, {
+        const newArea: ProjectArea = {
           id: data.id,
           code: data.code,
           city: data.city,
-          region: data.region || "", // Ensure region is handled properly
+          region: (data as any).region || "", // Cast to any to handle the potentially missing region
           country: data.country,
-        }]);
+        };
+        setAreas([...areas, newArea]);
       }
     }
     setOpen(false);
