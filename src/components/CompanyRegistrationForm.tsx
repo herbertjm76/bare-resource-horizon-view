@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -22,10 +22,41 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
   onSuccess,
   userId,
 }) => {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<CompanyFormData>();
+  const { register, handleSubmit, formState: { errors }, watch, setError } = useForm<CompanyFormData>();
+  const [isCheckingSubdomain, setIsCheckingSubdomain] = useState(false);
+
+  const checkSubdomainAvailability = async (subdomain: string) => {
+    setIsCheckingSubdomain(true);
+    try {
+      const { data, error, count } = await supabase
+        .from('companies')
+        .select('*', { count: 'exact' })
+        .eq('subdomain', subdomain.toLowerCase());
+
+      if (error) throw error;
+      
+      return count === 0;
+    } catch (error) {
+      console.error('Error checking subdomain:', error);
+      return false;
+    } finally {
+      setIsCheckingSubdomain(false);
+    }
+  };
 
   const onSubmit = async (data: CompanyFormData) => {
     try {
+      // Check if subdomain is available
+      const isAvailable = await checkSubdomainAvailability(data.subdomain);
+      
+      if (!isAvailable) {
+        setError('subdomain', {
+          type: 'manual',
+          message: 'This subdomain is already taken. Please choose another one.'
+        });
+        return;
+      }
+
       // Insert the company
       const { data: company, error: companyError } = await supabase
         .from('companies')
@@ -88,6 +119,14 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
               pattern: {
                 value: /^[a-zA-Z0-9-]+$/,
                 message: 'Subdomain can only contain letters, numbers, and hyphens'
+              },
+              minLength: {
+                value: 3,
+                message: 'Subdomain must be at least 3 characters long'
+              },
+              maxLength: {
+                value: 63,
+                message: 'Subdomain must be less than 64 characters long'
               }
             })}
           />
@@ -95,6 +134,9 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         </div>
         {errors.subdomain && (
           <p className="text-red-500 text-sm mt-1">{errors.subdomain.message}</p>
+        )}
+        {isCheckingSubdomain && (
+          <p className="text-blue-400 text-sm mt-1">Checking availability...</p>
         )}
       </div>
 
@@ -105,6 +147,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         <Input
           id="website"
           type="url"
+          placeholder="https://yourcompany.com"
           {...register('website')}
           className="mt-1"
         />
@@ -117,6 +160,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         <Input
           id="description"
           type="text"
+          placeholder="Brief description of your company"
           {...register('description')}
           className="mt-1"
         />
