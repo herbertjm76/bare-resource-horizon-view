@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Define types
@@ -37,11 +38,11 @@ const initialLocations: Location[] = [
   { id: "3", city: "Tokyo", country: "Japan", code: "JP", emoji: "🇯🇵" }
 ];
 
-const initialRates = [
-  { id: "1", type: "role" as const, name: "Project Manager", value: 150, unit: "hour" },
-  { id: "2", type: "role" as const, name: "Senior Architect", value: 125, unit: "hour" },
-  { id: "3", type: "location" as const, name: "New York", value: 140, unit: "hour" },
-  { id: "4", type: "location" as const, name: "London", value: 135, unit: "hour" }
+const initialRates: Rate[] = [
+  { id: "1", type: "role", name: "Project Manager", value: 150, unit: "hour" as const },
+  { id: "2", type: "role", name: "Senior Architect", value: 125, unit: "hour" as const },
+  { id: "3", type: "location", name: "New York", value: 140, unit: "hour" as const },
+  { id: "4", type: "location", name: "London", value: 135, unit: "hour" as const }
 ];
 
 // Create context
