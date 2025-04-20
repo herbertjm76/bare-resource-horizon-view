@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -9,7 +10,6 @@ import {
   FolderKanban,
   GanttChartSquare,
   UserSquare2,
-  FileText
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import {
@@ -105,8 +105,8 @@ const navigationItems = [
 export function DashboardSidebar() {
   return (
     <Sidebar 
-      className="backdrop-blur-md 
-        bg-transparent 
+      className="backdrop-blur-lg 
+        bg-white/10 
         border-r 
         border-white/20"
     >
@@ -114,7 +114,7 @@ export function DashboardSidebar() {
         <SidebarGroup>
           <div className="flex items-center justify-between px-4 py-2">
             <p className="text-lg font-semibold text-white">Bare Resource</p>
-            <SidebarTrigger className="md:hidden text-white hover:bg-white/10" />
+            <SidebarTrigger className="md:hidden text-white hover:bg-white/20" />
           </div>
           {navigationItems.map((section) => (
             <div key={section.label} className="mb-6">
@@ -125,9 +125,9 @@ export function DashboardSidebar() {
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
                         asChild
-                        className="text-white/80 hover:text-white hover:bg-white/10"
+                        className="text-white/80 hover:text-white hover:bg-white/20 rounded-md"
                       >
-                        <Link to={item.url}>
+                        <Link to={item.url} className="flex items-center gap-2 w-full p-2">
                           <item.icon className="h-4 w-4" />
                           <span>{item.title}</span>
                         </Link>
