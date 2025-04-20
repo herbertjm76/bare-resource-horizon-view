@@ -9,6 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Edit } from "lucide-react";
 import type { Tables } from '@/integrations/supabase/types';
 
 interface ProjectsTableProps {
@@ -47,7 +49,11 @@ export const ProjectsTable = ({ projects, isLoading }: ProjectsTableProps) => {
             <TableCell>Calculating...</TableCell>
             <TableCell>{project.status}</TableCell>
             <TableCell>{project.current_stage}</TableCell>
-            <TableCell>Edit</TableCell>
+            <TableCell>
+              <Button variant="ghost" size="icon">
+                <Edit className="h-4 w-4" />
+              </Button>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
