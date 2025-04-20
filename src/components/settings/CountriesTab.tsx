@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,8 +29,9 @@ type DatabaseLocation = {
 };
 
 function getAutoRegion(country: string): string {
+  // Always use the first region in the country's region array, which is often the subcontinent or most specific.
   if (countryRegions[country] && countryRegions[country].length > 0) {
-    return countryRegions[country][0];
+    return countryRegions[country][0]; // e.g. "East Asia", "Southern Europe"
   }
   // fallback to continent, using country code if possible (but we don't have code, so fallback to country)
   return getContinentByCountryCode(
@@ -136,12 +136,14 @@ export const CountriesTab = () => {
     setSelected(selected => selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
   };
 
-  // Every time the country changes in the form, auto-suggest region
+  // Every time the country changes in the form, auto-suggest region using the best mapping.
   React.useEffect(() => {
     const subscription = form.watch((values, { name }) => {
       if (name === "country") {
         const region = getAutoRegion(values.country);
-        form.setValue("region", region);
+        if (region) {
+          form.setValue("region", region, { shouldValidate: true });
+        }
       }
     });
     return () => subscription.unsubscribe();
