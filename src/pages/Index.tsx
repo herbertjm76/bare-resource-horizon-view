@@ -1,3 +1,6 @@
+
+import { Link } from 'react-router-dom';
+
 const Index = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
