@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,24 +13,20 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import allCountries from "@/lib/allCountries.json";
 
-const regionColors: Record<string, string> = {
-  Americas: "#FFA500",
-  Europe: "#4287f5",
-  Asia: "#27c94a",
-  Oceania: "#B266FF",
-  Africa: "#FFD700",
-  Other: "#b0b0b0"
-};
-const pastelShift = ["#FFF6E0", "#E6F7FE", "#F5F0FF", "#E0FFE0", "#FFF1FA", "#F7FFF4"];
-function pastelColorForArea(region: string, index: number) {
-  const base = regionColors[region] || regionColors.Other;
-  const pastel = pastelShift[index % pastelShift.length];
-  return `linear-gradient(90deg, ${base}40 70%, ${pastel} 100%)`;
+const pastelColors = [
+  "#F2FCE2", "#FEF7CD", "#FEC6A1", "#E5DEFF",
+  "#FFDEE2", "#FDE1D3", "#D3E4FD", "#F1F0FB"
+];
+
+function getPastelColor(index: number) {
+  return pastelColors[index % pastelColors.length];
 }
 
 const formSchema = z.object({
@@ -74,11 +71,12 @@ export const CountriesTab = () => {
         setError("Failed to load project areas.");
         setAreas([]);
       } else {
+        // region may not be present in legacy rows, patch it with ""
         setAreas((data || []).map(loc => ({
           id: loc.id,
           code: loc.code,
-          city: loc.city,
-          region: loc.region || "",
+          city: loc.city ?? "",
+          region: loc.region ?? "",
           country: loc.country,
         })));
       }
@@ -100,7 +98,7 @@ export const CountriesTab = () => {
     form.reset({
       code: area.code,
       city: area.city ?? "",
-      region: area.region,
+      region: area.region ?? "",
       country: area.country,
     });
     setOpen(true);
@@ -219,7 +217,7 @@ export const CountriesTab = () => {
               {areas.length > 0 ? (
                 <div className="grid gap-4">
                   {areas.map((area, idx) => {
-                    const bg = pastelColorForArea(area.region || "Other", idx);
+                    const bg = getPastelColor(idx);
                     return (
                       <div
                         key={area.id}
@@ -298,10 +296,27 @@ export const CountriesTab = () => {
                   <FormItem>
                     <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Country name"
-                        {...field}
-                        disabled={loading}
+                      <Controller
+                        control={form.control}
+                        name="country"
+                        render={({ field: ctrlField }) => (
+                          <Select
+                            value={ctrlField.value}
+                            onValueChange={ctrlField.onChange}
+                            disabled={loading}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Select country" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {allCountries.map((c) => (
+                                <SelectItem key={c.code} value={c.name}>
+                                  {c.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
                       />
                     </FormControl>
                     <FormMessage />
