@@ -19,11 +19,37 @@ import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import allCountries from "@/lib/allCountries.json";
 import CountrySelect from "@/components/ui/CountrySelect";
+import { useToast } from "@/hooks/use-toast";
 
 const pastelColors = [
   "#F2FCE2", "#FEF7CD", "#FEC6A1", "#E5DEFF",
   "#FFDEE2", "#FDE1D3", "#D3E4FD", "#F1F0FB"
 ];
+
+const countryRegions: Record<string, string[]> = {
+  "United States": ["North America"],
+  "Canada": ["North America"],
+  "Mexico": ["North America", "Latin America"],
+  "United Kingdom": ["Europe", "Western Europe"],
+  "France": ["Europe", "Western Europe"],
+  "Germany": ["Europe", "Western Europe"],
+  "Italy": ["Europe", "Southern Europe"],
+  "Spain": ["Europe", "Southern Europe"],
+  "Russia": ["Europe", "Asia", "Eastern Europe"],
+  "China": ["Asia", "East Asia"],
+  "Japan": ["Asia", "East Asia"],
+  "South Korea": ["Asia", "East Asia"],
+  "India": ["Asia", "South Asia"],
+  "Australia": ["Oceania"],
+  "New Zealand": ["Oceania"],
+  "Brazil": ["South America", "Latin America"],
+  "Argentina": ["South America", "Latin America"],
+  "South Africa": ["Africa"],
+  "Nigeria": ["Africa", "West Africa"],
+  "Egypt": ["Africa", "North Africa", "Middle East"],
+  "Saudi Arabia": ["Middle East"],
+  "United Arab Emirates": ["Middle East"]
+};
 
 function getPastelColor(index: number) {
   return pastelColors[index % pastelColors.length];
@@ -38,7 +64,6 @@ const formSchema = z.object({
 
 type ProjectAreaFormValues = z.infer<typeof formSchema>;
 
-// Define a comprehensive type for the area objects
 type ProjectArea = {
   id: string;
   code: string;
@@ -47,7 +72,6 @@ type ProjectArea = {
   country: string;
 };
 
-// Define the raw database type to handle what actually comes from the DB
 type DatabaseLocation = {
   id: string;
   code: string;
@@ -56,7 +80,7 @@ type DatabaseLocation = {
   created_at: string;
   emoji: string | null;
   updated_at: string;
-  region?: string | null; // Make region optional since it might not exist in all records
+  region: string | null;
 };
 
 export const CountriesTab = () => {
@@ -67,6 +91,7 @@ export const CountriesTab = () => {
   const [editing, setEditing] = useState<ProjectArea | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+  const { toast } = useToast();
 
   const form = useForm<ProjectAreaFormValues>({
     resolver: zodResolver(formSchema),
@@ -85,12 +110,11 @@ export const CountriesTab = () => {
         setError("Failed to load project areas.");
         setAreas([]);
       } else {
-        // Transform the data to include region, handling cases where it might be missing
         const transformedAreas = (data as DatabaseLocation[] || []).map(loc => ({
           id: loc.id,
           code: loc.code,
           city: loc.city ?? "",
-          region: loc.region ?? "", // Handle the potentially missing region property
+          region: loc.region ?? "",
           country: loc.country,
         }));
         setAreas(transformedAreas);
@@ -113,7 +137,7 @@ export const CountriesTab = () => {
     form.reset({
       code: area.code,
       city: area.city ?? "",
-      region: area.region ?? "", // Ensure region is handled properly
+      region: area.region ?? "",
       country: area.country,
     });
     setOpen(true);
@@ -126,15 +150,48 @@ export const CountriesTab = () => {
       .from("office_locations")
       .delete()
       .in("id", selected);
-    if (error) setError("Failed to delete area(s).");
-    setAreas(areas.filter(a => !selected.includes(a.id)));
-    setSelected([]);
-    setEditMode(false);
-    setLoading(false);
+    if (error) {
+      setError("Failed to delete area(s).");
+      toast({
+        title: "Error",
+        description: "Failed to delete the selected area(s).",
+        variant: "destructive"
+      });
+    } else {
+      setAreas(areas.filter(a => !selected.includes(a.id)));
+      toast({
+        title: "Success",
+        description: `${selected.length} area(s) deleted successfully.`,
+      });
+      setSelected([]);
+      setEditMode(false);
+      setLoading(false);
+    }
   };
 
   const handleSelect = (id: string) => {
     setSelected(selected => selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
+  };
+
+  const handleCountryChange = (countryName: string, countryCode?: string) => {
+    form.setValue("country", countryName);
+    
+    if (!form.getValues("region") || !editing) {
+      let suggestedRegion = "";
+      
+      if (countryRegions[countryName] && countryRegions[countryName].length > 0) {
+        suggestedRegion = countryRegions[countryName][0];
+      } else if (countryCode) {
+        const country = allCountries.find(c => c.name === countryName);
+        if (country) {
+          suggestedRegion = getContinentByCountryCode(country.code);
+        }
+      }
+      
+      if (suggestedRegion) {
+        form.setValue("region", suggestedRegion);
+      }
+    }
   };
 
   const onSubmit = async (values: ProjectAreaFormValues) => {
@@ -142,48 +199,67 @@ export const CountriesTab = () => {
     setError(null);
 
     if (editing) {
-      // Update
       const { error } = await supabase
         .from("office_locations")
         .update({
           code: values.code,
           city: values.city || "",
           country: values.country,
-          region: values.region // Include region in update
+          region: values.region
         })
         .eq("id", editing.id);
-      if (error) setError("Failed to update area.");
-      else {
+      if (error) {
+        setError("Failed to update area.");
+        toast({
+          title: "Error",
+          description: "Failed to update the area. Please try again.",
+          variant: "destructive"
+        });
+      } else {
         setAreas(
           areas.map(area => area.id === editing.id
             ? { ...area, ...values }
             : area
           )
         );
+        toast({
+          title: "Success",
+          description: "Area updated successfully.",
+        });
       }
     } else {
-      // Insert
       const { data, error } = await supabase
         .from("office_locations")
         .insert({
           code: values.code,
           city: values.city || "",
           country: values.country,
-          region: values.region // Include region in insert
+          region: values.region
         })
         .select()
         .single();
 
-      if (error) setError("Failed to add area.");
-      else if (data) {
+      if (error) {
+        setError("Failed to add area.");
+        toast({
+          title: "Error",
+          description: "Failed to add the area. Please try again.",
+          variant: "destructive"
+        });
+        console.error("Error adding area:", error);
+      } else if (data) {
         const newArea: ProjectArea = {
           id: data.id,
           code: data.code,
           city: data.city,
-          region: (data as any).region || "", // Cast to any to handle the potentially missing region
+          region: data.region || "",
           country: data.country,
         };
         setAreas([...areas, newArea]);
+        toast({
+          title: "Success",
+          description: "Area added successfully.",
+        });
       }
     }
     setOpen(false);
@@ -314,7 +390,7 @@ export const CountriesTab = () => {
                     <FormControl>
                       <CountrySelect
                         value={field.value}
-                        onChange={field.onChange}
+                        onChange={(value, code) => handleCountryChange(value, code)}
                         disabled={loading}
                         placeholder="Select country"
                       />
@@ -353,7 +429,7 @@ export const CountriesTab = () => {
                         disabled={loading}
                       />
                     </FormControl>
-                    <span className="text-xs text-muted-foreground">Enter region for project area.</span>
+                    <span className="text-xs text-muted-foreground">Region is auto-suggested based on country but can be edited.</span>
                     <FormMessage />
                   </FormItem>
                 )}

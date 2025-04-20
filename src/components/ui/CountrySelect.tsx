@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export interface CountrySelectProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, code?: string) => void;
   disabled?: boolean;
   placeholder?: string;
 }
@@ -47,7 +47,7 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({ value, onChange, d
                     value={country.name}
                     className="cursor-pointer"
                     onSelect={() => {
-                      onChange(country.name);
+                      onChange(country.name, country.code);
                       setOpen(false);
                     }}
                   >
