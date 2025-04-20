@@ -18,23 +18,37 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import allCountries from "@/lib/allCountries.json";
 
-// --- Broad Icon/Emoji Picker List (No flags here) ---
+// --- Broad Icon/Emoji Picker List (No flags here, no duplicates, explicit vegetables) ---
 const customIconList = [
   // Colored Hearts
   "❤️", "🧡", "💛", "💚", "💙", "💜", "🩷", "🤍", "🖤", "🤎",
   // Colored Circles
   "🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "🟤", "⚫", "⚪",
-  // Boxes and Squares
+  // Colored Boxes/Squares (no duplicates)
   "⬛", "⬜", "🟦", "🟩", "🟨", "🟧", "🟪", "🟫",
-  // Animals (some popular animal emojis)
+  // Animals (mammals, amphibian, big mix, NO duplicates)
   "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐸",
-  // Fruits & Vegetables
-  "🍎", "🍊", "🍌", "🍉", "🍇", "🍓", "🍒", "🥝", "🍍", "🥥", "🥑", "🍅", "🥕", "🌽", "🥔", "🍆", "🥒",
-  // Transportation
+  // Fruits
+  "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🍒", "🥝", "🍍", "🥭", "🥥",
+  // Vegetables (now more complete per user's screenshot: broccoli, cucumber, carrot, corn, potato, eggplant, sweet potato, etc)
+  "🥦", // Broccoli
+  "🥒", // Cucumber
+  "🥕", // Carrot
+  "🌽", // Corn
+  "🍆", // Eggplant
+  "🥔", // Potato
+  "🍠", // Sweet Potato
+  "🧅", // Onion
+  "🧄", // Garlic
+  "🌶️", // Hot Pepper
+  "🥬", // Leafy greens
+  "🍄", // Mushroom
+  "🥗", // Green salad
+  // Transportation (extensively, no duplicates)
   "🚕", "🚗", "🚙", "🚌", "🚎", "🏎️", "🚓", "🚑", "🚒", "🚐", "🚚", "🚛", "🚜", "🏍️", "🛵", "🚲", "🛴", "🚂", "✈️", "🚀", "🚁"
 ];
+// NOTE: If these lists get much longer or you want category separation, it's advisable to extract this to its own file/component!
 
-// Utility to get flag emoji from ISO country code
 const flagEmoji = (countryCode: string) =>
   countryCode && countryCode.length === 2
     ? String.fromCodePoint(...[...countryCode.toUpperCase()].map(c => 127397 + c.charCodeAt(0)))
