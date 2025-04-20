@@ -33,11 +33,12 @@ const formSchema = z.object({
 });
 
 type StageFormValues = z.infer<typeof formSchema>;
+type Stage = typeof mockStages[0];
 
 export const StagesTab = () => {
   const [stages, setStages] = useState(mockStages);
   const [open, setOpen] = useState(false);
-  const [editingStage, setEditingStage] = useState<(typeof mockStages)[0] | null>(null);
+  const [editingStage, setEditingStage] = useState<Stage | null>(null);
 
   const form = useForm<StageFormValues>({
     resolver: zodResolver(formSchema),
@@ -55,7 +56,7 @@ export const StagesTab = () => {
     }
   };
 
-  const handleEdit = (stage: typeof mockStages[0]) => {
+  const handleEdit = (stage: Stage) => {
     setEditingStage(stage);
     form.reset({
       name: stage.name,
@@ -71,8 +72,13 @@ export const StagesTab = () => {
         stage.id === editingStage.id ? { ...stage, ...values } : stage
       ));
     } else {
-      // Add new stage
-      setStages([...stages, { id: Date.now().toString(), ...values }]);
+      // Add new stage with proper typing
+      const newStage: Stage = { 
+        id: Date.now().toString(), 
+        name: values.name, 
+        color: values.color 
+      };
+      setStages([...stages, newStage]);
     }
     setOpen(false);
     form.reset();

@@ -33,11 +33,12 @@ const formSchema = z.object({
 });
 
 type LocationFormValues = z.infer<typeof formSchema>;
+type Location = typeof mockLocations[0];
 
 export const LocationsTab = () => {
   const [locations, setLocations] = useState(mockLocations);
   const [open, setOpen] = useState(false);
-  const [editingLocation, setEditingLocation] = useState<(typeof mockLocations)[0] | null>(null);
+  const [editingLocation, setEditingLocation] = useState<Location | null>(null);
 
   const form = useForm<LocationFormValues>({
     resolver: zodResolver(formSchema),
@@ -56,7 +57,7 @@ export const LocationsTab = () => {
     }
   };
 
-  const handleEdit = (location: typeof mockLocations[0]) => {
+  const handleEdit = (location: Location) => {
     setEditingLocation(location);
     form.reset({
       city: location.city,
@@ -73,8 +74,14 @@ export const LocationsTab = () => {
         loc.id === editingLocation.id ? { ...loc, ...values } : loc
       ));
     } else {
-      // Add new location
-      setLocations([...locations, { id: Date.now().toString(), ...values }]);
+      // Add new location with proper typing
+      const newLocation: Location = {
+        id: Date.now().toString(),
+        city: values.city,
+        country: values.country,
+        color: values.color
+      };
+      setLocations([...locations, newLocation]);
     }
     setOpen(false);
     form.reset();

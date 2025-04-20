@@ -43,11 +43,12 @@ const formSchema = z.object({
 });
 
 type HolidayFormValues = z.infer<typeof formSchema>;
+type Holiday = typeof mockHolidays[0];
 
 export const HolidaysTab = () => {
   const [holidays, setHolidays] = useState(mockHolidays);
   const [open, setOpen] = useState(false);
-  const [editingHoliday, setEditingHoliday] = useState<(typeof mockHolidays)[0] | null>(null);
+  const [editingHoliday, setEditingHoliday] = useState<Holiday | null>(null);
 
   const form = useForm<HolidayFormValues>({
     resolver: zodResolver(formSchema),
@@ -67,7 +68,7 @@ export const HolidaysTab = () => {
     }
   };
 
-  const handleEdit = (holiday: typeof mockHolidays[0]) => {
+  const handleEdit = (holiday: Holiday) => {
     setEditingHoliday(holiday);
     form.reset({
       description: holiday.description,
@@ -80,20 +81,28 @@ export const HolidaysTab = () => {
 
   const onSubmit = (values: HolidayFormValues) => {
     const officeName = mockOffices.find(o => o.id === values.office)?.name || "";
+    
     if (editingHoliday) {
       // Update existing holiday
       setHolidays(holidays.map(holiday => 
         holiday.id === editingHoliday.id ? 
-        { ...holiday, ...values, office: officeName } : 
-        holiday
+        { ...holiday, 
+          description: values.description,
+          startDate: values.startDate,
+          endDate: values.endDate,
+          office: officeName 
+        } : holiday
       ));
     } else {
-      // Add new holiday
-      setHolidays([...holidays, { 
+      // Add new holiday with proper typing
+      const newHoliday: Holiday = { 
         id: Date.now().toString(), 
-        ...values, 
+        description: values.description,
+        startDate: values.startDate,
+        endDate: values.endDate,
         office: officeName 
-      }]);
+      };
+      setHolidays([...holidays, newHoliday]);
     }
     setOpen(false);
     form.reset();

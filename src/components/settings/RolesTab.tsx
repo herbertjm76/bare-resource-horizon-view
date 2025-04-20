@@ -33,11 +33,12 @@ const formSchema = z.object({
 });
 
 type RoleFormValues = z.infer<typeof formSchema>;
+type Role = typeof mockRoles[0];
 
 export const RolesTab = () => {
   const [roles, setRoles] = useState(mockRoles);
   const [open, setOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<(typeof mockRoles)[0] | null>(null);
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
 
   const form = useForm<RoleFormValues>({
     resolver: zodResolver(formSchema),
@@ -56,7 +57,7 @@ export const RolesTab = () => {
     }
   };
 
-  const handleEdit = (role: typeof mockRoles[0]) => {
+  const handleEdit = (role: Role) => {
     setEditingRole(role);
     form.reset({
       name: role.name,
@@ -73,8 +74,14 @@ export const RolesTab = () => {
         role.id === editingRole.id ? { ...role, ...values } : role
       ));
     } else {
-      // Add new role
-      setRoles([...roles, { id: Date.now().toString(), ...values }]);
+      // Add new role with proper typing
+      const newRole: Role = {
+        id: Date.now().toString(),
+        name: values.name,
+        code: values.code,
+        color: values.color
+      };
+      setRoles([...roles, newRole]);
     }
     setOpen(false);
     form.reset();

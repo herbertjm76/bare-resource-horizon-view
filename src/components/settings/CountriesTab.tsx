@@ -33,11 +33,12 @@ const formSchema = z.object({
 });
 
 type CountryFormValues = z.infer<typeof formSchema>;
+type Country = typeof mockCountries[0];
 
 export const CountriesTab = () => {
   const [countries, setCountries] = useState(mockCountries);
   const [open, setOpen] = useState(false);
-  const [editingCountry, setEditingCountry] = useState<(typeof mockCountries)[0] | null>(null);
+  const [editingCountry, setEditingCountry] = useState<Country | null>(null);
 
   const form = useForm<CountryFormValues>({
     resolver: zodResolver(formSchema),
@@ -57,7 +58,7 @@ export const CountriesTab = () => {
     }
   };
 
-  const handleEdit = (country: typeof mockCountries[0]) => {
+  const handleEdit = (country: Country) => {
     setEditingCountry(country);
     form.reset({
       name: country.name,
@@ -75,8 +76,15 @@ export const CountriesTab = () => {
         country.id === editingCountry.id ? { ...country, ...values } : country
       ));
     } else {
-      // Add new country
-      setCountries([...countries, { id: Date.now().toString(), ...values }]);
+      // Add new country with proper typing
+      const newCountry: Country = {
+        id: Date.now().toString(),
+        name: values.name,
+        abbreviation: values.abbreviation,
+        city: values.city,
+        color: values.color
+      };
+      setCountries([...countries, newCountry]);
     }
     setOpen(false);
     form.reset();
