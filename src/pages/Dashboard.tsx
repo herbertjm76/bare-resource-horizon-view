@@ -1,12 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardStats } from '@/components/dashboard/DashboardStats';
 import { TeamManagement } from '@/components/dashboard/TeamManagement';
+import { toast } from 'sonner';
 
 // Create a proper Profile type based on the database schema
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -14,41 +15,53 @@ type Profile = Database['public']['Tables']['profiles']['Row'];
 const Dashboard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [teamMembers, setTeamMembers] = useState<Profile[]>([]);
   const [inviteUrl, setInviteUrl] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check current session
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setSession(session);
-      setUser(session?.user ?? null);
+    // Check current session and set up auth state change listener
+    const setupAuth = async () => {
+      try {
+        // Set up auth state listener FIRST to prevent missing auth events
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+          console.log('Auth state changed:', event);
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          if (!session && event === 'SIGNED_OUT') {
+            navigate('/auth');
+          }
+        });
 
-      if (session?.user) {
-        fetchProfileData(session.user.id);
+        // THEN check for existing session
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          await fetchProfileData(session.user.id);
+        }
+        
+        setLoading(false);
+        
+        return () => {
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error('Auth setup error:', error);
+        setLoading(false);
       }
     };
 
-    checkSession();
-
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        fetchProfileData(session.user.id);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+    setupAuth();
+  }, [navigate]);
 
   const fetchProfileData = async (userId: string) => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -81,8 +94,11 @@ const Dashboard: React.FC = () => {
           setInviteUrl(`${baseUrl}/join/invite-code-placeholder`);
         }
       }
+      
+      setLoading(false);
     } catch (error) {
       console.error('Error:', error);
+      setLoading(false);
     }
   };
 
@@ -104,6 +120,14 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
@@ -111,7 +135,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
       <div className="max-w-6xl mx-auto">
-        <DashboardHeader userName={profile?.first_name || user.email} />
+        <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
         <DashboardStats />
         {(profile?.role === 'owner' || profile?.role === 'admin') && (
           <TeamManagement 
