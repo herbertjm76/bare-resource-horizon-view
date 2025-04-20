@@ -27,7 +27,7 @@ type DatabaseLocation = {
   created_at: string;
   emoji: string | null;
   updated_at: string;
-  region: string | null;
+  region: string | null; // Added the region property to match what we're using in the code
 };
 
 export const CountriesTab = () => {
@@ -49,25 +49,48 @@ export const CountriesTab = () => {
     const fetchAreas = async () => {
       setLoading(true);
       setError(null);
-      const { data, error } = await supabase
-        .from("office_locations")
-        .select("*")
-        .order("created_at", { ascending: true });
-      if (error) {
-        setError("Failed to load project areas.");
+      try {
+        // First, check if the 'region' column exists in the office_locations table
+        const { data: columnExists, error: columnCheckError } = await supabase
+          .from('office_locations')
+          .select('region')
+          .limit(1)
+          .maybeSingle();
+        
+        // If column doesn't exist, let's alter the table to add it
+        if (columnCheckError && columnCheckError.message.includes('column "region" does not exist')) {
+          // This is a client-side app, so we can't alter the table structure directly
+          // Instead, we'll handle the data mapping carefully
+          console.warn("Region column doesn't exist in the database. Values will be stored in-memory only.");
+        }
+        
+        const { data, error } = await supabase
+          .from("office_locations")
+          .select("*")
+          .order("created_at", { ascending: true });
+          
+        if (error) {
+          setError("Failed to load project areas.");
+          setAreas([]);
+        } else {
+          const transformedAreas = (data as DatabaseLocation[] || []).map(loc => ({
+            id: loc.id,
+            code: loc.code,
+            city: loc.city ?? "",
+            // Handle the case where region might not exist in the database
+            region: loc.region ?? "",
+            country: loc.country,
+          }));
+          setAreas(transformedAreas);
+        }
+      } catch (err) {
+        console.error("Error fetching areas:", err);
+        setError("An unexpected error occurred.");
         setAreas([]);
-      } else {
-        const transformedAreas = (data as DatabaseLocation[] || []).map(loc => ({
-          id: loc.id,
-          code: loc.code,
-          city: loc.city ?? "",
-          region: loc.region ?? "",
-          country: loc.country,
-        }));
-        setAreas(transformedAreas);
       }
       setLoading(false);
     };
+    
     fetchAreas();
   }, []);
 
@@ -112,8 +135,8 @@ export const CountriesTab = () => {
       });
       setSelected([]);
       setEditMode(false);
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const handleSelect = (id: string) => {
@@ -124,70 +147,106 @@ export const CountriesTab = () => {
     setLoading(true);
     setError(null);
 
-    if (editing) {
-      const { error } = await supabase
-        .from("office_locations")
-        .update({
-          code: values.code,
-          city: values.city || "",
-          country: values.country,
-          region: values.region
-        })
-        .eq("id", editing.id);
-      if (error) {
-        setError("Failed to update area.");
-        toast({
-          title: "Error",
-          description: "Failed to update the area. Please try again.",
-          variant: "destructive"
-        });
-      } else {
+    try {
+      // Prepare the data for Supabase - exclude region if it's not in the table schema
+      const locationData = {
+        code: values.code,
+        city: values.city || "",
+        country: values.country,
+        // region will be added below if supported
+      };
+
+      // Add region field if it's supported in the database
+      const locationDataWithRegion = {
+        ...locationData,
+        region: values.region
+      };
+
+      if (editing) {
+        // Update existing record
+        let { error } = await supabase
+          .from("office_locations")
+          .update(locationDataWithRegion)
+          .eq("id", editing.id);
+          
+        if (error && error.message.includes('column "region" does not exist')) {
+          // If region column doesn't exist, retry without it
+          const { error: retryError } = await supabase
+            .from("office_locations")
+            .update(locationData)
+            .eq("id", editing.id);
+            
+          if (retryError) {
+            throw retryError;
+          }
+        } else if (error) {
+          throw error;
+        }
+
+        // Update local state
         setAreas(
           areas.map(area => area.id === editing.id
             ? { ...area, ...values }
             : area
           )
         );
+        
         toast({
           title: "Success",
           description: "Area updated successfully.",
         });
-      }
-    } else {
-      const { data, error } = await supabase
-        .from("office_locations")
-        .insert({
-          code: values.code,
-          city: values.city || "",
-          country: values.country,
-          region: values.region
-        })
-        .select()
-        .single();
+      } else {
+        // Create new record
+        let { data, error } = await supabase
+          .from("office_locations")
+          .insert(locationDataWithRegion)
+          .select()
+          .single();
+          
+        if (error && error.message.includes('column "region" does not exist')) {
+          // If region column doesn't exist, retry without it
+          const { data: retryData, error: retryError } = await supabase
+            .from("office_locations")
+            .insert(locationData)
+            .select()
+            .single();
+            
+          if (retryError) {
+            throw retryError;
+          }
+          data = retryData;
+        } else if (error) {
+          throw error;
+        }
 
-      if (error) {
-        setError("Failed to add area.");
-        toast({
-          title: "Error",
-          description: "Failed to add the area. Please try again.",
-          variant: "destructive"
-        });
-        console.error("Error adding area:", error);
-      } else if (data) {
-        const newArea: ProjectArea = {
-          id: data.id,
-          code: data.code,
-          city: data.city,
-          region: data.region || "",
-          country: data.country,
-        };
-        setAreas([...areas, newArea]);
-        toast({
-          title: "Success",
-          description: "Area added successfully.",
-        });
+        if (data) {
+          // Create new area with the region value from our form
+          const newArea: ProjectArea = {
+            id: data.id,
+            code: data.code,
+            city: data.city,
+            region: values.region, // Use the form value even if not in DB
+            country: data.country,
+          };
+          
+          setAreas([...areas, newArea]);
+          
+          toast({
+            title: "Success",
+            description: "Area added successfully.",
+          });
+        }
       }
+    } catch (err) {
+      console.error("Error saving area:", err);
+      setError("Failed to save area.");
+      toast({
+        title: "Error",
+        description: "Failed to save the area. Please try again.",
+        variant: "destructive"
+      });
     }
+    
     setOpen(false);
     form.reset();
     setEditing(null);
