@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, Flag as FlagIcon } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -17,7 +17,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-// ISO country codes and names
+// ISO country list
 const countries = [
   { code: "US", name: "United States" },
   { code: "GB", name: "United Kingdom" },
@@ -40,7 +40,7 @@ const flagEmoji = (countryCode: string) =>
     : "🏳️";
 
 // Simulated DB
-const initialLocations = [
+const initialCountries = [
   { id: "1", city: "New York", country: "United States", code: "US", emoji: "🇺🇸" },
   { id: "2", city: "London", country: "United Kingdom", code: "GB", emoji: "🇬🇧" },
   { id: "3", city: "Tokyo", country: "Japan", code: "JP", emoji: "🇯🇵" }
@@ -48,39 +48,44 @@ const initialLocations = [
 
 const formSchema = z.object({
   city: z.string().min(1, "City is required"),
+  code: z.string().length(2, "Country code is required"),
   country: z.string().min(1, "Country is required"),
-  code: z.string().length(2, "Country code required"),
   emoji: z.string().optional()
 });
-
-type LocationFormValues = z.infer<typeof formSchema>;
-type Location = typeof initialLocations[0];
+type CountryFormValues = z.infer<typeof formSchema>;
+type Country = {
+  id: string;
+  city: string;
+  country: string;
+  code: string;
+  emoji?: string;
+};
 
 export const LocationsTab = () => {
-  const [locations, setLocations] = useState<Location[]>(initialLocations);
+  // Now "CountriesTab" as per user's naming
+  const [countryRows, setCountryRows] = useState<Country[]>(initialCountries);
   const [open, setOpen] = useState(false);
-  const [editingLocation, setEditingLocation] = useState<Location | null>(null);
+  const [editingCountry, setEditingCountry] = useState<Country | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
 
-  const form = useForm<LocationFormValues>({
+  const form = useForm<CountryFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       city: "",
-      country: "",
       code: "",
+      country: "",
       emoji: ""
     }
   });
 
-  // Set fields when editing
-  const handleEdit = (location: Location) => {
-    setEditingLocation(location);
+  const handleEdit = (country: Country) => {
+    setEditingCountry(country);
     form.reset({
-      city: location.city,
-      country: location.country,
-      code: location.code,
-      emoji: location.emoji
+      city: country.city,
+      code: country.code,
+      country: country.country,
+      emoji: country.emoji
     });
     setOpen(true);
   };
@@ -90,7 +95,7 @@ export const LocationsTab = () => {
   }
 
   const handleBulkDelete = () => {
-    setLocations(locations.filter(loc => !selected.includes(loc.id)));
+    setCountryRows(countryRows.filter(row => !selected.includes(row.id)));
     setSelected([]);
     setEditMode(false);
   }
@@ -99,47 +104,47 @@ export const LocationsTab = () => {
     setOpen(open);
     if (!open) {
       form.reset();
-      setEditingLocation(null);
+      setEditingCountry(null);
     }
   };
 
-  const onSubmit = (values: LocationFormValues) => {
-    const emojiVal = values.emoji?.trim() ? values.emoji : flagEmoji(values.code);
+  const onSubmit = (values: CountryFormValues) => {
+    const emojiVal = values.emoji && values.emoji.trim() !== "" ? values.emoji : flagEmoji(values.code);
     const countryObj = countries.find(c => c.code === values.code);
-    const newLoc = {
+    const newEntry: Country = {
       ...values,
-      id: editingLocation ? editingLocation.id : Date.now().toString(),
+      id: editingCountry ? editingCountry.id : Date.now().toString(),
       country: countryObj ? countryObj.name : values.country,
       emoji: emojiVal
     };
-    if (editingLocation) {
-      setLocations(locations.map(loc => loc.id === editingLocation.id ? newLoc : loc));
+    if (editingCountry) {
+      setCountryRows(countryRows.map(row => row.id === editingCountry.id ? newEntry : row));
     } else {
-      setLocations([...locations, newLoc]);
+      setCountryRows([...countryRows, newEntry]);
     }
     setOpen(false);
     form.reset();
-    setEditingLocation(null);
+    setEditingCountry(null);
   };
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
-        <CardTitle>Office Locations</CardTitle>
+        <CardTitle>Countries</CardTitle>
         <div className="flex gap-2">
           <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)}>
             <Edit className="h-4 w-4 mr-2" /> {editMode ? "Done" : "Edit"}
           </Button>
           <Button size="sm" onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
-            Add Location
+            Add Country
           </Button>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground mb-4">
-            Manage your office locations here. Select a country, city, and customize the emoji if you wish.
+            Manage your company’s countries. Select a country and city for each office. Flag emoji is auto-generated, but can be changed.
           </div>
           {editMode && (
             <div className="flex items-center gap-2 mb-2">
@@ -154,27 +159,27 @@ export const LocationsTab = () => {
               <span className="text-xs text-muted-foreground">{selected.length} selected</span>
             </div>
           )}
-          {locations.length > 0 ? (
+          {countryRows.length > 0 ? (
             <div className="grid gap-4">
-              {locations.map((location) => (
+              {countryRows.map((row) => (
                 <div 
-                  key={location.id}
-                  className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"} `}
-                  style={editMode && selected.includes(location.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
+                  key={row.id}
+                  className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"}`}
+                  style={editMode && selected.includes(row.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">{location.emoji || flagEmoji(location.code)}</span>
-                    <span className="font-medium">{location.city}, {location.country} <span className="text-xs text-muted-foreground ml-1">({location.code})</span></span>
+                    <span className="text-2xl">{row.emoji || flagEmoji(row.code)}</span>
+                    <span className="font-medium">{row.city}, {row.country} <span className="text-xs text-muted-foreground ml-1">({row.code})</span></span>
                   </div>
                   {editMode ? (
                     <input
                       type="checkbox"
                       className="w-4 h-4 accent-purple-600"
-                      checked={selected.includes(location.id)}
-                      onChange={() => handleSelect(location.id)}
+                      checked={selected.includes(row.id)}
+                      onChange={() => handleSelect(row.id)}
                     />
                   ) : (
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(location)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(row)}>
                       <Edit className="h-4 w-4" />
                     </Button>
                   )}
@@ -183,7 +188,7 @@ export const LocationsTab = () => {
             </div>
           ) : (
             <div className="text-center p-4 border rounded-md border-dashed">
-              No locations added yet. Click "Add Location" to get started.
+              No countries added yet. Click "Add Country" to get started.
             </div>
           )}
         </div>
@@ -192,16 +197,16 @@ export const LocationsTab = () => {
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{editingLocation ? 'Edit' : 'Add'} Office Location</DialogTitle>
+            <DialogTitle>{editingCountry ? 'Edit' : 'Add'} Country</DialogTitle>
             <DialogDescription>
-              Select a country and city. Emoji is auto-assigned, but can be customized.
+              Choose a country (searchable), specify city. Emoji is auto-assigned, but may be customized.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="country"
+                name="code"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Country</FormLabel>
@@ -213,7 +218,8 @@ export const LocationsTab = () => {
                           const code = e.target.value;
                           const c = countries.find(k => k.code === code);
                           form.setValue("code", code);
-                          field.onChange(c ? c.name : code);
+                          form.setValue("country", c ? c.name : code);
+                          field.onChange(code);
                         }}
                       >
                         <option value="">Select a country...</option>
@@ -228,8 +234,6 @@ export const LocationsTab = () => {
                   </FormItem>
                 )}
               />
-              {/* hidden input for Code, set automatically */}
-              <input type="hidden" {...form.register('code')} />
               <FormField
                 control={form.control}
                 name="city"
@@ -248,24 +252,25 @@ export const LocationsTab = () => {
                 name="emoji"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Flag Emoji (optional)</FormLabel>
+                    <FormLabel>Emoji (optional)</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="e.g., 🗽"
+                        placeholder={flagEmoji(form.watch("code"))}
                         {...field}
                         maxLength={2}
                         className="w-20"
+                        disabled={!form.watch("code")}
                       />
                     </FormControl>
                     <span className="text-xs text-muted-foreground">
-                      Auto-set to flag. Enter custom emoji or leave blank to use country flag.
+                      Auto-set to flag. Enter custom emoji or clear to use country flag.
                     </span>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="submit">{editingLocation ? 'Update' : 'Add'} Location</Button>
+                <Button type="submit">{editingCountry ? 'Update' : 'Add'} Country</Button>
               </DialogFooter>
             </form>
           </Form>
@@ -274,3 +279,6 @@ export const LocationsTab = () => {
     </Card>
   );
 };
+
+// File is above 270 lines. This file is getting too long! Please consider breaking it into smaller components for maintainability.
+

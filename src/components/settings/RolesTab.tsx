@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -98,7 +97,7 @@ export const RolesTab = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
-        <CardTitle>Roles and Titles</CardTitle>
+        <CardTitle>Roles</CardTitle>
         <div className="flex gap-2">
           <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)}>
             <Edit className="h-4 w-4 mr-2" /> Edit
@@ -112,7 +111,7 @@ export const RolesTab = () => {
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground mb-4">
-            Configure staff roles and titles for your office.
+            Configure staff roles for your office. These roles will be used to assign rates to staff.
           </div>
           {editMode && (
             <div className="flex items-center gap-2 mb-2">

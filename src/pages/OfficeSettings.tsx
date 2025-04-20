@@ -24,24 +24,24 @@ const OfficeSettings = () => {
             <div className="rounded-md bg-slate-50 dark:bg-slate-900 p-4 border border-muted">
               <h2 className="font-semibold mb-1">Personalize your office settings</h2>
               <p className="text-muted-foreground text-sm">
-                Please set your office settings to match your unique working environment.
+                Every office is unique. Please set your office settings to match your working environment.
                 Configure your locations, countries, roles, rates, stages, and holidays according to your organization's requirements.
                 This will help personalize your resource management and planning experience.
               </p>
             </div>
-            <Tabs defaultValue="countries" className="w-full">
+            <Tabs defaultValue="areas" className="w-full">
               <TabsList className="grid grid-cols-6 w-full">
-                <TabsTrigger value="countries" className="flex items-center gap-2">
+                <TabsTrigger value="areas" className="flex items-center gap-2">
                   <Flag className="h-4 w-4" />
-                  <span>Project Locations</span>
+                  <span>Project Areas</span>
                 </TabsTrigger>
                 <TabsTrigger value="stages" className="flex items-center gap-2">
                   <Layers className="h-4 w-4" />
                   <span>Stages</span>
                 </TabsTrigger>
-                <TabsTrigger value="locations" className="flex items-center gap-2">
+                <TabsTrigger value="countries" className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  <span>Office Locations</span>
+                  <span>Countries</span>
                 </TabsTrigger>
                 <TabsTrigger value="roles" className="flex items-center gap-2">
                   <Briefcase className="h-4 w-4" />
@@ -56,13 +56,13 @@ const OfficeSettings = () => {
                   <span>Holidays</span>
                 </TabsTrigger>
               </TabsList>
-              <TabsContent value="countries" className="mt-6">
+              <TabsContent value="areas" className="mt-6">
                 <CountriesTab />
               </TabsContent>
               <TabsContent value="stages" className="mt-6">
                 <StagesTab />
               </TabsContent>
-              <TabsContent value="locations" className="mt-6">
+              <TabsContent value="countries" className="mt-6">
                 <LocationsTab />
               </TabsContent>
               <TabsContent value="roles" className="mt-6">
@@ -83,3 +83,4 @@ const OfficeSettings = () => {
 };
 
 export default OfficeSettings;
+
