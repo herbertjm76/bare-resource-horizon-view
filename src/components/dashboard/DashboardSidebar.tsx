@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -105,8 +106,8 @@ const navigationItems = [
 export function DashboardSidebar() {
   return (
     <Sidebar 
-      className="backdrop-blur-md 
-        bg-transparent 
+      className="backdrop-blur-sm 
+        bg-black/20
         border-r 
         border-white/20"
     >
@@ -125,7 +126,7 @@ export function DashboardSidebar() {
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
                         asChild
-                        className="text-white/80 hover:text-white hover:bg-white/10"
+                        className="text-white hover:text-white hover:bg-white/10"
                       >
                         <Link to={item.url}>
                           <item.icon className="h-4 w-4" />
