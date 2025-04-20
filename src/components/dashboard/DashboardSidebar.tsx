@@ -10,6 +10,7 @@ import {
   FolderKanban,
   GanttChartSquare,
   UserSquare2,
+  Flag
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import {
@@ -97,6 +98,11 @@ const navigationItems = [
         title: "Settings",
         url: "/settings",
         icon: Settings,
+      },
+      {
+        title: "Office Settings",
+        url: "/office-settings",
+        icon: Flag,
       },
     ],
   },

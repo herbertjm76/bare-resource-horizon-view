@@ -21,12 +21,19 @@ const OfficeSettings = () => {
             <div className="flex justify-between items-center">
               <h1 className="text-4xl font-bold">Office Settings</h1>
             </div>
-            
+            <div className="rounded-md bg-slate-50 dark:bg-slate-900 p-4 border border-muted">
+              <h2 className="font-semibold mb-1">Personalize your office settings</h2>
+              <p className="text-muted-foreground text-sm">
+                Please set your office settings to match your unique working environment.
+                Configure your locations, countries, roles, rates, stages, and holidays according to your organization's requirements.
+                This will help personalize your resource management and planning experience.
+              </p>
+            </div>
             <Tabs defaultValue="countries" className="w-full">
               <TabsList className="grid grid-cols-6 w-full">
                 <TabsTrigger value="countries" className="flex items-center gap-2">
                   <Flag className="h-4 w-4" />
-                  <span>Countries</span>
+                  <span>Project Locations</span>
                 </TabsTrigger>
                 <TabsTrigger value="stages" className="flex items-center gap-2">
                   <Layers className="h-4 w-4" />
@@ -34,7 +41,7 @@ const OfficeSettings = () => {
                 </TabsTrigger>
                 <TabsTrigger value="locations" className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  <span>Locations</span>
+                  <span>Office Locations</span>
                 </TabsTrigger>
                 <TabsTrigger value="roles" className="flex items-center gap-2">
                   <Briefcase className="h-4 w-4" />
