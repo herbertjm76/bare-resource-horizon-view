@@ -10,13 +10,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ProjectAreaList, { ProjectArea } from './ProjectAreaList';
 import ProjectAreaForm, { ProjectAreaFormValues } from './ProjectAreaForm';
-import { countryRegions } from './projectAreaHelpers';
+import { countryRegions, getContinentByCountryCode } from './projectAreaHelpers';
 
 const formSchema = z.object({
   code: z.string().min(1, "Code is required"),
   country: z.string().min(1, "Country is required"),
   city: z.string().optional(),
-  region: z.string().min(1, "Region is required"),
+  region: z.string().min(1, "Region is required"), // region is still part of the form, but not saved
 });
 
 type DatabaseLocation = {
@@ -27,8 +27,17 @@ type DatabaseLocation = {
   created_at: string;
   emoji: string | null;
   updated_at: string;
-  // The region field might not exist in the database yet
 };
+
+function getAutoRegion(country: string): string {
+  if (countryRegions[country] && countryRegions[country].length > 0) {
+    return countryRegions[country][0];
+  }
+  // fallback to continent, using country code if possible (but we don't have code, so fallback to country)
+  return getContinentByCountryCode(
+    (window as any).allCountries?.find((c: any) => c.name === country)?.code || ""
+  ) || "";
+}
 
 export const CountriesTab = () => {
   const [areas, setAreas] = useState<ProjectArea[]>([]);
@@ -38,7 +47,6 @@ export const CountriesTab = () => {
   const [editing, setEditing] = useState<ProjectArea | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
-  const [hasRegionColumn, setHasRegionColumn] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<ProjectAreaFormValues>({
@@ -50,48 +58,32 @@ export const CountriesTab = () => {
     const fetchAreas = async () => {
       setLoading(true);
       setError(null);
+
       try {
-        // Check if the region column exists in the office_locations table
-        try {
-          const { data: columnExists, error: columnCheckError } = await supabase
-            .from('office_locations')
-            .select('region')
-            .limit(1)
-            .maybeSingle();
-          
-          setHasRegionColumn(!columnCheckError || !columnCheckError.message.includes('column "region" does not exist'));
-        } catch (err) {
-          console.warn("Could not verify if region column exists:", err);
-          setHasRegionColumn(false);
-        }
-        
         const { data, error } = await supabase
           .from("office_locations")
           .select("*")
           .order("created_at", { ascending: true });
-          
         if (error) {
           setError("Failed to load project areas.");
           setAreas([]);
         } else {
+          // Region field is not in DB; always suggest for UI
           const transformedAreas = (data as DatabaseLocation[] || []).map(loc => ({
             id: loc.id,
             code: loc.code,
             city: loc.city ?? "",
-            // Handle case where region might not exist in the database
-            region: (loc as any).region ?? "",
+            region: getAutoRegion(loc.country),
             country: loc.country,
           }));
           setAreas(transformedAreas);
         }
       } catch (err) {
-        console.error("Error fetching areas:", err);
         setError("An unexpected error occurred.");
         setAreas([]);
       }
       setLoading(false);
     };
-    
     fetchAreas();
   }, []);
 
@@ -108,7 +100,7 @@ export const CountriesTab = () => {
     form.reset({
       code: area.code,
       city: area.city ?? "",
-      region: area.region ?? "",
+      region: area.region ?? getAutoRegion(area.country),
       country: area.country,
     });
     setOpen(true);
@@ -144,70 +136,68 @@ export const CountriesTab = () => {
     setSelected(selected => selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
   };
 
+  // Every time the country changes in the form, auto-suggest region
+  React.useEffect(() => {
+    const subscription = form.watch((values, { name }) => {
+      if (name === "country") {
+        const region = getAutoRegion(values.country);
+        form.setValue("region", region);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
   const onSubmit = async (values: ProjectAreaFormValues) => {
     setLoading(true);
     setError(null);
 
     try {
-      // Prepare the data for Supabase - only include region if the column exists
       const locationData: any = {
         code: values.code,
         city: values.city || null,
         country: values.country,
+        // region is intentionally NOT sent to DB
       };
 
-      // Add region field only if it's supported in the database
-      if (hasRegionColumn) {
-        locationData.region = values.region;
-      }
-
       if (editing) {
-        // Update existing record
+        // Update
         const { error } = await supabase
           .from("office_locations")
           .update(locationData)
           .eq("id", editing.id);
-          
-        if (error) {
-          throw error;
-        }
 
-        // Update local state
+        if (error) throw error;
+
         setAreas(
           areas.map(area => area.id === editing.id
-            ? { ...area, ...values }
+            ? { ...area, ...values, region: getAutoRegion(values.country) }
             : area
           )
         );
-        
+
         toast({
           title: "Success",
           description: "Area updated successfully.",
         });
       } else {
-        // Create new record
+        // Create
         const { data, error } = await supabase
           .from("office_locations")
           .insert(locationData)
           .select()
           .single();
-          
-        if (error) {
-          throw error;
-        }
+
+        if (error) throw error;
 
         if (data) {
-          // Create new area with the region value from our form
           const newArea: ProjectArea = {
             id: data.id,
             code: data.code,
             city: data.city,
-            region: values.region, // Use the form value even if not in DB
+            region: getAutoRegion(data.country),
             country: data.country,
           };
-          
           setAreas([...areas, newArea]);
-          
           toast({
             title: "Success",
             description: "Area added successfully.",
@@ -215,15 +205,14 @@ export const CountriesTab = () => {
         }
       }
     } catch (err: any) {
-      console.error("Error saving area:", err);
       setError("Failed to save area.");
       toast({
         title: "Error",
-        description: err.message || "Failed to save the area. Please try again.",
+        description: err?.message || "Failed to save the area. Please try again.",
         variant: "destructive"
       });
     }
-    
+
     setOpen(false);
     form.reset();
     setEditing(null);
