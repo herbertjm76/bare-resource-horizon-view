@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,9 +18,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import allCountries from "@/lib/allCountries.json";
 
-// --- Emoji/Icon picker dialog helper ---
-const emojiList = [
-  "🇺🇸", "🇬🇧", "🇯🇵", "🇵🇭", "🇩🇪", "🌍", "🌆", "🌏", "🌇", "🏙️", "🗺️", "🌐", "🏝️", "🏖️", "🗾", "🏔️", "⛱️", "🏚️", "🏨", "🏢", "🏬", "🏠", "🏕️", "⛩️", "🕌", "🏛️", "🇨🇳", "🇸🇬", "🇮🇳", "🇫🇷", "🇮🇹", "🇨🇦"
+// --- Broad Icon/Emoji Picker List (No flags here) ---
+const customIconList = [
+  // Colorful hearts
+  "❤️", "🧡", "💛", "💚", "💙", "💜", "🩷", "🤍", "🖤", "🤎",
+  // Colored circles
+  "🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "🟤", "⚫", "⚪",
+  // Stars
+  "⭐", "🌟", "✨",
+  // Other shapes
+  "⬛", "⬜", "🟦", "🟩", "🟨", "🟧", "🟪", "🟫", "🟥", "🟢", "🟠",
+  // Misc icons
+  "🏠", "🏡", "🏢", "🏬", "🏦", "🏥", "🏪", "🏫", "🏭", "🏰", "🏩",
+  // The earth, city, night, sky etc
+  "🌇", "🌆", "🌃", "🌉", "🗼", "🏙️", "🌍", "🌎", "🌏",
+  // Transport
+  "🚕", "🚗", "🚙", "🚂", "✈️", "🚀", "🚁",
 ];
 
 // Utility to get flag emoji from ISO country code
@@ -34,7 +46,7 @@ const formSchema = z.object({
   city: z.string().min(1, "City is required"),
   code: z.string().length(2, "Country code is required"),
   country: z.string().min(1, "Country is required"),
-  emoji: z.string().optional(),
+  emoji: z.string().optional()
 });
 type LocationFormValues = z.infer<typeof formSchema>;
 type Location = {
@@ -52,7 +64,7 @@ export const LocationsTab = () => {
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
 
-  // --- For emoji picker modal ---
+  // --- For emoji/icon picker dialog ---
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerTargetId, setPickerTargetId] = useState<string | null>(null);
 
@@ -95,7 +107,7 @@ export const LocationsTab = () => {
     }
   };
 
-  // LOCATION ICON PICKER (click flag or icon)
+  // LOCATION ICON PICKER (edit location only, not during creation)
   const openPicker = (id: string) => {
     setPickerTargetId(id);
     setPickerOpen(true);
@@ -116,17 +128,16 @@ export const LocationsTab = () => {
     setPickerTargetId(null);
   };
 
-  // Submit: flag auto-assigned, unless user picks custom
+  // Submit: flag auto-assigned and no icon/emoji picker during create/edit dialog!
   const onSubmit = (values: LocationFormValues) => {
     const countryObj = allCountries.find(c => c.code === values.code);
     const flag = flagEmoji(values.code) || "";
-    const emojiVal = values.emoji || flag;
     const newEntry: Location = {
       id: editingLocation ? editingLocation.id : Date.now().toString(),
       city: values.city,
       code: values.code,
       country: countryObj ? countryObj.name : values.country,
-      emoji: emojiVal
+      emoji: flag // always assign flag as default on creation
     };
     if (editingLocation) {
       setLocations(locations.map(row => row.id === editingLocation.id ? newEntry : row));
@@ -138,7 +149,7 @@ export const LocationsTab = () => {
     setEditingLocation(null);
   };
 
-  // Country search in the dropdown (no emoji in the dropdown)
+  // Country search in the dropdown (from allCountries, which is comprehensive)
   const [countrySearch, setCountrySearch] = useState("");
   const filteredCountries = allCountries.filter(country =>
     country.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
@@ -186,7 +197,7 @@ export const LocationsTab = () => {
                   style={editMode && selected.includes(row.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    {/* Emoji/Icon is clickable for picker */}
+                    {/* Emoji/Icon is clickable for picker (only after creation, NOT in dialog) */}
                     <button
                       type="button"
                       className="text-2xl focus:outline-none hover:scale-110 transition-transform"
@@ -225,7 +236,7 @@ export const LocationsTab = () => {
           <DialogHeader>
             <DialogTitle>{editingLocation ? 'Edit' : 'Add'} Location</DialogTitle>
             <DialogDescription>
-              Choose a country (searchable), specify city. The icon defaults to the country flag, but can be changed after creation.
+              Choose a country (searchable), specify city. The icon defaults to the country flag. You can change this to any icon/emoji after creation.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -283,11 +294,11 @@ export const LocationsTab = () => {
                   </FormItem>
                 )}
               />
-              {/* Display flag for selected country (not clickable here) */}
+              {/* Show flag (not clickable) for selected country */}
               {form.watch("code") && (
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold">Icon:</span>
-                  <span className="text-2xl">{form.watch("emoji") || flagEmoji(form.watch("code"))}</span>
+                  <span className="text-2xl">{flagEmoji(form.watch("code"))}</span>
                   <span className="text-xs text-muted-foreground">
                     (Icon defaults to the country flag. Can be changed after creation.)
                   </span>
@@ -306,11 +317,12 @@ export const LocationsTab = () => {
           <DialogHeader>
             <DialogTitle>Choose an Icon or Emoji</DialogTitle>
             <DialogDescription>
-              Click an emoji below to set as icon for this location.
+              Click an icon or emoji below to set as icon for this location.
+              <br />Flags are not available for icon changes.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-6 gap-3 py-2">
-            {emojiList.map(emoji => (
+          <div className="grid grid-cols-8 gap-3 py-2 max-h-56 overflow-y-auto">
+            {customIconList.map(emoji => (
               <button
                 key={emoji}
                 className="text-2xl p-2 rounded hover:scale-110 transition-all bg-muted"
@@ -327,4 +339,3 @@ export const LocationsTab = () => {
     </Card>
   );
 };
-
