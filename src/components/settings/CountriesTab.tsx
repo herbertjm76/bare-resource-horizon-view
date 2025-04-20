@@ -71,12 +71,12 @@ export const CountriesTab = () => {
         setError("Failed to load project areas.");
         setAreas([]);
       } else {
-        // region may not be present in legacy rows, patch it with ""
+        // Transform the data to include region, handling cases where it might be missing
         setAreas((data || []).map(loc => ({
           id: loc.id,
           code: loc.code,
           city: loc.city ?? "",
-          region: loc.region ?? "",
+          region: loc.region ?? "", // Handle potentially missing region property
           country: loc.country,
         })));
       }
@@ -98,7 +98,7 @@ export const CountriesTab = () => {
     form.reset({
       code: area.code,
       city: area.city ?? "",
-      region: area.region ?? "",
+      region: area.region ?? "", // Ensure region is handled properly
       country: area.country,
     });
     setOpen(true);
@@ -134,7 +134,7 @@ export const CountriesTab = () => {
           code: values.code,
           city: values.city || "",
           country: values.country,
-          region: values.region
+          region: values.region // Include region in update
         })
         .eq("id", editing.id);
       if (error) setError("Failed to update area.");
@@ -154,7 +154,7 @@ export const CountriesTab = () => {
           code: values.code,
           city: values.city || "",
           country: values.country,
-          region: values.region
+          region: values.region // Include region in insert
         })
         .select()
         .single();
@@ -165,7 +165,7 @@ export const CountriesTab = () => {
           id: data.id,
           code: data.code,
           city: data.city,
-          region: data.region,
+          region: data.region || "", // Ensure region is handled properly
           country: data.country,
         }]);
       }
