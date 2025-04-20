@@ -29,14 +29,16 @@ type DatabaseLocation = {
 };
 
 function getAutoRegion(country: string): string {
-  // Always use the first region in the country's region array, which is often the subcontinent or most specific.
-  if (countryRegions[country] && countryRegions[country].length > 0) {
-    return countryRegions[country][0]; // e.g. "East Asia", "Southern Europe"
+  // Always map country to primary continent only
+  // Find country code first
+  // Use allCountries.json for code lookup, then use getContinentByCountryCode
+  // (We rely on the updated version of getContinentByCountryCode)
+  const allCountries = require('@/lib/allCountries.json');
+  const countryData = allCountries.find((c: any) => c.name === country);
+  if (countryData) {
+    return getContinentByCountryCode(countryData.code);
   }
-  // fallback to continent, using country code if possible (but we don't have code, so fallback to country)
-  return getContinentByCountryCode(
-    (window as any).allCountries?.find((c: any) => c.name === country)?.code || ""
-  ) || "";
+  return "";
 }
 
 export const CountriesTab = () => {

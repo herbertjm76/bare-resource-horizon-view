@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Dialog,
@@ -49,25 +48,24 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
   onSubmit,
   onOpenChange,
 }) => {
-  // Suggest region based on country
+  // Auto-suggest region by continent, always, even if region is already filled
   const handleCountryChange = (countryName: string, countryCode?: string) => {
     form.setValue("country", countryName);
 
-    if (!form.getValues("region") || !editing) {
-      let suggestedRegion = "";
+    let suggestedRegion = "";
 
-      if (countryRegions[countryName] && countryRegions[countryName].length > 0) {
-        suggestedRegion = countryRegions[countryName][0];
-      } else if (countryCode) {
-        const country = allCountries.find(c => c.name === countryName);
-        if (country) {
-          suggestedRegion = getContinentByCountryCode(country.code);
-        }
+    if (countryCode) {
+      suggestedRegion = getContinentByCountryCode(countryCode);
+    } else {
+      // Fallback to lookup by name in allCountries and then code
+      const country = allCountries.find(c => c.name === countryName);
+      if (country) {
+        suggestedRegion = getContinentByCountryCode(country.code);
       }
+    }
 
-      if (suggestedRegion) {
-        form.setValue("region", suggestedRegion);
-      }
+    if (suggestedRegion) {
+      form.setValue("region", suggestedRegion, { shouldValidate: true });
     }
   };
 
