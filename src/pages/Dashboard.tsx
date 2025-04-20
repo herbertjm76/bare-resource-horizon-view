@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +9,7 @@ import { TeamManagement } from '@/components/dashboard/TeamManagement';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { toast } from 'sonner';
+import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
 
 // Create a proper Profile type based on the database schema
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -141,7 +141,7 @@ const Dashboard: React.FC = () => {
         <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
           <div className="max-w-6xl mx-auto">
             <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
-            <DashboardStats />
+            <DashboardMetrics />
             {(profile?.role === 'owner' || profile?.role === 'admin') && (
               <TeamManagement 
                 teamMembers={teamMembers} 

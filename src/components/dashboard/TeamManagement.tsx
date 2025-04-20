@@ -1,11 +1,9 @@
-
 import React from 'react';
 import { ClipboardCopy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
 
-// Create a proper Profile type based on the database schema
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
 interface TeamManagementProps {
@@ -22,21 +20,11 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
 
   return (
     <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl mb-8">
-      <h2 className="text-2xl font-semibold text-white mb-4">Team Management</h2>
-      
-      <div className="mb-6">
-        <h3 className="text-lg font-medium text-white mb-2">Invite Team Members</h3>
-        <div className="flex items-center space-x-4">
-          <input
-            type="text"
-            value={inviteUrl}
-            readOnly
-            className="flex-1 px-4 py-2 rounded-lg bg-white/5 text-white border border-white/20 focus:outline-none"
-          />
-          <Button onClick={copyInviteUrl} variant="secondary">
-            <ClipboardCopy className="mr-2 h-4 w-4" /> Copy
-          </Button>
-        </div>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold text-white">Team Management</h2>
+        <Button onClick={copyInviteUrl} variant="secondary">
+          <ClipboardCopy className="mr-2 h-4 w-4" /> Copy Invite Link
+        </Button>
       </div>
       
       <div>
