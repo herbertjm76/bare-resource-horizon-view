@@ -23,15 +23,12 @@ export function SidebarNavSection({ section }: SidebarNavSectionProps) {
         <SidebarMenu>
           {section.items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                asChild
-                className="text-white hover:text-white hover:bg-white/10"
-              >
-                <Link to={item.url}>
+              <Link to={item.url} className="w-full">
+                <SidebarMenuButton className="text-white hover:text-white hover:bg-white/10">
                   <item.icon className="h-4 w-4" />
                   <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
+                </SidebarMenuButton>
+              </Link>
             </SidebarMenuItem>
           ))}
         </SidebarMenu>
