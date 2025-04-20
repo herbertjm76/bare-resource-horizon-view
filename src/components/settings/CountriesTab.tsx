@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
 
-// ROYGBIV spectrum for regions, fallback to gray for 'Other'
 const regionColors: Record<string, string> = {
   Americas: "#FFA500",
   Europe: "#4287f5",
@@ -28,38 +26,6 @@ const regionColors: Record<string, string> = {
   Other: "#b0b0b0"
 };
 const pastelShift = ["#FFF6E0", "#E6F7FE", "#F5F0FF", "#E0FFE0", "#FFF1FA", "#F7FFF4"];
-const regionMap: { [code: string]: string } = {
-  US: "Americas",
-  BR: "Americas",
-  CA: "Americas",
-  GB: "Europe",
-  DE: "Europe",
-  FR: "Europe",
-  JP: "Asia",
-  CN: "Asia",
-  IN: "Asia",
-  SG: "Asia",
-  AU: "Oceania"
-};
-// Added emoji property to countries
-const countries = [
-  { code: "US", name: "United States", emoji: "🇺🇸" },
-  { code: "GB", name: "United Kingdom", emoji: "🇬🇧" },
-  { code: "JP", name: "Japan", emoji: "🇯🇵" },
-  { code: "SG", name: "Singapore", emoji: "🇸🇬" },
-  { code: "DE", name: "Germany", emoji: "🇩🇪" },
-  { code: "FR", name: "France", emoji: "🇫🇷" },
-  { code: "IN", name: "India", emoji: "🇮🇳" },
-  { code: "CN", name: "China", emoji: "🇨🇳" },
-  { code: "BR", name: "Brazil", emoji: "🇧🇷" },
-  { code: "CA", name: "Canada", emoji: "🇨🇦" },
-  { code: "AU", name: "Australia", emoji: "🇦🇺" },
-];
-
-function getRegion(code: string) {
-  return regionMap[code] || "Other";
-}
-// A pastel variant per project area in a region
 function pastelColorForArea(region: string, index: number) {
   const base = regionColors[region] || regionColors.Other;
   const pastel = pastelShift[index % pastelShift.length];
@@ -67,8 +33,9 @@ function pastelColorForArea(region: string, index: number) {
 }
 
 const formSchema = z.object({
-  code: z.string().length(2, "Country code required"),
-  city: z.string().min(1, "City is required"),
+  code: z.string().min(1, "Code is required"),
+  country: z.string().min(1, "Country is required"),
+  city: z.string().optional(),
   region: z.string().min(1, "Region is required"),
 });
 
@@ -76,10 +43,9 @@ type ProjectAreaFormValues = z.infer<typeof formSchema>;
 type ProjectArea = {
   id: string;
   code: string;
-  city: string;
+  city?: string;
   region: string;
   country: string;
-  emoji?: string | null;
 };
 
 export const CountriesTab = () => {
@@ -93,10 +59,9 @@ export const CountriesTab = () => {
 
   const form = useForm<ProjectAreaFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { code: "", city: "", region: "" }
+    defaultValues: { code: "", country: "", city: "", region: "" }
   });
 
-  // Fetch from Supabase
   useEffect(() => {
     const fetchAreas = async () => {
       setLoading(true);
@@ -109,16 +74,13 @@ export const CountriesTab = () => {
         setError("Failed to load project areas.");
         setAreas([]);
       } else {
-        setAreas(
-          (data || []).map(loc => ({
-            id: loc.id,
-            code: loc.code,
-            city: loc.city,
-            region: getRegion(loc.code),
-            country: loc.country,
-            emoji: loc.emoji
-          }))
-        );
+        setAreas((data || []).map(loc => ({
+          id: loc.id,
+          code: loc.code,
+          city: loc.city,
+          region: loc.region || "",
+          country: loc.country,
+        })));
       }
       setLoading(false);
     };
@@ -135,7 +97,12 @@ export const CountriesTab = () => {
 
   const handleEdit = (area: ProjectArea) => {
     setEditing(area);
-    form.reset({ code: area.code, city: area.city, region: area.region });
+    form.reset({
+      code: area.code,
+      city: area.city ?? "",
+      region: area.region,
+      country: area.country,
+    });
     setOpen(true);
   };
 
@@ -160,8 +127,6 @@ export const CountriesTab = () => {
   const onSubmit = async (values: ProjectAreaFormValues) => {
     setLoading(true);
     setError(null);
-    const emoji = countries.find(c => c.code === values.code)?.emoji ?? null; // Now works correctly
-    const regionVal = values.region || getRegion(values.code);
 
     if (editing) {
       // Update
@@ -169,16 +134,16 @@ export const CountriesTab = () => {
         .from("office_locations")
         .update({
           code: values.code,
-          city: values.city,
-          country: countries.find(c => c.code === values.code)?.name || "",
-          emoji
+          city: values.city || "",
+          country: values.country,
+          region: values.region
         })
         .eq("id", editing.id);
       if (error) setError("Failed to update area.");
       else {
         setAreas(
           areas.map(area => area.id === editing.id
-            ? { ...area, ...values, country: countries.find(c => c.code === values.code)?.name || "", emoji }
+            ? { ...area, ...values }
             : area
           )
         );
@@ -189,9 +154,9 @@ export const CountriesTab = () => {
         .from("office_locations")
         .insert({
           code: values.code,
-          city: values.city,
-          country: countries.find(c => c.code === values.code)?.name || "",
-          emoji
+          city: values.city || "",
+          country: values.country,
+          region: values.region
         })
         .select()
         .single();
@@ -202,9 +167,8 @@ export const CountriesTab = () => {
           id: data.id,
           code: data.code,
           city: data.city,
-          region: regionVal,
+          region: data.region,
           country: data.country,
-          emoji: data.emoji
         }]);
       }
     }
@@ -237,7 +201,7 @@ export const CountriesTab = () => {
           ) : (
             <>
               <div className="text-sm text-muted-foreground mb-4">
-                Track which cities and regions you operate projects in. Each region is colored by spectrum; backgrounds are auto-generated.
+                Track which locations you operate projects in, by code, country, city (optional), and region.
               </div>
               {editMode && (
                 <div className="flex items-center gap-2 mb-2">
@@ -255,8 +219,7 @@ export const CountriesTab = () => {
               {areas.length > 0 ? (
                 <div className="grid gap-4">
                   {areas.map((area, idx) => {
-                    const region = getRegion(area.code);
-                    const bg = pastelColorForArea(region, idx);
+                    const bg = pastelColorForArea(area.region || "Other", idx);
                     return (
                       <div
                         key={area.id}
@@ -270,15 +233,11 @@ export const CountriesTab = () => {
                           >
                             {area.code}
                           </span>
-                          <span className="font-medium">{area.city}</span>
+                          <span className="font-medium">{area.country}</span>
+                          {area.city && <span className="ml-2 text-muted-foreground text-xs">{area.city}</span>}
                           <span className="bg-muted-foreground/10 px-2 py-0.5 rounded text-xs text-muted-foreground ml-2">
                             {area.region}
                           </span>
-                          {area.emoji && (
-                            <span className="ml-2" aria-label={`${area.country} flag`} role="img">
-                              {area.emoji}
-                            </span>
-                          )}
                         </div>
                         {editMode ? (
                           <input
@@ -305,13 +264,12 @@ export const CountriesTab = () => {
           )}
         </div>
       </CardContent>
-      {/* Dialog for add/edit */}
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>{editing ? 'Edit' : 'Add'} Project Area</DialogTitle>
             <DialogDescription>
-              Select a country code, enter city, and assign region. Color is auto-assigned per region.
+              Enter a code, country, city (optional), and assign region.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -321,27 +279,30 @@ export const CountriesTab = () => {
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Country Code</FormLabel>
+                    <FormLabel>Code</FormLabel>
                     <FormControl>
-                      <select
-                        className="w-full bg-background border rounded px-3 py-2"
-                        value={field.value}
-                        onChange={e => {
-                          const code = e.target.value;
-                          field.onChange(code);
-                          if (regionMap[code]) {
-                            form.setValue("region", regionMap[code]);
-                          }
-                        }}
+                      <Input
+                        placeholder="Unique code"
+                        {...field}
                         disabled={loading}
-                      >
-                        <option value="">Select a country...</option>
-                        {countries.map(country => (
-                          <option key={country.code} value={country.code}>
-                            {country.code} {country.name}
-                          </option>
-                        ))}
-                      </select>
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Country name"
+                        {...field}
+                        disabled={loading}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -352,9 +313,13 @@ export const CountriesTab = () => {
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location (City)</FormLabel>
+                    <FormLabel>City</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., New York" {...field} disabled={loading} />
+                      <Input
+                        placeholder="City (optional)"
+                        {...field}
+                        disabled={loading}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -368,12 +333,12 @@ export const CountriesTab = () => {
                     <FormLabel>Region</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="e.g., Americas"
+                        placeholder="Region"
                         {...field}
                         disabled={loading}
                       />
                     </FormControl>
-                    <span className="text-xs text-muted-foreground">Auto-suggested for known codes, or enter a custom region.</span>
+                    <span className="text-xs text-muted-foreground">Enter region for project area.</span>
                     <FormMessage />
                   </FormItem>
                 )}
