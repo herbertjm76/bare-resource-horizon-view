@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -107,11 +106,7 @@ export function DashboardSidebar() {
   return (
     <Sidebar 
       className="backdrop-blur-md 
-        bg-gradient-to-br 
-        from-[#9b87f5] 
-        via-[#D946EF] 
-        to-[#1EAEDB] 
-        bg-opacity-10 
+        bg-transparent 
         border-r 
         border-white/20"
     >
