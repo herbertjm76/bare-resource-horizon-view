@@ -105,7 +105,16 @@ const navigationItems = [
 
 export function DashboardSidebar() {
   return (
-    <Sidebar className="backdrop-blur-md bg-white/10 border-r border-white/20">
+    <Sidebar 
+      className="backdrop-blur-md 
+        bg-gradient-to-br 
+        from-[#9b87f5] 
+        via-[#D946EF] 
+        to-[#1EAEDB] 
+        bg-opacity-10 
+        border-r 
+        border-white/20"
+    >
       <SidebarContent>
         <SidebarGroup>
           <div className="flex items-center justify-between px-4 py-2">
