@@ -20,10 +20,12 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useOfficeSettings, Rate } from "@/context/OfficeSettingsContext";
 
+// --- updated schema: add unit ---
 const formSchema = z.object({
   type: z.enum(["role", "location"]),
   entityId: z.string().min(1, "Please select an item"),
   rate: z.number().min(0, "Rate must be greater than or equal to 0"),
+  unit: z.enum(["hour", "day", "week"])
 });
 
 type RateFormValues = z.infer<typeof formSchema>;
@@ -38,11 +40,13 @@ export const RatesTab = () => {
     defaultValues: {
       type: "role",
       entityId: "",
-      rate: 0
+      rate: 0,
+      unit: "hour"
     }
   });
 
   const rateType = form.watch("type");
+  const unit = form.watch("unit");
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
@@ -56,12 +60,13 @@ export const RatesTab = () => {
     const entityId = rate.type === "role" 
       ? roles.find(r => r.name === rate.name)?.id || ""
       : locations.find(l => l.city === rate.name)?.id || "";
-    
+
     setEditingRate(rate);
     form.reset({
       type: rate.type as "role" | "location",
       entityId,
-      rate: rate.value
+      rate: rate.value,
+      unit: rate.unit || "hour"
     });
     setOpen(true);
   };
@@ -75,7 +80,7 @@ export const RatesTab = () => {
       // Update existing rate
       setRates(rates.map(rate => 
         rate.id === editingRate.id 
-          ? { ...rate, type: values.type, name: entityName, value: values.rate } 
+          ? { ...rate, type: values.type, name: entityName, value: values.rate, unit: values.unit } 
           : rate
       ));
     } else {
@@ -84,7 +89,8 @@ export const RatesTab = () => {
         id: Date.now().toString(), 
         type: values.type,
         name: entityName,
-        value: values.rate
+        value: values.rate,
+        unit: values.unit
       }]);
     }
     setOpen(false);
@@ -106,7 +112,6 @@ export const RatesTab = () => {
           <div className="text-sm text-muted-foreground mb-4">
             Set standard rates for different roles and locations in your office.
           </div>
-          
           {rates.length > 0 ? (
             <>
               <div className="grid gap-4 mb-6">
@@ -122,7 +127,9 @@ export const RatesTab = () => {
                         >
                           <div>
                             <div className="font-medium">{rate.name}</div>
-                            <div className="text-sm text-muted-foreground">${rate.value}/hour</div>
+                            <div className="text-sm text-muted-foreground">
+                              ${rate.value}/{rate.unit}
+                            </div>
                           </div>
                           <Button variant="ghost" size="sm" onClick={() => handleEdit(rate)}>
                             <Pencil className="h-4 w-4" />
@@ -136,7 +143,6 @@ export const RatesTab = () => {
                   </div>
                 )}
               </div>
-              
               <div className="grid gap-4">
                 <h3 className="text-sm font-medium">Rates by Location</h3>
                 {rates.filter(r => r.type === "location").length > 0 ? (
@@ -150,7 +156,9 @@ export const RatesTab = () => {
                         >
                           <div>
                             <div className="font-medium">{rate.name}</div>
-                            <div className="text-sm text-muted-foreground">${rate.value}/hour</div>
+                            <div className="text-sm text-muted-foreground">
+                              ${rate.value}/{rate.unit}
+                            </div>
                           </div>
                           <Button variant="ghost" size="sm" onClick={() => handleEdit(rate)}>
                             <Pencil className="h-4 w-4" />
@@ -178,7 +186,7 @@ export const RatesTab = () => {
           <DialogHeader>
             <DialogTitle>{editingRate ? 'Edit' : 'Add'} Rate</DialogTitle>
             <DialogDescription>
-              Define the hourly rate for a role or location.
+              Define the rate for a role or location, and choose if it's per hour, day, or week.
             </DialogDescription>
           </DialogHeader>
           
@@ -227,7 +235,7 @@ export const RatesTab = () => {
                     <FormLabel>
                       {rateType === 'role' ? 'Role' : 'Location'}
                     </FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder={`Select a ${rateType === 'role' ? 'role' : 'location'}`} />
@@ -258,7 +266,7 @@ export const RatesTab = () => {
                 name="rate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Hourly Rate ($)</FormLabel>
+                    <FormLabel>Rate Value</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
@@ -270,13 +278,34 @@ export const RatesTab = () => {
                       />
                     </FormControl>
                     <FormDescription>
-                      Enter the hourly rate in USD.
+                      Enter the rate value.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+              <FormField
+                control={form.control}
+                name="unit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Unit</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select unit" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="hour">Per Hour</SelectItem>
+                        <SelectItem value="day">Per Day</SelectItem>
+                        <SelectItem value="week">Per Week</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DialogFooter>
                 <Button type="submit">{editingRate ? 'Update' : 'Add'} Rate</Button>
               </DialogFooter>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -41,9 +40,9 @@ const OfficeSettings = () => {
                     <Layers className="h-4 w-4" />
                     <span>Stages</span>
                   </TabsTrigger>
-                  <TabsTrigger value="countries" className="flex items-center gap-2">
+                  <TabsTrigger value="locations" className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
-                    <span>Countries</span>
+                    <span>Locations</span>
                   </TabsTrigger>
                   <TabsTrigger value="roles" className="flex items-center gap-2">
                     <Briefcase className="h-4 w-4" />
@@ -64,7 +63,7 @@ const OfficeSettings = () => {
                 <TabsContent value="stages" className="mt-6">
                   <StagesTab />
                 </TabsContent>
-                <TabsContent value="countries" className="mt-6">
+                <TabsContent value="locations" className="mt-6">
                   <LocationsTab />
                 </TabsContent>
                 <TabsContent value="roles" className="mt-6">

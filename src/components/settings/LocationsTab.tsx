@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -156,13 +155,8 @@ export const LocationsTab = () => {
                   style={editMode && selected.includes(row.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    {/* Only show custom emoji, else default to flag */}
                     {row.emoji ? (
-                      typeof row.emoji === "string" && row.emoji.length === 2 && /[\uD83C-\uDBFF]{2}/.test(row.emoji) ? (
-                        <span className="text-2xl">{row.emoji}</span>
-                      ) : (
-                        <Flag className="h-6 w-6 text-muted" />
-                      )
+                      <span className="text-2xl">{row.emoji}</span>
                     ) : (
                       <span className="text-2xl">{flagEmoji(row.code)}</span>
                     )}
@@ -231,7 +225,6 @@ export const LocationsTab = () => {
                           <option value="">Select a country...</option>
                           {filteredCountries.map(country => (
                             <option key={country.code} value={country.code}>
-                              {/* country.flag is removed from dropdown options! */} 
                               {country.name} ({country.code})
                             </option>
                           ))}
@@ -260,7 +253,7 @@ export const LocationsTab = () => {
                 name="emoji"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Emoji (optional)</FormLabel>
+                    <FormLabel>Icon (optional)</FormLabel>
                     <FormControl>
                       <div className="flex items-center gap-2">
                         <Input
@@ -270,9 +263,9 @@ export const LocationsTab = () => {
                           className="w-20"
                           disabled={!form.watch("code")}
                         />
-                        <Flag className="h-5 w-5 text-muted" />
+                        <span className="text-2xl">{form.watch("emoji") ? form.watch("emoji") : flagEmoji(form.watch("code"))}</span>
                         <span className="text-xs text-muted-foreground">
-                          Auto-set to flag for country. You may enter another emoji, or leave blank for flag.
+                          Defaults to country flag. You may enter another emoji, or leave blank for flag.
                         </span>
                       </div>
                     </FormControl>
@@ -290,6 +283,3 @@ export const LocationsTab = () => {
     </Card>
   );
 };
-
-// File is above 285 lines. This file is getting too long! Please consider breaking it into smaller components for maintainability.
-
