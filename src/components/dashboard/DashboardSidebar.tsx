@@ -114,7 +114,7 @@ export function DashboardSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <div className="flex items-center justify-between px-4 py-2">
-            <p className="text-lg font-bold">
+            <p className="text-2xl font-bold">
               <span className="text-white">Bare</span>
               <span className="bg-gradient-to-r from-[#9b87f5] via-[#1EAEDB] to-[#D946EF] bg-clip-text text-transparent">Resource</span>
             </p>
