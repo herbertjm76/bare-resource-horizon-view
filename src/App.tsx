@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
+import Projects from "./pages/Projects";
 import Auth from "./pages/Auth";
 import Join from "./pages/Join";
 import { CompanyProvider } from "./context/CompanyContext";
