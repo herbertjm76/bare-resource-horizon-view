@@ -48,6 +48,101 @@ export type Database = {
         }
         Relationships: []
       }
+      office_areas: {
+        Row: {
+          code: string
+          created_at: string
+          emoji: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      office_holidays: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          is_recurring: boolean
+          location_id: string | null
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          is_recurring?: boolean
+          location_id?: string | null
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          is_recurring?: boolean
+          location_id?: string | null
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "office_holidays_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "office_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      office_locations: {
+        Row: {
+          city: string
+          code: string
+          country: string
+          created_at: string
+          emoji: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          city: string
+          code: string
+          country: string
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          code?: string
+          country?: string
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       office_project_stages: {
         Row: {
           created_at: string | null
@@ -83,6 +178,60 @@ export type Database = {
           },
         ]
       }
+      office_rates: {
+        Row: {
+          created_at: string
+          id: string
+          reference_id: string
+          type: string
+          unit: string
+          updated_at: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reference_id: string
+          type: string
+          unit: string
+          updated_at?: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reference_id?: string
+          type?: string
+          unit?: string
+          updated_at?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      office_roles: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       office_staff_rates: {
         Row: {
           created_at: string | null
@@ -117,6 +266,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      office_stages: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          order_index: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          order_index: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          order_index?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       offices: {
         Row: {

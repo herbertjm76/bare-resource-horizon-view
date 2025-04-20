@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
@@ -16,15 +16,16 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { supabase } from "@/integrations/supabase/client";
 
 // ROYGBIV spectrum for regions, fallback to gray for 'Other'
 const regionColors: Record<string, string> = {
-  Americas: "#FFA500", // Orange
-  Europe: "#4287f5",   // Blue
-  Asia: "#27c94a",     // Green
-  Oceania: "#B266FF",  // Violet
-  Africa: "#FFD700",   // Yellow
-  Other: "#b0b0b0"     // Gray
+  Americas: "#FFA500",
+  Europe: "#4287f5",
+  Asia: "#27c94a",
+  Oceania: "#B266FF",
+  Africa: "#FFD700",
+  Other: "#b0b0b0"
 };
 const pastelShift = ["#FFF6E0", "#E6F7FE", "#F5F0FF", "#E0FFE0", "#FFF1FA", "#F7FFF4"];
 const regionMap: { [code: string]: string } = {
@@ -57,20 +58,12 @@ const countries = [
 function getRegion(code: string) {
   return regionMap[code] || "Other";
 }
-// A pastel variant per project area in a region (different, but close, shades for the same region)
+// A pastel variant per project area in a region
 function pastelColorForArea(region: string, index: number) {
   const base = regionColors[region] || regionColors.Other;
   const pastel = pastelShift[index % pastelShift.length];
-  // Simple overlay blend for pastel
-  return `linear-gradient(90deg, ${base}40 70%, ${pastel} 100%)`; // 40 = ~25% alpha
+  return `linear-gradient(90deg, ${base}40 70%, ${pastel} 100%)`;
 }
-
-// Simulated DB, no emoji
-const initialAreas = [
-  { id: "1", code: "US", city: "New York", region: "Americas" },
-  { id: "2", code: "GB", city: "London", region: "Europe" },
-  { id: "3", code: "JP", city: "Tokyo", region: "Asia" }
-];
 
 const formSchema = z.object({
   code: z.string().length(2, "Country code required"),
@@ -79,19 +72,57 @@ const formSchema = z.object({
 });
 
 type ProjectAreaFormValues = z.infer<typeof formSchema>;
-type ProjectArea = { id: string; code: string; city: string; region: string };
+type ProjectArea = {
+  id: string;
+  code: string;
+  city: string;
+  region: string;
+  country: string;
+  emoji?: string | null;
+};
 
 export const CountriesTab = () => {
-  // Now "Project Areas"
-  const [areas, setAreas] = useState<ProjectArea[]>(initialAreas);
+  const [areas, setAreas] = useState<ProjectArea[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ProjectArea | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+
   const form = useForm<ProjectAreaFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { code: "", city: "", region: "" }
   });
+
+  // Fetch from Supabase
+  useEffect(() => {
+    const fetchAreas = async () => {
+      setLoading(true);
+      setError(null);
+      const { data, error } = await supabase
+        .from("office_locations")
+        .select("*")
+        .order("created_at", { ascending: true });
+      if (error) {
+        setError("Failed to load project areas.");
+        setAreas([]);
+      } else {
+        setAreas(
+          (data || []).map(loc => ({
+            id: loc.id,
+            code: loc.code,
+            city: loc.city,
+            region: getRegion(loc.code),
+            country: loc.country,
+            emoji: loc.emoji
+          }))
+        );
+      }
+      setLoading(false);
+    };
+    fetchAreas();
+  }, []);
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
@@ -107,32 +138,77 @@ export const CountriesTab = () => {
     setOpen(true);
   };
 
-  const handleBulkDelete = () => {
-    setAreas(areas.filter(l => !selected.includes(l.id)));
+  const handleBulkDelete = async () => {
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase
+      .from("office_locations")
+      .delete()
+      .in("id", selected);
+    if (error) setError("Failed to delete area(s).");
+    setAreas(areas.filter(a => !selected.includes(a.id)));
     setSelected([]);
     setEditMode(false);
+    setLoading(false);
   };
 
   const handleSelect = (id: string) => {
     setSelected(selected => selected.includes(id) ? selected.filter(x=>x!==id) : [...selected, id]);
   };
 
-  const onSubmit = (values: ProjectAreaFormValues) => {
+  const onSubmit = async (values: ProjectAreaFormValues) => {
+    setLoading(true);
+    setError(null);
+    const emoji = countries.find(c => c.code === values.code)?.emoji ?? null; // Not used, but left for future
     const regionVal = values.region || getRegion(values.code);
-    const newArea: ProjectArea = {
-      id: editing ? editing.id : Date.now().toString(),
-      code: values.code,
-      city: values.city,
-      region: regionVal
-    };
+
     if (editing) {
-      setAreas(areas.map(area => area.id === editing.id ? newArea : area));
+      // Update
+      const { error } = await supabase
+        .from("office_locations")
+        .update({
+          code: values.code,
+          city: values.city,
+          country: countries.find(c => c.code === values.code)?.name || "",
+        })
+        .eq("id", editing.id);
+      if (error) setError("Failed to update area.");
+      else {
+        setAreas(
+          areas.map(area => area.id === editing.id
+            ? { ...area, ...values, country: countries.find(c => c.code === values.code)?.name || "" }
+            : area
+          )
+        );
+      }
     } else {
-      setAreas([...areas, newArea]);
+      // Insert
+      const { data, error } = await supabase
+        .from("office_locations")
+        .insert({
+          code: values.code,
+          city: values.city,
+          country: countries.find(c => c.code === values.code)?.name || "",
+        })
+        .select()
+        .single();
+
+      if (error) setError("Failed to add area.");
+      else if (data) {
+        setAreas([...areas, {
+          id: data.id,
+          code: data.code,
+          city: data.city,
+          region: regionVal,
+          country: data.country,
+          emoji: data.emoji
+        }]);
+      }
     }
     setOpen(false);
     form.reset();
     setEditing(null);
+    setLoading(false);
   };
 
   return (
@@ -151,65 +227,73 @@ export const CountriesTab = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="text-sm text-muted-foreground mb-4">
-            Track which cities and regions you operate projects in. Each region is colored by spectrum; backgrounds are auto-generated.
-          </div>
-          {editMode && (
-            <div className="flex items-center gap-2 mb-2">
-              <Button
-                variant="destructive"
-                size="sm"
-                disabled={selected.length === 0}
-                onClick={handleBulkDelete}
-              >
-                <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
-              </Button>
-              <span className="text-xs text-muted-foreground">{selected.length} selected</span>
-            </div>
-          )}
-          {areas.length > 0 ? (
-            <div className="grid gap-4">
-              {areas.map((area, idx) => {
-                const region = getRegion(area.code);
-                const bg = pastelColorForArea(region, idx);
-                return (
-                  <div 
-                    key={area.id}
-                    className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"}`}
-                    style={editMode && selected.includes(area.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="font-bold px-3 py-1 rounded text-base"
-                        style={{ background: bg }}
-                      >
-                        {area.code}
-                      </span>
-                      <span className="font-medium">{area.city}</span>
-                      <span className="bg-muted-foreground/10 px-2 py-0.5 rounded text-xs text-muted-foreground ml-2">
-                        {area.region}
-                      </span>
-                    </div>
-                    {editMode ? (
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 accent-purple-600"
-                        checked={selected.includes(area.id)}
-                        onChange={() => handleSelect(area.id)}
-                      />
-                    ) : (
-                      <Button variant="ghost" size="sm" onClick={() => handleEdit(area)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+          {loading ? (
+            <div className="text-center text-muted-foreground">Loading...</div>
+          ) : error ? (
+            <div className="text-center text-destructive">{error}</div>
           ) : (
-            <div className="text-center p-4 border rounded-md border-dashed">
-              No project areas yet. Click "Add Area" to get started.
+            <>
+            <div className="text-sm text-muted-foreground mb-4">
+              Track which cities and regions you operate projects in. Each region is colored by spectrum; backgrounds are auto-generated.
             </div>
+            {editMode && (
+              <div className="flex items-center gap-2 mb-2">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  disabled={selected.length === 0}
+                  onClick={handleBulkDelete}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
+                </Button>
+                <span className="text-xs text-muted-foreground">{selected.length} selected</span>
+              </div>
+            )}
+            {areas.length > 0 ? (
+              <div className="grid gap-4">
+                {areas.map((area, idx) => {
+                  const region = getRegion(area.code);
+                  const bg = pastelColorForArea(region, idx);
+                  return (
+                    <div 
+                      key={area.id}
+                      className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"}`}
+                      style={editMode && selected.includes(area.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span
+                          className="font-bold px-3 py-1 rounded text-base"
+                          style={{ background: bg }}
+                        >
+                          {area.code}
+                        </span>
+                        <span className="font-medium">{area.city}</span>
+                        <span className="bg-muted-foreground/10 px-2 py-0.5 rounded text-xs text-muted-foreground ml-2">
+                          {area.region}
+                        </span>
+                      </div>
+                      {editMode ? (
+                        <input
+                          type="checkbox"
+                          className="w-4 h-4 accent-purple-600"
+                          checked={selected.includes(area.id)}
+                          onChange={() => handleSelect(area.id)}
+                        />
+                      ) : (
+                        <Button variant="ghost" size="sm" onClick={() => handleEdit(area)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="text-center p-4 border rounded-md border-dashed">
+                No project areas yet. Click "Add Area" to get started.
+              </div>
+            )}
+            </>
           )}
         </div>
       </CardContent>
@@ -237,11 +321,11 @@ export const CountriesTab = () => {
                         onChange={e => {
                           const code = e.target.value;
                           field.onChange(code);
-                          // Suggest region if known
                           if (regionMap[code]) {
                             form.setValue("region", regionMap[code]);
                           }
                         }}
+                        disabled={loading}
                       >
                         <option value="">Select a country...</option>
                         {countries.map(country => (
@@ -262,7 +346,7 @@ export const CountriesTab = () => {
                   <FormItem>
                     <FormLabel>Location (City)</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., New York" {...field} />
+                      <Input placeholder="e.g., New York" {...field} disabled={loading} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -278,6 +362,7 @@ export const CountriesTab = () => {
                       <Input
                         placeholder="e.g., Americas"
                         {...field}
+                        disabled={loading}
                       />
                     </FormControl>
                     <span className="text-xs text-muted-foreground">Auto-suggested for known codes, or enter a custom region.</span>
@@ -286,7 +371,7 @@ export const CountriesTab = () => {
                 )}
               />
               <DialogFooter>
-                <Button type="submit">{editing ? 'Update' : 'Add'} Area</Button>
+                <Button type="submit" disabled={loading}>{editing ? 'Update' : 'Add'} Area</Button>
               </DialogFooter>
             </form>
           </Form>
@@ -296,4 +381,5 @@ export const CountriesTab = () => {
   );
 };
 
-// File is above 290 lines. This file is getting too long! Consider breaking it into smaller components.
+// File is above 300 lines. This file is getting too long! Consider breaking it into smaller components.
+
