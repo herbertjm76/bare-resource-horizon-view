@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -18,8 +18,14 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-// Sample data - in a real app this would come from the database
-const mockCountries = [
+// Helper for country flag emoji (works for most common country codes)
+const countryFlagEmoji = (abbreviation: string) =>
+  abbreviation && abbreviation.length === 2
+    ? String.fromCodePoint(...[...abbreviation.toUpperCase()].map(c=>127397+c.charCodeAt(0)))
+    : "🏳️";
+
+// Simulated "database"
+const initialCountries = [
   { id: "1", name: "United States", abbreviation: "US", city: "New York", color: "#4f46e5" },
   { id: "2", name: "United Kingdom", abbreviation: "UK", city: "London", color: "#0ea5e9" },
   { id: "3", name: "Japan", abbreviation: "JP", city: "Tokyo", color: "#10b981" }
@@ -33,12 +39,14 @@ const formSchema = z.object({
 });
 
 type CountryFormValues = z.infer<typeof formSchema>;
-type Country = typeof mockCountries[0];
+type Country = typeof initialCountries[0];
 
 export const CountriesTab = () => {
-  const [countries, setCountries] = useState(mockCountries);
+  const [countries, setCountries] = useState<Country[]>(initialCountries);
   const [open, setOpen] = useState(false);
   const [editingCountry, setEditingCountry] = useState<Country | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const form = useForm<CountryFormValues>({
     resolver: zodResolver(formSchema),
@@ -69,14 +77,24 @@ export const CountriesTab = () => {
     setOpen(true);
   };
 
+  const handleSelect = (id: string) => {
+    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }
+
+  const handleBulkDelete = () => {
+    setCountries(countries.filter(c => !selected.includes(c.id)));
+    setSelected([]);
+    setEditMode(false);
+  }
+
   const onSubmit = (values: CountryFormValues) => {
     if (editingCountry) {
-      // Update existing country
-      setCountries(countries.map(country => 
-        country.id === editingCountry.id ? { ...country, ...values } : country
-      ));
+      setCountries(
+        countries.map(country => 
+          country.id === editingCountry.id ? { ...country, ...values } : country
+        )
+      );
     } else {
-      // Add new country with proper typing
       const newCountry: Country = {
         id: Date.now().toString(),
         name: values.name,
@@ -98,39 +116,61 @@ export const CountriesTab = () => {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Project Countries</CardTitle>
-        <Button size="sm" onClick={() => setOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Country
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)}>
+            <Edit className="h-4 w-4 mr-2" /> Edit
+          </Button>
+          <Button size="sm" onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Country
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground mb-4">
             Configure the countries where your office operates projects.
           </div>
-          
+          {editMode && (
+            <div className="flex items-center gap-2 mb-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={selected.length === 0}
+                onClick={handleBulkDelete}
+              >
+                <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
+              </Button>
+              <span className="text-xs text-muted-foreground">{selected.length} selected</span>
+            </div>
+          )}
           {countries.length > 0 ? (
             <div className="grid gap-4">
               {countries.map((country) => (
                 <div 
                   key={country.id}
-                  className="flex items-center justify-between p-3 border rounded-md"
+                  className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"} `}
+                  style={editMode && selected.includes(country.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    <div 
-                      className="w-4 h-4 rounded-full" 
-                      style={{ backgroundColor: country.color }}
-                    />
-                    <div>
-                      <div className="font-medium">{country.name} ({country.abbreviation})</div>
-                      <div className="text-sm text-muted-foreground">{country.city}</div>
-                    </div>
+                    <span className="text-xl">{countryFlagEmoji(country.abbreviation)}</span>
+                    <div className="font-medium">{country.name} ({country.abbreviation})</div>
+                    <div className="text-sm text-muted-foreground">{country.city}</div>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => handleEdit(country)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
+                  {editMode ? (
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 accent-purple-600"
+                      checked={selected.includes(country.id)}
+                      onChange={() => handleSelect(country.id)}
+                    />
+                  ) : (
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(country)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
@@ -142,6 +182,7 @@ export const CountriesTab = () => {
         </div>
       </CardContent>
 
+      {/* Dialog for add/edit */}
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -150,7 +191,6 @@ export const CountriesTab = () => {
               Enter the details for this project country.
             </DialogDescription>
           </DialogHeader>
-          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -166,7 +206,6 @@ export const CountriesTab = () => {
                   </FormItem>
                 )}
               />
-              
               <FormField
                 control={form.control}
                 name="abbreviation"
@@ -180,7 +219,6 @@ export const CountriesTab = () => {
                   </FormItem>
                 )}
               />
-              
               <FormField
                 control={form.control}
                 name="city"
@@ -194,7 +232,6 @@ export const CountriesTab = () => {
                   </FormItem>
                 )}
               />
-              
               <FormField
                 control={form.control}
                 name="color"
@@ -204,15 +241,9 @@ export const CountriesTab = () => {
                     <FormControl>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            className="w-full justify-start text-left font-normal"
-                          >
+                          <Button variant="outline" className="w-full justify-start text-left font-normal">
                             <div className="flex items-center gap-2">
-                              <div 
-                                className="w-4 h-4 rounded-full" 
-                                style={{ backgroundColor: field.value }}
-                              />
+                              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: field.value }} />
                               <span>{field.value}</span>
                             </div>
                           </Button>
@@ -236,7 +267,6 @@ export const CountriesTab = () => {
                   </FormItem>
                 )}
               />
-              
               <DialogFooter>
                 <Button type="submit">{editingCountry ? 'Update' : 'Add'} Country</Button>
               </DialogFooter>

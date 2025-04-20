@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -16,36 +16,35 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-// Sample data - in a real app this would come from the database
+// Simulated DB
 const mockRoles = [
-  { id: "1", name: "Project Manager", code: "PM", color: "#4f46e5" },
-  { id: "2", name: "Senior Architect", code: "SA", color: "#0ea5e9" },
-  { id: "3", name: "Junior Architect", code: "JA", color: "#10b981" },
-  { id: "4", name: "BIM Coordinator", code: "BIM", color: "#f97316" }
+  { id: "1", name: "Project Manager", code: "PM" },
+  { id: "2", name: "Senior Architect", code: "SA" },
+  { id: "3", name: "Junior Architect", code: "JA" },
+  { id: "4", name: "BIM Coordinator", code: "BIM" }
 ];
 
 const formSchema = z.object({
   name: z.string().min(1, "Role name is required"),
   code: z.string().min(1, "Role code is required"),
-  color: z.string().min(1, "Color is required"),
 });
 
 type RoleFormValues = z.infer<typeof formSchema>;
 type Role = typeof mockRoles[0];
 
 export const RolesTab = () => {
-  const [roles, setRoles] = useState(mockRoles);
+  const [roles, setRoles] = useState<Role[]>(mockRoles);
   const [open, setOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<Role | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const form = useForm<RoleFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      code: "",
-      color: "#4f46e5"
+      code: ""
     }
   });
 
@@ -61,25 +60,33 @@ export const RolesTab = () => {
     setEditingRole(role);
     form.reset({
       name: role.name,
-      code: role.code,
-      color: role.color
+      code: role.code
     });
     setOpen(true);
   };
 
+  const handleSelect = (id: string) => {
+    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }
+
+  const handleBulkDelete = () => {
+    setRoles(roles.filter(role => !selected.includes(role.id)));
+    setSelected([]);
+    setEditMode(false);
+  }
+
   const onSubmit = (values: RoleFormValues) => {
     if (editingRole) {
-      // Update existing role
-      setRoles(roles.map(role => 
-        role.id === editingRole.id ? { ...role, ...values } : role
-      ));
+      setRoles(
+        roles.map(role => 
+          role.id === editingRole.id ? { ...role, ...values } : role
+        )
+      );
     } else {
-      // Add new role with proper typing
       const newRole: Role = {
         id: Date.now().toString(),
         name: values.name,
-        code: values.code,
-        color: values.color
+        code: values.code
       };
       setRoles([...roles, newRole]);
     }
@@ -88,46 +95,64 @@ export const RolesTab = () => {
     setEditingRole(null);
   };
 
-  const colors = [
-    "#4f46e5", "#0ea5e9", "#10b981", "#f97316", "#ec4899", 
-    "#8b5cf6", "#d946ef", "#6366f1", "#0891b2", "#0d9488"
-  ];
-
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Roles and Titles</CardTitle>
-        <Button size="sm" onClick={() => setOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Role
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)}>
+            <Edit className="h-4 w-4 mr-2" /> Edit
+          </Button>
+          <Button size="sm" onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Role
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground mb-4">
             Configure staff roles and titles for your office.
           </div>
-          
+          {editMode && (
+            <div className="flex items-center gap-2 mb-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={selected.length === 0}
+                onClick={handleBulkDelete}
+              >
+                <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
+              </Button>
+              <span className="text-xs text-muted-foreground">{selected.length} selected</span>
+            </div>
+          )}
           {roles.length > 0 ? (
             <div className="grid gap-4">
               {roles.map((role) => (
                 <div 
                   key={role.id}
-                  className="flex items-center justify-between p-3 border rounded-md"
+                  className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"} `}
+                  style={editMode && selected.includes(role.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    <div 
-                      className="w-4 h-4 rounded-full" 
-                      style={{ backgroundColor: role.color }}
-                    />
                     <div>
                       <div className="font-medium">{role.name}</div>
-                      <div className="text-sm text-muted-foreground">Code: {role.code}</div>
+                      <div className="text-xs text-muted-foreground">Code: {role.code}</div>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => handleEdit(role)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
+                  {editMode ? (
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 accent-purple-600"
+                      checked={selected.includes(role.id)}
+                      onChange={() => handleSelect(role.id)}
+                    />
+                  ) : (
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(role)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
@@ -139,6 +164,7 @@ export const RolesTab = () => {
         </div>
       </CardContent>
 
+      {/* Add/Edit Dialog */}
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -147,7 +173,6 @@ export const RolesTab = () => {
               Enter the details for this staff role.
             </DialogDescription>
           </DialogHeader>
-          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -163,7 +188,6 @@ export const RolesTab = () => {
                   </FormItem>
                 )}
               />
-              
               <FormField
                 control={form.control}
                 name="code"
@@ -177,49 +201,6 @@ export const RolesTab = () => {
                   </FormItem>
                 )}
               />
-              
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Color</FormLabel>
-                    <FormControl>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            className="w-full justify-start text-left font-normal"
-                          >
-                            <div className="flex items-center gap-2">
-                              <div 
-                                className="w-4 h-4 rounded-full" 
-                                style={{ backgroundColor: field.value }}
-                              />
-                              <span>{field.value}</span>
-                            </div>
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-64">
-                          <div className="grid grid-cols-5 gap-2">
-                            {colors.map((color) => (
-                              <button
-                                key={color}
-                                type="button"
-                                className="w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                style={{ backgroundColor: color }}
-                                onClick={() => form.setValue('color', color)}
-                              />
-                            ))}
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
               <DialogFooter>
                 <Button type="submit">{editingRole ? 'Update' : 'Add'} Role</Button>
               </DialogFooter>

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Calendar as CalendarIcon } from "lucide-react";
+import { Plus, Edit, Trash2, Calendar as CalendarIcon } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -12,7 +12,6 @@ import {
   DialogDescription
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
@@ -22,33 +21,36 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 
-// Sample data - in a real app this would come from the database
-const mockHolidays = [
-  { id: "1", description: "New Year's Day", startDate: new Date(2025, 0, 1), endDate: new Date(2025, 0, 1), office: "New York" },
-  { id: "2", description: "Christmas Holiday", startDate: new Date(2025, 11, 24), endDate: new Date(2025, 11, 26), office: "London" },
-  { id: "3", description: "Golden Week", startDate: new Date(2025, 4, 3), endDate: new Date(2025, 4, 6), office: "Tokyo" }
-];
-
+// Simulated "db" (offices as locations from earlier)
 const mockOffices = [
   { id: "1", name: "New York" },
   { id: "2", name: "London" },
   { id: "3", name: "Tokyo" }
 ];
 
+// Mock holidays (office is now array of ids)
+const mockHolidays = [
+  { id: "1", description: "New Year's Day", startDate: new Date(2025, 0, 1), endDate: new Date(2025, 0, 1), offices: ["1"] },
+  { id: "2", description: "Christmas Holiday", startDate: new Date(2025, 11, 24), endDate: new Date(2025, 11, 26), offices: ["2"] },
+  { id: "3", description: "Golden Week", startDate: new Date(2025, 4, 3), endDate: new Date(2025, 4, 6), offices: ["3"] }
+];
+
 const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
   startDate: z.date({ required_error: "Start date is required" }),
   endDate: z.date({ required_error: "End date is required" }),
-  office: z.string().min(1, "Office is required"),
+  offices: z.array(z.string()).min(1, "Select at least one office."),
 });
 
 type HolidayFormValues = z.infer<typeof formSchema>;
 type Holiday = typeof mockHolidays[0];
 
 export const HolidaysTab = () => {
-  const [holidays, setHolidays] = useState(mockHolidays);
+  const [holidays, setHolidays] = useState<Holiday[]>(mockHolidays);
   const [open, setOpen] = useState(false);
   const [editingHoliday, setEditingHoliday] = useState<Holiday | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const form = useForm<HolidayFormValues>({
     resolver: zodResolver(formSchema),
@@ -56,7 +58,7 @@ export const HolidaysTab = () => {
       description: "",
       startDate: new Date(),
       endDate: new Date(),
-      office: ""
+      offices: [],
     }
   });
 
@@ -74,33 +76,37 @@ export const HolidaysTab = () => {
       description: holiday.description,
       startDate: holiday.startDate,
       endDate: holiday.endDate,
-      office: mockOffices.find(o => o.name === holiday.office)?.id || ""
+      offices: holiday.offices
     });
     setOpen(true);
   };
 
+  const handleSelect = (id: string) => {
+    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }
+
+  const handleBulkDelete = () => {
+    setHolidays(holidays.filter(h => !selected.includes(h.id)));
+    setSelected([]);
+    setEditMode(false);
+  }
+
   const onSubmit = (values: HolidayFormValues) => {
-    const officeName = mockOffices.find(o => o.id === values.office)?.name || "";
-    
     if (editingHoliday) {
-      // Update existing holiday
-      setHolidays(holidays.map(holiday => 
-        holiday.id === editingHoliday.id ? 
-        { ...holiday, 
-          description: values.description,
-          startDate: values.startDate,
-          endDate: values.endDate,
-          office: officeName 
-        } : holiday
-      ));
+      setHolidays(
+        holidays.map(holiday => 
+          holiday.id === editingHoliday.id
+          ? { ...holiday, ...values }
+          : holiday
+        )
+      );
     } else {
-      // Add new holiday with proper typing
       const newHoliday: Holiday = { 
         id: Date.now().toString(), 
         description: values.description,
         startDate: values.startDate,
         endDate: values.endDate,
-        office: officeName 
+        offices: values.offices 
       };
       setHolidays([...holidays, newHoliday]);
     }
@@ -109,43 +115,70 @@ export const HolidaysTab = () => {
     setEditingHoliday(null);
   };
 
-  // Function to disable weekends
+  // Disable weekends
   const disableWeekends = (date: Date) => {
     const day = date.getDay();
-    return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
+    return day === 0 || day === 6;
   };
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Office Holidays</CardTitle>
-        <Button size="sm" onClick={() => setOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Holiday
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)}>
+            <Edit className="h-4 w-4 mr-2" /> Edit
+          </Button>
+          <Button size="sm" onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Holiday
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground mb-4">
             Manage office holidays and closures.
           </div>
-          
+          {editMode && (
+            <div className="flex items-center gap-2 mb-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={selected.length === 0}
+                onClick={handleBulkDelete}
+              >
+                <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
+              </Button>
+              <span className="text-xs text-muted-foreground">{selected.length} selected</span>
+            </div>
+          )}
           {holidays.length > 0 ? (
             <div className="grid gap-4">
               {holidays.map((holiday) => (
                 <div 
                   key={holiday.id}
-                  className="flex items-center justify-between p-3 border rounded-md"
+                  className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"} `}
+                  style={editMode && selected.includes(holiday.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div>
                     <div className="font-medium">{holiday.description}</div>
                     <div className="text-sm text-muted-foreground">
-                      {format(holiday.startDate, "PPP")} to {format(holiday.endDate, "PPP")} • {holiday.office}
+                      {format(holiday.startDate, "PPP")} to {format(holiday.endDate, "PPP")} • {holiday.offices.map(id => mockOffices.find(o=>o.id===id)?.name).filter(Boolean).join(", ")}
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => handleEdit(holiday)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
+                  {editMode ? (
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 accent-purple-600"
+                      checked={selected.includes(holiday.id)}
+                      onChange={() => handleSelect(holiday.id)}
+                    />
+                  ) : (
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(holiday)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
@@ -157,6 +190,7 @@ export const HolidaysTab = () => {
         </div>
       </CardContent>
 
+      {/* Add/Edit Dialog */}
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -165,7 +199,6 @@ export const HolidaysTab = () => {
               Enter the details for this office holiday.
             </DialogDescription>
           </DialogHeader>
-          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -220,7 +253,6 @@ export const HolidaysTab = () => {
                     </FormItem>
                   )}
                 />
-                
                 <FormField
                   control={form.control}
                   name="endDate"
@@ -262,29 +294,32 @@ export const HolidaysTab = () => {
               
               <FormField
                 control={form.control}
-                name="office"
+                name="offices"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Office</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select an office" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {mockOffices.map((office) => (
-                          <SelectItem key={office.id} value={office.id}>
-                            {office.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Offices</FormLabel>
+                    <div className="grid grid-cols-2 gap-2">
+                      {mockOffices.map(office => (
+                        <label key={office.id} className="inline-flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            value={office.id}
+                            checked={field.value.includes(office.id)}
+                            onChange={(e) => {
+                              const newValue = e.target.checked
+                                ? [...field.value, office.id]
+                                : field.value.filter((id: string) => id !== office.id);
+                              field.onChange(newValue);
+                            }}
+                          />
+                          <span>{office.name}</span>
+                        </label>
+                      ))}
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
               <DialogFooter>
                 <Button type="submit">{editingHoliday ? 'Update' : 'Add'} Holiday</Button>
               </DialogFooter>

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -18,33 +18,37 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-// Sample data - in a real app this would come from the database
+// Simulated DB
 const mockStages = [
-  { id: "1", name: "Concept Design", color: "#4f46e5" },
-  { id: "2", name: "Schematic Design", color: "#0ea5e9" },
-  { id: "3", name: "Design Development", color: "#10b981" },
-  { id: "4", name: "Construction Documents", color: "#f97316" },
-  { id: "5", name: "Construction Administration", color: "#8b5cf6" }
+  { id: "1", name: "Concept Design", color: "#4f46e5", number: "1" },
+  { id: "2", name: "Schematic Design", color: "#0ea5e9", number: "2" },
+  { id: "3", name: "Design Development", color: "#10b981", number: "3" },
+  { id: "4", name: "Construction Documents", color: "#f97316", number: "4" },
+  { id: "5", name: "Construction Administration", color: "#8b5cf6", number: "5" }
 ];
 
 const formSchema = z.object({
   name: z.string().min(1, "Stage name is required"),
   color: z.string().min(1, "Color is required"),
+  number: z.string().min(1, "Stage number is required")
 });
 
 type StageFormValues = z.infer<typeof formSchema>;
 type Stage = typeof mockStages[0];
 
 export const StagesTab = () => {
-  const [stages, setStages] = useState(mockStages);
+  const [stages, setStages] = useState<Stage[]>(mockStages);
   const [open, setOpen] = useState(false);
   const [editingStage, setEditingStage] = useState<Stage | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
 
   const form = useForm<StageFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      color: "#4f46e5"
+      color: "#4f46e5",
+      number: ""
     }
   });
 
@@ -60,23 +64,35 @@ export const StagesTab = () => {
     setEditingStage(stage);
     form.reset({
       name: stage.name,
-      color: stage.color
+      color: stage.color,
+      number: stage.number
     });
     setOpen(true);
   };
 
+  const handleSelect = (id: string) => {
+    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }
+
+  const handleBulkDelete = () => {
+    setStages(stages.filter(stage => !selected.includes(stage.id)));
+    setSelected([]);
+    setEditMode(false);
+  }
+
   const onSubmit = (values: StageFormValues) => {
     if (editingStage) {
-      // Update existing stage
-      setStages(stages.map(stage => 
-        stage.id === editingStage.id ? { ...stage, ...values } : stage
-      ));
+      setStages(
+        stages.map(stage => 
+          stage.id === editingStage.id ? { ...stage, ...values } : stage
+        )
+      );
     } else {
-      // Add new stage with proper typing
       const newStage: Stage = { 
         id: Date.now().toString(), 
         name: values.name, 
-        color: values.color 
+        color: values.color,
+        number: values.number
       };
       setStages([...stages, newStage]);
     }
@@ -90,38 +106,65 @@ export const StagesTab = () => {
     "#8b5cf6", "#d946ef", "#6366f1", "#0891b2", "#0d9488"
   ];
 
+  const stageNumberOptions = [...Array(10).keys()].map(String).concat("NA");
+
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Project Stages</CardTitle>
-        <Button size="sm" onClick={() => setOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Stage
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)}>
+            <Edit className="h-4 w-4 mr-2" /> Edit
+          </Button>
+          <Button size="sm" onClick={() => setOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Stage
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground mb-4">
             Define the standard project stages for your office.
           </div>
-          
+          {editMode && (
+            <div className="flex items-center gap-2 mb-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                disabled={selected.length === 0}
+                onClick={handleBulkDelete}
+              >
+                <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
+              </Button>
+              <span className="text-xs text-muted-foreground">{selected.length} selected</span>
+            </div>
+          )}
           {stages.length > 0 ? (
             <div className="grid gap-4">
               {stages.map((stage) => (
                 <div 
                   key={stage.id}
-                  className="flex items-center justify-between p-3 border rounded-md"
+                  className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"} `}
+                  style={editMode && selected.includes(stage.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    <div 
-                      className="w-4 h-4 rounded-full" 
-                      style={{ backgroundColor: stage.color }}
-                    />
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: stage.color }} />
                     <span className="font-medium">{stage.name}</span>
+                    <span className="text-xs bg-muted-foreground/10 rounded px-2">{stage.number}</span>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => handleEdit(stage)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
+                  {editMode ? (
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 accent-purple-600"
+                      checked={selected.includes(stage.id)}
+                      onChange={() => handleSelect(stage.id)}
+                    />
+                  ) : (
+                    <Button variant="ghost" size="sm" onClick={() => handleEdit(stage)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
@@ -133,6 +176,7 @@ export const StagesTab = () => {
         </div>
       </CardContent>
 
+      {/* Add/Edit Dialog */}
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -157,7 +201,24 @@ export const StagesTab = () => {
                   </FormItem>
                 )}
               />
-              
+              <FormField
+                control={form.control}
+                name="number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Stage Number</FormLabel>
+                    <FormControl>
+                      <select {...field} className="w-full border rounded p-2">
+                        <option value="">Select stage number...</option>
+                        {stageNumberOptions.map(n => (
+                          <option key={n} value={n}>{n}</option>
+                        ))}
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="color"
