@@ -106,26 +106,27 @@ export function DashboardSidebar() {
   return (
     <Sidebar 
       className="backdrop-blur-lg 
-        bg-white/10 
+        bg-[hsl(210,15%,20%)] 
+        bg-opacity-80
         border-r 
-        border-white/20"
+        border-[hsl(210,10%,30%)]"
     >
       <SidebarContent>
         <SidebarGroup>
           <div className="flex items-center justify-between px-4 py-2">
-            <p className="text-lg font-semibold text-white">Bare Resource</p>
-            <SidebarTrigger className="md:hidden text-white hover:bg-white/20" />
+            <p className="text-lg font-semibold text-[hsl(210,10%,90%)]">Bare Resource</p>
+            <SidebarTrigger className="md:hidden text-[hsl(210,10%,90%)] hover:bg-[hsl(210,10%,30%)]" />
           </div>
           {navigationItems.map((section) => (
             <div key={section.label} className="mb-6">
-              <SidebarGroupLabel className="text-white/70">{section.label}</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-[hsl(210,10%,70%)]">{section.label}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {section.items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton
                         asChild
-                        className="text-white/80 hover:text-white hover:bg-white/20 rounded-md"
+                        className="text-[hsl(210,10%,80%)] hover:text-[hsl(210,10%,90%)] hover:bg-[hsl(210,10%,30%)] rounded-md"
                       >
                         <Link to={item.url} className="flex items-center gap-2 w-full p-2">
                           <item.icon className="h-4 w-4" />
