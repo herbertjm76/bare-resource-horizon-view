@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import allCountries from "@/lib/allCountries.json";
+import CountrySelect from "@/components/ui/CountrySelect";
 
 const pastelColors = [
   "#F2FCE2", "#FEF7CD", "#FEC6A1", "#E5DEFF",
@@ -312,27 +312,11 @@ export const CountriesTab = () => {
                   <FormItem>
                     <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <Controller
-                        control={form.control}
-                        name="country"
-                        render={({ field: ctrlField }) => (
-                          <Select
-                            value={ctrlField.value}
-                            onValueChange={ctrlField.onChange}
-                            disabled={loading}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select country" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {allCountries.map((c) => (
-                                <SelectItem key={c.code} value={c.name}>
-                                  {c.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )}
+                      <CountrySelect
+                        value={field.value}
+                        onChange={field.onChange}
+                        disabled={loading}
+                        placeholder="Select country"
                       />
                     </FormControl>
                     <FormMessage />
