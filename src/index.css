@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -34,14 +35,14 @@
 
     --radius: 0.5rem;
 
-    --bare-light-gray: #ccc;
-    --sidebar-background: #232733;   /* dark background for sidebar */
-    --sidebar-foreground: #ccc;      /* use standard light gray! */
-    --sidebar-primary: #232733;
-    --sidebar-primary-foreground: #ccc;
-    --sidebar-accent: #313642;
-    --sidebar-accent-foreground: 210 10% 90%;
-    --sidebar-border: #313642;
+    --bare-light-gray: #8E9196;      /* UPDATED: standardized medium grey */
+    --sidebar-background: #8E9196;   /* Sidebar now matches button grey */
+    --sidebar-foreground: #fff;      /* White icons/text on grey for contrast */
+    --sidebar-primary: #8E9196;
+    --sidebar-primary-foreground: #fff;
+    --sidebar-accent: #7d8086;
+    --sidebar-accent-foreground: #fff;
+    --sidebar-border: #7d8086;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -73,13 +74,14 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
+
+    --sidebar-background: #8E9196;
+    --sidebar-foreground: #fff;
+    --sidebar-primary: #8E9196;
+    --sidebar-primary-foreground: #fff;
+    --sidebar-accent: #7d8086;
+    --sidebar-accent-foreground: #fff;
+    --sidebar-border: #7d8086;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
@@ -93,4 +95,3 @@
     @apply bg-background text-foreground;
   }
 }
-

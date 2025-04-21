@@ -24,7 +24,7 @@ const Projects = () => {
           <div className="flex-1 p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
               <div className="flex justify-between items-center">
-                <h1 className="text-4xl font-bold">All Projects</h1>
+                <h1 className="text-4xl font-bold" style={{ color: '#8E9196' }}>All Projects</h1>
               </div>
               <ProjectsList />
             </div>

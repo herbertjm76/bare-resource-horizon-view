@@ -1,7 +1,5 @@
 
-// We'll update the default button variant color to #8E9196, the sidebar grey,
-// so all buttons appear consistent as solid grey buttons.
-
+// Standardized button gray color matches sidebar and sample.
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -12,12 +10,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Changed from #8E9196 to make it the site-wide main button color
-        default: "bg-[#8E9196] text-white hover:bg-[#7d8086]",
+        default: "bg-[#8E9196] text-white hover:bg-[#7d8086]",    // STANDARD GRAY
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        secondary: "bg-[#8E9196] text-white hover:bg-[#7d8086]", // Use same as default for consistency
+        ghost: "hover:bg-[#8E9196]/30 hover:text-[#8E9196]",      // Subtle gray on hover
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
