@@ -49,8 +49,14 @@ export const AppHeader: React.FC = () => {
         className="text-2xl font-bold tracking-tight select-none" 
         aria-label="Bare Resource"
       >
-        <span style={{ color: BARE_GRAY }}>Bare</span>
-        <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-500 to-pink-500">
+        {/* White text with black outline for "Bare" */}
+        <span className="relative text-white">
+          <span aria-hidden="true" className="absolute inset-0 -z-10 text-black stroke-[1.5px] stroke-current select-none pointer-events-none" style={{ WebkitTextStrokeWidth: '1.5px', WebkitTextStrokeColor: 'black' }}>
+            Bare
+          </span>
+          Bare
+        </span>
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-500 to-pink-500 ml-1">
           Resource
         </span>
       </h1>
@@ -84,3 +90,4 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
+
