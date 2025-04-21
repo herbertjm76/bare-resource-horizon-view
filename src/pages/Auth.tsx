@@ -50,6 +50,12 @@ const Auth: React.FC = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      toast.error('Please provide both email and password');
+      return;
+    }
+    
     setLoading(true);
     
     try {
@@ -91,7 +97,7 @@ const Auth: React.FC = () => {
             <CompanyRegistrationForm onSuccess={handleCompanySuccess} userId={userId} />
           </div>
         ) : (
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-white mb-2">Email</label>
               <Input
@@ -116,7 +122,8 @@ const Auth: React.FC = () => {
             </div>
             <div className="flex space-x-4">
               <Button
-                type="submit"
+                type="button"
+                onClick={handleLogin}
                 disabled={loading}
                 className="flex-1 bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
               >
