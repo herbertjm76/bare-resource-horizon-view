@@ -104,51 +104,36 @@ const Projects = () => {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-background">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">
-            {authLoading ? "Verifying access..." : "Loading company data..."}
-          </p>
-          <Button 
-            variant="outline" 
-            size="sm"
-            className="mt-2"
-            onClick={handleRefresh}
-          >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-          {error && (
-            <div className="text-sm text-red-500 mt-2 max-w-md text-center">
-              {error}
-              <Button 
-                variant="link" 
-                className="ml-2 p-0 h-auto" 
-                onClick={() => window.location.reload()}
-              >
-                Reload page
-              </Button>
+      <SidebarProvider>
+        <div className="w-full min-h-screen flex flex-row">
+          <DashboardSidebar />
+          <div className="flex-1 flex flex-col pl-[240px]">
+            <AppHeader />
+            <div className="pt-[56px]">
+              <div className="flex justify-center items-center min-h-[calc(100vh-56px)] bg-background">
+                <div className="flex flex-col items-center gap-2">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <p className="text-sm text-muted-foreground">Loading projects...</p>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      </SidebarProvider>
     );
   }
 
   return (
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
-        <div className="flex-shrink-0">
-          <DashboardSidebar />
-        </div>
+        <DashboardSidebar />
         <div className="flex-1 flex flex-col pl-[240px]">
           <AppHeader />
           <div className="pt-[56px]">
             <div className="flex-1 p-8 bg-background">
               <div className="max-w-6xl mx-auto space-y-8">
                 <div className="flex justify-between items-center">
-                  <h1 className="text-4xl font-bold text-[#8E9196]">All Projects</h1>
+                  <h1 className="text-4xl font-bold text-[#6E59A5]">All Projects</h1>
                   <Button 
                     variant="outline" 
                     size="sm" 

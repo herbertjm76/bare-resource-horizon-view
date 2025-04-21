@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
@@ -5,11 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { User as UserIcon, LogOut } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-
-// Colors
-const BARE_DARK_GREY_SHADOW = "#222";
-const RESOURCE_GRADIENT = "linear-gradient(90deg, #9b87f5, #7E69AB, #5a7eb7)";
-const BARE_MID_GRAY = "#8A898C";
 
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
@@ -42,10 +38,19 @@ export const AppHeader: React.FC = () => {
     navigate("/auth");
   };
 
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleDateString('en-US', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).toUpperCase();
+
   return (
-    <header
-      className="w-full px-6 py-2 flex items-center justify-end bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[56px]"
-    >
+    <header className="w-full px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[56px] pl-[240px]">
+      <div className="text-sm text-gray-500 font-medium">
+        {formattedDate}
+      </div>
       <div className="flex items-center gap-4">
         <span className="text-sm font-medium text-gray-500">ADMIN</span>
         <Button asChild variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100">

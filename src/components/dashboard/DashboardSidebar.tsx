@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -15,7 +16,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
@@ -26,7 +26,7 @@ import {
 
 const navigationItems = [
   {
-    label: "Overview",
+    label: "OVERVIEW",
     items: [
       {
         title: "Dashboard",
@@ -41,7 +41,7 @@ const navigationItems = [
     ],
   },
   {
-    label: "Resource Planning",
+    label: "RESOURCE PLANNING",
     items: [
       {
         title: "Weekly Planning",
@@ -61,7 +61,7 @@ const navigationItems = [
     ],
   },
   {
-    label: "Resources",
+    label: "RESOURCES",
     items: [
       {
         title: "Team Members",
@@ -76,7 +76,7 @@ const navigationItems = [
     ],
   },
   {
-    label: "Projects",
+    label: "PROJECTS",
     items: [
       {
         title: "All Projects",
@@ -91,7 +91,7 @@ const navigationItems = [
     ],
   },
   {
-    label: "System",
+    label: "SYSTEM",
     items: [
       {
         title: "Office Settings",
@@ -109,25 +109,14 @@ export function DashboardSidebar() {
 
   return (
     <Sidebar 
-      className={`
-        bg-[#8E9196]
-        border-r 
-        border-[#7d8086]
-        pt-0
-        min-h-screen
-        transition-[width]
-        fixed
-        left-0
-        top-0
-        bottom-0
-      `}
+      className="bg-[#6E59A5] border-r border-[#5d4b8e] pt-0 min-h-screen transition-[width] fixed left-0 top-0 bottom-0"
       style={{ marginTop: 0 }}
     >
       <SidebarContent className="p-0">
         <SidebarGroup>
-          <div className="flex items-center justify-between px-4 py-4 h-[56px] border-b border-[#7d8086]">
-            <span className="text-2xl font-bold text-white select-none">Bare</span>
-            <SidebarTrigger className="text-white bg-transparent hover:bg-[#7d8086]" />
+          <div className="flex items-center justify-between px-4 py-4 h-[56px] border-b border-[#5d4b8e]">
+            <span className="text-2xl font-bold text-white select-none">BareResource</span>
+            <SidebarTrigger className="text-white bg-transparent hover:bg-[#5d4b8e]" />
           </div>
           
           {navigationItems.map((section) => (
@@ -146,7 +135,7 @@ export function DashboardSidebar() {
                           className={`
                             text-white 
                             hover:text-white 
-                            hover:bg-[#7d8086]
+                            hover:bg-[#5d4b8e]
                             rounded-none
                             px-4
                             py-2
@@ -154,7 +143,7 @@ export function DashboardSidebar() {
                             items-center
                             gap-3
                             transition-all
-                            ${isActive ? "bg-[#7d8086] text-white" : ""}
+                            ${isActive ? "bg-[#5d4b8e] text-white" : ""}
                           `}
                           isActive={isActive}
                         >
