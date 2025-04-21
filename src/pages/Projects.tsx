@@ -11,8 +11,6 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const HEADER_HEIGHT = 56;
-
 const Projects = () => {
   const { company, loading: companyLoading, refreshCompany, error: companyError } = useCompany();
   const navigate = useNavigate();
@@ -108,7 +106,7 @@ const Projects = () => {
       <SidebarProvider>
         <div className="w-full min-h-screen flex flex-row">
           <DashboardSidebar />
-          <div className="flex-1 flex flex-col pl-[280px]">
+          <div className="flex-1 flex flex-col transition-all duration-300">
             <AppHeader />
             <div className="pt-[64px]">
               <div className="flex justify-center items-center min-h-[calc(100vh-64px)] bg-background">
@@ -128,18 +126,17 @@ const Projects = () => {
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
         <DashboardSidebar />
-        <div className="flex-1 flex flex-col pl-[280px]">
+        <div className="flex-1 flex flex-col transition-all duration-300">
           <AppHeader />
           <div className="pt-[64px]">
-            <div className="flex-1 p-8 bg-background">
+            <div className="flex-1 p-4 md:p-8 bg-background">
               <div className="max-w-6xl mx-auto space-y-8">
-                <div className="flex justify-between items-center">
-                  <h1 className="text-4xl font-bold text-[#6E59A5]">All Projects</h1>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+                  <h1 className="text-3xl md:text-4xl font-bold text-[#6E59A5]">All Projects</h1>
                   <Button 
-                    variant="outline" 
+                    className="bg-[#6E59A5] hover:bg-[#5D4A94] text-white gap-2"
                     size="sm" 
                     onClick={() => refreshCompany()}
-                    className="gap-2 border-[#6E59A5] text-[#6E59A5] hover:bg-[#6E59A5] hover:text-white"
                   >
                     <RefreshCw className="h-4 w-4" /> 
                     Refresh
@@ -150,7 +147,7 @@ const Projects = () => {
                   <ProjectsList />
                 ) : (
                   <div className="p-6 rounded-lg border border-red-500/30 bg-red-500/10">
-                    <div className="flex items-start gap-4">
+                    <div className="flex flex-col md:flex-row items-start gap-4">
                       <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
                       <div className="space-y-3">
                         <h3 className="text-lg font-medium text-foreground">No company data found</h3>
@@ -161,14 +158,17 @@ const Projects = () => {
                           <li>Your account isn't associated with a company</li>
                           <li>There was an issue retrieving your company data</li>
                         </ul>
-                        <div className="flex gap-3 pt-2">
-                          <Button onClick={() => navigate('/dashboard')}>
+                        <div className="flex flex-wrap gap-3 pt-2">
+                          <Button 
+                            className="bg-[#6E59A5] hover:bg-[#5D4A94] text-white"
+                            onClick={() => navigate('/dashboard')}
+                          >
                             Go to Dashboard
                           </Button>
                           <Button 
                             variant="outline" 
                             onClick={() => refreshCompany()}
-                            className="gap-2"
+                            className="gap-2 border-[#6E59A5] text-[#6E59A5] hover:bg-[#6E59A5] hover:text-white"
                           >
                             <RefreshCw className="h-4 w-4" /> 
                             Refresh Data

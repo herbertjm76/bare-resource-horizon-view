@@ -9,7 +9,9 @@ import {
   FolderKanban,
   GanttChartSquare,
   UserSquare2,
-  Flag
+  Flag,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import {
@@ -23,6 +25,8 @@ import {
   SidebarTrigger,
   useSidebar
 } from "@/components/ui/sidebar"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
 
 const navigationItems = [
   {
@@ -103,24 +107,38 @@ const navigationItems = [
 ]
 
 export function DashboardSidebar() {
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const location = useLocation();
   const collapsed = state === "collapsed";
 
   return (
     <Sidebar 
-      className="bg-[#8E9196] border-r border-[#7d8086] pt-0 min-h-screen transition-[width] fixed left-0 top-0 bottom-0 w-[280px]"
-      style={{ marginTop: 0 }}
+      className="bg-[#8E9196] border-r border-[#7d8086] pt-0 min-h-screen transition-all duration-300 fixed left-0 top-0 bottom-0 z-40"
+      style={{ marginTop: 0, width: collapsed ? '80px' : '280px' }}
     >
       <SidebarContent className="p-0">
         <SidebarGroup>
           <div className="flex items-center justify-between px-6 py-4 h-[64px] border-b border-[#7d8086]">
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-[#8E9196] select-none">
-                Bare<span className="bg-gradient-to-r from-[#6E59A5] via-[#9b87f5] to-[#D946EF] bg-clip-text text-transparent">Resource</span>
-              </span>
+              {!collapsed ? (
+                <span className="text-2xl font-bold select-none">
+                  <span className="text-[#8E9196]">Bare</span>
+                  <span className="bg-gradient-to-r from-[#6E59A5] via-[#9b87f5] to-[#D946EF] bg-clip-text text-transparent">Resource</span>
+                </span>
+              ) : (
+                <span className="text-2xl font-bold select-none">
+                  <span className="bg-gradient-to-r from-[#6E59A5] via-[#9b87f5] to-[#D946EF] bg-clip-text text-transparent">B</span>
+                </span>
+              )}
             </div>
-            <SidebarTrigger className="text-white bg-transparent hover:bg-[#7d8086] h-9 w-9" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleSidebar} 
+              className="text-white hover:bg-[#7d8086] h-10 w-10 p-2 rounded-full"
+            >
+              {collapsed ? <ChevronRight className="h-6 w-6" /> : <ChevronLeft className="h-6 w-6" />}
+            </Button>
           </div>
           
           {navigationItems.map((section) => (
@@ -142,7 +160,7 @@ export function DashboardSidebar() {
                             hover:bg-[#7d8086]
                             rounded-none
                             px-6
-                            py-3
+                            py-4
                             flex
                             items-center
                             gap-4
@@ -153,8 +171,8 @@ export function DashboardSidebar() {
                           isActive={isActive}
                         >
                           <Link to={item.url} className="flex items-center gap-4 w-full">
-                            <item.icon className="h-5 w-5" />
-                            {!collapsed && <span>{item.title}</span>}
+                            <item.icon className="h-6 w-6" />
+                            {!collapsed && <span className="font-medium">{item.title}</span>}
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
