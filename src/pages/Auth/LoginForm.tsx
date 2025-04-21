@@ -20,11 +20,21 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: ownerEmail,
         password: ownerPassword,
       });
-      if (error) throw error;
+      
+      if (error) {
+        // Specifically handle email not confirmed error
+        if (error.message.includes('Email not confirmed')) {
+          // Redirect to auth page with error parameter
+          navigate('/auth?error=email_not_confirmed');
+          return;
+        }
+        throw error;
+      }
+      
       toast.success('Login successful!');
       navigate('/dashboard');
     } catch (error: any) {

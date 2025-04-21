@@ -10,6 +10,8 @@ import CompanyInfoFields from "./CompanyInfoFields";
 import { emptyCompany, CompanyFormData } from '../companyHelpers';
 import { ensureUserProfile } from '@/utils/authHelpers';
 import { Database } from '@/integrations/supabase/types';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { InfoIcon } from 'lucide-react';
 
 // Define the specific user role type to match Supabase's enum
 type UserRole = Database['public']['Enums']['user_role'];
@@ -27,6 +29,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
   const [company, setCompany] = useState<CompanyFormData>(emptyCompany);
   const [subdomainCheck, setSubdomainCheck] = useState({ isChecking: false, error: '' });
   const [loading, setLoading] = useState(false);
+  const [showConfirmationInfo, setShowConfirmationInfo] = useState(false);
   const navigate = useNavigate();
 
   const form = useForm<CompanyFormData>({ defaultValues: emptyCompany });
@@ -160,7 +163,9 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         // We'll continue anyway since the database trigger should handle this
       }
 
-      toast.success('Sign up successful! Please check your email to confirm your account, then you can log in.');
+      // Show success message and confirmation info
+      toast.success('Sign up successful! Please check your email to confirm your account.');
+      setShowConfirmationInfo(true);
       
       // Clear form
       setOwnerFirstName('');
@@ -168,9 +173,6 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       setOwnerEmail('');
       setOwnerPassword('');
       setCompany(emptyCompany);
-      
-      // Switch to login view
-      onSwitchToLogin();
       
     } catch (error: any) {
       console.error("Signup error:", error);
@@ -184,6 +186,23 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
     <form className="space-y-4" onSubmit={handleSignUp} autoComplete="off">
       <h2 className="text-2xl font-extrabold text-white mb-1 text-center">Sign Up & Register Company</h2>
       <p className="text-white/70 text-center mb-6">Complete your details to create your account and register your company in one step.</p>
+
+      {showConfirmationInfo && (
+        <Alert className="bg-blue-500/10 border border-blue-500/30 mb-4 text-white">
+          <InfoIcon className="h-4 w-4 text-blue-300" />
+          <AlertDescription className="text-white/90">
+            <p className="font-medium">Please check your email to confirm your account</p>
+            <p className="mt-1">You'll need to click the confirmation link in your email before you can log in.</p>
+            <Button 
+              variant="link" 
+              className="text-blue-300 p-0 h-auto mt-2" 
+              onClick={() => onSwitchToLogin()}
+            >
+              Go to login page
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       <OwnerInfoFields
         ownerFirstName={ownerFirstName}
@@ -207,12 +226,18 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
 
       <Button
         type="submit"
-        disabled={loading}
+        disabled={loading || showConfirmationInfo}
         className="w-full mt-4"
         isLoading={loading}
       >
         Sign Up & Register Company
       </Button>
+      
+      {showConfirmationInfo && (
+        <p className="text-center text-white/70 text-sm mt-2">
+          You need to confirm your email before logging in
+        </p>
+      )}
     </form>
   );
 };
