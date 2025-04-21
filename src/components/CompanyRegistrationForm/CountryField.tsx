@@ -15,13 +15,12 @@ const CountryField: React.FC<CountryFieldProps> = ({ watch, setValue, errors }) 
 
   return (
     <div>
-      <label htmlFor="country" className="block text-sm font-medium text-gray-200">
-        Country
-      </label>
+      {/* Removed duplicate label "Country" here */}
       <CountrySelect
         value={selectedCountry ?? ""}
         onChange={(_name, code) => setValue("country", _name)}
         placeholder="Select country"
+        className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
       />
       {errors.country && (
         <p className="text-red-500 text-sm mt-1">{errors.country.message}</p>
@@ -31,3 +30,4 @@ const CountryField: React.FC<CountryFieldProps> = ({ watch, setValue, errors }) 
 };
 
 export default CountryField;
+

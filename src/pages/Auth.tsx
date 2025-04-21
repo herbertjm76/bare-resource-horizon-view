@@ -7,11 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import CountryField from '@/components/CompanyRegistrationForm/CountryField';
-import AddressField from '@/components/CompanyRegistrationForm/AddressField';
-import CityField from '@/components/CompanyRegistrationForm/CityField';
-import SizeField from '@/components/CompanyRegistrationForm/SizeField';
-import SubdomainField from '@/components/CompanyRegistrationForm/SubdomainField';
-import WebsiteField from '@/components/CompanyRegistrationForm/WebsiteField';
+import AddressAutocomplete from '@/components/ui/AddressAutocomplete';
 
 type CompanyFormData = {
   name: string;
@@ -39,25 +35,21 @@ const Auth: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  // Owner/cred fields
   const [ownerName, setOwnerName] = useState('');
   const [ownerEmail, setOwnerEmail] = useState('');
   const [ownerPassword, setOwnerPassword] = useState('');
 
-  // Company fields
   const [company, setCompany] = useState<CompanyFormData>(emptyCompany);
   const [subdomainCheck, setSubdomainCheck] = useState({ isChecking: false, error: '' });
 
   const navigate = useNavigate();
 
-  // Set up form validation using react-hook-form
   const form = useForm<CompanyFormData>({
     defaultValues: emptyCompany
   });
   
   const { register, watch, setValue, formState: { errors } } = form;
 
-  // Auto-redirect if already logged in
   useEffect(() => {
     const checkAuth = async () => {
       const { data } = await supabase.auth.getSession();
@@ -68,14 +60,12 @@ const Auth: React.FC = () => {
     checkAuth();
   }, [navigate]);
 
-  // Update form values when company state changes
   useEffect(() => {
     Object.entries(company).forEach(([key, value]) => {
       setValue(key as keyof CompanyFormData, value);
     });
   }, [company, setValue]);
 
-  // Utility to check for subdomain availability
   const checkSubdomainAvailability = async (subdomain: string) => {
     setSubdomainCheck({ isChecking: true, error: '' });
     try {
@@ -92,7 +82,6 @@ const Auth: React.FC = () => {
     }
   };
 
-  // Handle login
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -111,12 +100,10 @@ const Auth: React.FC = () => {
     }
   };
 
-  // Handle consolidated signup + company registration
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simple frontend validations
     if (!ownerName || !ownerEmail || !ownerPassword ||
         !company.name || !company.subdomain || !company.address || !company.country || !company.city || !company.size) {
       toast.error('Please fill in all required fields.');
@@ -124,7 +111,6 @@ const Auth: React.FC = () => {
       return;
     }
 
-    // Check subdomain availability before proceeding
     const available = await checkSubdomainAvailability(company.subdomain);
     if (!available) {
       toast.error('This subdomain is already taken. Please choose another one.');
@@ -133,7 +119,6 @@ const Auth: React.FC = () => {
     }
 
     try {
-      // 1. Create user with Supabase
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: ownerEmail,
         password: ownerPassword,
@@ -142,13 +127,12 @@ const Auth: React.FC = () => {
         }
       });
       if (signUpError) throw signUpError;
-      // Get the new user ID
+
       const user = signUpData?.user;
       if (!user || !user.id) {
         throw new Error('Could not create user');
       }
 
-      // 2. Register the company
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
@@ -164,7 +148,6 @@ const Auth: React.FC = () => {
         .single();
       if (companyError) throw companyError;
 
-      // 3. Update user profile: set company_id and role to owner
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
@@ -187,12 +170,10 @@ const Auth: React.FC = () => {
     }
   };
 
-  // Change handler for companies fields
   const handleCompanyChange = (field: keyof CompanyFormData, value: string) => {
     setCompany((prev) => ({ ...prev, [field]: value }));
   };
 
-  // New: Industry options added for design, built environment, and construction
   const industryOptions = [
     "Architecture",
     "Interior Design",
@@ -256,14 +237,13 @@ const Auth: React.FC = () => {
             </Button>
           </form>
         ) : (
-          <form className="space-y-8" onSubmit={handleSignUp} autoComplete="off">
+          <form className="space-y-4" onSubmit={handleSignUp} autoComplete="off">
             <h2 className="text-2xl font-extrabold text-white mb-1 text-center">Sign Up & Register Company</h2>
-            <p className="text-white/70 text-center mb-4">Complete your details to create your account and register your company in one step.</p>
+            <p className="text-white/70 text-center mb-6">Complete your details to create your account and register your company in one step.</p>
             
-            {/* Owner Information */}
-            <div>
+            <div className="space-y-2">
               <h3 className="text-lg font-bold text-white mb-2">Owner Information</h3>
-              <div className="grid grid-cols-1 gap-4 bg-white/5 rounded-xl px-4 py-3 glass">
+              <div className="grid grid-cols-1 gap-4 bg-white/10 rounded-xl px-6 py-4 glass">
                 <div>
                   <label htmlFor="ownerName" className="block text-white font-medium mb-1">Full Name</label>
                   <Input
@@ -271,7 +251,7 @@ const Auth: React.FC = () => {
                     id="ownerName"
                     value={ownerName}
                     onChange={e => setOwnerName(e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
                     required
                     autoComplete="name"
                   />
@@ -283,7 +263,7 @@ const Auth: React.FC = () => {
                     id="ownerEmail2"
                     value={ownerEmail}
                     onChange={e => setOwnerEmail(e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
                     required
                     autoComplete="email"
                   />
@@ -295,7 +275,7 @@ const Auth: React.FC = () => {
                     id="ownerPassword2"
                     value={ownerPassword}
                     onChange={e => setOwnerPassword(e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
                     required
                     autoComplete="new-password"
                   />
@@ -303,10 +283,9 @@ const Auth: React.FC = () => {
               </div>
             </div>
             
-            {/* Company Information */}
-            <div>
+            <div className="space-y-2">
               <h3 className="text-lg font-bold text-white mb-2">Company Information</h3>
-              <div className="space-y-4 bg-white/5 rounded-xl px-4 py-3 glass">
+              <div className="space-y-4 bg-white/10 rounded-xl px-6 py-4 glass">
                 <div>
                   <label htmlFor="companyName" className="block text-white font-medium mb-1">Name</label>
                   <Input
@@ -314,7 +293,7 @@ const Auth: React.FC = () => {
                     id="companyName"
                     value={company.name}
                     onChange={e => handleCompanyChange('name', e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
                     required
                   />
                 </div>
@@ -326,7 +305,7 @@ const Auth: React.FC = () => {
                       id="companySubdomain"
                       value={company.subdomain}
                       onChange={e => handleCompanyChange('subdomain', e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
                       required
                     />
                     <span className="ml-2 text-gray-300">.bareresource.com</span>
@@ -339,26 +318,31 @@ const Auth: React.FC = () => {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="website" className="block text-white font-medium mb-1">Website <span className="text-xs text-white/50">(optional)</span></label>
+                  <label htmlFor="website" className="block text-white font-medium mb-1">
+                    Website <span className="text-xs text-white/50">(optional)</span>
+                  </label>
                   <Input
                     id="website"
                     type="url"
                     value={company.website || ''}
                     onChange={e => handleCompanyChange('website', e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
                     placeholder="https://yourcompany.com"
                   />
                 </div>
-                {/* Address, City, Country: Address full row, then grid for city/country */}
                 <div>
                   <label htmlFor="companyAddress" className="block text-white font-medium mb-1">Address</label>
-                  <Input
-                    id="companyAddress"
-                    type="text"
+                  <AddressAutocomplete
                     value={company.address}
-                    onChange={e => handleCompanyChange('address', e.target.value)}
-                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                    required
+                    country={company.country}
+                    onChange={(address) => handleCompanyChange('address', address)}
+                    onSelectSuggestion={(address, city) => {
+                      handleCompanyChange('address', address);
+                      if (city) handleCompanyChange('city', city);
+                    }}
+                    placeholder="Enter company address"
+                    disabled={false}
+                    className="w-full rounded-lg bg-white/20 border border-white/30 text-white"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -369,12 +353,11 @@ const Auth: React.FC = () => {
                       id="companyCity"
                       value={company.city}
                       onChange={e => handleCompanyChange('city', e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="companyCountry" className="block text-white font-medium mb-1">Country</label>
                     <CountryField
                       watch={watch}
                       setValue={(field, value) => {
@@ -385,7 +368,6 @@ const Auth: React.FC = () => {
                     />
                   </div>
                 </div>
-                {/* Company Size + Industry in one row */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="companySize" className="block text-white font-medium mb-1">Size</label>
@@ -393,7 +375,7 @@ const Auth: React.FC = () => {
                       id="companySize"
                       value={company.size}
                       onChange={e => handleCompanyChange('size', e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
                       required
                     >
                       <option value="">Select size...</option>
@@ -409,7 +391,7 @@ const Auth: React.FC = () => {
                       id="companyIndustry"
                       value={company.industry || ""}
                       onChange={e => handleCompanyChange('industry', e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
                       required
                     >
                       <option value="">Select industry...</option>
