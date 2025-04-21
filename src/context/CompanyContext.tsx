@@ -2,7 +2,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
 
 type CompanyContextType = {
   company: any | null;
@@ -28,7 +27,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [subdomain, setSubdomain] = useState<string | null>(null);
   const [isSubdomainMode, setIsSubdomainMode] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [companyNotFound, setCompanyNotFound] = useState(false);
 
   // Extract subdomain from current hostname
   const extractSubdomain = () => {
@@ -65,10 +63,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const fetchCompanyData = async (subdomainValue: string) => {
     try {
       setLoading(true);
-      setCompanyNotFound(false);
-      
-      console.log("Fetching company data for subdomain:", subdomainValue);
-      
       const { data, error } = await supabase
         .from('companies')
         .select('*')
@@ -78,7 +72,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (error) {
         console.error('Error fetching company by subdomain:', error);
         setCompany(null);
-        setCompanyNotFound(true);
       } else {
         console.log('Company data fetched by subdomain:', data);
         setCompany(data);
@@ -86,7 +79,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (error) {
       console.error('Error in company data fetch by subdomain:', error);
       setCompany(null);
-      setCompanyNotFound(true);
     } finally {
       setLoading(false);
     }
@@ -200,11 +192,10 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       console.log({
         company: company ? company.name : 'No company',
         subdomain,
-        isSubdomainMode,
-        companyNotFound
+        isSubdomainMode
       });
     }
-  }, [company, subdomain, isSubdomainMode, companyNotFound]);
+  }, [company, subdomain, isSubdomainMode]);
 
   return (
     <CompanyContext.Provider value={{ 
@@ -214,26 +205,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       isSubdomainMode,
       refreshCompany 
     }}>
-      {isSubdomainMode && companyNotFound && !loading ? (
-        <NotFoundRedirect />
-      ) : (
-        children
-      )}
+      {children}
     </CompanyContext.Provider>
   );
-};
-
-// Component to handle company not found scenario
-const NotFoundRedirect: React.FC = () => {
-  // Access the current route
-  const currentPath = window.location.pathname;
-  
-  // Only redirect if not already on the not found page
-  useEffect(() => {
-    if (currentPath !== '/' && currentPath !== '/not-found') {
-      window.location.href = '/not-found';
-    }
-  }, [currentPath]);
-
-  return null;
 };
