@@ -108,12 +108,12 @@ const Projects = () => {
       <SidebarProvider>
         <div className="w-full min-h-screen flex flex-row">
           <DashboardSidebar />
-          <div className="flex-1 flex flex-col pl-[240px]">
+          <div className="flex-1 flex flex-col pl-[280px]">
             <AppHeader />
-            <div className="pt-[56px]">
-              <div className="flex justify-center items-center min-h-[calc(100vh-56px)] bg-background">
+            <div className="pt-[64px]">
+              <div className="flex justify-center items-center min-h-[calc(100vh-64px)] bg-background">
                 <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <Loader2 className="h-8 w-8 animate-spin text-[#6E59A5]" />
                   <p className="text-sm text-muted-foreground">Loading projects...</p>
                 </div>
               </div>
@@ -128,9 +128,9 @@ const Projects = () => {
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
         <DashboardSidebar />
-        <div className="flex-1 flex flex-col pl-[240px]">
+        <div className="flex-1 flex flex-col pl-[280px]">
           <AppHeader />
-          <div className="pt-[56px]">
+          <div className="pt-[64px]">
             <div className="flex-1 p-8 bg-background">
               <div className="max-w-6xl mx-auto space-y-8">
                 <div className="flex justify-between items-center">
@@ -139,7 +139,7 @@ const Projects = () => {
                     variant="outline" 
                     size="sm" 
                     onClick={() => refreshCompany()}
-                    className="gap-2"
+                    className="gap-2 border-[#6E59A5] text-[#6E59A5] hover:bg-[#6E59A5] hover:text-white"
                   >
                     <RefreshCw className="h-4 w-4" /> 
                     Refresh

@@ -109,21 +109,23 @@ export function DashboardSidebar() {
 
   return (
     <Sidebar 
-      className="bg-[#8E9196] border-r border-[#7d8086] pt-0 min-h-screen transition-[width] fixed left-0 top-0 bottom-0 w-[240px]"
+      className="bg-[#8E9196] border-r border-[#7d8086] pt-0 min-h-screen transition-[width] fixed left-0 top-0 bottom-0 w-[280px]"
       style={{ marginTop: 0 }}
     >
       <SidebarContent className="p-0">
         <SidebarGroup>
-          <div className="flex items-center justify-between px-4 py-4 h-[56px] border-b border-[#7d8086]">
+          <div className="flex items-center justify-between px-6 py-4 h-[64px] border-b border-[#7d8086]">
             <div className="flex items-center gap-2">
-              <span className="text-xl font-semibold text-white select-none">Bare<span className="text-[#6E59A5]">Resource</span></span>
+              <span className="text-2xl font-bold text-[#8E9196] select-none">
+                Bare<span className="bg-gradient-to-r from-[#6E59A5] via-[#9b87f5] to-[#D946EF] bg-clip-text text-transparent">Resource</span>
+              </span>
             </div>
-            <SidebarTrigger className="text-white bg-transparent hover:bg-[#7d8086]" />
+            <SidebarTrigger className="text-white bg-transparent hover:bg-[#7d8086] h-9 w-9" />
           </div>
           
           {navigationItems.map((section) => (
-            <div key={section.label} className="mb-1">
-              <SidebarGroupLabel className="text-white/70 px-4 pt-6 pb-2">
+            <div key={section.label} className="mb-2">
+              <SidebarGroupLabel className="text-white/70 px-6 pt-6 pb-3">
                 {collapsed ? "" : section.label}
               </SidebarGroupLabel>
               <SidebarContent>
@@ -139,17 +141,18 @@ export function DashboardSidebar() {
                             hover:text-white 
                             hover:bg-[#7d8086]
                             rounded-none
-                            px-4
-                            py-2
+                            px-6
+                            py-3
                             flex
                             items-center
-                            gap-3
+                            gap-4
                             transition-all
-                            ${isActive ? "bg-[#7d8086] text-white" : ""}
+                            text-base
+                            ${isActive ? "bg-[#6E59A5] text-white" : ""}
                           `}
                           isActive={isActive}
                         >
-                          <Link to={item.url} className="flex items-center gap-3 w-full">
+                          <Link to={item.url} className="flex items-center gap-4 w-full">
                             <item.icon className="h-5 w-5" />
                             {!collapsed && <span>{item.title}</span>}
                           </Link>
