@@ -120,23 +120,56 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
 
       console.log('User signup successful:', signUpData.user?.id);
 
-      // Use our helper to ensure profile is created
       if (signUpData.user) {
-        // Wait briefly to allow database trigger to work
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Wait to allow database trigger to work
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        const profileSuccess = await ensureUserProfile(signUpData.user.id, {
-          email: ownerEmail,
-          firstName: ownerFirstName,
-          lastName: ownerLastName,
-          companyId: companyData.id,
-          role: 'owner'
-        });
-        
-        console.log('Profile creation result:', profileSuccess);
-        
-        if (!profileSuccess) {
-          console.warn('Automated profile creation may have failed, manual fallback attempted');
+        // Attempt manual profile creation with multiple retries
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          console.log(`Manual profile creation attempt ${attempt}`);
+          
+          const profileSuccess = await ensureUserProfile(signUpData.user.id, {
+            email: ownerEmail,
+            firstName: ownerFirstName,
+            lastName: ownerLastName,
+            companyId: companyData.id,
+            role: 'owner'
+          });
+          
+          if (profileSuccess) {
+            console.log('Profile creation successful on attempt', attempt);
+            break;
+          } else if (attempt < 3) {
+            console.log(`Profile creation failed on attempt ${attempt}, retrying...`);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+          } else {
+            console.warn('All profile creation attempts failed, user may need to log in again');
+          }
+        }
+      }
+
+      // Direct insert fallback (as a last resort)
+      if (signUpData.user) {
+        try {
+          console.log('Attempting direct profile insert as fallback');
+          const { error: directInsertError } = await supabase
+            .from('profiles')
+            .upsert({
+              id: signUpData.user.id,
+              email: ownerEmail,
+              first_name: ownerFirstName,
+              last_name: ownerLastName,
+              company_id: companyData.id,
+              role: 'owner'
+            });
+            
+          if (directInsertError) {
+            console.warn('Direct profile insert fallback also failed:', directInsertError.message);
+          } else {
+            console.log('Direct profile insert fallback succeeded');
+          }
+        } catch (fallbackError) {
+          console.error('Error in direct profile insert fallback:', fallbackError);
         }
       }
 

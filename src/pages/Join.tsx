@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -67,22 +66,57 @@ const Join: React.FC = () => {
 
         // Ensure profile is created for this user
         if (data.user) {
-          // Wait briefly to allow database trigger to work
-          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Wait to allow database trigger to work
+          await new Promise(resolve => setTimeout(resolve, 2000));
           
-          // Attempt manual profile creation as a backup
-          const profileCreated = await ensureUserProfile(data.user.id, {
-            email,
-            firstName,
-            lastName,
-            companyId: company?.id,
-            role: 'member'
-          });
+          // Try multiple times to create the profile
+          let profileCreated = false;
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            console.log(`Attempt ${attempt} to create profile for user ${data.user.id}`);
+            
+            profileCreated = await ensureUserProfile(data.user.id, {
+              email,
+              firstName,
+              lastName,
+              companyId: company?.id,
+              role: 'member'
+            });
+            
+            if (profileCreated) {
+              console.log('Profile created or verified successfully on attempt', attempt);
+              break;
+            } else if (attempt < 3) {
+              console.log(`Profile creation failed on attempt ${attempt}, retrying...`);
+              await new Promise(resolve => setTimeout(resolve, 1500));
+            } else {
+              console.warn('All profile creation attempts failed');
+            }
+          }
           
+          // Direct insert fallback (as a last resort)
           if (!profileCreated) {
-            console.warn('Warning: Could not verify profile creation. The user may need to update their profile later.');
-          } else {
-            console.log('Profile created or verified successfully');
+            try {
+              console.log('Attempting direct profile insert as fallback');
+              const { error: directInsertError } = await supabase
+                .from('profiles')
+                .upsert({
+                  id: data.user.id,
+                  email: email,
+                  first_name: firstName,
+                  last_name: lastName,
+                  company_id: company?.id,
+                  role: 'member'
+                });
+                
+              if (directInsertError) {
+                console.warn('Direct profile insert fallback also failed:', directInsertError.message);
+              } else {
+                profileCreated = true;
+                console.log('Direct profile insert fallback succeeded');
+              }
+            } catch (fallbackError) {
+              console.error('Error in direct profile insert fallback:', fallbackError);
+            }
           }
           
           toast.success('Account created successfully! Please check your email for verification.');
