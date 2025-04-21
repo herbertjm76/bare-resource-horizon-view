@@ -33,13 +33,16 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const hostname = window.location.hostname;
     const params = new URLSearchParams(window.location.search);
     
-    // For localhost development, support both subdomain.localhost and ?subdomain= parameter
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    // For localhost development, prioritize subdomain.localhost pattern
+    if (hostname === 'localhost' || hostname.endsWith('.localhost') || hostname === '127.0.0.1') {
+      console.log('Checking for localhost subdomain pattern');
+      
       // First check for subdomain.localhost pattern
       const localParts = window.location.host.split('.');
-      if (localParts.length > 1 && localParts[1] === 'localhost') {
-        console.log('Found localhost subdomain:', localParts[0]);
-        return localParts[0];
+      if (localParts.length > 1 && (localParts[1] === 'localhost' || localParts[1].includes('localhost:'))) {
+        const extractedSubdomain = localParts[0];
+        console.log('Found localhost subdomain:', extractedSubdomain);
+        return extractedSubdomain;
       }
       
       // Then check for ?subdomain= parameter
@@ -57,6 +60,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return hostParts[0];
     }
     
+    console.log('No subdomain found, will use user company');
     return null;
   };
 
@@ -72,13 +76,13 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .single();
 
       if (error) {
-        console.error('Error fetching company:', error);
+        console.error('Error fetching company by subdomain:', error);
         setCompany(null);
         toast.error('Company not found');
         return;
       }
 
-      console.log('Found company:', data);
+      console.log('Found company by subdomain:', data);
       setCompany(data);
     } catch (error) {
       console.error('Error in fetchCompanyData:', error);
@@ -91,6 +95,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const fetchUserCompany = async () => {
     try {
       setLoading(true);
+      console.log('Attempting to fetch user company');
       
       // First check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
@@ -98,6 +103,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (!session) {
         console.log("No active session, cannot fetch company data");
         setCompany(null);
+        setLoading(false);
         return;
       }
       
@@ -111,6 +117,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (profileError || !profile || !profile.company_id) {
         console.log("No company associated with user profile");
         setCompany(null);
+        setLoading(false);
         return;
       }
       
@@ -138,7 +145,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const refreshCompany = async () => {
     const currentSubdomain = extractSubdomain();
-    console.log('Current subdomain:', currentSubdomain);
+    console.log('Current subdomain check result:', currentSubdomain);
     setSubdomain(currentSubdomain);
     
     if (currentSubdomain) {
@@ -173,18 +180,22 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Initial setup
   useEffect(() => {
     const loadInitialData = async () => {
+      console.log('CompanyContext: Initial loading started');
       const currentSubdomain = extractSubdomain();
-      console.log('Initial subdomain check:', currentSubdomain);
+      console.log('Initial subdomain check result:', currentSubdomain);
       setSubdomain(currentSubdomain);
       
       if (currentSubdomain) {
+        console.log('Using subdomain mode with:', currentSubdomain);
         setIsSubdomainMode(true);
         await fetchCompanyData(currentSubdomain);
       } else {
+        console.log('Using user profile mode');
         setIsSubdomainMode(false);
         await fetchUserCompany();
       }
       setAuthChecked(true);
+      console.log('CompanyContext: Initial loading completed');
     };
 
     loadInitialData();
@@ -193,13 +204,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // For debugging in development
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log({
+      console.log('CompanyContext state updated:', {
         company: company ? company.name : 'No company',
         subdomain,
-        isSubdomainMode
+        isSubdomainMode,
+        loading
       });
     }
-  }, [company, subdomain, isSubdomainMode]);
+  }, [company, subdomain, isSubdomainMode, loading]);
 
   return (
     <CompanyContext.Provider value={{ 
