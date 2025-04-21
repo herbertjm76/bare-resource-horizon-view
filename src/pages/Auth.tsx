@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
 import CountryField from '@/components/CompanyRegistrationForm/CountryField';
 import AddressField from '@/components/CompanyRegistrationForm/AddressField';
 import CityField from '@/components/CompanyRegistrationForm/CityField';
@@ -47,6 +49,13 @@ const Auth: React.FC = () => {
 
   const navigate = useNavigate();
 
+  // Set up form validation using react-hook-form
+  const form = useForm<CompanyFormData>({
+    defaultValues: emptyCompany
+  });
+  
+  const { register, watch, setValue, formState: { errors } } = form;
+
   // Auto-redirect if already logged in
   useEffect(() => {
     const checkAuth = async () => {
@@ -57,6 +66,13 @@ const Auth: React.FC = () => {
     };
     checkAuth();
   }, [navigate]);
+
+  // Update form values when company state changes
+  useEffect(() => {
+    Object.entries(company).forEach(([key, value]) => {
+      setValue(key as keyof CompanyFormData, value);
+    });
+  }, [company, setValue]);
 
   // Utility to check for subdomain availability
   const checkSubdomainAvailability = async (subdomain: string) => {
@@ -140,7 +156,8 @@ const Auth: React.FC = () => {
           website: company.website,
           address: company.address,
           size: company.size,
-          city: company.city
+          city: company.city,
+          country: company.country
         })
         .select()
         .single();
@@ -177,165 +194,202 @@ const Auth: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-4">
       <div className="w-full max-w-xl bg-white/10 backdrop-blur-md rounded-xl p-8 shadow-lg">
-        <h2 className="text-3xl font-bold text-white text-center mb-6">
+        <h1 className="text-3xl font-bold text-white text-center mb-6">
           BareResource Pro
-        </h2>
+        </h1>
         {isLogin ? (
           <form className="space-y-6" onSubmit={handleLogin}>
             <div>
-              <label htmlFor="ownerEmail" className="block text-white mb-2">Email</label>
-              <Input
-                type="email"
-                id="ownerEmail"
-                value={ownerEmail}
-                onChange={(e) => setOwnerEmail(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="ownerPassword" className="block text-white mb-2">Password</label>
-              <Input
-                type="password"
-                id="ownerPassword"
-                value={ownerPassword}
-                onChange={(e) => setOwnerPassword(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                required
-              />
+              <h2 className="text-xl font-semibold text-white mb-4">Login</h2>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="ownerEmail" className="block text-white font-medium mb-2">Email</label>
+                  <Input
+                    type="email"
+                    id="ownerEmail"
+                    value={ownerEmail}
+                    onChange={(e) => setOwnerEmail(e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="ownerPassword" className="block text-white font-medium mb-2">Password</label>
+                  <Input
+                    type="password"
+                    id="ownerPassword"
+                    value={ownerPassword}
+                    onChange={(e) => setOwnerPassword(e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    required
+                  />
+                </div>
+              </div>
             </div>
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
+              className="w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-all duration-300"
+              isLoading={loading}
             >
-              {loading ? 'Loading...' : 'Log In'}
+              Log In
             </Button>
           </form>
         ) : (
-          <form className="space-y-4" onSubmit={handleSignUp} autoComplete="off">
-            <h3 className="text-lg font-semibold text-white mb-2 mt-4">Owner Info</h3>
-            <div>
-              <label htmlFor="ownerName" className="block text-white mb-2">Your Name</label>
-              <Input
-                type="text"
-                id="ownerName"
-                value={ownerName}
-                onChange={e => setOwnerName(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="ownerEmail2" className="block text-white mb-2">Email</label>
-              <Input
-                type="email"
-                id="ownerEmail2"
-                value={ownerEmail}
-                onChange={e => setOwnerEmail(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="ownerPassword2" className="block text-white mb-2">Password</label>
-              <Input
-                type="password"
-                id="ownerPassword2"
-                value={ownerPassword}
-                onChange={e => setOwnerPassword(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                required
-              />
-            </div>
-            <h3 className="text-lg font-semibold text-white mb-2 mt-6">Company Info</h3>
-            <div>
-              <label htmlFor="companyName" className="block text-white mb-2">Company Name</label>
-              <Input
-                type="text"
-                id="companyName"
-                value={company.name}
-                onChange={e => handleCompanyChange('name', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="companySubdomain" className="block text-white mb-2">Subdomain</label>
-              <div className="flex items-center">
-                <Input
-                  type="text"
-                  id="companySubdomain"
-                  value={company.subdomain}
-                  onChange={e => handleCompanyChange('subdomain', e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                  required
-                />
-                <span className="ml-2 text-gray-300">.bareresource.com</span>
+          <form className="space-y-6" onSubmit={handleSignUp} autoComplete="off">
+            <h2 className="text-xl font-semibold text-white mb-2">Sign Up & Register Company</h2>
+            
+            <div className="space-y-6">
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-3 border-b border-white/20 pb-2">Owner Information</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label htmlFor="ownerName" className="block text-white font-medium mb-1">Your Name</label>
+                    <Input
+                      type="text"
+                      id="ownerName"
+                      value={ownerName}
+                      onChange={e => setOwnerName(e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="ownerEmail2" className="block text-white font-medium mb-1">Email</label>
+                    <Input
+                      type="email"
+                      id="ownerEmail2"
+                      value={ownerEmail}
+                      onChange={e => setOwnerEmail(e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="ownerPassword2" className="block text-white font-medium mb-1">Password</label>
+                    <Input
+                      type="password"
+                      id="ownerPassword2"
+                      value={ownerPassword}
+                      onChange={e => setOwnerPassword(e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
-              {subdomainCheck.isChecking && (
-                <p className="text-blue-400 text-sm mt-1">Checking availability...</p>
-              )}
-              {subdomainCheck.error && (
-                <p className="text-red-400 text-sm mt-1">{subdomainCheck.error}</p>
-              )}
+              
+              <div className="bg-white/5 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-white mb-3 border-b border-white/20 pb-2">Company Information</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label htmlFor="companyName" className="block text-white font-medium mb-1">Company Name</label>
+                    <Input
+                      type="text"
+                      id="companyName"
+                      value={company.name}
+                      onChange={e => handleCompanyChange('name', e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="companySubdomain" className="block text-white font-medium mb-1">Subdomain</label>
+                    <div className="flex items-center">
+                      <Input
+                        type="text"
+                        id="companySubdomain"
+                        value={company.subdomain}
+                        onChange={e => handleCompanyChange('subdomain', e.target.value)}
+                        className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                        required
+                      />
+                      <span className="ml-2 text-gray-300">.bareresource.com</span>
+                    </div>
+                    {subdomainCheck.isChecking && (
+                      <p className="text-blue-400 text-sm mt-1">Checking availability...</p>
+                    )}
+                    {subdomainCheck.error && (
+                      <p className="text-red-400 text-sm mt-1">{subdomainCheck.error}</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="companyCountry" className="block text-white font-medium mb-1">Country</label>
+                    <CountryField
+                      watch={watch}
+                      setValue={(field, value) => {
+                        setValue(field as any, value);
+                        handleCompanyChange(field as keyof CompanyFormData, value);
+                      }}
+                      errors={errors}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="companyAddress" className="block text-white font-medium mb-1">Company Address</label>
+                    <AddressField
+                      watch={watch}
+                      setValue={(field, value) => {
+                        setValue(field as any, value);
+                        handleCompanyChange(field as keyof CompanyFormData, value);
+                      }}
+                      errors={errors}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="companyCity" className="block text-white font-medium mb-1">City</label>
+                    <Input
+                      type="text"
+                      id="companyCity"
+                      value={company.city}
+                      onChange={e => handleCompanyChange('city', e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="companySize" className="block text-white font-medium mb-1">Company Size</label>
+                    <select
+                      id="companySize"
+                      value={company.size}
+                      onChange={e => handleCompanyChange('size', e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      required
+                    >
+                      <option value="">Select size...</option>
+                      <option value="1-5">1-5</option>
+                      <option value="5-25">5-25</option>
+                      <option value="26-50">26-50</option>
+                      <option value="51-100">51-100</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label htmlFor="website" className="block text-white font-medium mb-1">Website (optional)</label>
+                    <Input
+                      id="website"
+                      type="url"
+                      value={company.website || ''}
+                      onChange={e => handleCompanyChange('website', e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                      placeholder="https://yourcompany.com"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <label htmlFor="companyCountry" className="block text-white mb-2">Country</label>
-              <CountryField
-                watch={key => company.country}
-                setValue={(field, value) => handleCompanyChange('country', value)}
-                errors={{}}
-              />
-            </div>
-            <div>
-              <label htmlFor="companyAddress" className="block text-white mb-2">Company Address</label>
-              <AddressField
-                watch={key => company.address}
-                setValue={(field, value) => handleCompanyChange('address', value)}
-                errors={{}}
-              />
-            </div>
-            <div>
-              <label htmlFor="companyCity" className="block text-white mb-2">City</label>
-              <Input
-                type="text"
-                id="companyCity"
-                value={company.city}
-                onChange={e => handleCompanyChange('city', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="companySize" className="block text-white mb-2">Company Size</label>
-              <SizeField
-                register={(field: any) => ({
-                  name: 'size',
-                  value: company.size,
-                  onChange: (e: React.ChangeEvent<HTMLSelectElement>) =>
-                    handleCompanyChange('size', e.target.value)
-                })}
-                errors={{}}
-              />
-            </div>
-            <div>
-              <label htmlFor="website" className="block text-white mb-2">Website (optional)</label>
-              <Input
-                id="website"
-                type="url"
-                value={company.website || ''}
-                onChange={e => handleCompanyChange('website', e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                placeholder="https://yourcompany.com"
-              />
-            </div>
+            
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
+              className="w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-all duration-300"
+              isLoading={loading}
             >
-              {loading ? 'Submitting...' : 'Sign Up & Register Company'}
+              Sign Up & Register Company
             </Button>
           </form>
         )}
@@ -373,4 +427,3 @@ const Auth: React.FC = () => {
 };
 
 export default Auth;
-
