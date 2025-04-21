@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -125,7 +126,7 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+        <div className="text-muted-foreground text-xl">Loading...</div>
       </div>
     );
   }
@@ -142,7 +143,7 @@ const Dashboard: React.FC = () => {
           <div className="flex-1 flex flex-col bg-white">
             <AppHeader />
             <div style={{ height: HEADER_HEIGHT }} />
-            <div className="flex-1 p-8 max-w-6xl mx-auto">
+            <div className="flex-1 p-8 max-w-6xl mx-auto text-muted-foreground">
               <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || "User"} />
               <DashboardMetrics />
               {(profile?.role === 'owner' || profile?.role === 'admin') && (
@@ -161,3 +162,4 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+

@@ -125,7 +125,7 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
   // Invite Code Dialog
   const [inviteOpen, setInviteOpen] = useState(false);
 
-  // Main gradient sidebar
+  // Main gradient sidebar with purple-blue-magenta background and grey text
   return (
     <Sidebar
       className={`
@@ -135,12 +135,13 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
         shadow-xl
         bg-gradient-to-br from-[#9b87f5] via-[#1EAEDB] to-[#D946EF]
         bg-fixed
+        text-[#8E9196] 
         relative
       `}
       data-gradient-sidebar
     >
       <SidebarContent className="p-0">
-        {/* Company Logo and Collapse Button */}
+        {/* Company Logo and Collapse Button with grey text */}
         <div className="flex flex-col items-stretch w-full">
           <div
             className={`flex items-center justify-between gap-2 px-4 py-7 ${
@@ -152,19 +153,19 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                 src={LOGO_URL}
                 alt="Company Logo"
                 className={`shadow-lg rounded-full border-2 border-white/80 ${
-                  collapsed ? "w-14 h-14" : "w-12 h-12"
+                  collapsed ? "w-14 h-14" : "w-16 h-16"
                 } bg-white object-cover duration-200`}
                 style={{
-                  minWidth: 44,
-                  minHeight: 44,
-                  maxWidth: 56,
-                  maxHeight: 56,
+                  minWidth: 56,
+                  minHeight: 56,
+                  maxWidth: 64,
+                  maxHeight: 64,
                   objectFit: "cover",
                 }}
               />
               {!collapsed && (
                 <span
-                  className="text-3xl font-extrabold text-white drop-shadow bare-logo-shadow tracking-wide whitespace-nowrap"
+                  className="text-4xl font-extrabold text-[#8E9196] tracking-wide whitespace-nowrap"
                   style={{ letterSpacing: 1.5 }}
                 >
                   BareResource
@@ -174,13 +175,15 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
             <button
               onClick={toggleSidebar}
               className={`transition-colors rounded-full p-1 ml-2 ${
-                collapsed
-                  ? "bg-white/30 hover:bg-white/60"
-                  : "bg-white/20 hover:bg-white/40"
-              } text-white shadow-md focus:outline-none focus:ring-2 focus:ring-white`}
+                collapsed ? "bg-white/30 hover:bg-white/60" : "bg-white/20 hover:bg-white/40"
+              } text-[#8E9196] shadow-md focus:outline-none focus:ring-2 focus:ring-white`}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              {collapsed ? <ChevronRight className="w-7 h-7" /> : <ChevronLeft className="w-7 h-7" />}
+              {collapsed ? (
+                <ChevronRight className="w-9 h-9" />
+              ) : (
+                <ChevronLeft className="w-9 h-9" />
+              )}
             </button>
           </div>
         </div>
@@ -189,7 +192,7 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
         {navigationItems.map((section) => (
           <SidebarGroup key={section.label}>
             <SidebarGroupLabel
-              className={`text-white/90 uppercase tracking-wide font-semibold text-xs mb-1 ${
+              className={`text-[#8E9196]/90 uppercase tracking-wide font-semibold text-sm mb-1 ${
                 collapsed ? "hidden" : ""
               }`}
             >
@@ -204,32 +207,30 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                       <SidebarMenuButton
                         asChild
                         className={`
-                          text-white/95 
-                          text-lg
-                          hover:text-white
+                          text-[#8E9196]/95 
+                          text-xl
+                          hover:text-[#8E9196]
                           hover:bg-white/20
-                          px-4 py-3
-                          my-1
+                          px-5 py-4
+                          my-2
                           rounded-xl
                           flex
                           items-center
-                          gap-5
+                          gap-6
                           transition-all
                           ease-in
                           group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0
-                          ${isActive ? "bg-white/30 shadow-inner text-white font-semibold" : ""}
+                          ${isActive ? "bg-white/30 shadow-inner text-[#8E9196] font-semibold" : ""}
                         `}
                         isActive={isActive}
                         aria-current={isActive ? "page" : undefined}
-                        // Ensure focus visible is strong for accessibility
-                        // We'll rely on inherited styles from SidebarMenuButton
                       >
                         {/* Handle Invite Code special: open dialog on click */}
                         {item.isInvite ? (
                           <button
                             type="button"
                             className={`
-                              w-full flex items-center gap-5
+                              w-full flex items-center gap-6
                               group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
                               focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none transition-shadow
                             `}
@@ -240,7 +241,9 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                             }}
                           >
                             <item.icon
-                              className={`${collapsed ? "w-10 h-10" : "w-8 h-8"} drop-shadow-sm flex-shrink-0 transition-all`}
+                              className={`${
+                                collapsed ? "w-12 h-12" : "w-10 h-10"
+                              } drop-shadow-sm flex-shrink-0 transition-all text-[#8E9196]`}
                               aria-hidden="true"
                             />
                             <span
@@ -255,7 +258,7 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                           <Link
                             to={item.url}
                             className={`
-                              flex items-center gap-5 w-full
+                              flex items-center gap-6 w-full
                               group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
                               font-medium
                               transition-all
@@ -263,8 +266,8 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                           >
                             <item.icon
                               className={`${
-                                collapsed ? "w-10 h-10" : "w-8 h-8"
-                              } drop-shadow-sm flex-shrink-0 transition-all`}
+                                collapsed ? "w-12 h-12" : "w-10 h-10"
+                              } drop-shadow-sm flex-shrink-0 transition-all text-[#8E9196]`}
                               aria-hidden="true"
                             />
                             <span
@@ -286,8 +289,8 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
         ))}
       </SidebarContent>
       {/* Sidebar collapse/expand affordance always visible on wide screens */}
-      <div className="flex justify-end items-center px-2 py-4 md:block hidden">
-        <SidebarTrigger className="text-white hover:bg-white/30" />
+      <div className="flex justify-end items-center px-4 py-6 md:block hidden">
+        <SidebarTrigger className="text-[#8E9196] hover:bg-white/30" />
       </div>
       {/* Invite Code Dialog */}
       <InviteCodeDialog open={inviteOpen} onOpenChange={setInviteOpen} inviteUrl={inviteUrl || ""} />
