@@ -41,13 +41,16 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
     const metaData = user?.user_metadata || {};
     console.log('User metadata for profile creation:', metaData);
     
+    // Ensure role is a valid type from the user_role enum
+    const role = userData?.role || metaData.role || 'member';
+    
     const profileData = {
       id: userId,
       email: userData?.email || user?.email,
       first_name: userData?.firstName || metaData.first_name,
       last_name: userData?.lastName || metaData.last_name,
       company_id: userData?.companyId || metaData.company_id,
-      role: userData?.role || metaData.role || 'member'
+      role: role
     };
     
     console.log('Attempting to create profile with data:', profileData);

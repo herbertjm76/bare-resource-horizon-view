@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,7 +37,9 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
         }
 
         console.log(`Attempting to sign up user with email: ${email}`);
-        console.log(`User metadata: firstName=${firstName}, lastName=${lastName}, companyId=${company?.id}`);
+        
+        // Explicitly cast role to a string to avoid type issues
+        const role = 'member';
         
         // Register new user with metadata
         const { data, error } = await supabase.auth.signUp({
@@ -47,7 +50,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
               first_name: firstName,
               last_name: lastName,
               company_id: company?.id,
-              role: 'member'
+              role: role
             }
           }
         });
@@ -74,7 +77,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
               firstName,
               lastName,
               companyId: company?.id,
-              role: 'member'
+              role: role // Pass role as a string
             });
             
             if (profileCreated) {
@@ -100,7 +103,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
                   first_name: firstName,
                   last_name: lastName,
                   company_id: company?.id,
-                  role: 'member'
+                  role: role // Use string value directly
                 });
                 
               if (directInsertError) {
@@ -131,13 +134,14 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
           .from('profiles')
           .select('company_id')
           .eq('id', data.user.id)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single to avoid errors if not found
 
-        if (profileError) {
+        if (profileError || !profile) {
           // If profile doesn't exist, try to create it
           const profileCreated = await ensureUserProfile(data.user.id, {
             email,
-            companyId: company?.id
+            companyId: company?.id,
+            role: 'member' // Use string value directly
           });
           
           if (!profileCreated) {
@@ -152,7 +156,8 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
         navigate('/dashboard');
       }
     } catch (error: any) {
-      toast.error(error.message);
+      console.error('Authentication error:', error);
+      toast.error(error.message || 'Authentication failed. Please try again.');
     } finally {
       setLoading(false);
     }
