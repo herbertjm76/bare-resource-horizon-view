@@ -49,11 +49,16 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
     console.log('User metadata for profile creation:', metaData);
     
     // Ensure role is always a valid UserRole enum value
-    const userRole: UserRole = (userData?.role || metaData.role || 'member') as UserRole;
+    let userRole: UserRole;
+    const providedRole = userData?.role || metaData.role || 'member';
     
     // Make sure the role is one of the valid enum values
     const validRoles: UserRole[] = ['owner', 'admin', 'member'];
-    const role: UserRole = validRoles.includes(userRole) ? userRole : 'member';
+    if (validRoles.includes(providedRole as UserRole)) {
+      userRole = providedRole as UserRole;
+    } else {
+      userRole = 'member';
+    }
     
     const profileData = {
       id: userId,
@@ -61,7 +66,7 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
       first_name: userData?.firstName || metaData.first_name,
       last_name: userData?.lastName || metaData.last_name,
       company_id: userData?.companyId || metaData.company_id,
-      role
+      role: userRole
     };
     
     console.log('Creating profile with data:', profileData);
