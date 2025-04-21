@@ -21,7 +21,9 @@ export const AppHeader: React.FC = () => {
     let authSubscription: { unsubscribe: () => void } | null = null;
     setLoading(true);
     (async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       const { data } = supabase.auth.onAuthStateChange((_event, session) => {
         setUser(session?.user ?? null);
@@ -40,28 +42,28 @@ export const AppHeader: React.FC = () => {
   };
 
   return (
-    <header 
+    <header
       className="w-full px-4 py-2 flex items-center justify-between z-30 shadow-md bg-white/90 border-b border-white/30"
-      style={{minHeight:56}}
+      style={{ minHeight: 56 }}
     >
-      <h1 
+      <h1
         className="flex items-center text-[2.5rem] sm:text-[3.25rem] font-black select-none leading-none"
         aria-label="BareResource"
         style={{
           lineHeight: 1.1,
-          letterSpacing: "0.5px"
+          letterSpacing: "0.5px",
         }}
       >
         <span
           className="bare-logo-shadow"
           style={{
-            color: "white",
-            WebkitTextStroke: "0.3px #cccccc",
-            textShadow: "0 4px 18px rgba(40,40,76,0.18)",
+            color: BARE_GRAY,
+            // Removed white outline (no text stroke)
+            textShadow: "0 3px 8px rgba(0, 0, 0, 0.9), 0 0 5px rgba(0, 0, 0, 0.7)",
             fontWeight: 900,
             letterSpacing: "0.5px",
             display: "inline-block",
-            marginRight: 0,      // No space between Bare and Resource
+            marginRight: 0, // No space between Bare and Resource
           }}
         >
           Bare
@@ -69,7 +71,8 @@ export const AppHeader: React.FC = () => {
         <span
           className="bare-logo-shadow"
           style={{
-            background: "linear-gradient(90deg, #7c52a0 0%, #5863a9 45%, #5a7eb7 65%, #c153bd 100%)",
+            background:
+              "linear-gradient(90deg, #7c52a0 0%, #5863a9 45%, #5a7eb7 65%, #c153bd 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 900,
@@ -83,19 +86,17 @@ export const AppHeader: React.FC = () => {
       <div className="flex items-center gap-4">
         {!loading && user ? (
           <>
-            <span className="hidden sm:inline text-[#8E9196]">{company?.name ? company.name : "Company"}</span>
-            <Button 
-              asChild 
-              variant="ghost" 
-              className="text-[#8E9196] hover:bg-[#8E9196]/10"
-            >
+            <span className="hidden sm:inline text-[#8E9196]">
+              {company?.name ? company.name : "Company"}
+            </span>
+            <Button asChild variant="ghost" className="text-[#8E9196] hover:bg-[#8E9196]/10">
               <Link to="/profile">
                 <UserIcon className="mr-2 h-4 w-4" /> My Profile
               </Link>
             </Button>
-            <Button 
-              variant="ghost" 
-              className="text-[#8E9196] hover:bg-[#8E9196]/10" 
+            <Button
+              variant="ghost"
+              className="text-[#8E9196] hover:bg-[#8E9196]/10"
               onClick={handleLogout}
             >
               <LogOut className="mr-2 h-4 w-4" /> Sign Out
