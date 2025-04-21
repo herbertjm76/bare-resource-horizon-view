@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { ProjectsList } from '@/components/projects/ProjectsList';
@@ -8,21 +8,101 @@ import { useCompany } from '@/context/CompanyContext';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthorization } from '@/hooks/useAuthorization';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const HEADER_HEIGHT = 56; // Should match AppHeader minHeight
 
 const Projects = () => {
   const { company, loading: companyLoading, refreshCompany, error: companyError } = useCompany();
   const navigate = useNavigate();
-  const { loading: authLoading, error: authError } = useAuthorization();
+  const [authLoading, setAuthLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [user, setUser] = useState(null);
+  
+  // Direct authentication check instead of using useAuthorization hook
+  useEffect(() => {
+    let isMounted = true;
+    const loadingTimeout = setTimeout(() => {
+      if (isMounted && authLoading) {
+        console.log("Loading timeout reached, setting authLoading to false");
+        setAuthLoading(false);
+      }
+    }, 5000);
+    
+    const checkAuth = async () => {
+      try {
+        console.log("Projects: Checking auth directly");
+        setAuthLoading(true);
+        setAuthError(null);
+        
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Projects: Session error", sessionError);
+          if (isMounted) {
+            setAuthError("Failed to verify your session");
+            setAuthLoading(false);
+          }
+          return;
+        }
+        
+        if (!session) {
+          console.log("Projects: No session found, redirecting to auth");
+          if (isMounted) {
+            toast.error("Please sign in to continue");
+            navigate('/auth');
+          }
+          return;
+        }
+        
+        console.log("Projects: Session found, user is authenticated");
+        if (isMounted) {
+          setUser(session.user);
+          setAuthLoading(false);
+          setAuthError(null);
+        }
+      } catch (error: any) {
+        console.error("Projects: Auth error:", error);
+        if (isMounted) {
+          setAuthError(error.message || "Authentication error");
+          setAuthLoading(false);
+        }
+      }
+    };
+    
+    checkAuth();
+    
+    // Auth state change listener
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Projects: Auth state changed:", event);
+      if (!isMounted) return;
+      
+      if (event === 'SIGNED_OUT') {
+        navigate('/auth');
+        return;
+      }
+      
+      if (event === 'SIGNED_IN' && session) {
+        setUser(session.user);
+        setAuthLoading(false);
+      }
+    });
+    
+    return () => {
+      console.log("Projects: Cleanup");
+      isMounted = false;
+      clearTimeout(loadingTimeout);
+      authListener.subscription.unsubscribe();
+    };
+  }, [navigate]);
   
   const isLoading = authLoading || companyLoading;
   const error = authError || companyError;
 
   const handleRefresh = () => {
     console.log('Manually refreshing company data from Projects');
-    refreshCompany();
+    window.location.reload(); // Force complete page refresh
   };
 
   // Show a loading spinner while authenticating or loading company data
@@ -34,6 +114,15 @@ const Projects = () => {
           <p className="text-sm text-muted-foreground">
             {authLoading ? "Verifying access..." : "Loading company data..."}
           </p>
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="mt-2"
+            onClick={handleRefresh}
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
           {error && (
             <div className="text-sm text-red-500 mt-2 max-w-md text-center">
               {error}
@@ -72,7 +161,7 @@ const Projects = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={handleRefresh}
+                  onClick={() => refreshCompany()}
                   className="gap-2"
                 >
                   <RefreshCw className="h-4 w-4" /> 
@@ -101,7 +190,7 @@ const Projects = () => {
                         </Button>
                         <Button 
                           variant="outline" 
-                          onClick={handleRefresh}
+                          onClick={() => refreshCompany()}
                           className="gap-2"
                         >
                           <RefreshCw className="h-4 w-4" /> 
