@@ -48,18 +48,50 @@ export const AppHeader: React.FC = () => {
         className="text-2xl font-bold tracking-tight select-none" 
         aria-label="Bare Resource"
       >
-        {/* White text with crisp black outline and no overlap */}
-        <span 
+        {/* White text with outer black stroke */}
+        <span
           className="relative text-white"
           style={{
-            // Multi-directional thin shadow for smooth black outline
-            textShadow:
-              "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
-            letterSpacing: '0.5px',
+            position: 'relative',
             color: 'white',
-            WebkitTextStroke: "none",
+            letterSpacing: '1px', // Increased letter spacing to reduce overlap
+            // Remove any text-shadow or WebkitTextStroke
+            textShadow: 'none',
+            WebkitTextStroke: 'none',
           }}
         >
+          <span style={{
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            color: 'black',
+            zIndex: -1,
+            transform: 'translate(-0.5px, -0.5px)'
+          }}>Bare</span>
+          <span style={{
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            color: 'black',
+            zIndex: -1,
+            transform: 'translate(0.5px, -0.5px)'
+          }}>Bare</span>
+          <span style={{
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            color: 'black',
+            zIndex: -1,
+            transform: 'translate(-0.5px, 0.5px)'
+          }}>Bare</span>
+          <span style={{
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            color: 'black',
+            zIndex: -1,
+            transform: 'translate(0.5px, 0.5px)'
+          }}>Bare</span>
           Bare
         </span>
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-500 to-pink-500 ml-1">
@@ -96,4 +128,3 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
-
