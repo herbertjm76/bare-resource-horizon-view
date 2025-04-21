@@ -37,7 +37,7 @@ export const SidebarNavigation = ({
     <>
       {items.map((section) => (
         <div key={section.label} className="mb-2">
-          <SidebarGroupLabel className="text-white/70 px-6 pt-6 pb-3">
+          <SidebarGroupLabel className="text-white/70 px-2 pt-6 pb-3">
             {collapsed ? "" : section.label}
           </SidebarGroupLabel>
           <SidebarContent>
@@ -53,7 +53,7 @@ export const SidebarNavigation = ({
                         hover:text-white 
                         hover:bg-[#7d8086]
                         rounded-none
-                        px-6
+                        px-2
                         py-4
                         flex
                         items-center
