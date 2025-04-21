@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -73,7 +72,6 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
 
       console.log("Submitting company with data:", data);
 
-      // Insert the company
       const { data: company, error: companyError } = await supabase
         .from('companies')
         .insert({
@@ -82,14 +80,13 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
           website: data.website,
           address: data.address,
           size: data.size,
-          city: data.city // Save city to the companies table
+          city: data.city
         })
         .select()
         .single();
 
       if (companyError) throw companyError;
 
-      // Update the user's profile with the company ID and owner role
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
@@ -107,20 +104,12 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
     }
   };
 
-  // Handle address suggestion selection
-  const handleAddressSuggestion = (address: string, city: string) => {
-    setValue("address", address);
-    if (city) {
-      setValue("city", city);
-    }
-  };
-
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <NameField register={register} errors={errors} />
       <SubdomainField register={register} errors={errors} isChecking={isCheckingSubdomain} />
       <CountryField watch={watch} setValue={setValue} errors={errors} />
-      <AddressField watch={watch} setValue={setValue} errors={errors} handleAddressSuggestion={handleAddressSuggestion} />
+      <AddressField watch={watch} setValue={setValue} errors={errors} />
       <CityField register={register} errors={errors} />
       <SizeField register={register} errors={errors} />
       <WebsiteField register={register} />
