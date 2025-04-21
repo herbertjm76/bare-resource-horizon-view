@@ -30,7 +30,7 @@ export type Location = {
   company_id?: string;
 };
 
-// Define the exact response types from Supabase
+// Define simple response types without excessive nesting
 type SupabaseRole = {
   id: string;
   name: string;
@@ -93,7 +93,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        // Fetch roles for this company
+        // Use explicit type casting for query results to avoid deep type instantiation
         const { data: rolesData, error: rolesError } = await supabase
           .from('office_roles')
           .select('*')
@@ -101,7 +101,6 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (rolesError) throw rolesError;
         
-        // Fetch locations for this company
         const { data: locationsData, error: locationsError } = await supabase
           .from('office_locations')
           .select('*')
@@ -109,7 +108,6 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (locationsError) throw locationsError;
         
-        // Fetch rates for this company
         const { data: ratesData, error: ratesError } = await supabase
           .from('office_rates')
           .select('*')
@@ -117,15 +115,17 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (ratesError) throw ratesError;
 
-        // Handle roles data
+        // Process roles
         if (rolesData) {
+          const typedRolesData = rolesData as unknown as SupabaseRole[];
           const rolesToSet: Role[] = [];
-          for (const roleData of (rolesData as SupabaseRole[])) {
+          
+          for (const role of typedRolesData) {
             rolesToSet.push({
-              id: roleData.id,
-              name: roleData.name,
-              code: roleData.code,
-              company_id: roleData.company_id
+              id: role.id,
+              name: role.name,
+              code: role.code,
+              company_id: role.company_id
             });
           }
           setRoles(rolesToSet);
@@ -133,17 +133,19 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           setRoles([]);
         }
         
-        // Handle locations data
+        // Process locations
         if (locationsData) {
+          const typedLocationsData = locationsData as unknown as SupabaseLocation[];
           const locationsToSet: Location[] = [];
-          for (const locationData of (locationsData as SupabaseLocation[])) {
+          
+          for (const location of typedLocationsData) {
             locationsToSet.push({
-              id: locationData.id,
-              city: locationData.city,
-              country: locationData.country,
-              code: locationData.code,
-              emoji: locationData.emoji,
-              company_id: locationData.company_id
+              id: location.id,
+              city: location.city,
+              country: location.country,
+              code: location.code,
+              emoji: location.emoji,
+              company_id: location.company_id
             });
           }
           setLocations(locationsToSet);
@@ -151,17 +153,19 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           setLocations([]);
         }
         
-        // Handle rates data
+        // Process rates
         if (ratesData) {
+          const typedRatesData = ratesData as unknown as SupabaseRate[];
           const ratesToSet: Rate[] = [];
-          for (const rateData of (ratesData as SupabaseRate[])) {
+          
+          for (const rate of typedRatesData) {
             ratesToSet.push({
-              id: rateData.id,
-              type: rateData.type as "role" | "location",
-              reference_id: rateData.reference_id,
-              value: Number(rateData.value),
-              unit: rateData.unit as "hour" | "day" | "week",
-              company_id: rateData.company_id
+              id: rate.id,
+              type: rate.type as "role" | "location",
+              reference_id: rate.reference_id,
+              value: Number(rate.value),
+              unit: rate.unit as "hour" | "day" | "week",
+              company_id: rate.company_id
             });
           }
           setRates(ratesToSet);
