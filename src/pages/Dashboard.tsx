@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,10 +27,8 @@ const Dashboard: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [teamMembers, setTeamMembers] = useState<Profile[]>([]);
   const [inviteUrl, setInviteUrl] = useState('');
-  const { company, isSubdomainMode, loading: companyLoading } = useCompany();
+  const { company, isSubdomainMode } = useCompany();
   const navigate = useNavigate();
-
-  // Remove the redirection effect that was causing loading issues
 
   useEffect(() => {
     const setupAuth = async () => {

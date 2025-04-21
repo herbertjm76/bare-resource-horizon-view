@@ -27,8 +27,6 @@ const OfficeSettings = () => {
   const { company, loading: companyLoading, refreshCompany } = useCompany();
   const navigate = useNavigate();
 
-  // Remove redirection effect that was causing loading issues
-
   React.useEffect(() => {
     if (!companyLoading && !company) {
       toast.error("No company context found. Please ensure you're logged in with a company account.");

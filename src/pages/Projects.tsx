@@ -16,8 +16,6 @@ const Projects = () => {
   const { company, loading: companyLoading, refreshCompany } = useCompany();
   const navigate = useNavigate();
 
-  // Remove redirection effect that was causing loading issues
-
   return (
     <AuthGuard>
       <SidebarProvider>
