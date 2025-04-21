@@ -30,6 +30,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
   const [subdomainCheck, setSubdomainCheck] = useState({ isChecking: false, error: '' });
   const [loading, setLoading] = useState(false);
   const [showConfirmationInfo, setShowConfirmationInfo] = useState(false);
+  const [signupError, setSignupError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const form = useForm<CompanyFormData>({ defaultValues: emptyCompany });
@@ -64,6 +65,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSignupError(null);
     
     try {
       // Validate required fields
@@ -71,7 +73,16 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         !ownerFirstName || !ownerLastName || !ownerEmail || !ownerPassword ||
         !company.name || !company.subdomain || !company.address || !company.country || !company.city || !company.size || !company.industry
       ) {
+        setSignupError('Please fill in all required fields.');
         toast.error('Please fill in all required fields.');
+        setLoading(false);
+        return;
+      }
+
+      // Check password strength
+      if (ownerPassword.length < 6) {
+        setSignupError('Password must be at least 6 characters long');
+        toast.error('Password must be at least 6 characters long');
         setLoading(false);
         return;
       }
@@ -79,6 +90,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       // Check subdomain availability
       const available = await checkSubdomainAvailability(company.subdomain);
       if (!available) {
+        setSignupError('This subdomain is already taken. Please choose another one.');
         toast.error('This subdomain is already taken. Please choose another one.');
         setLoading(false);
         return;
@@ -130,7 +142,8 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
             last_name: ownerLastName,
             company_id: companyData.id,
             role: userRole
-          }
+          },
+          emailRedirectTo: window.location.origin + '/auth'
         }
       });
 
@@ -176,6 +189,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       
     } catch (error: any) {
       console.error("Signup error:", error);
+      setSignupError(error.message || 'Sign up failed. Please try again.');
       toast.error(error.message || 'Sign up failed. Please try again.');
     } finally {
       setLoading(false);
@@ -186,6 +200,15 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
     <form className="space-y-4" onSubmit={handleSignUp} autoComplete="off">
       <h2 className="text-2xl font-extrabold text-white mb-1 text-center">Sign Up & Register Company</h2>
       <p className="text-white/70 text-center mb-6">Complete your details to create your account and register your company in one step.</p>
+
+      {signupError && (
+        <Alert className="bg-red-500/10 border border-red-500/30 mb-4 text-white">
+          <InfoIcon className="h-4 w-4 text-red-300" />
+          <AlertDescription className="text-white/90">
+            {signupError}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {showConfirmationInfo && (
         <Alert className="bg-blue-500/10 border border-blue-500/30 mb-4 text-white">

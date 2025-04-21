@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { emptyCompany } from './Auth/companyHelpers';
 import LoginForm from './Auth/LoginForm';
 import SignupForm from './Auth/SignupForm';
 import { AlertCircle, Link2 } from 'lucide-react';
@@ -13,6 +12,7 @@ const Auth: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showConfigHelp, setShowConfigHelp] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -38,13 +38,40 @@ const Auth: React.FC = () => {
   // Check if user is already logged in
   useEffect(() => {
     const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        navigate('/dashboard');
+      try {
+        setIsCheckingSession(true);
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session check error:', error);
+          return;
+        }
+        
+        if (data.session) {
+          console.log('User already logged in, redirecting to dashboard');
+          navigate('/dashboard');
+        }
+      } catch (err) {
+        console.error('Error checking session:', err);
+      } finally {
+        setIsCheckingSession(false);
       }
     };
     
     checkSession();
+    
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
+      if (event === 'SIGNED_IN' && session) {
+        toast.success('Successfully signed in!');
+        navigate('/dashboard');
+      }
+    });
+    
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const resendConfirmationEmail = async () => {
@@ -64,6 +91,17 @@ const Auth: React.FC = () => {
       toast.error(err.message || 'Failed to resend confirmation email.');
     }
   };
+
+  if (isCheckingSession) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-4">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white"></div>
+          <p className="text-white mt-4">Checking authentication status...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-4">

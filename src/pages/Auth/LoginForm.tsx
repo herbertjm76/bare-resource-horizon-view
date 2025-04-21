@@ -44,10 +44,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
         
         // Handle specific error cases
         if (error.message.includes('Email not confirmed')) {
-          setErrorMessage('Please confirm your email before logging in');
+          setErrorMessage('Please confirm your email before logging in. Check your inbox for a confirmation link.');
           toast.error('Please confirm your email before logging in');
         } else if (error.message.includes('Invalid login credentials')) {
-          setErrorMessage('Invalid email or password');
+          setErrorMessage('Invalid email or password. Please try again.');
           toast.error('Invalid email or password');
         } else {
           setErrorMessage(error.message);
@@ -75,6 +75,30 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
     }
   };
 
+  const handleResendConfirmation = async () => {
+    if (!email) {
+      setErrorMessage('Please enter your email address to resend the confirmation link');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+      });
+
+      if (error) throw error;
+      toast.success('Confirmation email resent. Please check your inbox.');
+    } catch (error: any) {
+      console.error('Error resending confirmation email:', error);
+      setErrorMessage(error.message || 'Failed to resend confirmation email');
+      toast.error(error.message || 'Failed to resend confirmation email');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <form className="space-y-6" onSubmit={handleLogin}>
       <div>
@@ -83,7 +107,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
         {errorMessage && (
           <div className="bg-red-500/20 border border-red-500/30 rounded-md p-3 mb-4 flex items-start">
             <AlertCircle className="h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
-            <p className="text-white text-sm">{errorMessage}</p>
+            <div className="flex-1">
+              <p className="text-white text-sm">{errorMessage}</p>
+              {errorMessage.includes('confirm your email') && (
+                <button
+                  type="button"
+                  onClick={handleResendConfirmation}
+                  className="text-blue-300 text-sm underline mt-2 hover:text-blue-200 transition-colors"
+                >
+                  Resend confirmation email
+                </button>
+              )}
+            </div>
           </div>
         )}
         
