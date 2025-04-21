@@ -2,57 +2,17 @@
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import allCountries from "@/lib/allCountries.json";
-import { getContinentByCountryCode } from './projectAreaHelpers';
-// Add useCompany for company context
 import { useCompany } from '@/context/CompanyContext';
 
-// Types that match the project_areas table in Supabase
-export type ProjectAreaRow = {
-  id: string;
-  code: string;
-  name: string; // corresponds to country or area name
-  emoji: string | null;
-  created_at: string;
-  updated_at: string;
-  company_id: string | null; // newly added column
-};
+import type {
+  ProjectAreaFormValues,
+  ProjectArea,
+  ProjectAreaRow,
+} from "./projectAreaTypes";
+import { getAutoRegion, toProjectArea } from './projectAreaUtils';
 
-// The ProjectArea shape as used in the app
-export type ProjectArea = {
-  id: string;
-  code: string;
-  region: string;
-  country: string;
-  company_id: string | null;
-};
-
-// Used on form submit
-export type ProjectAreaFormValues = {
-  code: string;
-  country: string;
-  region: string;
-};
-
-// Helper: given a country name, find the region
-function getAutoRegion(country: string): string {
-  const countryData = allCountries.find((c) => c.name === country);
-  if (countryData) {
-    return getContinentByCountryCode(countryData.code);
-  }
-  return "";
-}
-
-// Helper: convert from DB row to ProjectArea
-function toProjectArea(area: ProjectAreaRow): ProjectArea {
-  return {
-    id: area.id,
-    code: area.code,
-    region: getAutoRegion(area.name),
-    country: area.name,
-    company_id: area.company_id ?? null
-  };
-}
+// Note: exports getAutoRegion for legacy/compatibility
+export { getAutoRegion };
 
 export default function useProjectAreas() {
   const [areas, setAreas] = useState<ProjectArea[]>([]);
@@ -65,7 +25,6 @@ export default function useProjectAreas() {
   useEffect(() => {
     setLoading(true);
     setError(null);
-
     const fetchAreas = async () => {
       try {
         if (!company) {
@@ -76,7 +35,7 @@ export default function useProjectAreas() {
         const { data, error } = await supabase
           .from("project_areas")
           .select("*")
-          .eq('company_id', company.id)               // fetch only for company
+          .eq('company_id', company.id)
           .order("created_at", { ascending: true });
 
         if (error) {
@@ -97,7 +56,6 @@ export default function useProjectAreas() {
         setLoading(false);
       }
     };
-
     fetchAreas();
     // eslint-disable-next-line
   }, [company]);
@@ -117,12 +75,11 @@ export default function useProjectAreas() {
         setLoading(false);
         return;
       }
-      // 'name' in project_areas is the country/area name
       const areaData = {
         code: values.code,
         name: values.country,
         emoji: null,
-        company_id: company.id
+        company_id: company.id,
       };
       const { data, error } = await supabase
         .from("project_areas")
@@ -269,5 +226,3 @@ export default function useProjectAreas() {
     deleteAreas,
   };
 }
-
-export { getAutoRegion };
