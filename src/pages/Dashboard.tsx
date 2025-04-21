@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,8 +11,8 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { toast } from 'sonner';
 import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
 import { AppHeader } from '@/components/AppHeader';
+import { InviteCodeDialog } from '@/components/dashboard/InviteCodeDialog';
 
-// Create a proper Profile type based on the database schema
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const HEADER_HEIGHT = 56;
@@ -28,10 +27,8 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check current session and set up auth state change listener
     const setupAuth = async () => {
       try {
-        // Set up auth state listener FIRST to prevent missing auth events
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           console.log('Auth state changed:', event);
           setSession(session);
@@ -42,7 +39,6 @@ const Dashboard: React.FC = () => {
           }
         });
 
-        // THEN check for existing session
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
         setUser(session?.user ?? null);
@@ -142,14 +138,11 @@ const Dashboard: React.FC = () => {
     <SidebarProvider>
       <div className="flex flex-col w-full min-h-screen">
         <div className="flex flex-1 w-full">
-          {/* Sidebar now starts below the glass header */}
-          <DashboardSidebar />
+          <DashboardSidebar inviteUrl={inviteUrl} />
           <div className="flex-1 flex flex-col">
-            {/* Header only in main column */}
             <AppHeader />
-            {/* Spacer for fixed header */}
             <div style={{ height: HEADER_HEIGHT }} />
-            <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
+            <div className="flex-1 bg-white p-8">
               <div className="max-w-6xl mx-auto">
                 <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
                 <DashboardMetrics />
