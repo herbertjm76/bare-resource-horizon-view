@@ -107,24 +107,20 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
 
       if (signUpError) throw signUpError;
 
-      // Ensure profile is created for this user (manual fallback)
+      // Manually ensure profile is created for this user
       if (signUpData.user) {
-        const { error: profileError } = await supabase
+        // First check if profile already exists
+        const { data: existingProfile } = await supabase
           .from('profiles')
-          .insert({
-            id: signUpData.user.id,
-            email: ownerEmail,
-            first_name: ownerFirstName,
-            last_name: ownerLastName,
-            company_id: companyData.id,
-            role: 'owner'
-          });
-
-        if (profileError) {
-          // Fallback to upsert to handle rare race condition
-          await supabase
+          .select('*')
+          .eq('id', signUpData.user.id)
+          .single();
+          
+        if (!existingProfile) {
+          // Create profile if it doesn't exist
+          const { error: profileError } = await supabase
             .from('profiles')
-            .upsert({
+            .insert({
               id: signUpData.user.id,
               email: ownerEmail,
               first_name: ownerFirstName,
@@ -132,6 +128,21 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
               company_id: companyData.id,
               role: 'owner'
             });
+
+          if (profileError) {
+            console.error("Profile creation error:", profileError);
+            // Try upsert as fallback
+            await supabase
+              .from('profiles')
+              .upsert({
+                id: signUpData.user.id,
+                email: ownerEmail,
+                first_name: ownerFirstName,
+                last_name: ownerLastName,
+                company_id: companyData.id,
+                role: 'owner'
+              });
+          }
         }
       }
 
