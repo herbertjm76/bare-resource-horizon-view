@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
@@ -47,32 +46,38 @@ export const AppHeader: React.FC = () => {
       <h1 
         className="flex items-center text-[2.5rem] sm:text-[3.25rem] font-black select-none leading-none"
         aria-label="Bare Resource"
+        style={{
+          lineHeight: 1.1,
+          letterSpacing: "0.5px",
+        }}
       >
         <span
           style={{
             color: "white",
             WebkitTextStroke: "0.3px black",
             textShadow: `
-              0px 0.5px 0 black,
-              0.5px 0px 0 black,
-              0px -0.5px 0 black,
-              -0.5px 0px 0 black
+              0px 1px 0 black,
+              1px 0px 0 black,
+              0px -1px 0 black,
+              -1px 0px 0 black,
+              0.5px 1.5px 1px black,
+              1.5px 0.5px 1px black,
+              -0.5px -1.5px 1px black,
+              -1.5px -0.5px 1px black
             `,
             fontWeight: 900,
             letterSpacing: "0.5px",
-            lineHeight: 1.1,
-            marginRight: 0, // No margin between the words
             display: "inline-block",
           }}
         >
           Bare
         </span>
         <span
-          className="font-extrabold px-2 rounded-[0.25em]"
+          className="font-extrabold"
           style={{
+            marginLeft: 0,
             background: "none",
-            backgroundClip: "padding-box",
-            display: "inline-block"
+            display: "inline-block",
           }}
         >
           <span
@@ -80,9 +85,21 @@ export const AppHeader: React.FC = () => {
               background: "linear-gradient(90deg,#6C4AB6 0%,#4D7AD8 35%,#D450C2 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
+              WebkitTextStroke: "0.3px black",
+              textShadow: `
+                0px 1px 0 black,
+                1px 0px 0 black,
+                0px -1px 0 black,
+                -1px 0px 0 black,
+                0.5px 1.5px 1px black,
+                1.5px 0.5px 1px black,
+                -0.5px -1.5px 1px black,
+                -1.5px -0.5px 1px black
+              `,
               fontWeight: 900,
               fontSize: "inherit",
               letterSpacing: "0.5px",
+              display: "inline-block",
             }}
             className="leading-none"
           >
