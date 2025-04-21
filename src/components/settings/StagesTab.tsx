@@ -19,7 +19,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { TablesInsert, Tables } from "@/integrations/supabase/types";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
+import { useCompany } from '@/context/CompanyContext';
 
 const formSchema = z.object({
   name: z.string().min(1, "Stage name is required"),
@@ -37,6 +38,7 @@ type Stage = {
   color?: string;
   number?: string;
   order_index: number;
+  company_id?: string;
 };
 
 const colors = [
@@ -54,6 +56,7 @@ export const StagesTab = () => {
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const { company } = useCompany();
 
   const form = useForm<StageFormValues>({
     resolver: zodResolver(formSchema),
@@ -67,32 +70,60 @@ export const StagesTab = () => {
   // Fetch all global stages from office_stages table
   const fetchStages = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("office_stages")
-      .select("*")
-      .order("order_index", { ascending: true });
-    if (error) {
-      toast({ title: "Failed to load stages", description: error.message, variant: "destructive" });
+    if (!company) {
+      setStages([]);
       setLoading(false);
       return;
     }
+
+    console.log("Fetching stages for company:", company.id);
+    
+    const { data, error } = await supabase
+      .from("office_stages")
+      .select("*")
+      .eq("company_id", company.id)
+      .order("order_index", { ascending: true });
+      
+    if (error) {
+      toast("Failed to load stages", {
+        description: error.message,
+        variant: "destructive"
+      });
+      console.error("Error fetching stages:", error);
+      setLoading(false);
+      return;
+    }
+
+    console.log("Stages data from Supabase:", data);
+    
     // Use localStorage to hydrate color/number for legacy (not persisted)
     const legacyData: Record<string, { color: string; number: string }> = {};
     try {
       const stored = localStorage.getItem("office_stage_details");
       if (stored) Object.assign(legacyData, JSON.parse(stored));
-    } catch {}
-    setStages(data.map(s => ({
+    } catch (e) {
+      console.error("Error parsing localStorage data:", e);
+    }
+    
+    const mappedStages = Array.isArray(data) ? data.map(s => ({
       ...s,
       color: legacyData[s.id]?.color || colors[(s.order_index - 1) % colors.length] || "#4f46e5",
-      number: legacyData[s.id]?.number || String(s.order_index)
-    })));
+      number: legacyData[s.id]?.number || String(s.order_index),
+      company_id: (s.company_id || company.id).toString()
+    })) : [];
+    
+    console.log("Mapped stages:", mappedStages);
+    setStages(mappedStages);
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchStages();
-  }, []);
+    if (company) {
+      fetchStages();
+    } else {
+      setStages([]);
+    }
+  }, [company]);
 
   // Save color/number to localStorage (since db doesn't have those columns)
   const persistLocalStageDetails = (id: string, color: string, number: string) => {
@@ -137,36 +168,58 @@ export const StagesTab = () => {
   };
 
   const handleBulkDelete = async () => {
+    if (!company) {
+      toast("Error", { description: "No company selected" });
+      return;
+    }
+    
     setLoading(true);
-    const { error } = await supabase.from("office_stages").delete().in("id", selected);
+    const { error } = await supabase
+      .from("office_stages")
+      .delete()
+      .in("id", selected)
+      .eq("company_id", company.id);
+      
     if (error) {
-      toast({ title: "Failed to delete stages", description: error.message, variant: "destructive" });
+      toast("Failed to delete stages", { description: error.message });
       setLoading(false);
       return;
     }
+    
     removeLocalStageDetails(selected);
     setStages(stages => stages.filter(stage => !selected.includes(stage.id)));
     setSelected([]);
     setEditMode(false);
     setLoading(false);
-    toast({ title: "Stages deleted", description: "Selected stages have been deleted." });
+    toast("Stages deleted", { description: "Selected stages have been deleted." });
   };
 
   const onSubmit = async (values: StageFormValues) => {
+    if (!company) {
+      toast("Error", { description: "No company selected" });
+      return;
+    }
+    
     setLoading(true);
     if (editingStage) {
       // Only the name is persisted, color/number is local
       const { error } = await supabase
         .from("office_stages")
-        .update({ name: values.name })
-        .eq("id", editingStage.id);
+        .update({ 
+          name: values.name,
+          company_id: company.id 
+        })
+        .eq("id", editingStage.id)
+        .eq("company_id", company.id);
+        
       if (error) {
-        toast({ title: "Failed to update stage", description: error.message, variant: "destructive" });
+        toast("Failed to update stage", { description: error.message });
         setLoading(false);
         return;
       }
+      
       persistLocalStageDetails(editingStage.id, values.color, values.number);
-      toast({ title: "Stage updated" });
+      toast("Stage updated");
     } else {
       // Create in Supabase, then persist UI color/number
       const maxOrder = stages.length ? Math.max(...stages.map(s => s.order_index)) : 0;
@@ -175,16 +228,20 @@ export const StagesTab = () => {
         .insert({
           name: values.name,
           order_index: maxOrder + 1,
+          company_id: company.id
         })
         .select()
         .single();
+        
       if (error || !data) {
-        toast({ title: "Failed to add stage", description: error?.message, variant: "destructive" });
+        toast("Failed to add stage", { description: error?.message });
         setLoading(false);
         return;
       }
+      
       persistLocalStageDetails(data.id, values.color, values.number);
     }
+    
     setOpen(false);
     form.reset();
     setEditingStage(null);
@@ -359,4 +416,3 @@ export const StagesTab = () => {
     </Card>
   );
 };
-
