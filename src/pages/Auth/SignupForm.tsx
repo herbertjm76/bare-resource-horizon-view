@@ -72,6 +72,12 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
     }
 
     try {
+      // Extract first and last name
+      const nameParts = ownerName.split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+
+      console.log("Creating company with data:", company);
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
@@ -81,17 +87,21 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           address: company.address,
           size: company.size,
           city: company.city,
-          country: company.country
+          country: company.country,
+          industry: company.industry
         })
         .select()
         .single();
 
       if (companyError) throw companyError;
+      console.log("Company created:", companyData);
 
-      // Extract first and last name
-      const nameParts = ownerName.split(' ');
-      const firstName = nameParts[0];
-      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+      console.log("Signing up user with metadata:", {
+        first_name: firstName,
+        last_name: lastName,
+        company_id: companyData.id,
+        role: 'owner'
+      });
 
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: ownerEmail,
@@ -107,10 +117,31 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
       });
 
       if (signUpError) throw signUpError;
+      console.log("User signed up successfully:", signUpData);
+
+      // Manually create profile if the trigger didn't work
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: signUpData.user?.id,
+          email: ownerEmail,
+          first_name: firstName,
+          last_name: lastName,
+          company_id: companyData.id,
+          role: 'owner'
+        });
+
+      if (profileError) {
+        console.error("Error creating profile:", profileError);
+      } else {
+        console.log("Profile created manually as fallback");
+      }
+
       toast.success('Sign up successful! Please check your email to confirm your account, then you can log in.');
       setOwnerEmail(''); setOwnerPassword(''); setOwnerName(''); setCompany(emptyCompany);
       onSwitchToLogin();
     } catch (error: any) {
+      console.error("Signup error:", error);
       toast.error(error.message || 'Sign up failed. Please try again.');
     } finally {
       setLoading(false);
