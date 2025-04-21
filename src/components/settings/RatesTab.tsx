@@ -1,12 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil } from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogFooter,
   DialogDescription
@@ -18,85 +18,175 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useOfficeSettings, Rate } from "@/context/OfficeSettingsContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 // --- updated schema: add unit ---
 const formSchema = z.object({
   type: z.enum(["role", "location"]),
-  entityId: z.string().min(1, "Please select an item"),
-  rate: z.number().min(0, "Rate must be greater than or equal to 0"),
+  reference_id: z.string().min(1, "Please select an item"),
+  value: z.number().min(0, "Rate must be greater than or equal to 0"),
   unit: z.enum(["hour", "day", "week"])
 });
 
 type RateFormValues = z.infer<typeof formSchema>;
 
+type OfficeRole = {
+  id: string;
+  name: string;
+  code: string;
+};
+
+type OfficeLocation = {
+  id: string;
+  city: string;
+  country: string;
+  code: string;
+  emoji?: string;
+};
+
+type OfficeRate = {
+  id: string;
+  type: "role" | "location";
+  reference_id: string;
+  value: number;
+  unit: "hour" | "day" | "week";
+};
+
 export const RatesTab = () => {
-  const { roles, locations, rates, setRates } = useOfficeSettings();
   const [open, setOpen] = useState(false);
-  const [editingRate, setEditingRate] = useState<Rate | null>(null);
+  const [editingRate, setEditingRate] = useState<OfficeRate | null>(null);
+
+  // Backend state
+  const [roles, setRoles] = useState<OfficeRole[]>([]);
+  const [locations, setLocations] = useState<OfficeLocation[]>([]);
+  const [rates, setRates] = useState<OfficeRate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const { toast } = useToast();
+
+  // Fetch roles, locations, rates from Supabase
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      // Fetch roles
+      const { data: rolesData, error: rolesError } = await supabase
+        .from("office_roles").select("*").order("created_at", { ascending: true });
+      // Fetch locations
+      const { data: locationsData, error: locationsError } = await supabase
+        .from("office_locations").select("*").order("created_at", { ascending: true });
+      // Fetch rates
+      const { data: ratesData, error: ratesError } = await supabase
+        .from("office_rates").select("*").order("created_at", { ascending: true });
+
+      if (rolesError || locationsError || ratesError) {
+        toast({
+          title: "Error loading data",
+          description: rolesError?.message || locationsError?.message || ratesError?.message,
+          variant: "destructive"
+        });
+      } else {
+        setRoles(rolesData || []);
+        setLocations(locationsData || []);
+        setRates(
+          (ratesData || []).map((rate) => ({
+            id: rate.id,
+            type: rate.type,
+            reference_id: rate.reference_id,
+            value: rate.value,
+            unit: rate.unit
+          }))
+        );
+      }
+      setLoading(false);
+    }
+    fetchData();
+  }, [open]); // refetch when dialog opens (e.g. after adding/updating)
 
   const form = useForm<RateFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       type: "role",
-      entityId: "",
-      rate: 0,
+      reference_id: "",
+      value: 0,
       unit: "hour"
     }
   });
 
   const rateType = form.watch("type");
-  const unit = form.watch("unit");
 
-  const onOpenChange = (open: boolean) => {
-    setOpen(open);
-    if (!open) {
+  const onOpenChange = (openDialog: boolean) => {
+    setOpen(openDialog);
+    if (!openDialog) {
       form.reset();
       setEditingRate(null);
     }
   };
 
-  const handleEdit = (rate: Rate) => {
-    const entityId = rate.type === "role" 
-      ? roles.find(r => r.name === rate.name)?.id || ""
-      : locations.find(l => l.city === rate.name)?.id || "";
-
+  const handleEdit = (rate: OfficeRate) => {
     setEditingRate(rate);
     form.reset({
-      type: rate.type as "role" | "location",
-      entityId,
-      rate: rate.value,
-      unit: rate.unit || "hour"
+      type: rate.type,
+      reference_id: rate.reference_id,
+      value: rate.value,
+      unit: rate.unit
     });
     setOpen(true);
   };
 
-  const onSubmit = (values: RateFormValues) => {
-    const entityName = values.type === "role"
-      ? roles.find(r => r.id === values.entityId)?.name || ""
-      : locations.find(l => l.id === values.entityId)?.city || "";
-
+  async function handleSubmit(values: RateFormValues) {
     if (editingRate) {
-      // Update existing rate
-      setRates(rates.map(rate => 
-        rate.id === editingRate.id 
-          ? { ...rate, type: values.type, name: entityName, value: values.rate, unit: values.unit } 
-          : rate
-      ));
+      // Update rate in Supabase
+      const { error } = await supabase
+        .from("office_rates")
+        .update({
+          type: values.type,
+          reference_id: values.reference_id,
+          value: values.value,
+          unit: values.unit,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", editingRate.id);
+      if (error) {
+        toast({ title: "Error updating rate", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Rate updated", description: "The rate was updated successfully." });
+        setOpen(false);
+        setEditingRate(null);
+        form.reset();
+      }
     } else {
       // Add new rate
-      setRates([...rates, { 
-        id: Date.now().toString(), 
-        type: values.type,
-        name: entityName,
-        value: values.rate,
-        unit: values.unit
-      }]);
+      const { error } = await supabase
+        .from("office_rates")
+        .insert([
+          {
+            type: values.type,
+            reference_id: values.reference_id,
+            value: values.value,
+            unit: values.unit
+          }
+        ]);
+      if (error) {
+        toast({ title: "Error adding rate", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Rate added", description: "A new rate was added successfully!" });
+        setOpen(false);
+        setEditingRate(null);
+        form.reset();
+      }
     }
-    setOpen(false);
-    form.reset();
-    setEditingRate(null);
-  };
+  }
+
+  function getDisplayName(type: "role" | "location", reference_id: string) {
+    if (type === "role") {
+      const role = roles.find((r) => r.id === reference_id);
+      return role ? role.name : "Unknown Role";
+    } else {
+      const location = locations.find((l) => l.id === reference_id);
+      return location ? location.city : "Unknown Location";
+    }
+  }
 
   return (
     <Card>
@@ -112,7 +202,9 @@ export const RatesTab = () => {
           <div className="text-sm text-muted-foreground mb-4">
             Set standard rates for different roles and locations in your office.
           </div>
-          {rates.length > 0 ? (
+          {loading ? (
+            <div className="text-center p-4">Loading rates...</div>
+          ) : rates.length > 0 ? (
             <>
               <div className="grid gap-4 mb-6">
                 <h3 className="text-sm font-medium">Rates by Role</h3>
@@ -121,12 +213,12 @@ export const RatesTab = () => {
                     {rates
                       .filter(r => r.type === "role")
                       .map((rate) => (
-                        <div 
+                        <div
                           key={rate.id}
                           className="flex items-center justify-between p-3 border rounded-md"
                         >
                           <div>
-                            <div className="font-medium">{rate.name}</div>
+                            <div className="font-medium">{getDisplayName("role", rate.reference_id)}</div>
                             <div className="text-sm text-muted-foreground">
                               ${rate.value}/{rate.unit}
                             </div>
@@ -150,12 +242,12 @@ export const RatesTab = () => {
                     {rates
                       .filter(r => r.type === "location")
                       .map((rate) => (
-                        <div 
+                        <div
                           key={rate.id}
                           className="flex items-center justify-between p-3 border rounded-md"
                         >
                           <div>
-                            <div className="font-medium">{rate.name}</div>
+                            <div className="font-medium">{getDisplayName("location", rate.reference_id)}</div>
                             <div className="text-sm text-muted-foreground">
                               ${rate.value}/{rate.unit}
                             </div>
@@ -189,9 +281,8 @@ export const RatesTab = () => {
               Define the rate for a role or location, and choose if it's per hour, day, or week.
             </DialogDescription>
           </DialogHeader>
-          
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="type"
@@ -226,10 +317,10 @@ export const RatesTab = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
-                name="entityId"
+                name="reference_id"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
@@ -242,17 +333,17 @@ export const RatesTab = () => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {rateType === 'role' 
+                        {rateType === 'role'
                           ? roles.map((role) => (
-                              <SelectItem key={role.id} value={role.id}>
-                                {role.name}
-                              </SelectItem>
-                            ))
+                            <SelectItem key={role.id} value={role.id}>
+                              {role.name}
+                            </SelectItem>
+                          ))
                           : locations.map((location) => (
-                              <SelectItem key={location.id} value={location.id}>
-                                {location.city}, {location.country} ({location.code})
-                              </SelectItem>
-                            ))
+                            <SelectItem key={location.id} value={location.id}>
+                              {location.city}, {location.country} ({location.code})
+                            </SelectItem>
+                          ))
                         }
                       </SelectContent>
                     </Select>
@@ -260,18 +351,18 @@ export const RatesTab = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
-                name="rate"
+                name="value"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Rate Value</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        min="0" 
-                        step="0.01" 
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
                         placeholder="0.00"
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value))}
@@ -307,7 +398,9 @@ export const RatesTab = () => {
                 )}
               />
               <DialogFooter>
-                <Button type="submit">{editingRate ? 'Update' : 'Add'} Rate</Button>
+                <Button type="submit" disabled={form.formState.isSubmitting}>
+                  {editingRate ? 'Update' : 'Add'} Rate
+                </Button>
               </DialogFooter>
             </form>
           </Form>
