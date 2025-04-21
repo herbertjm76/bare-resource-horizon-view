@@ -80,13 +80,17 @@ export const RatesTab = () => {
         setLoading(false);
         return;
       }
+      
       setLoading(true);
+      
       // Fetch roles
       const { data: rolesData, error: rolesError } = await supabase
         .from("office_roles").select("*").eq("company_id", company.id);
+      
       // Fetch locations
       const { data: locationsData, error: locationsError } = await supabase
         .from("office_locations").select("*").eq("company_id", company.id);
+      
       // Fetch rates
       const { data: ratesData, error: ratesError } = await supabase
         .from("office_rates").select("*").eq("company_id", company.id);
@@ -100,15 +104,24 @@ export const RatesTab = () => {
       } else {
         setRoles(rolesData || []);
         setLocations(locationsData || []);
-        setRates(
-          (ratesData || []).map((rate) => ({
+        
+        // Process rates data with proper type casting
+        if (ratesData) {
+          const typedRates: OfficeRate[] = ratesData.map((rate) => ({
             ...rate,
             value: Number(rate.value),
-          }))
-        );
+            type: rate.type as "role" | "location", // Cast the type explicitly
+            unit: rate.unit as "hour" | "day" | "week" // Cast the unit explicitly
+          }));
+          setRates(typedRates);
+        } else {
+          setRates([]);
+        }
       }
+      
       setLoading(false);
     }
+    
     fetchData();
   }, [open, company]); // refetch when dialog opens (e.g. after adding/updating) or company changes
 

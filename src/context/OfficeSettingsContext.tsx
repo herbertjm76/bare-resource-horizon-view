@@ -90,10 +90,21 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         setRoles(Array.isArray(rolesData) ? rolesData : []);
         setLocations(Array.isArray(locationsData) ? locationsData : []);
-        setRates(Array.isArray(ratesData) ? ratesData.map(r => ({
-          ...r,
-          value: Number(r.value), // handle numeric->number
-        })) : []);
+        
+        // Process rates with proper type casting
+        if (Array.isArray(ratesData)) {
+          const typedRates: Rate[] = ratesData.map(r => ({
+            id: r.id,
+            type: r.type as "role" | "location", // Cast to the union type
+            reference_id: r.reference_id,
+            value: Number(r.value), // Convert numeric to number
+            unit: r.unit as "hour" | "day" | "week", // Cast to the union type
+            company_id: r.company_id
+          }));
+          setRates(typedRates);
+        } else {
+          setRates([]);
+        }
       } catch (error: any) {
         console.error('Error fetching office settings:', error);
         toast.error('Failed to load office settings');

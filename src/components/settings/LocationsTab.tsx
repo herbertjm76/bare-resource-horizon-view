@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
+import { useCompany } from "@/context/CompanyContext";
 import allCountries from "@/lib/allCountries.json";
 
 // --- Broad Icon/Emoji Picker List (No flags here, no duplicates, explicit vegetables) ---
@@ -61,16 +63,20 @@ const formSchema = z.object({
   emoji: z.string().optional()
 });
 type LocationFormValues = z.infer<typeof formSchema>;
+
+// Ensure this type matches the one in OfficeSettingsContext
 type Location = {
   id: string;
   city: string;
   country: string;
   code: string;
   emoji?: string;
+  company_id: string; // Add this to match OfficeSettingsContext
 };
 
 export const LocationsTab = () => {
   const { locations, setLocations } = useOfficeSettings();
+  const { company } = useCompany();
   const [open, setOpen] = useState(false);
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [editMode, setEditMode] = useState(false);
@@ -129,6 +135,7 @@ export const LocationsTab = () => {
       setPickerOpen(false);
       return;
     }
+    
     setLocations(
       locations.map(loc =>
         loc.id === pickerTargetId
@@ -142,20 +149,29 @@ export const LocationsTab = () => {
 
   // Submit: flag auto-assigned and no icon/emoji picker during create/edit dialog!
   const onSubmit = (values: LocationFormValues) => {
+    if (!company) {
+      console.error("No company selected");
+      return;
+    }
+    
     const countryObj = allCountries.find(c => c.code === values.code);
     const flag = flagEmoji(values.code) || "";
+    
     const newEntry: Location = {
       id: editingLocation ? editingLocation.id : Date.now().toString(),
       city: values.city,
       code: values.code,
       country: countryObj ? countryObj.name : values.country,
-      emoji: flag // always assign flag as default on creation
+      emoji: flag, // always assign flag as default on creation
+      company_id: company.id // Add company_id from current company
     };
+    
     if (editingLocation) {
       setLocations(locations.map(row => row.id === editingLocation.id ? newEntry : row));
     } else {
       setLocations([...locations, newEntry]);
     }
+    
     setOpen(false);
     form.reset();
     setEditingLocation(null);
