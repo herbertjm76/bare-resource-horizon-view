@@ -148,31 +148,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
         }
       }
 
-      // Direct insert fallback (as a last resort)
-      if (signUpData.user) {
-        try {
-          console.log('Attempting direct profile insert as fallback');
-          const { error: directInsertError } = await supabase
-            .from('profiles')
-            .upsert({
-              id: signUpData.user.id,
-              email: ownerEmail,
-              first_name: ownerFirstName,
-              last_name: ownerLastName,
-              company_id: companyData.id,
-              role: 'owner'
-            });
-            
-          if (directInsertError) {
-            console.warn('Direct profile insert fallback also failed:', directInsertError.message);
-          } else {
-            console.log('Direct profile insert fallback succeeded');
-          }
-        } catch (fallbackError) {
-          console.error('Error in direct profile insert fallback:', fallbackError);
-        }
-      }
-
       toast.success('Sign up successful! Please check your email to confirm your account, then you can log in.');
       setOwnerFirstName('');
       setOwnerLastName('');
