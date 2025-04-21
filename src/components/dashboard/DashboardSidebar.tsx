@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   LayoutDashboard,
@@ -125,7 +124,7 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
   // Invite Code Dialog
   const [inviteOpen, setInviteOpen] = useState(false);
 
-  // Main gradient sidebar with purple-blue-magenta background and grey text
+  // Main sidebar: solid midgray, text/icons all white, larger icons and better hover.
   return (
     <Sidebar
       className={`
@@ -133,15 +132,14 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
         border-none 
         transition-[width]
         shadow-xl
-        bg-gradient-to-br from-[#9b87f5] via-[#1EAEDB] to-[#D946EF]
-        bg-fixed
-        text-[#8E9196] 
+        bg-[#8E9196]
+        text-white
         relative
       `}
       data-gradient-sidebar
     >
       <SidebarContent className="p-0">
-        {/* Company Logo and Collapse Button with grey text */}
+        {/* Company Logo and Collapse Button */}
         <div className="flex flex-col items-stretch w-full">
           <div
             className={`flex items-center justify-between gap-2 px-4 py-7 ${
@@ -165,7 +163,7 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
               />
               {!collapsed && (
                 <span
-                  className="text-4xl font-extrabold text-[#8E9196] tracking-wide whitespace-nowrap"
+                  className="text-4xl font-extrabold tracking-wide whitespace-nowrap text-white"
                   style={{ letterSpacing: 1.5 }}
                 >
                   BareResource
@@ -176,7 +174,7 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
               onClick={toggleSidebar}
               className={`transition-colors rounded-full p-1 ml-2 ${
                 collapsed ? "bg-white/30 hover:bg-white/60" : "bg-white/20 hover:bg-white/40"
-              } text-[#8E9196] shadow-md focus:outline-none focus:ring-2 focus:ring-white`}
+              } text-white shadow-md focus:outline-none focus:ring-2 focus:ring-white`}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {collapsed ? (
@@ -192,7 +190,7 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
         {navigationItems.map((section) => (
           <SidebarGroup key={section.label}>
             <SidebarGroupLabel
-              className={`text-[#8E9196]/90 uppercase tracking-wide font-semibold text-sm mb-1 ${
+              className={`uppercase tracking-wide font-semibold text-sm mb-1 text-white/60 ${
                 collapsed ? "hidden" : ""
               }`}
             >
@@ -207,10 +205,10 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                       <SidebarMenuButton
                         asChild
                         className={`
-                          text-[#8E9196]/95 
-                          text-xl
-                          hover:text-[#8E9196]
-                          hover:bg-white/20
+                          text-white 
+                          text-2xl
+                          hover:text-[#fff]
+                          hover:bg-white/10
                           px-5 py-4
                           my-2
                           rounded-xl
@@ -220,12 +218,12 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                           transition-all
                           ease-in
                           group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0
-                          ${isActive ? "bg-white/30 shadow-inner text-[#8E9196] font-semibold" : ""}
+                          ${isActive ? "bg-white/20 font-semibold shadow-inner" : ""}
                         `}
                         isActive={isActive}
                         aria-current={isActive ? "page" : undefined}
                       >
-                        {/* Handle Invite Code special: open dialog on click */}
+                        {/* Invite Code button breaks to popup */}
                         {item.isInvite ? (
                           <button
                             type="button"
@@ -243,7 +241,7 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                             <item.icon
                               className={`${
                                 collapsed ? "w-12 h-12" : "w-10 h-10"
-                              } drop-shadow-sm flex-shrink-0 transition-all text-[#8E9196]`}
+                              } drop-shadow-sm flex-shrink-0 transition-all text-white`}
                               aria-hidden="true"
                             />
                             <span
@@ -267,7 +265,7 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                             <item.icon
                               className={`${
                                 collapsed ? "w-12 h-12" : "w-10 h-10"
-                              } drop-shadow-sm flex-shrink-0 transition-all text-[#8E9196]`}
+                              } drop-shadow-sm flex-shrink-0 transition-all text-white`}
                               aria-hidden="true"
                             />
                             <span
@@ -290,9 +288,8 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
       </SidebarContent>
       {/* Sidebar collapse/expand affordance always visible on wide screens */}
       <div className="flex justify-end items-center px-4 py-6 md:block hidden">
-        <SidebarTrigger className="text-[#8E9196] hover:bg-white/30" />
+        <SidebarTrigger className="text-white hover:bg-white/30" />
       </div>
-      {/* Invite Code Dialog */}
       <InviteCodeDialog open={inviteOpen} onOpenChange={setInviteOpen} inviteUrl={inviteUrl || ""} />
     </Sidebar>
   );

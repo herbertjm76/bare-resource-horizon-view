@@ -124,9 +124,10 @@ const Dashboard: React.FC = () => {
   };
 
   if (loading) {
+    // Remove gradient bg, use clean white and midgray text
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 flex items-center justify-center">
-        <div className="text-muted-foreground text-xl">Loading...</div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-[#8E9196] text-xl">Loading...</div>
       </div>
     );
   }
@@ -137,13 +138,14 @@ const Dashboard: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex flex-col w-full min-h-screen">
-        <div className="flex flex-1 w-full">
+      <div className="flex flex-col w-full min-h-screen bg-white">
+        <AppHeader />
+        <div className="flex flex-1 w-full" style={{ minHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
           <DashboardSidebar inviteUrl={inviteUrl} />
           <div className="flex-1 flex flex-col bg-white">
-            <AppHeader />
-            <div style={{ height: HEADER_HEIGHT }} />
-            <div className="flex-1 p-8 max-w-6xl mx-auto text-muted-foreground">
+            {/* Remove old double header, header is now above sidebar */}
+            <div style={{ height: 0 }} />
+            <div className="flex-1 p-8 max-w-6xl mx-auto text-[#8E9196]">
               <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || "User"} />
               <DashboardMetrics />
               {(profile?.role === 'owner' || profile?.role === 'admin') && (
@@ -162,4 +164,3 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
-
