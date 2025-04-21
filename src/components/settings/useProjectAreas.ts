@@ -68,7 +68,8 @@ export default function useProjectAreas() {
           setAreas(transformedAreas);
         }
         setLoading(false);
-      }).catch(() => {
+      }).catch((err) => {
+        console.error("Error fetching project areas:", err);
         setError("An unexpected error occurred.");
         setAreas([]);
         setLoading(false);
@@ -79,98 +80,133 @@ export default function useProjectAreas() {
   const addArea = async (values: ProjectAreaFormValues) => {
     setLoading(true);
     setError(null);
-    const locationData: any = {
-      code: values.code,
-      city: values.city || null,
-      country: values.country,
-    };
-    const { data, error } = await supabase
-      .from("office_locations")
-      .insert(locationData)
-      .select()
-      .single();
-    if (error) {
-      setError("Failed to save area.");
+    try {
+      const locationData: any = {
+        code: values.code,
+        city: values.city || null,
+        country: values.country,
+      };
+      const { data, error } = await supabase
+        .from("office_locations")
+        .insert(locationData)
+        .select()
+        .single();
+      
+      if (error) {
+        setError("Failed to save area.");
+        toast({
+          title: "Error",
+          description: error?.message || "Failed to save the area. Please try again.",
+          variant: "destructive"
+        });
+      }
+      if (data) {
+        const newArea: ProjectArea = {
+          id: data.id,
+          code: data.code,
+          city: data.city,
+          region: getAutoRegion(data.country),
+          country: data.country,
+        };
+        setAreas(old => [...old, newArea]);
+        toast({
+          title: "Success",
+          description: "Area added successfully.",
+        });
+      }
+    } catch (err) {
+      console.error("Error adding area:", err);
+      setError("An unexpected error occurred.");
       toast({
         title: "Error",
-        description: error?.message || "Failed to save the area. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setLoading(false);
     }
-    if (data) {
-      const newArea: ProjectArea = {
-        id: data.id,
-        code: data.code,
-        city: data.city,
-        region: getAutoRegion(data.country),
-        country: data.country,
-      };
-      setAreas(old => [...old, newArea]);
-      toast({
-        title: "Success",
-        description: "Area added successfully.",
-      });
-    }
-    setLoading(false);
   };
 
   // Update
   const updateArea = async (id: string, values: ProjectAreaFormValues) => {
     setLoading(true);
     setError(null);
-    const locationData: any = {
-      code: values.code,
-      city: values.city || null,
-      country: values.country,
-    };
-    const { error } = await supabase
-      .from("office_locations")
-      .update(locationData)
-      .eq("id", id);
+    try {
+      const locationData: any = {
+        code: values.code,
+        city: values.city || null,
+        country: values.country,
+      };
+      const { error } = await supabase
+        .from("office_locations")
+        .update(locationData)
+        .eq("id", id);
 
-    if (error) {
-      setError("Failed to save area.");
+      if (error) {
+        setError("Failed to save area.");
+        toast({
+          title: "Error",
+          description: error?.message || "Failed to save the area. Please try again.",
+          variant: "destructive"
+        });
+      } else {
+        setAreas(areas => areas.map(area => area.id === id
+          ? { ...area, ...values, region: getAutoRegion(values.country) }
+          : area
+        ));
+        toast({
+          title: "Success",
+          description: "Area updated successfully.",
+        });
+      }
+    } catch (err) {
+      console.error("Error updating area:", err);
+      setError("An unexpected error occurred.");
       toast({
         title: "Error",
-        description: error?.message || "Failed to save the area. Please try again.",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
-    } else {
-      setAreas(areas => areas.map(area => area.id === id
-        ? { ...area, ...values, region: getAutoRegion(values.country) }
-        : area
-      ));
-      toast({
-        title: "Success",
-        description: "Area updated successfully.",
-      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // Bulk Delete
   const deleteAreas = async (ids: string[]) => {
     setLoading(true);
     setError(null);
-    const { error } = await supabase
-      .from("office_locations")
-      .delete()
-      .in("id", ids);
-    if (error) {
-      setError("Failed to delete area(s).");
+    try {
+      const { error } = await supabase
+        .from("office_locations")
+        .delete()
+        .in("id", ids);
+        
+      if (error) {
+        setError("Failed to delete area(s).");
+        toast({
+          title: "Error",
+          description: "Failed to delete the selected area(s).",
+          variant: "destructive"
+        });
+      } else {
+        setAreas(areas => areas.filter(a => !ids.includes(a.id)));
+        toast({
+          title: "Success",
+          description: `${ids.length} area(s) deleted successfully.`,
+        });
+      }
+    } catch (err) {
+      console.error("Error deleting areas:", err);
+      setError("An unexpected error occurred.");
       toast({
         title: "Error",
-        description: "Failed to delete the selected area(s).",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
-    } else {
-      setAreas(areas => areas.filter(a => !ids.includes(a.id)));
-      toast({
-        title: "Success",
-        description: `${ids.length} area(s) deleted successfully.`,
-      });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return {
@@ -184,4 +220,3 @@ export default function useProjectAreas() {
 }
 
 export { getAutoRegion };
-
