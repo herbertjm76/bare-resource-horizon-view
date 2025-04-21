@@ -49,11 +49,13 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
 
-    supabase
-      .from("office_locations")
-      .select("*")
-      .order("created_at", { ascending: true })
-      .then(({ data, error }) => {
+    const fetchAreas = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("office_locations")
+          .select("*")
+          .order("created_at", { ascending: true });
+          
         if (error) {
           setError("Failed to load project areas.");
           setAreas([]);
@@ -67,13 +69,16 @@ export default function useProjectAreas() {
           }));
           setAreas(transformedAreas);
         }
-        setLoading(false);
-      }).catch((err) => {
+      } catch (err) {
         console.error("Error fetching project areas:", err);
         setError("An unexpected error occurred.");
         setAreas([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchAreas();
   }, []);
 
   // Add
