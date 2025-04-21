@@ -33,6 +33,16 @@ const Join: React.FC = () => {
 
     try {
       if (isSignup) {
+        // Validate required fields
+        if (!firstName || !lastName || !email || !password) {
+          toast.error('Please fill in all required fields');
+          setLoading(false);
+          return;
+        }
+
+        console.log(`Attempting to sign up user with email: ${email}`);
+        console.log(`User metadata: firstName=${firstName}, lastName=${lastName}, companyId=${company?.id}`);
+        
         // Register new user with metadata
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -47,21 +57,33 @@ const Join: React.FC = () => {
           }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Signup error:', error);
+          throw error;
+        }
+
+        console.log('User created successfully:', data.user?.id);
 
         // Add an additional manual profile creation as backup
         if (data.user) {
           try {
+            // Wait a moment to allow the trigger to work first
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            console.log('Checking if profile was created by trigger...');
+            
             // Check if profile exists first
-            const { data: existingProfile } = await supabase
+            const { data: existingProfile, error: checkError } = await supabase
               .from('profiles')
               .select('*')
               .eq('id', data.user.id)
               .single();
             
-            // If no profile exists, create one
-            if (!existingProfile) {
-              console.log('No profile found, creating a new one...');
+            if (checkError) {
+              console.log('Profile check error (might be normal if not created yet):', checkError);
+              
+              // If no profile exists, create one
+              console.log('Creating profile manually...');
               const { error: profileError } = await supabase
                 .from('profiles')
                 .upsert({
@@ -75,21 +97,33 @@ const Join: React.FC = () => {
 
               if (profileError) {
                 console.error('Profile creation error:', profileError);
+                
+                // One more attempt with some delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                const { error: retryError } = await supabase
+                  .from('profiles')
+                  .upsert({
+                    id: data.user.id,
+                    email,
+                    first_name: firstName,
+                    last_name: lastName,
+                    company_id: company?.id,
+                    role: 'member'
+                  });
+                  
+                if (retryError) {
+                  console.error('Final profile creation attempt failed:', retryError);
+                } else {
+                  console.log('Profile created on final retry!');
+                }
+              } else {
+                console.log('Profile created successfully on first manual attempt');
               }
+            } else {
+              console.log('Profile already exists, created by trigger:', existingProfile);
             }
           } catch (profileCheckError) {
-            // If checking the profile fails (likely doesn't exist), create a new one
-            console.log('Creating profile as a fallback...');
-            await supabase
-              .from('profiles')
-              .upsert({
-                id: data.user.id,
-                email,
-                first_name: firstName,
-                last_name: lastName,
-                company_id: company?.id,
-                role: 'member'
-              });
+            console.error('Error in profile creation process:', profileCheckError);
           }
           
           toast.success('Account created successfully! Please check your email for verification.');
