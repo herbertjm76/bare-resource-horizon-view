@@ -8,6 +8,7 @@ export type ProjectAreaRow = {
   created_at: string;
   updated_at: string;
   company_id: string | null;
+  city?: string;
 };
 
 // The ProjectArea shape as used in the app
@@ -17,10 +18,12 @@ export type ProjectArea = {
   region: string;
   country: string;
   company_id: string | null;
+  city?: string;
 };
 
 export type ProjectAreaFormValues = {
   code: string;
   country: string;
   region: string;
+  city?: string;
 };

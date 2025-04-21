@@ -126,6 +126,7 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
                     <Input
                       placeholder="City (optional)"
                       {...field}
+                      value={field.value || ""}
                       disabled={loading}
                     />
                   </FormControl>

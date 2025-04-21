@@ -20,5 +20,6 @@ export function toProjectArea(area: ProjectAreaRow): ProjectArea {
     region: getAutoRegion(area.name),
     country: area.name,
     company_id: area.company_id ?? null,
+    city: area.city,
   };
 }

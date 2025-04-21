@@ -19,15 +19,20 @@ export default function useProjectAreas() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  const { company } = useCompany();
+  const { company, loading: companyLoading } = useCompany();
 
   // Fetch Project Areas from project_areas table
   useEffect(() => {
+    if (companyLoading) return; // Don't fetch until company loading is complete
+    
     setLoading(true);
     setError(null);
+    
     const fetchAreas = async () => {
       try {
-        if (!company) {
+        if (!company || !company.id) {
+          console.log("No company ID available in context:", company);
+          setError("No company selected; cannot load areas.");
           setAreas([]);
           setLoading(false);
           return;
@@ -60,16 +65,16 @@ export default function useProjectAreas() {
         setLoading(false);
       }
     };
+    
     fetchAreas();
-    // eslint-disable-next-line
-  }, [company]);
+  }, [company, companyLoading]);
 
   // Add Project Area (project_areas)
   const addArea = async (values: ProjectAreaFormValues) => {
     setLoading(true);
     setError(null);
     try {
-      if (!company) {
+      if (!company || !company.id) {
         setError("No company selected; cannot save area.");
         toast({
           title: "Error",
@@ -79,12 +84,16 @@ export default function useProjectAreas() {
         setLoading(false);
         return;
       }
+      
+      console.log("Adding area for company:", company.id);
+      
       const areaData = {
         code: values.code,
         name: values.country,
         emoji: null,
         company_id: company.id,
       };
+      
       const { data, error } = await supabase
         .from("project_areas")
         .insert(areaData)
@@ -92,6 +101,7 @@ export default function useProjectAreas() {
         .single();
 
       if (error) {
+        console.error("Error inserting area:", error);
         setError("Failed to save area.");
         toast({
           title: "Error",
@@ -124,7 +134,7 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
     try {
-      if (!company) {
+      if (!company || !company.id) {
         setError("No company selected; cannot update area.");
         toast({
           title: "Error",
@@ -134,6 +144,7 @@ export default function useProjectAreas() {
         setLoading(false);
         return;
       }
+      
       const areaData = {
         code: values.code,
         name: values.country,
@@ -146,6 +157,7 @@ export default function useProjectAreas() {
         .eq("id", id);
 
       if (error) {
+        console.error("Error updating area:", error);
         setError("Failed to update area.");
         toast({
           title: "Error",
@@ -195,6 +207,7 @@ export default function useProjectAreas() {
         .in("id", ids);
 
       if (error) {
+        console.error("Error deleting areas:", error);
         setError("Failed to delete area(s).");
         toast({
           title: "Error",
@@ -222,9 +235,12 @@ export default function useProjectAreas() {
   };
 
   return {
-    areas, setAreas,
-    loading, setLoading,
-    error, setError,
+    areas, 
+    setAreas,
+    loading, 
+    setLoading,
+    error, 
+    setError,
     addArea,
     updateArea,
     deleteAreas,
