@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -31,30 +30,30 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Extract subdomain from current hostname
   const extractSubdomain = () => {
     const hostname = window.location.hostname;
+    const params = new URLSearchParams(window.location.search);
     
-    // For localhost development
+    // For localhost development, support both subdomain.localhost and ?subdomain= parameter
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      // Check if using subdomain.localhost pattern
+      // First check for subdomain.localhost pattern
       const localParts = window.location.host.split('.');
       if (localParts.length > 1 && localParts[1] === 'localhost') {
+        console.log('Found localhost subdomain:', localParts[0]);
         return localParts[0];
       }
-      // For development, optionally get subdomain from query param
-      const params = new URLSearchParams(window.location.search);
-      return params.get('subdomain');
+      
+      // Then check for ?subdomain= parameter
+      const querySubdomain = params.get('subdomain');
+      if (querySubdomain) {
+        console.log('Found subdomain in query param:', querySubdomain);
+        return querySubdomain;
+      }
     }
     
-    // For production/deployed version
+    // For production (bareresource.com)
     const hostParts = hostname.split('.');
-    // Check if it's likely a subdomain (e.g., company.bareresource.com)
-    if (hostParts.length > 2) {
-      if (hostParts[1] === 'bareresource') {
-        return hostParts[0];
-      }
-      // Handle custom domains like company.lovable.app
-      if (hostParts[1] === 'lovable' && hostParts[2] === 'app') {
-        return hostParts[0];
-      }
+    if (hostParts.length === 3 && hostParts[1] === 'bareresource') {
+      console.log('Found production subdomain:', hostParts[0]);
+      return hostParts[0];
     }
     
     return null;
@@ -63,6 +62,8 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const fetchCompanyData = async (subdomainValue: string) => {
     try {
       setLoading(true);
+      console.log('Fetching company data for subdomain:', subdomainValue);
+      
       const { data, error } = await supabase
         .from('companies')
         .select('*')
@@ -70,14 +71,16 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .single();
 
       if (error) {
-        console.error('Error fetching company by subdomain:', error);
+        console.error('Error fetching company:', error);
         setCompany(null);
-      } else {
-        console.log('Company data fetched by subdomain:', data);
-        setCompany(data);
+        toast.error('Company not found');
+        return;
       }
+
+      console.log('Found company:', data);
+      setCompany(data);
     } catch (error) {
-      console.error('Error in company data fetch by subdomain:', error);
+      console.error('Error in fetchCompanyData:', error);
       setCompany(null);
     } finally {
       setLoading(false);
@@ -134,6 +137,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const refreshCompany = async () => {
     const currentSubdomain = extractSubdomain();
+    console.log('Current subdomain:', currentSubdomain);
     setSubdomain(currentSubdomain);
     
     if (currentSubdomain) {
@@ -165,18 +169,17 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, []);
 
-  // Initial load
+  // Initial setup
   useEffect(() => {
     const loadInitialData = async () => {
       const currentSubdomain = extractSubdomain();
+      console.log('Initial subdomain check:', currentSubdomain);
       setSubdomain(currentSubdomain);
       
       if (currentSubdomain) {
-        console.log("Subdomain detected:", currentSubdomain);
         setIsSubdomainMode(true);
         await fetchCompanyData(currentSubdomain);
       } else {
-        console.log("No subdomain detected, using user profile");
         setIsSubdomainMode(false);
         await fetchUserCompany();
       }
