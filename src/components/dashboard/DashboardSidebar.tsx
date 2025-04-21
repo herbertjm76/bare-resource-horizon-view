@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -121,11 +122,11 @@ export function DashboardSidebar() {
               {!collapsed ? (
                 <span className="text-2xl font-bold select-none">
                   <span className="text-white">Bare</span>
-                  <span className="bg-gradient-to-r from-[#6E59A5] via-[#8B5CF6] to-[#1A1F2C] bg-clip-text text-transparent font-semibold">Resource</span>
+                  <span className="bg-gradient-to-r from-[#6E59A5] via-[#8B5CF6] to-[#8B1C6B] bg-clip-text text-transparent font-semibold">Resource</span>
                 </span>
               ) : (
                 <span className="text-2xl font-bold select-none">
-                  <span className="bg-gradient-to-r from-[#6E59A5] via-[#8B5CF6] to-[#1A1F2C] bg-clip-text text-transparent">B</span>
+                  <span className="bg-gradient-to-r from-[#6E59A5] via-[#8B5CF6] to-[#8B1C6B] bg-clip-text text-transparent">B</span>
                 </span>
               )}
             </div>
