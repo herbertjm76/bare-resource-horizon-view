@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { LogOut } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { Link } from 'react-router-dom';
 
 export const DashboardHeader = ({ userName }: { userName: string }) => {
   const { company } = useCompany();
@@ -18,13 +19,24 @@ export const DashboardHeader = ({ userName }: { userName: string }) => {
           Welcome, {userName}
         </p>
       </div>
-      <Button 
-        variant="ghost"
-        className="text-white hover:bg-white/10"
-        onClick={() => supabase.auth.signOut()}
-      >
-        <LogOut className="mr-2 h-4 w-4" /> Logout
-      </Button>
+      <div className="flex gap-2">
+        <Button 
+          asChild
+          variant="ghost"
+          className="text-white hover:bg-white/10"
+        >
+          <Link to="/profile">
+            <User className="mr-2 h-4 w-4" /> My Profile
+          </Link>
+        </Button>
+        <Button 
+          variant="ghost"
+          className="text-white hover:bg-white/10"
+          onClick={() => supabase.auth.signOut()}
+        >
+          <LogOut className="mr-2 h-4 w-4" /> Logout
+        </Button>
+      </div>
     </header>
   );
 };

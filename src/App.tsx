@@ -30,6 +30,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/join" element={<Join />} />
             <Route path="/join/:inviteCode" element={<Join />} />
+            <Route path="/profile" element={<import('@/pages/Profile').then(mod => <mod.default />)} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
