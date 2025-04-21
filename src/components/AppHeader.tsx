@@ -53,10 +53,7 @@ export const AppHeader: React.FC = () => {
         <span 
           className="relative text-white"
           style={{
-            WebkitTextStrokeWidth: '1.5px',
-            WebkitTextStrokeColor: 'black',
-            textStrokeWidth: '1.5px',
-            textStrokeColor: 'black',
+            WebkitTextStroke: '1.5px black',
             // For fallback and more browser support, also add textShadow:
             textShadow: `
               -1px -1px 0 black,
@@ -102,3 +99,4 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
+
