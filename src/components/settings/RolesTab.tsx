@@ -52,9 +52,10 @@ async function fetchRoles(): Promise<OfficeRole[]> {
 }
 
 async function addRole(values: RoleFormValues): Promise<OfficeRole> {
+  // Fix: Ensure we're passing an object with required name and code properties
   const { data, error } = await supabase
     .from("office_roles")
-    .insert([values])
+    .insert([{ name: values.name, code: values.code }])
     .select()
     .single();
   if (error) throw error;
@@ -231,9 +232,16 @@ export const RolesTab = () => {
                 size="sm"
                 disabled={selected.length === 0}
                 onClick={handleBulkDelete}
-                isLoading={deleteMutation.isPending}
+                // Fix: Remove isLoading prop and use children to show loading state
+                className={deleteMutation.isPending ? "opacity-70 pointer-events-none" : ""}
               >
-                <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
+                {deleteMutation.isPending ? (
+                  "Deleting..."
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
+                  </>
+                )}
               </Button>
               <span className="text-xs text-muted-foreground">
                 {selected.length} selected
@@ -339,9 +347,13 @@ export const RolesTab = () => {
               <DialogFooter>
                 <Button
                   type="submit"
-                  isLoading={addMutation.isPending || editMutation.isPending}
+                  // Fix: Remove isLoading prop and use className/children to show loading state
+                  disabled={addMutation.isPending || editMutation.isPending}
+                  className={(addMutation.isPending || editMutation.isPending) ? "opacity-70" : ""}
                 >
-                  {editingRole ? "Update" : "Add"} Role
+                  {(addMutation.isPending || editMutation.isPending)
+                    ? `${editingRole ? "Updating" : "Adding"}...`
+                    : `${editingRole ? "Update" : "Add"} Role`}
                 </Button>
               </DialogFooter>
             </form>
