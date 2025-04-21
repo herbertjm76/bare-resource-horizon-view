@@ -1,91 +1,40 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, Edit } from "lucide-react";
+import CountriesToolbar from "./CountriesToolbar";
+import useProjectAreas, { getAutoRegion, ProjectAreaFormValues, ProjectArea } from "./useProjectAreas";
+import ProjectAreaList from './ProjectAreaList';
+import ProjectAreaForm from './ProjectAreaForm';
+
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import ProjectAreaList, { ProjectArea } from './ProjectAreaList';
-import ProjectAreaForm, { ProjectAreaFormValues } from './ProjectAreaForm';
-import { getContinentByCountryCode } from './projectAreaHelpers';
-import allCountries from "@/lib/allCountries.json";
 
 const formSchema = z.object({
   code: z.string().min(1, "Code is required"),
   country: z.string().min(1, "Country is required"),
   city: z.string().optional(),
-  region: z.string().min(1, "Region is required"), // region is still part of the form, but not saved
+  region: z.string().min(1, "Region is required"),
 });
 
-type DatabaseLocation = {
-  id: string;
-  code: string;
-  city: string | null;
-  country: string;
-  created_at: string;
-  emoji: string | null;
-  updated_at: string;
-};
-
-function getAutoRegion(country: string): string {
-  // Find country code first using allCountries.json import
-  const countryData = allCountries.find((c) => c.name === country);
-  if (countryData) {
-    return getContinentByCountryCode(countryData.code);
-  }
-  return "";
-}
-
 export const CountriesTab = () => {
-  const [areas, setAreas] = useState<ProjectArea[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<ProjectArea | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
-  const { toast } = useToast();
+  const {
+    areas,
+    loading,
+    error,
+    addArea,
+    updateArea,
+    deleteAreas,
+  } = useProjectAreas();
 
   const form = useForm<ProjectAreaFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: { code: "", country: "", city: "", region: "" }
   });
-
-  useEffect(() => {
-    const fetchAreas = async () => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const { data, error } = await supabase
-          .from("office_locations")
-          .select("*")
-          .order("created_at", { ascending: true });
-        if (error) {
-          setError("Failed to load project areas.");
-          setAreas([]);
-        } else {
-          // Region field is not in DB; always suggest for UI
-          const transformedAreas = (data as DatabaseLocation[] || []).map(loc => ({
-            id: loc.id,
-            code: loc.code,
-            city: loc.city ?? "",
-            region: getAutoRegion(loc.country),
-            country: loc.country,
-          }));
-          setAreas(transformedAreas);
-        }
-      } catch (err) {
-        setError("An unexpected error occurred.");
-        setAreas([]);
-      }
-      setLoading(false);
-    };
-    fetchAreas();
-  }, []);
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
@@ -107,36 +56,15 @@ export const CountriesTab = () => {
   };
 
   const handleBulkDelete = async () => {
-    setLoading(true);
-    setError(null);
-    const { error } = await supabase
-      .from("office_locations")
-      .delete()
-      .in("id", selected);
-    if (error) {
-      setError("Failed to delete area(s).");
-      toast({
-        title: "Error",
-        description: "Failed to delete the selected area(s).",
-        variant: "destructive"
-      });
-    } else {
-      setAreas(areas.filter(a => !selected.includes(a.id)));
-      toast({
-        title: "Success",
-        description: `${selected.length} area(s) deleted successfully.`,
-      });
-      setSelected([]);
-      setEditMode(false);
-    }
-    setLoading(false);
+    await deleteAreas(selected);
+    setSelected([]);
+    setEditMode(false);
   };
 
   const handleSelect = (id: string) => {
     setSelected(selected => selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
   };
 
-  // Every time the country changes in the form, auto-suggest region using the best mapping.
   React.useEffect(() => {
     const subscription = form.watch((values, { name }) => {
       if (name === "country") {
@@ -150,90 +78,21 @@ export const CountriesTab = () => {
   }, [form]);
 
   const onSubmit = async (values: ProjectAreaFormValues) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const locationData: any = {
-        code: values.code,
-        city: values.city || null,
-        country: values.country,
-        // region is intentionally NOT sent to DB
-      };
-
-      if (editing) {
-        // Update
-        const { error } = await supabase
-          .from("office_locations")
-          .update(locationData)
-          .eq("id", editing.id);
-
-        if (error) throw error;
-
-        setAreas(
-          areas.map(area => area.id === editing.id
-            ? { ...area, ...values, region: getAutoRegion(values.country) }
-            : area
-          )
-        );
-
-        toast({
-          title: "Success",
-          description: "Area updated successfully.",
-        });
-      } else {
-        // Create
-        const { data, error } = await supabase
-          .from("office_locations")
-          .insert(locationData)
-          .select()
-          .single();
-
-        if (error) throw error;
-
-        if (data) {
-          const newArea: ProjectArea = {
-            id: data.id,
-            code: data.code,
-            city: data.city,
-            region: getAutoRegion(data.country),
-            country: data.country,
-          };
-          setAreas([...areas, newArea]);
-          toast({
-            title: "Success",
-            description: "Area added successfully.",
-          });
-        }
-      }
-    } catch (err: any) {
-      setError("Failed to save area.");
-      toast({
-        title: "Error",
-        description: err?.message || "Failed to save the area. Please try again.",
-        variant: "destructive"
-      });
+    if (editing) {
+      await updateArea(editing.id, values);
+    } else {
+      await addArea(values);
     }
-
     setOpen(false);
     form.reset();
     setEditing(null);
-    setLoading(false);
   };
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Project Areas</CardTitle>
-        <div className="flex gap-2">
-          <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)}>
-            <Edit className="h-4 w-4 mr-2" /> {editMode ? "Done" : "Edit"}
-          </Button>
-          <Button size="sm" onClick={() => setOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Area
-          </Button>
-        </div>
+        <CountriesToolbar editMode={editMode} setEditMode={setEditMode} setOpen={setOpen} />
       </CardHeader>
       <CardContent>
         <ProjectAreaList

@@ -1,0 +1,187 @@
+
+import { useState, useEffect } from 'react';
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import allCountries from "@/lib/allCountries.json";
+import { getContinentByCountryCode } from './projectAreaHelpers';
+
+export type DatabaseLocation = {
+  id: string;
+  code: string;
+  city: string | null;
+  country: string;
+  created_at: string;
+  emoji: string | null;
+  updated_at: string;
+};
+
+export type ProjectArea = {
+  id: string;
+  code: string;
+  city?: string;
+  region: string;
+  country: string;
+};
+
+export type ProjectAreaFormValues = {
+  code: string;
+  country: string;
+  city?: string;
+  region: string;
+};
+
+function getAutoRegion(country: string): string {
+  const countryData = allCountries.find((c) => c.name === country);
+  if (countryData) {
+    return getContinentByCountryCode(countryData.code);
+  }
+  return "";
+}
+
+export default function useProjectAreas() {
+  const [areas, setAreas] = useState<ProjectArea[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  // Fetch
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+
+    supabase
+      .from("office_locations")
+      .select("*")
+      .order("created_at", { ascending: true })
+      .then(({ data, error }) => {
+        if (error) {
+          setError("Failed to load project areas.");
+          setAreas([]);
+        } else {
+          const transformedAreas = (data as DatabaseLocation[] || []).map(loc => ({
+            id: loc.id,
+            code: loc.code,
+            city: loc.city ?? "",
+            region: getAutoRegion(loc.country),
+            country: loc.country,
+          }));
+          setAreas(transformedAreas);
+        }
+        setLoading(false);
+      }).catch(() => {
+        setError("An unexpected error occurred.");
+        setAreas([]);
+        setLoading(false);
+      });
+  }, []);
+
+  // Add
+  const addArea = async (values: ProjectAreaFormValues) => {
+    setLoading(true);
+    setError(null);
+    const locationData: any = {
+      code: values.code,
+      city: values.city || null,
+      country: values.country,
+    };
+    const { data, error } = await supabase
+      .from("office_locations")
+      .insert(locationData)
+      .select()
+      .single();
+    if (error) {
+      setError("Failed to save area.");
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to save the area. Please try again.",
+        variant: "destructive"
+      });
+    }
+    if (data) {
+      const newArea: ProjectArea = {
+        id: data.id,
+        code: data.code,
+        city: data.city,
+        region: getAutoRegion(data.country),
+        country: data.country,
+      };
+      setAreas(old => [...old, newArea]);
+      toast({
+        title: "Success",
+        description: "Area added successfully.",
+      });
+    }
+    setLoading(false);
+  };
+
+  // Update
+  const updateArea = async (id: string, values: ProjectAreaFormValues) => {
+    setLoading(true);
+    setError(null);
+    const locationData: any = {
+      code: values.code,
+      city: values.city || null,
+      country: values.country,
+    };
+    const { error } = await supabase
+      .from("office_locations")
+      .update(locationData)
+      .eq("id", id);
+
+    if (error) {
+      setError("Failed to save area.");
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to save the area. Please try again.",
+        variant: "destructive"
+      });
+    } else {
+      setAreas(areas => areas.map(area => area.id === id
+        ? { ...area, ...values, region: getAutoRegion(values.country) }
+        : area
+      ));
+      toast({
+        title: "Success",
+        description: "Area updated successfully.",
+      });
+    }
+    setLoading(false);
+  };
+
+  // Bulk Delete
+  const deleteAreas = async (ids: string[]) => {
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase
+      .from("office_locations")
+      .delete()
+      .in("id", ids);
+    if (error) {
+      setError("Failed to delete area(s).");
+      toast({
+        title: "Error",
+        description: "Failed to delete the selected area(s).",
+        variant: "destructive"
+      });
+    } else {
+      setAreas(areas => areas.filter(a => !ids.includes(a.id)));
+      toast({
+        title: "Success",
+        description: `${ids.length} area(s) deleted successfully.`,
+      });
+    }
+    setLoading(false);
+  };
+
+  return {
+    areas, setAreas,
+    loading, setLoading,
+    error, setError,
+    addArea,
+    updateArea,
+    deleteAreas,
+  };
+}
+
+export { getAutoRegion };
+
