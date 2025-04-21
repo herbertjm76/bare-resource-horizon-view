@@ -11,7 +11,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 const BARE_GRAY = "#8E9196";
 const GRADIENT = "linear-gradient(90deg, #9b87f5, #5a7eb7)"; // gentle purple to blue
 
-// Option 1: Bare in white, Resource in gray, with gradient underline
+// Updated: Underline under "Bare" and more compact layout
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
   const [user, setUser] = React.useState<User | null>(null);
@@ -45,53 +45,50 @@ export const AppHeader: React.FC = () => {
 
   return (
     <header
-      className="w-full px-4 py-2 flex items-center justify-between z-30 shadow-md bg-white/90 border-b border-white/30"
-      style={{ minHeight: 56 }}
+      className="w-full px-4 py-1 flex items-center justify-between z-30 shadow-md bg-white/90 border-b border-white/30"
+      style={{ minHeight: 48 }}
     >
       <div>
-        <h1 className="flex items-end leading-none select-none" aria-label="BareResource">
+        <h1 className="flex items-end leading-none select-none" aria-label="BareResource" style={{ fontWeight: 900, fontSize: "2.4rem", letterSpacing: "0.5px", lineHeight: 1 }}>
           <span
             style={{
               color: "#fff",
-              fontWeight: 900,
-              fontSize: "2.4rem",
-              letterSpacing: "0.5px",
-              lineHeight: "1.1",
-              marginRight: "0.12em",
-              // Gentle shadow for white-on-bright
+              position: "relative",
+              display: "inline-block",
+              paddingBottom: 4,
+              marginRight: "0.1em",
               textShadow:
                 "0 4px 18px rgba(40,40,76,0.18), 1px 0 4px rgba(60,60,100,0.22)",
-              display: "inline-block",
+              fontWeight: 900,
             }}
           >
             Bare
+            <span
+              aria-hidden
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                height: 3,
+                width: "100%",
+                borderRadius: 3,
+                background: GRADIENT,
+                opacity: 0.85,
+              }}
+            />
           </span>
           <span
             style={{
               color: BARE_GRAY,
               fontWeight: 700,
-              fontSize: "2.1rem", // 10% smaller
+              fontSize: "2.1rem", // slightly smaller
               letterSpacing: "0.5px",
-              marginLeft: "0.04em",
               display: "inline-block",
-              position: "relative",
               verticalAlign: "bottom",
+              marginLeft: "0.1em",
             }}
           >
             Resource
-            <span
-              aria-hidden
-              style={{
-                display: "block",
-                height: 3,
-                width: "100%",
-                borderRadius: 3,
-                marginTop: "0.23em",
-                background: GRADIENT,
-                position: "relative",
-                opacity: 0.7,
-              }}
-            />
           </span>
         </h1>
       </div>
