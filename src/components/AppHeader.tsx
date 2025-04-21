@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
@@ -57,9 +56,10 @@ export const AppHeader: React.FC = () => {
         <span
           className="bare-logo-shadow"
           style={{
-            color: BARE_GRAY,
-            // Removed white outline (no text stroke)
-            textShadow: "0 3px 8px rgba(0, 0, 0, 0.9), 0 0 5px rgba(0, 0, 0, 0.7)",
+            color: "white",
+            // Darker and stronger shadows for better readability, no outline
+            textShadow:
+              "0 6px 10px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.85), 0 0 7px rgba(0,0,0,0.7)",
             fontWeight: 900,
             letterSpacing: "0.5px",
             display: "inline-block",
