@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -16,7 +15,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,8 +65,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
       console.log('LoginForm: Login successful, user:', data.user?.id);
       toast.success('Login successful!');
       
-      // Important: Let the auth listener handle redirection
-      // The navigate call is removed here to avoid race conditions
+      // Let the auth listener handle the redirection
+      // Don't call navigate here to avoid race conditions
     } catch (error: any) {
       console.error('LoginForm: Unexpected error during login:', error);
       setErrorMessage(error.message || 'An unexpected error occurred');

@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -15,93 +15,97 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const authChecked = useRef(false);
   
   // Function to check authentication and authorization
   const checkAuth = async () => {
-    console.log("AuthGuard: Checking authorization...");
-    
-    try {
-      // First, check if we have an active session
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    if (!authChecked.current) {
+      console.log("AuthGuard: Checking authorization...");
       
-      if (sessionError) {
-        console.error("AuthGuard: Error getting session:", sessionError);
-        setAuthError("Failed to verify your session");
-        setIsLoading(false);
-        setIsAuthorized(false);
-        toast.error("Session verification failed");
-        navigate('/auth');
-        return;
-      }
-      
-      if (!sessionData.session) {
-        console.log("AuthGuard: No active session, redirecting to auth page");
-        setIsLoading(false);
-        setIsAuthorized(false);
-        navigate('/auth');
-        return;
-      }
-
-      const user = sessionData.session.user;
-      console.log("AuthGuard: User authenticated", user.id);
-
-      // If role check is required
-      if (requiredRole) {
-        console.log("AuthGuard: Checking role requirement:", requiredRole);
+      try {
+        // First, check if we have an active session
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
         
-        // Get user profile to check role
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (profileError) {
-          console.error("AuthGuard: Error fetching user profile for role check:", profileError);
-          toast.error("Error verifying your account permissions");
+        if (sessionError) {
+          console.error("AuthGuard: Error getting session:", sessionError);
+          setAuthError("Failed to verify your session");
+          setIsLoading(false);
+          setIsAuthorized(false);
+          toast.error("Session verification failed");
+          navigate('/auth');
+          return;
+        }
+        
+        if (!sessionData.session) {
+          console.log("AuthGuard: No active session, redirecting to auth page");
           setIsLoading(false);
           setIsAuthorized(false);
           navigate('/auth');
           return;
         }
 
-        if (!profile) {
-          console.error("AuthGuard: Profile not found for role check");
-          toast.error("User profile not found");
-          setIsLoading(false);
-          setIsAuthorized(false);
-          navigate('/auth');
-          return;
+        const user = sessionData.session.user;
+        console.log("AuthGuard: User authenticated", user.id);
+
+        // If role check is required
+        if (requiredRole) {
+          console.log("AuthGuard: Checking role requirement:", requiredRole);
+          
+          // Get user profile to check role
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (profileError) {
+            console.error("AuthGuard: Error fetching user profile for role check:", profileError);
+            toast.error("Error verifying your account permissions");
+            setIsLoading(false);
+            setIsAuthorized(false);
+            navigate('/auth');
+            return;
+          }
+
+          if (!profile) {
+            console.error("AuthGuard: Profile not found for role check");
+            toast.error("User profile not found");
+            setIsLoading(false);
+            setIsAuthorized(false);
+            navigate('/auth');
+            return;
+          }
+
+          // Check if user has required role
+          const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+          const hasRequiredRole = roles.includes(profile.role);
+
+          console.log("AuthGuard: User role:", profile.role, "Required roles:", roles, "Has required role:", hasRequiredRole);
+
+          if (!hasRequiredRole) {
+            console.log("AuthGuard: User doesn't have required role", profile.role, "needs", requiredRole);
+            toast.error("You don't have permission to access this page");
+            setIsLoading(false);
+            setIsAuthorized(false);
+            navigate('/dashboard');
+            return;
+          }
+          
+          console.log("AuthGuard: User has required role:", profile.role);
         }
 
-        // Check if user has required role
-        const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-        const hasRequiredRole = roles.includes(profile.role);
-
-        console.log("AuthGuard: User role:", profile.role, "Required roles:", roles, "Has required role:", hasRequiredRole);
-
-        if (!hasRequiredRole) {
-          console.log("AuthGuard: User doesn't have required role", profile.role, "needs", requiredRole);
-          toast.error("You don't have permission to access this page");
-          setIsLoading(false);
-          setIsAuthorized(false);
-          navigate('/dashboard');
-          return;
-        }
-        
-        console.log("AuthGuard: User has required role:", profile.role);
+        console.log("AuthGuard: User is authorized, rendering protected content");
+        setIsAuthorized(true);
+        setIsLoading(false);
+        setAuthError(null);
+        authChecked.current = true;
+      } catch (error) {
+        console.error("AuthGuard error:", error);
+        toast.error("Authentication error");
+        setIsLoading(false);
+        setIsAuthorized(false);
+        navigate('/auth');
       }
-
-      console.log("AuthGuard: User is authorized, rendering protected content");
-      setIsAuthorized(true);
-      setIsLoading(false);
-      setAuthError(null);
-    } catch (error) {
-      console.error("AuthGuard error:", error);
-      toast.error("Authentication error");
-      setIsLoading(false);
-      setIsAuthorized(false);
-      navigate('/auth');
     }
   };
 
@@ -110,6 +114,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     console.log("AuthGuard: Manual refresh triggered");
     setIsLoading(true);
     setAuthError(null);
+    authChecked.current = false;
     checkAuth();
   };
 
@@ -118,7 +123,6 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     console.log("AuthGuard: Component mounted");
     let isMounted = true;
     let authTimeout: NodeJS.Timeout | null = null;
-    let authSubscription: { unsubscribe: () => void } | null = null;
     
     // Set a safety timeout to prevent getting stuck in loading
     authTimeout = setTimeout(() => {
@@ -127,13 +131,10 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         setIsLoading(false);
         setAuthError("Verification timed out. Please try refreshing.");
       }
-    }, 5000); // Reduced from 10s to 5s
+    }, 5000);
     
-    // Initial auth check
-    checkAuth();
-    
-    // Listen for auth state changes
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    // First set up auth state change listener
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("AuthGuard: Auth state changed:", event);
       
       if (!isMounted) return;
@@ -141,19 +142,23 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
       // Directly handle sign out
       if (event === 'SIGNED_OUT') {
         setIsAuthorized(false);
+        setIsLoading(false);
         navigate('/auth');
         return;
       }
       
-      // For other events, use setTimeout to avoid potential deadlocks
+      // For other events, just set auth checked to false to trigger a recheck
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        authChecked.current = false;
+        // Use setTimeout to avoid potential deadlocks with Supabase
         setTimeout(() => {
           if (isMounted) checkAuth();
         }, 0);
       }
     });
     
-    authSubscription = data.subscription;
+    // Then check auth
+    checkAuth();
     
     // Clean up
     return () => {
@@ -164,9 +169,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         clearTimeout(authTimeout);
       }
       
-      if (authSubscription) {
-        authSubscription.unsubscribe();
-      }
+      authListener.subscription.unsubscribe();
     };
   }, [navigate, requiredRole]);
 

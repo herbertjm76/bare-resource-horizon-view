@@ -22,10 +22,18 @@ const Projects = () => {
       companyLoading 
     });
     
+    let timeoutId: NodeJS.Timeout;
+    
     if (!companyLoading && !company) {
       console.log('No company found, refreshing company data');
-      refreshCompany();
+      timeoutId = setTimeout(() => {
+        refreshCompany();
+      }, 0);
     }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [company, companyLoading, refreshCompany]);
 
   return (
