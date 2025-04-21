@@ -159,8 +159,11 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     onChange(suggestion);
     setSearchTerm(suggestion);
     setShowDropdown(false);
+    
+    // Call onSelectSuggestion with both address and city if provided
     if (onSelectSuggestion) {
       const city = extractCity(suggestion);
+      console.log("Selecting suggestion:", suggestion, "City:", city);
       onSelectSuggestion(suggestion, city);
     }
   };

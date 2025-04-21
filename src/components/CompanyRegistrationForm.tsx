@@ -79,6 +79,8 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         return;
       }
 
+      console.log("Submitting company with data:", data);
+
       // Insert the company
       const { data: company, error: companyError } = await supabase
         .from('companies')
@@ -117,8 +119,13 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
   const handleAddressSuggestion = (address: string, city: string) => {
     console.log("Address selected:", address);
     console.log("City extracted:", city);
+    
+    // Set both address and city in the form
     setValue("address", address);
-    setValue("city", city);
+    if (city) {
+      setValue("city", city);
+      console.log("City value after setting:", watch("city"));
+    }
   };
 
   return (
