@@ -1,14 +1,18 @@
 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { CountrySelect } from "@/components/ui/CountrySelect";
-import AddressAutocomplete from "@/components/ui/AddressAutocomplete";
+import NameField from "./CompanyRegistrationForm/NameField";
+import SubdomainField from "./CompanyRegistrationForm/SubdomainField";
+import CountryField from "./CompanyRegistrationForm/CountryField";
+import AddressField from "./CompanyRegistrationForm/AddressField";
+import CityField from "./CompanyRegistrationForm/CityField";
+import SizeField from "./CompanyRegistrationForm/SizeField";
+import WebsiteField from "./CompanyRegistrationForm/WebsiteField";
 
-interface CompanyFormData {
+export interface CompanyFormData {
   name: string;
   subdomain: string;
   website?: string;
@@ -23,13 +27,6 @@ interface CompanyRegistrationFormProps {
   userId: string;
 }
 
-const companySizes = [
-  { value: "1-5", label: "1-5" },
-  { value: "5-25", label: "5-25" },
-  { value: "26-50", label: "26-50" },
-  { value: "51-100", label: "51-100" },
-];
-
 export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = ({
   onSuccess,
   userId,
@@ -43,11 +40,6 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
     setValue,
   } = useForm<CompanyFormData>();
   const [isCheckingSubdomain, setIsCheckingSubdomain] = useState(false);
-
-  // Country and Address Management
-  const selectedCountry = watch("country");
-  const addressValue = watch("address");
-  const cityValue = watch("city");
 
   const checkSubdomainAvailability = async (subdomain: string) => {
     setIsCheckingSubdomain(true);
@@ -117,156 +109,26 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
 
   // Handle address suggestion selection
   const handleAddressSuggestion = (address: string, city: string) => {
-    console.log("Address selected:", address);
-    console.log("City extracted:", city);
-    
-    // Set both address and city in the form
     setValue("address", address);
     if (city) {
       setValue("city", city);
-      console.log("City value after setting:", watch("city"));
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Name */}
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-200">
-          Company Name
-        </label>
-        <Input
-          id="name"
-          type="text"
-          {...register('name', { required: 'Company name is required' })}
-          className="mt-1"
-        />
-        {errors.name && (
-          <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-        )}
-      </div>
-
-      {/* Subdomain */}
-      <div>
-        <label htmlFor="subdomain" className="block text-sm font-medium text-gray-200">
-          Subdomain
-        </label>
-        <div className="flex items-center mt-1">
-          <Input
-            id="subdomain"
-            type="text"
-            {...register('subdomain', {
-              required: 'Subdomain is required',
-              pattern: {
-                value: /^[a-zA-Z0-9-]+$/,
-                message: 'Subdomain can only contain letters, numbers, and hyphens'
-              },
-              minLength: {
-                value: 3,
-                message: 'Subdomain must be at least 3 characters long'
-              },
-              maxLength: {
-                value: 63,
-                message: 'Subdomain must be less than 64 characters long'
-              }
-            })}
-          />
-          <span className="ml-2 text-gray-300">.bareresource.com</span>
-        </div>
-        {errors.subdomain && (
-          <p className="text-red-500 text-sm mt-1">{errors.subdomain.message}</p>
-        )}
-        {isCheckingSubdomain && (
-          <p className="text-blue-400 text-sm mt-1">Checking availability...</p>
-        )}
-      </div>
-
-      {/* Country */}
-      <div>
-        <label htmlFor="country" className="block text-sm font-medium text-gray-200">
-          Country
-        </label>
-        <CountrySelect
-          value={selectedCountry ?? ""}
-          onChange={(_name, code) => setValue("country", _name)}
-          placeholder="Select country"
-        />
-        {errors.country && (
-          <p className="text-red-500 text-sm mt-1">{errors.country.message}</p>
-        )}
-      </div>
-
-      {/* Address (under country, with autocomplete) */}
-      <div>
-        <label htmlFor="address" className="block text-sm font-medium text-gray-200">
-          Company Address
-        </label>
-        <AddressAutocomplete
-          value={addressValue || ""}
-          country={selectedCountry || ""}
-          onChange={addr => setValue("address", addr)}
-          disabled={!selectedCountry}
-          placeholder={selectedCountry ? "Type address..." : "Select country above first"}
-          onSelectSuggestion={handleAddressSuggestion}
-        />
-        {errors.address && (
-          <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
-        )}
-      </div>
-
-      {/* City (auto filled, still editable) */}
-      <div>
-        <label htmlFor="city" className="block text-sm font-medium text-gray-200">
-          City
-        </label>
-        <Input
-          id="city"
-          type="text"
-          {...register('city', { required: "City is required" })}
-          className="mt-1"
-        />
-        {errors.city && (
-          <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
-        )}
-      </div>
-
-      {/* Company Size dropdown */}
-      <div>
-        <label htmlFor="size" className="block text-sm font-medium text-gray-200">
-          Company Size
-        </label>
-        <select
-          id="size"
-          {...register('size', { required: "Size is required" })}
-          className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
-        >
-          <option value="">Select size...</option>
-          {companySizes.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-        {errors.size && (
-          <p className="text-red-500 text-sm mt-1">{errors.size.message}</p>
-        )}
-      </div>
-
-      {/* Website */}
-      <div>
-        <label htmlFor="website" className="block text-sm font-medium text-gray-200">
-          Website (optional)
-        </label>
-        <Input
-          id="website"
-          type="url"
-          placeholder="https://yourcompany.com"
-          {...register('website')}
-          className="mt-1"
-        />
-      </div>
-
+      <NameField register={register} errors={errors} />
+      <SubdomainField register={register} errors={errors} isChecking={isCheckingSubdomain} />
+      <CountryField watch={watch} setValue={setValue} errors={errors} />
+      <AddressField watch={watch} setValue={setValue} errors={errors} handleAddressSuggestion={handleAddressSuggestion} />
+      <CityField register={register} errors={errors} />
+      <SizeField register={register} errors={errors} />
+      <WebsiteField register={register} />
       <Button type="submit" className="w-full">
         Register Company
       </Button>
     </form>
   );
 };
+
+export default CompanyRegistrationForm;
