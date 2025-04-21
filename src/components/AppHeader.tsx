@@ -50,10 +50,22 @@ export const AppHeader: React.FC = () => {
         aria-label="Bare Resource"
       >
         {/* White text with black outline for "Bare" */}
-        <span className="relative text-white">
-          <span aria-hidden="true" className="absolute inset-0 -z-10 text-black stroke-[1.5px] stroke-current select-none pointer-events-none" style={{ WebkitTextStrokeWidth: '1.5px', WebkitTextStrokeColor: 'black' }}>
-            Bare
-          </span>
+        <span 
+          className="relative text-white"
+          style={{
+            WebkitTextStrokeWidth: '1.5px',
+            WebkitTextStrokeColor: 'black',
+            textStrokeWidth: '1.5px',
+            textStrokeColor: 'black',
+            // For fallback and more browser support, also add textShadow:
+            textShadow: `
+              -1px -1px 0 black,
+              1px -1px 0 black,
+              -1px 1px 0 black,
+              1px 1px 0 black
+            `
+          }}
+        >
           Bare
         </span>
         <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-500 to-pink-500 ml-1">
@@ -90,4 +102,3 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
-
