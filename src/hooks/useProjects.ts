@@ -26,11 +26,16 @@ export const useProjects = () => {
         return data || [];
       } catch (err) {
         console.error('Error in projects query:', err);
-        return [];
+        throw err; // We'll let React Query handle the retry and error state
       }
     },
     retry: 1,
+    retryDelay: 1000,
     refetchOnWindowFocus: false,
+    onError: (error) => {
+      console.error('React Query error in projects:', error);
+      toast.error('Could not load projects data');
+    }
   });
 
   return {

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import { Edit, Loader2 } from "lucide-react";
 import type { Tables } from '@/integrations/supabase/types';
 
 interface ProjectsTableProps {
@@ -21,6 +21,14 @@ interface ProjectsTableProps {
 export const ProjectsTable = ({ projects, isLoading }: ProjectsTableProps) => {
   if (isLoading) {
     return <LoadingState />;
+  }
+
+  if (!projects || projects.length === 0) {
+    return (
+      <div className="p-6 text-center">
+        <p className="text-muted-foreground">No projects found</p>
+      </div>
+    );
   }
 
   return (
@@ -39,10 +47,15 @@ export const ProjectsTable = ({ projects, isLoading }: ProjectsTableProps) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {projects?.map((project) => (
+        {projects.map((project) => (
           <TableRow key={project.id}>
             <TableCell className="font-medium">{project.name}</TableCell>
-            <TableCell>PM Name</TableCell>
+            <TableCell>
+              {project.project_manager ? 
+                `${project.project_manager.first_name || ''} ${project.project_manager.last_name || ''}`.trim() :
+                'Unassigned'
+              }
+            </TableCell>
             <TableCell>{project.country}</TableCell>
             <TableCell>{project.target_profit_percentage}%</TableCell>
             <TableCell>Calculating...</TableCell>

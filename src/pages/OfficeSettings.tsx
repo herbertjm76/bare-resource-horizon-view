@@ -3,7 +3,7 @@ import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Folder, Layers, MapPin, Briefcase, Currency, Calendar, AlertCircle, RefreshCw } from 'lucide-react';
+import { Folder, Layers, MapPin, Briefcase, Currency, Calendar, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 import { CountriesTab } from '@/components/settings/CountriesTab';
 import { StagesTab } from '@/components/settings/StagesTab';
 import { LocationsTab } from '@/components/settings/LocationsTab';
@@ -26,12 +26,6 @@ const HEADER_HEIGHT = 56;
 const OfficeSettings = () => {
   const { company, loading: companyLoading, refreshCompany } = useCompany();
   const navigate = useNavigate();
-
-  React.useEffect(() => {
-    if (!companyLoading && !company) {
-      toast.error("No company context found. Please ensure you're logged in with a company account.");
-    }
-  }, [company, companyLoading]);
 
   return (
     <AuthGuard requiredRole={['owner', 'admin']}>
@@ -61,7 +55,14 @@ const OfficeSettings = () => {
                   )}
                 </div>
                 
-                {!companyLoading && !company ? (
+                {companyLoading ? (
+                  <div className="flex justify-center items-center h-64">
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      <p className="text-sm text-muted-foreground">Loading company data...</p>
+                    </div>
+                  </div>
+                ) : !company ? (
                   <div className="p-6 rounded-lg border border-red-500/30 bg-red-500/10">
                     <div className="flex items-start gap-4">
                       <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />

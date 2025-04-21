@@ -6,7 +6,7 @@ import { ProjectsList } from '@/components/projects/ProjectsList';
 import { AppHeader } from '@/components/AppHeader';
 import { useCompany } from '@/context/CompanyContext';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, RefreshCw } from 'lucide-react';
+import { AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import AuthGuard from '@/components/AuthGuard';
 
@@ -48,7 +48,14 @@ const Projects = () => {
                   )}
                 </div>
 
-                {!companyLoading && !company ? (
+                {companyLoading ? (
+                  <div className="flex justify-center items-center h-64">
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                      <p className="text-sm text-muted-foreground">Loading company data...</p>
+                    </div>
+                  </div>
+                ) : !company ? (
                   <div className="p-6 rounded-lg border border-red-500/30 bg-red-500/10">
                     <div className="flex items-start gap-4">
                       <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
