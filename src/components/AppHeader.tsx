@@ -10,6 +10,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 // Colors
 const BARE_DARK_GREY_SHADOW = "#222";
 const RESOURCE_GRADIENT = "linear-gradient(90deg, #9b87f5, #7E69AB, #5a7eb7)";
+const BARE_MID_GRAY = "#8A898C";
 
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
@@ -52,18 +53,18 @@ export const AppHeader: React.FC = () => {
           className="flex items-end leading-none select-none"
           aria-label="BareResource"
           style={{
-            fontWeight: 400, // Bare as regular
+            fontWeight: 700,          // Make both bold for uniformity
             fontSize: "2.4rem",
-            letterSpacing: "0.2px", // tighter
+            letterSpacing: "0.1px",   // very tight spacing for the entire word
             lineHeight: 1,
           }}
         >
           <span
             style={{
-              color: "#fff",
-              fontWeight: 400,
+              color: BARE_MID_GRAY,
+              fontWeight: 700,
               fontSize: "2.4rem",
-              letterSpacing: "0.2px",
+              letterSpacing: "0.1px",
               lineHeight: 1,
               display: "inline-block",
               position: "relative",
@@ -75,17 +76,16 @@ export const AppHeader: React.FC = () => {
           </span>
           <span
             style={{
-              fontWeight: 700, // Resource as bold
-              fontSize: "2.1rem",
-              letterSpacing: "0.3px",
+              fontWeight: 700,
+              fontSize: "2.4rem",
+              letterSpacing: "0.1px",
               display: "inline-block",
               verticalAlign: "bottom",
               background: RESOURCE_GRADIENT,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-              /* Removed invalid CSS property 'textFillColor' */
-              marginLeft: 0, // Remove spacing
+              marginLeft: 0, // remove spacing between
             }}
           >
             Resource
@@ -120,4 +120,3 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
-
