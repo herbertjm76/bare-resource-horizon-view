@@ -5,8 +5,8 @@ import { useToast } from "@/hooks/use-toast";
 import allCountries from "@/lib/allCountries.json";
 import { getContinentByCountryCode } from './projectAreaHelpers';
 
-// Types that match the office_areas table in Supabase
-export type OfficeAreaRow = {
+// Types that match the project_areas table in Supabase
+export type ProjectAreaRow = {
   id: string;
   code: string;
   name: string; // corresponds to country or area name
@@ -40,7 +40,7 @@ function getAutoRegion(country: string): string {
 }
 
 // Helper: convert from DB row to ProjectArea
-function toProjectArea(area: OfficeAreaRow): ProjectArea {
+function toProjectArea(area: ProjectAreaRow): ProjectArea {
   return {
     id: area.id,
     code: area.code,
@@ -55,7 +55,7 @@ export default function useProjectAreas() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Fetch areas from office_areas
+  // Fetch Project Areas from project_areas table
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -63,7 +63,7 @@ export default function useProjectAreas() {
     const fetchAreas = async () => {
       try {
         const { data, error } = await supabase
-          .from("office_areas")
+          .from("project_areas")
           .select("*")
           .order("created_at", { ascending: true });
 
@@ -90,19 +90,19 @@ export default function useProjectAreas() {
     // eslint-disable-next-line
   }, []);
 
-  // Add Project Area (office_areas)
+  // Add Project Area (project_areas)
   const addArea = async (values: ProjectAreaFormValues) => {
     setLoading(true);
     setError(null);
     try {
-      // 'name' in office_areas is the country/area name
+      // 'name' in project_areas is the country/area name
       const areaData = {
         code: values.code,
         name: values.country,
         emoji: null,
       };
       const { data, error } = await supabase
-        .from("office_areas")
+        .from("project_areas")
         .insert(areaData)
         .select()
         .single();
@@ -116,7 +116,7 @@ export default function useProjectAreas() {
         });
       }
       if (data) {
-        setAreas(old => [...old, toProjectArea(data as OfficeAreaRow)]);
+        setAreas(old => [...old, toProjectArea(data as ProjectAreaRow)]);
         toast({
           title: "Success",
           description: "Area added successfully.",
@@ -146,7 +146,7 @@ export default function useProjectAreas() {
       };
 
       const { error } = await supabase
-        .from("office_areas")
+        .from("project_areas")
         .update(areaData)
         .eq("id", id);
 
@@ -194,7 +194,7 @@ export default function useProjectAreas() {
     setError(null);
     try {
       const { error } = await supabase
-        .from("office_areas")
+        .from("project_areas")
         .delete()
         .in("id", ids);
 
@@ -236,4 +236,3 @@ export default function useProjectAreas() {
 }
 
 export { getAutoRegion };
-

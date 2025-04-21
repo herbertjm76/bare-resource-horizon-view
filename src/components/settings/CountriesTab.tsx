@@ -13,7 +13,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 const formSchema = z.object({
   code: z.string().min(1, "Code is required"),
   country: z.string().min(1, "Country is required"),
-  city: z.string().optional(),
   region: z.string().min(1, "Region is required"),
 });
 
@@ -33,7 +32,7 @@ export const CountriesTab = () => {
 
   const form = useForm<ProjectAreaFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { code: "", country: "", city: "", region: "" }
+    defaultValues: { code: "", country: "", region: "" }
   });
 
   const onOpenChange = (open: boolean) => {
@@ -48,7 +47,6 @@ export const CountriesTab = () => {
     setEditing(area);
     form.reset({
       code: area.code,
-      city: area.city ?? "",
       region: area.region ?? getAutoRegion(area.country),
       country: area.country,
     });

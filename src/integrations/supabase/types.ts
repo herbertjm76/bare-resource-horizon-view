@@ -48,33 +48,6 @@ export type Database = {
         }
         Relationships: []
       }
-      office_areas: {
-        Row: {
-          code: string
-          created_at: string
-          emoji: string | null
-          id: string
-          name: string
-          updated_at: string
-        }
-        Insert: {
-          code: string
-          created_at?: string
-          emoji?: string | null
-          id?: string
-          name: string
-          updated_at?: string
-        }
-        Update: {
-          code?: string
-          created_at?: string
-          emoji?: string | null
-          id?: string
-          name?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       office_holidays: {
         Row: {
           created_at: string
@@ -358,6 +331,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      project_areas: {
+        Row: {
+          code: string
+          created_at: string
+          emoji: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       project_resources: {
         Row: {
