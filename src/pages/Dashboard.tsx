@@ -139,21 +139,19 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-col w-full min-h-screen">
         <div className="flex flex-1 w-full">
           <DashboardSidebar inviteUrl={inviteUrl} />
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col bg-white">
             <AppHeader />
             <div style={{ height: HEADER_HEIGHT }} />
-            <div className="flex-1 bg-white p-8">
-              <div className="max-w-6xl mx-auto">
-                <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
-                <DashboardMetrics />
-                {(profile?.role === 'owner' || profile?.role === 'admin') && (
-                  <TeamManagement 
-                    teamMembers={teamMembers} 
-                    inviteUrl={inviteUrl}
-                    userRole={profile.role}
-                  />
-                )}
-              </div>
+            <div className="flex-1 p-8 max-w-6xl mx-auto">
+              <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || "User"} />
+              <DashboardMetrics />
+              {(profile?.role === 'owner' || profile?.role === 'admin') && (
+                <TeamManagement
+                  teamMembers={teamMembers}
+                  inviteUrl={inviteUrl}
+                  userRole={profile.role}
+                />
+              )}
             </div>
           </div>
         </div>

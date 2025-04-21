@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { 
+import {
   LayoutDashboard,
   CalendarDays,
   CalendarRange,
@@ -13,7 +13,7 @@ import {
   Flag,
   Code,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -26,7 +26,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
-  useSidebar
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { InviteCodeDialog } from "./InviteCodeDialog";
 
@@ -111,7 +111,7 @@ const navigationItems = [
         title: "Invite Code",
         url: "#",
         icon: Code,
-        isInvite: true
+        isInvite: true,
       },
     ],
   },
@@ -127,7 +127,7 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
 
   // Main gradient sidebar
   return (
-    <Sidebar 
+    <Sidebar
       className={`
         min-h-screen w-full p-0
         border-none 
@@ -142,17 +142,29 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
       <SidebarContent className="p-0">
         {/* Company Logo and Collapse Button */}
         <div className="flex flex-col items-stretch w-full">
-          <div className={`flex items-center justify-between gap-2 px-4 py-7 ${collapsed ? "justify-center px-2" : ""}`}>
+          <div
+            className={`flex items-center justify-between gap-2 px-4 py-7 ${
+              collapsed ? "justify-center px-2" : ""
+            }`}
+          >
             <div className={collapsed ? "w-full flex justify-center" : "flex items-center gap-3"}>
               <img
                 src={LOGO_URL}
                 alt="Company Logo"
-                className={`material-symbols-outlined shadow-lg rounded-full border-2 border-white/70 ${collapsed ? "w-11 h-11" : "w-10 h-10"} bg-white object-cover duration-200`}
-                style={{ minWidth: 40, minHeight: 40, maxWidth: 44, maxHeight: 44, objectFit: "cover" }}
+                className={`shadow-lg rounded-full border-2 border-white/80 ${
+                  collapsed ? "w-14 h-14" : "w-12 h-12"
+                } bg-white object-cover duration-200`}
+                style={{
+                  minWidth: 44,
+                  minHeight: 44,
+                  maxWidth: 56,
+                  maxHeight: 56,
+                  objectFit: "cover",
+                }}
               />
               {!collapsed && (
                 <span
-                  className="text-2xl font-extrabold text-white drop-shadow bare-logo-shadow tracking-wide"
+                  className="text-3xl font-extrabold text-white drop-shadow bare-logo-shadow tracking-wide whitespace-nowrap"
                   style={{ letterSpacing: 1.5 }}
                 >
                   BareResource
@@ -161,17 +173,14 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
             </div>
             <button
               onClick={toggleSidebar}
-              className={`transition-colors rounded-full p-1 ml-2 ${collapsed
-                ? "bg-white/20 hover:bg-purple-400/60"
-                : "bg-white/10 hover:bg-purple-300/40"
-              } text-white`}
+              className={`transition-colors rounded-full p-1 ml-2 ${
+                collapsed
+                  ? "bg-white/30 hover:bg-white/60"
+                  : "bg-white/20 hover:bg-white/40"
+              } text-white shadow-md focus:outline-none focus:ring-2 focus:ring-white`}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              {collapsed ? (
-                <ChevronRight className="w-6 h-6" />
-              ) : (
-                <ChevronLeft className="w-6 h-6" />
-              )}
+              {collapsed ? <ChevronRight className="w-7 h-7" /> : <ChevronLeft className="w-7 h-7" />}
             </button>
           </div>
         </div>
@@ -179,7 +188,11 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
         {/* Navigation Menu */}
         {navigationItems.map((section) => (
           <SidebarGroup key={section.label}>
-            <SidebarGroupLabel className={`text-white/70 uppercase tracking-wide font-semibold text-xs mb-1 ${collapsed ? "hidden" : ""}`}>
+            <SidebarGroupLabel
+              className={`text-white/90 uppercase tracking-wide font-semibold text-xs mb-1 ${
+                collapsed ? "hidden" : ""
+              }`}
+            >
               {collapsed ? "" : section.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -191,43 +204,50 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                       <SidebarMenuButton
                         asChild
                         className={`
-                          text-white/90 
-                          text-base
+                          text-white/95 
+                          text-lg
                           hover:text-white
-                          hover:bg-white/12
-                          px-3 py-2
+                          hover:bg-white/20
+                          px-4 py-3
                           my-1
                           rounded-xl
                           flex
                           items-center
-                          gap-3
+                          gap-5
                           transition-all
                           ease-in
                           group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0
-                          ${isActive ? "bg-white/20 shadow-inner text-white font-bold" : ""}
+                          ${isActive ? "bg-white/30 shadow-inner text-white font-semibold" : ""}
                         `}
                         isActive={isActive}
+                        aria-current={isActive ? "page" : undefined}
+                        // Ensure focus visible is strong for accessibility
+                        // We'll rely on inherited styles from SidebarMenuButton
                       >
                         {/* Handle Invite Code special: open dialog on click */}
                         {item.isInvite ? (
                           <button
                             type="button"
                             className={`
-                              w-full flex items-center gap-4
+                              w-full flex items-center gap-5
                               group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
-                              focus-visible:ring-2 focus-visible:ring-pink-300 transition-shadow`}
+                              focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none transition-shadow
+                            `}
                             tabIndex={0}
-                            onClick={(e) => { e.preventDefault(); setInviteOpen(true); }}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setInviteOpen(true);
+                            }}
                           >
                             <item.icon
-                              className={`
-                                ${collapsed ? "w-8 h-8" : "w-7 h-7"}
-                                drop-shadow-sm
-                                flex-shrink-0
-                                transition-all
-                              `}
+                              className={`${collapsed ? "w-10 h-10" : "w-8 h-8"} drop-shadow-sm flex-shrink-0 transition-all`}
+                              aria-hidden="true"
                             />
-                            <span className={`truncate group-data-[collapsible=icon]:hidden ${collapsed ? "hidden" : ""}`}>
+                            <span
+                              className={`truncate group-data-[collapsible=icon]:hidden ${
+                                collapsed ? "hidden" : ""
+                              }`}
+                            >
                               {item.title}
                             </span>
                           </button>
@@ -235,21 +255,23 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
                           <Link
                             to={item.url}
                             className={`
-                              flex items-center gap-4 w-full
+                              flex items-center gap-5 w-full
                               group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
                               font-medium
                               transition-all
                             `}
                           >
                             <item.icon
-                              className={`
-                                ${collapsed ? "w-8 h-8" : "w-7 h-7"}
-                                drop-shadow-sm
-                                flex-shrink-0
-                                transition-all
-                              `}
+                              className={`${
+                                collapsed ? "w-10 h-10" : "w-8 h-8"
+                              } drop-shadow-sm flex-shrink-0 transition-all`}
+                              aria-hidden="true"
                             />
-                            <span className={`truncate group-data-[collapsible=icon]:hidden ${collapsed ? "hidden" : ""}`}>
+                            <span
+                              className={`truncate group-data-[collapsible=icon]:hidden ${
+                                collapsed ? "hidden" : ""
+                              }`}
+                            >
                               {item.title}
                             </span>
                           </Link>
@@ -265,14 +287,10 @@ export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
       </SidebarContent>
       {/* Sidebar collapse/expand affordance always visible on wide screens */}
       <div className="flex justify-end items-center px-2 py-4 md:block hidden">
-        <SidebarTrigger className="text-white hover:bg-white/20" />
+        <SidebarTrigger className="text-white hover:bg-white/30" />
       </div>
       {/* Invite Code Dialog */}
-      <InviteCodeDialog
-        open={inviteOpen}
-        onOpenChange={setInviteOpen}
-        inviteUrl={inviteUrl || ""}
-      />
+      <InviteCodeDialog open={inviteOpen} onOpenChange={setInviteOpen} inviteUrl={inviteUrl || ""} />
     </Sidebar>
   );
 }
