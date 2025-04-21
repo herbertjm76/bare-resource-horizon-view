@@ -50,35 +50,35 @@ export const ProjectsTable = ({ projects, isLoading }: ProjectsTableProps) => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Project Name</TableHead>
-          <TableHead>PM</TableHead>
-          <TableHead>Country</TableHead>
-          <TableHead>Target Profit (%)</TableHead>
-          <TableHead>Ideal Average Rate</TableHead>
-          <TableHead>Actual Average Rate</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Current Stage</TableHead>
-          <TableHead>Actions</TableHead>
+          <TableHead className="px-6 py-4">Project Name</TableHead>
+          <TableHead className="px-6 py-4">PM</TableHead>
+          <TableHead className="px-6 py-4">Country</TableHead>
+          <TableHead className="px-6 py-4">Target Profit (%)</TableHead>
+          <TableHead className="px-6 py-4">Ideal Average Rate</TableHead>
+          <TableHead className="px-6 py-4">Actual Average Rate</TableHead>
+          <TableHead className="px-6 py-4">Status</TableHead>
+          <TableHead className="px-6 py-4">Current Stage</TableHead>
+          <TableHead className="px-6 py-4">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {projects.map((project) => (
           <TableRow key={project.id}>
-            <TableCell className="font-medium">{project.name}</TableCell>
-            <TableCell>
+            <TableCell className="px-6 py-4 font-medium">{project.name}</TableCell>
+            <TableCell className="px-6 py-4">
               {project.project_manager ? 
                 `${project.project_manager.first_name || ''} ${project.project_manager.last_name || ''}`.trim() || 'Unassigned' :
                 'Unassigned'
               }
             </TableCell>
-            <TableCell>{project.country}</TableCell>
-            <TableCell>{project.target_profit_percentage}%</TableCell>
-            <TableCell>Calculating...</TableCell>
-            <TableCell>Calculating...</TableCell>
-            <TableCell>{project.status}</TableCell>
-            <TableCell>{project.current_stage}</TableCell>
-            <TableCell>
-              <Button variant="ghost" size="icon">
+            <TableCell className="px-6 py-4">{project.country}</TableCell>
+            <TableCell className="px-6 py-4">{project.target_profit_percentage}%</TableCell>
+            <TableCell className="px-6 py-4">Calculating...</TableCell>
+            <TableCell className="px-6 py-4">Calculating...</TableCell>
+            <TableCell className="px-6 py-4">{project.status}</TableCell>
+            <TableCell className="px-6 py-4">{project.current_stage}</TableCell>
+            <TableCell className="px-6 py-4">
+              <Button variant="ghost" size="icon" className="h-8 w-8">
                 <Edit className="h-4 w-4" />
               </Button>
             </TableCell>
@@ -90,8 +90,8 @@ export const ProjectsTable = ({ projects, isLoading }: ProjectsTableProps) => {
 };
 
 const LoadingState = () => (
-  <div className="p-4">
-    <div className="space-y-3">
+  <div className="p-6">
+    <div className="space-y-4">
       {Array.from({ length: 5 }).map((_, i) => (
         <div key={i} className="flex gap-4">
           <Skeleton className="h-4 w-[250px]" />
