@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
+import { useCompany } from "@/context/CompanyContext";
 
 type Profile = {
   id: string;
@@ -19,6 +20,7 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { company, loading: companyLoading } = useCompany();
 
   useEffect(() => {
     // Fetch the current user profile
@@ -72,7 +74,7 @@ export default function Profile() {
     }
   };
 
-  if (loading) {
+  if (loading || companyLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <span className="text-white">Loading profile...</span>
@@ -93,6 +95,18 @@ export default function Profile() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Edit Profile</CardTitle>
+          {company && (
+            <div className="mt-2 flex items-center gap-2">
+              {company.logo_url && (
+                <img
+                  src={company.logo_url}
+                  alt="Company Logo"
+                  className="h-8 w-8 rounded"
+                />
+              )}
+              <span className="font-medium text-lg">{company.name}</span>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSave} className="space-y-4">
