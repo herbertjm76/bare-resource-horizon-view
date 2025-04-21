@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, Loader2 } from "lucide-react";
 import type { Tables } from '@/integrations/supabase/types';
 
+// Define the extended project interface to match the data structure from the API
 interface ExtendedProject extends Tables<'projects'> {
   project_manager?: {
     first_name: string | null;

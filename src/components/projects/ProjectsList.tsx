@@ -4,10 +4,17 @@ import { useProjects } from '@/hooks/useProjects';
 import { ProjectsTable } from './ProjectsTable';
 import { ProjectsToolbar } from './ProjectsToolbar';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Loader2 } from 'lucide-react';
+import { AlertTriangle, Loader2, RefreshCw } from 'lucide-react';
 
 export const ProjectsList = () => {
   const { projects, isLoading, error } = useProjects();
+  
+  console.log('ProjectsList render:', { projects, isLoading, error });
+
+  const handleRetry = () => {
+    console.log('Retrying projects fetch');
+    window.location.reload();
+  };
 
   if (error) {
     return (
@@ -19,7 +26,8 @@ export const ProjectsList = () => {
             <p className="text-muted-foreground mt-1">
               There was a problem loading your projects. Please try again.
             </p>
-            <Button variant="outline" className="mt-4" onClick={() => window.location.reload()}>
+            <Button variant="outline" className="mt-4" onClick={handleRetry}>
+              <RefreshCw className="h-4 w-4 mr-2" />
               Retry
             </Button>
           </div>
