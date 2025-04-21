@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/context/CompanyContext";
+import { toast } from "sonner";
 
 type Profile = {
   id: string;
@@ -70,13 +71,14 @@ export default function Profile() {
       setError("Update failed. Please try again.");
     } else {
       setError(null);
+      toast.success("Profile updated successfully");
       navigate("/dashboard");
     }
   };
 
   if (loading || companyLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500">
         <span className="text-white">Loading profile...</span>
       </div>
     );
@@ -84,7 +86,7 @@ export default function Profile() {
 
   if (!profile) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500">
         <span className="text-white">Profile not found.</span>
       </div>
     );
@@ -93,20 +95,8 @@ export default function Profile() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
+        <CardHeader className="pb-4">
           <CardTitle>Edit Profile</CardTitle>
-          {company && (
-            <div className="mt-2 flex items-center gap-2">
-              {company.logo_url && (
-                <img
-                  src={company.logo_url}
-                  alt="Company Logo"
-                  className="h-8 w-8 rounded"
-                />
-              )}
-              <span className="font-medium text-lg">{company.name}</span>
-            </div>
-          )}
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSave} className="space-y-4">
@@ -146,7 +136,7 @@ export default function Profile() {
             {error && <div className="text-red-600 text-sm">{error}</div>}
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-blue-900 hover:bg-blue-800 dark:bg-blue-700 dark:hover:bg-blue-600"
               isLoading={saving}
               disabled={saving}
             >
