@@ -4,7 +4,7 @@ import { ClipboardCopy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
-import { AuthGuard } from '@/components/AuthGuard';
+import AuthGuard from '@/components/AuthGuard';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
