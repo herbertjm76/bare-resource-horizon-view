@@ -184,7 +184,7 @@ export function DashboardSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarRail 
-        className="after:bg-white after:w-[4px] after:opacity-100 hover:after:opacity-100 after:h-12 z-50 cursor-pointer"
+        className="after:bg-white after:w-[6px] after:opacity-100 hover:after:opacity-100 after:h-16 z-50 cursor-pointer absolute right-0 top-1/2 -translate-y-1/2"
         onClick={toggleSidebar}
       />
     </Sidebar>

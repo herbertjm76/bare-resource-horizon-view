@@ -175,7 +175,7 @@ const ProjectsContent = () => {
 
 const Projects = () => {
   return (
-    <SidebarProvider defaultState="collapsed">
+    <SidebarProvider defaultOpen={false}>
       <div className="w-full min-h-screen flex flex-row">
         <DashboardSidebar />
         <ProjectsContent />
