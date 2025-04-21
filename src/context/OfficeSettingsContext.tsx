@@ -86,20 +86,32 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         if (ratesError) throw ratesError;
 
         // Set the data in state without excessive type assertions
-        setRoles(rolesData || []);
-        setLocations(locationsData || []);
+        if (rolesData) {
+          setRoles(rolesData);
+        } else {
+          setRoles([]);
+        }
+        
+        if (locationsData) {
+          setLocations(locationsData);
+        } else {
+          setLocations([]);
+        }
         
         // Transform rates data to match our Rate type
-        const transformedRates: Rate[] = ratesData ? ratesData.map((rate: any) => ({
-          id: rate.id,
-          type: rate.type as "role" | "location",
-          reference_id: rate.reference_id,
-          value: Number(rate.value),
-          unit: rate.unit as "hour" | "day" | "week",
-          company_id: rate.company_id
-        })) : [];
-        
-        setRates(transformedRates);
+        if (ratesData) {
+          const transformedRates: Rate[] = ratesData.map((rate) => ({
+            id: rate.id,
+            type: rate.type as "role" | "location",
+            reference_id: rate.reference_id,
+            value: Number(rate.value),
+            unit: rate.unit as "hour" | "day" | "week",
+            company_id: rate.company_id
+          }));
+          setRates(transformedRates);
+        } else {
+          setRates([]);
+        }
       } catch (error: any) {
         console.error('Error fetching office settings:', error);
         toast.error('Failed to load office settings');
