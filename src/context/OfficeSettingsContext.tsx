@@ -4,7 +4,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-// Define types
+// Define types with optional company_id to match the database
 export type Role = {
   id: string;
   name: string;
@@ -15,7 +15,7 @@ export type Role = {
 export type Rate = {
   id: string;
   type: "role" | "location";
-  reference_id: string; // ID of the role or location
+  reference_id: string; 
   value: number;
   unit: "hour" | "day" | "week";
   company_id?: string;
@@ -61,33 +61,63 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        // Fetch roles data
-        const rolesResult = await supabase
+        // Define explicit return types for Supabase queries to avoid deep type instantiation
+        type SupabaseRoleRow = {
+          id: string;
+          name: string;
+          code: string;
+          company_id?: string;
+          created_at: string;
+          updated_at: string;
+        };
+        
+        type SupabaseLocationRow = {
+          id: string;
+          city: string;
+          country: string;
+          code: string;
+          emoji?: string;
+          company_id?: string;
+          created_at: string;
+          updated_at: string;
+        };
+        
+        type SupabaseRateRow = {
+          id: string;
+          type: string;
+          reference_id: string;
+          value: number;
+          unit: string;
+          company_id?: string;
+          created_at: string;
+          updated_at: string;
+        };
+
+        // Manually cast Supabase responses to avoid TypeScript depth issues
+        const { data: rolesData, error: rolesError } = await supabase
           .from('office_roles')
           .select('*')
           .eq('company_id', company.id);
-          
-        if (rolesResult.error) throw rolesResult.error;
         
-        // Fetch locations data
-        const locationsResult = await supabase
+        if (rolesError) throw rolesError;
+          
+        const { data: locationsData, error: locationsError } = await supabase
           .from('office_locations')
           .select('*')
           .eq('company_id', company.id);
           
-        if (locationsResult.error) throw locationsResult.error;
-        
-        // Fetch rates data
-        const ratesResult = await supabase
+        if (locationsError) throw locationsError;
+          
+        const { data: ratesData, error: ratesError } = await supabase
           .from('office_rates')
           .select('*')
           .eq('company_id', company.id);
           
-        if (ratesResult.error) throw ratesResult.error;
+        if (ratesError) throw ratesError;
 
-        // Process roles data
-        if (rolesResult.data) {
-          const processedRoles: Role[] = rolesResult.data.map(role => ({
+        // Process roles data with manual typing
+        if (rolesData) {
+          const processedRoles: Role[] = (rolesData as SupabaseRoleRow[]).map(role => ({
             id: role.id,
             name: role.name,
             code: role.code,
@@ -98,9 +128,9 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           setRoles([]);
         }
         
-        // Process locations data
-        if (locationsResult.data) {
-          const processedLocations: Location[] = locationsResult.data.map(location => ({
+        // Process locations data with manual typing
+        if (locationsData) {
+          const processedLocations: Location[] = (locationsData as SupabaseLocationRow[]).map(location => ({
             id: location.id,
             city: location.city,
             country: location.country,
@@ -113,9 +143,9 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           setLocations([]);
         }
         
-        // Process rates data
-        if (ratesResult.data) {
-          const processedRates: Rate[] = ratesResult.data.map(rate => ({
+        // Process rates data with manual typing
+        if (ratesData) {
+          const processedRates: Rate[] = (ratesData as SupabaseRateRow[]).map(rate => ({
             id: rate.id,
             type: rate.type as "role" | "location",
             reference_id: rate.reference_id,
