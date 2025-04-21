@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -28,32 +27,29 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [isSubdomainMode, setIsSubdomainMode] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
 
-  // Extract subdomain from current hostname
   const extractSubdomain = () => {
     const hostname = window.location.hostname;
     const params = new URLSearchParams(window.location.search);
     
-    // For localhost development, prioritize subdomain.localhost pattern
+    console.log('Extracting subdomain from:', hostname);
+    
+    const querySubdomain = params.get('subdomain');
+    if (querySubdomain) {
+      console.log('Found subdomain in query param:', querySubdomain);
+      return querySubdomain;
+    }
+    
     if (hostname === 'localhost' || hostname.endsWith('.localhost') || hostname === '127.0.0.1') {
       console.log('Checking for localhost subdomain pattern');
       
-      // First check for subdomain.localhost pattern
       const localParts = window.location.host.split('.');
       if (localParts.length > 1 && (localParts[1] === 'localhost' || localParts[1].includes('localhost:'))) {
         const extractedSubdomain = localParts[0];
         console.log('Found localhost subdomain:', extractedSubdomain);
         return extractedSubdomain;
       }
-      
-      // Then check for ?subdomain= parameter
-      const querySubdomain = params.get('subdomain');
-      if (querySubdomain) {
-        console.log('Found subdomain in query param:', querySubdomain);
-        return querySubdomain;
-      }
     }
     
-    // For production (bareresource.com)
     const hostParts = hostname.split('.');
     if (hostParts.length === 3 && hostParts[1] === 'bareresource') {
       console.log('Found production subdomain:', hostParts[0]);
@@ -97,7 +93,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setLoading(true);
       console.log('Attempting to fetch user company');
       
-      // First check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
@@ -107,7 +102,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return;
       }
       
-      // Get user profile to find company_id
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('company_id')
@@ -121,7 +115,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return;
       }
       
-      // Fetch company data using company_id
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .select('*')
@@ -144,26 +137,40 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const refreshCompany = async () => {
-    const currentSubdomain = extractSubdomain();
-    console.log('Current subdomain check result:', currentSubdomain);
-    setSubdomain(currentSubdomain);
+    console.log('Refreshing company data...');
     
-    if (currentSubdomain) {
-      setIsSubdomainMode(true);
-      await fetchCompanyData(currentSubdomain);
-    } else {
-      setIsSubdomainMode(false);
-      await fetchUserCompany();
+    try {
+      setLoading(true);
+      const currentSubdomain = extractSubdomain();
+      console.log('Current subdomain check result:', currentSubdomain);
+      setSubdomain(currentSubdomain);
+      
+      if (currentSubdomain) {
+        console.log('Using subdomain mode with:', currentSubdomain);
+        setIsSubdomainMode(true);
+        await fetchCompanyData(currentSubdomain);
+      } else {
+        console.log('Using user profile mode');
+        setIsSubdomainMode(false);
+        await fetchUserCompany();
+      }
+      
+      console.log('Company refresh completed');
+    } catch (error) {
+      console.error('Error in refreshCompany:', error);
+      toast.error('Error refreshing company data');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Listen for auth state changes
   useEffect(() => {
+    console.log('Setting up auth state change listener');
+    
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event) => {
         console.log("Auth state changed:", event);
         if (event === 'SIGNED_IN') {
-          // Refresh company data when user signs in
           await refreshCompany();
         } else if (event === 'SIGNED_OUT') {
           setCompany(null);
@@ -177,23 +184,19 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, []);
 
-  // Initial setup
   useEffect(() => {
     const loadInitialData = async () => {
       console.log('CompanyContext: Initial loading started');
-      const currentSubdomain = extractSubdomain();
-      console.log('Initial subdomain check result:', currentSubdomain);
-      setSubdomain(currentSubdomain);
-      
-      if (currentSubdomain) {
-        console.log('Using subdomain mode with:', currentSubdomain);
-        setIsSubdomainMode(true);
-        await fetchCompanyData(currentSubdomain);
-      } else {
-        console.log('Using user profile mode');
-        setIsSubdomainMode(false);
-        await fetchUserCompany();
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Current auth session:', session ? 'Exists' : 'None');
+        
+        await refreshCompany();
+      } catch (error) {
+        console.error('Error in initial company data load:', error);
+        setLoading(false);
       }
+      
       setAuthChecked(true);
       console.log('CompanyContext: Initial loading completed');
     };
@@ -201,17 +204,15 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     loadInitialData();
   }, []);
 
-  // For debugging in development
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log('CompanyContext state updated:', {
-        company: company ? company.name : 'No company',
-        subdomain,
-        isSubdomainMode,
-        loading
-      });
-    }
-  }, [company, subdomain, isSubdomainMode, loading]);
+    console.log('CompanyContext state updated:', {
+      company: company ? company.name : 'No company',
+      subdomain,
+      isSubdomainMode,
+      loading,
+      authChecked
+    });
+  }, [company, subdomain, isSubdomainMode, loading, authChecked]);
 
   return (
     <CompanyContext.Provider value={{ 

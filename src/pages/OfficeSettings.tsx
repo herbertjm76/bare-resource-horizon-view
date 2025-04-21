@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +17,7 @@ import { toast } from 'sonner';
 import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const tabBarClass =
   "w-full mb-4 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-6 gap-1 flex-nowrap rounded-none bg-transparent p-0";
@@ -26,6 +27,37 @@ const HEADER_HEIGHT = 56;
 const OfficeSettings = () => {
   const { company, loading: companyLoading, refreshCompany } = useCompany();
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    console.log('OfficeSettings page mounted', { 
+      hasCompany: !!company, 
+      companyLoading 
+    });
+    
+    // Check auth status on mount
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      console.log('Current auth session:', data.session ? 'Exists' : 'None');
+      
+      if (!data.session) {
+        console.log('No active session found in OfficeSettings');
+        navigate('/auth');
+        return;
+      }
+      
+      if (!companyLoading && !company) {
+        console.log('No company found, refreshing company data');
+        refreshCompany();
+      }
+    };
+    
+    checkAuth();
+  }, [company, companyLoading, refreshCompany, navigate]);
+
+  const handleRefresh = () => {
+    console.log('Manually refreshing company data from OfficeSettings');
+    refreshCompany();
+  };
 
   return (
     <AuthGuard requiredRole={['owner', 'admin']}>
@@ -42,17 +74,15 @@ const OfficeSettings = () => {
                 <div className="flex justify-between items-center px-2 sm:px-0">
                   <h1 className="text-4xl font-bold">Office Settings</h1>
                   
-                  {!companyLoading && !company && (
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={refreshCompany}
-                      className="gap-2"
-                    >
-                      <RefreshCw className="h-4 w-4" /> 
-                      Refresh
-                    </Button>
-                  )}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleRefresh}
+                    className="gap-2"
+                  >
+                    <RefreshCw className="h-4 w-4" /> 
+                    Refresh Data
+                  </Button>
                 </div>
                 
                 {companyLoading ? (
@@ -67,11 +97,11 @@ const OfficeSettings = () => {
                     <div className="flex items-start gap-4">
                       <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
                       <div className="space-y-3">
-                        <h3 className="text-lg font-medium text-white">No company context found</h3>
-                        <p className="text-white/80">
+                        <h3 className="text-lg font-medium text-foreground">No company context found</h3>
+                        <p className="text-muted-foreground">
                           This could be happening because:
                         </p>
-                        <ul className="list-disc pl-5 text-white/80 space-y-1">
+                        <ul className="list-disc pl-5 text-muted-foreground space-y-1">
                           <li>You're not logged in</li>
                           <li>Your account isn't associated with a company</li>
                           <li>There was an issue retrieving your company data</li>
@@ -82,7 +112,7 @@ const OfficeSettings = () => {
                           </Button>
                           <Button 
                             variant="outline" 
-                            onClick={refreshCompany}
+                            onClick={handleRefresh}
                             className="gap-2"
                           >
                             <RefreshCw className="h-4 w-4" /> 
@@ -95,7 +125,7 @@ const OfficeSettings = () => {
                 ) : (
                   <>
                     <div className="rounded-md bg-slate-50 dark:bg-slate-900 p-4 border border-muted">
-                      <h2 className="font-semibold mb-1">Personalize your office settings</h2>
+                      <h2 className="font-semibold mb-1">Personalize your office settings for {company.name}</h2>
                       <p className="text-muted-foreground text-sm">
                         Every office is unique. Please set your office settings to match your working environment.
                         Configure your locations, countries, roles, rates, stages, and holidays according to your organization's requirements.

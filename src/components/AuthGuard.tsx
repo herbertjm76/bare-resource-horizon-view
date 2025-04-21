@@ -17,6 +17,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
 
   useEffect(() => {
     const checkAuth = async () => {
+      console.log("AuthGuard: Checking authentication...");
       setIsLoading(true);
 
       try {
@@ -25,7 +26,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         
         if (!session) {
           // User is not logged in, redirect to auth page
-          console.log("No active session, redirecting to auth page");
+          console.log("AuthGuard: No active session, redirecting to auth page");
           navigate('/auth');
           return;
         }
@@ -33,30 +34,45 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         const user = session.user;
         console.log("AuthGuard: User authenticated", user.id);
 
-        // Ensure user profile exists with retry logic
-        let profileExists = false;
-        for (let attempt = 1; attempt <= 3; attempt++) {
-          console.log(`Attempt ${attempt} to ensure profile exists`);
-          profileExists = await ensureUserProfile(user.id);
-          if (profileExists) break;
+        // Check if profile exists
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
           
-          // Wait before retry
-          if (attempt < 3) {
-            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+        if (profileError || !profileData) {
+          console.log("AuthGuard: Profile not found, attempting to create...");
+          
+          // Ensure user profile exists with retry logic
+          let profileExists = false;
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            console.log(`AuthGuard: Attempt ${attempt} to ensure profile exists`);
+            profileExists = await ensureUserProfile(user.id);
+            if (profileExists) break;
+            
+            // Wait before retry
+            if (attempt < 3) {
+              await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            }
           }
+          
+          if (!profileExists) {
+            console.error("AuthGuard: Failed to ensure profile exists after multiple attempts");
+            toast.error("Error setting up your user account");
+            navigate('/auth');
+            return;
+          }
+          
+          console.log("AuthGuard: Profile created successfully");
+        } else {
+          console.log("AuthGuard: Existing profile found", profileData);
         }
-        
-        if (!profileExists) {
-          console.error("Failed to ensure profile exists after multiple attempts");
-          toast.error("Error setting up your user account");
-          navigate('/auth');
-          return;
-        }
-
-        console.log("AuthGuard: Profile exists or created:", profileExists);
 
         // If role check is required
         if (requiredRole) {
+          console.log("AuthGuard: Checking role requirement:", requiredRole);
+          
           // Get user profile to check role
           const { data: profile, error } = await supabase
             .from('profiles')
@@ -65,7 +81,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
             .single();
 
           if (error || !profile) {
-            console.error("Error fetching user profile or profile not found:", error);
+            console.error("AuthGuard: Error fetching user profile or profile not found:", error);
             toast.error("Error verifying your account permissions");
             navigate('/auth');
             return;
@@ -76,11 +92,13 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
           const hasRequiredRole = roles.includes(profile.role);
 
           if (!hasRequiredRole) {
-            console.log("User doesn't have required role", profile.role, "needs", requiredRole);
+            console.log("AuthGuard: User doesn't have required role", profile.role, "needs", requiredRole);
             toast.error("You don't have permission to access this page");
             navigate('/dashboard');
             return;
           }
+          
+          console.log("AuthGuard: User has required role:", profile.role);
         }
 
         setIsAuthorized(true);
@@ -97,16 +115,10 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
 
     // Also listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth state change:", event, session?.user?.id);
+      (event, session) => {
+        console.log("AuthGuard: Auth state change:", event, session?.user?.id);
         
-        if (event === 'SIGNED_IN' && session?.user) {
-          // Ensure profile exists when user signs in
-          // Use setTimeout to avoid blocking the event handler
-          setTimeout(async () => {
-            await ensureUserProfile(session.user.id);
-          }, 0);
-        } else if (event === 'SIGNED_OUT') {
+        if (event === 'SIGNED_OUT') {
           navigate('/auth');
         }
       }
@@ -118,9 +130,14 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
   }, [requiredRole, navigate]);
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <p className="text-sm text-muted-foreground">Verifying access...</p>
+        </div>
+      </div>
+    );
   }
 
   return isAuthorized ? <>{children}</> : null;
