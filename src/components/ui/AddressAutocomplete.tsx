@@ -49,7 +49,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     if (value && !searchTerm) {
       setSearchTerm(value);
     }
-  }, [value]);
+  }, [value, searchTerm]);
 
   useEffect(() => {
     if (searchTerm && country) {
