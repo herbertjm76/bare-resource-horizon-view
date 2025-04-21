@@ -7,7 +7,7 @@ export type CompanyFormData = {
   city: string;
   size: string;
   website?: string;
-  industry?: string;
+  industry: string; // Changed from optional to required
 };
 
 export const emptyCompany: CompanyFormData = {

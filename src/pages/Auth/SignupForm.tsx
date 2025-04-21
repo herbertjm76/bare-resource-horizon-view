@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -57,7 +56,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
     setLoading(true);
     if (
       !ownerName || !ownerEmail || !ownerPassword ||
-      !company.name || !company.subdomain || !company.address || !company.country || !company.city || !company.size
+      !company.name || !company.subdomain || !company.address || !company.country || !company.city || !company.size || !company.industry
     ) {
       toast.error('Please fill in all required fields.');
       setLoading(false);
@@ -83,7 +82,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
         .insert({
           name: company.name,
           subdomain: company.subdomain.toLowerCase(),
-          website: company.website,
+          website: company.website || null,
           address: company.address,
           size: company.size,
           city: company.city,
@@ -103,6 +102,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
         role: 'owner'
       });
 
+      // First create the auth user
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: ownerEmail,
         password: ownerPassword,
@@ -119,22 +119,41 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
       if (signUpError) throw signUpError;
       console.log("User signed up successfully:", signUpData);
 
-      // Manually create profile if the trigger didn't work
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          id: signUpData.user?.id,
-          email: ownerEmail,
-          first_name: firstName,
-          last_name: lastName,
-          company_id: companyData.id,
-          role: 'owner'
-        });
+      // Ensure profile is created immediately with all needed data
+      if (signUpData.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: signUpData.user.id,
+            email: ownerEmail,
+            first_name: firstName,
+            last_name: lastName,
+            company_id: companyData.id,
+            role: 'owner'
+          });
 
-      if (profileError) {
-        console.error("Error creating profile:", profileError);
-      } else {
-        console.log("Profile created manually as fallback");
+        if (profileError) {
+          console.error("Error creating profile:", profileError);
+          // Retry with upsert to handle potential race conditions
+          const { error: upsertError } = await supabase
+            .from('profiles')
+            .upsert({
+              id: signUpData.user.id,
+              email: ownerEmail,
+              first_name: firstName,
+              last_name: lastName,
+              company_id: companyData.id,
+              role: 'owner'
+            });
+          
+          if (upsertError) {
+            console.error("Error even with upsert:", upsertError);
+          } else {
+            console.log("Profile created with upsert as fallback");
+          }
+        } else {
+          console.log("Profile created directly");
+        }
       }
 
       toast.success('Sign up successful! Please check your email to confirm your account, then you can log in.');
@@ -193,6 +212,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           </div>
         </div>
       </div>
+      
       <div className="space-y-2">
         <h3 className="text-lg font-bold text-white mb-2">Company Information</h3>
         <div className="space-y-4 bg-white/10 rounded-xl px-6 py-4 glass">
@@ -313,6 +333,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           </div>
         </div>
       </div>
+      
       <Button
         type="submit"
         disabled={loading}
