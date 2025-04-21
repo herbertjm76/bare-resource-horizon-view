@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useCompany } from "@/context/CompanyContext";
 import { useEffect, useState } from "react";
@@ -13,12 +12,12 @@ const BARE_GRAY = "var(--bare-light-gray)";
 
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = React.useState<User | null>(null);
+  const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
+  React.useEffect(() => {
     let authSubscription: { unsubscribe: () => void } | null = null;
     setLoading(true);
     (async () => {
@@ -49,20 +48,15 @@ export const AppHeader: React.FC = () => {
         className="text-2xl font-bold tracking-tight select-none" 
         aria-label="Bare Resource"
       >
-        {/* Improved "Bare" text with better visibility */}
+        {/* White text with black stroke, no shadow */}
         <span 
           className="relative text-white"
           style={{
-            // Using a combination of text-shadow for better outline visibility
-            textShadow: `
-              -1px -1px 0 #000,
-              1px -1px 0 #000,
-              -1px 1px 0 #000,
-              1px 1px 0 #000,
-              0px 2px 2px rgba(0,0,0,0.5)
-            `,
-            // Adding a slight letterSpacing for better readability
-            letterSpacing: '0.5px'
+            WebkitTextStroke: '0.8px black',
+            letterSpacing: '0.5px',
+            color: 'white',  // ensure text remains white
+            // Remove any shadows to keep only stroke
+            textShadow: 'none',
           }}
         >
           Bare
