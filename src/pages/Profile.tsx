@@ -20,6 +20,12 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
+
   const navigate = useNavigate();
   const { company, loading: companyLoading } = useCompany();
 
@@ -76,6 +82,27 @@ export default function Profile() {
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSuccess(null);
+    setPasswordLoading(true);
+    if (!newPassword) {
+      setPasswordError("Please enter a new password.");
+      setPasswordLoading(false);
+      return;
+    }
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      setPasswordError(error.message || "Failed to update password.");
+    } else {
+      setPasswordSuccess("Password updated successfully!");
+      setShowPassword(false);
+      setNewPassword("");
+    }
+    setPasswordLoading(false);
+  };
+
   if (loading || companyLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500">
@@ -95,7 +122,7 @@ export default function Profile() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="pb-4">
+        <CardHeader className="pb-2">
           <CardTitle>Edit Profile</CardTitle>
         </CardHeader>
         <CardContent>
@@ -133,6 +160,17 @@ export default function Profile() {
                 onChange={handleChange}
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="company">
+                Company Name
+              </label>
+              <Input
+                id="company"
+                name="company"
+                disabled
+                value={company?.name ?? "Not Assigned"}
+              />
+            </div>
             {error && <div className="text-red-600 text-sm">{error}</div>}
             <Button
               type="submit"
@@ -143,6 +181,43 @@ export default function Profile() {
               Save Changes
             </Button>
           </form>
+          {/* Password Change Section */}
+          <div className="mt-8 border-t pt-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-semibold text-base">Change Password</span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowPassword(v => !v)}
+                type="button"
+              >
+                {showPassword ? "Cancel" : "Change"}
+              </Button>
+            </div>
+            {showPassword && (
+              <form onSubmit={handleChangePassword} className="space-y-3">
+                <Input
+                  id="new_password"
+                  name="new_password"
+                  type="password"
+                  placeholder="Enter new password"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+                {passwordError && <div className="text-red-600 text-sm">{passwordError}</div>}
+                {passwordSuccess && <div className="text-green-600 text-sm">{passwordSuccess}</div>}
+                <Button
+                  type="submit"
+                  className="w-full bg-[#8E9196] hover:bg-[#7d8086]"
+                  isLoading={passwordLoading}
+                  disabled={passwordLoading}
+                >
+                  Update Password
+                </Button>
+              </form>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
