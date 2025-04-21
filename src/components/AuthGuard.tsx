@@ -15,14 +15,8 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const navigate = useNavigate();
-
-  const handleRefresh = () => {
-    console.log("AuthGuard: Manual refresh triggered");
-    setIsLoading(true);
-    setAuthError(null);
-    checkAuth();
-  };
-
+  
+  // Function to check authentication and authorization
   const checkAuth = async () => {
     console.log("AuthGuard: Checking authorization...");
     
@@ -112,6 +106,14 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     }
   };
 
+  // Manual refresh handler
+  const handleRefresh = () => {
+    console.log("AuthGuard: Manual refresh triggered");
+    setIsLoading(true);
+    setAuthError(null);
+    checkAuth();
+  };
+
   // Handle authentication state
   useEffect(() => {
     console.log("AuthGuard: Component mounted");
@@ -129,29 +131,11 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     // Initial auth check
     checkAuth();
     
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!isMounted) return;
-      
-      console.log("AuthGuard: Auth state change event:", event, session?.user?.id);
-      
-      if (event === 'SIGNED_OUT') {
-        console.log("AuthGuard: User signed out, redirecting to auth page");
-        setIsAuthorized(false);
-        setIsLoading(false);
-        navigate('/auth');
-      } else if (event === 'SIGNED_IN') {
-        console.log("AuthGuard: User signed in, checking authorization");
-        setIsLoading(true);
-        checkAuth();
-      }
-    });
-
+    // Clean up
     return () => {
       console.log("AuthGuard: Component unmounted");
       isMounted = false;
       clearTimeout(safetyTimeout);
-      subscription.unsubscribe();
     };
   }, [navigate, requiredRole]);
 

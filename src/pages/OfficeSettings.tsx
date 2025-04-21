@@ -16,7 +16,6 @@ import { toast } from 'sonner';
 import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 
 const tabBarClass =
   "w-full mb-4 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-6 gap-1 flex-nowrap rounded-none bg-transparent p-0";
@@ -33,25 +32,11 @@ const OfficeSettings = () => {
       companyLoading 
     });
     
-    // Check auth status on mount
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      console.log('Current auth session:', data.session ? 'Exists' : 'None');
-      
-      if (!data.session) {
-        console.log('No active session found in OfficeSettings');
-        navigate('/auth');
-        return;
-      }
-      
-      if (!companyLoading && !company) {
-        console.log('No company found, refreshing company data');
-        refreshCompany();
-      }
-    };
-    
-    checkAuth();
-  }, [company, companyLoading, refreshCompany, navigate]);
+    if (!companyLoading && !company) {
+      console.log('No company found, refreshing company data');
+      refreshCompany();
+    }
+  }, [company, companyLoading, refreshCompany]);
 
   const handleRefresh = () => {
     console.log('Manually refreshing company data from OfficeSettings');
@@ -123,64 +108,54 @@ const OfficeSettings = () => {
                     </div>
                   </div>
                 ) : (
-                  <>
-                    <div className="rounded-md bg-slate-50 dark:bg-slate-900 p-4 border border-muted">
-                      <h2 className="font-semibold mb-1">Personalize your office settings for {company.name}</h2>
-                      <p className="text-muted-foreground text-sm">
-                        Every office is unique. Please set your office settings to match your working environment.
-                        Configure your locations, countries, roles, rates, stages, and holidays according to your organization's requirements.
-                        This will help personalize your resource management and planning experience.
-                      </p>
-                    </div>
-                    <OfficeSettingsProvider>
-                      <Tabs defaultValue="areas" className="w-full">
-                        <TabsList className={tabBarClass + " flex sm:grid"}>
-                          <TabsTrigger value="areas" className="flex items-center gap-2 min-w-max">
-                            <Folder className="h-4 w-4" />
-                            <span className="hidden xs:inline">Project Areas</span>
-                          </TabsTrigger>
-                          <TabsTrigger value="stages" className="flex items-center gap-2 min-w-max">
-                            <Layers className="h-4 w-4" />
-                            <span className="hidden xs:inline">Stages</span>
-                          </TabsTrigger>
-                          <TabsTrigger value="locations" className="flex items-center gap-2 min-w-max">
-                            <MapPin className="h-4 w-4" />
-                            <span className="hidden xs:inline">Locations</span>
-                          </TabsTrigger>
-                          <TabsTrigger value="roles" className="flex items-center gap-2 min-w-max">
-                            <Briefcase className="h-4 w-4" />
-                            <span className="hidden xs:inline">Roles</span>
-                          </TabsTrigger>
-                          <TabsTrigger value="rates" className="flex items-center gap-2 min-w-max">
-                            <Currency className="h-4 w-4" />
-                            <span className="hidden xs:inline">Rates</span>
-                          </TabsTrigger>
-                          <TabsTrigger value="holidays" className="flex items-center gap-2 min-w-max">
-                            <Calendar className="h-4 w-4" />
-                            <span className="hidden xs:inline">Holidays</span>
-                          </TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="areas" className="mt-4">
-                          <CountriesTab />
-                        </TabsContent>
-                        <TabsContent value="stages" className="mt-4">
-                          <StagesTab />
-                        </TabsContent>
-                        <TabsContent value="locations" className="mt-4">
-                          <LocationsTab />
-                        </TabsContent>
-                        <TabsContent value="roles" className="mt-4">
-                          <RolesTab />
-                        </TabsContent>
-                        <TabsContent value="rates" className="mt-4">
-                          <RatesTab />
-                        </TabsContent>
-                        <TabsContent value="holidays" className="mt-4">
-                          <HolidaysTab />
-                        </TabsContent>
-                      </Tabs>
-                    </OfficeSettingsProvider>
-                  </>
+                  <OfficeSettingsProvider>
+                    <Tabs defaultValue="areas" className="w-full">
+                      <TabsList className={tabBarClass + " flex sm:grid"}>
+                        <TabsTrigger value="areas" className="flex items-center gap-2 min-w-max">
+                          <Folder className="h-4 w-4" />
+                          <span className="hidden xs:inline">Project Areas</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="stages" className="flex items-center gap-2 min-w-max">
+                          <Layers className="h-4 w-4" />
+                          <span className="hidden xs:inline">Stages</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="locations" className="flex items-center gap-2 min-w-max">
+                          <MapPin className="h-4 w-4" />
+                          <span className="hidden xs:inline">Locations</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="roles" className="flex items-center gap-2 min-w-max">
+                          <Briefcase className="h-4 w-4" />
+                          <span className="hidden xs:inline">Roles</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="rates" className="flex items-center gap-2 min-w-max">
+                          <Currency className="h-4 w-4" />
+                          <span className="hidden xs:inline">Rates</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="holidays" className="flex items-center gap-2 min-w-max">
+                          <Calendar className="h-4 w-4" />
+                          <span className="hidden xs:inline">Holidays</span>
+                        </TabsTrigger>
+                      </TabsList>
+                      <TabsContent value="areas" className="mt-4">
+                        <CountriesTab />
+                      </TabsContent>
+                      <TabsContent value="stages" className="mt-4">
+                        <StagesTab />
+                      </TabsContent>
+                      <TabsContent value="locations" className="mt-4">
+                        <LocationsTab />
+                      </TabsContent>
+                      <TabsContent value="roles" className="mt-4">
+                        <RolesTab />
+                      </TabsContent>
+                      <TabsContent value="rates" className="mt-4">
+                        <RatesTab />
+                      </TabsContent>
+                      <TabsContent value="holidays" className="mt-4">
+                        <HolidaysTab />
+                      </TabsContent>
+                    </Tabs>
+                  </OfficeSettingsProvider>
                 )}
               </div>
             </div>
