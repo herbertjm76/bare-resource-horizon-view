@@ -30,7 +30,7 @@ export type Location = {
   company_id?: string;
 };
 
-// Define database response types to prevent deep instantiation
+// Define database response types with explicit properties (no deep nesting)
 type SupabaseRole = {
   id: string;
   name: string;
@@ -117,23 +117,38 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (ratesError) throw ratesError;
 
-        // Handle roles data
+        // Handle roles data with explicit typing
         if (rolesData) {
-          setRoles(rolesData as Role[]);
+          const typedRolesData = rolesData as SupabaseRole[];
+          setRoles(typedRolesData.map(role => ({
+            id: role.id,
+            name: role.name,
+            code: role.code,
+            ...(role.company_id ? { company_id: role.company_id } : {})
+          })));
         } else {
           setRoles([]);
         }
         
-        // Handle locations data
+        // Handle locations data with explicit typing
         if (locationsData) {
-          setLocations(locationsData as Location[]);
+          const typedLocationsData = locationsData as SupabaseLocation[];
+          setLocations(typedLocationsData.map(location => ({
+            id: location.id,
+            city: location.city,
+            country: location.country,
+            code: location.code,
+            ...(location.emoji ? { emoji: location.emoji } : {}),
+            ...(location.company_id ? { company_id: location.company_id } : {})
+          })));
         } else {
           setLocations([]);
         }
         
         // Transform rates data with proper typing
         if (ratesData) {
-          const transformedRates: Rate[] = (ratesData as SupabaseRate[]).map(rate => ({
+          const typedRatesData = ratesData as SupabaseRate[];
+          const transformedRates: Rate[] = typedRatesData.map(rate => ({
             id: rate.id,
             type: rate.type as "role" | "location",
             reference_id: rate.reference_id,
