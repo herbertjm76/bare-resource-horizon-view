@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useCompany } from "@/context/CompanyContext";
 
 // --- updated schema: add unit ---
 const formSchema = z.object({
@@ -34,6 +36,7 @@ type OfficeRole = {
   id: string;
   name: string;
   code: string;
+  company_id: string;
 };
 
 type OfficeLocation = {
@@ -42,6 +45,7 @@ type OfficeLocation = {
   country: string;
   code: string;
   emoji?: string;
+  company_id: string;
 };
 
 type OfficeRate = {
@@ -50,6 +54,7 @@ type OfficeRate = {
   reference_id: string;
   value: number;
   unit: "hour" | "day" | "week";
+  company_id: string;
 };
 
 export const RatesTab = () => {
@@ -63,20 +68,28 @@ export const RatesTab = () => {
   const [loading, setLoading] = useState(true);
 
   const { toast } = useToast();
+  const { company } = useCompany();
 
   // Fetch roles, locations, rates from Supabase
   useEffect(() => {
     async function fetchData() {
+      if (!company) {
+        setRoles([]);
+        setLocations([]);
+        setRates([]);
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       // Fetch roles
       const { data: rolesData, error: rolesError } = await supabase
-        .from("office_roles").select("*").order("created_at", { ascending: true });
+        .from("office_roles").select("*").eq("company_id", company.id);
       // Fetch locations
       const { data: locationsData, error: locationsError } = await supabase
-        .from("office_locations").select("*").order("created_at", { ascending: true });
+        .from("office_locations").select("*").eq("company_id", company.id);
       // Fetch rates
       const { data: ratesData, error: ratesError } = await supabase
-        .from("office_rates").select("*").order("created_at", { ascending: true });
+        .from("office_rates").select("*").eq("company_id", company.id);
 
       if (rolesError || locationsError || ratesError) {
         toast({
@@ -89,18 +102,15 @@ export const RatesTab = () => {
         setLocations(locationsData || []);
         setRates(
           (ratesData || []).map((rate) => ({
-            id: rate.id,
-            type: rate.type as "role" | "location",
-            reference_id: rate.reference_id,
-            value: rate.value,
-            unit: rate.unit as "hour" | "day" | "week"
+            ...rate,
+            value: Number(rate.value),
           }))
         );
       }
       setLoading(false);
     }
     fetchData();
-  }, [open]); // refetch when dialog opens (e.g. after adding/updating)
+  }, [open, company]); // refetch when dialog opens (e.g. after adding/updating) or company changes
 
   const form = useForm<RateFormValues>({
     resolver: zodResolver(formSchema),
@@ -134,6 +144,10 @@ export const RatesTab = () => {
   };
 
   async function handleSubmit(values: RateFormValues) {
+    if (!company) {
+      toast({ title: "No company selected", description: "Please select a company first.", variant: "destructive" });
+      return;
+    }
     if (editingRate) {
       // Update rate in Supabase
       const { error } = await supabase
@@ -143,6 +157,7 @@ export const RatesTab = () => {
           reference_id: values.reference_id,
           value: values.value,
           unit: values.unit,
+          company_id: company.id,
           updated_at: new Date().toISOString(),
         })
         .eq("id", editingRate.id);
@@ -163,7 +178,8 @@ export const RatesTab = () => {
             type: values.type,
             reference_id: values.reference_id,
             value: values.value,
-            unit: values.unit
+            unit: values.unit,
+            company_id: company.id
           }
         ]);
       if (error) {

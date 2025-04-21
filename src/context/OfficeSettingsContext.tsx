@@ -4,19 +4,21 @@ import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-// Define types without company_id to match the database structure
+// Updated types WITH company_id
 export type Role = {
   id: string;
   name: string;
   code: string;
+  company_id: string;
 };
 
 export type Rate = {
   id: string;
   type: "role" | "location";
-  reference_id: string; 
+  reference_id: string;
   value: number;
   unit: "hour" | "day" | "week";
+  company_id: string;
 };
 
 export type Location = {
@@ -25,6 +27,7 @@ export type Location = {
   country: string;
   code: string;
   emoji?: string;
+  company_id: string;
 };
 
 // Create context
@@ -52,76 +55,51 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
   useEffect(() => {
     if (!company) {
       setLoading(false);
+      setRoles([]);
+      setLocations([]);
+      setRates([]);
       return;
     }
 
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        // Fetch roles - remove company_id from the query
+        // Fetch roles for this company
         const { data: rolesData, error: rolesError } = await supabase
           .from('office_roles')
-          .select('id, name, code');
-        
+          .select('id, name, code, company_id')
+          .eq('company_id', company.id);
+
         if (rolesError) throw rolesError;
-        
-        // Fetch locations - remove company_id from the query
+
+        // Fetch locations for this company
         const { data: locationsData, error: locationsError } = await supabase
           .from('office_locations')
-          .select('id, city, country, code, emoji');
-        
+          .select('id, city, country, code, emoji, company_id')
+          .eq('company_id', company.id);
+
         if (locationsError) throw locationsError;
-        
-        // Fetch rates - remove company_id from the query
+
+        // Fetch rates for this company
         const { data: ratesData, error: ratesError } = await supabase
           .from('office_rates')
-          .select('id, type, reference_id, value, unit');
-        
+          .select('id, type, reference_id, value, unit, company_id')
+          .eq('company_id', company.id);
+
         if (ratesError) throw ratesError;
 
-        // Process data with explicit casting to avoid deep type instantiation
-        if (rolesData) {
-          const typedRoles: Role[] = rolesData.map(role => ({
-            id: role.id,
-            name: role.name,
-            code: role.code
-          }));
-          setRoles(typedRoles);
-        } else {
-          setRoles([]);
-        }
-        
-        if (locationsData) {
-          const typedLocations: Location[] = locationsData.map(location => ({
-            id: location.id,
-            city: location.city,
-            country: location.country,
-            code: location.code,
-            emoji: location.emoji
-          }));
-          setLocations(typedLocations);
-        } else {
-          setLocations([]);
-        }
-        
-        if (ratesData) {
-          const typedRates: Rate[] = [];
-          for (const rate of ratesData) {
-            typedRates.push({
-              id: rate.id,
-              type: rate.type as "role" | "location",
-              reference_id: rate.reference_id,
-              value: Number(rate.value),
-              unit: rate.unit as "hour" | "day" | "week"
-            });
-          }
-          setRates(typedRates);
-        } else {
-          setRates([]);
-        }
+        setRoles(Array.isArray(rolesData) ? rolesData : []);
+        setLocations(Array.isArray(locationsData) ? locationsData : []);
+        setRates(Array.isArray(ratesData) ? ratesData.map(r => ({
+          ...r,
+          value: Number(r.value), // handle numeric->number
+        })) : []);
       } catch (error: any) {
         console.error('Error fetching office settings:', error);
         toast.error('Failed to load office settings');
+        setRoles([]);
+        setLocations([]);
+        setRates([]);
       } finally {
         setLoading(false);
       }

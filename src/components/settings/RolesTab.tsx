@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -86,6 +87,7 @@ export const RolesTab = () => {
           .update({
             name: values.name,
             code: values.code,
+            company_id: company.id,
           })
           .eq('id', editingRole.id);
         
@@ -93,25 +95,27 @@ export const RolesTab = () => {
         
         setRoles(roles.map(role => 
           role.id === editingRole.id 
-            ? { ...role, name: values.name, code: values.code } 
+            ? { ...role, name: values.name, code: values.code, company_id: company.id }
             : role
         ));
         toast.success('Role updated successfully');
       } else {
-        // Create new role - removing company_id from the insert
+        // Create new role - add company_id
         const { data, error } = await supabase
           .from('office_roles')
           .insert([
             {
               name: values.name,
               code: values.code,
+              company_id: company.id
             }
           ])
           .select();
         
         if (error) throw error;
-        
-        setRoles([...roles, data[0]]);
+        if (data && data.length > 0) {
+          setRoles([...roles, data[0]]);
+        }
         toast.success('Role created successfully');
       }
       

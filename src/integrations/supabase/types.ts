@@ -90,6 +90,7 @@ export type Database = {
         Row: {
           city: string
           code: string
+          company_id: string | null
           country: string
           created_at: string
           emoji: string | null
@@ -99,6 +100,7 @@ export type Database = {
         Insert: {
           city: string
           code: string
+          company_id?: string | null
           country: string
           created_at?: string
           emoji?: string | null
@@ -108,13 +110,22 @@ export type Database = {
         Update: {
           city?: string
           code?: string
+          company_id?: string | null
           country?: string
           created_at?: string
           emoji?: string | null
           id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "office_locations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       office_project_stages: {
         Row: {
@@ -153,6 +164,7 @@ export type Database = {
       }
       office_rates: {
         Row: {
+          company_id: string | null
           created_at: string
           id: string
           reference_id: string
@@ -162,6 +174,7 @@ export type Database = {
           value: number
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           id?: string
           reference_id: string
@@ -171,6 +184,7 @@ export type Database = {
           value: number
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           id?: string
           reference_id?: string
@@ -179,11 +193,20 @@ export type Database = {
           updated_at?: string
           value?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "office_rates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       office_roles: {
         Row: {
           code: string
+          company_id: string | null
           created_at: string
           id: string
           name: string
@@ -191,6 +214,7 @@ export type Database = {
         }
         Insert: {
           code: string
+          company_id?: string | null
           created_at?: string
           id?: string
           name: string
@@ -198,12 +222,21 @@ export type Database = {
         }
         Update: {
           code?: string
+          company_id?: string | null
           created_at?: string
           id?: string
           name?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "office_roles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       office_staff_rates: {
         Row: {
