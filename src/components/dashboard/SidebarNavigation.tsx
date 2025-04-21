@@ -37,7 +37,7 @@ export const SidebarNavigation = ({
     <>
       {items.map((section) => (
         <div key={section.label} className="mb-2">
-          <SidebarGroupLabel className="text-white/70 px-2 pt-6 pb-3">
+          <SidebarGroupLabel className="text-white/70 px-2 pt-4 pb-2">
             {collapsed ? "" : section.label}
           </SidebarGroupLabel>
           <SidebarContent>
@@ -54,12 +54,12 @@ export const SidebarNavigation = ({
                         hover:bg-[#7d8086]
                         rounded-none
                         px-2
-                        py-4
+                        py-2
                         flex
                         items-center
-                        gap-4
+                        gap-3
                         transition-all
-                        text-base
+                        text-sm
                         ${isActive ? "bg-[#6E59A5] text-white" : ""}
                       `}
                       isActive={isActive}
@@ -67,10 +67,10 @@ export const SidebarNavigation = ({
                     >
                       <Link 
                         to={item.url} 
-                        className="flex items-center gap-4 w-full"
+                        className="flex items-center gap-3 w-full"
                         onClick={onItemClick}
                       >
-                        <item.icon className="h-6 w-6 min-w-6" />
+                        <item.icon className="h-5 w-5 min-w-5" />
                         {!collapsed && <span className="font-medium">{item.title}</span>}
                       </Link>
                     </SidebarMenuButton>
@@ -82,5 +82,6 @@ export const SidebarNavigation = ({
         </div>
       ))}
     </>
-  )
-}
+  );
+};
+

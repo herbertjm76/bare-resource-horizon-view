@@ -1,4 +1,3 @@
-
 import { Menu } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import {
@@ -20,7 +19,6 @@ export function DashboardSidebar() {
   const isMobile = useIsMobile();
   const collapsed = state === "collapsed";
 
-  // Mobile sidebar using Sheet component
   if (isMobile) {
     return (
       <>
@@ -34,7 +32,7 @@ export function DashboardSidebar() {
         </Button>
         
         <Sheet open={openMobile} onOpenChange={setOpenMobile}>
-          <SheetContent side="left" className="p-0 w-[280px]">
+          <SheetContent side="left" className="p-0 w-[220px]">
             <div className="flex flex-col h-full bg-[#8E9196]">
               <SidebarLogo collapsed={false} toggleSidebar={toggleSidebar} />
               <SidebarNavigation 
@@ -49,12 +47,11 @@ export function DashboardSidebar() {
     );
   }
 
-  // Desktop sidebar
   return (
     <Sidebar 
       className="bg-[#8E9196] border-r border-[#7d8086] pt-0 transition-all duration-300 fixed left-0 top-0 bottom-0 z-40 min-h-screen"
       collapsible="icon"
-      style={{ marginTop: 0, width: collapsed ? '80px' : '280px' }}
+      style={{ marginTop: 0, width: collapsed ? '80px' : '220px' }}
     >
       <SidebarContent className="p-0">
         <SidebarGroup>

@@ -104,7 +104,7 @@ const Projects = () => {
     <SidebarProvider defaultOpen={true}>
       <div className="w-full min-h-screen flex flex-row">
         <DashboardSidebar />
-        <div className="flex-1 flex flex-col transition-all duration-300 md:pl-[80px] lg:pl-[280px]">
+        <div className="flex-1 flex flex-col transition-all duration-300 md:pl-[80px] lg:pl-[220px]">
           <AppHeader />
           <div className="pt-[64px]">
             {isLoading ? (
@@ -115,8 +115,8 @@ const Projects = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 p-4 md:p-6 bg-background">
-                <div className="max-w-6xl mx-auto space-y-8 px-4">
+              <div className="flex-1 p-4 bg-background">
+                <div className="max-w-[1200px] mx-auto space-y-6">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
                     <h1 className="text-3xl md:text-4xl font-bold text-[#6E59A5]">All Projects</h1>
                     <Button 
