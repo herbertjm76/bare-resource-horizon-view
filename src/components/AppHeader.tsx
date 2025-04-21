@@ -52,7 +52,7 @@ export const AppHeader: React.FC = () => {
           className="flex items-end leading-none select-none"
           aria-label="BareResource"
           style={{
-            fontWeight: 900,
+            fontWeight: 400, // Bare as regular
             fontSize: "2.4rem",
             letterSpacing: "0.5px",
             lineHeight: 1,
@@ -61,7 +61,7 @@ export const AppHeader: React.FC = () => {
           <span
             style={{
               color: "#fff",
-              fontWeight: 900,
+              fontWeight: 400,
               fontSize: "2.4rem",
               letterSpacing: "0.5px",
               lineHeight: 1,
@@ -76,7 +76,7 @@ export const AppHeader: React.FC = () => {
           </span>
           <span
             style={{
-              fontWeight: 700,
+              fontWeight: 700, // Resource as bold
               fontSize: "2.1rem",
               letterSpacing: "0.5px",
               display: "inline-block",
@@ -86,7 +86,7 @@ export const AppHeader: React.FC = () => {
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-              textFillColor: "transparent",
+              /* Removed invalid CSS property 'textFillColor' */
             }}
           >
             Resource
@@ -121,4 +121,3 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
-
