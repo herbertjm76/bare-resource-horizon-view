@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,10 +18,8 @@ export const AppHeader: React.FC = () => {
     let authSubscription: { unsubscribe: () => void } | null = null;
     setLoading(true);
     (async () => {
-      // Listen for auth events, update state
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-      // Listen for auth changes to update state on login/logout
       const { data } = supabase.auth.onAuthStateChange((_event, session) => {
         setUser(session?.user ?? null);
       });
@@ -40,12 +37,16 @@ export const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="w-full bg-[#8E9196] text-white px-4 py-2 flex items-center justify-between z-30 shadow">
-      <Link to="/" className="text-2xl font-bold tracking-tight hover:opacity-80">BareResource</Link>
+    <header className="w-full 
+      glass-morphism
+      fixed top-0 left-0 right-0
+      px-4 py-2 flex items-center justify-between z-50 shadow-lg
+      ">
+      <Link to="/" className="text-2xl font-bold tracking-tight hover:opacity-80 text-white">BareResource</Link>
       <div className="flex items-center gap-4">
         {!loading && user ? (
           <>
-            <span className="hidden sm:inline">{company?.name ? company.name : "Company"}</span>
+            <span className="hidden sm:inline text-white/80">{company?.name ? company.name : "Company"}</span>
             <Button 
               asChild 
               variant="ghost" 

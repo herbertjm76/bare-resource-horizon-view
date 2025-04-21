@@ -1,5 +1,6 @@
-
 import { Link } from 'react-router-dom';
+
+const HEADER_HEIGHT = 56; // px ~ height of AppHeader with padding
 
 const Index = () => {
   const scrollToSection = (sectionId: string) => {
@@ -36,7 +37,7 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden pt-16">
+      <div className="relative overflow-hidden" style={{ paddingTop: `${HEADER_HEIGHT + 16}px` }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center animate-fade-in">
             <h1 className="text-5xl font-bold text-white mb-6">
