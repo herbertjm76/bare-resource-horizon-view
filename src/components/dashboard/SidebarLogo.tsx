@@ -21,8 +21,8 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => (
         </Button>
       ) : (
         <>
-          <div className="flex items-center gap-1">
-            <span className="text-white">Bare</span>
+          <div className="flex items-center gap-2">
+            <span className="text-white font-medium">Bare</span>
             <span className="bg-gradient-to-r from-[#6e5af1] via-[#5948b4] to-[#162c69] bg-clip-text text-transparent font-semibold">Resource</span>
           </div>
           <Button 
