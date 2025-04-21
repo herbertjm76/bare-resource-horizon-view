@@ -52,7 +52,6 @@ export const AppHeader: React.FC = () => {
           style={{
             color: "white",
             WebkitTextStroke: "2.5px black",
-            textStroke: "2.5px black",
             fontWeight: 900,
             letterSpacing: "0.5px",
             lineHeight: 1.1,
