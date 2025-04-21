@@ -45,57 +45,44 @@ export const AppHeader: React.FC = () => {
       style={{minHeight:56}}
     >
       <h1 
-        className="text-2xl font-bold tracking-tight select-none" 
+        className="flex items-center text-[2.5rem] sm:text-[3.25rem] font-black select-none leading-none"
         aria-label="Bare Resource"
       >
-        {/* White text with outer black stroke */}
         <span
-          className="relative text-white"
           style={{
-            position: 'relative',
-            color: 'white',
-            letterSpacing: '1px', // Increased letter spacing to reduce overlap
-            // Remove any text-shadow or WebkitTextStroke
-            textShadow: 'none',
-            WebkitTextStroke: 'none',
+            color: "white",
+            WebkitTextStroke: "2.5px black",
+            textStroke: "2.5px black",
+            fontWeight: 900,
+            letterSpacing: "0.5px",
+            lineHeight: 1.1,
+            marginRight: "0.5rem",
+            display: "inline-block",
           }}
         >
-          <span style={{
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            color: 'black',
-            zIndex: -1,
-            transform: 'translate(-0.5px, -0.5px)'
-          }}>Bare</span>
-          <span style={{
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            color: 'black',
-            zIndex: -1,
-            transform: 'translate(0.5px, -0.5px)'
-          }}>Bare</span>
-          <span style={{
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            color: 'black',
-            zIndex: -1,
-            transform: 'translate(-0.5px, 0.5px)'
-          }}>Bare</span>
-          <span style={{
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            color: 'black',
-            zIndex: -1,
-            transform: 'translate(0.5px, 0.5px)'
-          }}>Bare</span>
           Bare
         </span>
-        <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-500 to-pink-500 ml-1">
-          Resource
+        <span
+          className="font-extrabold ml-2 px-2 rounded-[0.25em]"
+          style={{
+            background: "rgba(154, 129, 237, 0.07)", // subtle purple background
+            backgroundClip: "padding-box",
+            display: "inline-block",
+          }}
+        >
+          <span
+            style={{
+              background: "linear-gradient(90deg,#6C4AB6 0%,#4D7AD8 35%,#D450C2 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontWeight: 900,
+              fontSize: "inherit",
+              letterSpacing: "0.5px",
+            }}
+            className="leading-none"
+          >
+            Resource
+          </span>
         </span>
       </h1>
       <div className="flex items-center gap-4">
