@@ -13,8 +13,20 @@ import { Button } from "@/components/ui/button";
 import { Edit, Loader2 } from "lucide-react";
 import type { Tables } from '@/integrations/supabase/types';
 
+interface ExtendedProject extends Tables<'projects'> {
+  project_manager?: {
+    first_name: string | null;
+    last_name: string | null;
+  } | null;
+  office?: {
+    name: string;
+    country: string;
+  } | null;
+  team_composition?: any[];
+}
+
 interface ProjectsTableProps {
-  projects: Tables<'projects'>[] | null;
+  projects: ExtendedProject[] | null;
   isLoading: boolean;
 }
 

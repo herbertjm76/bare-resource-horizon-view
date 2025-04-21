@@ -32,9 +32,11 @@ export const useProjects = () => {
     retry: 1,
     retryDelay: 1000,
     refetchOnWindowFocus: false,
-    onError: (error) => {
-      console.error('React Query error in projects:', error);
-      toast.error('Could not load projects data');
+    meta: {
+      onError: (error: Error) => {
+        console.error('React Query error in projects:', error);
+        toast.error('Could not load projects data');
+      }
     }
   });
 
