@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +21,7 @@ type CompanyFormData = {
   city: string;
   size: string;
   website?: string;
+  industry?: string;
 };
 
 const emptyCompany: CompanyFormData = {
@@ -31,7 +31,8 @@ const emptyCompany: CompanyFormData = {
   country: '',
   city: '',
   size: '',
-  website: ''
+  website: '',
+  industry: ''
 };
 
 const Auth: React.FC = () => {
@@ -191,9 +192,28 @@ const Auth: React.FC = () => {
     setCompany((prev) => ({ ...prev, [field]: value }));
   };
 
+  // New: Industry options added for design, built environment, and construction
+  const industryOptions = [
+    "Architecture",
+    "Interior Design",
+    "Urban Planning",
+    "Landscape Architecture",
+    "Structural Engineering",
+    "Civil Engineering",
+    "Construction Management",
+    "Project Management",
+    "Surveying",
+    "Building Services",
+    "Environmental Engineering",
+    "Property Development",
+    "Sustainability Consulting",
+    "Facility Management",
+    "Other"
+  ];
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-4">
-      <div className="w-full max-w-xl bg-white/10 backdrop-blur-md rounded-xl p-8 shadow-lg">
+      <div className="w-full max-w-xl glass rounded-2xl p-8 shadow-lg border border-white/20">
         <h1 className="text-3xl font-bold text-white text-center mb-6">
           BareResource Pro
         </h1>
@@ -229,116 +249,119 @@ const Auth: React.FC = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-all duration-300"
+              className="w-full"
               isLoading={loading}
             >
               Log In
             </Button>
           </form>
         ) : (
-          <form className="space-y-6" onSubmit={handleSignUp} autoComplete="off">
-            <h2 className="text-xl font-semibold text-white mb-2">Sign Up & Register Company</h2>
+          <form className="space-y-8" onSubmit={handleSignUp} autoComplete="off">
+            <h2 className="text-2xl font-extrabold text-white mb-1 text-center">Sign Up & Register Company</h2>
+            <p className="text-white/70 text-center mb-4">Complete your details to create your account and register your company in one step.</p>
             
-            <div className="space-y-6">
-              <div className="bg-white/5 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold text-white mb-3 border-b border-white/20 pb-2">Owner Information</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label htmlFor="ownerName" className="block text-white font-medium mb-1">Your Name</label>
-                    <Input
-                      type="text"
-                      id="ownerName"
-                      value={ownerName}
-                      onChange={e => setOwnerName(e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="ownerEmail2" className="block text-white font-medium mb-1">Email</label>
-                    <Input
-                      type="email"
-                      id="ownerEmail2"
-                      value={ownerEmail}
-                      onChange={e => setOwnerEmail(e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="ownerPassword2" className="block text-white font-medium mb-1">Password</label>
-                    <Input
-                      type="password"
-                      id="ownerPassword2"
-                      value={ownerPassword}
-                      onChange={e => setOwnerPassword(e.target.value)}
-                      className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                      required
-                    />
-                  </div>
+            {/* Owner Information */}
+            <div>
+              <h3 className="text-lg font-bold text-white mb-2">Owner Information</h3>
+              <div className="grid grid-cols-1 gap-4 bg-white/5 rounded-xl px-4 py-3 glass">
+                <div>
+                  <label htmlFor="ownerName" className="block text-white font-medium mb-1">Full Name</label>
+                  <Input
+                    type="text"
+                    id="ownerName"
+                    value={ownerName}
+                    onChange={e => setOwnerName(e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    required
+                    autoComplete="name"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="ownerEmail2" className="block text-white font-medium mb-1">Email</label>
+                  <Input
+                    type="email"
+                    id="ownerEmail2"
+                    value={ownerEmail}
+                    onChange={e => setOwnerEmail(e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    required
+                    autoComplete="email"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="ownerPassword2" className="block text-white font-medium mb-1">Password</label>
+                  <Input
+                    type="password"
+                    id="ownerPassword2"
+                    value={ownerPassword}
+                    onChange={e => setOwnerPassword(e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    required
+                    autoComplete="new-password"
+                  />
                 </div>
               </div>
-              
-              <div className="bg-white/5 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold text-white mb-3 border-b border-white/20 pb-2">Company Information</h3>
-                <div className="space-y-3">
-                  <div>
-                    <label htmlFor="companyName" className="block text-white font-medium mb-1">Company Name</label>
+            </div>
+            
+            {/* Company Information */}
+            <div>
+              <h3 className="text-lg font-bold text-white mb-2">Company Information</h3>
+              <div className="space-y-4 bg-white/5 rounded-xl px-4 py-3 glass">
+                <div>
+                  <label htmlFor="companyName" className="block text-white font-medium mb-1">Name</label>
+                  <Input
+                    type="text"
+                    id="companyName"
+                    value={company.name}
+                    onChange={e => handleCompanyChange('name', e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="companySubdomain" className="block text-white font-medium mb-1">Subdomain</label>
+                  <div className="flex items-center">
                     <Input
                       type="text"
-                      id="companyName"
-                      value={company.name}
-                      onChange={e => handleCompanyChange('name', e.target.value)}
+                      id="companySubdomain"
+                      value={company.subdomain}
+                      onChange={e => handleCompanyChange('subdomain', e.target.value)}
                       className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
                       required
                     />
+                    <span className="ml-2 text-gray-300">.bareresource.com</span>
                   </div>
-                  
-                  <div>
-                    <label htmlFor="companySubdomain" className="block text-white font-medium mb-1">Subdomain</label>
-                    <div className="flex items-center">
-                      <Input
-                        type="text"
-                        id="companySubdomain"
-                        value={company.subdomain}
-                        onChange={e => handleCompanyChange('subdomain', e.target.value)}
-                        className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                        required
-                      />
-                      <span className="ml-2 text-gray-300">.bareresource.com</span>
-                    </div>
-                    {subdomainCheck.isChecking && (
-                      <p className="text-blue-400 text-sm mt-1">Checking availability...</p>
-                    )}
-                    {subdomainCheck.error && (
-                      <p className="text-red-400 text-sm mt-1">{subdomainCheck.error}</p>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="companyCountry" className="block text-white font-medium mb-1">Country</label>
-                    <CountryField
-                      watch={watch}
-                      setValue={(field, value) => {
-                        setValue(field as any, value);
-                        handleCompanyChange(field as keyof CompanyFormData, value);
-                      }}
-                      errors={errors}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="companyAddress" className="block text-white font-medium mb-1">Company Address</label>
-                    <AddressField
-                      watch={watch}
-                      setValue={(field, value) => {
-                        setValue(field as any, value);
-                        handleCompanyChange(field as keyof CompanyFormData, value);
-                      }}
-                      errors={errors}
-                    />
-                  </div>
-                  
+                  {subdomainCheck.isChecking && (
+                    <p className="text-blue-400 text-sm mt-1">Checking availability...</p>
+                  )}
+                  {subdomainCheck.error && (
+                    <p className="text-red-400 text-sm mt-1">{subdomainCheck.error}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="website" className="block text-white font-medium mb-1">Website <span className="text-xs text-white/50">(optional)</span></label>
+                  <Input
+                    id="website"
+                    type="url"
+                    value={company.website || ''}
+                    onChange={e => handleCompanyChange('website', e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    placeholder="https://yourcompany.com"
+                  />
+                </div>
+                {/* Address, City, Country: Address full row, then grid for city/country */}
+                <div>
+                  <label htmlFor="companyAddress" className="block text-white font-medium mb-1">Address</label>
+                  <Input
+                    id="companyAddress"
+                    type="text"
+                    value={company.address}
+                    onChange={e => handleCompanyChange('address', e.target.value)}
+                    className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="companyCity" className="block text-white font-medium mb-1">City</label>
                     <Input
@@ -350,9 +373,22 @@ const Auth: React.FC = () => {
                       required
                     />
                   </div>
-                  
                   <div>
-                    <label htmlFor="companySize" className="block text-white font-medium mb-1">Company Size</label>
+                    <label htmlFor="companyCountry" className="block text-white font-medium mb-1">Country</label>
+                    <CountryField
+                      watch={watch}
+                      setValue={(field, value) => {
+                        setValue(field as any, value);
+                        handleCompanyChange(field as keyof CompanyFormData, value);
+                      }}
+                      errors={errors}
+                    />
+                  </div>
+                </div>
+                {/* Company Size + Industry in one row */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="companySize" className="block text-white font-medium mb-1">Size</label>
                     <select
                       id="companySize"
                       value={company.size}
@@ -367,37 +403,38 @@ const Auth: React.FC = () => {
                       <option value="51-100">51-100</option>
                     </select>
                   </div>
-                  
                   <div>
-                    <label htmlFor="website" className="block text-white font-medium mb-1">Website (optional)</label>
-                    <Input
-                      id="website"
-                      type="url"
-                      value={company.website || ''}
-                      onChange={e => handleCompanyChange('website', e.target.value)}
+                    <label htmlFor="companyIndustry" className="block text-white font-medium mb-1">Industry</label>
+                    <select
+                      id="companyIndustry"
+                      value={company.industry || ""}
+                      onChange={e => handleCompanyChange('industry', e.target.value)}
                       className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                      placeholder="https://yourcompany.com"
-                    />
+                      required
+                    >
+                      <option value="">Select industry...</option>
+                      {industryOptions.map(opt => (
+                        <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
             </div>
-            
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-all duration-300"
+              className="w-full mt-4"
               isLoading={loading}
             >
               Sign Up & Register Company
             </Button>
           </form>
         )}
-
         <div className="mt-6 text-center">
           {isLogin ? (
             <span className="text-white/80 text-sm">
-              Don&apos;t have an account?{' '}
+              Don&apos;t have an account?{" "}
               <a
                 href="#"
                 onClick={(e) => { e.preventDefault(); setIsLogin(false); setOwnerName(''); setOwnerEmail(''); setOwnerPassword(''); setCompany(emptyCompany); }}
@@ -409,7 +446,7 @@ const Auth: React.FC = () => {
             </span>
           ) : (
             <span className="text-white/80 text-sm">
-              Already have an account?{' '}
+              Already have an account?{" "}
               <a
                 href="#"
                 onClick={(e) => { e.preventDefault(); setIsLogin(true); setOwnerName(''); setOwnerEmail(''); setOwnerPassword(''); setCompany(emptyCompany); }}
