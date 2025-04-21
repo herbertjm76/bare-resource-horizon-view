@@ -7,13 +7,17 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle, Loader2, RefreshCw } from 'lucide-react';
 
 export const ProjectsList = () => {
-  const { projects, isLoading, error } = useProjects();
+  const { projects, isLoading, error, refetch } = useProjects();
   
-  console.log('ProjectsList render:', { projects, isLoading, error });
+  console.log('ProjectsList render:', { 
+    projectsLength: projects?.length || 0, 
+    isLoading, 
+    hasError: !!error 
+  });
 
   const handleRetry = () => {
-    console.log('Retrying projects fetch');
-    window.location.reload();
+    console.log('Manually retrying projects fetch');
+    refetch();
   };
 
   if (error) {

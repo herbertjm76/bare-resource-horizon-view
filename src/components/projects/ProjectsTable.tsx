@@ -32,6 +32,8 @@ interface ProjectsTableProps {
 }
 
 export const ProjectsTable = ({ projects, isLoading }: ProjectsTableProps) => {
+  console.log('ProjectsTable render:', { projectsLength: projects?.length || 0, isLoading });
+  
   if (isLoading) {
     return <LoadingState />;
   }
@@ -65,7 +67,7 @@ export const ProjectsTable = ({ projects, isLoading }: ProjectsTableProps) => {
             <TableCell className="font-medium">{project.name}</TableCell>
             <TableCell>
               {project.project_manager ? 
-                `${project.project_manager.first_name || ''} ${project.project_manager.last_name || ''}`.trim() :
+                `${project.project_manager.first_name || ''} ${project.project_manager.last_name || ''}`.trim() || 'Unassigned' :
                 'Unassigned'
               }
             </TableCell>

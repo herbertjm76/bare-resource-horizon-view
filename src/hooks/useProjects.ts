@@ -4,40 +4,46 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export const useProjects = () => {
-  const { data: projects, isLoading, error } = useQuery({
+  console.log('useProjects hook called');
+  
+  const { data: projects, isLoading, error, refetch } = useQuery({
     queryKey: ['projects'],
     queryFn: async () => {
-      try {
-        const { data, error } = await supabase
-          .from('projects')
-          .select(`
-            *,
-            project_manager:profiles(first_name, last_name),
-            office:offices(name, country),
-            team_composition:project_team_composition(*)
-          `);
+      console.log('Fetching projects data...');
+      
+      const { data, error } = await supabase
+        .from('projects')
+        .select(`
+          *,
+          project_manager:profiles(first_name, last_name),
+          office:offices(name, country),
+          team_composition:project_team_composition(*)
+        `);
 
-        if (error) {
-          console.error('Error fetching projects:', error);
-          toast.error('Failed to load projects');
-          throw error;
-        }
-
-        console.log('Projects data fetched:', data);
-        return data || [];
-      } catch (err) {
-        console.error('Error in projects query:', err);
-        throw err;
+      if (error) {
+        console.error('Error fetching projects:', error);
+        toast.error('Failed to load projects');
+        throw error;
       }
+
+      console.log('Projects data fetched successfully:', data);
+      return data || [];
     },
     retry: 1,
     retryDelay: 1000,
     refetchOnWindowFocus: false
   });
 
+  console.log('useProjects hook state:', { 
+    projectsLength: projects?.length || 0, 
+    isLoading, 
+    hasError: !!error 
+  });
+
   return {
     projects: projects || [],
     isLoading,
     error,
+    refetch
   };
 };

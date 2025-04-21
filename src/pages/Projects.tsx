@@ -17,8 +17,16 @@ const Projects = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('Projects page mounted', { company, companyLoading });
-  }, [company, companyLoading]);
+    console.log('Projects page mounted', { 
+      hasCompany: !!company, 
+      companyLoading 
+    });
+    
+    if (!companyLoading && !company) {
+      console.log('No company found, refreshing company data');
+      refreshCompany();
+    }
+  }, [company, companyLoading, refreshCompany]);
 
   return (
     <AuthGuard>
@@ -44,7 +52,7 @@ const Projects = () => {
                       variant="outline" 
                       size="sm" 
                       onClick={() => {
-                        console.log('Refreshing company data');
+                        console.log('Manually refreshing company data');
                         refreshCompany();
                       }}
                       className="gap-2"
@@ -85,7 +93,7 @@ const Projects = () => {
                           <Button 
                             variant="outline" 
                             onClick={() => {
-                              console.log('Refreshing company data');
+                              console.log('Manually refreshing company data');
                               refreshCompany();
                             }}
                             className="gap-2"
