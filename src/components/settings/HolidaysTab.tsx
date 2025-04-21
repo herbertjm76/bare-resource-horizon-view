@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2, Calendar as CalendarIcon } from "lucide-react";
@@ -20,20 +20,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-
-// Simulated "db" (offices as locations from earlier)
-const mockOffices = [
-  { id: "1", name: "New York" },
-  { id: "2", name: "London" },
-  { id: "3", name: "Tokyo" }
-];
-
-// Mock holidays (office is now array of ids)
-const mockHolidays = [
-  { id: "1", description: "New Year's Day", startDate: new Date(2025, 0, 1), endDate: new Date(2025, 0, 1), offices: ["1"] },
-  { id: "2", description: "Christmas Holiday", startDate: new Date(2025, 11, 24), endDate: new Date(2025, 11, 26), offices: ["2"] },
-  { id: "3", description: "Golden Week", startDate: new Date(2025, 4, 3), endDate: new Date(2025, 4, 6), offices: ["3"] }
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useCompany } from "@/context/CompanyContext";
+import { useOfficeSettings } from "@/context/OfficeSettingsContext";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
@@ -43,14 +33,25 @@ const formSchema = z.object({
 });
 
 type HolidayFormValues = z.infer<typeof formSchema>;
-type Holiday = typeof mockHolidays[0];
+
+type Holiday = {
+  id: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  offices: string[];
+  company_id?: string;
+};
 
 export const HolidaysTab = () => {
-  const [holidays, setHolidays] = useState<Holiday[]>(mockHolidays);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [open, setOpen] = useState(false);
   const [editingHoliday, setEditingHoliday] = useState<Holiday | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const { company } = useCompany();
+  const { locations } = useOfficeSettings();
 
   const form = useForm<HolidayFormValues>({
     resolver: zodResolver(formSchema),
@@ -61,6 +62,48 @@ export const HolidaysTab = () => {
       offices: [],
     }
   });
+
+  const fetchHolidays = async () => {
+    if (!company) return;
+    
+    setLoading(true);
+    console.log("Fetching holidays for company:", company.id);
+    
+    try {
+      // Get holidays from localStorage first
+      const storedHolidays = localStorage.getItem("office_holidays");
+      let holidaysData: Holiday[] = [];
+      
+      if (storedHolidays) {
+        try {
+          const parsed = JSON.parse(storedHolidays);
+          holidaysData = Array.isArray(parsed) ? parsed : [];
+        } catch (err) {
+          console.error("Error parsing localStorage holidays:", err);
+        }
+      }
+      
+      console.log("Loaded holidays from localStorage:", holidaysData);
+      setHolidays(holidaysData);
+    } catch (error) {
+      console.error("Error fetching holidays:", error);
+      toast("Failed to load holidays");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHolidays();
+  }, [company]);
+
+  const persistHolidays = (updatedHolidays: Holiday[]) => {
+    try {
+      localStorage.setItem("office_holidays", JSON.stringify(updatedHolidays));
+    } catch (err) {
+      console.error("Error saving holidays to localStorage:", err);
+    }
+  };
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
@@ -83,32 +126,40 @@ export const HolidaysTab = () => {
 
   const handleSelect = (id: string) => {
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  }
+  };
 
   const handleBulkDelete = () => {
-    setHolidays(holidays.filter(h => !selected.includes(h.id)));
+    const updatedHolidays = holidays.filter(h => !selected.includes(h.id));
+    setHolidays(updatedHolidays);
+    persistHolidays(updatedHolidays);
     setSelected([]);
     setEditMode(false);
-  }
+    toast("Holidays deleted", { description: "Selected holidays have been deleted" });
+  };
 
   const onSubmit = (values: HolidayFormValues) => {
     if (editingHoliday) {
-      setHolidays(
-        holidays.map(holiday => 
-          holiday.id === editingHoliday.id
-          ? { ...holiday, ...values }
-          : holiday
-        )
+      const updatedHolidays = holidays.map(holiday => 
+        holiday.id === editingHoliday.id
+        ? { ...holiday, ...values }
+        : holiday
       );
+      setHolidays(updatedHolidays);
+      persistHolidays(updatedHolidays);
+      toast("Holiday updated");
     } else {
       const newHoliday: Holiday = { 
         id: Date.now().toString(), 
         description: values.description,
         startDate: values.startDate,
         endDate: values.endDate,
-        offices: values.offices 
+        offices: values.offices,
+        company_id: company?.id 
       };
-      setHolidays([...holidays, newHoliday]);
+      const updatedHolidays = [...holidays, newHoliday];
+      setHolidays(updatedHolidays);
+      persistHolidays(updatedHolidays);
+      toast("Holiday added");
     }
     setOpen(false);
     form.reset();
@@ -126,10 +177,10 @@ export const HolidaysTab = () => {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Office Holidays</CardTitle>
         <div className="flex gap-2">
-          <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)}>
+          <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)} disabled={loading}>
             <Edit className="h-4 w-4 mr-2" /> Edit
           </Button>
-          <Button size="sm" onClick={() => setOpen(true)}>
+          <Button size="sm" onClick={() => setOpen(true)} disabled={loading}>
             <Plus className="h-4 w-4 mr-2" />
             Add Holiday
           </Button>
@@ -145,7 +196,7 @@ export const HolidaysTab = () => {
               <Button
                 variant="destructive"
                 size="sm"
-                disabled={selected.length === 0}
+                disabled={selected.length === 0 || loading}
                 onClick={handleBulkDelete}
               >
                 <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
@@ -153,7 +204,9 @@ export const HolidaysTab = () => {
               <span className="text-xs text-muted-foreground">{selected.length} selected</span>
             </div>
           )}
-          {holidays.length > 0 ? (
+          {loading ? (
+            <div className="text-center p-4 border rounded-md border-dashed">Loading...</div>
+          ) : holidays.length > 0 ? (
             <div className="grid gap-4">
               {holidays.map((holiday) => (
                 <div 
@@ -164,7 +217,7 @@ export const HolidaysTab = () => {
                   <div>
                     <div className="font-medium">{holiday.description}</div>
                     <div className="text-sm text-muted-foreground">
-                      {format(holiday.startDate, "PPP")} to {format(holiday.endDate, "PPP")} • {holiday.offices.map(id => mockOffices.find(o=>o.id===id)?.name).filter(Boolean).join(", ")}
+                      {format(holiday.startDate, "PPP")} to {format(holiday.endDate, "PPP")} • {holiday.offices.map(id => locations.find(o=>o.id===id)?.city).filter(Boolean).join(", ")}
                     </div>
                   </div>
                   {editMode ? (
@@ -299,7 +352,7 @@ export const HolidaysTab = () => {
                   <FormItem>
                     <FormLabel>Offices</FormLabel>
                     <div className="grid grid-cols-2 gap-2">
-                      {mockOffices.map(office => (
+                      {locations.map(office => (
                         <label key={office.id} className="inline-flex items-center gap-2">
                           <input
                             type="checkbox"
@@ -312,7 +365,7 @@ export const HolidaysTab = () => {
                               field.onChange(newValue);
                             }}
                           />
-                          <span>{office.name}</span>
+                          <span>{office.city}</span>
                         </label>
                       ))}
                     </div>

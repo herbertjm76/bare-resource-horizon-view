@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -86,8 +85,7 @@ export const StagesTab = () => {
       
     if (error) {
       toast("Failed to load stages", {
-        description: error.message,
-        variant: "destructive"
+        description: error.message
       });
       console.error("Error fetching stages:", error);
       setLoading(false);
