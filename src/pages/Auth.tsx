@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -135,20 +136,35 @@ const Auth: React.FC = () => {
       
       if (companyError) throw companyError;
       
+      // Extract first and last name
+      const nameParts = ownerName.split(' ');
+      const firstName = nameParts[0];
+      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+      
+      // Sign up with complete user metadata
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: ownerEmail,
         password: ownerPassword,
         options: {
           data: { 
-            name: ownerName,
-            first_name: ownerName.split(' ')[0],
-            last_name: ownerName.split(' ').slice(1).join(' '),
-            company_id: companyData.id
+            first_name: firstName,
+            last_name: lastName,
+            company_id: companyData.id,
+            role: 'owner'
           }
         }
       });
       
       if (signUpError) throw signUpError;
+
+      // Log successful signup details for debugging
+      console.log('Signup successful:', signUpData);
+      console.log('User metadata:', {
+        first_name: firstName,
+        last_name: lastName,
+        company_id: companyData.id,
+        role: 'owner'
+      });
 
       toast.success('Sign up successful! Please check your email to confirm your account, then you can log in.');
       setIsLogin(true);
