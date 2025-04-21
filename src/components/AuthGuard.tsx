@@ -38,7 +38,6 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         console.log("AuthGuard: No active session, redirecting to auth page");
         setIsLoading(false);
         setIsAuthorized(false);
-        toast.error("Please sign in to continue");
         navigate('/auth');
         return;
       }
@@ -131,11 +130,26 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     // Initial auth check
     checkAuth();
     
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("AuthGuard: Auth state changed:", event);
+      
+      if (!isMounted) return;
+      
+      if (event === 'SIGNED_IN') {
+        checkAuth();
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthorized(false);
+        navigate('/auth');
+      }
+    });
+    
     // Clean up
     return () => {
       console.log("AuthGuard: Component unmounted");
       isMounted = false;
       clearTimeout(safetyTimeout);
+      subscription.unsubscribe();
     };
   }, [navigate, requiredRole]);
 
