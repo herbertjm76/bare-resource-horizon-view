@@ -69,7 +69,7 @@ export const AppHeader: React.FC = () => {
               display: "inline-block",
               position: "relative",
               paddingBottom: 0,
-              textShadow: `0 4px 18px ${BARE_DARK_GREY_SHADOW}, 1px 0 4px ${BARE_DARK_GREY_SHADOW}`,
+              // Removed textShadow here as requested
             }}
           >
             Bare
