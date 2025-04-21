@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -116,8 +115,8 @@ const Projects = () => {
                 </div>
               </div>
             ) : (
-              <div className="flex-1 p-4 md:p-8 bg-background">
-                <div className="max-w-6xl mx-auto space-y-8">
+              <div className="flex-1 p-4 md:p-6 bg-background">
+                <div className="max-w-6xl mx-auto space-y-8 px-4">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
                     <h1 className="text-3xl md:text-4xl font-bold text-[#6E59A5]">All Projects</h1>
                     <Button 
