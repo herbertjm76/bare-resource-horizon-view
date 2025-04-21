@@ -6,12 +6,13 @@ import { toast } from 'sonner';
 import { emptyCompany } from './Auth/companyHelpers';
 import LoginForm from './Auth/LoginForm';
 import SignupForm from './Auth/SignupForm';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Link2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const Auth: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showConfigHelp, setShowConfigHelp] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -23,8 +24,14 @@ const Auth: React.FC = () => {
     
     if (errorCode === 'email_not_confirmed') {
       setError('Please confirm your email address before logging in. Check your inbox for a confirmation link.');
+    } else if (errorCode === 'invalid_request') {
+      setError('The verification link is invalid or has expired. If you\'re trying to verify your email, please try requesting a new confirmation email.');
+      setShowConfigHelp(true);
     } else if (errorCode && errorDescription) {
       setError(`${errorDescription}`);
+      if (errorDescription.includes('invalid') || errorDescription.includes('expired')) {
+        setShowConfigHelp(true);
+      }
     }
   }, [location]);
 
@@ -71,7 +78,7 @@ const Auth: React.FC = () => {
             <AlertTitle>Authentication Error</AlertTitle>
             <AlertDescription className="mt-2">
               {error}
-              {error.includes('confirm your email') && (
+              {(error.includes('confirm your email') || error.includes('verification link') || error.includes('invalid')) && (
                 <button 
                   onClick={resendConfirmationEmail}
                   className="block mt-2 text-blue-300 underline hover:text-blue-200 transition-colors"
@@ -83,11 +90,23 @@ const Auth: React.FC = () => {
           </Alert>
         )}
         
+        {showConfigHelp && (
+          <Alert className="mb-6 bg-blue-500/10 border-blue-500/30 text-white">
+            <Link2 className="h-4 w-4" />
+            <AlertTitle>Configuration Help</AlertTitle>
+            <AlertDescription className="mt-2">
+              <p>This error often occurs when the Supabase Site URL and Redirect URL are not properly configured.</p>
+              <p className="mt-2">For administrators: Please ensure that your Supabase project has the correct Site URL and Redirect URLs configured in the Authentication settings.</p>
+            </AlertDescription>
+          </Alert>
+        )}
+        
         {isLogin ? (
           <LoginForm
             onSwitchToSignup={() => {
               setIsLogin(false);
               setError(null);
+              setShowConfigHelp(false);
             }}
           />
         ) : (
@@ -95,6 +114,7 @@ const Auth: React.FC = () => {
             onSwitchToLogin={() => {
               setIsLogin(true);
               setError(null);
+              setShowConfigHelp(false);
             }}
           />
         )}
@@ -109,6 +129,7 @@ const Auth: React.FC = () => {
                   e.preventDefault(); 
                   setIsLogin(false);
                   setError(null);
+                  setShowConfigHelp(false);
                 }}
                 className="underline text-white font-medium hover:text-pink-200 focus:outline-none bg-transparent border-none p-0 m-0"
                 tabIndex={0}
@@ -125,6 +146,7 @@ const Auth: React.FC = () => {
                   e.preventDefault(); 
                   setIsLogin(true);
                   setError(null);
+                  setShowConfigHelp(false);
                 }}
                 className="underline text-white font-medium hover:text-blue-200 focus:outline-none bg-transparent border-none p-0 m-0"
                 tabIndex={0}
