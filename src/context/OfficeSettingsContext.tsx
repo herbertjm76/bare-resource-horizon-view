@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Database } from '@/integrations/supabase/types';
 
 // Define types
 export type Role = {
@@ -62,70 +61,68 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        // Define types for the query responses to avoid deep type instantiation
-        type RoleResponse = { data: any[] | null, error: any };
-        type LocationResponse = { data: any[] | null, error: any };
-        type RateResponse = { data: any[] | null, error: any };
-
-        // Fetch all data in parallel with explicit typing
-        const [rolesData, locationsData, ratesData] = await Promise.all([
-          supabase.from('office_roles').select('*').eq('company_id', company.id) as Promise<RoleResponse>,
-          supabase.from('office_locations').select('*').eq('company_id', company.id) as Promise<LocationResponse>,
-          supabase.from('office_rates').select('*').eq('company_id', company.id) as Promise<RateResponse>
-        ]);
-
-        // Check for errors in responses
-        if (rolesData.error) throw rolesData.error;
-        if (locationsData.error) throw locationsData.error;
-        if (ratesData.error) throw ratesData.error;
+        // Fetch roles data
+        const rolesResult = await supabase
+          .from('office_roles')
+          .select('*')
+          .eq('company_id', company.id);
+          
+        if (rolesResult.error) throw rolesResult.error;
+        
+        // Fetch locations data
+        const locationsResult = await supabase
+          .from('office_locations')
+          .select('*')
+          .eq('company_id', company.id);
+          
+        if (locationsResult.error) throw locationsResult.error;
+        
+        // Fetch rates data
+        const ratesResult = await supabase
+          .from('office_rates')
+          .select('*')
+          .eq('company_id', company.id);
+          
+        if (ratesResult.error) throw ratesResult.error;
 
         // Process roles data
-        if (rolesData.data) {
-          const processedRoles: Role[] = [];
-          for (const role of rolesData.data) {
-            processedRoles.push({
-              id: role.id,
-              name: role.name,
-              code: role.code,
-              company_id: role.company_id
-            });
-          }
+        if (rolesResult.data) {
+          const processedRoles: Role[] = rolesResult.data.map(role => ({
+            id: role.id,
+            name: role.name,
+            code: role.code,
+            company_id: role.company_id
+          }));
           setRoles(processedRoles);
         } else {
           setRoles([]);
         }
         
         // Process locations data
-        if (locationsData.data) {
-          const processedLocations: Location[] = [];
-          for (const location of locationsData.data) {
-            processedLocations.push({
-              id: location.id,
-              city: location.city,
-              country: location.country,
-              code: location.code,
-              emoji: location.emoji,
-              company_id: location.company_id
-            });
-          }
+        if (locationsResult.data) {
+          const processedLocations: Location[] = locationsResult.data.map(location => ({
+            id: location.id,
+            city: location.city,
+            country: location.country,
+            code: location.code,
+            emoji: location.emoji,
+            company_id: location.company_id
+          }));
           setLocations(processedLocations);
         } else {
           setLocations([]);
         }
         
         // Process rates data
-        if (ratesData.data) {
-          const processedRates: Rate[] = [];
-          for (const rate of ratesData.data) {
-            processedRates.push({
-              id: rate.id,
-              type: rate.type as "role" | "location",
-              reference_id: rate.reference_id,
-              value: Number(rate.value),
-              unit: rate.unit as "hour" | "day" | "week",
-              company_id: rate.company_id
-            });
-          }
+        if (ratesResult.data) {
+          const processedRates: Rate[] = ratesResult.data.map(rate => ({
+            id: rate.id,
+            type: rate.type as "role" | "location",
+            reference_id: rate.reference_id,
+            value: Number(rate.value),
+            unit: rate.unit as "hour" | "day" | "week",
+            company_id: rate.company_id
+          }));
           setRates(processedRates);
         } else {
           setRates([]);
