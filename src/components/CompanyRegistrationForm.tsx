@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ export interface CompanyFormData {
   country: string;
   size: string;
   city: string;
+  industry: string; // Added the industry field to match the type in companyHelpers.ts
 }
 
 interface CompanyRegistrationFormProps {
@@ -80,7 +82,8 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
           website: data.website,
           address: data.address,
           size: data.size,
-          city: data.city
+          city: data.city,
+          industry: data.industry // Add industry to the insert operation
         })
         .select()
         .single();
