@@ -5,12 +5,11 @@ import { useToast } from "@/hooks/use-toast";
 import allCountries from "@/lib/allCountries.json";
 import { getContinentByCountryCode } from './projectAreaHelpers';
 
-// Types that match the office_locations table in Supabase
-export type LocationRow = {
+// Types that match the office_areas table in Supabase
+export type OfficeAreaRow = {
   id: string;
-  city: string;
-  country: string;
   code: string;
+  name: string; // corresponds to country or area name
   emoji: string | null;
   created_at: string;
   updated_at: string;
@@ -20,7 +19,6 @@ export type LocationRow = {
 export type ProjectArea = {
   id: string;
   code: string;
-  city?: string;
   region: string;
   country: string;
 };
@@ -29,7 +27,6 @@ export type ProjectArea = {
 export type ProjectAreaFormValues = {
   code: string;
   country: string;
-  city?: string;
   region: string;
 };
 
@@ -43,13 +40,12 @@ function getAutoRegion(country: string): string {
 }
 
 // Helper: convert from DB row to ProjectArea
-function toProjectArea(location: LocationRow): ProjectArea {
+function toProjectArea(area: OfficeAreaRow): ProjectArea {
   return {
-    id: location.id,
-    code: location.code,
-    city: location.city,
-    region: getAutoRegion(location.country),
-    country: location.country,
+    id: area.id,
+    code: area.code,
+    region: getAutoRegion(area.name),
+    country: area.name,
   };
 }
 
@@ -59,7 +55,7 @@ export default function useProjectAreas() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Fetch
+  // Fetch areas from office_areas
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -67,7 +63,7 @@ export default function useProjectAreas() {
     const fetchAreas = async () => {
       try {
         const { data, error } = await supabase
-          .from("office_locations")
+          .from("office_areas")
           .select("*")
           .order("created_at", { ascending: true });
 
@@ -76,7 +72,6 @@ export default function useProjectAreas() {
           setError("Failed to load project areas.");
           setAreas([]);
         } else {
-          // Transform using map
           const transformedAreas = Array.isArray(data)
             ? data.map(toProjectArea)
             : [];
@@ -95,22 +90,20 @@ export default function useProjectAreas() {
     // eslint-disable-next-line
   }, []);
 
-  // Add
+  // Add Project Area (office_areas)
   const addArea = async (values: ProjectAreaFormValues) => {
     setLoading(true);
     setError(null);
     try {
-      // Match the structure of the office_locations table
-      const locationData = {
+      // 'name' in office_areas is the country/area name
+      const areaData = {
         code: values.code,
-        country: values.country,
-        city: values.city || "",
+        name: values.country,
         emoji: null,
       };
-
       const { data, error } = await supabase
-        .from("office_locations")
-        .insert(locationData)
+        .from("office_areas")
+        .insert(areaData)
         .select()
         .single();
 
@@ -123,7 +116,7 @@ export default function useProjectAreas() {
         });
       }
       if (data) {
-        setAreas(old => [...old, toProjectArea(data as LocationRow)]);
+        setAreas(old => [...old, toProjectArea(data as OfficeAreaRow)]);
         toast({
           title: "Success",
           description: "Area added successfully.",
@@ -142,20 +135,19 @@ export default function useProjectAreas() {
     }
   };
 
-  // Update
+  // Update Project Area
   const updateArea = async (id: string, values: ProjectAreaFormValues) => {
     setLoading(true);
     setError(null);
     try {
-      const locationData = {
+      const areaData = {
         code: values.code,
-        country: values.country,
-        city: values.city || "",
+        name: values.country,
       };
 
       const { error } = await supabase
-        .from("office_locations")
-        .update(locationData)
+        .from("office_areas")
+        .update(areaData)
         .eq("id", id);
 
       if (error) {
@@ -174,7 +166,6 @@ export default function useProjectAreas() {
                   code: values.code,
                   country: values.country,
                   region: getAutoRegion(values.country),
-                  city: values.city || ""
                 }
               : area
           )
@@ -197,13 +188,13 @@ export default function useProjectAreas() {
     }
   };
 
-  // Bulk Delete
+  // Bulk Delete Project Areas
   const deleteAreas = async (ids: string[]) => {
     setLoading(true);
     setError(null);
     try {
       const { error } = await supabase
-        .from("office_locations")
+        .from("office_areas")
         .delete()
         .in("id", ids);
 
@@ -245,3 +236,4 @@ export default function useProjectAreas() {
 }
 
 export { getAutoRegion };
+
