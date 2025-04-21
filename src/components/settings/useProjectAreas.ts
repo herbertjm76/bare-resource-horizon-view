@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import allCountries from "@/lib/allCountries.json";
 import { getContinentByCountryCode } from './projectAreaHelpers';
+// Add useCompany for company context
+import { useCompany } from '@/context/CompanyContext';
 
 // Types that match the project_areas table in Supabase
 export type ProjectAreaRow = {
@@ -13,6 +15,7 @@ export type ProjectAreaRow = {
   emoji: string | null;
   created_at: string;
   updated_at: string;
+  company_id: string | null; // newly added column
 };
 
 // The ProjectArea shape as used in the app
@@ -21,6 +24,7 @@ export type ProjectArea = {
   code: string;
   region: string;
   country: string;
+  company_id: string | null;
 };
 
 // Used on form submit
@@ -46,6 +50,7 @@ function toProjectArea(area: ProjectAreaRow): ProjectArea {
     code: area.code,
     region: getAutoRegion(area.name),
     country: area.name,
+    company_id: area.company_id ?? null
   };
 }
 
@@ -54,6 +59,7 @@ export default function useProjectAreas() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { company } = useCompany();
 
   // Fetch Project Areas from project_areas table
   useEffect(() => {
@@ -62,9 +68,15 @@ export default function useProjectAreas() {
 
     const fetchAreas = async () => {
       try {
+        if (!company) {
+          setAreas([]);
+          setLoading(false);
+          return;
+        }
         const { data, error } = await supabase
           .from("project_areas")
           .select("*")
+          .eq('company_id', company.id)               // fetch only for company
           .order("created_at", { ascending: true });
 
         if (error) {
@@ -88,18 +100,29 @@ export default function useProjectAreas() {
 
     fetchAreas();
     // eslint-disable-next-line
-  }, []);
+  }, [company]);
 
   // Add Project Area (project_areas)
   const addArea = async (values: ProjectAreaFormValues) => {
     setLoading(true);
     setError(null);
     try {
+      if (!company) {
+        setError("No company selected; cannot save area.");
+        toast({
+          title: "Error",
+          description: "No company selected; cannot save area.",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
       // 'name' in project_areas is the country/area name
       const areaData = {
         code: values.code,
         name: values.country,
         emoji: null,
+        company_id: company.id
       };
       const { data, error } = await supabase
         .from("project_areas")
@@ -140,9 +163,20 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
     try {
+      if (!company) {
+        setError("No company selected; cannot update area.");
+        toast({
+          title: "Error",
+          description: "No company selected; cannot update area.",
+          variant: "destructive"
+        });
+        setLoading(false);
+        return;
+      }
       const areaData = {
         code: values.code,
         name: values.country,
+        company_id: company.id,
       };
 
       const { error } = await supabase
@@ -166,6 +200,7 @@ export default function useProjectAreas() {
                   code: values.code,
                   country: values.country,
                   region: getAutoRegion(values.country),
+                  company_id: company.id,
                 }
               : area
           )
