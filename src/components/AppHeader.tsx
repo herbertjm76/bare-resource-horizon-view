@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
@@ -6,9 +7,11 @@ import { Button } from "@/components/ui/button";
 import { User as UserIcon, LogOut } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
-// Use the standardized light gray for Bare.
-const BARE_GRAY = "var(--bare-light-gray)";
+// Standardized colors
+const BARE_GRAY = "#8E9196";
+const GRADIENT = "linear-gradient(90deg, #9b87f5, #5a7eb7)"; // gentle purple to blue
 
+// Option 1: Bare in white, Resource in gray, with gradient underline
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
   const [user, setUser] = React.useState<User | null>(null);
@@ -45,44 +48,53 @@ export const AppHeader: React.FC = () => {
       className="w-full px-4 py-2 flex items-center justify-between z-30 shadow-md bg-white/90 border-b border-white/30"
       style={{ minHeight: 56 }}
     >
-      <h1
-        className="flex items-center text-[2.5rem] sm:text-[3.25rem] font-black select-none leading-none"
-        aria-label="BareResource"
-        style={{
-          lineHeight: 1.1,
-          letterSpacing: "0.5px",
-        }}
-      >
-        <span
-          className="bare-logo-shadow"
-          style={{
-            color: "white",
-            // Darker and stronger shadows for better readability, no outline
-            textShadow:
-              "0 6px 10px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.85), 0 0 7px rgba(0,0,0,0.7)",
-            fontWeight: 900,
-            letterSpacing: "0.5px",
-            display: "inline-block",
-            marginRight: 0, // No space between Bare and Resource
-          }}
-        >
-          Bare
-        </span>
-        <span
-          className="bare-logo-shadow"
-          style={{
-            background:
-              "linear-gradient(90deg, #7c52a0 0%, #5863a9 45%, #5a7eb7 65%, #c153bd 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            fontWeight: 900,
-            letterSpacing: "0.5px",
-            display: "inline-block",
-          }}
-        >
-          Resource
-        </span>
-      </h1>
+      <div>
+        <h1 className="flex items-end leading-none select-none" aria-label="BareResource">
+          <span
+            style={{
+              color: "#fff",
+              fontWeight: 900,
+              fontSize: "2.4rem",
+              letterSpacing: "0.5px",
+              lineHeight: "1.1",
+              marginRight: "0.12em",
+              // Gentle shadow for white-on-bright
+              textShadow:
+                "0 4px 18px rgba(40,40,76,0.18), 1px 0 4px rgba(60,60,100,0.22)",
+              display: "inline-block",
+            }}
+          >
+            Bare
+          </span>
+          <span
+            style={{
+              color: BARE_GRAY,
+              fontWeight: 700,
+              fontSize: "2.1rem", // 10% smaller
+              letterSpacing: "0.5px",
+              marginLeft: "0.04em",
+              display: "inline-block",
+              position: "relative",
+              verticalAlign: "bottom",
+            }}
+          >
+            Resource
+            <span
+              aria-hidden
+              style={{
+                display: "block",
+                height: 3,
+                width: "100%",
+                borderRadius: 3,
+                marginTop: "0.23em",
+                background: GRADIENT,
+                position: "relative",
+                opacity: 0.7,
+              }}
+            />
+          </span>
+        </h1>
+      </div>
       <div className="flex items-center gap-4">
         {!loading && user ? (
           <>
@@ -111,3 +123,4 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
+
