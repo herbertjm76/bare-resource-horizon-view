@@ -62,6 +62,15 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
         setInvLoading(false);
         return;
       }
+      
+      // Get the current user's ID for created_by
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) {
+        toast.error('You must be logged in to send invites');
+        setInvLoading(false);
+        return;
+      }
+
       // Insert invite row into supabase
       const { data, error } = await supabase
         .from('invites')
@@ -69,7 +78,7 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
           code,
           company_id: companyId,
           email: inviteEmail,
-          // created_by is populated automatically by RLS policy
+          created_by: session.user.id, // Add the required created_by field
         });
       if (error) {
         toast.error(error.message || 'Failed to send invite');
@@ -121,7 +130,7 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
                 required
                 disabled={invLoading}
               />
-              <Button type="submit" variant="primary" disabled={invLoading}>
+              <Button type="submit" variant="default" disabled={invLoading}>
                 {invLoading ? 'Sending...' : (
                   <>
                     <Plus className="w-4 h-4 mr-1" /> Send Invite
@@ -215,4 +224,3 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     </AuthGuard>
   );
 };
-
