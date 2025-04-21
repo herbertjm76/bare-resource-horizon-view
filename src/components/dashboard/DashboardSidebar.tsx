@@ -11,7 +11,8 @@ import {
   UserSquare2,
   Flag,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Menu
 } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import {
@@ -26,6 +27,8 @@ import {
   useSidebar
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { Sheet, SheetContent } from "@/components/ui/sheet"
 
 const navigationItems = [
   {
@@ -106,10 +109,87 @@ const navigationItems = [
 ]
 
 export function DashboardSidebar() {
-  const { state, toggleSidebar } = useSidebar();
+  const { state, toggleSidebar, openMobile, setOpenMobile } = useSidebar();
   const location = useLocation();
+  const isMobile = useIsMobile();
   const collapsed = state === "collapsed";
 
+  // Mobile sidebar using Sheet component
+  if (isMobile) {
+    return (
+      <>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setOpenMobile(true)}
+          className="fixed left-4 top-4 z-50 md:hidden"
+        >
+          <Menu className="h-6 w-6" />
+        </Button>
+        
+        <Sheet open={openMobile} onOpenChange={setOpenMobile}>
+          <SheetContent side="left" className="p-0 w-[280px]">
+            <div className="flex flex-col h-full bg-[#8E9196]">
+              <div className="flex items-center justify-between px-6 py-4 h-[64px] border-b border-[#7d8086]">
+                <span className="text-2xl font-bold select-none">
+                  <span className="text-white">Bare</span>
+                  <span className="bg-gradient-to-r from-[#6e5af1] via-[#5948b4] to-[#162c69] bg-clip-text text-transparent font-semibold">Resource</span>
+                </span>
+              </div>
+              
+              {navigationItems.map((section) => (
+                <div key={section.label} className="mb-2">
+                  <SidebarGroupLabel className="text-white/70 px-6 pt-6 pb-3">
+                    {section.label}
+                  </SidebarGroupLabel>
+                  <SidebarContent>
+                    <SidebarMenu>
+                      {section.items.map((item) => {
+                        const isActive = location.pathname === item.url;
+                        return (
+                          <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton
+                              asChild
+                              className={`
+                                text-white 
+                                hover:text-white 
+                                hover:bg-[#7d8086]
+                                rounded-none
+                                px-6
+                                py-4
+                                flex
+                                items-center
+                                gap-4
+                                transition-all
+                                text-base
+                                ${isActive ? "bg-[#6E59A5] text-white" : ""}
+                              `}
+                              isActive={isActive}
+                            >
+                              <Link 
+                                to={item.url} 
+                                className="flex items-center gap-4 w-full"
+                                onClick={() => setOpenMobile(false)}
+                              >
+                                <item.icon className="h-6 w-6" />
+                                <span className="font-medium">{item.title}</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        );
+                      })}
+                    </SidebarMenu>
+                  </SidebarContent>
+                </div>
+              ))}
+            </div>
+          </SheetContent>
+        </Sheet>
+      </>
+    );
+  }
+
+  // Desktop sidebar
   return (
     <Sidebar 
       className="bg-[#8E9196] border-r border-[#7d8086] pt-0 min-h-screen transition-all duration-300 fixed left-0 top-0 bottom-0 z-40"
