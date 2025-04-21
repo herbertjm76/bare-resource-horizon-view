@@ -147,44 +147,17 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       console.log('User created successfully with ID:', authData.user.id);
 
       // 3. Create profile record manually since the trigger might be failing
-      try {
-        console.log('Attempting direct profile creation');
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: ownerEmail,
-            first_name: ownerFirstName,
-            last_name: ownerLastName,
-            company_id: companyData.id,
-            role: userRole
-          });
-          
-        if (profileError) {
-          console.error('Direct profile creation error:', profileError);
-          // Try upsert as fallback
-          const { error: upsertError } = await supabase
-            .from('profiles')
-            .upsert({
-              id: authData.user.id,
-              email: ownerEmail,
-              first_name: ownerFirstName,
-              last_name: ownerLastName,
-              company_id: companyData.id,
-              role: userRole
-            });
-            
-          if (upsertError) {
-            console.error('Profile upsert error:', upsertError);
-          } else {
-            console.log('Profile created via upsert');
-          }
-        } else {
-          console.log('Profile created successfully via direct insert');
-        }
-      } catch (profileCreationError) {
-        console.error('Error in profile creation:', profileCreationError);
-        // Continue anyway, the user is created
+      const profileCreated = await ensureUserProfile(authData.user.id, {
+        email: ownerEmail,
+        firstName: ownerFirstName,
+        lastName: ownerLastName,
+        companyId: companyData.id,
+        role: userRole
+      });
+
+      if (!profileCreated) {
+        console.warn('Warning: Could not ensure profile creation through helper function');
+        // We'll continue anyway since the database trigger should handle this
       }
 
       toast.success('Sign up successful! Please check your email to confirm your account, then you can log in.');
