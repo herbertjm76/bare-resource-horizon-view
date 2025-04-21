@@ -3,7 +3,6 @@ import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Ensures a user profile exists or creates one if it doesn't
- * This function will implement retry logic and better error handling
  */
 export const ensureUserProfile = async (userId: string, userData?: any) => {
   if (!userId) {
@@ -13,14 +12,13 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
   
   console.log('Ensuring profile exists for user:', userId);
   
-  // First check if profile exists
   try {
     // Check if profile exists
     const { data: existingProfile, error: checkError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
     
     // If profile exists, we're good
     if (existingProfile) {
@@ -41,7 +39,7 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
     const metaData = user?.user_metadata || {};
     console.log('User metadata for profile creation:', metaData);
     
-    // Ensure role is a valid type from the user_role enum
+    // Ensure role is always a valid string value
     const role = userData?.role || metaData.role || 'member';
     
     const profileData = {
@@ -53,9 +51,7 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
       role: role
     };
     
-    console.log('Attempting to create profile with data:', profileData);
-    
-    // Try upsert operation (handles both insert and update)
+    // Try upsert operation
     const { error: upsertError } = await supabase
       .from('profiles')
       .upsert(profileData);
