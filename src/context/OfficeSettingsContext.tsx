@@ -30,38 +30,6 @@ export type Location = {
   company_id?: string;
 };
 
-// Define simple response types without excessive nesting
-type SupabaseRole = {
-  id: string;
-  name: string;
-  code: string;
-  company_id?: string;
-  created_at?: string;
-  updated_at?: string;
-};
-
-type SupabaseLocation = {
-  id: string;
-  city: string;
-  country: string;
-  code: string;
-  emoji?: string;
-  company_id?: string;
-  created_at?: string;
-  updated_at?: string;
-};
-
-type SupabaseRate = {
-  id: string;
-  type: string;
-  reference_id: string;
-  value: number;
-  unit: string;
-  company_id?: string;
-  created_at?: string;
-  updated_at?: string;
-};
-
 // Create context
 type OfficeSettingsContextType = {
   roles: Role[];
@@ -93,82 +61,57 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        // Use explicit type casting for query results to avoid deep type instantiation
-        const { data: rolesData, error: rolesError } = await supabase
-          .from('office_roles')
-          .select('*')
-          .eq('company_id', company.id);
+        // Using Promises.all to fetch all data in parallel and avoid deep type instantiation
+        const [rolesResponse, locationsResponse, ratesResponse] = await Promise.all([
+          supabase.from('office_roles').select('*').eq('company_id', company.id),
+          supabase.from('office_locations').select('*').eq('company_id', company.id),
+          supabase.from('office_rates').select('*').eq('company_id', company.id)
+        ]);
 
-        if (rolesError) throw rolesError;
-        
-        const { data: locationsData, error: locationsError } = await supabase
-          .from('office_locations')
-          .select('*')
-          .eq('company_id', company.id);
+        // Check for errors in responses
+        if (rolesResponse.error) throw rolesResponse.error;
+        if (locationsResponse.error) throw locationsResponse.error;
+        if (ratesResponse.error) throw ratesResponse.error;
 
-        if (locationsError) throw locationsError;
-        
-        const { data: ratesData, error: ratesError } = await supabase
-          .from('office_rates')
-          .select('*')
-          .eq('company_id', company.id);
-
-        if (ratesError) throw ratesError;
-
-        // Process roles
-        if (rolesData) {
-          const typedRolesData = rolesData as unknown as SupabaseRole[];
-          const rolesToSet: Role[] = [];
-          
-          for (const role of typedRolesData) {
-            rolesToSet.push({
-              id: role.id,
-              name: role.name,
-              code: role.code,
-              company_id: role.company_id
-            });
-          }
-          setRoles(rolesToSet);
+        // Process roles data
+        if (rolesResponse.data) {
+          const processedRoles = rolesResponse.data.map(role => ({
+            id: role.id,
+            name: role.name,
+            code: role.code,
+            company_id: role.company_id
+          }));
+          setRoles(processedRoles);
         } else {
           setRoles([]);
         }
         
-        // Process locations
-        if (locationsData) {
-          const typedLocationsData = locationsData as unknown as SupabaseLocation[];
-          const locationsToSet: Location[] = [];
-          
-          for (const location of typedLocationsData) {
-            locationsToSet.push({
-              id: location.id,
-              city: location.city,
-              country: location.country,
-              code: location.code,
-              emoji: location.emoji,
-              company_id: location.company_id
-            });
-          }
-          setLocations(locationsToSet);
+        // Process locations data
+        if (locationsResponse.data) {
+          const processedLocations = locationsResponse.data.map(location => ({
+            id: location.id,
+            city: location.city,
+            country: location.country,
+            code: location.code,
+            emoji: location.emoji,
+            company_id: location.company_id
+          }));
+          setLocations(processedLocations);
         } else {
           setLocations([]);
         }
         
-        // Process rates
-        if (ratesData) {
-          const typedRatesData = ratesData as unknown as SupabaseRate[];
-          const ratesToSet: Rate[] = [];
-          
-          for (const rate of typedRatesData) {
-            ratesToSet.push({
-              id: rate.id,
-              type: rate.type as "role" | "location",
-              reference_id: rate.reference_id,
-              value: Number(rate.value),
-              unit: rate.unit as "hour" | "day" | "week",
-              company_id: rate.company_id
-            });
-          }
-          setRates(ratesToSet);
+        // Process rates data
+        if (ratesResponse.data) {
+          const processedRates = ratesResponse.data.map(rate => ({
+            id: rate.id,
+            type: rate.type as "role" | "location",
+            reference_id: rate.reference_id,
+            value: Number(rate.value),
+            unit: rate.unit as "hour" | "day" | "week",
+            company_id: rate.company_id
+          }));
+          setRates(processedRates);
         } else {
           setRates([]);
         }
