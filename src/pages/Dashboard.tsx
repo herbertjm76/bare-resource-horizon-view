@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
 import { AppHeader } from '@/components/AppHeader';
 import { useCompany } from '@/context/CompanyContext';
+import AuthGuard from '@/components/AuthGuard';
 
 // Create a proper Profile type based on the database schema
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -28,26 +29,7 @@ const Dashboard: React.FC = () => {
   const { company, isSubdomainMode, loading: companyLoading } = useCompany();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!companyLoading && company && !isSubdomainMode) {
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      if (isLocalhost) {
-        console.log('In localhost mode, not redirecting to subdomain');
-        return;
-      }
-      
-      const subdomain = company.subdomain;
-      if (subdomain) {
-        const baseDomain = 'bareresource.com';
-        const protocol = window.location.protocol;
-        
-        const subdomainUrl = `${protocol}//${subdomain}.${baseDomain}${window.location.pathname}`;
-        
-        console.log(`Redirecting to company subdomain: ${subdomainUrl}`);
-        window.location.href = subdomainUrl;
-      }
-    }
-  }, [company, companyLoading, isSubdomainMode]);
+  // Remove the redirection effect that was causing loading issues
 
   useEffect(() => {
     const setupAuth = async () => {
@@ -158,30 +140,32 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <SidebarProvider>
-      <div className="flex flex-col w-full min-h-screen">
-        <div className="flex flex-1 w-full">
-          <DashboardSidebar />
-          <div className="flex-1 flex flex-col">
-            <AppHeader />
-            <div style={{ height: HEADER_HEIGHT }} />
-            <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
-              <div className="max-w-6xl mx-auto">
-                <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
-                <DashboardMetrics />
-                {(profile?.role === 'owner' || profile?.role === 'admin') && (
-                  <TeamManagement 
-                    teamMembers={teamMembers} 
-                    inviteUrl={inviteUrl}
-                    userRole={profile.role}
-                  />
-                )}
+    <AuthGuard>
+      <SidebarProvider>
+        <div className="flex flex-col w-full min-h-screen">
+          <div className="flex flex-1 w-full">
+            <DashboardSidebar />
+            <div className="flex-1 flex flex-col">
+              <AppHeader />
+              <div style={{ height: HEADER_HEIGHT }} />
+              <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
+                <div className="max-w-6xl mx-auto">
+                  <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
+                  <DashboardMetrics />
+                  {(profile?.role === 'owner' || profile?.role === 'admin') && (
+                    <TeamManagement 
+                      teamMembers={teamMembers} 
+                      inviteUrl={inviteUrl}
+                      userRole={profile.role}
+                    />
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </AuthGuard>
   );
 };
 

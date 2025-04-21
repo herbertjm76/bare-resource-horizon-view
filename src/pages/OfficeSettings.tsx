@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,33 +24,10 @@ const tabBarClass =
 const HEADER_HEIGHT = 56;
 
 const OfficeSettings = () => {
-  const { company, loading: companyLoading, refreshCompany, isSubdomainMode } = useCompany();
+  const { company, loading: companyLoading, refreshCompany } = useCompany();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!companyLoading && company && !isSubdomainMode) {
-      // Don't redirect if we're in localhost - this was causing the pages not to load
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      if (isLocalhost) {
-        console.log('In localhost mode, not redirecting to subdomain');
-        return;
-      }
-      
-      const subdomain = company.subdomain;
-      if (subdomain) {
-        // Only redirect if we're in production
-        const baseDomain = 'bareresource.com';
-        const protocol = window.location.protocol;
-        
-        // Create the subdomain URL
-        const subdomainUrl = `${protocol}//${subdomain}.${baseDomain}${window.location.pathname}`;
-        
-        // Redirect to the subdomain URL
-        console.log(`Redirecting to company subdomain: ${subdomainUrl}`);
-        window.location.href = subdomainUrl;
-      }
-    }
-  }, [company, companyLoading, isSubdomainMode]);
+  // Remove redirection effect that was causing loading issues
 
   React.useEffect(() => {
     if (!companyLoading && !company) {
