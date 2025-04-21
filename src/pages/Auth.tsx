@@ -37,46 +37,56 @@ const Auth: React.FC = () => {
 
   // Check if user is already logged in
   useEffect(() => {
+    let mounted = true;
+    let authSubscription: { unsubscribe: () => void } | null = null;
+    
     const checkSession = async () => {
       try {
-        setIsCheckingSession(true);
-        const { data, error } = await supabase.auth.getSession();
+        console.log('Auth page: Checking session');
+        
+        // First set up auth state change listener to catch immediate events
+        const { data } = supabase.auth.onAuthStateChange((event, session) => {
+          console.log('Auth page: Auth state changed:', event);
+          
+          if (!mounted) return;
+          
+          if (event === 'SIGNED_IN' && session) {
+            console.log('Auth page: User signed in, redirecting to dashboard');
+            toast.success('Successfully signed in!');
+            navigate('/dashboard');
+          }
+        });
+        
+        authSubscription = data.subscription;
+        
+        // Check for existing session
+        const { data: sessionData, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Session check error:', error);
-          setIsCheckingSession(false);
+          console.error('Auth page: Session check error:', error);
+          if (mounted) setIsCheckingSession(false);
           return;
         }
         
-        if (data.session) {
-          console.log('User already logged in, redirecting to dashboard');
+        if (sessionData.session) {
+          console.log('Auth page: User already logged in, redirecting to dashboard');
           navigate('/dashboard');
         } else {
-          console.log('No active session found');
-          setIsCheckingSession(false);
+          console.log('Auth page: No active session found');
+          if (mounted) setIsCheckingSession(false);
         }
       } catch (err) {
-        console.error('Error checking session:', err);
-        setIsCheckingSession(false);
+        console.error('Auth page: Error checking session:', err);
+        if (mounted) setIsCheckingSession(false);
       }
     };
     
-    // First set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event);
-      
-      if (event === 'SIGNED_IN' && session) {
-        console.log('User signed in, redirecting to dashboard');
-        toast.success('Successfully signed in!');
-        navigate('/dashboard');
-      }
-    });
-    
-    // Then check for existing session
     checkSession();
     
     return () => {
-      subscription.unsubscribe();
+      console.log('Auth page: Cleaning up');
+      mounted = false;
+      if (authSubscription) authSubscription.unsubscribe();
     };
   }, [navigate]);
 
@@ -101,9 +111,9 @@ const Auth: React.FC = () => {
   if (isCheckingSession) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-4">
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center bg-white/10 p-6 rounded-lg shadow-lg border border-white/20">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white"></div>
-          <p className="text-white mt-4">Checking authentication status...</p>
+          <p className="text-white mt-4">Checking login status...</p>
         </div>
       </div>
     );

@@ -32,7 +32,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
     setLoading(true);
     
     try {
-      console.log('Attempting to login with:', { email });
+      console.log('LoginForm: Attempting to login with:', email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -40,7 +40,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
       });
       
       if (error) {
-        console.error('Login error:', error.message);
+        console.error('LoginForm: Login error:', error.message);
         
         if (error.message.includes('Email not confirmed')) {
           setErrorMessage('Please confirm your email before logging in. Check your inbox for a confirmation link.');
@@ -57,25 +57,22 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
       }
       
       if (!data.session) {
-        console.error('No session returned after login');
+        console.error('LoginForm: No session returned after login');
         setErrorMessage('Login failed. Please try again.');
         toast.error('Login failed. Please try again.');
         setLoading(false);
         return;
       }
       
-      console.log('Login successful, user:', data.user?.id);
+      console.log('LoginForm: Login successful, user:', data.user?.id);
       toast.success('Login successful!');
       
-      // Important: Wait a moment before navigating to ensure session is properly set
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 500);
+      // Important: Let the auth listener handle redirection
+      // The navigate call is removed here to avoid race conditions
     } catch (error: any) {
-      console.error('Unexpected error during login:', error);
+      console.error('LoginForm: Unexpected error during login:', error);
       setErrorMessage(error.message || 'An unexpected error occurred');
       toast.error(error.message || 'Login failed. Please try again.');
-    } finally {
       setLoading(false);
     }
   };
@@ -96,7 +93,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
       if (error) throw error;
       toast.success('Confirmation email resent. Please check your inbox.');
     } catch (error: any) {
-      console.error('Error resending confirmation email:', error);
+      console.error('LoginForm: Error resending confirmation email:', error);
       setErrorMessage(error.message || 'Failed to resend confirmation email');
       toast.error(error.message || 'Failed to resend confirmation email');
     } finally {

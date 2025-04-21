@@ -31,58 +31,81 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let mounted = true;
+    let authSubscription: { unsubscribe: () => void } | null = null;
+
     const setupAuth = async () => {
       try {
-        // Set up auth state change listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-          console.log('Auth state changed:', event);
+        console.log('Dashboard: Setting up auth');
+        
+        // First check for existing session
+        const { data: sessionData } = await supabase.auth.getSession();
+        
+        if (!sessionData.session) {
+          console.log('Dashboard: No session found, redirecting to login');
+          if (mounted) {
+            setLoading(false);
+            navigate('/auth');
+          }
+          return;
+        }
+        
+        if (mounted) {
+          console.log('Dashboard: Session found, user is logged in:', sessionData.session.user.id);
+          setSession(sessionData.session);
+          setUser(sessionData.session.user);
+        }
+
+        // Then set up auth state change listener
+        const { data } = supabase.auth.onAuthStateChange((event, currentSession) => {
+          console.log('Dashboard: Auth state changed:', event);
+          
+          if (!mounted) return;
           
           // Set session data
-          setSession(session);
-          setUser(session?.user ?? null);
+          setSession(currentSession);
+          setUser(currentSession?.user ?? null);
           
           if (event === 'SIGNED_OUT') {
-            // Redirect if signed out
+            console.log('Dashboard: User signed out, redirecting');
             navigate('/auth');
           }
         });
 
-        // Check for existing session
-        const { data: { session } } = await supabase.auth.getSession();
+        authSubscription = data.subscription;
+
+        if (sessionData.session?.user && mounted) {
+          await fetchProfileData(sessionData.session.user.id);
+        }
         
-        if (!session) {
-          console.log('No session found, redirecting to login');
+        if (mounted) {
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('Dashboard: Auth setup error:', error);
+        if (mounted) {
           setLoading(false);
           navigate('/auth');
-          return;
         }
-        
-        console.log('Session found, user is logged in:', session.user.id);
-        setSession(session);
-        setUser(session.user);
-
-        if (session.user) {
-          await fetchProfileData(session.user.id);
-        }
-        
-        setLoading(false);
-        
-        return () => {
-          subscription.unsubscribe();
-        };
-      } catch (error) {
-        console.error('Auth setup error:', error);
-        setLoading(false);
-        navigate('/auth');
       }
     };
 
     setupAuth();
+    
+    // Cleanup function
+    return () => {
+      console.log('Dashboard: Cleaning up auth setup');
+      mounted = false;
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
+    };
   }, [navigate]);
 
   const fetchProfileData = async (userId: string) => {
     try {
-      setLoading(true);
+      console.log('Dashboard: Fetching profile data for user', userId);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -90,10 +113,11 @@ const Dashboard: React.FC = () => {
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error);
+        console.error('Dashboard: Error fetching profile:', error);
         return;
       }
 
+      console.log('Dashboard: Profile data fetched:', data);
       setProfile(data);
 
       if (data.role === 'owner' || data.role === 'admin') {
@@ -115,36 +139,36 @@ const Dashboard: React.FC = () => {
           setInviteUrl(`${baseUrl}/join/invite-code-placeholder`);
         }
       }
-      
-      setLoading(false);
     } catch (error) {
-      console.error('Error:', error);
-      setLoading(false);
+      console.error('Dashboard: Error fetching data:', error);
     }
   };
 
   const fetchTeamMembers = async (companyId: string) => {
     try {
+      console.log('Dashboard: Fetching team members for company', companyId);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('company_id', companyId);
 
       if (error) {
-        console.error('Error fetching team members:', error);
+        console.error('Dashboard: Error fetching team members:', error);
         return;
       }
 
+      console.log('Dashboard: Team members fetched:', data?.length || 0);
       setTeamMembers(data || []);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Dashboard: Error:', error);
     }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+        <div className="text-white text-xl">Loading dashboard...</div>
       </div>
     );
   }

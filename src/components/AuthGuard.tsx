@@ -117,54 +117,71 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
   useEffect(() => {
     console.log("AuthGuard: Component mounted");
     let isMounted = true;
+    let authTimeout: NodeJS.Timeout | null = null;
+    let authSubscription: { unsubscribe: () => void } | null = null;
     
     // Set a safety timeout to prevent getting stuck in loading
-    const safetyTimeout = setTimeout(() => {
+    authTimeout = setTimeout(() => {
       if (isMounted && isLoading) {
-        console.error("AuthGuard: Safety timeout triggered after 10 seconds");
+        console.error("AuthGuard: Safety timeout triggered after 5 seconds");
         setIsLoading(false);
         setAuthError("Verification timed out. Please try refreshing.");
       }
-    }, 10000);
+    }, 5000); // Reduced from 10s to 5s
     
     // Initial auth check
     checkAuth();
     
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("AuthGuard: Auth state changed:", event);
       
       if (!isMounted) return;
       
-      if (event === 'SIGNED_IN') {
-        checkAuth();
-      } else if (event === 'SIGNED_OUT') {
+      // Directly handle sign out
+      if (event === 'SIGNED_OUT') {
         setIsAuthorized(false);
         navigate('/auth');
+        return;
+      }
+      
+      // For other events, use setTimeout to avoid potential deadlocks
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        setTimeout(() => {
+          if (isMounted) checkAuth();
+        }, 0);
       }
     });
+    
+    authSubscription = data.subscription;
     
     // Clean up
     return () => {
       console.log("AuthGuard: Component unmounted");
       isMounted = false;
-      clearTimeout(safetyTimeout);
-      subscription.unsubscribe();
+      
+      if (authTimeout) {
+        clearTimeout(authTimeout);
+      }
+      
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
     };
   }, [navigate, requiredRole]);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-          <p className="text-sm text-muted-foreground">Verifying access...</p>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500">
+        <div className="flex flex-col items-center gap-3 bg-white/10 p-6 rounded-lg shadow-lg border border-white/20">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+          <p className="text-sm text-white font-medium">Verifying access...</p>
           {authError && (
-            <p className="text-sm text-red-500">{authError}</p>
+            <p className="text-sm text-red-300 mt-2">{authError}</p>
           )}
           <button 
             onClick={handleRefresh} 
-            className="mt-4 px-4 py-2 text-sm flex items-center gap-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+            className="mt-4 px-4 py-2 text-sm flex items-center gap-2 bg-white/20 text-white rounded-md hover:bg-white/30 transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
             Refresh
