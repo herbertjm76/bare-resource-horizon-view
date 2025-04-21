@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
@@ -45,66 +46,40 @@ export const AppHeader: React.FC = () => {
     >
       <h1 
         className="flex items-center text-[2.5rem] sm:text-[3.25rem] font-black select-none leading-none"
-        aria-label="Bare Resource"
+        aria-label="BareResource"
         style={{
           lineHeight: 1.1,
-          letterSpacing: "0.5px",
+          letterSpacing: "0.5px"
         }}
       >
         <span
+          className="bare-logo-shadow"
           style={{
             color: "white",
-            WebkitTextStroke: "0.3px black",
-            textShadow: `
-              0px 1px 0 black,
-              1px 0px 0 black,
-              0px -1px 0 black,
-              -1px 0px 0 black,
-              0.5px 1.5px 1px black,
-              1.5px 0.5px 1px black,
-              -0.5px -1.5px 1px black,
-              -1.5px -0.5px 1px black
-            `,
+            WebkitTextStroke: "0.3px #cccccc",
+            textShadow: "0 4px 18px rgba(40,40,76,0.18)",
             fontWeight: 900,
             letterSpacing: "0.5px",
             display: "inline-block",
+            marginRight: 0,      // No space between Bare and Resource
           }}
         >
           Bare
         </span>
         <span
-          className="font-extrabold"
+          className="bare-logo-shadow"
           style={{
-            marginLeft: 0,
-            background: "none",
+            background: "linear-gradient(90deg, #7c52a0 0%, #5863a9 45%, #5a7eb7 65%, #c153bd 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            WebkitTextStroke: "0.3px #cccccc",
+            textShadow: "0 4px 18px rgba(40,40,76,0.18)",
+            fontWeight: 900,
+            letterSpacing: "0.5px",
             display: "inline-block",
           }}
         >
-          <span
-            style={{
-              background: "linear-gradient(90deg,#6C4AB6 0%,#4D7AD8 35%,#D450C2 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              WebkitTextStroke: "0.3px black",
-              textShadow: `
-                0px 1px 0 black,
-                1px 0px 0 black,
-                0px -1px 0 black,
-                -1px 0px 0 black,
-                0.5px 1.5px 1px black,
-                1.5px 0.5px 1px black,
-                -0.5px -1.5px 1px black,
-                -1.5px -0.5px 1px black
-              `,
-              fontWeight: 900,
-              fontSize: "inherit",
-              letterSpacing: "0.5px",
-              display: "inline-block",
-            }}
-            className="leading-none"
-          >
-            Resource
-          </span>
+          Resource
         </span>
       </h1>
       <div className="flex items-center gap-4">

@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -94,4 +93,16 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* 
+ * BareResource logo shadow effect utility for consistent branding
+ * Usage: className="bare-logo-shadow"
+ */
+.bare-logo-shadow {
+  /* For both light and dark, strong blurred shadow effect */
+  text-shadow:
+    0 4px 18px rgba(40,40,76,0.18),
+    1px 0px 4px rgba(60,60,100,0.15);
+  /* Ensures the shadow is smooth and soft like the PNG */
 }
