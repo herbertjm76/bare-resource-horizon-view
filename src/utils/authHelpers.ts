@@ -1,5 +1,9 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
+
+// Define user role type to match the database enum
+type UserRole = Database['public']['Enums']['user_role'];
 
 /**
  * Ensures a user profile exists or creates one if it doesn't
@@ -44,8 +48,12 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
     const metaData = user?.user_metadata || {};
     console.log('User metadata for profile creation:', metaData);
     
-    // Ensure role is always a valid string value
-    const role = userData?.role || metaData.role || 'member';
+    // Ensure role is always a valid UserRole enum value
+    const userRole: UserRole = (userData?.role || metaData.role || 'member') as UserRole;
+    
+    // Make sure the role is one of the valid enum values
+    const validRoles: UserRole[] = ['owner', 'admin', 'member'];
+    const role: UserRole = validRoles.includes(userRole) ? userRole : 'member';
     
     const profileData = {
       id: userId,
@@ -53,7 +61,7 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
       first_name: userData?.firstName || metaData.first_name,
       last_name: userData?.lastName || metaData.last_name,
       company_id: userData?.companyId || metaData.company_id,
-      role: role
+      role
     };
     
     console.log('Creating profile with data:', profileData);

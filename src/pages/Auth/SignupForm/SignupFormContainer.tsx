@@ -9,6 +9,10 @@ import OwnerInfoFields from "./OwnerInfoFields";
 import CompanyInfoFields from "./CompanyInfoFields";
 import { emptyCompany, CompanyFormData } from '../companyHelpers';
 import { ensureUserProfile } from '@/utils/authHelpers';
+import { Database } from '@/integrations/supabase/types';
+
+// Define the specific user role type to match Supabase's enum
+type UserRole = Database['public']['Enums']['user_role'];
 
 interface SignupFormContainerProps {
   onSwitchToLogin: () => void;
@@ -119,7 +123,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
             first_name: ownerFirstName,
             last_name: ownerLastName,
             company_id: companyData.id,
-            role: 'owner'
+            role: 'owner' as UserRole
           }
         }
       });
@@ -146,7 +150,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         first_name: ownerFirstName,
         last_name: ownerLastName,
         company_id: companyData.id,
-        role: 'owner'
+        role: 'owner' as UserRole
       };
 
       // First try insert
