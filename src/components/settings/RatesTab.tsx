@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -91,10 +90,10 @@ export const RatesTab = () => {
         setRates(
           (ratesData || []).map((rate) => ({
             id: rate.id,
-            type: rate.type,
+            type: rate.type as "role" | "location",
             reference_id: rate.reference_id,
             value: rate.value,
-            unit: rate.unit
+            unit: rate.unit as "hour" | "day" | "week"
           }))
         );
       }
@@ -409,4 +408,3 @@ export const RatesTab = () => {
     </Card>
   );
 };
-// File is above 290 lines. This file is getting too long! If you’d like, ask me to refactor it for better maintainability.
