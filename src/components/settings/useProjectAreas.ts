@@ -5,13 +5,14 @@ import { useToast } from "@/hooks/use-toast";
 import allCountries from "@/lib/allCountries.json";
 import { getContinentByCountryCode } from './projectAreaHelpers';
 
-// Types that match the office_areas table in Supabase
-export type OfficeAreaRow = {
+// Types that match the office_locations table in Supabase
+export type LocationRow = {
   id: string;
+  city: string;
+  country: string;
   code: string;
-  name: string;
-  created_at: string;
   emoji: string | null;
+  created_at: string;
   updated_at: string;
 };
 
@@ -32,7 +33,7 @@ export type ProjectAreaFormValues = {
   region: string;
 };
 
-// Helper: given a country name (as stored in "name"), find the region
+// Helper: given a country name, find the region
 function getAutoRegion(country: string): string {
   const countryData = allCountries.find((c) => c.name === country);
   if (countryData) {
@@ -42,13 +43,13 @@ function getAutoRegion(country: string): string {
 }
 
 // Helper: convert from DB row to ProjectArea
-function toProjectArea(area: OfficeAreaRow): ProjectArea {
+function toProjectArea(location: LocationRow): ProjectArea {
   return {
-    id: area.id,
-    code: area.code,
-    city: "", // The table doesn't have city
-    region: getAutoRegion(area.name),
-    country: area.name,
+    id: location.id,
+    code: location.code,
+    city: location.city,
+    region: getAutoRegion(location.country),
+    country: location.country,
   };
 }
 
@@ -66,7 +67,7 @@ export default function useProjectAreas() {
     const fetchAreas = async () => {
       try {
         const { data, error } = await supabase
-          .from("office_areas")
+          .from("office_locations")
           .select("*")
           .order("created_at", { ascending: true });
 
@@ -99,15 +100,17 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
     try {
-      const areaData = {
+      // Match the structure of the office_locations table
+      const locationData = {
         code: values.code,
-        name: values.country,
+        country: values.country,
+        city: values.city || "",
         emoji: null,
       };
 
       const { data, error } = await supabase
-        .from("office_areas")
-        .insert(areaData)
+        .from("office_locations")
+        .insert(locationData)
         .select()
         .single();
 
@@ -120,7 +123,7 @@ export default function useProjectAreas() {
         });
       }
       if (data) {
-        setAreas(old => [...old, toProjectArea(data as OfficeAreaRow)]);
+        setAreas(old => [...old, toProjectArea(data as LocationRow)]);
         toast({
           title: "Success",
           description: "Area added successfully.",
@@ -144,21 +147,22 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
     try {
-      const areaData = {
+      const locationData = {
         code: values.code,
-        name: values.country,
+        country: values.country,
+        city: values.city || "",
       };
 
       const { error } = await supabase
-        .from("office_areas")
-        .update(areaData)
+        .from("office_locations")
+        .update(locationData)
         .eq("id", id);
 
       if (error) {
-        setError("Failed to save area.");
+        setError("Failed to update area.");
         toast({
           title: "Error",
-          description: error?.message || "Failed to save the area. Please try again.",
+          description: error?.message || "Failed to update the area. Please try again.",
           variant: "destructive"
         });
       } else {
@@ -170,7 +174,7 @@ export default function useProjectAreas() {
                   code: values.code,
                   country: values.country,
                   region: getAutoRegion(values.country),
-                  city: values.city ?? ""
+                  city: values.city || ""
                 }
               : area
           )
@@ -199,7 +203,7 @@ export default function useProjectAreas() {
     setError(null);
     try {
       const { error } = await supabase
-        .from("office_areas")
+        .from("office_locations")
         .delete()
         .in("id", ids);
 
@@ -241,4 +245,3 @@ export default function useProjectAreas() {
 }
 
 export { getAutoRegion };
-
