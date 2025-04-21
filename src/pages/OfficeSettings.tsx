@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,8 +23,29 @@ const tabBarClass =
 const HEADER_HEIGHT = 56;
 
 const OfficeSettings = () => {
-  const { company, loading: companyLoading, refreshCompany } = useCompany();
+  const { company, loading: companyLoading, refreshCompany, isSubdomainMode } = useCompany();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!companyLoading && company && !isSubdomainMode) {
+      const subdomain = company.subdomain;
+      if (subdomain) {
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const baseDomain = isLocalhost ? 'localhost:8080' : 'bareresource.com';
+        const protocol = window.location.protocol;
+        
+        let subdomainUrl;
+        if (isLocalhost) {
+          subdomainUrl = `${protocol}//${baseDomain}${window.location.pathname}?subdomain=${subdomain}`;
+        } else {
+          subdomainUrl = `${protocol}//${subdomain}.${baseDomain}${window.location.pathname}`;
+        }
+        
+        console.log(`Redirecting to company subdomain: ${subdomainUrl}`);
+        window.location.href = subdomainUrl;
+      }
+    }
+  }, [company, companyLoading, isSubdomainMode]);
 
   React.useEffect(() => {
     if (!companyLoading && !company) {
@@ -37,15 +57,11 @@ const OfficeSettings = () => {
     <AuthGuard requiredRole={['owner', 'admin']}>
       <SidebarProvider>
         <div className="w-full min-h-screen flex flex-row">
-          {/* Sidebar in first column */}
           <div className="flex-shrink-0">
             <DashboardSidebar />
           </div>
-          {/* Main content in second column */}
           <div className="flex-1 flex flex-col">
-            {/* Header only in main column */}
             <AppHeader />
-            {/* Spacer for header height */}
             <div style={{ height: HEADER_HEIGHT }} />
             <div className="flex-1 p-2 sm:p-8 bg-background">
               <div className="max-w-6xl mx-auto space-y-8">

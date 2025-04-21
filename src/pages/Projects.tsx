@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { ProjectsList } from '@/components/projects/ProjectsList';
@@ -13,8 +13,35 @@ import AuthGuard from '@/components/AuthGuard';
 const HEADER_HEIGHT = 56; // Should match AppHeader minHeight
 
 const Projects = () => {
-  const { company, loading: companyLoading, refreshCompany } = useCompany();
+  const { company, loading: companyLoading, refreshCompany, isSubdomainMode } = useCompany();
   const navigate = useNavigate();
+
+  // Effect to redirect to the company subdomain if not in subdomain mode
+  useEffect(() => {
+    if (!companyLoading && company && !isSubdomainMode) {
+      const subdomain = company.subdomain;
+      if (subdomain) {
+        // Build the subdomain URL - for production
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const baseDomain = isLocalhost ? 'localhost:8080' : 'bareresource.com';
+        const protocol = window.location.protocol;
+        
+        // Create the subdomain URL
+        let subdomainUrl;
+        if (isLocalhost) {
+          // For development - use query param
+          subdomainUrl = `${protocol}//${baseDomain}${window.location.pathname}?subdomain=${subdomain}`;
+        } else {
+          // For production - use actual subdomain
+          subdomainUrl = `${protocol}//${subdomain}.${baseDomain}${window.location.pathname}`;
+        }
+        
+        // Redirect to the subdomain URL
+        console.log(`Redirecting to company subdomain: ${subdomainUrl}`);
+        window.location.href = subdomainUrl;
+      }
+    }
+  }, [company, companyLoading, isSubdomainMode]);
 
   return (
     <AuthGuard>

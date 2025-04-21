@@ -8,12 +8,14 @@ type CompanyContextType = {
   loading: boolean;
   subdomain: string | null;
   refreshCompany: () => Promise<void>;
+  isSubdomainMode: boolean;
 };
 
 const CompanyContext = createContext<CompanyContextType>({
   company: null,
   loading: true,
   subdomain: null,
+  isSubdomainMode: false,
   refreshCompany: async () => {},
 });
 
@@ -23,6 +25,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [company, setCompany] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [subdomain, setSubdomain] = useState<string | null>(null);
+  const [isSubdomainMode, setIsSubdomainMode] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
 
   // Extract subdomain from current hostname
@@ -44,8 +47,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // For production/deployed version
     const hostParts = hostname.split('.');
     // Check if it's likely a subdomain (e.g., company.bareresource.com)
-    if (hostParts.length > 2 && hostParts[1] === 'bareresource') {
-      return hostParts[0];
+    if (hostParts.length > 2) {
+      if (hostParts[1] === 'bareresource') {
+        return hostParts[0];
+      }
+      // Handle custom domains like company.lovable.app
+      if (hostParts[1] === 'lovable' && hostParts[2] === 'app') {
+        return hostParts[0];
+      }
     }
     
     return null;
@@ -61,13 +70,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .single();
 
       if (error) {
-        console.error('Error fetching company:', error);
+        console.error('Error fetching company by subdomain:', error);
         setCompany(null);
       } else {
+        console.log('Company data fetched by subdomain:', data);
         setCompany(data);
       }
     } catch (error) {
-      console.error('Error in company data fetch:', error);
+      console.error('Error in company data fetch by subdomain:', error);
       setCompany(null);
     } finally {
       setLoading(false);
@@ -108,13 +118,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .single();
         
       if (companyError) {
-        console.error('Error fetching company:', companyError);
+        console.error('Error fetching company by user profile:', companyError);
         setCompany(null);
       } else {
+        console.log('Company data fetched by user profile:', companyData);
         setCompany(companyData);
       }
     } catch (error) {
-      console.error('Error in company data fetch:', error);
+      console.error('Error in company data fetch by user profile:', error);
       setCompany(null);
     } finally {
       setLoading(false);
@@ -126,8 +137,10 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setSubdomain(currentSubdomain);
     
     if (currentSubdomain) {
+      setIsSubdomainMode(true);
       await fetchCompanyData(currentSubdomain);
     } else {
+      setIsSubdomainMode(false);
       await fetchUserCompany();
     }
   };
@@ -159,8 +172,12 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setSubdomain(currentSubdomain);
       
       if (currentSubdomain) {
+        console.log("Subdomain detected:", currentSubdomain);
+        setIsSubdomainMode(true);
         await fetchCompanyData(currentSubdomain);
       } else {
+        console.log("No subdomain detected, using user profile");
+        setIsSubdomainMode(false);
         await fetchUserCompany();
       }
       setAuthChecked(true);
@@ -169,8 +186,25 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     loadInitialData();
   }, []);
 
+  // For debugging in development
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log({
+        company: company ? company.name : 'No company',
+        subdomain,
+        isSubdomainMode
+      });
+    }
+  }, [company, subdomain, isSubdomainMode]);
+
   return (
-    <CompanyContext.Provider value={{ company, loading, subdomain, refreshCompany }}>
+    <CompanyContext.Provider value={{ 
+      company, 
+      loading, 
+      subdomain, 
+      isSubdomainMode,
+      refreshCompany 
+    }}>
       {children}
     </CompanyContext.Provider>
   );
