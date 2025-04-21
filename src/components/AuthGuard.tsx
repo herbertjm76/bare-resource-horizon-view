@@ -1,36 +1,44 @@
+import { useEffect, useState } from 'react';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useRouter } from 'next/router';
 
-import React from 'react';
-import { useAuthorization } from '@/hooks/useAuthorization';
-import { Loader2 } from 'lucide-react';
+const AuthGuard = ({ children }: { children: React.ReactNode }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const session = useSession();
+  const supabase = useSupabaseClient();
+  const router = useRouter();
+  const user = session?.user;
 
-type UserRole = 'owner' | 'admin' | 'member';
+  useEffect(() => {
+    const checkAuth = async () => {
+      setIsLoading(true);
 
-interface AuthGuardProps {
-  children: React.ReactNode;
-  requiredRole?: UserRole | UserRole[];
-  redirectTo?: string;
-  companyId?: string;
-}
+      if (!user) {
+        router.push('/auth');
+      } else {
+        // Add this additional code to ensure profile exists
+        if (user && user.id) {
+          import('@/utils/authHelpers').then(({ ensureUserProfile }) => {
+            ensureUserProfile(user.id).then((success) => {
+              if (!success) {
+                console.warn('Failed to ensure user profile exists');
+              }
+            });
+          });
+        }
+      }
 
-export const AuthGuard: React.FC<AuthGuardProps> = ({
-  children,
-  requiredRole = 'member',
-  redirectTo = '/dashboard',
-  companyId,
-}) => {
-  const { loading, isAuthorized } = useAuthorization({
-    requiredRole,
-    redirectTo,
-    companyId,
-  });
+      setIsLoading(false);
+    };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 text-white animate-spin" />
-      </div>
-    );
+    checkAuth();
+  }, [user, router]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
-  return isAuthorized ? <>{children}</> : null;
+  return <>{children}</>;
 };
+
+export default AuthGuard;

@@ -27,6 +27,63 @@ const Join: React.FC = () => {
     }
   }, [company]);
 
+  const createUserProfile = async (userId: string, userData: any) => {
+    console.log(`Creating profile for user ${userId} with data:`, userData);
+    
+    try {
+      // Check if profile already exists
+      const { data: existingProfile, error: checkError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+      
+      if (!checkError && existingProfile) {
+        console.log('Profile already exists:', existingProfile);
+        return true;
+      }
+      
+      // Create profile with direct insert
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+          id: userId,
+          email: userData.email,
+          first_name: userData.firstName,
+          last_name: userData.lastName,
+          company_id: userData.companyId,
+          role: userData.role || 'member'
+        });
+      
+      if (insertError) {
+        console.error('Profile insert error:', insertError);
+        
+        // Try upsert as fallback
+        const { error: upsertError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: userId,
+            email: userData.email,
+            first_name: userData.firstName,
+            last_name: userData.lastName,
+            company_id: userData.companyId,
+            role: userData.role || 'member'
+          });
+          
+        if (upsertError) {
+          console.error('Profile upsert error:', upsertError);
+          return false;
+        }
+      }
+      
+      console.log('Profile created successfully for user:', userId);
+      return true;
+    } catch (error) {
+      console.error('Error in profile creation process:', error);
+      return false;
+    }
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -64,66 +121,22 @@ const Join: React.FC = () => {
 
         console.log('User created successfully:', data.user?.id);
 
-        // Add an additional manual profile creation as backup
+        // Ensure profile is created for this user
         if (data.user) {
-          try {
-            // Wait a moment to allow the trigger to work first
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            console.log('Checking if profile was created by trigger...');
-            
-            // Check if profile exists first
-            const { data: existingProfile, error: checkError } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', data.user.id)
-              .single();
-            
-            if (checkError) {
-              console.log('Profile check error (might be normal if not created yet):', checkError);
-              
-              // If no profile exists, create one
-              console.log('Creating profile manually...');
-              const { error: profileError } = await supabase
-                .from('profiles')
-                .upsert({
-                  id: data.user.id,
-                  email,
-                  first_name: firstName,
-                  last_name: lastName,
-                  company_id: company?.id,
-                  role: 'member'
-                });
-
-              if (profileError) {
-                console.error('Profile creation error:', profileError);
-                
-                // One more attempt with some delay
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                const { error: retryError } = await supabase
-                  .from('profiles')
-                  .upsert({
-                    id: data.user.id,
-                    email,
-                    first_name: firstName,
-                    last_name: lastName,
-                    company_id: company?.id,
-                    role: 'member'
-                  });
-                  
-                if (retryError) {
-                  console.error('Final profile creation attempt failed:', retryError);
-                } else {
-                  console.log('Profile created on final retry!');
-                }
-              } else {
-                console.log('Profile created successfully on first manual attempt');
-              }
-            } else {
-              console.log('Profile already exists, created by trigger:', existingProfile);
-            }
-          } catch (profileCheckError) {
-            console.error('Error in profile creation process:', profileCheckError);
+          // Wait a moment to allow the DB trigger to work first
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Attempt manual profile creation as a backup
+          const profileCreated = await createUserProfile(data.user.id, {
+            email,
+            firstName,
+            lastName,
+            companyId: company?.id,
+            role: 'member'
+          });
+          
+          if (!profileCreated) {
+            console.warn('Warning: Could not verify profile creation. The user may need to update their profile later.');
           }
           
           toast.success('Account created successfully! Please check your email for verification.');
