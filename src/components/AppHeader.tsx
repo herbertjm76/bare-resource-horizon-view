@@ -1,6 +1,6 @@
+
 import React from "react";
 import { useCompany } from "@/context/CompanyContext";
-import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -48,15 +48,16 @@ export const AppHeader: React.FC = () => {
         className="text-2xl font-bold tracking-tight select-none" 
         aria-label="Bare Resource"
       >
-        {/* White text with black stroke, no shadow */}
+        {/* White text with crisp black outline and no overlap */}
         <span 
           className="relative text-white"
           style={{
-            WebkitTextStroke: '0.8px black',
+            // Multi-directional thin shadow for smooth black outline
+            textShadow:
+              "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
             letterSpacing: '0.5px',
-            color: 'white',  // ensure text remains white
-            // Remove any shadows to keep only stroke
-            textShadow: 'none',
+            color: 'white',
+            WebkitTextStroke: "none",
           }}
         >
           Bare
@@ -95,3 +96,4 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
+
