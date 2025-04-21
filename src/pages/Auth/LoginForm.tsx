@@ -42,7 +42,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
       if (error) {
         console.error('Login error:', error.message);
         
-        // Handle specific error cases
         if (error.message.includes('Email not confirmed')) {
           setErrorMessage('Please confirm your email before logging in. Check your inbox for a confirmation link.');
           toast.error('Please confirm your email before logging in');
@@ -53,6 +52,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
           setErrorMessage(error.message);
           toast.error(error.message || 'Login failed');
         }
+        setLoading(false);
         return;
       }
       
@@ -60,12 +60,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
         console.error('No session returned after login');
         setErrorMessage('Login failed. Please try again.');
         toast.error('Login failed. Please try again.');
+        setLoading(false);
         return;
       }
       
       console.log('Login successful, user:', data.user?.id);
       toast.success('Login successful!');
-      navigate('/dashboard');
+      
+      // Important: Wait a moment before navigating to ensure session is properly set
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 500);
     } catch (error: any) {
       console.error('Unexpected error during login:', error);
       setErrorMessage(error.message || 'An unexpected error occurred');
@@ -159,6 +164,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
       >
         {loading ? 'Logging in...' : 'Log In'}
       </Button>
+      
+      <div className="text-center">
+        <button
+          type="button"
+          onClick={onSwitchToSignup}
+          className="underline text-white font-medium hover:text-pink-200 focus:outline-none bg-transparent border-none p-0 m-0 text-sm"
+        >
+          Need an account? Sign up
+        </button>
+      </div>
     </form>
   );
 };

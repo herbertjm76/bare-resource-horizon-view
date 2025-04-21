@@ -44,30 +44,36 @@ const Auth: React.FC = () => {
         
         if (error) {
           console.error('Session check error:', error);
+          setIsCheckingSession(false);
           return;
         }
         
         if (data.session) {
           console.log('User already logged in, redirecting to dashboard');
           navigate('/dashboard');
+        } else {
+          console.log('No active session found');
+          setIsCheckingSession(false);
         }
       } catch (err) {
         console.error('Error checking session:', err);
-      } finally {
         setIsCheckingSession(false);
       }
     };
     
-    checkSession();
-    
-    // Listen for auth state changes
+    // First set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event);
+      
       if (event === 'SIGNED_IN' && session) {
+        console.log('User signed in, redirecting to dashboard');
         toast.success('Successfully signed in!');
         navigate('/dashboard');
       }
     });
+    
+    // Then check for existing session
+    checkSession();
     
     return () => {
       subscription.unsubscribe();
@@ -156,44 +162,6 @@ const Auth: React.FC = () => {
             }}
           />
         )}
-        
-        <div className="mt-6 text-center">
-          {isLogin ? (
-            <span className="text-white/80 text-sm">
-              Don&apos;t have an account?{" "}
-              <a
-                href="#"
-                onClick={e => {
-                  e.preventDefault(); 
-                  setIsLogin(false);
-                  setError(null);
-                  setShowConfigHelp(false);
-                }}
-                className="underline text-white font-medium hover:text-pink-200 focus:outline-none bg-transparent border-none p-0 m-0"
-                tabIndex={0}
-              >
-                Sign up
-              </a>
-            </span>
-          ) : (
-            <span className="text-white/80 text-sm">
-              Already have an account?{" "}
-              <a
-                href="#"
-                onClick={e => {
-                  e.preventDefault(); 
-                  setIsLogin(true);
-                  setError(null);
-                  setShowConfigHelp(false);
-                }}
-                className="underline text-white font-medium hover:text-blue-200 focus:outline-none bg-transparent border-none p-0 m-0"
-                tabIndex={0}
-              >
-                Log in
-              </a>
-            </span>
-          )}
-        </div>
       </div>
     </div>
   );

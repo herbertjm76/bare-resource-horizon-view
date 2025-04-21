@@ -33,21 +33,35 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const setupAuth = async () => {
       try {
+        // Set up auth state change listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           console.log('Auth state changed:', event);
+          
+          // Set session data
           setSession(session);
           setUser(session?.user ?? null);
           
-          if (!session && event === 'SIGNED_OUT') {
+          if (event === 'SIGNED_OUT') {
+            // Redirect if signed out
             navigate('/auth');
           }
         });
 
+        // Check for existing session
         const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          console.log('No session found, redirecting to login');
+          setLoading(false);
+          navigate('/auth');
+          return;
+        }
+        
+        console.log('Session found, user is logged in:', session.user.id);
         setSession(session);
-        setUser(session?.user ?? null);
+        setUser(session.user);
 
-        if (session?.user) {
+        if (session.user) {
           await fetchProfileData(session.user.id);
         }
         
@@ -59,6 +73,7 @@ const Dashboard: React.FC = () => {
       } catch (error) {
         console.error('Auth setup error:', error);
         setLoading(false);
+        navigate('/auth');
       }
     };
 
@@ -134,10 +149,6 @@ const Dashboard: React.FC = () => {
     );
   }
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
   return (
     <AuthGuard>
       <SidebarProvider>
@@ -149,7 +160,7 @@ const Dashboard: React.FC = () => {
               <div style={{ height: HEADER_HEIGHT }} />
               <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
                 <div className="max-w-6xl mx-auto">
-                  <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
+                  <DashboardHeader userName={profile?.first_name || user?.email?.split('@')[0] || 'User'} />
                   <DashboardMetrics />
                   {(profile?.role === 'owner' || profile?.role === 'admin') && (
                     <TeamManagement 
