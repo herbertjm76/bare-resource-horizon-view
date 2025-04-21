@@ -12,8 +12,8 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => (
     <div className="flex items-center justify-center w-full">
       <span className={`text-2xl font-bold select-none whitespace-nowrap ${collapsed ? 'w-8 h-8' : ''}`}>
         {collapsed ? (
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#6e5af1] text-white text-sm">
-            BR
+          <span className="flex items-center justify-center w-8 h-8 rounded-full">
+            <ChevronRight className="h-6 w-6 text-white" />
           </span>
         ) : (
           <>
