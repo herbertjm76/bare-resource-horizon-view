@@ -1,5 +1,6 @@
 
 import { Link } from 'react-router-dom';
+import { AppHeader } from '@/components/AppHeader';
 
 const HEADER_HEIGHT = 56; // px ~ height of AppHeader with padding
 
@@ -13,7 +14,8 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500">
-      {/* Removed the separate navigation bar with menu Items for Features, Pricing, etc. */}
+      {/* Add header to homepage */}
+      <AppHeader />
       
       {/* Hero Section */}
       <div className="relative overflow-hidden" style={{ paddingTop: `${HEADER_HEIGHT + 16}px` }}>
@@ -283,4 +285,3 @@ const Index = () => {
 };
 
 export default Index;
-
