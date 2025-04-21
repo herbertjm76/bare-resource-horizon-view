@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCompany } from '@/context/CompanyContext';
+import { ensureUserProfile } from '@/utils/authHelpers';
 
 const Join: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -26,63 +27,6 @@ const Join: React.FC = () => {
       setCompanyName(company.name);
     }
   }, [company]);
-
-  const createUserProfile = async (userId: string, userData: any) => {
-    console.log(`Creating profile for user ${userId} with data:`, userData);
-    
-    try {
-      // Check if profile already exists
-      const { data: existingProfile, error: checkError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-      
-      if (!checkError && existingProfile) {
-        console.log('Profile already exists:', existingProfile);
-        return true;
-      }
-      
-      // Create profile with direct insert
-      const { error: insertError } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          email: userData.email,
-          first_name: userData.firstName,
-          last_name: userData.lastName,
-          company_id: userData.companyId,
-          role: userData.role || 'member'
-        });
-      
-      if (insertError) {
-        console.error('Profile insert error:', insertError);
-        
-        // Try upsert as fallback
-        const { error: upsertError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: userId,
-            email: userData.email,
-            first_name: userData.firstName,
-            last_name: userData.lastName,
-            company_id: userData.companyId,
-            role: userData.role || 'member'
-          });
-          
-        if (upsertError) {
-          console.error('Profile upsert error:', upsertError);
-          return false;
-        }
-      }
-      
-      console.log('Profile created successfully for user:', userId);
-      return true;
-    } catch (error) {
-      console.error('Error in profile creation process:', error);
-      return false;
-    }
-  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,11 +67,11 @@ const Join: React.FC = () => {
 
         // Ensure profile is created for this user
         if (data.user) {
-          // Wait a moment to allow the DB trigger to work first
+          // Wait briefly to allow database trigger to work
           await new Promise(resolve => setTimeout(resolve, 1000));
           
           // Attempt manual profile creation as a backup
-          const profileCreated = await createUserProfile(data.user.id, {
+          const profileCreated = await ensureUserProfile(data.user.id, {
             email,
             firstName,
             lastName,
@@ -137,6 +81,8 @@ const Join: React.FC = () => {
           
           if (!profileCreated) {
             console.warn('Warning: Could not verify profile creation. The user may need to update their profile later.');
+          } else {
+            console.log('Profile created or verified successfully');
           }
           
           toast.success('Account created successfully! Please check your email for verification.');
@@ -158,9 +104,17 @@ const Join: React.FC = () => {
           .eq('id', data.user.id)
           .single();
 
-        if (profileError) throw profileError;
-
-        if (profile.company_id !== company?.id) {
+        if (profileError) {
+          // If profile doesn't exist, try to create it
+          const profileCreated = await ensureUserProfile(data.user.id, {
+            email,
+            companyId: company?.id
+          });
+          
+          if (!profileCreated) {
+            throw new Error('Could not verify your account. Please contact support.');
+          }
+        } else if (profile.company_id !== company?.id) {
           await supabase.auth.signOut();
           throw new Error('You are not a member of this company.');
         }

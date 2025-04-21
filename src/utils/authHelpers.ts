@@ -6,27 +6,32 @@ import { supabase } from '@/integrations/supabase/client';
  * This can be called whenever a user's auth state is verified
  */
 export const ensureUserProfile = async (userId: string, userData?: any) => {
-  if (!userId) return false;
+  if (!userId) {
+    console.error('Cannot ensure profile: No user ID provided');
+    return false;
+  }
+  
+  console.log('Ensuring profile exists for user:', userId);
   
   try {
-    // Check if profile exists
+    // First check if profile exists
     const { data: existingProfile, error: checkError } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .maybeSingle();
+      .single();
+    
+    if (checkError) {
+      console.log('Profile check error (expected if not exists):', checkError.message);
+    }
     
     // If profile exists, we're good
     if (existingProfile) {
-      console.log('User profile exists:', existingProfile.id);
+      console.log('User profile already exists:', existingProfile.id);
       return true;
     }
     
-    // If no profile and no user data, we can't create one
-    if (!userData) {
-      console.error('Cannot create profile: No user data provided and no existing profile found');
-      return false;
-    }
+    console.log('Profile not found, attempting to create');
     
     // Get user data from auth if available
     const { data: authData, error: authError } = await supabase.auth.getUser();
@@ -35,18 +40,23 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
       console.error('Error getting auth user data:', authError);
     }
     
-    // Merge metadata from auth with provided userData
+    // Combine provided userData with auth metadata
+    const userEmail = userData?.email || authData?.user?.email;
     const metaData = authData?.user?.user_metadata || {};
+    console.log('User metadata for profile creation:', metaData);
+    
     const profileData = {
       id: userId,
-      email: userData.email || authData?.user?.email,
-      first_name: userData.firstName || metaData.first_name,
-      last_name: userData.lastName || metaData.last_name,
-      company_id: userData.companyId || metaData.company_id,
-      role: userData.role || metaData.role || 'member'
+      email: userEmail,
+      first_name: userData?.firstName || metaData.first_name,
+      last_name: userData?.lastName || metaData.last_name,
+      company_id: userData?.companyId || metaData.company_id,
+      role: userData?.role || metaData.role || 'member'
     };
     
-    // Insert profile
+    console.log('Attempting to create profile with data:', profileData);
+    
+    // Try insert first
     const { error: insertError } = await supabase
       .from('profiles')
       .insert(profileData);
@@ -55,20 +65,35 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
       console.error('Profile insert error:', insertError);
       
       // Try with upsert as fallback
+      console.log('Trying upsert instead');
       const { error: upsertError } = await supabase
         .from('profiles')
         .upsert(profileData);
       
       if (upsertError) {
-        console.error('Profile upsert error:', upsertError);
+        console.error('Profile upsert also failed:', upsertError);
         return false;
       }
     }
     
     console.log('Profile created successfully for user:', userId);
+    
+    // Verify the profile was actually created
+    const { data: verifyProfile, error: verifyError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+      
+    if (verifyError || !verifyProfile) {
+      console.error('Profile verification failed after creation:', verifyError);
+      return false;
+    }
+    
+    console.log('Profile verified after creation:', verifyProfile.id);
     return true;
   } catch (error) {
-    console.error('Error in ensureUserProfile:', error);
+    console.error('Unexpected error in ensureUserProfile:', error);
     return false;
   }
 };

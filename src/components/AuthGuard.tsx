@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { ensureUserProfile } from '@/utils/authHelpers';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -17,54 +18,89 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     const checkAuth = async () => {
       setIsLoading(true);
 
-      // Check if user is authenticated
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        // User is not logged in, redirect to auth page
-        navigate('/auth');
-        return;
-      }
-
-      const user = session.user;
-
-      // If role check is required
-      if (requiredRole) {
-        // Get user profile to check role
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-
-        if (error || !profile) {
+      try {
+        // Check if user is authenticated
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          // User is not logged in, redirect to auth page
           navigate('/auth');
           return;
         }
 
-        // Check if user has required role
-        const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-        const hasRequiredRole = roles.includes(profile.role);
+        const user = session.user;
+        console.log("AuthGuard: User authenticated", user.id);
 
-        if (!hasRequiredRole) {
-          navigate('/dashboard');
-          return;
-        }
-      }
+        // If role check is required
+        if (requiredRole) {
+          // Get user profile to check role
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
 
-      // Add this additional code to ensure profile exists
-      if (user && user.id) {
-        import('@/utils/authHelpers').then(({ ensureUserProfile }) => {
-          ensureUserProfile(user.id).then((success) => {
-            if (!success) {
-              console.warn('Failed to ensure user profile exists');
+          if (error) {
+            console.error("Profile fetch error:", error);
+            
+            // Attempt to create profile if it doesn't exist
+            const profileCreated = await ensureUserProfile(user.id);
+            
+            if (!profileCreated) {
+              console.error("Could not create or find profile");
+              navigate('/auth');
+              return;
             }
-          });
-        });
-      }
+            
+            // Try again to get the profile after creating it
+            const { data: retryProfile, error: retryError } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('id', user.id)
+              .single();
+              
+            if (retryError || !retryProfile) {
+              console.error("Profile still not available after creation attempt");
+              navigate('/auth');
+              return;
+            }
+            
+            // Check required role with the newly created profile
+            const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+            const hasRequiredRole = roles.includes(retryProfile.role);
+            
+            if (!hasRequiredRole) {
+              console.log("User doesn't have required role", retryProfile.role, "needs", requiredRole);
+              navigate('/dashboard');
+              return;
+            }
+          } else if (!profile) {
+            console.error("No profile found and no error returned");
+            navigate('/auth');
+            return;
+          } else {
+            // Check if user has required role with existing profile
+            const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+            const hasRequiredRole = roles.includes(profile.role);
 
-      setIsAuthorized(true);
-      setIsLoading(false);
+            if (!hasRequiredRole) {
+              console.log("User doesn't have required role", profile.role, "needs", requiredRole);
+              navigate('/dashboard');
+              return;
+            }
+          }
+        } else {
+          // Even if no role is required, ensure profile exists
+          await ensureUserProfile(user.id);
+        }
+
+        setIsAuthorized(true);
+      } catch (error) {
+        console.error("AuthGuard error:", error);
+        navigate('/auth');
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     checkAuth();
@@ -74,7 +110,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     return <div>Loading...</div>;
   }
 
-  return <>{children}</>;
+  return isAuthorized ? <>{children}</> : null;
 };
 
 export default AuthGuard;

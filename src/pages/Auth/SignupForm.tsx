@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import OwnerInfoFields from "./SignupForm/OwnerInfoFields";
 import CompanyInfoFields from "./SignupForm/CompanyInfoFields";
 import { emptyCompany, CompanyFormData } from './companyHelpers';
+import { ensureUserProfile } from '@/utils/authHelpers';
 
 interface SignupFormProps {
   onSwitchToLogin: () => void;
@@ -73,6 +74,8 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
     }
 
     try {
+      console.log('Starting signup process');
+      
       // Create company first
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
@@ -89,7 +92,12 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
         .select()
         .single();
 
-      if (companyError) throw companyError;
+      if (companyError) {
+        console.error('Company creation error:', companyError);
+        throw companyError;
+      }
+
+      console.log('Company created:', companyData.id);
 
       // Now sign up user with profile metadata
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -105,44 +113,30 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
         }
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        console.error('Signup error:', signUpError);
+        throw signUpError;
+      }
 
-      // Manually ensure profile is created for this user
+      console.log('User signup successful:', signUpData.user?.id);
+
+      // Use our helper to ensure profile is created
       if (signUpData.user) {
-        // First check if profile already exists
-        const { data: existingProfile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', signUpData.user.id)
-          .single();
-          
-        if (!existingProfile) {
-          // Create profile if it doesn't exist
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: signUpData.user.id,
-              email: ownerEmail,
-              first_name: ownerFirstName,
-              last_name: ownerLastName,
-              company_id: companyData.id,
-              role: 'owner'
-            });
-
-          if (profileError) {
-            console.error("Profile creation error:", profileError);
-            // Try upsert as fallback
-            await supabase
-              .from('profiles')
-              .upsert({
-                id: signUpData.user.id,
-                email: ownerEmail,
-                first_name: ownerFirstName,
-                last_name: ownerLastName,
-                company_id: companyData.id,
-                role: 'owner'
-              });
-          }
+        // Wait briefly to allow database trigger to work
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const profileSuccess = await ensureUserProfile(signUpData.user.id, {
+          email: ownerEmail,
+          firstName: ownerFirstName,
+          lastName: ownerLastName,
+          companyId: companyData.id,
+          role: 'owner'
+        });
+        
+        console.log('Profile creation result:', profileSuccess);
+        
+        if (!profileSuccess) {
+          console.warn('Automated profile creation may have failed, manual fallback attempted');
         }
       }
 
