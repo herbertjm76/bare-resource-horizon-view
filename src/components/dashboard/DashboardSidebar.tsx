@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -124,7 +123,7 @@ export function DashboardSidebar() {
               <SidebarGroupLabel className="text-white/70 px-4 pt-6 pb-2">
                 {collapsed ? "" : section.label}
               </SidebarGroupLabel>
-              <SidebarGroupContent>
+              <SidebarContent>
                 <SidebarMenu>
                   {section.items.map((item) => {
                     const isActive = location.pathname === item.url;
@@ -156,7 +155,7 @@ export function DashboardSidebar() {
                     );
                   })}
                 </SidebarMenu>
-              </SidebarGroupContent>
+              </SidebarContent>
             </div>
           ))}
         </SidebarGroup>
