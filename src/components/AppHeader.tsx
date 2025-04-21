@@ -72,8 +72,6 @@ export const AppHeader: React.FC = () => {
             background: "linear-gradient(90deg, #7c52a0 0%, #5863a9 45%, #5a7eb7 65%, #c153bd 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
-            WebkitTextStroke: "0.3px #cccccc",
-            textShadow: "0 4px 18px rgba(40,40,76,0.18)",
             fontWeight: 900,
             letterSpacing: "0.5px",
             display: "inline-block",
