@@ -1,167 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useCompany } from '@/context/CompanyContext';
-import { ensureUserProfile } from '@/utils/authHelpers';
+import JoinForm from './JoinForm';
 
 const Join: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [companyName, setCompanyName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isSignup, setIsSignup] = useState(true);
-  const navigate = useNavigate();
   const { company } = useCompany();
   const { inviteCode } = useParams<{ inviteCode?: string }>();
 
   useEffect(() => {
-    // In a real app, the invite code would be validated against a table of invites
-    // For this demo, we'll just use the company data from context
     if (company) {
       setCompanyName(company.name);
     }
   }, [company]);
-
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      if (isSignup) {
-        // Validate required fields
-        if (!firstName || !lastName || !email || !password) {
-          toast.error('Please fill in all required fields');
-          setLoading(false);
-          return;
-        }
-
-        console.log(`Attempting to sign up user with email: ${email}`);
-        console.log(`User metadata: firstName=${firstName}, lastName=${lastName}, companyId=${company?.id}`);
-        
-        // Register new user with metadata
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              first_name: firstName,
-              last_name: lastName,
-              company_id: company?.id,
-              role: 'member'
-            }
-          }
-        });
-
-        if (error) {
-          console.error('Signup error:', error);
-          throw error;
-        }
-
-        console.log('User created successfully:', data.user?.id);
-
-        // Ensure profile is created for this user
-        if (data.user) {
-          // Wait to allow database trigger to work
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-          // Try multiple times to create the profile
-          let profileCreated = false;
-          for (let attempt = 1; attempt <= 3; attempt++) {
-            console.log(`Attempt ${attempt} to create profile for user ${data.user.id}`);
-            
-            profileCreated = await ensureUserProfile(data.user.id, {
-              email,
-              firstName,
-              lastName,
-              companyId: company?.id,
-              role: 'member'
-            });
-            
-            if (profileCreated) {
-              console.log('Profile created or verified successfully on attempt', attempt);
-              break;
-            } else if (attempt < 3) {
-              console.log(`Profile creation failed on attempt ${attempt}, retrying...`);
-              await new Promise(resolve => setTimeout(resolve, 1500));
-            } else {
-              console.warn('All profile creation attempts failed');
-            }
-          }
-          
-          // Direct insert fallback (as a last resort)
-          if (!profileCreated) {
-            try {
-              console.log('Attempting direct profile insert as fallback');
-              const { error: directInsertError } = await supabase
-                .from('profiles')
-                .upsert({
-                  id: data.user.id,
-                  email: email,
-                  first_name: firstName,
-                  last_name: lastName,
-                  company_id: company?.id,
-                  role: 'member'
-                });
-                
-              if (directInsertError) {
-                console.warn('Direct profile insert fallback also failed:', directInsertError.message);
-              } else {
-                profileCreated = true;
-                console.log('Direct profile insert fallback succeeded');
-              }
-            } catch (fallbackError) {
-              console.error('Error in direct profile insert fallback:', fallbackError);
-            }
-          }
-          
-          toast.success('Account created successfully! Please check your email for verification.');
-          navigate('/dashboard');
-        }
-      } else {
-        // Login existing user
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (error) throw error;
-
-        // Check if user belongs to this company
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('company_id')
-          .eq('id', data.user.id)
-          .single();
-
-        if (profileError) {
-          // If profile doesn't exist, try to create it
-          const profileCreated = await ensureUserProfile(data.user.id, {
-            email,
-            companyId: company?.id
-          });
-          
-          if (!profileCreated) {
-            throw new Error('Could not verify your account. Please contact support.');
-          }
-        } else if (profile.company_id !== company?.id) {
-          await supabase.auth.signOut();
-          throw new Error('You are not a member of this company.');
-        }
-
-        toast.success('Login successful!');
-        navigate('/dashboard');
-      }
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 flex items-center justify-center p-4">
@@ -170,76 +22,13 @@ const Join: React.FC = () => {
           Join {companyName || 'Company'}
         </h2>
         <p className="text-white/80 text-center mb-6">
-          {isSignup ? 'Create an account to join the team' : 'Sign in to your account'}
+          Create an account to join the team or sign in to your account
         </p>
-        
-        <form onSubmit={handleAuth} className="space-y-4">
-          {isSignup && (
-            <>
-              <div>
-                <label htmlFor="firstName" className="block text-white/80 mb-2">First Name</label>
-                <Input
-                  type="text"
-                  id="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="lastName" className="block text-white/80 mb-2">Last Name</label>
-                <Input
-                  type="text"
-                  id="lastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-                  required
-                />
-              </div>
-            </>
-          )}
-          <div>
-            <label htmlFor="email" className="block text-white/80 mb-2">Email</label>
-            <Input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-white/80 mb-2">Password</label>
-            <Input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-              required
-            />
-          </div>
-          <Button
-            type="submit"
-            className="w-full bg-white/10 backdrop-blur-sm text-white px-6 py-2 rounded-lg hover:bg-white/20 transition-all duration-300"
-            disabled={loading}
-          >
-            {loading ? 'Processing...' : isSignup ? 'Create Account' : 'Sign In'}
-          </Button>
-          <p className="text-white/80 text-center mt-4">
-            {isSignup ? 'Already have an account?' : 'Need to create an account?'}
-            <button
-              type="button"
-              onClick={() => setIsSignup(!isSignup)}
-              className="ml-2 text-white underline"
-            >
-              {isSignup ? 'Sign In' : 'Sign Up'}
-            </button>
-          </p>
-        </form>
+        <JoinForm
+          companyName={companyName}
+          company={company}
+          inviteCode={inviteCode}
+        />
       </div>
     </div>
   );
