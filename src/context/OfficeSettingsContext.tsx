@@ -30,6 +30,38 @@ export type Location = {
   company_id?: string;
 };
 
+// Define database response types to prevent deep instantiation
+type SupabaseRole = {
+  id: string;
+  name: string;
+  code: string;
+  company_id?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type SupabaseLocation = {
+  id: string;
+  city: string;
+  country: string;
+  code: string;
+  emoji?: string;
+  company_id?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+type SupabaseRate = {
+  id: string;
+  type: string;
+  reference_id: string;
+  value: number;
+  unit: string;
+  company_id?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
 // Create context
 type OfficeSettingsContextType = {
   roles: Role[];
@@ -87,36 +119,28 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         // Handle roles data
         if (rolesData) {
-          setRoles(rolesData);
+          setRoles(rolesData as Role[]);
         } else {
           setRoles([]);
         }
         
         // Handle locations data
         if (locationsData) {
-          setLocations(locationsData);
+          setLocations(locationsData as Location[]);
         } else {
           setLocations([]);
         }
         
-        // Transform rates data with explicit typing to avoid deep instantiation errors
+        // Transform rates data with proper typing
         if (ratesData) {
-          const transformedRates = ratesData.map(rate => {
-            const typedRate: Rate = {
-              id: rate.id,
-              type: rate.type as "role" | "location",
-              reference_id: rate.reference_id,
-              value: Number(rate.value),
-              unit: rate.unit as "hour" | "day" | "week"
-            };
-            
-            // Only add company_id if it exists
-            if ('company_id' in rate && rate.company_id) {
-              typedRate.company_id = rate.company_id;
-            }
-            
-            return typedRate;
-          });
+          const transformedRates: Rate[] = (ratesData as SupabaseRate[]).map(rate => ({
+            id: rate.id,
+            type: rate.type as "role" | "location",
+            reference_id: rate.reference_id,
+            value: Number(rate.value),
+            unit: rate.unit as "hour" | "day" | "week",
+            ...(rate.company_id ? { company_id: rate.company_id } : {})
+          }));
           
           setRates(transformedRates);
         } else {
