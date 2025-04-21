@@ -5,11 +5,11 @@ import { useToast } from "@/hooks/use-toast";
 import allCountries from "@/lib/allCountries.json";
 import { getContinentByCountryCode } from './projectAreaHelpers';
 
-export type DatabaseLocation = {
+// Updated type to match the office_areas table structure
+export type DatabaseArea = {
   id: string;
   code: string;
-  city: string | null;
-  country: string;
+  name: string;
   created_at: string;
   emoji: string | null;
   updated_at: string;
@@ -61,12 +61,13 @@ export default function useProjectAreas() {
           setError("Failed to load project areas.");
           setAreas([]);
         } else {
-          const transformedAreas = (data as DatabaseLocation[] || []).map(loc => ({
-            id: loc.id,
-            code: loc.code,
-            city: loc.city ?? "",
-            region: getAutoRegion(loc.country),
-            country: loc.country,
+          // Use the correct type for the data from office_areas table
+          const transformedAreas = (data as DatabaseArea[] || []).map(area => ({
+            id: area.id,
+            code: area.code,
+            city: "", // office_areas doesn't have city, so we default to empty string
+            region: getAutoRegion(area.name),
+            country: area.name, // The country name is stored in the 'name' field
           }));
           setAreas(transformedAreas);
         }
