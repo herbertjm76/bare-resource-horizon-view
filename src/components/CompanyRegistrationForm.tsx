@@ -11,6 +11,9 @@ interface CompanyFormData {
   subdomain: string;
   website?: string;
   description?: string;
+  address: string;
+  size: string;
+  location: string;
 }
 
 interface CompanyRegistrationFormProps {
@@ -34,7 +37,6 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         .eq('subdomain', subdomain.toLowerCase());
 
       if (error) throw error;
-      
       return count === 0;
     } catch (error) {
       console.error('Error checking subdomain:', error);
@@ -48,7 +50,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
     try {
       // Check if subdomain is available
       const isAvailable = await checkSubdomainAvailability(data.subdomain);
-      
+
       if (!isAvailable) {
         setError('subdomain', {
           type: 'manual',
@@ -65,6 +67,8 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
           subdomain: data.subdomain.toLowerCase(),
           website: data.website,
           description: data.description,
+          address: data.address,
+          size: data.size,
         })
         .select()
         .single();
@@ -74,7 +78,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
       // Update the user's profile with the company ID and owner role
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ 
+        .update({
           company_id: company.id,
           role: 'owner'
         })
@@ -137,6 +141,53 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         )}
         {isCheckingSubdomain && (
           <p className="text-blue-400 text-sm mt-1">Checking availability...</p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="address" className="block text-sm font-medium text-gray-200">
+          Company Address
+        </label>
+        <Input
+          id="address"
+          type="text"
+          {...register('address', { required: "Address is required" })}
+          className="mt-1"
+        />
+        {errors.address && (
+          <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="size" className="block text-sm font-medium text-gray-200">
+          Company Size
+        </label>
+        <Input
+          id="size"
+          type="text"
+          placeholder="e.g. 1-10, 11-50, 51-200, etc."
+          {...register('size', { required: "Size is required" })}
+          className="mt-1"
+        />
+        {errors.size && (
+          <p className="text-red-500 text-sm mt-1">{errors.size.message}</p>
+        )}
+      </div>
+
+      <div>
+        <label htmlFor="location" className="block text-sm font-medium text-gray-200">
+          Location (City, Country)
+        </label>
+        <Input
+          id="location"
+          type="text"
+          placeholder="e.g. New York, USA"
+          {...register('location', { required: "Location is required" })}
+          className="mt-1"
+        />
+        {errors.location && (
+          <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>
         )}
       </div>
 

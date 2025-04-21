@@ -18,6 +18,7 @@ export type Database = {
           logo_url: string | null
           name: string
           phone: string | null
+          size: string | null
           subdomain: string
           updated_at: string
           website: string | null
@@ -30,6 +31,7 @@ export type Database = {
           logo_url?: string | null
           name: string
           phone?: string | null
+          size?: string | null
           subdomain: string
           updated_at?: string
           website?: string | null
@@ -42,6 +44,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           phone?: string | null
+          size?: string | null
           subdomain?: string
           updated_at?: string
           website?: string | null
