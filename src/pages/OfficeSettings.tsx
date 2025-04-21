@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -14,8 +13,8 @@ import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { AuthGuard } from '@/components/AuthGuard';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
+import { AppHeader } from '@/components/AppHeader';
 
-// Responsive styling: tab bar will scroll horizontally on small screens.
 const tabBarClass =
   "w-full mb-4 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-6 gap-1 flex-nowrap rounded-none bg-transparent p-0";
 
@@ -24,7 +23,6 @@ const HEADER_HEIGHT = 56;
 const OfficeSettings = () => {
   const { company, loading: companyLoading } = useCompany();
 
-  // Show toast if no company is available
   React.useEffect(() => {
     if (!companyLoading && !company) {
       toast.error("No company context found. Please ensure you're logged in with a company account.");
@@ -34,8 +32,8 @@ const OfficeSettings = () => {
   return (
     <AuthGuard requiredRole={['owner', 'admin']}>
       <SidebarProvider>
+        <AppHeader />
         <div className="w-full flex flex-col min-h-screen">
-          {/* Spacer for fixed header */}
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex flex-1 w-full">
             <DashboardSidebar />
@@ -54,7 +52,6 @@ const OfficeSettings = () => {
                 </div>
                 <OfficeSettingsProvider>
                   <Tabs defaultValue="areas" className="w-full">
-                    {/* Responsive tab list */}
                     <TabsList className={tabBarClass + " flex sm:grid"}>
                       <TabsTrigger value="areas" className="flex items-center gap-2 min-w-max">
                         <Folder className="h-4 w-4" />

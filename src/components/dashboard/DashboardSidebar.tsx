@@ -11,7 +11,7 @@ import {
   UserSquare2,
   Flag
 } from "lucide-react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import {
   Sidebar,
   SidebarContent,
@@ -22,8 +22,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
+  useSidebar
 } from "@/components/ui/sidebar"
 
+// Menu items:
 const navigationItems = [
   {
     label: "Overview",
@@ -103,14 +105,22 @@ const navigationItems = [
 ]
 
 export function DashboardSidebar() {
+  const { state } = useSidebar();
+  const location = useLocation();
+
   return (
     <Sidebar 
       className="backdrop-blur-lg 
         bg-sidebar 
         bg-opacity-80
         border-r 
-        border-sidebar-border"
+        border-sidebar-border
+        pt-0
+        "
+      style={{ marginTop: 0 }}
     >
+      {/* Add margin-top to push sidebar below header */}
+      <div style={{ marginTop: 56 }} className="md:mt-0" />
       <SidebarContent>
         <SidebarGroup>
           <div className="flex items-center justify-between px-4 py-2">
@@ -125,19 +135,48 @@ export function DashboardSidebar() {
               <SidebarGroupLabel className="text-sidebar-foreground/70">{section.label}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {section.items.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        className="text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent rounded-md"
-                      >
-                        <Link to={item.url} className="flex items-center gap-2 w-full p-2">
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
+                  {section.items.map((item) => {
+                    const isActive = location.pathname === item.url;
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                          asChild
+                          className={`
+                            text-sidebar-foreground/80 
+                            hover:text-sidebar-foreground 
+                            hover:bg-sidebar-accent 
+                            rounded-md
+                            flex
+                            items-center
+                            gap-3
+                            transition-all
+                            group-data-[collapsible=icon]:justify-center
+                            group-data-[collapsible=icon]:px-0
+                            group-data-[collapsible=icon]:py-2
+                          `}
+                          isActive={isActive}
+                        >
+                          <Link to={item.url} className={`
+                            flex items-center gap-2 w-full p-2
+                            transition-all
+                            group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
+                          `}>
+                            <item.icon 
+                              className={`
+                                h-5 w-5
+                                group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7
+                                transition-all
+                              `}
+                            />
+                            {/* Only show label if sidebar expanded */}
+                            <span className="truncate group-data-[collapsible=icon]:hidden">
+                              {item.title}
+                            </span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
                 </SidebarMenu>
               </SidebarGroupContent>
             </div>

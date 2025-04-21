@@ -3,17 +3,20 @@ import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { ProjectsList } from '@/components/projects/ProjectsList';
+import { AppHeader } from '@/components/AppHeader';
 
 const HEADER_HEIGHT = 56; // Should match AppHeader minHeight
 
 const Projects = () => {
   return (
-    // Header is now globally present (AppHeader)
     <SidebarProvider>
+      {/* Glassmorphism header, always present */}
+      <AppHeader />
       <div className="w-full flex flex-col min-h-screen">
         {/* Spacer for fixed header */}
         <div style={{ height: HEADER_HEIGHT }} />
         <div className="flex flex-1 w-full">
+          {/* Sidebar now starts below the glass header */}
           <DashboardSidebar />
           <div className="flex-1 p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +10,7 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { toast } from 'sonner';
 import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
+import { AppHeader } from '@/components/AppHeader';
 
 // Create a proper Profile type based on the database schema
 type Profile = Database['public']['Tables']['profiles']['Row'];
@@ -139,10 +139,13 @@ const Dashboard: React.FC = () => {
 
   return (
     <SidebarProvider>
+      {/* Glassmorphism header, always present */}
+      <AppHeader />
       <div className="flex flex-col w-full min-h-screen">
         {/* Spacer for fixed header */}
         <div style={{ height: HEADER_HEIGHT }} />
         <div className="flex flex-1 w-full">
+          {/* Sidebar now starts below the glass header */}
           <DashboardSidebar />
           <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
             <div className="max-w-6xl mx-auto">
