@@ -8,6 +8,9 @@ import type { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { User as UserIcon, LogOut } from "lucide-react";
 
+// Use the standardized light gray for Bare.
+const BARE_GRAY = "var(--bare-light-gray)";
+
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
   const [user, setUser] = useState<User | null>(null);
@@ -37,10 +40,18 @@ export const AppHeader: React.FC = () => {
     navigate("/auth");
   };
 
+  // Only render in the content column, not beyond the sidebar
   return (
-    <header className="w-full glass-morphism fixed top-0 left-0 right-0 px-4 py-2 flex items-center justify-between z-50 shadow-lg bg-white/20 backdrop-blur-md border-b border-white/50" style={{minHeight:56}}>
-      <Link to="/" className="text-2xl font-bold tracking-tight hover:opacity-80 flex items-center select-none" aria-label="BareResource">
-        <span className="text-white drop-shadow-sm">Bare</span>
+    <header 
+      className="w-full glass-morphism px-4 py-2 flex items-center justify-between z-50 shadow-lg bg-white/20 backdrop-blur-md border-b border-white/50"
+      style={{minHeight:56}}
+    >
+      <Link 
+        to="/" 
+        className="text-2xl font-bold tracking-tight hover:opacity-80 flex items-center select-none" 
+        aria-label="BareResource"
+      >
+        <span className="drop-shadow-sm" style={{ color: "var(--bare-light-gray)" }}>Bare</span>
         <span
           className="ml-0.5 bg-clip-text text-transparent bg-gradient-to-r from-[#9b87f5] via-[#1EAEDB] to-[#D946EF] drop-shadow-sm"
           style={{ WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}

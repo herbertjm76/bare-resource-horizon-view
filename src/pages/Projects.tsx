@@ -10,14 +10,17 @@ const HEADER_HEIGHT = 56; // Should match AppHeader minHeight
 const Projects = () => {
   return (
     <SidebarProvider>
-      {/* Glassmorphism header, always present */}
-      <AppHeader />
-      <div className="w-full flex flex-col min-h-screen">
-        {/* Spacer for fixed header */}
-        <div style={{ height: HEADER_HEIGHT }} />
-        <div className="flex flex-1 w-full">
-          {/* Sidebar now starts below the glass header */}
+      <div className="w-full min-h-screen flex flex-row">
+        {/* Sidebar in first column */}
+        <div className="flex-shrink-0">
           <DashboardSidebar />
+        </div>
+        {/* Main content in second column */}
+        <div className="flex-1 flex flex-col">
+          {/* Header only in main column */}
+          <AppHeader />
+          {/* Spacer for header height */}
+          <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
               <div className="flex justify-between items-center">

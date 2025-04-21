@@ -107,26 +107,29 @@ const navigationItems = [
 export function DashboardSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
+  const collapsed = state === "collapsed";
 
   return (
     <Sidebar 
-      className="backdrop-blur-lg 
+      className={`
+        backdrop-blur-lg 
         bg-sidebar 
         bg-opacity-80
         border-r 
         border-sidebar-border
         pt-0
-        "
+        min-h-screen
+        transition-[width]
+      `}
       style={{ marginTop: 0 }}
     >
-      {/* Add margin-top to push sidebar below header */}
-      <div style={{ marginTop: 56 }} className="md:mt-0" />
+      {/* Only margin for space below (now handled by main layout) */}
       <SidebarContent>
         <SidebarGroup>
           <div className="flex items-center justify-between px-4 py-2">
             <p className="text-2xl font-bold">
-              <span className="text-white">Bare</span>
-              <span className="bg-gradient-to-r from-[#9b87f5] via-[#1EAEDB] to-[#D946EF] bg-clip-text text-transparent">Resource</span>
+              <span className="drop-shadow-sm" style={{ color: "var(--bare-light-gray)" }}>Bare</span>
+              <span className="bg-gradient-to-r from-[#9b87f5] via-[#1EAEDB] to-[#D946EF] bg-clip-text text-transparent ml-0.5">Resource</span>
             </p>
             <SidebarTrigger className="md:hidden text-sidebar-foreground hover:bg-sidebar-accent" />
           </div>
@@ -163,9 +166,9 @@ export function DashboardSidebar() {
                           `}>
                             <item.icon 
                               className={`
-                                h-5 w-5
-                                group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7
                                 transition-all
+                                ${collapsed ? "h-7 w-7" : "h-5 w-5"}
+                                group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7
                               `}
                             />
                             {/* Only show label if sidebar expanded */}
@@ -183,6 +186,10 @@ export function DashboardSidebar() {
           ))}
         </SidebarGroup>
       </SidebarContent>
+      {/* Sidebar trigger in collapsed state (show always for easy access) */}
+      <div className="flex justify-end px-2 pb-4 md:block hidden">
+        <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-accent" />
+      </div>
     </Sidebar>
   )
 }
