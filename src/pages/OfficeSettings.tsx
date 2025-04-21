@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -32,11 +33,17 @@ const OfficeSettings = () => {
   return (
     <AuthGuard requiredRole={['owner', 'admin']}>
       <SidebarProvider>
-        <AppHeader />
-        <div className="w-full flex flex-col min-h-screen">
-          <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex flex-1 w-full">
+        <div className="w-full min-h-screen flex flex-row">
+          {/* Sidebar in first column */}
+          <div className="flex-shrink-0">
             <DashboardSidebar />
+          </div>
+          {/* Main content in second column */}
+          <div className="flex-1 flex flex-col">
+            {/* Header only in main column */}
+            <AppHeader />
+            {/* Spacer for header height */}
+            <div style={{ height: HEADER_HEIGHT }} />
             <div className="flex-1 p-2 sm:p-8 bg-background">
               <div className="max-w-6xl mx-auto space-y-8">
                 <div className="flex justify-between items-center px-2 sm:px-0">

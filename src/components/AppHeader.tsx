@@ -40,7 +40,6 @@ export const AppHeader: React.FC = () => {
     navigate("/auth");
   };
 
-  // Only render the word "Bare" in the standardized light gray, no "Resource", no gradient.
   return (
     <header 
       className="w-full px-4 py-2 flex items-center justify-between z-30 shadow-md bg-white/90 border-b border-white/30"
@@ -48,10 +47,12 @@ export const AppHeader: React.FC = () => {
     >
       <h1 
         className="text-2xl font-bold tracking-tight select-none" 
-        aria-label="Bare"
-        style={{ color: BARE_GRAY }}
+        aria-label="Bare Resource"
       >
-        Bare
+        <span style={{ color: BARE_GRAY }}>Bare</span>
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-blue-500 to-pink-500">
+          Resource
+        </span>
       </h1>
       <div className="flex items-center gap-4">
         {!loading && user ? (

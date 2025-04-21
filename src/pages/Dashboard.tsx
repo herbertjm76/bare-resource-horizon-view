@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -139,25 +140,27 @@ const Dashboard: React.FC = () => {
 
   return (
     <SidebarProvider>
-      {/* Glassmorphism header, always present */}
-      <AppHeader />
       <div className="flex flex-col w-full min-h-screen">
-        {/* Spacer for fixed header */}
-        <div style={{ height: HEADER_HEIGHT }} />
         <div className="flex flex-1 w-full">
           {/* Sidebar now starts below the glass header */}
           <DashboardSidebar />
-          <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
-            <div className="max-w-6xl mx-auto">
-              <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
-              <DashboardMetrics />
-              {(profile?.role === 'owner' || profile?.role === 'admin') && (
-                <TeamManagement 
-                  teamMembers={teamMembers} 
-                  inviteUrl={inviteUrl}
-                  userRole={profile.role}
-                />
-              )}
+          <div className="flex-1 flex flex-col">
+            {/* Header only in main column */}
+            <AppHeader />
+            {/* Spacer for fixed header */}
+            <div style={{ height: HEADER_HEIGHT }} />
+            <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
+              <div className="max-w-6xl mx-auto">
+                <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
+                <DashboardMetrics />
+                {(profile?.role === 'owner' || profile?.role === 'admin') && (
+                  <TeamManagement 
+                    teamMembers={teamMembers} 
+                    inviteUrl={inviteUrl}
+                    userRole={profile.role}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>
