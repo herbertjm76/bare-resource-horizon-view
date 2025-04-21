@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -119,20 +120,7 @@ const Auth: React.FC = () => {
     }
 
     try {
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: ownerEmail,
-        password: ownerPassword,
-        options: {
-          data: { name: ownerName }
-        }
-      });
-      if (signUpError) throw signUpError;
-
-      const user = signUpData?.user;
-      if (!user || !user.id) {
-        throw new Error('Could not create user');
-      }
-
+      // Step 1: Create the company first
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
@@ -146,16 +134,66 @@ const Auth: React.FC = () => {
         })
         .select()
         .single();
+      
       if (companyError) throw companyError;
+      
+      // Step 2: Sign up the user with the company data
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: ownerEmail,
+        password: ownerPassword,
+        options: {
+          data: { 
+            name: ownerName,
+            first_name: ownerName.split(' ')[0],
+            last_name: ownerName.split(' ').slice(1).join(' '),
+            company_id: companyData.id
+          }
+        }
+      });
+      
+      if (signUpError) throw signUpError;
 
-      const { error: profileError } = await supabase
+      const user = signUpData?.user;
+      if (!user || !user.id) {
+        throw new Error('Could not create user');
+      }
+
+      // Step 3: Ensure the profile exists and update it with company and role
+      // Check if profile exists first to avoid errors
+      const { data: existingProfile } = await supabase
         .from('profiles')
-        .update({
-          company_id: companyData.id,
-          role: 'owner'
-        })
-        .eq('id', user.id);
-      if (profileError) throw profileError;
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      if (existingProfile) {
+        // Update the existing profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            company_id: companyData.id,
+            role: 'owner',
+            first_name: ownerName.split(' ')[0],
+            last_name: ownerName.split(' ').slice(1).join(' ')
+          })
+          .eq('id', user.id);
+          
+        if (profileError) throw profileError;
+      } else {
+        // Create a new profile if it doesn't exist
+        const { error: insertProfileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: ownerEmail,
+            first_name: ownerName.split(' ')[0],
+            last_name: ownerName.split(' ').slice(1).join(' '),
+            company_id: companyData.id,
+            role: 'owner'
+          });
+          
+        if (insertProfileError) throw insertProfileError;
+      }
 
       toast.success('Sign up and company registration successful! You may now log in.');
       setIsLogin(true);
@@ -164,6 +202,7 @@ const Auth: React.FC = () => {
       setOwnerName('');
       setCompany(emptyCompany);
     } catch (error: any) {
+      console.error('Signup error:', error);
       toast.error(error.message || 'Sign up failed. Please try again.');
     } finally {
       setLoading(false);
