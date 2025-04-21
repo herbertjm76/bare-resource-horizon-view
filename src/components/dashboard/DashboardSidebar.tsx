@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -25,7 +24,6 @@ import {
   useSidebar
 } from "@/components/ui/sidebar"
 
-// Menu items:
 const navigationItems = [
   {
     label: "Overview",
@@ -112,27 +110,31 @@ export function DashboardSidebar() {
   return (
     <Sidebar 
       className={`
-        backdrop-blur-lg 
-        bg-[#8E9196]        /* Standardized grey background */
-        bg-opacity-100
+        bg-[#8E9196]
         border-r 
         border-[#7d8086]
         pt-0
         min-h-screen
         transition-[width]
+        fixed
+        left-0
+        top-0
+        bottom-0
       `}
       style={{ marginTop: 0 }}
     >
-      {/* Margin for space below (now handled by main layout) */}
       <SidebarContent className="p-0">
         <SidebarGroup>
-          <div className="flex items-center justify-between px-2 py-4">
-            <span className="text-2xl font-bold text-white select-none" style={{ color: "#fff" }}>Bare</span>
-            <SidebarTrigger className="md:hidden text-white bg-transparent hover:bg-[#7d8086]" />
+          <div className="flex items-center justify-between px-4 py-4 h-[56px] border-b border-[#7d8086]">
+            <span className="text-2xl font-bold text-white select-none">Bare</span>
+            <SidebarTrigger className="text-white bg-transparent hover:bg-[#7d8086]" />
           </div>
+          
           {navigationItems.map((section) => (
             <div key={section.label} className="mb-1">
-              <SidebarGroupLabel className="text-white/70">{collapsed ? "" : section.label}</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-white/70 px-4 pt-6 pb-2">
+                {collapsed ? "" : section.label}
+              </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {section.items.map((item) => {
@@ -145,34 +147,20 @@ export function DashboardSidebar() {
                             text-white 
                             hover:text-white 
                             hover:bg-[#7d8086]
-                            rounded-lg
+                            rounded-none
+                            px-4
+                            py-2
                             flex
                             items-center
                             gap-3
                             transition-all
-                            group-data-[collapsible=icon]:justify-center
-                            group-data-[collapsible=icon]:px-0
-                            group-data-[collapsible=icon]:py-3
-                            ${isActive ? "bg-[#7d8086]! text-white" : ""}
+                            ${isActive ? "bg-[#7d8086] text-white" : ""}
                           `}
                           isActive={isActive}
                         >
-                          <Link to={item.url} className={`
-                            flex items-center gap-2 w-full
-                            transition-all
-                            group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
-                          `}>
-                            <item.icon 
-                              className={`
-                                transition-all
-                                ${collapsed ? "h-8 w-8" : "h-6 w-6"}   /* LARGER ICONS WHEN COLLAPSED */
-                                group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8
-                              `}
-                            />
-                            {/* Only show label if sidebar expanded */}
-                            <span className={`truncate group-data-[collapsible=icon]:hidden ${collapsed ? "hidden" : ""}`}>
-                              {item.title}
-                            </span>
+                          <Link to={item.url} className="flex items-center gap-3 w-full">
+                            <item.icon className="h-5 w-5" />
+                            {!collapsed && <span>{item.title}</span>}
                           </Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -184,10 +172,6 @@ export function DashboardSidebar() {
           ))}
         </SidebarGroup>
       </SidebarContent>
-      {/* Sidebar trigger in collapsed state (show always for easy access) */}
-      <div className="flex justify-end px-2 pb-4 md:block hidden">
-        <SidebarTrigger className="text-white hover:bg-[#7d8086]" />
-      </div>
     </Sidebar>
-  )
+  );
 }

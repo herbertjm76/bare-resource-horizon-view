@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -20,7 +19,6 @@ const Projects = () => {
   const [authError, setAuthError] = useState<string | null>(null);
   const [user, setUser] = useState(null);
   
-  // Direct authentication check instead of using useAuthorization hook
   useEffect(() => {
     let isMounted = true;
     const loadingTimeout = setTimeout(() => {
@@ -73,7 +71,6 @@ const Projects = () => {
     
     checkAuth();
     
-    // Auth state change listener
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Projects: Auth state changed:", event);
       if (!isMounted) return;
@@ -105,7 +102,6 @@ const Projects = () => {
     window.location.reload(); // Force complete page refresh
   };
 
-  // Show a loading spinner while authenticating or loading company data
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-background">
@@ -143,64 +139,60 @@ const Projects = () => {
   return (
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
-        {/* Sidebar in first column */}
         <div className="flex-shrink-0">
           <DashboardSidebar />
         </div>
-        {/* Main content in second column */}
-        <div className="flex-1 flex flex-col">
-          {/* Header only in main column */}
+        <div className="flex-1 flex flex-col pl-[240px]">
           <AppHeader />
-          {/* Spacer for header height */}
-          <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-8 bg-background">
-            <div className="max-w-6xl mx-auto space-y-8">
-              <div className="flex justify-between items-center">
-                <h1 className="text-4xl font-bold" style={{ color: '#8E9196' }}>All Projects</h1>
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => refreshCompany()}
-                  className="gap-2"
-                >
-                  <RefreshCw className="h-4 w-4" /> 
-                  Refresh
-                </Button>
-              </div>
+          <div className="pt-[56px]">
+            <div className="flex-1 p-8 bg-background">
+              <div className="max-w-6xl mx-auto space-y-8">
+                <div className="flex justify-between items-center">
+                  <h1 className="text-4xl font-bold text-[#8E9196]">All Projects</h1>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => refreshCompany()}
+                    className="gap-2"
+                  >
+                    <RefreshCw className="h-4 w-4" /> 
+                    Refresh
+                  </Button>
+                </div>
 
-              {company ? (
-                <ProjectsList />
-              ) : (
-                <div className="p-6 rounded-lg border border-red-500/30 bg-red-500/10">
-                  <div className="flex items-start gap-4">
-                    <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
-                    <div className="space-y-3">
-                      <h3 className="text-lg font-medium text-foreground">No company data found</h3>
-                      <p className="text-muted-foreground">
-                        This could be happening because:
-                      </p>
-                      <ul className="list-disc pl-5 text-muted-foreground space-y-1">
-                        <li>Your account isn't associated with a company</li>
-                        <li>There was an issue retrieving your company data</li>
-                      </ul>
-                      <div className="flex gap-3 pt-2">
-                        <Button onClick={() => navigate('/dashboard')}>
-                          Go to Dashboard
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          onClick={() => refreshCompany()}
-                          className="gap-2"
-                        >
-                          <RefreshCw className="h-4 w-4" /> 
-                          Refresh Data
-                        </Button>
+                {company ? (
+                  <ProjectsList />
+                ) : (
+                  <div className="p-6 rounded-lg border border-red-500/30 bg-red-500/10">
+                    <div className="flex items-start gap-4">
+                      <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
+                      <div className="space-y-3">
+                        <h3 className="text-lg font-medium text-foreground">No company data found</h3>
+                        <p className="text-muted-foreground">
+                          This could be happening because:
+                        </p>
+                        <ul className="list-disc pl-5 text-muted-foreground space-y-1">
+                          <li>Your account isn't associated with a company</li>
+                          <li>There was an issue retrieving your company data</li>
+                        </ul>
+                        <div className="flex gap-3 pt-2">
+                          <Button onClick={() => navigate('/dashboard')}>
+                            Go to Dashboard
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            onClick={() => refreshCompany()}
+                            className="gap-2"
+                          >
+                            <RefreshCw className="h-4 w-4" /> 
+                            Refresh Data
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
