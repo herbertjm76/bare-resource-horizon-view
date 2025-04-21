@@ -51,22 +51,28 @@ export const AppHeader: React.FC = () => {
         <span
           style={{
             color: "white",
-            WebkitTextStroke: "2.5px black",
+            WebkitTextStroke: "0.3px black",
+            textShadow: `
+              0px 0.5px 0 black,
+              0.5px 0px 0 black,
+              0px -0.5px 0 black,
+              -0.5px 0px 0 black
+            `,
             fontWeight: 900,
             letterSpacing: "0.5px",
             lineHeight: 1.1,
-            marginRight: "0.5rem",
+            marginRight: 0, // No margin between the words
             display: "inline-block",
           }}
         >
           Bare
         </span>
         <span
-          className="font-extrabold ml-2 px-2 rounded-[0.25em]"
+          className="font-extrabold px-2 rounded-[0.25em]"
           style={{
-            background: "rgba(154, 129, 237, 0.07)", // subtle purple background
+            background: "none",
             backgroundClip: "padding-box",
-            display: "inline-block",
+            display: "inline-block"
           }}
         >
           <span
