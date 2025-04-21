@@ -102,10 +102,10 @@ const Projects = () => {
   };
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={false}>
       <div className="w-full min-h-screen flex flex-row">
         <DashboardSidebar />
-        <div className="flex-1 flex flex-col transition-all duration-300 pl-[280px] sm:pl-[80px] md:pl-[280px]">
+        <div className="flex-1 flex flex-col transition-all duration-300 pl-[80px] md:pl-[80px]">
           <AppHeader />
           <div className="pt-[64px]">
             {isLoading ? (
