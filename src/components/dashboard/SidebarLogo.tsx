@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronRight, ChevronLeft } from "lucide-react"
 
 interface SidebarLogoProps {
   collapsed: boolean
@@ -15,7 +15,7 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => (
           variant="ghost" 
           size="icon" 
           onClick={toggleSidebar}
-          className="text-white hover:bg-[#7d8086] h-10 w-10 p-2 rounded-full"
+          className="text-white hover:bg-[#7d8086] h-10 w-10 p-2 rounded-full flex items-center justify-center"
         >
           <ChevronRight className="h-6 w-6" />
         </Button>
