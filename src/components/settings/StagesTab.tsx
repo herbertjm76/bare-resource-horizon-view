@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
-import { TablesInsert, Tables } from "@/integrations/supabase/types";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
 
@@ -47,7 +47,6 @@ const colors = [
 
 const stageNumberOptions = [...Array(10).keys()].map(n => String(n + 1)).concat("NA");
 
-// Fetch and persist stages globally in the office_stages table
 export const StagesTab = () => {
   const [stages, setStages] = useState<Stage[]>([]);
   const [open, setOpen] = useState(false);
@@ -66,10 +65,10 @@ export const StagesTab = () => {
     }
   });
 
-  // Fetch all global stages from office_stages table
   const fetchStages = async () => {
     setLoading(true);
-    if (!company) {
+    if (!company || !company.id) {
+      console.log("No company found in context, cannot fetch stages");
       setStages([]);
       setLoading(false);
       return;
@@ -84,7 +83,7 @@ export const StagesTab = () => {
       .order("order_index", { ascending: true });
       
     if (error) {
-      toast("Failed to load stages", {
+      toast.error("Failed to load stages", {
         description: error.message
       });
       console.error("Error fetching stages:", error);
@@ -107,7 +106,7 @@ export const StagesTab = () => {
       ...s,
       color: legacyData[s.id]?.color || colors[(s.order_index - 1) % colors.length] || "#4f46e5",
       number: legacyData[s.id]?.number || String(s.order_index),
-      company_id: (s.company_id || company.id).toString()
+      company_id: company.id
     })) : [];
     
     console.log("Mapped stages:", mappedStages);
@@ -166,8 +165,8 @@ export const StagesTab = () => {
   };
 
   const handleBulkDelete = async () => {
-    if (!company) {
-      toast("Error", { description: "No company selected" });
+    if (!company || !company.id) {
+      toast.error("Error", { description: "No company found in context" });
       return;
     }
     
@@ -179,7 +178,7 @@ export const StagesTab = () => {
       .eq("company_id", company.id);
       
     if (error) {
-      toast("Failed to delete stages", { description: error.message });
+      toast.error("Failed to delete stages", { description: error.message });
       setLoading(false);
       return;
     }
@@ -189,62 +188,66 @@ export const StagesTab = () => {
     setSelected([]);
     setEditMode(false);
     setLoading(false);
-    toast("Stages deleted", { description: "Selected stages have been deleted." });
+    toast.success("Stages deleted", { description: "Selected stages have been deleted." });
   };
 
   const onSubmit = async (values: StageFormValues) => {
-    if (!company) {
-      toast("Error", { description: "No company selected" });
+    if (!company || !company.id) {
+      toast.error("Error", { description: "No company found in context" });
       return;
     }
     
     setLoading(true);
-    if (editingStage) {
-      // Only the name is persisted, color/number is local
-      const { error } = await supabase
-        .from("office_stages")
-        .update({ 
-          name: values.name,
-          company_id: company.id 
-        })
-        .eq("id", editingStage.id)
-        .eq("company_id", company.id);
-        
-      if (error) {
-        toast("Failed to update stage", { description: error.message });
-        setLoading(false);
-        return;
-      }
-      
-      persistLocalStageDetails(editingStage.id, values.color, values.number);
-      toast("Stage updated");
-    } else {
-      // Create in Supabase, then persist UI color/number
-      const maxOrder = stages.length ? Math.max(...stages.map(s => s.order_index)) : 0;
-      const { data, error } = await supabase
-        .from("office_stages")
-        .insert({
-          name: values.name,
-          order_index: maxOrder + 1,
-          company_id: company.id
-        })
-        .select()
-        .single();
-        
-      if (error || !data) {
-        toast("Failed to add stage", { description: error?.message });
-        setLoading(false);
-        return;
-      }
-      
-      persistLocalStageDetails(data.id, values.color, values.number);
-    }
     
-    setOpen(false);
-    form.reset();
-    setEditingStage(null);
-    await fetchStages();
-    setLoading(false);
+    try {
+      if (editingStage) {
+        // Only the name is persisted, color/number is local
+        const { error } = await supabase
+          .from("office_stages")
+          .update({ 
+            name: values.name,
+            company_id: company.id 
+          })
+          .eq("id", editingStage.id)
+          .eq("company_id", company.id);
+          
+        if (error) {
+          throw error;
+        }
+        
+        persistLocalStageDetails(editingStage.id, values.color, values.number);
+        toast.success("Stage updated");
+      } else {
+        // Create in Supabase, then persist UI color/number
+        const maxOrder = stages.length ? Math.max(...stages.map(s => s.order_index)) : 0;
+        const { data, error } = await supabase
+          .from("office_stages")
+          .insert({
+            name: values.name,
+            order_index: maxOrder + 1,
+            company_id: company.id
+          })
+          .select()
+          .single();
+          
+        if (error || !data) {
+          throw error || new Error("No data returned from insertion");
+        }
+        
+        persistLocalStageDetails(data.id, values.color, values.number);
+        toast.success("Stage added");
+      }
+      
+      setOpen(false);
+      form.reset();
+      setEditingStage(null);
+      await fetchStages();
+    } catch (error: any) {
+      console.error("Error in stage operation:", error);
+      toast.error(error.message || "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -255,7 +258,7 @@ export const StagesTab = () => {
           <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)} disabled={loading}>
             <Edit className="h-4 w-4 mr-2" /> Edit
           </Button>
-          <Button size="sm" onClick={() => setOpen(true)} disabled={loading}>
+          <Button size="sm" onClick={() => setOpen(true)} disabled={loading || !company}>
             <Plus className="h-4 w-4 mr-2" />
             Add Stage
           </Button>
@@ -266,7 +269,14 @@ export const StagesTab = () => {
           <div className="text-sm text-muted-foreground mb-4">
             Define the standard project stages for your office. These are used across ALL PROJECTS.
           </div>
-          {editMode && (
+          
+          {!company && (
+            <div className="text-center p-4 border rounded-md border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800">
+              No company selected. Please select a company to manage project stages.
+            </div>
+          )}
+          
+          {editMode && company && (
             <div className="flex items-center gap-2 mb-2">
               <Button
                 variant="destructive"
@@ -279,9 +289,10 @@ export const StagesTab = () => {
               <span className="text-xs text-muted-foreground">{selected.length} selected</span>
             </div>
           )}
+          
           {loading ? (
             <div className="text-center p-4 border rounded-md border-dashed">Loading...</div>
-          ) : stages.length > 0 ? (
+          ) : company && stages.length > 0 ? (
             <div className="grid gap-4">
               {stages.map((stage) => (
                 <div 
@@ -309,11 +320,11 @@ export const StagesTab = () => {
                 </div>
               ))}
             </div>
-          ) : (
+          ) : company ? (
             <div className="text-center p-4 border rounded-md border-dashed">
               No stages added yet. Click "Add Stage" to get started.
             </div>
-          )}
+          ) : null}
         </div>
       </CardContent>
 
