@@ -1,177 +1,53 @@
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, UserCog } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+import { Plus, Pencil, Trash } from "lucide-react";
+import { Role, useOfficeSettings } from "@/context/OfficeSettingsContext";
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
+import { useCompany } from '@/context/CompanyContext';
 
 const formSchema = z.object({
-  name: z.string().min(1, "Role name is required"),
-  code: z.string().min(1, "Role code is required"),
+  name: z.string().min(1, "Name is required"),
+  code: z.string().min(1, "Code is required"),
 });
 
-type RoleFormValues = z.infer<typeof formSchema>;
-
-type OfficeRole = {
-  id: string;
-  name: string;
-  code: string;
-  created_at: string;
-  updated_at: string;
-};
-
-async function fetchRoles(): Promise<OfficeRole[]> {
-  const { data, error } = await supabase
-    .from("office_roles")
-    .select("*")
-    .order("created_at", { ascending: true });
-  if (error) throw error;
-  return data || [];
-}
-
-async function addRole(values: RoleFormValues): Promise<OfficeRole> {
-  // Fix: Ensure we're passing an object with required name and code properties
-  const { data, error } = await supabase
-    .from("office_roles")
-    .insert([{ name: values.name, code: values.code }])
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
-}
-
-async function editRole(id: string, values: RoleFormValues): Promise<OfficeRole> {
-  const { data, error } = await supabase
-    .from("office_roles")
-    .update({ ...values })
-    .eq("id", id)
-    .select()
-    .single();
-  if (error) throw error;
-  return data;
-}
-
-async function deleteRoles(ids: string[]): Promise<void> {
-  const { error } = await supabase.from("office_roles").delete().in("id", ids);
-  if (error) throw error;
-}
-
 export const RolesTab = () => {
+  const { roles, setRoles, loading } = useOfficeSettings();
+  const { company } = useCompany();
   const [open, setOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<OfficeRole | null>(null);
-  const [editMode, setEditMode] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const [editingRole, setEditingRole] = useState<Role | null>(null);
 
-  // Fetch data
-  const { data: roles = [], isLoading, isError } = useQuery({
-    queryKey: ["office_roles"],
-    queryFn: fetchRoles,
-  });
-
-  // Add role
-  const addMutation = useMutation({
-    mutationFn: addRole,
-    onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ["office_roles"] });
-      toast({
-        title: "Role added",
-        description: "A new role was added successfully!",
-      });
-      setOpen(false);
-      setEditingRole(null);
-      setSelected([]);
-    },
-    onError(e: any) {
-      toast({
-        title: "Error adding role",
-        description: e.message || "Could not add the role.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Edit role
-  const editMutation = useMutation({
-    mutationFn: ({ id, values }: { id: string; values: RoleFormValues }) =>
-      editRole(id, values),
-    onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ["office_roles"] });
-      toast({
-        title: "Role updated",
-        description: "The role was updated successfully!",
-      });
-      setOpen(false);
-      setEditingRole(null);
-      setSelected([]);
-    },
-    onError(e: any) {
-      toast({
-        title: "Error updating role",
-        description: e.message || "Could not update the role.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Delete roles
-  const deleteMutation = useMutation({
-    mutationFn: (ids: string[]) => deleteRoles(ids),
-    onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ["office_roles"] });
-      toast({
-        title: "Roles deleted",
-        description: "Selected roles have been deleted.",
-      });
-      setSelected([]);
-      setEditMode(false);
-    },
-    onError(e: any) {
-      toast({
-        title: "Error deleting roles",
-        description: e.message || "Could not delete the selected roles.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const form = useForm<RoleFormValues>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { name: "", code: "" },
+    defaultValues: {
+      name: "",
+      code: "",
+    },
   });
 
-  const onOpenChange = (openDialog: boolean) => {
-    setOpen(openDialog);
-    if (!openDialog) {
-      form.reset();
-      setEditingRole(null);
-    }
-  };
-
-  const handleEdit = (role: OfficeRole) => {
+  const handleEditRole = (role: Role) => {
     setEditingRole(role);
     form.reset({
       name: role.name,
@@ -180,186 +56,170 @@ export const RolesTab = () => {
     setOpen(true);
   };
 
-  const handleSelect = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  const handleBulkDelete = () => {
-    deleteMutation.mutate(selected);
-  };
-
-  const onSubmit = (values: RoleFormValues) => {
-    if (editingRole) {
-      editMutation.mutate({ id: editingRole.id, values });
-    } else {
-      addMutation.mutate(values);
+  const handleDeleteRole = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('office_roles')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setRoles(roles.filter(role => role.id !== id));
+      toast.success('Role deleted successfully');
+    } catch (error: any) {
+      console.error('Error deleting role:', error);
+      toast.error('Failed to delete role');
     }
-    form.reset();
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!company) {
+      toast.error('No company selected');
+      return;
+    }
+
+    try {
+      if (editingRole) {
+        // Update existing role
+        const { error } = await supabase
+          .from('office_roles')
+          .update({
+            name: values.name,
+            code: values.code,
+          })
+          .eq('id', editingRole.id);
+        
+        if (error) throw error;
+        
+        setRoles(roles.map(role => 
+          role.id === editingRole.id 
+            ? { ...role, name: values.name, code: values.code } 
+            : role
+        ));
+        toast.success('Role updated successfully');
+      } else {
+        // Create new role
+        const { data, error } = await supabase
+          .from('office_roles')
+          .insert([
+            {
+              name: values.name,
+              code: values.code,
+              company_id: company.id
+            }
+          ])
+          .select();
+        
+        if (error) throw error;
+        
+        setRoles([...roles, data[0]]);
+        toast.success('Role created successfully');
+      }
+      
+      setOpen(false);
+      form.reset();
+      setEditingRole(null);
+    } catch (error: any) {
+      console.error('Error saving role:', error);
+      toast.error('Failed to save role');
+    }
   };
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
-        <CardTitle className="flex items-center gap-2">
-          <UserCog className="h-5 w-5 text-violet-600" />
-          Roles
-        </CardTitle>
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            variant={editMode ? "secondary" : "outline"}
-            onClick={() => setEditMode((em) => !em)}
-          >
-            <Edit className="h-4 w-4 mr-2" /> Edit
-          </Button>
-          <Button size="sm" onClick={() => setOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Role
-          </Button>
-        </div>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle>Roles</CardTitle>
+        <Button onClick={() => {
+          form.reset({ name: "", code: "" });
+          setEditingRole(null);
+          setOpen(true);
+        }} size="sm">
+          <Plus className="mr-2 h-4 w-4" />
+          Add Role
+        </Button>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div className="text-sm text-muted-foreground mb-4">
-            Configure staff roles for your office. These roles will be used to assign rates to staff.
+        {loading ? (
+          <div className="text-center py-4">Loading roles...</div>
+        ) : roles.length === 0 ? (
+          <div className="text-center py-4 text-muted-foreground">
+            No roles defined yet. Click "Add Role" to create your first role.
           </div>
-          {editMode && (
-            <div className="flex items-center gap-2 mb-2">
-              <Button
-                variant="destructive"
-                size="sm"
-                disabled={selected.length === 0}
-                onClick={handleBulkDelete}
-                // Fix: Remove isLoading prop and use children to show loading state
-                className={deleteMutation.isPending ? "opacity-70 pointer-events-none" : ""}
+        ) : (
+          <div className="grid gap-4">
+            {roles.map((role) => (
+              <div
+                key={role.id}
+                className="flex items-center justify-between p-4 border rounded-lg"
               >
-                {deleteMutation.isPending ? (
-                  "Deleting..."
-                ) : (
-                  <>
-                    <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
-                  </>
-                )}
-              </Button>
-              <span className="text-xs text-muted-foreground">
-                {selected.length} selected
-              </span>
-            </div>
-          )}
-
-          {isLoading ? (
-            <div className="text-center p-4">Loading roles...</div>
-          ) : isError ? (
-            <div className="text-center p-4 text-destructive">
-              Error loading roles.
-            </div>
-          ) : roles.length > 0 ? (
-            <div className="grid gap-4">
-              {roles.map((role) => (
-                <div
-                  key={role.id}
-                  className={`flex items-center justify-between p-3 border rounded-md ${
-                    editMode && "ring-2"
-                  } `}
-                  style={
-                    editMode && selected.includes(role.id)
-                      ? { borderColor: "#dc2626", background: "#fee2e2" }
-                      : {}
-                  }
-                >
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <div className="font-medium">{role.name}</div>
-                      <div className="text-xs text-muted-foreground">
-                        Code: {role.code}
-                      </div>
-                    </div>
-                  </div>
-                  {editMode ? (
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 accent-purple-600"
-                      checked={selected.includes(role.id)}
-                      onChange={() => handleSelect(role.id)}
-                    />
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(role)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  )}
+                <div>
+                  <div className="font-medium">{role.name}</div>
+                  <div className="text-sm text-muted-foreground">Code: {role.code}</div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center p-4 border rounded-md border-dashed">
-              No roles added yet. Click "Add Role" to get started.
-            </div>
-          )}
-        </div>
-      </CardContent>
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="icon" onClick={() => handleEditRole(role)}>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleDeleteRole(role.id)}>
+                    <Trash className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-      {/* Add/Edit Dialog */}
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{editingRole ? "Edit" : "Add"} Role</DialogTitle>
-            <DialogDescription>
-              Enter the details for this staff role.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4"
-            >
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Project Manager" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Role Code</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., PM" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  // Fix: Remove isLoading prop and use className/children to show loading state
-                  disabled={addMutation.isPending || editMutation.isPending}
-                  className={(addMutation.isPending || editMutation.isPending) ? "opacity-70" : ""}
-                >
-                  {(addMutation.isPending || editMutation.isPending)
-                    ? `${editingRole ? "Updating" : "Adding"}...`
-                    : `${editingRole ? "Update" : "Add"} Role`}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editingRole ? "Edit Role" : "Add Role"}</DialogTitle>
+              <DialogDescription>
+                {editingRole
+                  ? "Update the role details below."
+                  : "Fill in the details for the new role."}
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Project Manager" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., PM" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <DialogFooter>
+                  <Button type="submit">
+                    {editingRole ? "Save Changes" : "Add Role"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </CardContent>
     </Card>
   );
 };
+
+export default RolesTab;

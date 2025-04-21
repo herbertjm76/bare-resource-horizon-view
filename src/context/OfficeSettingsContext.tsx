@@ -1,11 +1,15 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { useCompany } from '@/context/CompanyContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 // Define types
 export type Role = {
   id: string;
   name: string;
   code: string;
+  company_id?: string;
 };
 
 export type Rate = {
@@ -14,6 +18,7 @@ export type Rate = {
   name: string;
   value: number;
   unit: "hour" | "day" | "week";
+  company_id?: string;
 };
 
 export type Location = {
@@ -22,28 +27,8 @@ export type Location = {
   country: string;
   code: string;
   emoji?: string;
+  company_id?: string;
 };
-
-// Initial data
-const initialRoles = [
-  { id: "1", name: "Project Manager", code: "PM" },
-  { id: "2", name: "Senior Architect", code: "SA" },
-  { id: "3", name: "Junior Architect", code: "JA" },
-  { id: "4", name: "BIM Coordinator", code: "BIM" }
-];
-
-const initialLocations: Location[] = [
-  { id: "1", city: "New York", country: "United States", code: "US", emoji: "🇺🇸" },
-  { id: "2", city: "London", country: "United Kingdom", code: "GB", emoji: "🇬🇧" },
-  { id: "3", city: "Tokyo", country: "Japan", code: "JP", emoji: "🇯🇵" }
-];
-
-const initialRates: Rate[] = [
-  { id: "1", type: "role", name: "Project Manager", value: 150, unit: "hour" as const },
-  { id: "2", type: "role", name: "Senior Architect", value: 125, unit: "hour" as const },
-  { id: "3", type: "location", name: "New York", value: 140, unit: "hour" as const },
-  { id: "4", type: "location", name: "London", value: 135, unit: "hour" as const }
-];
 
 // Create context
 type OfficeSettingsContextType = {
@@ -53,15 +38,67 @@ type OfficeSettingsContextType = {
   setRoles: React.Dispatch<React.SetStateAction<Role[]>>;
   setLocations: React.Dispatch<React.SetStateAction<Location[]>>;
   setRates: React.Dispatch<React.SetStateAction<Rate[]>>;
+  loading: boolean;
 };
 
 const OfficeSettingsContext = createContext<OfficeSettingsContextType | null>(null);
 
 // Provider component
 export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) => {
-  const [roles, setRoles] = useState<Role[]>(initialRoles);
-  const [locations, setLocations] = useState<Location[]>(initialLocations);
-  const [rates, setRates] = useState<Rate[]>(initialRates);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [rates, setRates] = useState<Rate[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { company } = useCompany();
+
+  // Fetch settings data based on current company
+  useEffect(() => {
+    if (!company) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchSettings = async () => {
+      setLoading(true);
+      try {
+        // Fetch roles for this company
+        const { data: rolesData, error: rolesError } = await supabase
+          .from('office_roles')
+          .select('*')
+          .eq('company_id', company.id);
+
+        if (rolesError) throw rolesError;
+        
+        // Fetch locations for this company
+        const { data: locationsData, error: locationsError } = await supabase
+          .from('office_locations')
+          .select('*')
+          .eq('company_id', company.id);
+
+        if (locationsError) throw locationsError;
+        
+        // Fetch rates for this company
+        const { data: ratesData, error: ratesError } = await supabase
+          .from('office_rates')
+          .select('*')
+          .eq('company_id', company.id);
+
+        if (ratesError) throw ratesError;
+
+        // Set the data in state
+        setRoles(rolesData || []);
+        setLocations(locationsData || []);
+        setRates(ratesData || []);
+      } catch (error: any) {
+        console.error('Error fetching office settings:', error);
+        toast.error('Failed to load office settings');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, [company]);
 
   return (
     <OfficeSettingsContext.Provider 
@@ -71,7 +108,8 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         locations, 
         setLocations, 
         rates, 
-        setRates 
+        setRates,
+        loading
       }}
     >
       {children}
