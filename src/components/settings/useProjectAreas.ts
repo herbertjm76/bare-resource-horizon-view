@@ -52,11 +52,12 @@ export default function useProjectAreas() {
     const fetchAreas = async () => {
       try {
         const { data, error } = await supabase
-          .from("office_locations")
+          .from("office_areas")
           .select("*")
           .order("created_at", { ascending: true });
           
         if (error) {
+          console.error("Supabase error:", error);
           setError("Failed to load project areas.");
           setAreas([]);
         } else {
@@ -86,14 +87,15 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
     try {
-      const locationData: any = {
+      const areaData: any = {
         code: values.code,
-        city: values.city || null,
-        country: values.country,
+        name: values.country,
+        emoji: null
       };
+      
       const { data, error } = await supabase
-        .from("office_locations")
-        .insert(locationData)
+        .from("office_areas")
+        .insert(areaData)
         .select()
         .single();
       
@@ -109,9 +111,8 @@ export default function useProjectAreas() {
         const newArea: ProjectArea = {
           id: data.id,
           code: data.code,
-          city: data.city,
-          region: getAutoRegion(data.country),
-          country: data.country,
+          region: getAutoRegion(data.name),
+          country: data.name,
         };
         setAreas(old => [...old, newArea]);
         toast({
@@ -137,14 +138,14 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
     try {
-      const locationData: any = {
+      const areaData: any = {
         code: values.code,
-        city: values.city || null,
-        country: values.country,
+        name: values.country,
       };
+      
       const { error } = await supabase
-        .from("office_locations")
-        .update(locationData)
+        .from("office_areas")
+        .update(areaData)
         .eq("id", id);
 
       if (error) {
@@ -183,7 +184,7 @@ export default function useProjectAreas() {
     setError(null);
     try {
       const { error } = await supabase
-        .from("office_locations")
+        .from("office_areas")
         .delete()
         .in("id", ids);
         
