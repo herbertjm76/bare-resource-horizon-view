@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ProjectAreaList, { ProjectArea } from './ProjectAreaList';
 import ProjectAreaForm, { ProjectAreaFormValues } from './ProjectAreaForm';
-import { countryRegions, getContinentByCountryCode } from './projectAreaHelpers';
+import { getContinentByCountryCode } from './projectAreaHelpers';
+import allCountries from "@/lib/allCountries.json";
 
 const formSchema = z.object({
   code: z.string().min(1, "Code is required"),
@@ -29,12 +31,8 @@ type DatabaseLocation = {
 };
 
 function getAutoRegion(country: string): string {
-  // Always map country to primary continent only
-  // Find country code first
-  // Use allCountries.json for code lookup, then use getContinentByCountryCode
-  // (We rely on the updated version of getContinentByCountryCode)
-  const allCountries = require('@/lib/allCountries.json');
-  const countryData = allCountries.find((c: any) => c.name === country);
+  // Find country code first using allCountries.json import
+  const countryData = allCountries.find((c) => c.name === country);
   if (countryData) {
     return getContinentByCountryCode(countryData.code);
   }

@@ -1,3 +1,4 @@
+
 import React from "react";
 import {
   Dialog,
@@ -11,9 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import CountrySelect from "@/components/ui/CountrySelect";
-import { z, ZodSchema } from "zod";
+import { z } from "zod";
 import { UseFormReturn } from "react-hook-form";
-import { countryRegions, getContinentByCountryCode } from "./projectAreaHelpers";
+import { getContinentByCountryCode } from "./projectAreaHelpers";
 import allCountries from "@/lib/allCountries.json";
 
 export type ProjectAreaFormValues = {
@@ -106,7 +107,7 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
                   <FormControl>
                     <CountrySelect
                       value={field.value}
-                      onChange={(value, code) => handleCountryChange(value, code)}
+                      onChange={handleCountryChange}
                       disabled={loading}
                       placeholder="Select country"
                     />
