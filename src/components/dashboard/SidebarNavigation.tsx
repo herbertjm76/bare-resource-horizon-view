@@ -70,7 +70,7 @@ export const SidebarNavigation = ({
                         className="flex items-center gap-4 w-full"
                         onClick={onItemClick}
                       >
-                        <item.icon className="h-6 w-6" />
+                        <item.icon className="h-6 w-6 min-w-6" />
                         {!collapsed && <span className="font-medium">{item.title}</span>}
                       </Link>
                     </SidebarMenuButton>
