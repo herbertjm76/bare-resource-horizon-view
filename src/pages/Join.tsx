@@ -10,6 +10,8 @@ import { useCompany } from '@/context/CompanyContext';
 const Join: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignup, setIsSignup] = useState(true);
@@ -31,25 +33,64 @@ const Join: React.FC = () => {
 
     try {
       if (isSignup) {
-        // Register new user
+        // Register new user with metadata
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              company_id: company?.id,
+              role: 'member'
+            }
+          }
         });
 
         if (error) throw error;
 
+        // Add an additional manual profile creation as backup
         if (data.user) {
-          // Update user's profile with company information
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .update({
-              company_id: company?.id,
-              role: 'member'
-            })
-            .eq('id', data.user.id);
+          try {
+            // Check if profile exists first
+            const { data: existingProfile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .single();
+            
+            // If no profile exists, create one
+            if (!existingProfile) {
+              console.log('No profile found, creating a new one...');
+              const { error: profileError } = await supabase
+                .from('profiles')
+                .upsert({
+                  id: data.user.id,
+                  email,
+                  first_name: firstName,
+                  last_name: lastName,
+                  company_id: company?.id,
+                  role: 'member'
+                });
 
-          if (profileError) throw profileError;
+              if (profileError) {
+                console.error('Profile creation error:', profileError);
+              }
+            }
+          } catch (profileCheckError) {
+            // If checking the profile fails (likely doesn't exist), create a new one
+            console.log('Creating profile as a fallback...');
+            await supabase
+              .from('profiles')
+              .upsert({
+                id: data.user.id,
+                email,
+                first_name: firstName,
+                last_name: lastName,
+                company_id: company?.id,
+                role: 'member'
+              });
+          }
           
           toast.success('Account created successfully! Please check your email for verification.');
           navigate('/dashboard');
@@ -98,6 +139,32 @@ const Join: React.FC = () => {
         </p>
         
         <form onSubmit={handleAuth} className="space-y-4">
+          {isSignup && (
+            <>
+              <div>
+                <label htmlFor="firstName" className="block text-white/80 mb-2">First Name</label>
+                <Input
+                  type="text"
+                  id="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="lastName" className="block text-white/80 mb-2">Last Name</label>
+                <Input
+                  type="text"
+                  id="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
+                  required
+                />
+              </div>
+            </>
+          )}
           <div>
             <label htmlFor="email" className="block text-white/80 mb-2">Email</label>
             <Input
