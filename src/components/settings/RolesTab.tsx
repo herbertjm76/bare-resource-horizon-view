@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -99,14 +98,13 @@ export const RolesTab = () => {
         ));
         toast.success('Role updated successfully');
       } else {
-        // Create new role
+        // Create new role - removing company_id from the insert
         const { data, error } = await supabase
           .from('office_roles')
           .insert([
             {
               name: values.name,
               code: values.code,
-              company_id: company.id
             }
           ])
           .select();

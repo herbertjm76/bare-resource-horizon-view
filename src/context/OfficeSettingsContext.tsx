@@ -4,12 +4,11 @@ import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-// Define types with optional company_id to match the database
+// Define types without company_id to match the database structure
 export type Role = {
   id: string;
   name: string;
   code: string;
-  company_id?: string;
 };
 
 export type Rate = {
@@ -18,7 +17,6 @@ export type Rate = {
   reference_id: string; 
   value: number;
   unit: "hour" | "day" | "week";
-  company_id?: string;
 };
 
 export type Location = {
@@ -27,7 +25,6 @@ export type Location = {
   country: string;
   code: string;
   emoji?: string;
-  company_id?: string;
 };
 
 // Create context
@@ -61,35 +58,52 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        // Fetch roles
+        // Fetch roles - remove company_id from the query
         const { data: rolesData, error: rolesError } = await supabase
           .from('office_roles')
-          .select('id, name, code, company_id')
-          .eq('company_id', company.id);
+          .select('id, name, code');
         
         if (rolesError) throw rolesError;
         
-        // Fetch locations
+        // Fetch locations - remove company_id from the query
         const { data: locationsData, error: locationsError } = await supabase
           .from('office_locations')
-          .select('id, city, country, code, emoji, company_id')
-          .eq('company_id', company.id);
+          .select('id, city, country, code, emoji');
         
         if (locationsError) throw locationsError;
         
-        // Fetch rates
+        // Fetch rates - remove company_id from the query
         const { data: ratesData, error: ratesError } = await supabase
           .from('office_rates')
-          .select('id, type, reference_id, value, unit, company_id')
-          .eq('company_id', company.id);
+          .select('id, type, reference_id, value, unit');
         
         if (ratesError) throw ratesError;
 
-        // Process data using simpler approach that avoids deep type instantiation
-        setRoles(rolesData || []);
-        setLocations(locationsData || []);
+        // Process data with explicit casting to avoid deep type instantiation
+        if (rolesData) {
+          const typedRoles: Role[] = rolesData.map(role => ({
+            id: role.id,
+            name: role.name,
+            code: role.code
+          }));
+          setRoles(typedRoles);
+        } else {
+          setRoles([]);
+        }
         
-        // Process rates with explicit type casting for specialized fields
+        if (locationsData) {
+          const typedLocations: Location[] = locationsData.map(location => ({
+            id: location.id,
+            city: location.city,
+            country: location.country,
+            code: location.code,
+            emoji: location.emoji
+          }));
+          setLocations(typedLocations);
+        } else {
+          setLocations([]);
+        }
+        
         if (ratesData) {
           const typedRates: Rate[] = [];
           for (const rate of ratesData) {
@@ -98,8 +112,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
               type: rate.type as "role" | "location",
               reference_id: rate.reference_id,
               value: Number(rate.value),
-              unit: rate.unit as "hour" | "day" | "week",
-              company_id: rate.company_id
+              unit: rate.unit as "hour" | "day" | "week"
             });
           }
           setRates(typedRates);
