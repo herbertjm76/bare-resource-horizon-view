@@ -1,10 +1,8 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-// Updated types WITH company_id
 export type Role = {
   id: string;
   name: string;
@@ -30,7 +28,6 @@ export type Location = {
   company_id: string;
 };
 
-// Create context
 type OfficeSettingsContextType = {
   roles: Role[];
   locations: Location[];
@@ -43,7 +40,6 @@ type OfficeSettingsContextType = {
 
 const OfficeSettingsContext = createContext<OfficeSettingsContextType | null>(null);
 
-// Provider component
 export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -51,7 +47,6 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
   const [loading, setLoading] = useState(true);
   const { company } = useCompany();
 
-  // Fetch settings data based on current company
   useEffect(() => {
     if (!company) {
       setLoading(false);
@@ -64,7 +59,6 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        // Fetch roles for this company
         const { data: rolesData, error: rolesError } = await supabase
           .from('office_roles')
           .select('id, name, code, company_id')
@@ -72,7 +66,6 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (rolesError) throw rolesError;
 
-        // Fetch locations for this company
         const { data: locationsData, error: locationsError } = await supabase
           .from('office_locations')
           .select('id, city, country, code, emoji, company_id')
@@ -80,7 +73,6 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (locationsError) throw locationsError;
 
-        // Fetch rates for this company
         const { data: ratesData, error: ratesError } = await supabase
           .from('office_rates')
           .select('id, type, reference_id, value, unit, company_id')
@@ -88,18 +80,24 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (ratesError) throw ratesError;
 
-        setRoles(Array.isArray(rolesData) ? rolesData : []);
-        setLocations(Array.isArray(locationsData) ? locationsData : []);
-        
-        // Process rates with proper type casting
+        setRoles(Array.isArray(rolesData) ? rolesData.map((r) => ({
+          ...r,
+          company_id: (r.company_id ?? company.id).toString()
+        })) : []);
+
+        setLocations(Array.isArray(locationsData) ? locationsData.map((loc) => ({
+          ...loc,
+          company_id: (loc.company_id ?? company.id).toString()
+        })) : []);
+
         if (Array.isArray(ratesData)) {
           const typedRates: Rate[] = ratesData.map(r => ({
             id: r.id,
-            type: r.type as "role" | "location", // Cast to the union type
+            type: r.type === "role" ? "role" : "location",
             reference_id: r.reference_id,
-            value: Number(r.value), // Convert numeric to number
-            unit: r.unit as "hour" | "day" | "week", // Cast to the union type
-            company_id: r.company_id
+            value: Number(r.value),
+            unit: r.unit === "hour" || r.unit === "day" || r.unit === "week" ? r.unit : "hour",
+            company_id: (r.company_id ?? company.id).toString()
           }));
           setRates(typedRates);
         } else {
@@ -136,7 +134,6 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
   );
 };
 
-// Custom hook to use the context
 export const useOfficeSettings = () => {
   const context = useContext(OfficeSettingsContext);
   if (!context) {

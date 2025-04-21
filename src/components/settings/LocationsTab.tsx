@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,36 +19,15 @@ import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
 import allCountries from "@/lib/allCountries.json";
 
-// --- Broad Icon/Emoji Picker List (No flags here, no duplicates, explicit vegetables) ---
 const customIconList = [
-  // Colored Hearts
   "❤️", "🧡", "💛", "💚", "💙", "💜", "🩷", "🤍", "🖤", "🤎",
-  // Colored Circles
   "🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "🟤", "⚫", "⚪",
-  // Colored Boxes/Squares (no duplicates)
   "⬛", "⬜", "🟦", "🟩", "🟨", "🟧", "🟪", "🟫",
-  // Animals (mammals, amphibian, big mix, NO duplicates)
   "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐸",
-  // Fruits
   "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🍒", "🥝", "🍍", "🥭", "🥥",
-  // Vegetables (now more complete per user's screenshot: broccoli, cucumber, carrot, corn, potato, eggplant, sweet potato, etc)
-  "🥦", // Broccoli
-  "🥒", // Cucumber
-  "🥕", // Carrot
-  "🌽", // Corn
-  "🍆", // Eggplant
-  "🥔", // Potato
-  "🍠", // Sweet Potato
-  "🧅", // Onion
-  "🧄", // Garlic
-  "🌶️", // Hot Pepper
-  "🥬", // Leafy greens
-  "🍄", // Mushroom
-  "🥗", // Green salad
-  // Transportation (extensively, no duplicates)
+  "🥦", "🥒", "🥕", "🌽", "🍆", "🥔", "🍠", "🧅", "🧄", "🌶️", "🥬", "🍄", "🥗",
   "🚕", "🚗", "🚙", "🚌", "🚎", "🏎️", "🚓", "🚑", "🚒", "🚐", "🚚", "🚛", "🚜", "🏍️", "🛵", "🚲", "🛴", "🚂", "✈️", "🚀", "🚁"
 ];
-// NOTE: If these lists get much longer or you want category separation, it's advisable to extract this to its own file/component!
 
 const flagEmoji = (countryCode: string) =>
   countryCode && countryCode.length === 2
@@ -64,14 +42,13 @@ const formSchema = z.object({
 });
 type LocationFormValues = z.infer<typeof formSchema>;
 
-// Ensure this type matches the one in OfficeSettingsContext
 type Location = {
   id: string;
   city: string;
   country: string;
   code: string;
   emoji?: string;
-  company_id: string; // Add this to match OfficeSettingsContext
+  company_id: string;
 };
 
 export const LocationsTab = () => {
@@ -82,7 +59,6 @@ export const LocationsTab = () => {
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
 
-  // --- For emoji/icon picker dialog ---
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerTargetId, setPickerTargetId] = useState<string | null>(null);
 
@@ -125,21 +101,20 @@ export const LocationsTab = () => {
     }
   };
 
-  // LOCATION ICON PICKER (edit location only, not during creation)
   const openPicker = (id: string) => {
     setPickerTargetId(id);
     setPickerOpen(true);
   };
+
   const handlePickerSelect = (emoji: string) => {
     if (!pickerTargetId) {
       setPickerOpen(false);
       return;
     }
-    
     setLocations(
       locations.map(loc =>
         loc.id === pickerTargetId
-          ? { ...loc, emoji }
+          ? { ...loc, emoji, company_id: loc.company_id }
           : loc
       )
     );
@@ -147,37 +122,34 @@ export const LocationsTab = () => {
     setPickerTargetId(null);
   };
 
-  // Submit: flag auto-assigned and no icon/emoji picker during create/edit dialog!
   const onSubmit = (values: LocationFormValues) => {
     if (!company) {
       console.error("No company selected");
       return;
     }
-    
     const countryObj = allCountries.find(c => c.code === values.code);
     const flag = flagEmoji(values.code) || "";
-    
+
     const newEntry: Location = {
       id: editingLocation ? editingLocation.id : Date.now().toString(),
       city: values.city,
       code: values.code,
       country: countryObj ? countryObj.name : values.country,
-      emoji: flag, // always assign flag as default on creation
-      company_id: company.id // Add company_id from current company
+      emoji: flag,
+      company_id: company.id
     };
-    
+
     if (editingLocation) {
       setLocations(locations.map(row => row.id === editingLocation.id ? newEntry : row));
     } else {
       setLocations([...locations, newEntry]);
     }
-    
+
     setOpen(false);
     form.reset();
     setEditingLocation(null);
   };
 
-  // Country search in the dropdown (from allCountries, which is comprehensive)
   const [countrySearch, setCountrySearch] = useState("");
   const filteredCountries = allCountries.filter(country =>
     country.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
@@ -225,7 +197,6 @@ export const LocationsTab = () => {
                   style={editMode && selected.includes(row.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    {/* Emoji/Icon is clickable for picker (only after creation, NOT in dialog) */}
                     <button
                       type="button"
                       className="text-2xl focus:outline-none hover:scale-110 transition-transform"
@@ -258,7 +229,6 @@ export const LocationsTab = () => {
           )}
         </div>
       </CardContent>
-      {/* Add/Edit Dialog */}
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -275,7 +245,6 @@ export const LocationsTab = () => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Country</FormLabel>
-                    {/* Searchable Dropdown (NO emoji!) */}
                     <FormControl>
                       <div>
                         <Input
@@ -322,7 +291,6 @@ export const LocationsTab = () => {
                   </FormItem>
                 )}
               />
-              {/* Show flag (not clickable) for selected country */}
               {form.watch("code") && (
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-semibold">Icon:</span>
@@ -339,7 +307,6 @@ export const LocationsTab = () => {
           </Form>
         </DialogContent>
       </Dialog>
-      {/* Icon/Emoji Picker Dialog */}
       <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
         <DialogContent>
           <DialogHeader>

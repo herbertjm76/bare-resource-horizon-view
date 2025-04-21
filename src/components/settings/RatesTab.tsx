@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useCompany } from "@/context/CompanyContext";
 
-// --- updated schema: add unit ---
 const formSchema = z.object({
   type: z.enum(["role", "location"]),
   reference_id: z.string().min(1, "Please select an item"),
@@ -80,17 +78,17 @@ export const RatesTab = () => {
         setLoading(false);
         return;
       }
-      
+
       setLoading(true);
-      
+
       // Fetch roles
       const { data: rolesData, error: rolesError } = await supabase
         .from("office_roles").select("*").eq("company_id", company.id);
-      
+
       // Fetch locations
       const { data: locationsData, error: locationsError } = await supabase
         .from("office_locations").select("*").eq("company_id", company.id);
-      
+
       // Fetch rates
       const { data: ratesData, error: ratesError } = await supabase
         .from("office_rates").select("*").eq("company_id", company.id);
@@ -104,26 +102,27 @@ export const RatesTab = () => {
       } else {
         setRoles(rolesData || []);
         setLocations(locationsData || []);
-        
-        // Process rates data with proper type casting
+
+        // Process rates data with proper type casting & company_id always string
         if (ratesData) {
           const typedRates: OfficeRate[] = ratesData.map((rate) => ({
             ...rate,
             value: Number(rate.value),
-            type: rate.type as "role" | "location", // Cast the type explicitly
-            unit: rate.unit as "hour" | "day" | "week" // Cast the unit explicitly
+            type: rate.type === "role" ? "role" : "location",
+            unit: rate.unit === "hour" || rate.unit === "day" || rate.unit === "week" ? rate.unit : "hour",
+            company_id: (rate.company_id ?? company.id).toString(),
           }));
           setRates(typedRates);
         } else {
           setRates([]);
         }
       }
-      
+
       setLoading(false);
     }
-    
+
     fetchData();
-  }, [open, company]); // refetch when dialog opens (e.g. after adding/updating) or company changes
+  }, [open, company]);
 
   const form = useForm<RateFormValues>({
     resolver: zodResolver(formSchema),
