@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -21,7 +22,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
+  SidebarRail,
   useSidebar
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
@@ -152,6 +153,7 @@ export function DashboardSidebar() {
                       <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton
                           asChild
+                          tooltip={collapsed ? item.title : undefined}
                           className={`
                             text-white 
                             hover:text-white 
@@ -182,6 +184,7 @@ export function DashboardSidebar() {
           ))}
         </SidebarGroup>
       </SidebarContent>
+      <SidebarRail />
     </Sidebar>
   );
 }
