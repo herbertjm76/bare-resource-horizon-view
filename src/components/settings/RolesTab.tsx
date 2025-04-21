@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,6 +47,13 @@ export const RolesTab = () => {
     },
   });
 
+  useEffect(() => {
+    if (company) {
+      console.log("RolesTab - Company ID:", company.id);
+      console.log("RolesTab - Roles:", roles);
+    }
+  }, [company, roles]);
+
   const handleEditRole = (role: Role) => {
     setEditingRole(role);
     form.reset({
@@ -57,6 +64,11 @@ export const RolesTab = () => {
   };
 
   const handleDeleteRole = async (id: string) => {
+    if (!company) {
+      toast.error('No company selected');
+      return;
+    }
+    
     try {
       const { error } = await supabase
         .from('office_roles')
@@ -87,7 +99,6 @@ export const RolesTab = () => {
           .update({
             name: values.name,
             code: values.code,
-            company_id: company.id,
           })
           .eq('id', editingRole.id);
         
@@ -95,7 +106,7 @@ export const RolesTab = () => {
         
         setRoles(roles.map(role => 
           role.id === editingRole.id 
-            ? { ...role, name: values.name, code: values.code, company_id: company.id }
+            ? { ...role, name: values.name, code: values.code }
             : role
         ));
         toast.success('Role updated successfully');

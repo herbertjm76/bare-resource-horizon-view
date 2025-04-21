@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -59,6 +60,8 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
     const fetchSettings = async () => {
       setLoading(true);
       try {
+        console.log("Fetching settings for company:", company.id);
+        
         const { data: rolesData, error: rolesError } = await supabase
           .from('office_roles')
           .select('id, name, code, company_id')
@@ -79,6 +82,10 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           .eq('company_id', company.id);
 
         if (ratesError) throw ratesError;
+
+        console.log("Roles data:", rolesData);
+        console.log("Locations data:", locationsData);
+        console.log("Rates data:", ratesData);
 
         setRoles(Array.isArray(rolesData) ? rolesData.map((r) => ({
           ...r,

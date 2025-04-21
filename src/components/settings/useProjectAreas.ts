@@ -32,6 +32,9 @@ export default function useProjectAreas() {
           setLoading(false);
           return;
         }
+        
+        console.log("Fetching project areas for company:", company.id);
+        
         const { data, error } = await supabase
           .from("project_areas")
           .select("*")
@@ -43,6 +46,7 @@ export default function useProjectAreas() {
           setError("Failed to load project areas.");
           setAreas([]);
         } else {
+          console.log("Project areas data:", data);
           const transformedAreas = Array.isArray(data)
             ? data.map(toProjectArea)
             : [];
