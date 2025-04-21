@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CountriesToolbar from "./CountriesToolbar";
-import useProjectAreas, { getAutoRegion, ProjectAreaFormValues, ProjectArea } from "./useProjectAreas";
+import useProjectAreas, { getAutoRegion } from "./useProjectAreas";
+import { ProjectAreaFormValues, ProjectArea } from "./projectAreaTypes";
 import ProjectAreaList from './ProjectAreaList';
 import ProjectAreaForm from './ProjectAreaForm';
 
@@ -72,7 +73,9 @@ export const CountriesTab = () => {
         }
       }
     });
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe?.();
+    };
   }, [form]);
 
   const onSubmit = async (values: ProjectAreaFormValues) => {
