@@ -10,31 +10,33 @@ export const DashboardHeader = ({ userName }: { userName: string }) => {
   const { company } = useCompany();
 
   return (
-    <header className="flex justify-between items-center mb-8">
+    <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
       <div>
-        <h1 className="text-3xl font-bold text-white">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
           {company?.name || 'Your Company'} Dashboard
         </h1>
-        <p className="text-white/80">
+        <p className="text-white/80 font-light mt-1">
           Welcome, {userName}
         </p>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-3">
         <Button 
           asChild
           variant="ghost"
           className="text-white hover:bg-white/10"
+          size="sm"
         >
           <Link to="/profile">
-            <User className="mr-2 h-4 w-4" /> My Profile
+            <User className="h-4 w-4" /> Profile
           </Link>
         </Button>
         <Button 
           variant="ghost"
           className="text-white hover:bg-white/10"
+          size="sm"
           onClick={() => supabase.auth.signOut()}
         >
-          <LogOut className="mr-2 h-4 w-4" /> Logout
+          <LogOut className="h-4 w-4" /> Logout
         </Button>
       </div>
     </header>

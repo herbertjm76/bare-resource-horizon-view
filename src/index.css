@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -34,14 +35,17 @@
 
     --radius: 0.5rem;
 
-    --bare-light-gray: #8E9196;      /* UPDATED: standardized medium grey */
-    --sidebar-background: #8E9196;   /* Sidebar now matches button grey */
-    --sidebar-foreground: #fff;      /* White icons/text on grey for contrast */
-    --sidebar-primary: #8E9196;
+    /* Refined color palette for minimalist design */
+    --bare-light-gray: #8E9196;
+    --bare-dark-gray: #2D3748;
+    --bare-subtle-gray: #F7FAFC;
+    --sidebar-background: #2D3748;
+    --sidebar-foreground: #fff;
+    --sidebar-primary: #2D3748;
     --sidebar-primary-foreground: #fff;
-    --sidebar-accent: #7d8086;
+    --sidebar-accent: #4A5568;
     --sidebar-accent-foreground: #fff;
-    --sidebar-border: #7d8086;
+    --sidebar-border: #4A5568;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -74,13 +78,13 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
 
-    --sidebar-background: #8E9196;
+    --sidebar-background: #1A202C;
     --sidebar-foreground: #fff;
-    --sidebar-primary: #8E9196;
+    --sidebar-primary: #1A202C;
     --sidebar-primary-foreground: #fff;
-    --sidebar-accent: #7d8086;
+    --sidebar-accent: #2D3748;
     --sidebar-accent-foreground: #fff;
-    --sidebar-border: #7d8086;
+    --sidebar-border: #2D3748;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
@@ -92,6 +96,7 @@
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
   }
 }
 
@@ -100,9 +105,22 @@
  * Usage: className="bare-logo-shadow"
  */
 .bare-logo-shadow {
-  /* For both light and dark, strong blurred shadow effect */
   text-shadow:
     0 4px 18px rgba(40,40,76,0.18),
     1px 0px 4px rgba(60,60,100,0.15);
-  /* Ensures the shadow is smooth and soft like the PNG */
+}
+
+/* Modern minimalist animation utilities */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+/* Glass card effect for modern UI */
+.glass-card {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm;
 }
