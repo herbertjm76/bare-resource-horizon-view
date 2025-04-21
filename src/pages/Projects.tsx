@@ -105,7 +105,7 @@ const ProjectsContent = () => {
 
   return (
     <div className="flex-1 flex flex-col transition-all duration-300" 
-         style={{ paddingLeft: collapsed ? '80px' : '280px' }}>
+         style={{ marginLeft: collapsed ? '80px' : '280px' }}>
       <AppHeader />
       <div className="pt-[64px]">
         {isLoading ? (
@@ -176,7 +176,7 @@ const ProjectsContent = () => {
 const Projects = () => {
   return (
     <SidebarProvider defaultOpen={false}>
-      <div className="w-full min-h-screen flex flex-row">
+      <div className="w-full min-h-screen flex flex-row bg-background">
         <DashboardSidebar />
         <ProjectsContent />
       </div>
