@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { User as UserIcon, LogOut } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
-// Gradient: purple-blue-magenta
-const RESOURCE_GRADIENT =
-  "linear-gradient(90deg, #9b87f5 0%, #1EAEDB 50%, #D946EF 100%)";
+// Colors
+const BARE_DARK_GREY_SHADOW = "#222";
+const RESOURCE_GRADIENT = "linear-gradient(90deg, #9b87f5, #7E69AB, #5a7eb7)";
+const BARE_MID_GRAY = "#8A898C";
 
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
@@ -44,26 +45,23 @@ export const AppHeader: React.FC = () => {
 
   return (
     <header
-      className="w-full px-8 py-3 flex items-center justify-between z-30"
-      style={{
-        minHeight: 56,
-        background: RESOURCE_GRADIENT,
-      }}
+      className="w-full px-4 py-1 flex items-center justify-between z-30 shadow-md bg-white/90 border-b border-white/30"
+      style={{ minHeight: 48 }}
     >
       <div>
         <h1
           className="flex items-end leading-none select-none"
           aria-label="BareResource"
           style={{
-            fontWeight: 700,
+            fontWeight: 700,          // Make both bold for uniformity
             fontSize: "2.4rem",
-            letterSpacing: "0.1px",
+            letterSpacing: "0.1px",   // very tight spacing for the entire word
             lineHeight: 1,
           }}
         >
           <span
             style={{
-              color: "#fff",
+              color: BARE_MID_GRAY,
               fontWeight: 700,
               fontSize: "2.4rem",
               letterSpacing: "0.1px",
@@ -71,6 +69,7 @@ export const AppHeader: React.FC = () => {
               display: "inline-block",
               position: "relative",
               paddingBottom: 0,
+              // Removed textShadow here as requested
             }}
           >
             Bare
@@ -86,7 +85,7 @@ export const AppHeader: React.FC = () => {
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-              marginLeft: 0,
+              marginLeft: 0, // remove spacing between
             }}
           >
             Resource
@@ -96,24 +95,24 @@ export const AppHeader: React.FC = () => {
       <div className="flex items-center gap-4">
         {!loading && user ? (
           <>
-            <span className="hidden sm:inline text-white">
+            <span className="hidden sm:inline text-[#8E9196]">
               {company?.name ? company.name : "Company"}
             </span>
-            <Button asChild variant="ghost" className="text-white hover:bg-white/10">
+            <Button asChild variant="ghost" className="text-[#8E9196] hover:bg-[#8E9196]/10">
               <Link to="/profile">
                 <UserIcon className="mr-2 h-4 w-4" /> My Profile
               </Link>
             </Button>
             <Button
               variant="ghost"
-              className="text-white hover:bg-white/10"
+              className="text-[#8E9196] hover:bg-[#8E9196]/10"
               onClick={handleLogout}
             >
               <LogOut className="mr-2 h-4 w-4" /> Sign Out
             </Button>
           </>
         ) : !loading ? (
-          <Button asChild variant="ghost" className="text-white hover:bg-white/10">
+          <Button asChild variant="ghost" className="text-[#8E9196] hover:bg-[#8E9196]/10">
             <Link to="/auth">Sign In</Link>
           </Button>
         ) : null}

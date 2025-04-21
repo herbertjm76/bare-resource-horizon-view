@@ -12,10 +12,10 @@ export const DashboardHeader = ({ userName }: { userName: string }) => {
   return (
     <header className="flex justify-between items-center mb-8">
       <div>
-        <h1 className="text-3xl font-bold text-[#8E9196]">
+        <h1 className="text-3xl font-bold text-white">
           {company?.name || 'Your Company'} Dashboard
         </h1>
-        <p className="text-[#8E9196]">
+        <p className="text-white/80">
           Welcome, {userName}
         </p>
       </div>
@@ -23,7 +23,7 @@ export const DashboardHeader = ({ userName }: { userName: string }) => {
         <Button 
           asChild
           variant="ghost"
-          className="text-[#8E9196] hover:bg-[#8E9196]/10"
+          className="text-white hover:bg-white/10"
         >
           <Link to="/profile">
             <User className="mr-2 h-4 w-4" /> My Profile
@@ -31,7 +31,7 @@ export const DashboardHeader = ({ userName }: { userName: string }) => {
         </Button>
         <Button 
           variant="ghost"
-          className="text-[#8E9196] hover:bg-[#8E9196]/10"
+          className="text-white hover:bg-white/10"
           onClick={() => supabase.auth.signOut()}
         >
           <LogOut className="mr-2 h-4 w-4" /> Logout

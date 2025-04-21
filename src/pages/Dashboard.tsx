@@ -12,8 +12,8 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { toast } from 'sonner';
 import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
 import { AppHeader } from '@/components/AppHeader';
-import { InviteCodeDialog } from '@/components/dashboard/InviteCodeDialog';
 
+// Create a proper Profile type based on the database schema
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const HEADER_HEIGHT = 56;
@@ -28,8 +28,10 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check current session and set up auth state change listener
     const setupAuth = async () => {
       try {
+        // Set up auth state listener FIRST to prevent missing auth events
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           console.log('Auth state changed:', event);
           setSession(session);
@@ -40,6 +42,7 @@ const Dashboard: React.FC = () => {
           }
         });
 
+        // THEN check for existing session
         const { data: { session } } = await supabase.auth.getSession();
         setSession(session);
         setUser(session?.user ?? null);
@@ -124,10 +127,9 @@ const Dashboard: React.FC = () => {
   };
 
   if (loading) {
-    // Remove gradient bg, use clean white and midgray text
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-[#8E9196] text-xl">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
       </div>
     );
   }
@@ -138,23 +140,27 @@ const Dashboard: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <div className="flex flex-col w-full min-h-screen bg-white">
-        <AppHeader />
-        <div className="flex flex-1 w-full" style={{ minHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
-          <DashboardSidebar inviteUrl={inviteUrl} />
-          <div className="flex-1 flex flex-col bg-white">
-            {/* Remove old double header, header is now above sidebar */}
-            <div style={{ height: 0 }} />
-            <div className="flex-1 p-8 max-w-6xl mx-auto text-[#8E9196]">
-              <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || "User"} />
-              <DashboardMetrics />
-              {(profile?.role === 'owner' || profile?.role === 'admin') && (
-                <TeamManagement
-                  teamMembers={teamMembers}
-                  inviteUrl={inviteUrl}
-                  userRole={profile.role}
-                />
-              )}
+      <div className="flex flex-col w-full min-h-screen">
+        <div className="flex flex-1 w-full">
+          {/* Sidebar now starts below the glass header */}
+          <DashboardSidebar />
+          <div className="flex-1 flex flex-col">
+            {/* Header only in main column */}
+            <AppHeader />
+            {/* Spacer for fixed header */}
+            <div style={{ height: HEADER_HEIGHT }} />
+            <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
+              <div className="max-w-6xl mx-auto">
+                <DashboardHeader userName={profile?.first_name || user.email?.split('@')[0] || 'User'} />
+                <DashboardMetrics />
+                {(profile?.role === 'owner' || profile?.role === 'admin') && (
+                  <TeamManagement 
+                    teamMembers={teamMembers} 
+                    inviteUrl={inviteUrl}
+                    userRole={profile.role}
+                  />
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import {
+
+import { 
   LayoutDashboard,
   CalendarDays,
   CalendarRange,
@@ -9,12 +9,9 @@ import {
   FolderKanban,
   GanttChartSquare,
   UserSquare2,
-  Flag,
-  Code,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+  Flag
+} from "lucide-react"
+import { Link, useLocation } from "react-router-dom"
 import {
   Sidebar,
   SidebarContent,
@@ -25,13 +22,10 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarTrigger,
-  useSidebar,
-} from "@/components/ui/sidebar";
-import { InviteCodeDialog } from "./InviteCodeDialog";
+  useSidebar
+} from "@/components/ui/sidebar"
 
-// --- TEMP LOGO -- //
-const LOGO_URL = "/placeholder.svg";
-
+// Menu items:
 const navigationItems = [
   {
     label: "Overview",
@@ -106,191 +100,94 @@ const navigationItems = [
         url: "/office-settings",
         icon: Flag,
       },
-      {
-        title: "Invite Code",
-        url: "#",
-        icon: Code,
-        isInvite: true,
-      },
     ],
   },
-];
+]
 
-export function DashboardSidebar({ inviteUrl }: { inviteUrl?: string }) {
-  const { state, toggleSidebar } = useSidebar();
+export function DashboardSidebar() {
+  const { state } = useSidebar();
   const location = useLocation();
   const collapsed = state === "collapsed";
 
-  // Invite Code Dialog
-  const [inviteOpen, setInviteOpen] = useState(false);
-
-  // Main sidebar: solid midgray, text/icons all white, larger icons and better hover.
   return (
-    <Sidebar
+    <Sidebar 
       className={`
-        min-h-screen w-full p-0
-        border-none 
+        backdrop-blur-lg 
+        bg-[#8E9196]        /* Standardized grey background */
+        bg-opacity-100
+        border-r 
+        border-[#7d8086]
+        pt-0
+        min-h-screen
         transition-[width]
-        shadow-xl
-        bg-[#8E9196]
-        text-white
-        relative
       `}
-      data-gradient-sidebar
+      style={{ marginTop: 0 }}
     >
+      {/* Margin for space below (now handled by main layout) */}
       <SidebarContent className="p-0">
-        {/* Company Logo and Collapse Button */}
-        <div className="flex flex-col items-stretch w-full">
-          <div
-            className={`flex items-center justify-between gap-2 px-4 py-7 ${
-              collapsed ? "justify-center px-2" : ""
-            }`}
-          >
-            <div className={collapsed ? "w-full flex justify-center" : "flex items-center gap-3"}>
-              <img
-                src={LOGO_URL}
-                alt="Company Logo"
-                className={`shadow-lg rounded-full border-2 border-white/80 ${
-                  collapsed ? "w-14 h-14" : "w-16 h-16"
-                } bg-white object-cover duration-200`}
-                style={{
-                  minWidth: 56,
-                  minHeight: 56,
-                  maxWidth: 64,
-                  maxHeight: 64,
-                  objectFit: "cover",
-                }}
-              />
-              {!collapsed && (
-                <span
-                  className="text-4xl font-extrabold tracking-wide whitespace-nowrap text-white"
-                  style={{ letterSpacing: 1.5 }}
-                >
-                  BareResource
-                </span>
-              )}
-            </div>
-            <button
-              onClick={toggleSidebar}
-              className={`transition-colors rounded-full p-1 ml-2 ${
-                collapsed ? "bg-white/30 hover:bg-white/60" : "bg-white/20 hover:bg-white/40"
-              } text-white shadow-md focus:outline-none focus:ring-2 focus:ring-white`}
-              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              {collapsed ? (
-                <ChevronRight className="w-9 h-9" />
-              ) : (
-                <ChevronLeft className="w-9 h-9" />
-              )}
-            </button>
+        <SidebarGroup>
+          <div className="flex items-center justify-between px-2 py-4">
+            <span className="text-2xl font-bold text-white select-none" style={{ color: "#fff" }}>Bare</span>
+            <SidebarTrigger className="md:hidden text-white bg-transparent hover:bg-[#7d8086]" />
           </div>
-        </div>
-
-        {/* Navigation Menu */}
-        {navigationItems.map((section) => (
-          <SidebarGroup key={section.label}>
-            <SidebarGroupLabel
-              className={`uppercase tracking-wide font-semibold text-sm mb-1 text-white/60 ${
-                collapsed ? "hidden" : ""
-              }`}
-            >
-              {collapsed ? "" : section.label}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {section.items.map((item) => {
-                  const isActive = location.pathname === item.url;
-                  return (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton
-                        asChild
-                        className={`
-                          text-white 
-                          text-2xl
-                          hover:text-[#fff]
-                          hover:bg-white/10
-                          px-5 py-4
-                          my-2
-                          rounded-xl
-                          flex
-                          items-center
-                          gap-6
-                          transition-all
-                          ease-in
-                          group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0
-                          ${isActive ? "bg-white/20 font-semibold shadow-inner" : ""}
-                        `}
-                        isActive={isActive}
-                        aria-current={isActive ? "page" : undefined}
-                      >
-                        {/* Invite Code button breaks to popup */}
-                        {item.isInvite ? (
-                          <button
-                            type="button"
-                            className={`
-                              w-full flex items-center gap-6
-                              group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
-                              focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:outline-none transition-shadow
-                            `}
-                            tabIndex={0}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setInviteOpen(true);
-                            }}
-                          >
-                            <item.icon
-                              className={`${
-                                collapsed ? "w-12 h-12" : "w-10 h-10"
-                              } drop-shadow-sm flex-shrink-0 transition-all text-white`}
-                              aria-hidden="true"
+          {navigationItems.map((section) => (
+            <div key={section.label} className="mb-1">
+              <SidebarGroupLabel className="text-white/70">{collapsed ? "" : section.label}</SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {section.items.map((item) => {
+                    const isActive = location.pathname === item.url;
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton
+                          asChild
+                          className={`
+                            text-white 
+                            hover:text-white 
+                            hover:bg-[#7d8086]
+                            rounded-lg
+                            flex
+                            items-center
+                            gap-3
+                            transition-all
+                            group-data-[collapsible=icon]:justify-center
+                            group-data-[collapsible=icon]:px-0
+                            group-data-[collapsible=icon]:py-3
+                            ${isActive ? "bg-[#7d8086]! text-white" : ""}
+                          `}
+                          isActive={isActive}
+                        >
+                          <Link to={item.url} className={`
+                            flex items-center gap-2 w-full
+                            transition-all
+                            group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
+                          `}>
+                            <item.icon 
+                              className={`
+                                transition-all
+                                ${collapsed ? "h-8 w-8" : "h-6 w-6"}   /* LARGER ICONS WHEN COLLAPSED */
+                                group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8
+                              `}
                             />
-                            <span
-                              className={`truncate group-data-[collapsible=icon]:hidden ${
-                                collapsed ? "hidden" : ""
-                              }`}
-                            >
-                              {item.title}
-                            </span>
-                          </button>
-                        ) : (
-                          <Link
-                            to={item.url}
-                            className={`
-                              flex items-center gap-6 w-full
-                              group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
-                              font-medium
-                              transition-all
-                            `}
-                          >
-                            <item.icon
-                              className={`${
-                                collapsed ? "w-12 h-12" : "w-10 h-10"
-                              } drop-shadow-sm flex-shrink-0 transition-all text-white`}
-                              aria-hidden="true"
-                            />
-                            <span
-                              className={`truncate group-data-[collapsible=icon]:hidden ${
-                                collapsed ? "hidden" : ""
-                              }`}
-                            >
+                            {/* Only show label if sidebar expanded */}
+                            <span className={`truncate group-data-[collapsible=icon]:hidden ${collapsed ? "hidden" : ""}`}>
                               {item.title}
                             </span>
                           </Link>
-                        )}
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  );
-                })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </div>
+          ))}
+        </SidebarGroup>
       </SidebarContent>
-      {/* Sidebar collapse/expand affordance always visible on wide screens */}
-      <div className="flex justify-end items-center px-4 py-6 md:block hidden">
-        <SidebarTrigger className="text-white hover:bg-white/30" />
+      {/* Sidebar trigger in collapsed state (show always for easy access) */}
+      <div className="flex justify-end px-2 pb-4 md:block hidden">
+        <SidebarTrigger className="text-white hover:bg-[#7d8086]" />
       </div>
-      <InviteCodeDialog open={inviteOpen} onOpenChange={setInviteOpen} inviteUrl={inviteUrl || ""} />
     </Sidebar>
-  );
+  )
 }
