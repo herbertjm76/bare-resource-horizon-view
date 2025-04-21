@@ -30,7 +30,7 @@ export type Location = {
   company_id?: string;
 };
 
-// Define database response types with explicit properties (no deep nesting)
+// Define the exact response types from Supabase
 type SupabaseRole = {
   id: string;
   name: string;
@@ -117,16 +117,15 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (ratesError) throw ratesError;
 
-        // Handle roles data with explicit typing
+        // Handle roles data
         if (rolesData) {
-          // Cast to SupabaseRole array first to avoid deep instantiation issues
           const rolesToSet: Role[] = [];
-          for (const role of rolesData) {
+          for (const roleData of (rolesData as SupabaseRole[])) {
             rolesToSet.push({
-              id: role.id,
-              name: role.name,
-              code: role.code,
-              ...(role.company_id ? { company_id: role.company_id } : {})
+              id: roleData.id,
+              name: roleData.name,
+              code: roleData.code,
+              company_id: roleData.company_id
             });
           }
           setRoles(rolesToSet);
@@ -134,18 +133,17 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           setRoles([]);
         }
         
-        // Handle locations data with explicit typing
+        // Handle locations data
         if (locationsData) {
-          // Cast to SupabaseLocation array first to avoid deep instantiation issues
           const locationsToSet: Location[] = [];
-          for (const location of locationsData) {
+          for (const locationData of (locationsData as SupabaseLocation[])) {
             locationsToSet.push({
-              id: location.id,
-              city: location.city,
-              country: location.country,
-              code: location.code,
-              ...(location.emoji ? { emoji: location.emoji } : {}),
-              ...(location.company_id ? { company_id: location.company_id } : {})
+              id: locationData.id,
+              city: locationData.city,
+              country: locationData.country,
+              code: locationData.code,
+              emoji: locationData.emoji,
+              company_id: locationData.company_id
             });
           }
           setLocations(locationsToSet);
@@ -153,18 +151,17 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           setLocations([]);
         }
         
-        // Transform rates data with proper typing
+        // Handle rates data
         if (ratesData) {
-          // Cast to SupabaseRate array first to avoid deep instantiation issues
           const ratesToSet: Rate[] = [];
-          for (const rate of ratesData) {
+          for (const rateData of (ratesData as SupabaseRate[])) {
             ratesToSet.push({
-              id: rate.id,
-              type: rate.type as "role" | "location",
-              reference_id: rate.reference_id,
-              value: Number(rate.value),
-              unit: rate.unit as "hour" | "day" | "week",
-              ...(rate.company_id ? { company_id: rate.company_id } : {})
+              id: rateData.id,
+              type: rateData.type as "role" | "location",
+              reference_id: rateData.reference_id,
+              value: Number(rateData.value),
+              unit: rateData.unit as "hour" | "day" | "week",
+              company_id: rateData.company_id
             });
           }
           setRates(ratesToSet);
