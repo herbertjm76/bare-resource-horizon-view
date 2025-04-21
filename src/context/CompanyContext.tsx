@@ -1,17 +1,20 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 type CompanyContextType = {
   company: any | null;
   loading: boolean;
   subdomain: string | null;
+  refreshCompany: () => Promise<void>;
 };
 
 const CompanyContext = createContext<CompanyContextType>({
   company: null,
   loading: true,
   subdomain: null,
+  refreshCompany: async () => {},
 });
 
 export const useCompany = () => useContext(CompanyContext);
@@ -20,68 +23,154 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [company, setCompany] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [subdomain, setSubdomain] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
-  useEffect(() => {
-    // Extract subdomain from current hostname
-    const extractSubdomain = () => {
-      const hostname = window.location.hostname;
-      
-      // For localhost development
-      if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        // Check if using subdomain.localhost pattern
-        const localParts = window.location.host.split('.');
-        if (localParts.length > 1 && localParts[1] === 'localhost') {
-          return localParts[0];
-        }
-        // For development, optionally get subdomain from query param
-        const params = new URLSearchParams(window.location.search);
-        return params.get('subdomain');
+  // Extract subdomain from current hostname
+  const extractSubdomain = () => {
+    const hostname = window.location.hostname;
+    
+    // For localhost development
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // Check if using subdomain.localhost pattern
+      const localParts = window.location.host.split('.');
+      if (localParts.length > 1 && localParts[1] === 'localhost') {
+        return localParts[0];
       }
-      
-      // For production/deployed version
-      const hostParts = hostname.split('.');
-      // Check if it's likely a subdomain (e.g., company.bareresource.com)
-      if (hostParts.length > 2 && hostParts[1] === 'bareresource') {
-        return hostParts[0];
-      }
-      
-      return null;
-    };
+      // For development, optionally get subdomain from query param
+      const params = new URLSearchParams(window.location.search);
+      return params.get('subdomain');
+    }
+    
+    // For production/deployed version
+    const hostParts = hostname.split('.');
+    // Check if it's likely a subdomain (e.g., company.bareresource.com)
+    if (hostParts.length > 2 && hostParts[1] === 'bareresource') {
+      return hostParts[0];
+    }
+    
+    return null;
+  };
 
-    const fetchCompanyData = async (subdomainValue: string) => {
-      try {
-        const { data, error } = await supabase
-          .from('companies')
-          .select('*')
-          .eq('subdomain', subdomainValue)
-          .single();
+  const fetchCompanyData = async (subdomainValue: string) => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('subdomain', subdomainValue)
+        .single();
 
-        if (error) {
-          console.error('Error fetching company:', error);
-          setCompany(null);
-        } else {
-          setCompany(data);
-        }
-      } catch (error) {
-        console.error('Error in company data fetch:', error);
+      if (error) {
+        console.error('Error fetching company:', error);
         setCompany(null);
-      } finally {
-        setLoading(false);
+      } else {
+        setCompany(data);
       }
-    };
+    } catch (error) {
+      console.error('Error in company data fetch:', error);
+      setCompany(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const fetchUserCompany = async () => {
+    try {
+      setLoading(true);
+      
+      // First check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        console.log("No active session, cannot fetch company data");
+        setCompany(null);
+        return;
+      }
+      
+      // Get user profile to find company_id
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('company_id')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (profileError || !profile || !profile.company_id) {
+        console.log("No company associated with user profile");
+        setCompany(null);
+        return;
+      }
+      
+      // Fetch company data using company_id
+      const { data: companyData, error: companyError } = await supabase
+        .from('companies')
+        .select('*')
+        .eq('id', profile.company_id)
+        .single();
+        
+      if (companyError) {
+        console.error('Error fetching company:', companyError);
+        setCompany(null);
+      } else {
+        setCompany(companyData);
+      }
+    } catch (error) {
+      console.error('Error in company data fetch:', error);
+      setCompany(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshCompany = async () => {
     const currentSubdomain = extractSubdomain();
     setSubdomain(currentSubdomain);
     
     if (currentSubdomain) {
-      fetchCompanyData(currentSubdomain);
+      await fetchCompanyData(currentSubdomain);
     } else {
-      setLoading(false);
+      await fetchUserCompany();
     }
+  };
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event) => {
+        console.log("Auth state changed:", event);
+        if (event === 'SIGNED_IN') {
+          // Refresh company data when user signs in
+          await refreshCompany();
+        } else if (event === 'SIGNED_OUT') {
+          setCompany(null);
+        }
+        setAuthChecked(true);
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    const loadInitialData = async () => {
+      const currentSubdomain = extractSubdomain();
+      setSubdomain(currentSubdomain);
+      
+      if (currentSubdomain) {
+        await fetchCompanyData(currentSubdomain);
+      } else {
+        await fetchUserCompany();
+      }
+      setAuthChecked(true);
+    };
+
+    loadInitialData();
   }, []);
 
   return (
-    <CompanyContext.Provider value={{ company, loading, subdomain }}>
+    <CompanyContext.Provider value={{ company, loading, subdomain, refreshCompany }}>
       {children}
     </CompanyContext.Provider>
   );
