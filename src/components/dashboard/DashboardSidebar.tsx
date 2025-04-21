@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -25,7 +24,6 @@ import {
   SidebarTrigger,
   useSidebar
 } from "@/components/ui/sidebar"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 
 const navigationItems = [
