@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -174,7 +175,7 @@ const ProjectsContent = () => {
 
 const Projects = () => {
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider defaultState="collapsed">
       <div className="w-full min-h-screen flex flex-row">
         <DashboardSidebar />
         <ProjectsContent />
