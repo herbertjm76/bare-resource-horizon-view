@@ -1,15 +1,18 @@
 
+// TeamManagement.tsx (refactored shell, logic + main state, composes new children)
+
 import React, { useEffect, useState } from 'react';
-import { ClipboardCopy, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
 import { supabase } from '@/integrations/supabase/client';
 import AuthGuard from '@/components/AuthGuard';
+import TeamInviteSection from './TeamInviteSection';
+import TeamInvitesTable from './TeamInvitesTable';
+import TeamMembersTable from './TeamMembersTable';
 
-type Profile = Database['public']['Tables']['profiles']['Row'];
-type Invite = Database['public']['Tables']['invites']['Row'];
+export type Profile = Database['public']['Tables']['profiles']['Row'];
+export type Invite = Database['public']['Tables']['invites']['Row'];
 
 interface TeamManagementProps {
   teamMembers: Profile[];
@@ -62,7 +65,7 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
         setInvLoading(false);
         return;
       }
-      
+
       // Get the current user's ID for created_by
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) {
@@ -115,111 +118,19 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
             Copy Invite Link
           </Button>
         </div>
-        
-        {/* Invite management section */}
+
         {['owner', 'admin'].includes(userRole) && (
-          <div className="mb-6">
-            <h3 className="text-lg text-white font-medium mb-2">Send Invite</h3>
-            <form className="flex gap-2" onSubmit={handleSendInvite}>
-              <Input
-                type="email"
-                placeholder="Invite email"
-                value={inviteEmail}
-                onChange={e => setInviteEmail(e.target.value)}
-                className="w-64"
-                required
-                disabled={invLoading}
-              />
-              <Button type="submit" variant="default" disabled={invLoading}>
-                {invLoading ? 'Sending...' : (
-                  <>
-                    <Plus className="w-4 h-4 mr-1" /> Send Invite
-                  </>
-                )}
-              </Button>
-            </form>
-          </div>
+          <TeamInviteSection
+            inviteEmail={inviteEmail}
+            setInviteEmail={setInviteEmail}
+            invLoading={invLoading}
+            handleSendInvite={handleSendInvite}
+          />
         )}
 
-        {/* List of existing invites */}
-        {invitees.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-lg font-medium text-white mb-2">Pending Invites</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="py-2 px-4 text-left text-white/80">Email</th>
-                    <th className="py-2 px-4 text-left text-white/80">Invite Code</th>
-                    <th className="py-2 px-4 text-left text-white/80">Status</th>
-                    <th className="py-2 px-4 text-left text-white/80">Created</th>
-                    <th className="py-2 px-4 text-left text-white/80">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {invitees.map(invite => (
-                    <tr key={invite.id} className="border-b border-white/10 hover:bg-white/5">
-                      <td className="py-2 px-4 text-white">{invite.email || <span className="italic text-white/50">Not set</span>}</td>
-                      <td className="py-2 px-4 text-white">{invite.code}</td>
-                      <td className="py-2 px-4 text-white">{invite.status}</td>
-                      <td className="py-2 px-4 text-white">{new Date(invite.created_at).toLocaleString()}</td>
-                      <td className="py-2 px-4">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="inline-flex gap-1 text-white"
-                          onClick={() => copyInviteCode(invite.code)}
-                        >
-                          <ClipboardCopy className="h-4 w-4" />
-                          Copy Link
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-        
-        {/* Members */}
-        <div>
-          <h3 className="text-lg font-medium text-white mb-4">
-            Team Members ({teamMembers.length})
-          </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-white/10">
-                  <th className="py-2 px-4 text-left text-white/80">Name</th>
-                  <th className="py-2 px-4 text-left text-white/80">Email</th>
-                  <th className="py-2 px-4 text-left text-white/80">Role</th>
-                  <th className="py-2 px-4 text-left text-white/80">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {teamMembers.map((member) => (
-                  <tr key={member.id} className="border-b border-white/10 hover:bg-white/5">
-                    <td className="py-3 px-4 text-white">
-                      {member.first_name && member.last_name 
-                        ? `${member.first_name} ${member.last_name}`
-                        : 'No name provided'}
-                    </td>
-                    <td className="py-3 px-4 text-white">{member.email}</td>
-                    <td className="py-3 px-4 text-white capitalize">{member.role}</td>
-                    <td className="py-3 px-4">
-                      {userRole === 'owner' && (
-                        <Button variant="ghost" size="sm" className="text-white">
-                          Manage
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <TeamInvitesTable invitees={invitees} copyInviteCode={copyInviteCode} />
+
+        <TeamMembersTable teamMembers={teamMembers} userRole={userRole} />
       </div>
     </AuthGuard>
   );

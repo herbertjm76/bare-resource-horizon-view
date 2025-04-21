@@ -1,0 +1,54 @@
+
+import React from "react";
+import { Button } from "@/components/ui/button";
+import { Profile } from "./TeamManagement";
+
+interface TeamMembersTableProps {
+  teamMembers: Profile[];
+  userRole: string;
+}
+
+const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
+  teamMembers,
+  userRole
+}) => (
+  <div>
+    <h3 className="text-lg font-medium text-white mb-4">
+      Team Members ({teamMembers.length})
+    </h3>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="border-b border-white/10">
+            <th className="py-2 px-4 text-left text-white/80">Name</th>
+            <th className="py-2 px-4 text-left text-white/80">Email</th>
+            <th className="py-2 px-4 text-left text-white/80">Role</th>
+            <th className="py-2 px-4 text-left text-white/80">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {teamMembers.map((member) => (
+            <tr key={member.id} className="border-b border-white/10 hover:bg-white/5">
+              <td className="py-3 px-4 text-white">
+                {member.first_name && member.last_name
+                  ? `${member.first_name} ${member.last_name}`
+                  : 'No name provided'}
+              </td>
+              <td className="py-3 px-4 text-white">{member.email}</td>
+              <td className="py-3 px-4 text-white capitalize">{member.role}</td>
+              <td className="py-3 px-4">
+                {userRole === 'owner' && (
+                  <Button variant="ghost" size="sm" className="text-white">
+                    Manage
+                  </Button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+);
+
+export default TeamMembersTable;
