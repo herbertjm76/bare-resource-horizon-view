@@ -85,17 +85,17 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (ratesError) throw ratesError;
 
-        // Set the data in state (with type assertions to ensure compatibility)
-        setRoles(rolesData as Role[] || []);
-        setLocations(locationsData as Location[] || []);
+        // Set the data in state without excessive type assertions
+        setRoles(rolesData || []);
+        setLocations(locationsData || []);
         
         // Transform rates data to match our Rate type
-        const transformedRates = ratesData ? ratesData.map((rate: any) => ({
+        const transformedRates: Rate[] = ratesData ? ratesData.map((rate: any) => ({
           id: rate.id,
-          type: rate.type,
+          type: rate.type as "role" | "location",
           reference_id: rate.reference_id,
-          value: rate.value,
-          unit: rate.unit,
+          value: Number(rate.value),
+          unit: rate.unit as "hour" | "day" | "week",
           company_id: rate.company_id
         })) : [];
         
