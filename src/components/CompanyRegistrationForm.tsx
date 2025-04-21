@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { CountrySelect } from "@/components/ui/CountrySelect";
+import AddressAutocomplete from "@/components/ui/AddressAutocomplete";
 
 interface CompanyFormData {
   name: string;
@@ -12,6 +14,7 @@ interface CompanyFormData {
   website?: string;
   description?: string;
   address: string;
+  country: string;
   size: string;
   location: string;
 }
@@ -21,12 +24,30 @@ interface CompanyRegistrationFormProps {
   userId: string;
 }
 
+const companySizes = [
+  { value: "1-5", label: "1-5" },
+  { value: "5-25", label: "5-25" },
+  { value: "26-50", label: "26-50" },
+  { value: "51-100", label: "51-100" },
+];
+
 export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = ({
   onSuccess,
   userId,
 }) => {
-  const { register, handleSubmit, formState: { errors }, watch, setError } = useForm<CompanyFormData>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    setError,
+    setValue,
+  } = useForm<CompanyFormData>();
   const [isCheckingSubdomain, setIsCheckingSubdomain] = useState(false);
+
+  // Country and Address Management
+  const selectedCountry = watch("country");
+  const addressValue = watch("address");
 
   const checkSubdomainAvailability = async (subdomain: string) => {
     setIsCheckingSubdomain(true);
@@ -95,6 +116,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* Name */}
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-200">
           Company Name
@@ -110,6 +132,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         )}
       </div>
 
+      {/* Subdomain */}
       <div>
         <label htmlFor="subdomain" className="block text-sm font-medium text-gray-200">
           Subdomain
@@ -144,37 +167,59 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         )}
       </div>
 
+      {/* Country */}
+      <div>
+        <label htmlFor="country" className="block text-sm font-medium text-gray-200">
+          Country
+        </label>
+        <CountrySelect
+          value={selectedCountry ?? ""}
+          onChange={(_name, code) => setValue("country", _name)}
+          placeholder="Select country"
+        />
+        {errors.country && (
+          <p className="text-red-500 text-sm mt-1">{errors.country.message}</p>
+        )}
+      </div>
+
+      {/* Address (under country, with autocomplete) */}
       <div>
         <label htmlFor="address" className="block text-sm font-medium text-gray-200">
           Company Address
         </label>
-        <Input
-          id="address"
-          type="text"
-          {...register('address', { required: "Address is required" })}
-          className="mt-1"
+        <AddressAutocomplete
+          value={addressValue || ""}
+          country={selectedCountry || ""}
+          onChange={addr => setValue("address", addr)}
+          disabled={!selectedCountry}
+          placeholder={selectedCountry ? "Type address..." : "Select country above first"}
         />
         {errors.address && (
           <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
         )}
       </div>
 
+      {/* Company Size dropdown */}
       <div>
         <label htmlFor="size" className="block text-sm font-medium text-gray-200">
           Company Size
         </label>
-        <Input
+        <select
           id="size"
-          type="text"
-          placeholder="e.g. 1-10, 11-50, 51-200, etc."
           {...register('size', { required: "Size is required" })}
-          className="mt-1"
-        />
+          className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+        >
+          <option value="">Select size...</option>
+          {companySizes.map(opt => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
         {errors.size && (
           <p className="text-red-500 text-sm mt-1">{errors.size.message}</p>
         )}
       </div>
 
+      {/* Location */}
       <div>
         <label htmlFor="location" className="block text-sm font-medium text-gray-200">
           Location (City, Country)
@@ -191,6 +236,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         )}
       </div>
 
+      {/* Website */}
       <div>
         <label htmlFor="website" className="block text-sm font-medium text-gray-200">
           Website (optional)
@@ -204,6 +250,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         />
       </div>
 
+      {/* Description */}
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-200">
           Description (optional)
