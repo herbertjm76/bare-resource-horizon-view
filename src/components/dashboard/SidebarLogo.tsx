@@ -10,30 +10,29 @@ interface SidebarLogoProps {
 export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => (
   <div className="flex items-center justify-center h-[64px] border-b border-[#7d8086]">
     <div className="flex items-center justify-center w-full">
-      <span className={`text-2xl font-bold select-none whitespace-nowrap ${collapsed ? 'w-8 h-8' : ''}`}>
-        {collapsed ? (
-          <span className="flex items-center justify-center w-8 h-8 rounded-full">
-            <ChevronRight className="h-6 w-6 text-white" />
-          </span>
-        ) : (
-          <>
-            <span className="text-white">Bare</span>
-            <span className="bg-gradient-to-r from-[#6e5af1] via-[#5948b4] to-[#162c69] bg-clip-text text-transparent font-semibold">Resource</span>
-          </>
-        )}
-      </span>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        onClick={toggleSidebar}
-        className="text-white hover:bg-[#7d8086] h-10 w-10 p-2 rounded-full md:flex hidden ml-auto"
-      >
-        {collapsed ? (
+      {collapsed ? (
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleSidebar}
+          className="text-white hover:bg-[#7d8086] h-10 w-10 p-2 rounded-full"
+        >
           <ChevronRight className="h-6 w-6" />
-        ) : (
-          <ChevronLeft className="h-6 w-6" />
-        )}
-      </Button>
+        </Button>
+      ) : (
+        <>
+          <span className="text-white">Bare</span>
+          <span className="bg-gradient-to-r from-[#6e5af1] via-[#5948b4] to-[#162c69] bg-clip-text text-transparent font-semibold">Resource</span>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleSidebar}
+            className="text-white hover:bg-[#7d8086] h-10 w-10 p-2 rounded-full md:flex hidden ml-auto"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+        </>
+      )}
     </div>
   </div>
 )
