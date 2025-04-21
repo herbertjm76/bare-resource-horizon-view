@@ -85,31 +85,38 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (ratesError) throw ratesError;
 
-        // Set the data in state with explicit typing to avoid deep instantiation errors
+        // Handle roles data
         if (rolesData) {
-          setRoles(rolesData as Role[]);
+          setRoles(rolesData);
         } else {
           setRoles([]);
         }
         
+        // Handle locations data
         if (locationsData) {
-          setLocations(locationsData as Location[]);
+          setLocations(locationsData);
         } else {
           setLocations([]);
         }
         
-        // Transform rates data to match our Rate type with proper type handling
+        // Transform rates data with explicit typing to avoid deep instantiation errors
         if (ratesData) {
-          // Explicitly type and transform the data
-          const transformedRates = ratesData.map(rate => ({
-            id: rate.id,
-            type: rate.type as "role" | "location",
-            reference_id: rate.reference_id,
-            value: Number(rate.value),
-            unit: rate.unit as "hour" | "day" | "week",
-            // Only add company_id if it exists in the database response
-            ...(rate.company_id && { company_id: rate.company_id })
-          }));
+          const transformedRates = ratesData.map(rate => {
+            const typedRate: Rate = {
+              id: rate.id,
+              type: rate.type as "role" | "location",
+              reference_id: rate.reference_id,
+              value: Number(rate.value),
+              unit: rate.unit as "hour" | "day" | "week"
+            };
+            
+            // Only add company_id if it exists
+            if ('company_id' in rate && rate.company_id) {
+              typedRate.company_id = rate.company_id;
+            }
+            
+            return typedRate;
+          });
           
           setRates(transformedRates);
         } else {
