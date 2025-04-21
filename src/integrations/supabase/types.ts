@@ -60,6 +60,50 @@ export type Database = {
         }
         Relationships: []
       }
+      invites: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          code: string
+          company_id: string
+          created_at: string
+          created_by: string
+          email: string | null
+          id: string
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          code: string
+          company_id: string
+          created_at?: string
+          created_by: string
+          email?: string | null
+          id?: string
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          code?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string
+          email?: string | null
+          id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invites_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       office_holidays: {
         Row: {
           company_id: string | null
