@@ -114,6 +114,9 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
 
       console.log('Company created successfully with ID:', companyData.id);
 
+      // Define the role explicitly as a valid UserRole enum value
+      const userRole: UserRole = 'owner';
+
       // 2. Sign up user with Supabase Auth
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: ownerEmail,
@@ -123,7 +126,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
             first_name: ownerFirstName,
             last_name: ownerLastName,
             company_id: companyData.id,
-            role: 'owner' as UserRole
+            role: userRole
           }
         }
       });
@@ -143,31 +146,37 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
 
       console.log('User created successfully with ID:', authData.user.id);
 
-      // 3. Create profile manually in case trigger fails
-      const profileData = {
-        id: authData.user.id,
-        email: ownerEmail,
-        first_name: ownerFirstName,
-        last_name: ownerLastName,
-        company_id: companyData.id,
-        role: 'owner' as UserRole
-      };
+      // 3. Ensure profile exists (creates it if it doesn't)
+      const profileCreated = await ensureUserProfile(
+        authData.user.id, 
+        {
+          email: ownerEmail,
+          firstName: ownerFirstName,
+          lastName: ownerLastName,
+          companyId: companyData.id,
+          role: userRole
+        }
+      );
 
-      // First try insert
-      const { error: profileInsertError } = await supabase
-        .from('profiles')
-        .insert(profileData);
-
-      // If insert fails (maybe trigger already created it), try upsert
-      if (profileInsertError) {
-        console.log('Profile insert failed, trying upsert:', profileInsertError);
-        const { error: profileUpsertError } = await supabase
+      if (!profileCreated) {
+        console.warn('Profile creation via helper may have failed, trying direct insert');
+        
+        // Try direct insertion as fallback
+        const { error: profileError } = await supabase
           .from('profiles')
-          .upsert(profileData);
+          .insert({
+            id: authData.user.id,
+            email: ownerEmail,
+            first_name: ownerFirstName,
+            last_name: ownerLastName,
+            company_id: companyData.id,
+            role: userRole
+          });
           
-        if (profileUpsertError) {
-          console.error('Profile upsert error:', profileUpsertError);
-          // Continue anyway as the trigger might have succeeded
+        if (profileError) {
+          console.error('Direct profile creation error:', profileError);
+        } else {
+          console.log('Direct profile creation succeeded');
         }
       }
 
