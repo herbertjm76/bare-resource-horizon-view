@@ -114,6 +114,33 @@ export function DashboardSidebar() {
   const isMobile = useIsMobile();
   const collapsed = state === "collapsed";
 
+  const Logo = () => (
+    <div className="flex items-center justify-between px-6 py-4 h-[64px] border-b border-[#7d8086]">
+      <span className="text-2xl font-bold select-none whitespace-nowrap">
+        {collapsed ? (
+          <span className="text-white">B</span>
+        ) : (
+          <>
+            <span className="text-white">Bare</span>
+            <span className="bg-gradient-to-r from-[#6e5af1] via-[#5948b4] to-[#162c69] bg-clip-text text-transparent font-semibold">Resource</span>
+          </>
+        )}
+      </span>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        onClick={toggleSidebar}
+        className="text-white hover:bg-[#7d8086] h-10 w-10 p-2 rounded-full md:flex hidden"
+      >
+        {collapsed ? (
+          <ChevronRight className="h-6 w-6" />
+        ) : (
+          <ChevronLeft className="h-6 w-6" />
+        )}
+      </Button>
+    </div>
+  );
+
   // Mobile sidebar using Sheet component
   if (isMobile) {
     return (
@@ -130,12 +157,7 @@ export function DashboardSidebar() {
         <Sheet open={openMobile} onOpenChange={setOpenMobile}>
           <SheetContent side="left" className="p-0 w-[280px]">
             <div className="flex flex-col h-full bg-[#8E9196]">
-              <div className="flex items-center justify-between px-6 py-4 h-[64px] border-b border-[#7d8086]">
-                <span className="text-2xl font-bold select-none">
-                  <span className="text-white">Bare</span>
-                  <span className="bg-gradient-to-r from-[#6e5af1] via-[#5948b4] to-[#162c69] bg-clip-text text-transparent font-semibold">Resource</span>
-                </span>
-              </div>
+              <Logo />
               
               {navigationItems.map((section) => (
                 <div key={section.label} className="mb-2">
@@ -197,28 +219,7 @@ export function DashboardSidebar() {
     >
       <SidebarContent className="p-0">
         <SidebarGroup>
-          <div className="flex items-center justify-between px-6 py-4 h-[64px] border-b border-[#7d8086]">
-            <div className="flex items-center gap-2">
-              {!collapsed ? (
-                <span className="text-2xl font-bold select-none">
-                  <span className="text-white">Bare</span>
-                  <span className="bg-gradient-to-r from-[#6e5af1] via-[#5948b4] to-[#162c69] bg-clip-text text-transparent font-semibold">Resource</span>
-                </span>
-              ) : (
-                <span className="text-2xl font-bold select-none">
-                  <span className="bg-gradient-to-r from-[#6e5af1] via-[#5948b4] to-[#162c69] bg-clip-text text-transparent">B</span>
-                </span>
-              )}
-            </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleSidebar} 
-              className="text-white hover:bg-[#7d8086] h-10 w-10 p-2 rounded-full"
-            >
-              {collapsed ? <ChevronRight className="h-6 w-6" /> : <ChevronLeft className="h-6 w-6" />}
-            </Button>
-          </div>
+          <Logo />
           
           {navigationItems.map((section) => (
             <div key={section.label} className="mb-2">
