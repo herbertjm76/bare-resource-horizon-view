@@ -52,7 +52,8 @@ export function DashboardSidebar() {
   // Desktop sidebar
   return (
     <Sidebar 
-      className="bg-[#8E9196] border-r border-[#7d8086] pt-0 min-h-screen transition-all duration-300 fixed left-0 top-0 bottom-0 z-40"
+      className="bg-[#8E9196] border-r border-[#7d8086] pt-0 transition-all duration-300 fixed left-0 top-0 bottom-0 z-40 min-h-screen"
+      collapsible="icon"
       style={{ marginTop: 0, width: collapsed ? '80px' : '280px' }}
     >
       <SidebarContent className="p-0">
