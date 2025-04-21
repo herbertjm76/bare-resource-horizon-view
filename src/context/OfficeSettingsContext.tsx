@@ -15,7 +15,7 @@ export type Role = {
 export type Rate = {
   id: string;
   type: "role" | "location";
-  name: string;
+  reference_id: string; // ID of the role or location
   value: number;
   unit: "hour" | "day" | "week";
   company_id?: string;
@@ -85,10 +85,21 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (ratesError) throw ratesError;
 
-        // Set the data in state
-        setRoles(rolesData || []);
-        setLocations(locationsData || []);
-        setRates(ratesData || []);
+        // Set the data in state (with type assertions to ensure compatibility)
+        setRoles(rolesData as Role[] || []);
+        setLocations(locationsData as Location[] || []);
+        
+        // Transform rates data to match our Rate type
+        const transformedRates = ratesData ? ratesData.map((rate: any) => ({
+          id: rate.id,
+          type: rate.type,
+          reference_id: rate.reference_id,
+          value: rate.value,
+          unit: rate.unit,
+          company_id: rate.company_id
+        })) : [];
+        
+        setRates(transformedRates);
       } catch (error: any) {
         console.error('Error fetching office settings:', error);
         toast.error('Failed to load office settings');
