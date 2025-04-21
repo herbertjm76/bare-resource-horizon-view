@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Database } from '@/integrations/supabase/types';
 
 // Define types
 export type Role = {
@@ -61,21 +62,21 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        // Using Promises.all to fetch all data in parallel and avoid deep type instantiation
-        const [rolesResponse, locationsResponse, ratesResponse] = await Promise.all([
+        // Fetch all data in parallel
+        const [rolesData, locationsData, ratesData] = await Promise.all([
           supabase.from('office_roles').select('*').eq('company_id', company.id),
           supabase.from('office_locations').select('*').eq('company_id', company.id),
           supabase.from('office_rates').select('*').eq('company_id', company.id)
         ]);
 
         // Check for errors in responses
-        if (rolesResponse.error) throw rolesResponse.error;
-        if (locationsResponse.error) throw locationsResponse.error;
-        if (ratesResponse.error) throw ratesResponse.error;
+        if (rolesData.error) throw rolesData.error;
+        if (locationsData.error) throw locationsData.error;
+        if (ratesData.error) throw ratesData.error;
 
-        // Process roles data
-        if (rolesResponse.data) {
-          const processedRoles = rolesResponse.data.map(role => ({
+        // Process roles data with safer type handling
+        if (rolesData.data) {
+          const processedRoles: Role[] = rolesData.data.map(role => ({
             id: role.id,
             name: role.name,
             code: role.code,
@@ -86,9 +87,9 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           setRoles([]);
         }
         
-        // Process locations data
-        if (locationsResponse.data) {
-          const processedLocations = locationsResponse.data.map(location => ({
+        // Process locations data with safer type handling
+        if (locationsData.data) {
+          const processedLocations: Location[] = locationsData.data.map(location => ({
             id: location.id,
             city: location.city,
             country: location.country,
@@ -101,9 +102,9 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           setLocations([]);
         }
         
-        // Process rates data
-        if (ratesResponse.data) {
-          const processedRates = ratesResponse.data.map(rate => ({
+        // Process rates data with safer type handling
+        if (ratesData.data) {
+          const processedRates: Rate[] = ratesData.data.map(rate => ({
             id: rate.id,
             type: rate.type as "role" | "location",
             reference_id: rate.reference_id,
