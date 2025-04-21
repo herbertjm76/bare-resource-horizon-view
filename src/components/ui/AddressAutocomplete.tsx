@@ -9,6 +9,8 @@ interface AddressAutocompleteProps {
   onChange: (address: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  // NEW: onSelectSuggestion receives both address and parsed city
+  onSelectSuggestion?: (addr: string, city: string) => void;
 }
 
 // This function simulates fetching address suggestions
@@ -69,6 +71,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   onChange,
   placeholder = "Start typing address...",
   disabled,
+  onSelectSuggestion,
 }) => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -140,10 +143,26 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     onChange(newValue);
   };
 
+  // Helper: Parse city from suggestion
+  const extractCity = (suggestion: string) => {
+    // Expected format: "street info, city, country"
+    const parts = suggestion.split(",");
+    if (parts.length >= 3) {
+      return parts[parts.length - 2].trim();
+    } else if (parts.length === 2) {
+      return parts[0].trim(); // fallback
+    }
+    return "";
+  };
+
   const handleSuggestionClick = (suggestion: string) => {
     onChange(suggestion);
     setSearchTerm(suggestion);
     setShowDropdown(false);
+    if (onSelectSuggestion) {
+      const city = extractCity(suggestion);
+      onSelectSuggestion(suggestion, city);
+    }
   };
 
   return (

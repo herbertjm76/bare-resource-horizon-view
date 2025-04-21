@@ -12,11 +12,10 @@ interface CompanyFormData {
   name: string;
   subdomain: string;
   website?: string;
-  description?: string;
   address: string;
   country: string;
   size: string;
-  location: string;
+  city: string;  // <-- added city
 }
 
 interface CompanyRegistrationFormProps {
@@ -48,6 +47,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
   // Country and Address Management
   const selectedCountry = watch("country");
   const addressValue = watch("address");
+  const cityValue = watch("city");
 
   const checkSubdomainAvailability = async (subdomain: string) => {
     setIsCheckingSubdomain(true);
@@ -69,7 +69,6 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
 
   const onSubmit = async (data: CompanyFormData) => {
     try {
-      // Check if subdomain is available
       const isAvailable = await checkSubdomainAvailability(data.subdomain);
 
       if (!isAvailable) {
@@ -87,9 +86,9 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
           name: data.name,
           subdomain: data.subdomain.toLowerCase(),
           website: data.website,
-          description: data.description,
           address: data.address,
           size: data.size,
+          // Note: If you want to also save city, add `city: data.city` to your DB/company table
         })
         .select()
         .single();
@@ -193,9 +192,32 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
           onChange={addr => setValue("address", addr)}
           disabled={!selectedCountry}
           placeholder={selectedCountry ? "Type address..." : "Select country above first"}
+          // when a suggestion is selected, auto-update city
+          onSelectSuggestion={(addr, city) => {
+            setValue('address', addr);
+            if (city) setValue('city', city);
+          }}
         />
         {errors.address && (
           <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
+        )}
+      </div>
+
+      {/* City (auto filled, still editable) */}
+      <div>
+        <label htmlFor="city" className="block text-sm font-medium text-gray-200">
+          City
+        </label>
+        <Input
+          id="city"
+          type="text"
+          {...register('city', { required: "City is required" })}
+          className="mt-1"
+          value={cityValue || ""}
+          onChange={(e) => setValue('city', e.target.value)}
+        />
+        {errors.city && (
+          <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
         )}
       </div>
 
@@ -219,23 +241,6 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
         )}
       </div>
 
-      {/* Location */}
-      <div>
-        <label htmlFor="location" className="block text-sm font-medium text-gray-200">
-          Location (City, Country)
-        </label>
-        <Input
-          id="location"
-          type="text"
-          placeholder="e.g. New York, USA"
-          {...register('location', { required: "Location is required" })}
-          className="mt-1"
-        />
-        {errors.location && (
-          <p className="text-red-500 text-sm mt-1">{errors.location.message}</p>
-        )}
-      </div>
-
       {/* Website */}
       <div>
         <label htmlFor="website" className="block text-sm font-medium text-gray-200">
@@ -246,20 +251,6 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
           type="url"
           placeholder="https://yourcompany.com"
           {...register('website')}
-          className="mt-1"
-        />
-      </div>
-
-      {/* Description */}
-      <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-200">
-          Description (optional)
-        </label>
-        <Input
-          id="description"
-          type="text"
-          placeholder="Brief description of your company"
-          {...register('description')}
           className="mt-1"
         />
       </div>
