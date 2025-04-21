@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { ProjectsList } from '@/components/projects/ProjectsList';
@@ -8,102 +8,35 @@ import { useCompany } from '@/context/CompanyContext';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { useAuthorization } from '@/hooks/useAuthorization';
 
 const HEADER_HEIGHT = 56; // Should match AppHeader minHeight
 
 const Projects = () => {
-  const { company, loading: companyLoading, refreshCompany } = useCompany();
+  const { company, loading: companyLoading, refreshCompany, error: companyError } = useCompany();
   const navigate = useNavigate();
-  const [isAuthenticating, setIsAuthenticating] = useState(true);
-  const [authError, setAuthError] = useState<string | null>(null);
+  const { loading: authLoading, error: authError } = useAuthorization();
   
-  // Check authentication status
-  useEffect(() => {
-    let mounted = true;
-    let authTimeout: NodeJS.Timeout | null = null;
-    
-    console.log('Projects page mounted', { 
-      hasCompany: !!company, 
-      companyLoading 
-    });
-    
-    // Set a safety timeout
-    authTimeout = setTimeout(() => {
-      if (mounted) {
-        console.log('Auth check timed out');
-        setIsAuthenticating(false);
-        setAuthError('Authentication check timed out. Please try refreshing.');
-      }
-    }, 5000);
-    
-    const checkAuth = async () => {
-      try {
-        // Check if there's a session
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) throw error;
-        
-        if (!session) {
-          console.log('No active session, redirecting to auth page');
-          navigate('/auth');
-          return;
-        }
-        
-        if (mounted) {
-          setIsAuthenticating(false);
-          setAuthError(null);
-        }
-      } catch (error: any) {
-        console.error('Auth check error:', error);
-        if (mounted) {
-          setIsAuthenticating(false);
-          setAuthError(error.message || 'Authentication check failed');
-          toast.error('Authentication error');
-        }
-      }
-    };
-    
-    // Check authentication
-    checkAuth();
-    
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event);
-      
-      if (!mounted) return;
-      
-      if (event === 'SIGNED_OUT') {
-        navigate('/auth');
-      }
-    });
-    
-    return () => {
-      mounted = false;
-      if (authTimeout) clearTimeout(authTimeout);
-      subscription.unsubscribe();
-    };
-  }, [navigate]);
+  const isLoading = authLoading || companyLoading;
+  const error = authError || companyError;
 
-  // Load company data only after authentication is confirmed
-  useEffect(() => {
-    if (!isAuthenticating && !companyLoading && !company) {
-      console.log('No company found, refreshing company data');
-      refreshCompany();
-    }
-  }, [company, companyLoading, refreshCompany, isAuthenticating]);
+  const handleRefresh = () => {
+    console.log('Manually refreshing company data from Projects');
+    refreshCompany();
+  };
 
-  // Show a loading spinner while authenticating
-  if (isAuthenticating) {
+  // Show a loading spinner while authenticating or loading company data
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-background">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground">Verifying access...</p>
-          {authError && (
+          <p className="text-sm text-muted-foreground">
+            {authLoading ? "Verifying access..." : "Loading company data..."}
+          </p>
+          {error && (
             <div className="text-sm text-red-500 mt-2 max-w-md text-center">
-              {authError}
+              {error}
               <Button 
                 variant="link" 
                 className="ml-2 p-0 h-auto" 
@@ -136,55 +69,39 @@ const Projects = () => {
               <div className="flex justify-between items-center">
                 <h1 className="text-4xl font-bold" style={{ color: '#8E9196' }}>All Projects</h1>
                 
-                {!companyLoading && !company && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => {
-                      console.log('Manually refreshing company data');
-                      refreshCompany();
-                    }}
-                    className="gap-2"
-                  >
-                    <RefreshCw className="h-4 w-4" /> 
-                    Refresh
-                  </Button>
-                )}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleRefresh}
+                  className="gap-2"
+                >
+                  <RefreshCw className="h-4 w-4" /> 
+                  Refresh
+                </Button>
               </div>
 
-              {companyLoading ? (
-                <div className="flex justify-center items-center h-64">
-                  <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">Loading company data...</p>
-                  </div>
-                </div>
-              ) : company ? (
+              {company ? (
                 <ProjectsList />
               ) : (
                 <div className="p-6 rounded-lg border border-red-500/30 bg-red-500/10">
                   <div className="flex items-start gap-4">
                     <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
                     <div className="space-y-3">
-                      <h3 className="text-lg font-medium text-foreground">No company context found</h3>
+                      <h3 className="text-lg font-medium text-foreground">No company data found</h3>
                       <p className="text-muted-foreground">
                         This could be happening because:
                       </p>
                       <ul className="list-disc pl-5 text-muted-foreground space-y-1">
-                        <li>You're not logged in</li>
                         <li>Your account isn't associated with a company</li>
                         <li>There was an issue retrieving your company data</li>
                       </ul>
                       <div className="flex gap-3 pt-2">
-                        <Button onClick={() => navigate('/auth')}>
-                          Go to Login
+                        <Button onClick={() => navigate('/dashboard')}>
+                          Go to Dashboard
                         </Button>
                         <Button 
                           variant="outline" 
-                          onClick={() => {
-                            console.log('Manually refreshing company data');
-                            refreshCompany();
-                          }}
+                          onClick={handleRefresh}
                           className="gap-2"
                         >
                           <RefreshCw className="h-4 w-4" /> 

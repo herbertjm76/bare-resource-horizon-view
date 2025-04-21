@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -8,6 +9,7 @@ type CompanyContextType = {
   subdomain: string | null;
   refreshCompany: () => Promise<void>;
   isSubdomainMode: boolean;
+  error: string | null;
 };
 
 const CompanyContext = createContext<CompanyContextType>({
@@ -15,6 +17,7 @@ const CompanyContext = createContext<CompanyContextType>({
   loading: true,
   subdomain: null,
   isSubdomainMode: false,
+  error: null,
   refreshCompany: async () => {},
 });
 
@@ -26,6 +29,9 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [subdomain, setSubdomain] = useState<string | null>(null);
   const [isSubdomainMode, setIsSubdomainMode] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const initialLoadAttempted = useRef(false);
 
   const extractSubdomain = () => {
     const hostname = window.location.hostname;
@@ -63,6 +69,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const fetchCompanyData = async (subdomainValue: string) => {
     try {
       setLoading(true);
+      setError(null);
       console.log('Fetching company data for subdomain:', subdomainValue);
       
       const { data, error } = await supabase
@@ -74,23 +81,31 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (error) {
         console.error('Error fetching company by subdomain:', error);
         setCompany(null);
+        setError(`Company not found for subdomain "${subdomainValue}"`);
         toast.error('Company not found');
         return;
       }
 
       console.log('Found company by subdomain:', data);
       setCompany(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in fetchCompanyData:', error);
       setCompany(null);
+      setError(error.message || 'Failed to fetch company data');
     } finally {
       setLoading(false);
+      // Clear any loading timeout
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+        loadingTimeoutRef.current = null;
+      }
     }
   };
 
   const fetchUserCompany = async () => {
     try {
       setLoading(true);
+      setError(null);
       console.log('Attempting to fetch user company');
       
       const { data: { session } } = await supabase.auth.getSession();
@@ -98,6 +113,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (!session) {
         console.log("No active session, cannot fetch company data");
         setCompany(null);
+        setError("No active session found. Please log in.");
         setLoading(false);
         return;
       }
@@ -106,10 +122,19 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .from('profiles')
         .select('company_id')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
         
-      if (profileError || !profile || !profile.company_id) {
+      if (profileError) {
+        console.error("Error fetching user profile:", profileError);
+        setError("Failed to fetch user profile");
+        setCompany(null);
+        setLoading(false);
+        return;
+      }
+      
+      if (!profile || !profile.company_id) {
         console.log("No company associated with user profile");
+        setError("Your account is not associated with any company");
         setCompany(null);
         setLoading(false);
         return;
@@ -123,16 +148,24 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         
       if (companyError) {
         console.error('Error fetching company by user profile:', companyError);
+        setError("Failed to fetch company data");
         setCompany(null);
       } else {
         console.log('Company data fetched by user profile:', companyData);
         setCompany(companyData);
+        setError(null);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in company data fetch by user profile:', error);
       setCompany(null);
+      setError(error.message || 'Failed to fetch company data');
     } finally {
       setLoading(false);
+      // Clear any loading timeout
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+        loadingTimeoutRef.current = null;
+      }
     }
   };
 
@@ -141,6 +174,20 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     try {
       setLoading(true);
+      setError(null);
+      
+      // Set a timeout to prevent eternal loading state
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+      
+      loadingTimeoutRef.current = setTimeout(() => {
+        console.log('Company data fetch timeout reached');
+        setLoading(false);
+        setError('Company data fetch timed out. Please try again.');
+        toast.error('Data fetch timed out, please refresh');
+      }, 10000); // 10 second timeout
+      
       const currentSubdomain = extractSubdomain();
       console.log('Current subdomain check result:', currentSubdomain);
       setSubdomain(currentSubdomain);
@@ -156,11 +203,17 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
       
       console.log('Company refresh completed');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in refreshCompany:', error);
+      setError(error.message || 'Error refreshing company data');
       toast.error('Error refreshing company data');
     } finally {
       setLoading(false);
+      // Always clear the timeout in finally block
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+        loadingTimeoutRef.current = null;
+      }
     }
   };
 
@@ -171,9 +224,13 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       async (event) => {
         console.log("Auth state changed:", event);
         if (event === 'SIGNED_IN') {
-          await refreshCompany();
+          // Use setTimeout to avoid auth deadlocks
+          setTimeout(() => {
+            refreshCompany();
+          }, 0);
         } else if (event === 'SIGNED_OUT') {
           setCompany(null);
+          setError(null);
         }
         setAuthChecked(true);
       }
@@ -181,27 +238,52 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     return () => {
       subscription.unsubscribe();
+      // Clear any remaining timeout on unmount
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
     };
   }, []);
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      console.log('CompanyContext: Initial loading started');
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log('Current auth session:', session ? 'Exists' : 'None');
+    // Only load initial data if it hasn't been attempted yet
+    if (!initialLoadAttempted.current) {
+      const loadInitialData = async () => {
+        console.log('CompanyContext: Initial loading started');
+        initialLoadAttempted.current = true;
         
-        await refreshCompany();
-      } catch (error) {
-        console.error('Error in initial company data load:', error);
-        setLoading(false);
-      }
-      
-      setAuthChecked(true);
-      console.log('CompanyContext: Initial loading completed');
-    };
+        try {
+          // Set a safety timeout for initial loading
+          loadingTimeoutRef.current = setTimeout(() => {
+            console.log('Initial company data fetch timeout');
+            setLoading(false);
+            setError('Initial data fetch timed out. Please refresh the page.');
+          }, 8000);
+          
+          const { data: { session } } = await supabase.auth.getSession();
+          console.log('Current auth session:', session ? 'Exists' : 'None');
+          
+          if (session) {
+            // Use setTimeout to avoid auth deadlocks
+            setTimeout(() => {
+              refreshCompany();
+            }, 0);
+          } else {
+            setLoading(false);
+            setError('No active session found. Please log in.');
+          }
+        } catch (error: any) {
+          console.error('Error in initial company data load:', error);
+          setLoading(false);
+          setError(error.message || 'Failed to load initial data');
+        }
+        
+        setAuthChecked(true);
+        console.log('CompanyContext: Initial loading completed');
+      };
 
-    loadInitialData();
+      loadInitialData();
+    }
   }, []);
 
   useEffect(() => {
@@ -210,9 +292,20 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       subdomain,
       isSubdomainMode,
       loading,
-      authChecked
+      authChecked,
+      error
     });
-  }, [company, subdomain, isSubdomainMode, loading, authChecked]);
+  }, [company, subdomain, isSubdomainMode, loading, authChecked, error]);
+
+  // Cleanup timeouts when component unmounts
+  useEffect(() => {
+    return () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+        loadingTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <CompanyContext.Provider value={{ 
@@ -220,6 +313,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       loading, 
       subdomain, 
       isSubdomainMode,
+      error,
       refreshCompany 
     }}>
       {children}

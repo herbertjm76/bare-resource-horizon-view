@@ -10,12 +10,14 @@ interface UseAuthorizationProps {
   requiredRole?: UserRole | UserRole[];
   redirectTo?: string;
   companyId?: string;
+  autoRedirect?: boolean;
 }
 
 export const useAuthorization = ({
   requiredRole = 'member',
   redirectTo = '/dashboard',
   companyId,
+  autoRedirect = false,
 }: UseAuthorizationProps = {}) => {
   const [loading, setLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -23,7 +25,7 @@ export const useAuthorization = ({
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const authChecked = useRef(false);
-  const authTimeout = useRef<NodeJS.Timeout | null>(null);
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const checkAuthorization = useCallback(async () => {
     try {
@@ -32,12 +34,12 @@ export const useAuthorization = ({
       setError(null);
       
       // Clear any existing timeout
-      if (authTimeout.current) {
-        clearTimeout(authTimeout.current);
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
       }
 
       // Set a new timeout to prevent getting stuck
-      authTimeout.current = setTimeout(() => {
+      loadingTimeoutRef.current = setTimeout(() => {
         console.warn("useAuthorization: Authorization check timed out");
         setLoading(false);
         setError("Authorization check timed out. Please try refreshing.");
@@ -50,16 +52,22 @@ export const useAuthorization = ({
       if (sessionError) {
         console.error("useAuthorization: Session error", sessionError);
         setError("Failed to verify your session");
-        toast.error('Session error. Please sign in again.');
-        navigate('/auth');
+        setIsAuthorized(false);
+        if (autoRedirect) {
+          toast.error('Session error. Please sign in again.');
+          navigate('/auth');
+        }
         return;
       }
       
       if (!session) {
         console.log("useAuthorization: No active session");
         setError("No active session");
-        toast.error('You must be logged in to access this page');
-        navigate('/auth');
+        setIsAuthorized(false);
+        if (autoRedirect) {
+          toast.error('You must be logged in to access this page');
+          navigate('/auth');
+        }
         return;
       }
 
@@ -75,16 +83,22 @@ export const useAuthorization = ({
       if (profileError) {
         console.error("useAuthorization: Profile error", profileError);
         setError("Error checking authorization");
-        toast.error('Error checking authorization');
-        navigate('/auth');
+        setIsAuthorized(false);
+        if (autoRedirect) {
+          toast.error('Error checking authorization');
+          navigate('/auth');
+        }
         return;
       }
 
       if (!profile) {
         console.error("useAuthorization: No profile found");
         setError("No user profile found");
-        toast.error('User profile not found');
-        navigate('/auth');
+        setIsAuthorized(false);
+        if (autoRedirect) {
+          toast.error('User profile not found');
+          navigate('/auth');
+        }
         return;
       }
 
@@ -98,8 +112,11 @@ export const useAuthorization = ({
       if (companyId && profile.company_id !== companyId) {
         console.error("useAuthorization: Company mismatch", profile.company_id, companyId);
         setError("Company access denied");
-        toast.error('You do not have access to this company');
-        navigate('/dashboard');
+        setIsAuthorized(false);
+        if (autoRedirect) {
+          toast.error('You do not have access to this company');
+          navigate('/dashboard');
+        }
         return;
       }
 
@@ -110,8 +127,11 @@ export const useAuthorization = ({
       if (!hasRequiredRole) {
         console.error("useAuthorization: Role mismatch", profile.role, requiredRole);
         setError("Insufficient permissions");
-        toast.error('You do not have permission to access this page');
-        navigate(redirectTo);
+        setIsAuthorized(false);
+        if (autoRedirect) {
+          toast.error('You do not have permission to access this page');
+          navigate(redirectTo);
+        }
         return;
       }
 
@@ -120,20 +140,23 @@ export const useAuthorization = ({
       setIsAuthorized(true);
       setError(null);
       authChecked.current = true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Authorization error:', error);
       setError("Authorization check failed");
-      toast.error('An error occurred during authorization');
-      navigate('/auth');
+      setIsAuthorized(false);
+      if (autoRedirect) {
+        toast.error('An error occurred during authorization');
+        navigate('/auth');
+      }
     } finally {
       // Clear the timeout
-      if (authTimeout.current) {
-        clearTimeout(authTimeout.current);
-        authTimeout.current = null;
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+        loadingTimeoutRef.current = null;
       }
       setLoading(false);
     }
-  }, [companyId, navigate, redirectTo, requiredRole]);
+  }, [companyId, navigate, redirectTo, requiredRole, autoRedirect]);
 
   useEffect(() => {
     let mounted = true;
@@ -142,6 +165,7 @@ export const useAuthorization = ({
       requiredRole,
       redirectTo,
       companyId,
+      autoRedirect,
       authChecked: authChecked.current
     });
     
@@ -156,11 +180,16 @@ export const useAuthorization = ({
     
     // Only run checkAuthorization if it hasn't been checked yet
     if (!authChecked.current) {
-      checkAuthorization();
+      // Use setTimeout to avoid auth deadlocks
+      setTimeout(() => {
+        if (mounted) {
+          checkAuthorization();
+        }
+      }, 0);
     }
     
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       console.log("useAuthorization: Auth state change", event);
       
       if (!mounted) {
@@ -173,11 +202,18 @@ export const useAuthorization = ({
         setIsAuthorized(false);
         setUserRole(null);
         authChecked.current = false;
-        navigate('/auth');
+        if (autoRedirect) {
+          navigate('/auth');
+        }
       } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         console.log("useAuthorization: User signed in or token refreshed");
         authChecked.current = false;
-        checkAuthorization();
+        // Use setTimeout to avoid auth deadlocks
+        setTimeout(() => {
+          if (mounted) {
+            checkAuthorization();
+          }
+        }, 0);
       }
     });
     
@@ -186,13 +222,13 @@ export const useAuthorization = ({
       mounted = false;
       clearTimeout(safetyTimeout);
       
-      if (authTimeout.current) {
-        clearTimeout(authTimeout.current);
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
       }
       
       subscription.unsubscribe();
     };
-  }, [checkAuthorization, loading, navigate]);
+  }, [checkAuthorization, loading, navigate, autoRedirect]);
 
   return { 
     loading, 
