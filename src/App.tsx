@@ -25,7 +25,9 @@ const AppRoutes = () => {
   if (isSubdomainMode && !loading && !company) {
     return (
       <Routes>
-        <Route path="*" element={<NotFound companyNotFound />} />
+        <Route path="/not-found" element={<NotFound companyNotFound />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="*" element={<Navigate to="/not-found" replace />} />
       </Routes>
     );
   }
@@ -37,6 +39,7 @@ const AppRoutes = () => {
       <Route path="/auth" element={<Auth />} />
       <Route path="/join" element={<Join />} />
       <Route path="/join/:inviteCode" element={<Join />} />
+      <Route path="/not-found" element={<NotFound companyNotFound={isSubdomainMode && !company} />} />
       
       {/* Root path handling depends on subdomain status */}
       <Route path="/" element={
