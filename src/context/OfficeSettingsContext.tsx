@@ -62,11 +62,16 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        // Fetch all data in parallel
+        // Define types for the query responses to avoid deep type instantiation
+        type RoleResponse = { data: any[] | null, error: any };
+        type LocationResponse = { data: any[] | null, error: any };
+        type RateResponse = { data: any[] | null, error: any };
+
+        // Fetch all data in parallel with explicit typing
         const [rolesData, locationsData, ratesData] = await Promise.all([
-          supabase.from('office_roles').select('*').eq('company_id', company.id),
-          supabase.from('office_locations').select('*').eq('company_id', company.id),
-          supabase.from('office_rates').select('*').eq('company_id', company.id)
+          supabase.from('office_roles').select('*').eq('company_id', company.id) as Promise<RoleResponse>,
+          supabase.from('office_locations').select('*').eq('company_id', company.id) as Promise<LocationResponse>,
+          supabase.from('office_rates').select('*').eq('company_id', company.id) as Promise<RateResponse>
         ]);
 
         // Check for errors in responses
@@ -74,44 +79,53 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         if (locationsData.error) throw locationsData.error;
         if (ratesData.error) throw ratesData.error;
 
-        // Process roles data with safer type handling
+        // Process roles data
         if (rolesData.data) {
-          const processedRoles: Role[] = rolesData.data.map(role => ({
-            id: role.id,
-            name: role.name,
-            code: role.code,
-            company_id: role.company_id
-          }));
+          const processedRoles: Role[] = [];
+          for (const role of rolesData.data) {
+            processedRoles.push({
+              id: role.id,
+              name: role.name,
+              code: role.code,
+              company_id: role.company_id
+            });
+          }
           setRoles(processedRoles);
         } else {
           setRoles([]);
         }
         
-        // Process locations data with safer type handling
+        // Process locations data
         if (locationsData.data) {
-          const processedLocations: Location[] = locationsData.data.map(location => ({
-            id: location.id,
-            city: location.city,
-            country: location.country,
-            code: location.code,
-            emoji: location.emoji,
-            company_id: location.company_id
-          }));
+          const processedLocations: Location[] = [];
+          for (const location of locationsData.data) {
+            processedLocations.push({
+              id: location.id,
+              city: location.city,
+              country: location.country,
+              code: location.code,
+              emoji: location.emoji,
+              company_id: location.company_id
+            });
+          }
           setLocations(processedLocations);
         } else {
           setLocations([]);
         }
         
-        // Process rates data with safer type handling
+        // Process rates data
         if (ratesData.data) {
-          const processedRates: Rate[] = ratesData.data.map(rate => ({
-            id: rate.id,
-            type: rate.type as "role" | "location",
-            reference_id: rate.reference_id,
-            value: Number(rate.value),
-            unit: rate.unit as "hour" | "day" | "week",
-            company_id: rate.company_id
-          }));
+          const processedRates: Rate[] = [];
+          for (const rate of ratesData.data) {
+            processedRates.push({
+              id: rate.id,
+              type: rate.type as "role" | "location",
+              reference_id: rate.reference_id,
+              value: Number(rate.value),
+              unit: rate.unit as "hour" | "day" | "week",
+              company_id: rate.company_id
+            });
+          }
           setRates(processedRates);
         } else {
           setRates([]);
