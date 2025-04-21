@@ -7,11 +7,10 @@ import { Button } from "@/components/ui/button";
 import { User as UserIcon, LogOut } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
-// Standardized colors
-const BARE_GRAY = "#8E9196";
-const GRADIENT = "linear-gradient(90deg, #9b87f5, #5a7eb7)"; // gentle purple to blue
+// Colors
+const BARE_DARK_GREY_SHADOW = "#222";
+const RESOURCE_GRADIENT = "linear-gradient(90deg, #9b87f5, #7E69AB, #5a7eb7)";
 
-// Updated: Underline under "Bare" and more compact layout
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
   const [user, setUser] = React.useState<User | null>(null);
@@ -49,43 +48,45 @@ export const AppHeader: React.FC = () => {
       style={{ minHeight: 48 }}
     >
       <div>
-        <h1 className="flex items-end leading-none select-none" aria-label="BareResource" style={{ fontWeight: 900, fontSize: "2.4rem", letterSpacing: "0.5px", lineHeight: 1 }}>
+        <h1
+          className="flex items-end leading-none select-none"
+          aria-label="BareResource"
+          style={{
+            fontWeight: 900,
+            fontSize: "2.4rem",
+            letterSpacing: "0.5px",
+            lineHeight: 1,
+          }}
+        >
           <span
             style={{
               color: "#fff",
-              position: "relative",
-              display: "inline-block",
-              paddingBottom: 4,
-              marginRight: "0.1em",
-              textShadow:
-                "0 4px 18px rgba(40,40,76,0.18), 1px 0 4px rgba(60,60,100,0.22)",
               fontWeight: 900,
+              fontSize: "2.4rem",
+              letterSpacing: "0.5px",
+              lineHeight: 1,
+              marginRight: "0.1em",
+              display: "inline-block",
+              position: "relative",
+              paddingBottom: 0,
+              textShadow: `0 4px 18px ${BARE_DARK_GREY_SHADOW}, 1px 0 4px ${BARE_DARK_GREY_SHADOW}`,
             }}
           >
             Bare
-            <span
-              aria-hidden
-              style={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                height: 3,
-                width: "100%",
-                borderRadius: 3,
-                background: GRADIENT,
-                opacity: 0.85,
-              }}
-            />
           </span>
           <span
             style={{
-              color: BARE_GRAY,
               fontWeight: 700,
-              fontSize: "2.1rem", // slightly smaller
+              fontSize: "2.1rem",
               letterSpacing: "0.5px",
               display: "inline-block",
               verticalAlign: "bottom",
               marginLeft: "0.1em",
+              background: RESOURCE_GRADIENT,
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              textFillColor: "transparent",
             }}
           >
             Resource
