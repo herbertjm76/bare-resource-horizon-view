@@ -11,6 +11,7 @@ import Projects from "./pages/Projects";
 import OfficeSettings from "./pages/OfficeSettings";
 import Auth from "./pages/Auth";
 import Join from "./pages/Join";
+import Profile from "./pages/Profile";
 import { CompanyProvider } from "./context/CompanyContext";
 
 const queryClient = new QueryClient();
@@ -30,7 +31,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/join" element={<Join />} />
             <Route path="/join/:inviteCode" element={<Join />} />
-            <Route path="/profile" element={<import('@/pages/Profile').then(mod => <mod.default />)} />
+            <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
