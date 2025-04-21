@@ -88,7 +88,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
           website: data.website,
           address: data.address,
           size: data.size,
-          // Note: If you want to also save city, add `city: data.city` to your DB/company table
+          city: data.city // Save city to the companies table
         })
         .select()
         .single();
@@ -111,6 +111,14 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
     } catch (error: any) {
       toast.error(error.message);
     }
+  };
+
+  // Handle address suggestion selection
+  const handleAddressSuggestion = (address: string, city: string) => {
+    console.log("Address selected:", address);
+    console.log("City extracted:", city);
+    setValue("address", address);
+    setValue("city", city);
   };
 
   return (
@@ -192,11 +200,7 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
           onChange={addr => setValue("address", addr)}
           disabled={!selectedCountry}
           placeholder={selectedCountry ? "Type address..." : "Select country above first"}
-          // when a suggestion is selected, auto-update city
-          onSelectSuggestion={(addr, city) => {
-            setValue('address', addr);
-            if (city) setValue('city', city);
-          }}
+          onSelectSuggestion={handleAddressSuggestion}
         />
         {errors.address && (
           <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
@@ -213,8 +217,6 @@ export const CompanyRegistrationForm: React.FC<CompanyRegistrationFormProps> = (
           type="text"
           {...register('city', { required: "City is required" })}
           className="mt-1"
-          value={cityValue || ""}
-          onChange={(e) => setValue('city', e.target.value)}
         />
         {errors.city && (
           <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
