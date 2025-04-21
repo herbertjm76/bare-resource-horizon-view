@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -59,6 +58,7 @@ const OfficeSettings = () => {
     refreshCompany();
   };
 
+  // Use AuthGuard with explicit roles
   return (
     <AuthGuard requiredRole={['owner', 'admin']}>
       <SidebarProvider>

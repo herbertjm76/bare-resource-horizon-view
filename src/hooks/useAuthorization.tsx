@@ -1,5 +1,5 @@
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -22,12 +22,27 @@ export const useAuthorization = ({
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const authChecked = useRef(false);
+  const authTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const checkAuthorization = useCallback(async () => {
     try {
       console.log("useAuthorization: Checking authorization...");
       setLoading(true);
       setError(null);
+      
+      // Clear any existing timeout
+      if (authTimeout.current) {
+        clearTimeout(authTimeout.current);
+      }
+
+      // Set a new timeout to prevent getting stuck
+      authTimeout.current = setTimeout(() => {
+        console.warn("useAuthorization: Authorization check timed out");
+        setLoading(false);
+        setError("Authorization check timed out. Please try refreshing.");
+        toast.error("Authorization check timed out");
+      }, 8000);
       
       // Check if user is authenticated
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -47,6 +62,8 @@ export const useAuthorization = ({
         navigate('/auth');
         return;
       }
+
+      console.log("useAuthorization: Session found for user", session.user.id);
 
       // Get user profile to check role
       const { data: profile, error: profileError } = await supabase
@@ -70,6 +87,8 @@ export const useAuthorization = ({
         navigate('/auth');
         return;
       }
+
+      console.log("useAuthorization: Profile found", profile);
 
       // Set the user's role
       setUserRole(profile.role as UserRole);
@@ -100,18 +119,31 @@ export const useAuthorization = ({
       console.log("useAuthorization: User is authorized");
       setIsAuthorized(true);
       setError(null);
+      authChecked.current = true;
     } catch (error) {
       console.error('Authorization error:', error);
       setError("Authorization check failed");
       toast.error('An error occurred during authorization');
       navigate('/auth');
     } finally {
+      // Clear the timeout
+      if (authTimeout.current) {
+        clearTimeout(authTimeout.current);
+        authTimeout.current = null;
+      }
       setLoading(false);
     }
   }, [companyId, navigate, redirectTo, requiredRole]);
 
   useEffect(() => {
     let mounted = true;
+    
+    console.log("useAuthorization: Initializing with", {
+      requiredRole,
+      redirectTo,
+      companyId,
+      authChecked: authChecked.current
+    });
     
     // Set a safety timeout
     const safetyTimeout = setTimeout(() => {
@@ -122,24 +154,42 @@ export const useAuthorization = ({
       }
     }, 10000);
     
-    checkAuthorization();
+    // Only run checkAuthorization if it hasn't been checked yet
+    if (!authChecked.current) {
+      checkAuthorization();
+    }
     
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (mounted) {
-        if (event === 'SIGNED_OUT') {
-          setIsAuthorized(false);
-          setUserRole(null);
-          navigate('/auth');
-        } else if (event === 'SIGNED_IN') {
-          checkAuthorization();
-        }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      console.log("useAuthorization: Auth state change", event);
+      
+      if (!mounted) {
+        console.log("useAuthorization: Component not mounted, skipping auth state change handling");
+        return;
+      }
+      
+      if (event === 'SIGNED_OUT') {
+        console.log("useAuthorization: User signed out");
+        setIsAuthorized(false);
+        setUserRole(null);
+        authChecked.current = false;
+        navigate('/auth');
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        console.log("useAuthorization: User signed in or token refreshed");
+        authChecked.current = false;
+        checkAuthorization();
       }
     });
     
     return () => {
+      console.log("useAuthorization: Cleanup called");
       mounted = false;
       clearTimeout(safetyTimeout);
+      
+      if (authTimeout.current) {
+        clearTimeout(authTimeout.current);
+      }
+      
       subscription.unsubscribe();
     };
   }, [checkAuthorization, loading, navigate]);
@@ -149,6 +199,10 @@ export const useAuthorization = ({
     isAuthorized, 
     userRole, 
     error,
-    refreshAuth: checkAuthorization
+    refreshAuth: useCallback(() => {
+      console.log("useAuthorization: Manual refresh triggered");
+      authChecked.current = false;
+      checkAuthorization();
+    }, [checkAuthorization])
   };
 };
