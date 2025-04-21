@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -28,19 +29,23 @@ const OfficeSettings = () => {
 
   useEffect(() => {
     if (!companyLoading && company && !isSubdomainMode) {
+      // Don't redirect if we're in localhost - this was causing the pages not to load
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      if (isLocalhost) {
+        console.log('In localhost mode, not redirecting to subdomain');
+        return;
+      }
+      
       const subdomain = company.subdomain;
       if (subdomain) {
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const baseDomain = isLocalhost ? 'localhost:8080' : 'bareresource.com';
+        // Only redirect if we're in production
+        const baseDomain = 'bareresource.com';
         const protocol = window.location.protocol;
         
-        let subdomainUrl;
-        if (isLocalhost) {
-          subdomainUrl = `${protocol}//${baseDomain}${window.location.pathname}?subdomain=${subdomain}`;
-        } else {
-          subdomainUrl = `${protocol}//${subdomain}.${baseDomain}${window.location.pathname}`;
-        }
+        // Create the subdomain URL
+        const subdomainUrl = `${protocol}//${subdomain}.${baseDomain}${window.location.pathname}`;
         
+        // Redirect to the subdomain URL
         console.log(`Redirecting to company subdomain: ${subdomainUrl}`);
         window.location.href = subdomainUrl;
       }
