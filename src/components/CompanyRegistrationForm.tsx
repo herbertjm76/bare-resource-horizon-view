@@ -15,7 +15,7 @@ interface CompanyFormData {
   address: string;
   country: string;
   size: string;
-  city: string;  // <-- added city
+  city: string;
 }
 
 interface CompanyRegistrationFormProps {
