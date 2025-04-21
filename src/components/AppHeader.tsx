@@ -49,18 +49,20 @@ export const AppHeader: React.FC = () => {
         className="text-2xl font-bold tracking-tight select-none" 
         aria-label="Bare Resource"
       >
-        {/* White text with black outline for "Bare" */}
+        {/* Improved "Bare" text with better visibility */}
         <span 
           className="relative text-white"
           style={{
-            WebkitTextStroke: '0.8px black',
-            // For fallback and more browser support, also add textShadow:
+            // Using a combination of text-shadow for better outline visibility
             textShadow: `
-              -1px -1px 0 black,
-              1px -1px 0 black,
-              -1px 1px 0 black,
-              1px 1px 0 black
-            `
+              -1px -1px 0 #000,
+              1px -1px 0 #000,
+              -1px 1px 0 #000,
+              1px 1px 0 #000,
+              0px 2px 2px rgba(0,0,0,0.5)
+            `,
+            // Adding a slight letterSpacing for better readability
+            letterSpacing: '0.5px'
           }}
         >
           Bare
@@ -99,4 +101,3 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
-
