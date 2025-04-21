@@ -28,7 +28,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [suggestions, setSuggestions] = useAddressSuggestions(searchTerm, country);
+  const { suggestions, loading, fetchSuggestions, setSuggestions } = useAddressSuggestions();
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -51,6 +51,12 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     }
   }, [value]);
 
+  useEffect(() => {
+    if (searchTerm && country) {
+      fetchSuggestions(searchTerm, country);
+    }
+  }, [searchTerm, country, fetchSuggestions]);
+
   return (
     <div className="relative" ref={containerRef}>
       <Input
@@ -63,6 +69,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
             setShowDropdown(true);
           } else {
             setShowDropdown(false);
+            setSuggestions([]);
           }
         }}
         placeholder={placeholder}
@@ -76,24 +83,25 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         }}
       />
       <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-        {suggestions.length > 0 ? (
-          <Search size={18} />
-        ) : !showDropdown ? (
-          <MapPin size={18} />
-        ) : (
+        {loading ? (
           <Loader className="animate-spin" size={18} />
+        ) : suggestions.length > 0 ? (
+          <Search size={18} />
+        ) : (
+          <MapPin size={18} />
         )}
       </div>
       {showDropdown && suggestions.length > 0 && (
         <AddressSuggestionList
           suggestions={suggestions}
-          onSelect={(address) => {
+          onSuggestionClick={(address) => {
             onChange(address);
             const city = extractCityFromAddress(address);
             if (onSelectSuggestion) {
               onSelectSuggestion(address, city);
             }
             setShowDropdown(false);
+            setSearchTerm(address);
           }}
         />
       )}
