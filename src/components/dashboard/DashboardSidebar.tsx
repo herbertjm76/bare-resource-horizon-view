@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -120,7 +121,7 @@ export function DashboardSidebar() {
             <div className="flex items-center gap-2">
               {!collapsed ? (
                 <span className="text-2xl font-bold select-none">
-                  <span className="text-[#8E9196]">Bare</span>
+                  <span className="text-white">Bare</span>
                   <span className="bg-gradient-to-r from-[#6E59A5] via-[#9b87f5] to-[#D946EF] bg-clip-text text-transparent">Resource</span>
                 </span>
               ) : (

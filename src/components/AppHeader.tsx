@@ -38,31 +38,8 @@ export const AppHeader: React.FC = () => {
     navigate("/auth");
   };
 
-  const currentDate = new Date();
-  const formattedDate = currentDate.toLocaleDateString('en-US', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  }).toUpperCase();
-
   return (
-    <header className="w-full px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[64px] pl-[280px] transition-all duration-300">
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400 text-sm">MON</span>
-          <span className="text-gray-600">|</span>
-          <span className="text-gray-600 text-sm">21 APRIL 2024</span>
-        </div>
-      </div>
-      
-      <div className="absolute left-1/2 transform -translate-x-1/2">
-        <span className="text-2xl font-bold select-none">
-          <span className="text-[#8E9196]">Bare</span>
-          <span className="bg-gradient-to-r from-[#6E59A5] via-[#9b87f5] to-[#D946EF] bg-clip-text text-transparent">Resource</span>
-        </span>
-      </div>
-      
+    <header className="w-full px-6 py-2 flex items-center justify-end bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[64px] pl-[280px] transition-all duration-300">
       <div className="flex items-center gap-4">
         <span className="text-sm font-medium text-gray-500">ADMIN</span>
         <Button asChild variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100">
