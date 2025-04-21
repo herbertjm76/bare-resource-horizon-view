@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -112,8 +111,8 @@ export function DashboardSidebar() {
 
   return (
     <Sidebar 
-      className="fixed bg-[#8E9196] border-r border-[#7d8086] pt-0 h-screen transition-all duration-300 overflow-hidden z-30"
-      style={{ width: collapsed ? '80px' : '280px' }}
+      className="bg-[#8E9196] border-r border-[#7d8086] pt-0 min-h-screen transition-all duration-300 fixed left-0 top-0 bottom-0 z-40"
+      style={{ marginTop: 0, width: collapsed ? '80px' : '280px' }}
     >
       <SidebarContent className="p-0">
         <SidebarGroup>
@@ -184,12 +183,10 @@ export function DashboardSidebar() {
           ))}
         </SidebarGroup>
       </SidebarContent>
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 h-32 w-2 bg-transparent flex items-center">
-        <SidebarRail 
-          className="after:bg-white after:w-[6px] after:opacity-100 hover:after:opacity-100 after:h-16 z-50 cursor-pointer"
-          onClick={toggleSidebar}
-        />
-      </div>
+      <SidebarRail 
+        className="after:bg-white after:w-[4px] hover:after:bg-white after:opacity-70 hover:after:opacity-100 after:translate-x-1 after:h-12 z-50"
+        onClick={toggleSidebar}
+      />
     </Sidebar>
   );
 }
