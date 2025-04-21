@@ -54,7 +54,7 @@ export const AppHeader: React.FC = () => {
           style={{
             fontWeight: 400, // Bare as regular
             fontSize: "2.4rem",
-            letterSpacing: "0.5px",
+            letterSpacing: "0.2px", // tighter
             lineHeight: 1,
           }}
         >
@@ -63,9 +63,8 @@ export const AppHeader: React.FC = () => {
               color: "#fff",
               fontWeight: 400,
               fontSize: "2.4rem",
-              letterSpacing: "0.5px",
+              letterSpacing: "0.2px",
               lineHeight: 1,
-              marginRight: "0.1em",
               display: "inline-block",
               position: "relative",
               paddingBottom: 0,
@@ -78,15 +77,15 @@ export const AppHeader: React.FC = () => {
             style={{
               fontWeight: 700, // Resource as bold
               fontSize: "2.1rem",
-              letterSpacing: "0.5px",
+              letterSpacing: "0.3px",
               display: "inline-block",
               verticalAlign: "bottom",
-              marginLeft: "0.1em",
               background: RESOURCE_GRADIENT,
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
               /* Removed invalid CSS property 'textFillColor' */
+              marginLeft: 0, // Remove spacing
             }}
           >
             Resource
@@ -121,3 +120,4 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
+
