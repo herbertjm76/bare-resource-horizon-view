@@ -49,15 +49,13 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
     console.log('User metadata for profile creation:', metaData);
     
     // Ensure role is always a valid UserRole enum value
-    let userRole: UserRole;
-    const providedRole = userData?.role || metaData.role || 'member';
+    let userRole: UserRole = 'member';
+    const providedRole = userData?.role || metaData.role;
     
     // Make sure the role is one of the valid enum values
     const validRoles: UserRole[] = ['owner', 'admin', 'member'];
-    if (validRoles.includes(providedRole as UserRole)) {
+    if (providedRole && validRoles.includes(providedRole as UserRole)) {
       userRole = providedRole as UserRole;
-    } else {
-      userRole = 'member';
     }
     
     const profileData = {
