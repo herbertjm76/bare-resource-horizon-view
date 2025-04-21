@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -185,7 +184,7 @@ export function DashboardSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarRail 
-        className="after:bg-white after:w-[4px] hover:after:bg-white after:opacity-70 hover:after:opacity-100 after:translate-x-1 after:h-12"
+        className="after:bg-white after:w-[4px] hover:after:bg-white after:opacity-70 hover:after:opacity-100 after:translate-x-1 after:h-12 z-50"
         onClick={toggleSidebar}
       />
     </Sidebar>

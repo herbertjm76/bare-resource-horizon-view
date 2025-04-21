@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { ProjectsList } from '@/components/projects/ProjectsList';
 import { AppHeader } from '@/components/AppHeader';
@@ -11,12 +10,14 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const Projects = () => {
+const ProjectsContent = () => {
   const { company, loading: companyLoading, refreshCompany, error: companyError } = useCompany();
   const navigate = useNavigate();
   const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [user, setUser] = useState(null);
+  const { state } = useSidebar();
+  const collapsed = state === "collapsed";
   
   useEffect(() => {
     let isMounted = true;
@@ -102,74 +103,81 @@ const Projects = () => {
   };
 
   return (
+    <div className="flex-1 flex flex-col transition-all duration-300" 
+         style={{ paddingLeft: collapsed ? '80px' : '280px' }}>
+      <AppHeader />
+      <div className="pt-[64px]">
+        {isLoading ? (
+          <div className="flex justify-center items-center min-h-[calc(100vh-64px)] bg-background">
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="h-8 w-8 animate-spin text-[#6E59A5]" />
+              <p className="text-sm text-muted-foreground">Loading projects...</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 p-4 md:p-8 bg-background">
+            <div className="max-w-6xl mx-auto space-y-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
+                <h1 className="text-3xl md:text-4xl font-bold text-[#6E59A5]">All Projects</h1>
+                <Button 
+                  className="bg-[#6E59A5] hover:bg-[#5D4A94] text-white gap-2"
+                  size="sm" 
+                  onClick={() => refreshCompany()}
+                >
+                  <RefreshCw className="h-4 w-4" /> 
+                  Refresh
+                </Button>
+              </div>
+
+              {company ? (
+                <ProjectsList />
+              ) : (
+                <div className="p-6 rounded-lg border border-red-500/30 bg-red-500/10">
+                  <div className="flex flex-col md:flex-row items-start gap-4">
+                    <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium text-foreground">No company data found</h3>
+                      <p className="text-muted-foreground">
+                        This could be happening because:
+                      </p>
+                      <ul className="list-disc pl-5 text-muted-foreground space-y-1">
+                        <li>Your account isn't associated with a company</li>
+                        <li>There was an issue retrieving your company data</li>
+                      </ul>
+                      <div className="flex flex-wrap gap-3 pt-2">
+                        <Button 
+                          className="bg-[#6E59A5] hover:bg-[#5D4A94] text-white"
+                          onClick={() => navigate('/dashboard')}
+                        >
+                          Go to Dashboard
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => refreshCompany()}
+                          className="gap-2 border-[#6E59A5] text-[#6E59A5] hover:bg-[#6E59A5] hover:text-white"
+                        >
+                          <RefreshCw className="h-4 w-4" /> 
+                          Refresh Data
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const Projects = () => {
+  return (
     <SidebarProvider defaultOpen={false}>
       <div className="w-full min-h-screen flex flex-row">
         <DashboardSidebar />
-        <div className="flex-1 flex flex-col transition-all duration-300 pl-[80px] md:pl-[80px]">
-          <AppHeader />
-          <div className="pt-[64px]">
-            {isLoading ? (
-              <div className="flex justify-center items-center min-h-[calc(100vh-64px)] bg-background">
-                <div className="flex flex-col items-center gap-2">
-                  <Loader2 className="h-8 w-8 animate-spin text-[#6E59A5]" />
-                  <p className="text-sm text-muted-foreground">Loading projects...</p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1 p-4 md:p-8 bg-background">
-                <div className="max-w-6xl mx-auto space-y-8">
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
-                    <h1 className="text-3xl md:text-4xl font-bold text-[#6E59A5]">All Projects</h1>
-                    <Button 
-                      className="bg-[#6E59A5] hover:bg-[#5D4A94] text-white gap-2"
-                      size="sm" 
-                      onClick={() => refreshCompany()}
-                    >
-                      <RefreshCw className="h-4 w-4" /> 
-                      Refresh
-                    </Button>
-                  </div>
-
-                  {company ? (
-                    <ProjectsList />
-                  ) : (
-                    <div className="p-6 rounded-lg border border-red-500/30 bg-red-500/10">
-                      <div className="flex flex-col md:flex-row items-start gap-4">
-                        <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-1" />
-                        <div className="space-y-3">
-                          <h3 className="text-lg font-medium text-foreground">No company data found</h3>
-                          <p className="text-muted-foreground">
-                            This could be happening because:
-                          </p>
-                          <ul className="list-disc pl-5 text-muted-foreground space-y-1">
-                            <li>Your account isn't associated with a company</li>
-                            <li>There was an issue retrieving your company data</li>
-                          </ul>
-                          <div className="flex flex-wrap gap-3 pt-2">
-                            <Button 
-                              className="bg-[#6E59A5] hover:bg-[#5D4A94] text-white"
-                              onClick={() => navigate('/dashboard')}
-                            >
-                              Go to Dashboard
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              onClick={() => refreshCompany()}
-                              className="gap-2 border-[#6E59A5] text-[#6E59A5] hover:bg-[#6E59A5] hover:text-white"
-                            >
-                              <RefreshCw className="h-4 w-4" /> 
-                              Refresh Data
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <ProjectsContent />
       </div>
     </SidebarProvider>
   );
