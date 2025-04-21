@@ -119,45 +119,55 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         // Handle roles data with explicit typing
         if (rolesData) {
-          const typedRolesData = rolesData as SupabaseRole[];
-          setRoles(typedRolesData.map(role => ({
-            id: role.id,
-            name: role.name,
-            code: role.code,
-            ...(role.company_id ? { company_id: role.company_id } : {})
-          })));
+          // Cast to SupabaseRole array first to avoid deep instantiation issues
+          const rolesToSet: Role[] = [];
+          for (const role of rolesData) {
+            rolesToSet.push({
+              id: role.id,
+              name: role.name,
+              code: role.code,
+              ...(role.company_id ? { company_id: role.company_id } : {})
+            });
+          }
+          setRoles(rolesToSet);
         } else {
           setRoles([]);
         }
         
         // Handle locations data with explicit typing
         if (locationsData) {
-          const typedLocationsData = locationsData as SupabaseLocation[];
-          setLocations(typedLocationsData.map(location => ({
-            id: location.id,
-            city: location.city,
-            country: location.country,
-            code: location.code,
-            ...(location.emoji ? { emoji: location.emoji } : {}),
-            ...(location.company_id ? { company_id: location.company_id } : {})
-          })));
+          // Cast to SupabaseLocation array first to avoid deep instantiation issues
+          const locationsToSet: Location[] = [];
+          for (const location of locationsData) {
+            locationsToSet.push({
+              id: location.id,
+              city: location.city,
+              country: location.country,
+              code: location.code,
+              ...(location.emoji ? { emoji: location.emoji } : {}),
+              ...(location.company_id ? { company_id: location.company_id } : {})
+            });
+          }
+          setLocations(locationsToSet);
         } else {
           setLocations([]);
         }
         
         // Transform rates data with proper typing
         if (ratesData) {
-          const typedRatesData = ratesData as SupabaseRate[];
-          const transformedRates: Rate[] = typedRatesData.map(rate => ({
-            id: rate.id,
-            type: rate.type as "role" | "location",
-            reference_id: rate.reference_id,
-            value: Number(rate.value),
-            unit: rate.unit as "hour" | "day" | "week",
-            ...(rate.company_id ? { company_id: rate.company_id } : {})
-          }));
-          
-          setRates(transformedRates);
+          // Cast to SupabaseRate array first to avoid deep instantiation issues
+          const ratesToSet: Rate[] = [];
+          for (const rate of ratesData) {
+            ratesToSet.push({
+              id: rate.id,
+              type: rate.type as "role" | "location",
+              reference_id: rate.reference_id,
+              value: Number(rate.value),
+              unit: rate.unit as "hour" | "day" | "week",
+              ...(rate.company_id ? { company_id: rate.company_id } : {})
+            });
+          }
+          setRates(ratesToSet);
         } else {
           setRates([]);
         }
