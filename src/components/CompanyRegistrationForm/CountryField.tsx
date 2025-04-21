@@ -15,6 +15,9 @@ const CountryField: React.FC<CountryFieldProps> = ({ watch, setValue, errors }) 
 
   return (
     <div>
+      <label htmlFor="country" className="block text-sm font-medium text-gray-200 mb-1">
+        Country
+      </label>
       <CountrySelect
         value={selectedCountry ?? ""}
         onChange={(_name, code) => setValue("country", _name)}

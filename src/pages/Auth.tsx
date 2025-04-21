@@ -362,7 +362,7 @@ const Auth: React.FC = () => {
                       watch={watch}
                       setValue={(field, value) => {
                         setValue(field as any, value);
-                        handleCompanyChange(field as keyof CompanyFormData, value);
+                        handleCompanyChange(field as keyof typeof company, value);
                       }}
                       errors={errors}
                     />
@@ -395,7 +395,23 @@ const Auth: React.FC = () => {
                       required
                     >
                       <option value="">Select industry...</option>
-                      {industryOptions.map(opt => (
+                      {[
+                        "Architecture",
+                        "Interior Design",
+                        "Urban Planning",
+                        "Landscape Architecture",
+                        "Structural Engineering",
+                        "Civil Engineering",
+                        "Construction Management",
+                        "Project Management",
+                        "Surveying",
+                        "Building Services",
+                        "Environmental Engineering",
+                        "Property Development",
+                        "Sustainability Consulting",
+                        "Facility Management",
+                        "Other",
+                      ].map(opt => (
                         <option key={opt} value={opt}>{opt}</option>
                       ))}
                     </select>

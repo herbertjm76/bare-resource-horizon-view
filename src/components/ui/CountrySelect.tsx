@@ -54,11 +54,14 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({ value, onChange, d
         )}
         onClick={() => !disabled && setOpen(!open)}
         disabled={disabled}
+        id="country"
+        aria-haspopup="listbox"
+        aria-expanded={open}
       >
         <span className={value ? "text-foreground" : "text-muted-foreground"}>
           {value ? selected?.name : (placeholder || "Select country")}
         </span>
-        <svg className="h-4 w-4 ml-2 opacity-60" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+        <svg className="h-4 w-4 ml-2 opacity-60" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M6 9l6 6 6-6" />
         </svg>
       </button>

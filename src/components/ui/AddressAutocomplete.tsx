@@ -28,88 +28,74 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [suggestions, setSuggestions] = useAddressSuggestions(searchTerm, country);
 
-  const { suggestions, loading, fetchSuggestions, setSuggestions } = useAddressSuggestions();
-
-  useEffect(() => {
-    setSearchTerm(value);
-  }, [value]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (searchTerm && country) {
-      fetchSuggestions(searchTerm, country);
-      setShowDropdown(true);
-    } else {
-      setSuggestions([]);
-      setShowDropdown(false);
-    }
-  }, [searchTerm, country, fetchSuggestions, setSuggestions]);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        inputRef.current &&
-        !inputRef.current.contains(e.target as Node)
-      ) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowDropdown(false);
       }
     };
-    if (showDropdown) document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [showDropdown]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    setSearchTerm(newValue);
-    onChange(newValue);
-  };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
-  const handleSuggestionClick = (suggestion: string) => {
-    onChange(suggestion);
-    setSearchTerm(suggestion);
-    setShowDropdown(false);
-    if (onSelectSuggestion) {
-      const city = extractCityFromAddress(suggestion);
-      console.log("Selecting suggestion:", suggestion, "City:", city);
-      onSelectSuggestion(suggestion, city);
+  useEffect(() => {
+    if (value && !searchTerm) {
+      setSearchTerm(value);
     }
-  };
+  }, [value]);
 
   return (
-    <div className="relative">
-      <div className="relative">
-        <Input
-          ref={inputRef}
-          value={searchTerm}
-          onChange={handleInputChange}
-          placeholder={placeholder}
-          disabled={disabled}
-          autoComplete="off"
-          className={cn("mt-1 pr-10", className)}
-          onFocus={() => {
-            if (searchTerm && suggestions.length > 0) {
-              setShowDropdown(true);
-            }
-          }}
-        />
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400">
-          {loading ? <Loader className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-        </div>
+    <div className="relative" ref={containerRef}>
+      <Input
+        type="text"
+        value={searchTerm}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          onChange(e.target.value);
+          if (e.target.value.length > 0) {
+            setShowDropdown(true);
+          } else {
+            setShowDropdown(false);
+          }
+        }}
+        placeholder={placeholder}
+        disabled={disabled}
+        autoComplete="off"
+        className={cn("mt-1 pr-10", className)}
+        onFocus={() => {
+          if (searchTerm && suggestions.length > 0) {
+            setShowDropdown(true);
+          }
+        }}
+      />
+      <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+        {suggestions.length > 0 ? (
+          <Search size={18} />
+        ) : !showDropdown ? (
+          <MapPin size={18} />
+        ) : (
+          <Loader className="animate-spin" size={18} />
+        )}
       </div>
-      {loading && (
-        <span className="block text-xs text-gray-400 mt-1">Searching addresses...</span>
-      )}
-      {(showDropdown && suggestions.length > 0) && (
+      {showDropdown && suggestions.length > 0 && (
         <AddressSuggestionList
           suggestions={suggestions}
-          onSuggestionClick={handleSuggestionClick}
+          onSelect={(address) => {
+            onChange(address);
+            const city = extractCityFromAddress(address);
+            if (onSelectSuggestion) {
+              onSelectSuggestion(address, city);
+            }
+            setShowDropdown(false);
+          }}
         />
-      )}
-      {searchTerm && !loading && country && suggestions.length === 0 && (
-        <span className="block text-xs text-gray-400 mt-1">
-          No address suggestions found. Try entering more details.
-        </span>
       )}
     </div>
   );
