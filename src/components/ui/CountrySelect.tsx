@@ -9,9 +9,10 @@ export interface CountrySelectProps {
   onChange: (value: string, code?: string) => void;
   disabled?: boolean;
   placeholder?: string;
+  className?: string;
 }
 
-export const CountrySelect: React.FC<CountrySelectProps> = ({ value, onChange, disabled, placeholder }) => {
+export const CountrySelect: React.FC<CountrySelectProps> = ({ value, onChange, disabled, placeholder, className }) => {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -48,7 +49,8 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({ value, onChange, d
         type="button"
         className={cn(
           "flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-          disabled && "cursor-not-allowed opacity-50"
+          disabled && "cursor-not-allowed opacity-50",
+          className
         )}
         onClick={() => !disabled && setOpen(!open)}
         disabled={disabled}

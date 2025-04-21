@@ -15,7 +15,6 @@ const CountryField: React.FC<CountryFieldProps> = ({ watch, setValue, errors }) 
 
   return (
     <div>
-      {/* Removed duplicate label "Country" here */}
       <CountrySelect
         value={selectedCountry ?? ""}
         onChange={(_name, code) => setValue("country", _name)}
@@ -30,4 +29,3 @@ const CountryField: React.FC<CountryFieldProps> = ({ watch, setValue, errors }) 
 };
 
 export default CountryField;
-

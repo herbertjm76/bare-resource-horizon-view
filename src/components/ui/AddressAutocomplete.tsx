@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Loader, MapPin, Search } from "lucide-react";
 import { useAddressSuggestions } from "./useAddressSuggestions";
 import { extractCityFromAddress } from "./extractCityFromAddress";
 import AddressSuggestionList from "./AddressSuggestionList";
+import { cn } from "@/lib/utils";
 
 interface AddressAutocompleteProps {
   value: string;
@@ -12,6 +14,7 @@ interface AddressAutocompleteProps {
   placeholder?: string;
   disabled?: boolean;
   onSelectSuggestion?: (addr: string, city: string) => void;
+  className?: string;
 }
 
 export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
@@ -21,6 +24,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   placeholder = "Start typing address...",
   disabled,
   onSelectSuggestion,
+  className,
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -82,7 +86,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           placeholder={placeholder}
           disabled={disabled}
           autoComplete="off"
-          className="mt-1 pr-10"
+          className={cn("mt-1 pr-10", className)}
           onFocus={() => {
             if (searchTerm && suggestions.length > 0) {
               setShowDropdown(true);
