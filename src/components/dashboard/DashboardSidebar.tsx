@@ -1,3 +1,4 @@
+
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -108,14 +109,16 @@ export function DashboardSidebar() {
 
   return (
     <Sidebar 
-      className="bg-[#6E59A5] border-r border-[#5d4b8e] pt-0 min-h-screen transition-[width] fixed left-0 top-0 bottom-0"
+      className="bg-[#8E9196] border-r border-[#7d8086] pt-0 min-h-screen transition-[width] fixed left-0 top-0 bottom-0 w-[240px]"
       style={{ marginTop: 0 }}
     >
       <SidebarContent className="p-0">
         <SidebarGroup>
-          <div className="flex items-center justify-between px-4 py-4 h-[56px] border-b border-[#5d4b8e]">
-            <span className="text-2xl font-bold text-white select-none">BareResource</span>
-            <SidebarTrigger className="text-white bg-transparent hover:bg-[#5d4b8e]" />
+          <div className="flex items-center justify-between px-4 py-4 h-[56px] border-b border-[#7d8086]">
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-semibold text-white select-none">Bare<span className="text-[#6E59A5]">Resource</span></span>
+            </div>
+            <SidebarTrigger className="text-white bg-transparent hover:bg-[#7d8086]" />
           </div>
           
           {navigationItems.map((section) => (
@@ -134,7 +137,7 @@ export function DashboardSidebar() {
                           className={`
                             text-white 
                             hover:text-white 
-                            hover:bg-[#5d4b8e]
+                            hover:bg-[#7d8086]
                             rounded-none
                             px-4
                             py-2
@@ -142,7 +145,7 @@ export function DashboardSidebar() {
                             items-center
                             gap-3
                             transition-all
-                            ${isActive ? "bg-[#5d4b8e] text-white" : ""}
+                            ${isActive ? "bg-[#7d8086] text-white" : ""}
                           `}
                           isActive={isActive}
                         >

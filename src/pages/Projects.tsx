@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -10,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-const HEADER_HEIGHT = 56; // Should match AppHeader minHeight
+const HEADER_HEIGHT = 56;
 
 const Projects = () => {
   const { company, loading: companyLoading, refreshCompany, error: companyError } = useCompany();

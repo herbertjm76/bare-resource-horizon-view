@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
@@ -47,9 +46,13 @@ export const AppHeader: React.FC = () => {
   }).toUpperCase();
 
   return (
-    <header className="w-full px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[56px] pl-[240px]">
-      <div className="text-sm text-gray-500 font-medium">
-        {formattedDate}
+    <header className="w-full px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[56px] pl-[256px]">
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-gray-400 text-sm">MON</span>
+          <span className="text-gray-600">|</span>
+          <span className="text-gray-600 text-sm">21 APRIL 2024</span>
+        </div>
       </div>
       <div className="flex items-center gap-4">
         <span className="text-sm font-medium text-gray-500">ADMIN</span>
