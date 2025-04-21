@@ -5,8 +5,8 @@ import { useToast } from "@/hooks/use-toast";
 import allCountries from "@/lib/allCountries.json";
 import { getContinentByCountryCode } from './projectAreaHelpers';
 
-// Updated type to match the office_areas table structure
-export type DatabaseArea = {
+// Types that match the office_areas table in Supabase
+export type OfficeAreaRow = {
   id: string;
   code: string;
   name: string;
@@ -15,6 +15,7 @@ export type DatabaseArea = {
   updated_at: string;
 };
 
+// The ProjectArea shape as used in the app
 export type ProjectArea = {
   id: string;
   code: string;
@@ -23,6 +24,7 @@ export type ProjectArea = {
   country: string;
 };
 
+// Used on form submit
 export type ProjectAreaFormValues = {
   code: string;
   country: string;
@@ -30,12 +32,24 @@ export type ProjectAreaFormValues = {
   region: string;
 };
 
+// Helper: given a country name (as stored in "name"), find the region
 function getAutoRegion(country: string): string {
   const countryData = allCountries.find((c) => c.name === country);
   if (countryData) {
     return getContinentByCountryCode(countryData.code);
   }
   return "";
+}
+
+// Helper: convert from DB row to ProjectArea
+function toProjectArea(area: OfficeAreaRow): ProjectArea {
+  return {
+    id: area.id,
+    code: area.code,
+    city: "", // The table doesn't have city
+    region: getAutoRegion(area.name),
+    country: area.name,
+  };
 }
 
 export default function useProjectAreas() {
@@ -55,20 +69,16 @@ export default function useProjectAreas() {
           .from("office_areas")
           .select("*")
           .order("created_at", { ascending: true });
-          
+
         if (error) {
           console.error("Supabase error:", error);
           setError("Failed to load project areas.");
           setAreas([]);
         } else {
-          // Use the correct type for the data from office_areas table
-          const transformedAreas = (data as DatabaseArea[] || []).map(area => ({
-            id: area.id,
-            code: area.code,
-            city: "", // office_areas doesn't have city, so we default to empty string
-            region: getAutoRegion(area.name),
-            country: area.name, // The country name is stored in the 'name' field
-          }));
+          // Transform using map
+          const transformedAreas = Array.isArray(data)
+            ? data.map(toProjectArea)
+            : [];
           setAreas(transformedAreas);
         }
       } catch (err) {
@@ -81,6 +91,7 @@ export default function useProjectAreas() {
     };
 
     fetchAreas();
+    // eslint-disable-next-line
   }, []);
 
   // Add
@@ -88,18 +99,18 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
     try {
-      const areaData: any = {
+      const areaData = {
         code: values.code,
         name: values.country,
-        emoji: null
+        emoji: null,
       };
-      
+
       const { data, error } = await supabase
         .from("office_areas")
         .insert(areaData)
         .select()
         .single();
-      
+
       if (error) {
         setError("Failed to save area.");
         toast({
@@ -109,13 +120,7 @@ export default function useProjectAreas() {
         });
       }
       if (data) {
-        const newArea: ProjectArea = {
-          id: data.id,
-          code: data.code,
-          region: getAutoRegion(data.name),
-          country: data.name,
-        };
-        setAreas(old => [...old, newArea]);
+        setAreas(old => [...old, toProjectArea(data as OfficeAreaRow)]);
         toast({
           title: "Success",
           description: "Area added successfully.",
@@ -139,11 +144,11 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
     try {
-      const areaData: any = {
+      const areaData = {
         code: values.code,
         name: values.country,
       };
-      
+
       const { error } = await supabase
         .from("office_areas")
         .update(areaData)
@@ -157,10 +162,19 @@ export default function useProjectAreas() {
           variant: "destructive"
         });
       } else {
-        setAreas(areas => areas.map(area => area.id === id
-          ? { ...area, ...values, region: getAutoRegion(values.country) }
-          : area
-        ));
+        setAreas(areas =>
+          areas.map(area =>
+            area.id === id
+              ? {
+                  ...area,
+                  code: values.code,
+                  country: values.country,
+                  region: getAutoRegion(values.country),
+                  city: values.city ?? ""
+                }
+              : area
+          )
+        );
         toast({
           title: "Success",
           description: "Area updated successfully.",
@@ -188,7 +202,7 @@ export default function useProjectAreas() {
         .from("office_areas")
         .delete()
         .in("id", ids);
-        
+
       if (error) {
         setError("Failed to delete area(s).");
         toast({
@@ -227,3 +241,4 @@ export default function useProjectAreas() {
 }
 
 export { getAutoRegion };
+
