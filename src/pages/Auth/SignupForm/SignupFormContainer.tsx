@@ -57,26 +57,37 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    if (
-      !ownerFirstName || !ownerLastName || !ownerEmail || !ownerPassword ||
-      !company.name || !company.subdomain || !company.address || !company.country || !company.city || !company.size || !company.industry
-    ) {
-      toast.error('Please fill in all required fields.');
-      setLoading(false);
-      return;
-    }
-
-    const available = await checkSubdomainAvailability(company.subdomain);
-    if (!available) {
-      toast.error('This subdomain is already taken. Please choose another one.');
-      setLoading(false);
-      return;
-    }
-
+    
     try {
-      console.log('Starting signup process');
+      // Validate required fields
+      if (
+        !ownerFirstName || !ownerLastName || !ownerEmail || !ownerPassword ||
+        !company.name || !company.subdomain || !company.address || !company.country || !company.city || !company.size || !company.industry
+      ) {
+        toast.error('Please fill in all required fields.');
+        setLoading(false);
+        return;
+      }
+
+      // Check subdomain availability
+      const available = await checkSubdomainAvailability(company.subdomain);
+      if (!available) {
+        toast.error('This subdomain is already taken. Please choose another one.');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Starting signup process with data:', {
+        email: ownerEmail,
+        firstName: ownerFirstName,
+        lastName: ownerLastName,
+        company: {
+          name: company.name,
+          subdomain: company.subdomain
+        }
+      });
       
-      // Create company first
+      // 1. Create company first
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
@@ -97,10 +108,10 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         throw companyError;
       }
 
-      console.log('Company created:', companyData.id);
+      console.log('Company created successfully with ID:', companyData.id);
 
-      // Now sign up user with profile metadata
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      // 2. Sign up user with Supabase Auth
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: ownerEmail,
         password: ownerPassword,
         options: {
@@ -114,47 +125,60 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       });
 
       if (signUpError) {
+        // If auth fails, clean up by deleting the company
         console.error('Signup error:', signUpError);
+        await supabase.from('companies').delete().eq('id', companyData.id);
         throw signUpError;
       }
 
-      console.log('User signup successful:', signUpData.user?.id);
+      if (!authData.user) {
+        console.error('No user returned from signup');
+        await supabase.from('companies').delete().eq('id', companyData.id);
+        throw new Error('Failed to create user account');
+      }
 
-      if (signUpData.user) {
-        // Wait to allow database trigger to work
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Attempt manual profile creation with multiple retries
-        for (let attempt = 1; attempt <= 3; attempt++) {
-          console.log(`Manual profile creation attempt ${attempt}`);
+      console.log('User created successfully with ID:', authData.user.id);
+
+      // 3. Create profile manually in case trigger fails
+      const profileData = {
+        id: authData.user.id,
+        email: ownerEmail,
+        first_name: ownerFirstName,
+        last_name: ownerLastName,
+        company_id: companyData.id,
+        role: 'owner'
+      };
+
+      // First try insert
+      const { error: profileInsertError } = await supabase
+        .from('profiles')
+        .insert(profileData);
+
+      // If insert fails (maybe trigger already created it), try upsert
+      if (profileInsertError) {
+        console.log('Profile insert failed, trying upsert:', profileInsertError);
+        const { error: profileUpsertError } = await supabase
+          .from('profiles')
+          .upsert(profileData);
           
-          const profileSuccess = await ensureUserProfile(signUpData.user.id, {
-            email: ownerEmail,
-            firstName: ownerFirstName,
-            lastName: ownerLastName,
-            companyId: companyData.id,
-            role: 'owner'
-          });
-          
-          if (profileSuccess) {
-            console.log('Profile creation successful on attempt', attempt);
-            break;
-          } else if (attempt < 3) {
-            console.log(`Profile creation failed on attempt ${attempt}, retrying...`);
-            await new Promise(resolve => setTimeout(resolve, 1500));
-          } else {
-            console.warn('All profile creation attempts failed, user may need to log in again');
-          }
+        if (profileUpsertError) {
+          console.error('Profile upsert error:', profileUpsertError);
+          // Continue anyway as the trigger might have succeeded
         }
       }
 
       toast.success('Sign up successful! Please check your email to confirm your account, then you can log in.');
+      
+      // Clear form
       setOwnerFirstName('');
       setOwnerLastName('');
       setOwnerEmail('');
       setOwnerPassword('');
       setCompany(emptyCompany);
+      
+      // Switch to login view
       onSwitchToLogin();
+      
     } catch (error: any) {
       console.error("Signup error:", error);
       toast.error(error.message || 'Sign up failed. Please try again.');

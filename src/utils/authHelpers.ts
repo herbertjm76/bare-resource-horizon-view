@@ -20,6 +20,11 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
       .eq('id', userId)
       .maybeSingle();
     
+    if (checkError) {
+      console.error('Error checking profile existence:', checkError);
+      return false;
+    }
+    
     // If profile exists, we're good
     if (existingProfile) {
       console.log('User profile already exists:', existingProfile.id);
@@ -51,14 +56,24 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
       role: role
     };
     
-    // Try upsert operation
-    const { error: upsertError } = await supabase
-      .from('profiles')
-      .upsert(profileData);
+    console.log('Creating profile with data:', profileData);
     
-    if (upsertError) {
-      console.error('Profile upsert error:', upsertError);
-      return false;
+    // Try insert operation first
+    const { error: insertError } = await supabase
+      .from('profiles')
+      .insert(profileData);
+    
+    // If insert fails, try upsert as fallback
+    if (insertError) {
+      console.log('Profile insert failed, trying upsert:', insertError);
+      const { error: upsertError } = await supabase
+        .from('profiles')
+        .upsert(profileData);
+      
+      if (upsertError) {
+        console.error('Profile upsert error:', upsertError);
+        return false;
+      }
     }
     
     console.log('Profile created successfully for user:', userId);
