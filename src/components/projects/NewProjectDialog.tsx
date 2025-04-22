@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -66,6 +65,7 @@ export const NewProjectDialog: React.FC = () => {
   const [projectStages, setProjectStages] = useState<ProjectStageOption[]>([]);
   const [roles, setRoles] = useState<{ id: string; name: string; code: string; }[]>([]);
   const [roleNumbers, setRoleNumbers] = useState<{ [roleId: string]: number }>({});
+  const [officeStages, setOfficeStages] = useState<{ id: string; name: string }[]>([]);
 
   // Fetch project managers, project areas, offices, stages
   useEffect(() => {
@@ -108,6 +108,12 @@ export const NewProjectDialog: React.FC = () => {
         .from('office_roles')
         .select('id, name, code');
       setRoles(Array.isArray(officeRoles) ? officeRoles : []);
+
+      // Fetch office stages for this multi-select
+      const { data: stages } = await supabase
+        .from('office_stages')
+        .select('id, name');
+      setOfficeStages(Array.isArray(stages) ? stages : []);
     })();
   }, []);
 
@@ -237,9 +243,12 @@ export const NewProjectDialog: React.FC = () => {
             {/* Deadline removed as per instructions */}
           </div>
           <div className="mb-4">
-            <div className="font-semibold mb-2 flex items-center gap-2"><CheckSquare className="w-4 h-4" />Project Stages (Multi-Select)<span className="text-destructive">*</span></div>
+            <div className="font-semibold mb-2 flex items-center gap-2">
+              <CheckSquare className="w-4 h-4" />Project Stages (Multi-Select)
+              <span className="text-destructive">*</span>
+            </div>
             <div className="flex flex-wrap gap-6">
-              {projectStages.map(stage => (
+              {officeStages.map(stage => (
                 <label className="flex items-center gap-2" key={stage.id}>
                   <Checkbox
                     checked={form.stages.includes(stage.id)}
@@ -252,7 +261,7 @@ export const NewProjectDialog: React.FC = () => {
                       );
                     }}
                   />
-                  {stage.stage_name}
+                  {stage.name}
                 </label>
               ))}
             </div>
