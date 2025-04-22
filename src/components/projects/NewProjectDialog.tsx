@@ -83,8 +83,13 @@ export const NewProjectDialog: React.FC = () => {
       // Project areas/countries
       const { data: areas } = await supabase
         .from('project_areas')
-        .select('country, name');
-      setCountries(Array.from(new Set((areas ?? []).map(a => a.country ?? a.name).filter(Boolean))) as string[]);
+        .select('name');
+      
+      // Extract country names from the project_areas table
+      // The 'name' field in project_areas contains the country name
+      setCountries(Array.from(new Set(Array.isArray(areas) 
+        ? areas.map(a => a.name).filter(Boolean) 
+        : [])) as string[]);
 
       // Office locations
       const { data: off } = await supabase
