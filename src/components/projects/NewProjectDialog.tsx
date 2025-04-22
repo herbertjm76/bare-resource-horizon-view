@@ -20,6 +20,7 @@ import { toast } from "sonner";
 type RoleOption = { id: string; name: string };
 type OfficeOption = { id: string; city: string; country: string };
 type ProjectStageOption = { id: string; stage_name: string; };
+type OfficeStageOption = { id: string; name: string };
 
 const statusOptions = [
   { label: "Not started", value: "Planning" },
@@ -65,7 +66,7 @@ export const NewProjectDialog: React.FC = () => {
   const [projectStages, setProjectStages] = useState<ProjectStageOption[]>([]);
   const [roles, setRoles] = useState<{ id: string; name: string; code: string; }[]>([]);
   const [roleNumbers, setRoleNumbers] = useState<{ [roleId: string]: number }>({});
-  const [officeStages, setOfficeStages] = useState<{ id: string; name: string }[]>([]);
+  const [officeStages, setOfficeStages] = useState<OfficeStageOption[]>([]);
 
   // Fetch project managers, project areas, offices, stages
   useEffect(() => {
@@ -98,10 +99,10 @@ export const NewProjectDialog: React.FC = () => {
       setOffices(Array.isArray(off) ? off : []);
 
       // Project stages
-      const { data: stages } = await supabase
+      const { data: projectStagesData } = await supabase
         .from('project_stages')
         .select('id, stage_name');
-      setProjectStages(Array.isArray(stages) ? stages : []);
+      setProjectStages(Array.isArray(projectStagesData) ? projectStagesData : []);
 
       // Office roles for rate calculation
       const { data: officeRoles } = await supabase
@@ -110,10 +111,10 @@ export const NewProjectDialog: React.FC = () => {
       setRoles(Array.isArray(officeRoles) ? officeRoles : []);
 
       // Fetch office stages for this multi-select
-      const { data: stages } = await supabase
+      const { data: officeStagesData } = await supabase
         .from('office_stages')
         .select('id, name');
-      setOfficeStages(Array.isArray(stages) ? stages : []);
+      setOfficeStages(Array.isArray(officeStagesData) ? officeStagesData : []);
     })();
   }, []);
 
@@ -240,7 +241,6 @@ export const NewProjectDialog: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
-            {/* Deadline removed as per instructions */}
           </div>
           <div className="mb-4">
             <div className="font-semibold mb-2 flex items-center gap-2">
