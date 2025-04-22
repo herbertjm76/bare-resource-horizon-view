@@ -6,9 +6,10 @@ import { RefreshCw } from "lucide-react";
 
 interface ProjectsToolbarProps {
   onRefresh?: () => void;
+  onProjectCreated?: () => void;
 }
 
-const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({ onRefresh }) => {
+const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({ onRefresh, onProjectCreated }) => {
   return (
     <div className="flex items-center gap-2">
       {onRefresh && (
@@ -22,7 +23,8 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({ onRefresh }) => {
           Refresh
         </Button>
       )}
-      <NewProjectDialog />
+      {/* Pass the callback for refreshing after project creation */}
+      <NewProjectDialog onProjectCreated={onProjectCreated} />
     </div>
   );
 };

@@ -23,6 +23,11 @@ export const ProjectsList = () => {
     refetch();
   };
 
+  // New: refresh after project creation!
+  const handleProjectCreated = () => {
+    refetch();
+  };
+
   return (
     <Card className="border shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
@@ -32,7 +37,7 @@ export const ProjectsList = () => {
             View and manage all your ongoing projects
           </p>
         </div>
-        <ProjectsToolbar onRefresh={handleRefresh} />
+        <ProjectsToolbar onRefresh={handleRefresh} onProjectCreated={handleProjectCreated} />
       </CardHeader>
       <CardContent>
         <ProjectFilters 

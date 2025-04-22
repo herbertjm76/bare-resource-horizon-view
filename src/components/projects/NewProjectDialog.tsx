@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -17,6 +16,7 @@ import { Card } from "@/components/ui/card";
 import { PlusCircle, Percent, Users, FileText, Code, Building, MapPin, CheckSquare, Calculator } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useCompany } from '@/context/CompanyContext';
 
 type RoleOption = { id: string; name: string };
 type OfficeOption = { id: string; city: string; country: string };
@@ -40,13 +40,16 @@ type NewProjectForm = {
   status: string;
   office: string;
   stages: string[];
+  client?: string;
+  dueDate?: string;
 };
 
-export const NewProjectDialog: React.FC = () => {
+export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ onProjectCreated }) => {
   const [open, setOpen] = useState(false);
   const [showRateCalc, setShowRateCalc] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
+  const { company } = useCompany();
 
   const [form, setForm] = useState<NewProjectForm>({
     code: "",
@@ -58,6 +61,8 @@ export const NewProjectDialog: React.FC = () => {
     status: "",
     office: "",
     stages: [],
+    client: "",
+    dueDate: "",
   });
 
   const [managers, setManagers] = useState<RoleOption[]>([]);
@@ -167,18 +172,45 @@ export const NewProjectDialog: React.FC = () => {
       toast.error('Please fill in all required fields.');
       return;
     }
+
+    if (!company || !company.id) {
+      toast.error('No company found for your user. Cannot create project.');
+      return;
+    }
     
     setIsLoading(true);
-    
     try {
-      await new Promise(r => setTimeout(r, 600));
+      const { error } = await supabase.from('projects').insert([
+        {
+          code: form.code,
+          name: form.name,
+          company_id: company.id,
+          project_manager_id: form.manager === "not_assigned" ? null : (form.manager || null),
+          office_id: form.office || null,
+          status: form.status,
+          country: form.country,
+          target_profit_percentage: form.profit ? Number(form.profit) : null,
+          dueDate: form.dueDate ? form.dueDate : null,
+          client: form.client ? form.client : null,
+        }
+      ]);
+      if (error) {
+        console.error("Supabase error inserting project:", error);
+        toast.error('Failed to create project: ' + error.message);
+        return;
+      }
+
       setOpen(false);
       toast.success('Project successfully created!');
       setForm({
         code: "", name: "", manager: "", country: "", 
-        profit: "", avgRate: "", status: "", office: "", stages: []
+        profit: "", avgRate: "", status: "", office: "", stages: [],
+        client: "", dueDate: "",
       });
       setCurrentStep(1);
+      if (typeof onProjectCreated === 'function') {
+        onProjectCreated();
+      }
     } catch (error) {
       console.error("Error creating project:", error);
       toast.error("Failed to create project");
@@ -188,180 +220,188 @@ export const NewProjectDialog: React.FC = () => {
   };
 
   const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-medium text-[#6E59A5]">Project Information</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                  <Code className="w-4 h-4" />Project Code<span className="text-destructive">*</span>
-                </label>
-                <Input 
-                  value={form.code} 
-                  onChange={e => handleChange('code', e.target.value)} 
-                  required 
-                  placeholder="Enter Project Code" 
-                  className="text-base"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                  <FileText className="w-4 h-4" />Project Name<span className="text-destructive">*</span>
-                </label>
-                <Input 
-                  value={form.name} 
-                  onChange={e => handleChange('name', e.target.value)} 
-                  required 
-                  placeholder="Enter Project Name"
-                  className="text-base" 
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                  <Users className="w-4 h-4" />Project Manager<span className="text-destructive">*</span>
-                </label>
-                <Select value={form.manager} onValueChange={v => handleChange('manager', v)}>
-                  <SelectTrigger className="text-base">
-                    <SelectValue placeholder="Select Manager" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="not_assigned">Not Assigned</SelectItem>
-                    {managers.map(m => (
-                      <SelectItem key={m.id} value={m.id}>
-                        {m.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-        );
-      case 2:
-        return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-medium text-[#6E59A5]">Project Details</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                  <MapPin className="w-4 h-4" />Project Country<span className="text-destructive">*</span>
-                </label>
-                <Select value={form.country} onValueChange={v => handleChange('country', v)}>
-                  <SelectTrigger className="text-base">
-                    <SelectValue placeholder="Select Country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countries.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                  <Percent className="w-4 h-4" />Target Profit %<span className="text-destructive">*</span>
-                </label>
-                <Input 
-                  value={form.profit} 
-                  type="number" 
-                  onChange={e => handleChange('profit', e.target.value)} 
-                  required 
-                  placeholder="Enter % Profit"
-                  className="text-base"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                  <CheckSquare className="w-4 h-4" />Project Status<span className="text-destructive">*</span>
-                </label>
-                <Select value={form.status} onValueChange={v => handleChange('status', v)}>
-                  <SelectTrigger className="text-base">
-                    <SelectValue placeholder="Select Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statusOptions.map(opt => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                  <Building className="w-4 h-4" />Office<span className="text-destructive">*</span>
-                </label>
-                <Select value={form.office} onValueChange={v => handleChange('office', v)}>
-                  <SelectTrigger className="text-base">
-                    <SelectValue placeholder="Select Office" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {offices.map(o => (
-                      <SelectItem key={o.id} value={o.id}>
-                        {`${o.city}, ${o.country}`}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="sm:col-span-2">
-                <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                  <Calculator className="w-4 h-4" />Average Rate<span className="text-destructive">*</span>
-                </label>
-                <div className="flex gap-2">
-                  <Input 
-                    value={form.avgRate} 
-                    type="number" 
-                    onChange={e => handleChange('avgRate', e.target.value)} 
-                    required 
-                    placeholder="Enter AVG Rate"
-                    className="text-base" 
-                  />
-                  <Button type="button" variant="outline" onClick={() => setShowRateCalc(true)} title="Calculate Avg Rate">
-                    <Calculator className="w-4 h-4 mr-2" />
-                    Calculate
-                  </Button>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Click Calculate to use the rate calculator
-                </p>
-              </div>
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-medium text-[#6E59A5]">Project Stages</h3>
-            <div>
-              <div className="font-semibold mb-3 flex items-center gap-2 text-sm">
-                <CheckSquare className="w-4 h-4" />Select Project Stages<span className="text-destructive">*</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto p-1">
-                {officeStages.map(stage => (
-                  <label className="flex items-center gap-2 p-2 border rounded-md hover:bg-muted/50 transition-colors" key={stage.id}>
-                    <Checkbox
-                      checked={form.stages.includes(stage.id)}
-                      onCheckedChange={checked => {
-                        handleChange(
-                          'stages',
-                          checked
-                            ? [...form.stages, stage.id]
-                            : form.stages.filter(s => s !== stage.id)
-                        );
-                      }}
-                    />
-                    <span className="text-base">{stage.name}</span>
-                  </label>
-                ))}
-              </div>
-              {officeStages.length === 0 && (
-                <p className="text-sm text-muted-foreground italic">No project stages available</p>
-              )}
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
+    return (
+      <>
+        {
+          (() => {
+            switch (currentStep) {
+              case 1:
+                return (
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-medium text-[#6E59A5]">Project Information</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
+                          <Code className="w-4 h-4" />Project Code<span className="text-destructive">*</span>
+                        </label>
+                        <Input 
+                          value={form.code} 
+                          onChange={e => handleChange('code', e.target.value)} 
+                          required 
+                          placeholder="Enter Project Code" 
+                          className="text-base"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
+                          <FileText className="w-4 h-4" />Project Name<span className="text-destructive">*</span>
+                        </label>
+                        <Input 
+                          value={form.name} 
+                          onChange={e => handleChange('name', e.target.value)} 
+                          required 
+                          placeholder="Enter Project Name"
+                          className="text-base" 
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
+                          <Users className="w-4 h-4" />Project Manager<span className="text-destructive">*</span>
+                        </label>
+                        <Select value={form.manager} onValueChange={v => handleChange('manager', v)}>
+                          <SelectTrigger className="text-base">
+                            <SelectValue placeholder="Select Manager" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="not_assigned">Not Assigned</SelectItem>
+                            {managers.map(m => (
+                              <SelectItem key={m.id} value={m.id}>
+                                {m.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+                );
+              case 2:
+                return (
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-medium text-[#6E59A5]">Project Details</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
+                          <MapPin className="w-4 h-4" />Project Country<span className="text-destructive">*</span>
+                        </label>
+                        <Select value={form.country} onValueChange={v => handleChange('country', v)}>
+                          <SelectTrigger className="text-base">
+                            <SelectValue placeholder="Select Country" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {countries.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
+                          <Percent className="w-4 h-4" />Target Profit %<span className="text-destructive">*</span>
+                        </label>
+                        <Input 
+                          value={form.profit} 
+                          type="number" 
+                          onChange={e => handleChange('profit', e.target.value)} 
+                          required 
+                          placeholder="Enter % Profit"
+                          className="text-base"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
+                          <CheckSquare className="w-4 h-4" />Project Status<span className="text-destructive">*</span>
+                        </label>
+                        <Select value={form.status} onValueChange={v => handleChange('status', v)}>
+                          <SelectTrigger className="text-base">
+                            <SelectValue placeholder="Select Status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {statusOptions.map(opt => (
+                              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
+                          <Building className="w-4 h-4" />Office<span className="text-destructive">*</span>
+                        </label>
+                        <Select value={form.office} onValueChange={v => handleChange('office', v)}>
+                          <SelectTrigger className="text-base">
+                            <SelectValue placeholder="Select Office" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {offices.map(o => (
+                              <SelectItem key={o.id} value={o.id}>
+                                {`${o.city}, ${o.country}`}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
+                          <Calculator className="w-4 h-4" />Average Rate<span className="text-destructive">*</span>
+                        </label>
+                        <div className="flex gap-2">
+                          <Input 
+                            value={form.avgRate} 
+                            type="number" 
+                            onChange={e => handleChange('avgRate', e.target.value)} 
+                            required 
+                            placeholder="Enter AVG Rate"
+                            className="text-base" 
+                          />
+                          <Button type="button" variant="outline" onClick={() => setShowRateCalc(true)} title="Calculate Avg Rate">
+                            <Calculator className="w-4 h-4 mr-2" />
+                            Calculate
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Click Calculate to use the rate calculator
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              case 3:
+                return (
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-medium text-[#6E59A5]">Project Stages</h3>
+                    <div>
+                      <div className="font-semibold mb-3 flex items-center gap-2 text-sm">
+                        <CheckSquare className="w-4 h-4" />Select Project Stages<span className="text-destructive">*</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto p-1">
+                        {officeStages.map(stage => (
+                          <label className="flex items-center gap-2 p-2 border rounded-md hover:bg-muted/50 transition-colors" key={stage.id}>
+                            <Checkbox
+                              checked={form.stages.includes(stage.id)}
+                              onCheckedChange={checked => {
+                                handleChange(
+                                  'stages',
+                                  checked
+                                    ? [...form.stages, stage.id]
+                                    : form.stages.filter(s => s !== stage.id)
+                                );
+                              }}
+                            />
+                            <span className="text-base">{stage.name}</span>
+                          </label>
+                        ))}
+                      </div>
+                      {officeStages.length === 0 && (
+                        <p className="text-sm text-muted-foreground italic">No project stages available</p>
+                      )}
+                    </div>
+                  </div>
+                );
+              default:
+                return null;
+            }
+          })()
+        }
+      </>
+    );
   };
 
   return (
