@@ -74,13 +74,16 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
   useEffect(() => {
     const fetchData = async () => {
       console.log("Fetching data for new project dialog");
-
+      if (!company || !company.id) {
+        toast.error("No company context found, cannot load project resources.");
+        return;
+      }
       try {
         const { data: mgrs, error: mgrsError } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, role')
-          .eq('role', 'member');
-
+          .eq('role', 'member')
+          .eq('company_id', company.id);
         if (mgrsError) {
           console.error("Error fetching managers:", mgrsError);
           toast.error("Failed to load manager options");
@@ -92,7 +95,8 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
 
         const { data: projectAreas, error: areasError } = await supabase
           .from('project_areas')
-          .select('name');
+          .select('name')
+          .eq('company_id', company.id);
         if (areasError) {
           console.error("Error fetching project areas:", areasError);
           toast.error("Failed to load country options");
@@ -105,7 +109,8 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
 
         const { data: locations, error: locationsError } = await supabase
           .from('office_locations')
-          .select('id, city, country, code, emoji');
+          .select('id, city, country, code, emoji')
+          .eq('company_id', company.id);
         if (locationsError) {
           console.error("Error fetching office locations:", locationsError);
           toast.error("Failed to load office options");
@@ -115,7 +120,8 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
 
         const { data: projectStagesData, error: projectStagesError } = await supabase
           .from('project_stages')
-          .select('id, stage_name');
+          .select('id, stage_name')
+          .eq('company_id', company.id);
         if (projectStagesError) {
           console.error("Error fetching project stages:", projectStagesError);
           toast.error("Failed to load project stage options");
@@ -125,7 +131,8 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
 
         const { data: officeRoles, error: officeRolesError } = await supabase
           .from('office_roles')
-          .select('id, name, code');
+          .select('id, name, code')
+          .eq('company_id', company.id);
         if (officeRolesError) {
           console.error("Error fetching office roles:", officeRolesError);
           toast.error("Failed to load office roles");
@@ -135,29 +142,30 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
 
         const { data: officeRates, error: officeRatesError } = await supabase
           .from('office_rates')
-          .select('id, type, value, unit, reference_id');
+          .select('id, type, value, unit, reference_id')
+          .eq('company_id', company.id);
         if (officeRatesError) {
           console.error("Error fetching office rates:", officeRatesError);
           toast.error("Failed to load office rates");
         } else {
-          // Optional: can set in state if you want to show/use them in project dialog
-          // console.log('Office rates:', officeRates);
+          // Optional: for further use/display in dialog
         }
 
         const { data: officeHolidays, error: officeHolidaysError } = await supabase
           .from('office_holidays')
-          .select('id, name, date');
+          .select('id, name, date')
+          .eq('company_id', company.id);
         if (officeHolidaysError) {
           console.error("Error fetching office holidays:", officeHolidaysError);
           toast.error("Failed to load office holiday options");
         } else {
-          // Optional: can set in state if you want to show/use them in project dialog
-          // console.log('Office holidays:', officeHolidays);
+          // Optional: for further use/display in dialog
         }
 
         const { data: officeStagesData, error: officeStagesError } = await supabase
           .from('office_stages')
-          .select('id, name');
+          .select('id, name')
+          .eq('company_id', company.id);
         if (officeStagesError) {
           console.error("Error fetching office stages:", officeStagesError);
           toast.error("Failed to load office stages");
@@ -173,7 +181,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     if (open) {
       fetchData();
     }
-  }, [open]);
+  }, [open, company]);
 
   const handleChange = (key: keyof NewProjectForm, value: any) => setForm((f) => ({ ...f, [key]: value }));
 
