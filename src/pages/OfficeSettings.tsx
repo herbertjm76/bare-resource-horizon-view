@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -20,7 +19,7 @@ import { toast } from 'sonner';
 import { useAuthorization } from '@/hooks/useAuthorization';
 
 const tabBarClass =
-  "w-full mb-4 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-6 gap-1 flex-nowrap rounded-none bg-transparent p-0";
+  "w-full mb-6 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-6 gap-2 flex-nowrap rounded-none bg-transparent p-0";
 
 const HEADER_HEIGHT = 56;
 
@@ -40,7 +39,6 @@ const OfficeSettings = () => {
     refreshCompany();
   };
 
-  // Show a loading spinner while authenticating
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-background">
@@ -66,7 +64,6 @@ const OfficeSettings = () => {
     );
   }
 
-  // If not authorized or no company data after loading completes, show appropriate error
   if (!isLoading && (!isAuthorized || !company)) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-background">
@@ -102,7 +99,6 @@ const OfficeSettings = () => {
     );
   }
 
-  // After authentication is confirmed, render the page
   return (
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
@@ -112,16 +108,15 @@ const OfficeSettings = () => {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-2 sm:p-8 bg-background">
+          <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
-              <div className="flex justify-between items-center px-2 sm:px-0">
-                <h1 className="text-4xl font-bold">Office Settings</h1>
-                
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold tracking-tight">Office Settings</h1>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={handleRefresh}
-                  className="gap-2"
+                  className="gap-2 h-9"
                 >
                   <RefreshCw className="h-4 w-4" /> 
                   Refresh Data
@@ -131,49 +126,51 @@ const OfficeSettings = () => {
               <OfficeSettingsProvider>
                 <Tabs defaultValue="areas" className="w-full">
                   <TabsList className={tabBarClass + " flex sm:grid"}>
-                    <TabsTrigger value="areas" className="flex items-center gap-2 min-w-max">
+                    <TabsTrigger value="areas" className="flex items-center gap-2 min-w-max px-4 h-10">
                       <Folder className="h-4 w-4" />
                       <span className="hidden xs:inline">Project Areas</span>
                     </TabsTrigger>
-                    <TabsTrigger value="stages" className="flex items-center gap-2 min-w-max">
+                    <TabsTrigger value="stages" className="flex items-center gap-2 min-w-max px-4 h-10">
                       <Layers className="h-4 w-4" />
                       <span className="hidden xs:inline">Stages</span>
                     </TabsTrigger>
-                    <TabsTrigger value="locations" className="flex items-center gap-2 min-w-max">
+                    <TabsTrigger value="locations" className="flex items-center gap-2 min-w-max px-4 h-10">
                       <MapPin className="h-4 w-4" />
                       <span className="hidden xs:inline">Locations</span>
                     </TabsTrigger>
-                    <TabsTrigger value="roles" className="flex items-center gap-2 min-w-max">
+                    <TabsTrigger value="roles" className="flex items-center gap-2 min-w-max px-4 h-10">
                       <Briefcase className="h-4 w-4" />
                       <span className="hidden xs:inline">Roles</span>
                     </TabsTrigger>
-                    <TabsTrigger value="rates" className="flex items-center gap-2 min-w-max">
+                    <TabsTrigger value="rates" className="flex items-center gap-2 min-w-max px-4 h-10">
                       <Currency className="h-4 w-4" />
                       <span className="hidden xs:inline">Rates</span>
                     </TabsTrigger>
-                    <TabsTrigger value="holidays" className="flex items-center gap-2 min-w-max">
+                    <TabsTrigger value="holidays" className="flex items-center gap-2 min-w-max px-4 h-10">
                       <Calendar className="h-4 w-4" />
                       <span className="hidden xs:inline">Holidays</span>
                     </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="areas" className="mt-4">
-                    <CountriesTab />
-                  </TabsContent>
-                  <TabsContent value="stages" className="mt-4">
-                    <StagesTab />
-                  </TabsContent>
-                  <TabsContent value="locations" className="mt-4">
-                    <LocationsTab />
-                  </TabsContent>
-                  <TabsContent value="roles" className="mt-4">
-                    <RolesTab />
-                  </TabsContent>
-                  <TabsContent value="rates" className="mt-4">
-                    <RatesTab />
-                  </TabsContent>
-                  <TabsContent value="holidays" className="mt-4">
-                    <HolidaysTab />
-                  </TabsContent>
+                  <div className="mt-6">
+                    <TabsContent value="areas">
+                      <CountriesTab />
+                    </TabsContent>
+                    <TabsContent value="stages">
+                      <StagesTab />
+                    </TabsContent>
+                    <TabsContent value="locations">
+                      <LocationsTab />
+                    </TabsContent>
+                    <TabsContent value="roles">
+                      <RolesTab />
+                    </TabsContent>
+                    <TabsContent value="rates">
+                      <RatesTab />
+                    </TabsContent>
+                    <TabsContent value="holidays">
+                      <HolidaysTab />
+                    </TabsContent>
+                  </div>
                 </Tabs>
               </OfficeSettingsProvider>
             </div>

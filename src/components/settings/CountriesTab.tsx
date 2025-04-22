@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import CountriesToolbar from "./CountriesToolbar";
 import useProjectAreas, { getAutoRegion } from "./useProjectAreas";
 import { ProjectAreaFormValues, ProjectArea } from "./projectAreaTypes";
@@ -103,9 +103,14 @@ export const CountriesTab = () => {
   const showCompanyWarning = !company && !companyLoading;
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
-        <CardTitle>Project Areas</CardTitle>
+    <Card className="border shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
+        <div>
+          <CardTitle className="text-2xl font-semibold mb-1.5">Project Areas</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            Track which locations you operate projects in, by code, country, city (optional)
+          </CardDescription>
+        </div>
         <CountriesToolbar 
           editMode={editMode} 
           setEditMode={setEditMode} 
@@ -113,10 +118,10 @@ export const CountriesTab = () => {
           disabled={!company}
         />
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-2">
         {showCompanyWarning && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded flex items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/30 text-destructive rounded-lg flex items-center gap-2">
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <span>No company selected; cannot save area. Please ensure you're logged in with a company account.</span>
           </div>
         )}
