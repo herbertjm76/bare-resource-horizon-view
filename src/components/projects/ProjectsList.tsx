@@ -6,7 +6,7 @@ import ProjectsTable from './ProjectsTable';
 import { useProjects } from '@/hooks/useProjects';
 
 export const ProjectsList = () => {
-  const { projects, loading, error } = useProjects();
+  const { projects, isLoading, error } = useProjects();
 
   return (
     <Card className="border shadow-sm">
@@ -22,8 +22,8 @@ export const ProjectsList = () => {
       <CardContent className="pt-2">
         <ProjectsTable 
           projects={projects} 
-          loading={loading} 
-          error={error} 
+          loading={isLoading} 
+          error={error ? error.message : ''} 
         />
       </CardContent>
     </Card>
