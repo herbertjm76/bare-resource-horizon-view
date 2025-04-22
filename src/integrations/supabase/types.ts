@@ -635,6 +635,7 @@ export type Database = {
           project_manager_id: string | null
           status: Database["public"]["Enums"]["project_status"]
           target_profit_percentage: number
+          temp_office_location_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -649,6 +650,7 @@ export type Database = {
           project_manager_id?: string | null
           status?: Database["public"]["Enums"]["project_status"]
           target_profit_percentage: number
+          temp_office_location_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -663,6 +665,7 @@ export type Database = {
           project_manager_id?: string | null
           status?: Database["public"]["Enums"]["project_status"]
           target_profit_percentage?: number
+          temp_office_location_id?: string | null
           updated_at?: string | null
         }
         Relationships: [

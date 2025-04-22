@@ -10,15 +10,15 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Trash } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import type { Database } from '@/integrations/supabase/types';
 
 type Project = {
   id: string;
+  code?: string | null;
   name: string;
   status: Database["public"]["Enums"]["project_status"];
   country?: string | null;
-  code?: string | null;
   target_profit_percentage?: number | null;
   project_manager?: { first_name: string | null; last_name: string | null } | null;
   office?: { id: string; name: string | null; country: string | null } | null;
@@ -29,6 +29,30 @@ interface ProjectsTableProps {
   loading: boolean;
   error?: string;
 }
+
+const statusColors: Record<string, string> = {
+  "On Hold": "bg-[#ccc9ff] text-[#212172]",        // light purple bg, dark purple text
+  "In Progress": "bg-[#b3efa7] text-[#257e30]",    // light green bg, dark green text
+  "Complete": "bg-[#eaf1fe] text-[#174491]",       // light blue bg, medium blue text
+  "Planning": "bg-destructive/10 text-destructive",// fallback
+};
+
+const countryColors: Record<string, string> = {
+  "KSA": "bg-[#d0f5a7] text-[#316d09]", // Green highlight for KSA
+  "IT": "bg-[#d1e6ff] text-[#0050aa]",  // Blue for IT
+  "OM": "bg-[#f1ffd2] text-[#6a7c28]",  // Light yellow for OM
+  "LDN": "bg-[#f8ddff] text-[#991be1]", // Light purple for LDN
+  // Add more mappings as needed
+};
+
+const getPmFullName = (pm: Project["project_manager"]) =>
+  pm ? [pm.first_name, pm.last_name].filter(Boolean).join(" ") : "-";
+
+const getStatusStyles = (status: string) =>
+  statusColors[status] || "bg-muted text-foreground";
+
+const getCountryStyles = (country: string | null | undefined) =>
+  (country && countryColors[country]) || "bg-muted text-foreground";
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error }) => {
   if (loading) {
@@ -55,55 +79,66 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
     );
   }
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'in progress':
-        return 'default';
-      case 'complete':
-        return 'secondary';
-      case 'on hold':
-        return 'outline';
-      case 'planning':
-        return 'destructive';
-      default:
-        return 'default';
-    }
-  };
-
   return (
-    <div className="rounded-md border">
+    <div className="rounded-md border overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[300px] pl-6">Name</TableHead>
+            <TableHead className="w-12 text-center">ID</TableHead>
+            <TableHead className="w-20 text-center">Action</TableHead>
+            <TableHead className="w-20">Code</TableHead>
+            <TableHead>Project Name</TableHead>
+            <TableHead>PM</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Country</TableHead>
-            <TableHead>Office</TableHead>
-            <TableHead className="text-right pr-6">Actions</TableHead>
+            <TableHead>Hours</TableHead>
+            <TableHead>%Profit</TableHead>
+            <TableHead>AVG Rate</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {projects.map((project) => (
-            <TableRow key={project.id}>
-              <TableCell className="font-medium pl-6">{project.name}</TableCell>
-              <TableCell>
-                {project.status && (
-                  <Badge variant={getStatusBadgeVariant(project.status)}>
-                    {project.status}
-                  </Badge>
-                )}
-              </TableCell>
-              <TableCell>{project.country}</TableCell>
-              <TableCell>{project.office?.name || 'Not assigned'}</TableCell>
-              <TableCell className="text-right pr-6">
-                <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="icon">
-                    <Edit className="h-4 w-4" />
+          {projects.map((project, idx) => (
+            <TableRow key={project.id} className="align-middle">
+              <TableCell className="text-center font-bold">{idx + 1}</TableCell>
+              <TableCell className="text-center">
+                <div className="flex items-center justify-center gap-2">
+                  <Button variant="ghost" size="icon" className="p-1" title="Edit">
+                    <Edit size={18} />
                   </Button>
-                  <Button variant="ghost" size="icon">
-                    <Trash className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" className="p-1" title="Delete">
+                    <Trash2 size={18} />
                   </Button>
                 </div>
+              </TableCell>
+              <TableCell className="font-semibold">{project.code}</TableCell>
+              <TableCell>
+                <span className="font-bold">{project.name}</span>
+              </TableCell>
+              <TableCell>{getPmFullName(project.project_manager)}</TableCell>
+              <TableCell>
+                {project.status && (
+                  <span className={`inline-block px-2 py-1 rounded ${getStatusStyles(project.status)}`}>
+                    {project.status}
+                  </span>
+                )}
+              </TableCell>
+              <TableCell>
+                {project.country && (
+                  <span className={`inline-block px-2 py-1 rounded font-semibold ${getCountryStyles(project.country)}`}>
+                    {project.country}
+                  </span>
+                )}
+              </TableCell>
+              <TableCell>
+                {/* Placeholder: Replace with real value if available */}
+                82
+              </TableCell>
+              <TableCell>
+                {project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"}
+              </TableCell>
+              <TableCell>
+                {/* Placeholder: Replace with real value if available */}
+                85
               </TableCell>
             </TableRow>
           ))}
@@ -114,3 +149,4 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
 };
 
 export default ProjectsTable;
+
