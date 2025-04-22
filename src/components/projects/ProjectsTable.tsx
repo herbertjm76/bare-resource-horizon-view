@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Table,
@@ -54,6 +53,14 @@ const getStatusStyles = (status: string) =>
 const getCountryStyles = (country: string | null | undefined) =>
   (country && countryColors[country]) || "bg-muted text-foreground";
 
+const getCountryAbbreviation = (country: string | null | undefined) => {
+  if (!country) return "";
+  const abbr = country.toUpperCase();
+  if (abbr.length <= 3) return abbr; // already abbreviation
+  // fallback: take first 3 letters uppercased (e.g. "Saudi Arabia" => SAU)
+  return abbr.slice(0, 3);
+};
+
 const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error }) => {
   if (loading) {
     return (
@@ -84,8 +91,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-12 text-center">ID</TableHead>
-            <TableHead className="w-20 text-center">Action</TableHead>
             <TableHead className="w-20">Code</TableHead>
             <TableHead>Project Name</TableHead>
             <TableHead>PM</TableHead>
@@ -97,19 +102,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
           </TableRow>
         </TableHeader>
         <TableBody>
-          {projects.map((project, idx) => (
+          {projects.map((project) => (
             <TableRow key={project.id} className="align-middle">
-              <TableCell className="text-center font-bold">{idx + 1}</TableCell>
-              <TableCell className="text-center">
-                <div className="flex items-center justify-center gap-2">
-                  <Button variant="ghost" size="icon" className="p-1" title="Edit">
-                    <Edit size={18} />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="p-1" title="Delete">
-                    <Trash2 size={18} />
-                  </Button>
-                </div>
-              </TableCell>
               <TableCell className="font-semibold">{project.code}</TableCell>
               <TableCell>
                 <span className="font-bold">{project.name}</span>
@@ -125,7 +119,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
               <TableCell>
                 {project.country && (
                   <span className={`inline-block px-2 py-1 rounded font-semibold ${getCountryStyles(project.country)}`}>
-                    {project.country}
+                    {getCountryAbbreviation(project.country)}
                   </span>
                 )}
               </TableCell>
@@ -149,4 +143,3 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
 };
 
 export default ProjectsTable;
-

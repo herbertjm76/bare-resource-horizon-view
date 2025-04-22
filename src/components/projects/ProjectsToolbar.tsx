@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { NewProjectDialog } from "./NewProjectDialog";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Edit } from "lucide-react";
 
 interface ProjectsToolbarProps {
   onRefresh?: () => void;
@@ -23,7 +23,16 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({ onRefresh, onProjectC
           Refresh
         </Button>
       )}
-      {/* Pass the callback for refreshing after project creation */}
+      <Button 
+        variant="outline"
+        size="sm"
+        className="mr-2"
+        // currently no edit handler, placeholder
+        onClick={() => { /* Add edit functionality here if desired */ }}
+      >
+        <Edit className="h-4 w-4 mr-1" />
+        Edit
+      </Button>
       <NewProjectDialog onProjectCreated={onProjectCreated} />
     </div>
   );
