@@ -20,8 +20,8 @@ export const ProjectFilters = ({
 
   // Extract unique values for filters
   const statuses = [...new Set(projects.map(p => p.status))];
-  const stages = [...new Set(projects.map(p => p.current_stage))];
-  const countries = [...new Set(projects.map(p => p.country))];
+  const countries = [...new Set(projects.map(p => p.country).filter(Boolean))];
+  const offices = [...new Set(projects.map(p => p.office?.name).filter(Boolean))];
 
   const handleFilterChange = (value: string, filterKey: string) => {
     // Create a new filters object with the updated value
@@ -53,23 +53,6 @@ export const ProjectFilters = ({
       </Select>
 
       <Select 
-        onValueChange={(value) => handleFilterChange(value, 'current_stage')}
-        value={currentFilters.current_stage || "all"}
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Filter by Stage" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">All Stages</SelectItem>
-          {stages.map((stage) => (
-            <SelectItem key={stage} value={stage}>
-              {stage}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <Select 
         onValueChange={(value) => handleFilterChange(value, 'country')}
         value={currentFilters.country || "all"}
       >
@@ -81,6 +64,23 @@ export const ProjectFilters = ({
           {countries.map((country) => (
             <SelectItem key={country} value={country}>
               {country}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select 
+        onValueChange={(value) => handleFilterChange(value, 'office')}
+        value={currentFilters.office || "all"}
+      >
+        <SelectTrigger className="w-[180px]">
+          <SelectValue placeholder="Filter by Office" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Offices</SelectItem>
+          {offices.map((office) => (
+            <SelectItem key={office} value={office}>
+              {office}
             </SelectItem>
           ))}
         </SelectContent>

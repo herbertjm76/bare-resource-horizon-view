@@ -14,7 +14,13 @@ export const ProjectsList = () => {
     return projects.filter(project => {
       return Object.entries(filters).every(([key, value]) => {
         if (!value) return true; // Skip empty filters
-        return project[key as keyof typeof project] === value;
+        
+        if (key === 'office') {
+          return project.office?.name === value;
+        }
+        
+        // @ts-ignore - This is safe as we're only filtering properties that exist
+        return project[key] === value;
       });
     });
   }, [projects, filters]);
@@ -23,7 +29,7 @@ export const ProjectsList = () => {
     refetch();
   };
 
-  // New: refresh after project creation!
+  // Refresh after project creation
   const handleProjectCreated = () => {
     refetch();
   };
