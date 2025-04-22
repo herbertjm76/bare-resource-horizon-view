@@ -21,7 +21,7 @@ import { useCompany } from '@/context/CompanyContext';
 import type { Database } from "@/integrations/supabase/types";
 
 type RoleOption = { id: string; name: string };
-type OfficeOption = { id: string; city: string; country: string };
+type OfficeOption = { id: string; name: string; country: string };
 type ProjectStageOption = { id: string; stage_name: string; };
 type OfficeStageOption = { id: string; name: string };
 
@@ -45,8 +45,6 @@ type NewProjectForm = {
   status: ProjectStatus | "";
   office: string;
   stages: string[];
-  client?: string;
-  dueDate?: string;
 };
 
 export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ onProjectCreated }) => {
@@ -66,8 +64,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     status: "",
     office: "",
     stages: [],
-    client: "",
-    dueDate: "",
   });
 
   const [managers, setManagers] = useState<RoleOption[]>([]);
@@ -99,9 +95,16 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
           ? areas.map(a => a.name).filter(Boolean) 
           : [])) as string[]);
 
-        const { data: off } = await supabase
-          .from('office_locations')
-          .select('id, city, country');
+        // Important: Fetch data from the offices table - this has the valid IDs
+        const { data: off, error: officeError } = await supabase
+          .from('offices')
+          .select('id, name, country');
+          
+        if (officeError) {
+          console.error("Error fetching offices:", officeError);
+          toast.error("Failed to load office options");
+        }
+        
         setOffices(Array.isArray(off) ? off : []);
 
         const { data: projectStagesData } = await supabase
@@ -196,7 +199,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         project_manager_id: form.manager === "not_assigned" ? null : (form.manager || null)
       });
       
-      const { error } = await supabase.from('projects').insert({
+      const { data, error } = await supabase.from('projects').insert({
         code: form.code,
         name: form.name,
         company_id: company.id,
@@ -205,8 +208,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         status: form.status,
         country: form.country,
         target_profit_percentage: form.profit ? Number(form.profit) : null
-        // Removed client and dueDate fields as they're not in the schema
-      });
+      }).select();
       
       if (error) {
         console.error("Supabase error inserting project:", error);
@@ -219,7 +221,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       setForm({
         code: "", name: "", manager: "", country: "", 
         profit: "", avgRate: "", status: "", office: "", stages: [],
-        client: "", dueDate: "",
       });
       setCurrentStep(1);
       if (typeof onProjectCreated === 'function') {
@@ -346,7 +347,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
                           <SelectContent>
                             {offices.map(o => (
                               <SelectItem key={o.id} value={o.id}>
-                                {`${o.city}, ${o.country}`}
+                                {`${o.name}, ${o.country}`}
                               </SelectItem>
                             ))}
                           </SelectContent>

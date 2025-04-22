@@ -21,7 +21,7 @@ type Project = {
   code?: string | null;
   target_profit_percentage?: number | null;
   project_manager?: { first_name: string | null; last_name: string | null } | null;
-  office?: { name: string | null; country: string | null } | null;
+  office?: { id: string; name: string | null; country: string | null } | null;
 };
 
 interface ProjectsTableProps {

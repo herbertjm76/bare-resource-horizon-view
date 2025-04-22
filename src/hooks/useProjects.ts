@@ -41,7 +41,7 @@ export const useProjects = () => {
             country,
             target_profit_percentage,
             project_manager:profiles(first_name, last_name),
-            office:offices(name, country)
+            office:offices(id, name, country)
           `)
           .eq('company_id', company.id);
 
@@ -52,6 +52,7 @@ export const useProjects = () => {
         }
 
         console.log('Projects data fetched successfully:', data?.length || 0, 'projects found');
+        console.log('Sample project data:', data?.[0] || 'No projects');
         return data || [];
       } catch (err) {
         console.error('Exception in projects fetch:', err);
