@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -128,14 +129,14 @@ export const LocationsTab = () => {
       console.error("No company selected");
       return;
     }
-    const countryObj = allCountries.find(c => c.code === values.code);
+
     const flag = flagEmoji(values.code) || "";
 
     const newEntry: Location = {
       id: editingLocation ? editingLocation.id : Date.now().toString(),
       city: values.city,
       code: values.code,
-      country: countryObj ? countryObj.name : values.country,
+      country: values.country,
       emoji: flag,
       company_id: company.id
     };
@@ -150,12 +151,6 @@ export const LocationsTab = () => {
     form.reset();
     setEditingLocation(null);
   };
-
-  const [countrySearch, setCountrySearch] = useState("");
-  const filteredCountries = allCountries.filter(country =>
-    country.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
-    country.code.toLowerCase().includes(countrySearch.toLowerCase())
-  );
 
   return (
     <Card>
@@ -248,12 +243,13 @@ export const LocationsTab = () => {
                     <FormLabel>Country</FormLabel>
                     <FormControl>
                       <CountrySelect
-                        value={form.watch("country")}
-                        onChange={(countryName, code) => {
+                        value={form.watch("country")} // The dropdown binds the country name to display
+                        onChange={(countryName: string, code?: string) => {
                           form.setValue("country", countryName);
                           form.setValue("code", code || "");
                         }}
                         placeholder="Search or select country"
+                        majorCountries={["United States", "United Kingdom", "Canada", "Germany", "France", "India", "China", "Australia", "Japan", "Brazil"]}
                       />
                     </FormControl>
                     <FormMessage />
@@ -316,3 +312,4 @@ export const LocationsTab = () => {
     </Card>
   );
 };
+
