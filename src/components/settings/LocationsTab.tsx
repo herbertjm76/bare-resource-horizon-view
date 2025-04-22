@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,8 @@ import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
 import allCountries from "@/lib/allCountries.json";
 import CountrySelect from "@/components/ui/CountrySelect";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const customIconList = [
   "❤️", "🧡", "💛", "💚", "💙", "💜", "🩷", "🤍", "🖤", "🤎",
@@ -54,15 +56,48 @@ type Location = {
 };
 
 export const LocationsTab = () => {
-  const { locations, setLocations } = useOfficeSettings();
+  const { locations, setLocations, loading: contextLoading } = useOfficeSettings();
   const { company } = useCompany();
   const [open, setOpen] = useState(false);
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerTargetId, setPickerTargetId] = useState<string | null>(null);
+
+  // Fetch locations directly from Supabase
+  const fetchLocations = async () => {
+    if (!company) return;
+    
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('office_locations')
+        .select('*')
+        .eq('company_id', company.id);
+        
+      if (error) throw error;
+      
+      console.log("Fetched locations:", data);
+      if (data) {
+        setLocations(data);
+      }
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+      toast.error("Failed to load locations");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch locations on component mount
+  useEffect(() => {
+    if (company) {
+      fetchLocations();
+    }
+  }, [company]);
 
   const form = useForm<LocationFormValues>({
     resolver: zodResolver(formSchema),
@@ -89,10 +124,30 @@ export const LocationsTab = () => {
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
-  const handleBulkDelete = () => {
-    setLocations(locations.filter(row => !selected.includes(row.id)));
-    setSelected([]);
-    setEditMode(false);
+  const handleBulkDelete = async () => {
+    if (!company || selected.length === 0) return;
+    
+    setLoading(true);
+    try {
+      // Delete from Supabase
+      const { error } = await supabase
+        .from('office_locations')
+        .delete()
+        .in('id', selected);
+        
+      if (error) throw error;
+      
+      // Update local state
+      setLocations(locations.filter(row => !selected.includes(row.id)));
+      setSelected([]);
+      setEditMode(false);
+      toast.success("Locations deleted successfully");
+    } catch (error) {
+      console.error("Error deleting locations:", error);
+      toast.error("Failed to delete locations");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onOpenChange = (open: boolean) => {
@@ -108,49 +163,102 @@ export const LocationsTab = () => {
     setPickerOpen(true);
   };
 
-  const handlePickerSelect = (emoji: string) => {
-    if (!pickerTargetId) {
+  const handlePickerSelect = async (emoji: string) => {
+    if (!pickerTargetId || !company) {
       setPickerOpen(false);
       return;
     }
-    setLocations(
-      locations.map(loc =>
-        loc.id === pickerTargetId
-          ? { ...loc, emoji, company_id: loc.company_id }
-          : loc
-      )
-    );
-    setPickerOpen(false);
-    setPickerTargetId(null);
+    
+    setLoading(true);
+    try {
+      // Update in Supabase
+      const { error } = await supabase
+        .from('office_locations')
+        .update({ emoji })
+        .eq('id', pickerTargetId);
+        
+      if (error) throw error;
+      
+      // Update local state
+      setLocations(
+        locations.map(loc =>
+          loc.id === pickerTargetId
+            ? { ...loc, emoji }
+            : loc
+        )
+      );
+      toast.success("Icon updated successfully");
+    } catch (error) {
+      console.error("Error updating location icon:", error);
+      toast.error("Failed to update icon");
+    } finally {
+      setLoading(false);
+      setPickerOpen(false);
+      setPickerTargetId(null);
+    }
   };
 
-  const onSubmit = (values: LocationFormValues) => {
+  const onSubmit = async (values: LocationFormValues) => {
     if (!company) {
       console.error("No company selected");
       return;
     }
 
-    const flag = flagEmoji(values.code) || "";
+    setLoading(true);
+    try {
+      const flag = flagEmoji(values.code) || "";
+      
+      const locationData = {
+        city: values.city,
+        code: values.code,
+        country: values.country,
+        emoji: flag,
+        company_id: company.id
+      };
 
-    const newEntry: Location = {
-      id: editingLocation ? editingLocation.id : Date.now().toString(),
-      city: values.city,
-      code: values.code,
-      country: values.country,
-      emoji: flag,
-      company_id: company.id
-    };
-
-    if (editingLocation) {
-      setLocations(locations.map(row => row.id === editingLocation.id ? newEntry : row));
-    } else {
-      setLocations([...locations, newEntry]);
+      if (editingLocation) {
+        // Update existing location in Supabase
+        const { error } = await supabase
+          .from('office_locations')
+          .update(locationData)
+          .eq('id', editingLocation.id);
+          
+        if (error) throw error;
+        
+        // Update local state
+        setLocations(locations.map(row => 
+          row.id === editingLocation.id 
+            ? { ...locationData, id: editingLocation.id } 
+            : row
+        ));
+        toast.success("Location updated successfully");
+      } else {
+        // Insert new location in Supabase
+        const { data, error } = await supabase
+          .from('office_locations')
+          .insert(locationData)
+          .select();
+          
+        if (error) throw error;
+        
+        // Update local state with the returned data that includes the generated ID
+        if (data && data.length > 0) {
+          setLocations([...locations, data[0]]);
+          toast.success("Location added successfully");
+        }
+      }
+    } catch (error) {
+      console.error("Error saving location:", error);
+      toast.error("Failed to save location");
+    } finally {
+      setLoading(false);
+      setOpen(false);
+      form.reset();
+      setEditingLocation(null);
     }
-
-    setOpen(false);
-    form.reset();
-    setEditingLocation(null);
   };
+
+  const isLoading = loading || contextLoading;
 
   return (
     <Card>
@@ -176,15 +284,19 @@ export const LocationsTab = () => {
               <Button
                 variant="destructive"
                 size="sm"
-                disabled={selected.length === 0}
+                disabled={selected.length === 0 || isLoading}
                 onClick={handleBulkDelete}
               >
-                <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
+                {isLoading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Trash2 className="h-4 w-4 mr-1" />} Delete Selected
               </Button>
               <span className="text-xs text-muted-foreground">{selected.length} selected</span>
             </div>
           )}
-          {locations.length > 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center items-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : locations.length > 0 ? (
             <div className="grid gap-4">
               {locations.map((row) => (
                 <div
@@ -243,7 +355,7 @@ export const LocationsTab = () => {
                     <FormLabel>Country</FormLabel>
                     <FormControl>
                       <CountrySelect
-                        value={form.watch("country")} // The dropdown binds the country name to display
+                        value={form.watch("country")}
                         onChange={(countryName: string, code?: string) => {
                           form.setValue("country", countryName);
                           form.setValue("code", code || "");
@@ -279,7 +391,10 @@ export const LocationsTab = () => {
                 </div>
               )}
               <DialogFooter>
-                <Button type="submit">{editingLocation ? 'Update' : 'Add'} Location</Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+                  {editingLocation ? 'Update' : 'Add'} Location
+                </Button>
               </DialogFooter>
             </form>
           </Form>
@@ -312,4 +427,3 @@ export const LocationsTab = () => {
     </Card>
   );
 };
-
