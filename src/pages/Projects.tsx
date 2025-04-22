@@ -4,6 +4,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { ProjectsList } from '@/components/projects/ProjectsList';
+import OfficeDebugger from '@/components/projects/OfficeDebugger';
 
 const HEADER_HEIGHT = 56;
 
@@ -23,6 +24,7 @@ const Projects = () => {
                 <h1 className="text-3xl font-bold tracking-tight text-[#6E59A5]">Projects</h1>
               </div>
               <ProjectsList />
+              <OfficeDebugger />
             </div>
           </div>
         </div>

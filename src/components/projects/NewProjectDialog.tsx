@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -73,25 +72,42 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    (async () => {
+    const fetchData = async () => {
+      console.log("Fetching data for new project dialog");
+      
       try {
-        const { data: mgrs } = await supabase
+        // Fetch managers
+        const { data: mgrs, error: mgrsError } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, role')
           .eq('role', 'member');
 
-        setManagers(Array.isArray(mgrs)
-          ? mgrs.map((u) => ({ id: u.id, name: `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() }))
-          : []);
+        if (mgrsError) {
+          console.error("Error fetching managers:", mgrsError);
+          toast.error("Failed to load manager options");
+        } else {
+          console.log("Managers data:", mgrs);
+          setManagers(Array.isArray(mgrs)
+            ? mgrs.map((u) => ({ id: u.id, name: `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() }))
+            : []);
+        }
 
-        const { data: areas } = await supabase
+        // Fetch countries
+        const { data: areas, error: areasError } = await supabase
           .from('project_areas')
           .select('name');
         
-        setCountries(Array.from(new Set(Array.isArray(areas) 
-          ? areas.map(a => a.name).filter(Boolean) 
-          : [])) as string[]);
+        if (areasError) {
+          console.error("Error fetching areas:", areasError);
+          toast.error("Failed to load country options");
+        } else {
+          console.log("Areas data:", areas);
+          setCountries(Array.from(new Set(Array.isArray(areas) 
+            ? areas.map(a => a.name).filter(Boolean) 
+            : [])) as string[]);
+        }
 
+        // Fetch offices
         const { data: off, error: officeError } = await supabase
           .from('offices')
           .select('id, name, country');
@@ -99,30 +115,56 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         if (officeError) {
           console.error("Error fetching offices:", officeError);
           toast.error("Failed to load office options");
+        } else {
+          console.log("Offices data:", off);
+          setOffices(Array.isArray(off) ? off : []);
         }
-        
-        setOffices(Array.isArray(off) ? off : []);
 
-        const { data: projectStagesData } = await supabase
+        // Fetch project stages
+        const { data: projectStagesData, error: projectStagesError } = await supabase
           .from('project_stages')
           .select('id, stage_name');
-        setProjectStages(Array.isArray(projectStagesData) ? projectStagesData : []);
+        
+        if (projectStagesError) {
+          console.error("Error fetching project stages:", projectStagesError);
+        } else {
+          console.log("Project stages data:", projectStagesData);
+          setProjectStages(Array.isArray(projectStagesData) ? projectStagesData : []);
+        }
 
-        const { data: officeRoles } = await supabase
+        // Fetch office roles
+        const { data: officeRoles, error: officeRolesError } = await supabase
           .from('office_roles')
           .select('id, name, code');
-        setRoles(Array.isArray(officeRoles) ? officeRoles : []);
+        
+        if (officeRolesError) {
+          console.error("Error fetching office roles:", officeRolesError);
+        } else {
+          console.log("Office roles data:", officeRoles);
+          setRoles(Array.isArray(officeRoles) ? officeRoles : []);
+        }
 
-        const { data: officeStagesData } = await supabase
+        // Fetch office stages
+        const { data: officeStagesData, error: officeStagesError } = await supabase
           .from('office_stages')
           .select('id, name');
-        setOfficeStages(Array.isArray(officeStagesData) ? officeStagesData : []);
+        
+        if (officeStagesError) {
+          console.error("Error fetching office stages:", officeStagesError);
+        } else {
+          console.log("Office stages data:", officeStagesData);
+          setOfficeStages(Array.isArray(officeStagesData) ? officeStagesData : []);
+        }
       } catch (error) {
         console.error("Error fetching project data:", error);
         toast.error("Failed to load project options");
       }
-    })();
-  }, []);
+    };
+
+    if (open) {
+      fetchData();
+    }
+  }, [open]);
 
   const handleChange = (key: keyof NewProjectForm, value: any) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -317,4 +359,3 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     </Dialog>
   );
 };
-
