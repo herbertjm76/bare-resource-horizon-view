@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Edit, Trash } from "lucide-react";
 
 interface ProjectsTableProps {
@@ -42,6 +43,21 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
     );
   }
 
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'active':
+        return 'default';
+      case 'completed':
+        return 'secondary';
+      case 'on hold':
+        return 'outline';
+      case 'cancelled':
+        return 'destructive';
+      default:
+        return 'default';
+    }
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -58,7 +74,13 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
           {projects.map((project) => (
             <TableRow key={project.id}>
               <TableCell className="font-medium pl-6">{project.name}</TableCell>
-              <TableCell>{project.status}</TableCell>
+              <TableCell>
+                {project.status && (
+                  <Badge variant={getStatusBadgeVariant(project.status)}>
+                    {project.status}
+                  </Badge>
+                )}
+              </TableCell>
               <TableCell>{project.client}</TableCell>
               <TableCell>{project.dueDate}</TableCell>
               <TableCell className="text-right pr-6">

@@ -7,7 +7,7 @@ import { useProjects } from '@/hooks/useProjects';
 import { ProjectFilters } from './ProjectFilters';
 
 export const ProjectsList = () => {
-  const { projects, isLoading, error } = useProjects();
+  const { projects, isLoading, error, refetch } = useProjects();
   const [filters, setFilters] = useState<{ [key: string]: string }>({});
 
   const filteredProjects = useMemo(() => {
@@ -19,6 +19,10 @@ export const ProjectsList = () => {
     });
   }, [projects, filters]);
 
+  const handleRefresh = () => {
+    refetch();
+  };
+
   return (
     <Card className="border shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
@@ -28,7 +32,7 @@ export const ProjectsList = () => {
             View and manage all your ongoing projects
           </p>
         </div>
-        <ProjectsToolbar />
+        <ProjectsToolbar onRefresh={handleRefresh} />
       </CardHeader>
       <CardContent>
         <ProjectFilters 
