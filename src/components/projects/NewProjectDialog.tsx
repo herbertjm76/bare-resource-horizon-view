@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -226,7 +227,7 @@ export const NewProjectDialog: React.FC = () => {
                     <SelectValue placeholder="Select Manager" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Not Assigned</SelectItem>
+                    <SelectItem value="not_assigned">Not Assigned</SelectItem>
                     {managers.map(m => (
                       <SelectItem key={m.id} value={m.id}>
                         {m.name}
