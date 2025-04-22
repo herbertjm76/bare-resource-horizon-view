@@ -6,26 +6,23 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Card } from "@/components/ui/card";
-import { PlusCircle, Percent, Users, FileText, Code, Building, MapPin, CheckSquare, Calculator } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
 import type { Database } from "@/integrations/supabase/types";
+import NewProjectStep1Info from "./NewProjectStep1Info";
+import NewProjectStep2Details from "./NewProjectStep2Details";
+import NewProjectStep3Stages from "./NewProjectStep3Stages";
+import NewProjectRateCalculator from "./NewProjectRateCalculator";
 
 type RoleOption = { id: string; name: string };
 type OfficeOption = { id: string; name: string; country: string };
 type ProjectStageOption = { id: string; stage_name: string; };
-type OfficeStageOption = { id: string; name: string };
+type OfficeStageOption = { id: string; name: string; };
 
-// Define the valid project status values based on the database enum
 type ProjectStatus = Database["public"]["Enums"]["project_status"];
 
 const statusOptions = [
@@ -95,7 +92,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
           ? areas.map(a => a.name).filter(Boolean) 
           : [])) as string[]);
 
-        // Important: Fetch data from the offices table - this has the valid IDs
         const { data: off, error: officeError } = await supabase
           .from('offices')
           .select('id, name, country');
@@ -146,11 +142,11 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
 
   const validateStep = (step: number): boolean => {
     switch(step) {
-      case 1: // Basic info
+      case 1:
         return !!form.code && !!form.name;
-      case 2: // Details
+      case 2:
         return !!form.country && !!form.profit && !!form.avgRate && !!form.status && !!form.office;
-      case 3: // Stages
+      case 3:
         return form.stages.length > 0;
       default:
         return true;
@@ -162,7 +158,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       toast.error("Please fill all required fields in this section");
       return;
     }
-    
     if (currentStep < totalSteps) {
       setCurrentStep(curr => curr + 1);
     }
@@ -188,17 +183,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     
     setIsLoading(true);
     try {
-      console.log("Submitting project with data:", {
-        code: form.code,
-        name: form.name,
-        company_id: company.id,
-        country: form.country,
-        target_profit_percentage: form.profit ? Number(form.profit) : null,
-        office_id: form.office,
-        status: form.status,
-        project_manager_id: form.manager === "not_assigned" ? null : (form.manager || null)
-      });
-      
       const { data, error } = await supabase.from('projects').insert({
         code: form.code,
         name: form.name,
@@ -211,7 +195,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       }).select();
       
       if (error) {
-        console.error("Supabase error inserting project:", error);
         toast.error('Failed to create project: ' + error.message);
         return;
       }
@@ -227,203 +210,15 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         onProjectCreated();
       }
     } catch (error) {
-      console.error("Error creating project:", error);
       toast.error("Failed to create project");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const renderStepContent = () => {
-    return (
-      <>
-        {
-          (() => {
-            switch (currentStep) {
-              case 1:
-                return (
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-medium text-[#6E59A5]">Project Information</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                          <Code className="w-4 h-4" />Project Code<span className="text-destructive">*</span>
-                        </label>
-                        <Input 
-                          value={form.code} 
-                          onChange={e => handleChange('code', e.target.value)} 
-                          required 
-                          placeholder="Enter Project Code" 
-                          className="text-base"
-                        />
-                      </div>
-                      <div>
-                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                          <FileText className="w-4 h-4" />Project Name<span className="text-destructive">*</span>
-                        </label>
-                        <Input 
-                          value={form.name} 
-                          onChange={e => handleChange('name', e.target.value)} 
-                          required 
-                          placeholder="Enter Project Name"
-                          className="text-base" 
-                        />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                          <Users className="w-4 h-4" />Project Manager<span className="text-destructive">*</span>
-                        </label>
-                        <Select value={form.manager} onValueChange={v => handleChange('manager', v)}>
-                          <SelectTrigger className="text-base">
-                            <SelectValue placeholder="Select Manager" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="not_assigned">Not Assigned</SelectItem>
-                            {managers.map(m => (
-                              <SelectItem key={m.id} value={m.id}>
-                                {m.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </div>
-                );
-              case 2:
-                return (
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-medium text-[#6E59A5]">Project Details</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                          <MapPin className="w-4 h-4" />Project Country<span className="text-destructive">*</span>
-                        </label>
-                        <Select value={form.country} onValueChange={v => handleChange('country', v)}>
-                          <SelectTrigger className="text-base">
-                            <SelectValue placeholder="Select Country" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {countries.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                          <Percent className="w-4 h-4" />Target Profit %<span className="text-destructive">*</span>
-                        </label>
-                        <Input 
-                          value={form.profit} 
-                          type="number" 
-                          onChange={e => handleChange('profit', e.target.value)} 
-                          required 
-                          placeholder="Enter % Profit"
-                          className="text-base"
-                        />
-                      </div>
-                      <div>
-                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                          <CheckSquare className="w-4 h-4" />Project Status<span className="text-destructive">*</span>
-                        </label>
-                        <Select value={form.status} onValueChange={v => handleChange('status', v)}>
-                          <SelectTrigger className="text-base">
-                            <SelectValue placeholder="Select Status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {statusOptions.map(opt => (
-                              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                          <Building className="w-4 h-4" />Office<span className="text-destructive">*</span>
-                        </label>
-                        <Select value={form.office} onValueChange={v => handleChange('office', v)}>
-                          <SelectTrigger className="text-base">
-                            <SelectValue placeholder="Select Office" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {offices.map(o => (
-                              <SelectItem key={o.id} value={o.id}>
-                                {`${o.name}, ${o.country}`}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
-                          <Calculator className="w-4 h-4" />Average Rate<span className="text-destructive">*</span>
-                        </label>
-                        <div className="flex gap-2">
-                          <Input 
-                            value={form.avgRate} 
-                            type="number" 
-                            onChange={e => handleChange('avgRate', e.target.value)} 
-                            required 
-                            placeholder="Enter AVG Rate"
-                            className="text-base" 
-                          />
-                          <Button type="button" variant="outline" onClick={() => setShowRateCalc(true)} title="Calculate Avg Rate">
-                            <Calculator className="w-4 h-4 mr-2" />
-                            Calculate
-                          </Button>
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Click Calculate to use the rate calculator
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              case 3:
-                return (
-                  <div className="space-y-6">
-                    <h3 className="text-lg font-medium text-[#6E59A5]">Project Stages</h3>
-                    <div>
-                      <div className="font-semibold mb-3 flex items-center gap-2 text-sm">
-                        <CheckSquare className="w-4 h-4" />Select Project Stages<span className="text-destructive">*</span>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[300px] overflow-y-auto p-1">
-                        {officeStages.map(stage => (
-                          <label className="flex items-center gap-2 p-2 border rounded-md hover:bg-muted/50 transition-colors" key={stage.id}>
-                            <Checkbox
-                              checked={form.stages.includes(stage.id)}
-                              onCheckedChange={checked => {
-                                handleChange(
-                                  'stages',
-                                  checked
-                                    ? [...form.stages, stage.id]
-                                    : form.stages.filter(s => s !== stage.id)
-                                );
-                              }}
-                            />
-                            <span className="text-base">{stage.name}</span>
-                          </label>
-                        ))}
-                      </div>
-                      {officeStages.length === 0 && (
-                        <p className="text-sm text-muted-foreground italic">No project stages available</p>
-                      )}
-                    </div>
-                  </div>
-                );
-              default:
-                return null;
-            }
-          })()
-        }
-      </>
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={(o) => { 
-      if (!o) {
-        setCurrentStep(1);
-      }
+      if (!o) setCurrentStep(1);
       setOpen(o); 
       setShowRateCalc(false); 
     }}>
@@ -461,8 +256,30 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         </div>
         
         <form onSubmit={onSubmit}>
-          {renderStepContent()}
-          
+          {currentStep === 1 && (
+            <NewProjectStep1Info 
+              form={form}
+              managers={managers}
+              onChange={handleChange}
+            />
+          )}
+          {currentStep === 2 && (
+            <NewProjectStep2Details
+              form={form}
+              countries={countries}
+              offices={offices}
+              statusOptions={statusOptions}
+              onChange={handleChange}
+              onShowRateCalc={() => setShowRateCalc(true)}
+            />
+          )}
+          {currentStep === 3 && (
+            <NewProjectStep3Stages
+              stages={form.stages}
+              setStages={value => handleChange('stages', value)}
+              officeStages={officeStages}
+            />
+          )}
           <div className="flex justify-between mt-8">
             <Button 
               type="button" 
@@ -472,7 +289,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
             >
               Previous
             </Button>
-            
             {currentStep < totalSteps ? (
               <Button type="button" variant="default" onClick={goToNextStep}>
                 Next
@@ -484,69 +300,21 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
             )}
           </div>
         </form>
-        
         {showRateCalc && (
-          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-            <Card className="p-6 max-w-lg mx-auto relative z-50 shadow-xl">
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-[#6E59A5]">
-                <Calculator className="w-5 h-5" />Average Rate Calculator
-              </h2>
-              
-              <p className="text-sm text-muted-foreground mb-4">
-                Specify how many people per role will work on this project to calculate the average rate.
-              </p>
-              
-              <div className="bg-muted/30 p-4 rounded-md space-y-3 mb-6">
-                {roles.map(role => (
-                  <div className="flex items-center gap-3" key={role.id}>
-                    <span className="w-36 font-medium">{role.name}</span>
-                    <Input
-                      type="number"
-                      value={roleNumbers[role.id] || ''}
-                      min={0}
-                      onChange={e => setRoleNumbers(rns => ({
-                        ...rns,
-                        [role.id]: Number(e.target.value)
-                      }))}
-                      placeholder="# People"
-                      className="w-28"
-                    />
-                  </div>
-                ))}
-              </div>
-              
-              <div className="mb-6 p-3 border rounded-md bg-[#F8F4FF]">
-                <div className="flex justify-between">
-                  <span className="font-medium">Calculated Average Rate:</span>
-                  <span className="text-[#6E59A5] font-bold text-lg">${calculateAvgRate() || '--'}</span>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">(Using dummy rates for demonstration)</p>
-              </div>
-              
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="secondary"
-                  type="button"
-                  onClick={() => setShowRateCalc(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={() => {
-                    handleChange('avgRate', calculateAvgRate());
-                    setShowRateCalc(false);
-                  }}
-                  type="button"
-                  variant="default"
-                  disabled={!calculateAvgRate()}
-                >
-                  Apply Rate
-                </Button>
-              </div>
-            </Card>
-          </div>
+          <NewProjectRateCalculator
+            roles={roles}
+            roleNumbers={roleNumbers}
+            setRoleNumbers={setRoleNumbers}
+            calculateAvgRate={calculateAvgRate}
+            onCancel={() => setShowRateCalc(false)}
+            onApply={rate => {
+              handleChange('avgRate', rate);
+              setShowRateCalc(false);
+            }}
+          />
         )}
       </DialogContent>
     </Dialog>
   );
 };
+
