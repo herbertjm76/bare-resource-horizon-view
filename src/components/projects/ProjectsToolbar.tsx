@@ -1,15 +1,10 @@
 
-import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import React from "react";
+import { NewProjectDialog } from "./NewProjectDialog";
 
 const ProjectsToolbar = () => {
-  return (
-    <Button size="sm">
-      <Plus className="h-4 w-4 mr-2" />
-      New Project
-    </Button>
-  );
+  // Only show the "New Project" modal trigger now, as per new requirements
+  return <NewProjectDialog />;
 };
 
 export default ProjectsToolbar;
