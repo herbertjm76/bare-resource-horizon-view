@@ -27,7 +27,7 @@ export const ProjectFilters = ({
     // Create a new filters object with the updated value
     const newFilters = {
       ...currentFilters,
-      [filterKey]: value
+      [filterKey]: value === "all" ? "" : value
     };
     // Pass the complete new filters object to the parent
     onFilterChange(newFilters);
@@ -37,13 +37,13 @@ export const ProjectFilters = ({
     <div className="flex flex-wrap gap-4 mb-6">
       <Select 
         onValueChange={(value) => handleFilterChange(value, 'status')}
-        value={currentFilters.status || ""}
+        value={currentFilters.status || "all"}
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Filter by Status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Statuses</SelectItem>
+          <SelectItem value="all">All Statuses</SelectItem>
           {statuses.map((status) => (
             <SelectItem key={status} value={status}>
               {status}
@@ -54,13 +54,13 @@ export const ProjectFilters = ({
 
       <Select 
         onValueChange={(value) => handleFilterChange(value, 'current_stage')}
-        value={currentFilters.current_stage || ""}
+        value={currentFilters.current_stage || "all"}
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Filter by Stage" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Stages</SelectItem>
+          <SelectItem value="all">All Stages</SelectItem>
           {stages.map((stage) => (
             <SelectItem key={stage} value={stage}>
               {stage}
@@ -71,13 +71,13 @@ export const ProjectFilters = ({
 
       <Select 
         onValueChange={(value) => handleFilterChange(value, 'country')}
-        value={currentFilters.country || ""}
+        value={currentFilters.country || "all"}
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Filter by Country" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Countries</SelectItem>
+          <SelectItem value="all">All Countries</SelectItem>
           {countries.map((country) => (
             <SelectItem key={country} value={country}>
               {country}
