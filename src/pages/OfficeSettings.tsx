@@ -111,7 +111,7 @@ const OfficeSettings = () => {
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
               <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold tracking-tight">Office Settings</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-[#6E59A5]">Office Settings</h1>
                 <Button 
                   variant="outline" 
                   size="sm" 
