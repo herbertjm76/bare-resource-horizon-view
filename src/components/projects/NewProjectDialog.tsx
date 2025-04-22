@@ -74,7 +74,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
   useEffect(() => {
     const fetchData = async () => {
       console.log("Fetching data for new project dialog");
-      
+
       try {
         const { data: mgrs, error: mgrsError } = await supabase
           .from('profiles')
@@ -85,24 +85,22 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
           console.error("Error fetching managers:", mgrsError);
           toast.error("Failed to load manager options");
         } else {
-          console.log("Managers data:", mgrs);
           setManagers(Array.isArray(mgrs)
             ? mgrs.map((u) => ({ id: u.id, name: `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() }))
             : []);
         }
 
-        const { data: areas, error: areasError } = await supabase
+        const { data: projectAreas, error: areasError } = await supabase
           .from('project_areas')
           .select('name');
-        
         if (areasError) {
-          console.error("Error fetching areas:", areasError);
+          console.error("Error fetching project areas:", areasError);
           toast.error("Failed to load country options");
         } else {
-          console.log("Areas data:", areas);
-          setCountries(Array.from(new Set(Array.isArray(areas) 
-            ? areas.map(a => a.name).filter(Boolean) 
-            : [])) as string[]);
+          const areaNames = Array.from(new Set(Array.isArray(projectAreas)
+            ? projectAreas.map(a => a.name).filter(Boolean)
+            : [])) as string[];
+          setCountries(areaNames);
         }
 
         const { data: locations, error: locationsError } = await supabase
@@ -112,40 +110,58 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
           console.error("Error fetching office locations:", locationsError);
           toast.error("Failed to load office options");
         } else {
-          console.log("Office locations data:", locations);
           setOffices(Array.isArray(locations) ? locations : []);
         }
 
         const { data: projectStagesData, error: projectStagesError } = await supabase
           .from('project_stages')
           .select('id, stage_name');
-        
         if (projectStagesError) {
           console.error("Error fetching project stages:", projectStagesError);
+          toast.error("Failed to load project stage options");
         } else {
-          console.log("Project stages data:", projectStagesData);
           setProjectStages(Array.isArray(projectStagesData) ? projectStagesData : []);
         }
 
         const { data: officeRoles, error: officeRolesError } = await supabase
           .from('office_roles')
           .select('id, name, code');
-        
         if (officeRolesError) {
           console.error("Error fetching office roles:", officeRolesError);
+          toast.error("Failed to load office roles");
         } else {
-          console.log("Office roles data:", officeRoles);
           setRoles(Array.isArray(officeRoles) ? officeRoles : []);
+        }
+
+        const { data: officeRates, error: officeRatesError } = await supabase
+          .from('office_rates')
+          .select('id, type, value, unit, reference_id');
+        if (officeRatesError) {
+          console.error("Error fetching office rates:", officeRatesError);
+          toast.error("Failed to load office rates");
+        } else {
+          // Optional: can set in state if you want to show/use them in project dialog
+          // console.log('Office rates:', officeRates);
+        }
+
+        const { data: officeHolidays, error: officeHolidaysError } = await supabase
+          .from('office_holidays')
+          .select('id, name, date');
+        if (officeHolidaysError) {
+          console.error("Error fetching office holidays:", officeHolidaysError);
+          toast.error("Failed to load office holiday options");
+        } else {
+          // Optional: can set in state if you want to show/use them in project dialog
+          // console.log('Office holidays:', officeHolidays);
         }
 
         const { data: officeStagesData, error: officeStagesError } = await supabase
           .from('office_stages')
           .select('id, name');
-        
         if (officeStagesError) {
           console.error("Error fetching office stages:", officeStagesError);
+          toast.error("Failed to load office stages");
         } else {
-          console.log("Office stages data:", officeStagesData);
           setOfficeStages(Array.isArray(officeStagesData) ? officeStagesData : []);
         }
       } catch (error) {
