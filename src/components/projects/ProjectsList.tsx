@@ -1,12 +1,23 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProjectsToolbar from './ProjectsToolbar';
 import ProjectsTable from './ProjectsTable';
 import { useProjects } from '@/hooks/useProjects';
+import { ProjectFilters } from './ProjectFilters';
 
 export const ProjectsList = () => {
   const { projects, isLoading, error } = useProjects();
+  const [filters, setFilters] = useState<{ [key: string]: string }>({});
+
+  const filteredProjects = useMemo(() => {
+    return projects.filter(project => {
+      return Object.entries(filters).every(([key, value]) => {
+        if (!value) return true; // Skip empty filters
+        return project[key as keyof typeof project] === value;
+      });
+    });
+  }, [projects, filters]);
 
   return (
     <Card className="border shadow-sm">
@@ -19,9 +30,10 @@ export const ProjectsList = () => {
         </div>
         <ProjectsToolbar />
       </CardHeader>
-      <CardContent className="pt-2">
+      <CardContent>
+        <ProjectFilters onFilterChange={setFilters} />
         <ProjectsTable 
-          projects={projects} 
+          projects={filteredProjects} 
           loading={isLoading} 
           error={error ? error.message : ''} 
         />
