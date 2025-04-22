@@ -18,7 +18,7 @@ import NewProjectStep3Stages from "./NewProjectStep3Stages";
 import NewProjectRateCalculator from "./NewProjectRateCalculator";
 
 type RoleOption = { id: string; name: string };
-type OfficeOption = { id: string; name: string; country: string };
+type OfficeOption = { id: string; city: string; country: string; code?: string; emoji?: string };
 type ProjectStageOption = { id: string; stage_name: string; };
 type OfficeStageOption = { id: string; name: string; };
 
@@ -76,7 +76,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       console.log("Fetching data for new project dialog");
       
       try {
-        // Fetch managers
         const { data: mgrs, error: mgrsError } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, role')
@@ -92,7 +91,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
             : []);
         }
 
-        // Fetch countries
         const { data: areas, error: areasError } = await supabase
           .from('project_areas')
           .select('name');
@@ -107,20 +105,17 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
             : [])) as string[]);
         }
 
-        // Fetch offices
-        const { data: off, error: officeError } = await supabase
-          .from('offices')
-          .select('id, name, country');
-          
-        if (officeError) {
-          console.error("Error fetching offices:", officeError);
+        const { data: locations, error: locationsError } = await supabase
+          .from('office_locations')
+          .select('id, city, country, code, emoji');
+        if (locationsError) {
+          console.error("Error fetching office locations:", locationsError);
           toast.error("Failed to load office options");
         } else {
-          console.log("Offices data:", off);
-          setOffices(Array.isArray(off) ? off : []);
+          console.log("Office locations data:", locations);
+          setOffices(Array.isArray(locations) ? locations : []);
         }
 
-        // Fetch project stages
         const { data: projectStagesData, error: projectStagesError } = await supabase
           .from('project_stages')
           .select('id, stage_name');
@@ -132,7 +127,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
           setProjectStages(Array.isArray(projectStagesData) ? projectStagesData : []);
         }
 
-        // Fetch office roles
         const { data: officeRoles, error: officeRolesError } = await supabase
           .from('office_roles')
           .select('id, name, code');
@@ -144,7 +138,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
           setRoles(Array.isArray(officeRoles) ? officeRoles : []);
         }
 
-        // Fetch office stages
         const { data: officeStagesData, error: officeStagesError } = await supabase
           .from('office_stages')
           .select('id, name');

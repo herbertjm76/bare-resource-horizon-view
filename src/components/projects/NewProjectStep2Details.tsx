@@ -1,11 +1,10 @@
-
 import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Percent, Building, MapPin, CheckSquare, Calculator } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-type OfficeOption = { id: string; name: string; country: string };
+type OfficeOption = { id: string; city: string; country: string; code?: string; emoji?: string };
 type ProjectStatus = string;
 
 interface Props {
@@ -27,7 +26,6 @@ const NewProjectStep2Details: React.FC<Props> = ({
   form, countries, offices, statusOptions, onChange, onShowRateCalc
 }) => {
   
-  // Add debugging to check offices data
   useEffect(() => {
     console.log("NewProjectStep2Details rendered with offices:", offices);
   }, [offices]);
@@ -89,7 +87,7 @@ const NewProjectStep2Details: React.FC<Props> = ({
               {offices.length > 0 ? (
                 offices.map(o => (
                   <SelectItem key={o.id} value={o.id}>
-                    {`${o.name}, ${o.country}`}
+                    {`${o.emoji ? `${o.emoji} ` : ''}${o.city}, ${o.country}`}
                   </SelectItem>
                 ))
               ) : (
