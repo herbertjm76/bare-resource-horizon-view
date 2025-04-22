@@ -18,6 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
 import allCountries from "@/lib/allCountries.json";
+import CountrySelect from "@/components/ui/CountrySelect";
 
 const customIconList = [
   "❤️", "🧡", "💛", "💚", "💙", "💜", "🩷", "🤍", "🖤", "🤎",
@@ -246,33 +247,14 @@ export const LocationsTab = () => {
                   <FormItem>
                     <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <div>
-                        <Input
-                          className="mb-2"
-                          placeholder="Search country..."
-                          value={countrySearch}
-                          onChange={(e) => setCountrySearch(e.target.value)}
-                        />
-                        <select
-                          className="w-full bg-background border rounded px-3 py-2"
-                          value={field.value}
-                          onChange={e => {
-                            const code = e.target.value;
-                            const c = allCountries.find(k => k.code === code);
-                            form.setValue("code", code);
-                            form.setValue("country", c ? c.name : code);
-                            field.onChange(code);
-                            setCountrySearch("");
-                          }}
-                        >
-                          <option value="">Select a country...</option>
-                          {filteredCountries.map(country => (
-                            <option key={country.code} value={country.code}>
-                              {country.name} ({country.code})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                      <CountrySelect
+                        value={form.watch("country")}
+                        onChange={(countryName, code) => {
+                          form.setValue("country", countryName);
+                          form.setValue("code", code || "");
+                        }}
+                        placeholder="Search or select country"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

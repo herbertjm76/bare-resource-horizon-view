@@ -10,37 +10,70 @@ export interface CountrySelectProps {
   disabled?: boolean;
   placeholder?: string;
   className?: string;
+  majorCountries?: string[];
 }
 
-export const CountrySelect: React.FC<CountrySelectProps> = ({ value, onChange, disabled, placeholder, className }) => {
+// These are typical "major" countries people select most
+const DEFAULT_MAJOR_COUNTRIES = [
+  "United States",
+  "United Kingdom",
+  "Canada",
+  "Germany",
+  "France",
+  "India",
+  "China",
+  "Australia",
+  "Japan",
+  "Brazil"
+];
+
+export const CountrySelect: React.FC<CountrySelectProps> = ({
+  value,
+  onChange,
+  disabled,
+  placeholder,
+  className,
+  majorCountries = DEFAULT_MAJOR_COUNTRIES
+}) => {
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Compute selected country label
+  // Compute selected country
   const selected = allCountries.find(c => c.name === value);
 
-  // Filter countries based on search term
-  const filteredCountries = searchTerm 
-    ? allCountries.filter(c => 
-        c.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    : allCountries;
+  // Sort major countries at the top
+  const majorList = allCountries.filter(c =>
+    majorCountries.includes(c.name)
+  );
 
-  // Close the dropdown when clicking outside
+  // Alphabetical list excluding majors
+  const otherCountries = allCountries
+    .filter(c => !majorCountries.includes(c.name))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  // Search both lists and combine - search result always on top
+  let displayedCountries: typeof allCountries;
+  if (searchTerm) {
+    const term = searchTerm.toLowerCase();
+    displayedCountries = [
+      ...allCountries
+        .filter(c => c.name.toLowerCase().includes(term) || c.code.toLowerCase().includes(term))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    ];
+  } else {
+    displayedCountries = [...majorList, ...otherCountries];
+  }
+
+  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpen(false);
       }
     };
-
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    if (open) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
   return (
@@ -74,8 +107,31 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({ value, onChange, d
               onValueChange={setSearchTerm}
             />
             <CommandList className="max-h-64 overflow-auto">
-              {filteredCountries.length > 0 ? (
-                filteredCountries.map((country) => (
+              {/* Show Major Countries group if not searching */}
+              {!searchTerm && (
+                <>
+                  <div className="px-2 py-1 text-xs uppercase text-muted-foreground">Popular</div>
+                  {majorList.map(country => (
+                    <CommandItem
+                      key={country.code}
+                      value={country.name}
+                      className="cursor-pointer"
+                      onSelect={() => {
+                        onChange(country.name, country.code);
+                        setOpen(false);
+                        setSearchTerm("");
+                      }}
+                    >
+                      {country.name}
+                    </CommandItem>
+                  ))}
+                  <div className="border-t my-1" />
+                  <div className="px-2 py-1 text-xs uppercase text-muted-foreground">All countries</div>
+                </>
+              )}
+              {/* Show filtered list if searching */}
+              {displayedCountries.length > 0 ? (
+                displayedCountries.map((country) => (
                   <CommandItem
                     key={country.code}
                     value={country.name}
