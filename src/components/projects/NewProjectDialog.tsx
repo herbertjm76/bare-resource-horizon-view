@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -43,13 +42,11 @@ type NewProjectForm = {
 };
 
 export const NewProjectDialog: React.FC = () => {
-  // Dialog, rates popup
   const [open, setOpen] = useState(false);
   const [showRateCalc, setShowRateCalc] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
 
-  // Form state
   const [form, setForm] = useState<NewProjectForm>({
     code: "",
     name: "",
@@ -62,7 +59,6 @@ export const NewProjectDialog: React.FC = () => {
     stages: [],
   });
 
-  // Dynamic data options
   const [managers, setManagers] = useState<RoleOption[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
   const [offices, setOffices] = useState<OfficeOption[]>([]);
@@ -72,11 +68,9 @@ export const NewProjectDialog: React.FC = () => {
   const [officeStages, setOfficeStages] = useState<OfficeStageOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch project managers, project areas, offices, stages
   useEffect(() => {
     (async () => {
       try {
-        // Project managers
         const { data: mgrs } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, role')
@@ -86,35 +80,29 @@ export const NewProjectDialog: React.FC = () => {
           ? mgrs.map((u) => ({ id: u.id, name: `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() }))
           : []);
 
-        // Project areas/countries
         const { data: areas } = await supabase
           .from('project_areas')
           .select('name');
         
-        // Extract country names from the project_areas table
         setCountries(Array.from(new Set(Array.isArray(areas) 
           ? areas.map(a => a.name).filter(Boolean) 
           : [])) as string[]);
 
-        // Office locations
         const { data: off } = await supabase
           .from('office_locations')
           .select('id, city, country');
         setOffices(Array.isArray(off) ? off : []);
 
-        // Project stages
         const { data: projectStagesData } = await supabase
           .from('project_stages')
           .select('id, stage_name');
         setProjectStages(Array.isArray(projectStagesData) ? projectStagesData : []);
 
-        // Office roles for rate calculation
         const { data: officeRoles } = await supabase
           .from('office_roles')
           .select('id, name, code');
         setRoles(Array.isArray(officeRoles) ? officeRoles : []);
 
-        // Fetch office stages for this multi-select
         const { data: officeStagesData } = await supabase
           .from('office_stages')
           .select('id, name');
@@ -126,17 +114,15 @@ export const NewProjectDialog: React.FC = () => {
     })();
   }, []);
 
-  // Helpers to update the form
   const handleChange = (key: keyof NewProjectForm, value: any) => setForm((f) => ({ ...f, [key]: value }));
 
-  // Average rate calculation logic
   const calculateAvgRate = () => {
     let total = 0;
     let count = 0;
     roles.forEach(role => {
       const num = roleNumbers[role.id] || 0;
       if (num > 0) {
-        const dummyRate = 50; // Will use actual rates in production
+        const dummyRate = 50;
         total += dummyRate * num;
         count += num;
       }
@@ -144,11 +130,10 @@ export const NewProjectDialog: React.FC = () => {
     return count > 0 ? (total / count).toFixed(2) : '';
   };
 
-  // Step validation
   const validateStep = (step: number): boolean => {
     switch(step) {
       case 1: // Basic info
-        return !!form.code && !!form.name && !!form.manager;
+        return !!form.code && !!form.name;
       case 2: // Details
         return !!form.country && !!form.profit && !!form.avgRate && !!form.status && !!form.office;
       case 3: // Stages
@@ -158,7 +143,6 @@ export const NewProjectDialog: React.FC = () => {
     }
   };
 
-  // Navigate between steps
   const goToNextStep = () => {
     if (!validateStep(currentStep)) {
       toast.error("Please fill all required fields in this section");
@@ -176,12 +160,9 @@ export const NewProjectDialog: React.FC = () => {
     }
   };
 
-  // Handle submitting the project
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Final validation for all fields
-    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
+    if (!form.code || !form.name || !form.country || !form.profit || !form.avgRate || !form.status || !form.office || form.stages.length === 0) {
       toast.error('Please fill in all required fields.');
       return;
     }
@@ -189,13 +170,9 @@ export const NewProjectDialog: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // TODO: Insert new project to Supabase
-      // This would be implemented based on your database schema
-      await new Promise(r => setTimeout(r, 600)); // Simulate API call
-      
+      await new Promise(r => setTimeout(r, 600));
       setOpen(false);
       toast.success('Project successfully created!');
-      // Reset form
       setForm({
         code: "", name: "", manager: "", country: "", 
         profit: "", avgRate: "", status: "", office: "", stages: []
@@ -209,7 +186,6 @@ export const NewProjectDialog: React.FC = () => {
     }
   };
 
-  // Render step content
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
@@ -250,7 +226,12 @@ export const NewProjectDialog: React.FC = () => {
                     <SelectValue placeholder="Select Manager" />
                   </SelectTrigger>
                   <SelectContent>
-                    {managers.map(m => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
+                    <SelectItem value="">Not Assigned</SelectItem>
+                    {managers.map(m => (
+                      <SelectItem key={m.id} value={m.id}>
+                        {m.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -382,11 +363,9 @@ export const NewProjectDialog: React.FC = () => {
     }
   };
 
-  // UI
   return (
     <Dialog open={open} onOpenChange={(o) => { 
       if (!o) {
-        // Reset when closing
         setCurrentStep(1);
       }
       setOpen(o); 
@@ -405,7 +384,6 @@ export const NewProjectDialog: React.FC = () => {
           </DialogTitle>
         </DialogHeader>
         
-        {/* Step indicator */}
         <div className="flex items-center justify-between mb-6">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div key={i} className="flex flex-col items-center">
@@ -451,7 +429,6 @@ export const NewProjectDialog: React.FC = () => {
           </div>
         </form>
         
-        {/* Average Rate Calculator Popup */}
         {showRateCalc && (
           <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
             <Card className="p-6 max-w-lg mx-auto relative z-50 shadow-xl">
