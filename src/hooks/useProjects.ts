@@ -30,13 +30,18 @@ export const useProjects = () => {
       console.log('Fetching projects data for company:', company.id);
       
       try {
+        // Define fields to select based on the actual schema
         const { data, error } = await supabase
           .from('projects')
           .select(`
-            *,
+            id,
+            name,
+            code,
+            status,
+            country,
+            target_profit_percentage,
             project_manager:profiles(first_name, last_name),
-            office:offices(name, country),
-            team_composition:project_team_composition(*)
+            office:offices(name, country)
           `)
           .eq('company_id', company.id);
 

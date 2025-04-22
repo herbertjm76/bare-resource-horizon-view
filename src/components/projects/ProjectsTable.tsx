@@ -17,10 +17,11 @@ type Project = {
   id: string;
   name: string;
   status: Database["public"]["Enums"]["project_status"];
-  client?: string | null;
-  dueDate?: string | null;
-  country?: string;
-  code?: string;
+  country?: string | null;
+  code?: string | null;
+  target_profit_percentage?: number | null;
+  project_manager?: { first_name: string | null; last_name: string | null } | null;
+  office?: { name: string | null; country: string | null } | null;
 };
 
 interface ProjectsTableProps {
@@ -76,8 +77,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
           <TableRow>
             <TableHead className="w-[300px] pl-6">Name</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Client</TableHead>
-            <TableHead>Due Date</TableHead>
+            <TableHead>Country</TableHead>
+            <TableHead>Office</TableHead>
             <TableHead className="text-right pr-6">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -92,8 +93,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
                   </Badge>
                 )}
               </TableCell>
-              <TableCell>{project.client}</TableCell>
-              <TableCell>{project.dueDate}</TableCell>
+              <TableCell>{project.country}</TableCell>
+              <TableCell>{project.office?.name}</TableCell>
               <TableCell className="text-right pr-6">
                 <div className="flex justify-end gap-2">
                   <Button variant="ghost" size="icon">

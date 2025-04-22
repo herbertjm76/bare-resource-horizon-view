@@ -185,17 +185,27 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     
     setIsLoading(true);
     try {
+      console.log("Submitting project with data:", {
+        code: form.code,
+        name: form.name,
+        company_id: company.id,
+        country: form.country,
+        target_profit_percentage: form.profit ? Number(form.profit) : null,
+        office_id: form.office,
+        status: form.status,
+        project_manager_id: form.manager === "not_assigned" ? null : (form.manager || null)
+      });
+      
       const { error } = await supabase.from('projects').insert({
         code: form.code,
         name: form.name,
         company_id: company.id,
         project_manager_id: form.manager === "not_assigned" ? null : (form.manager || null),
-        office_id: form.office || null,
+        office_id: form.office,
         status: form.status,
         country: form.country,
-        target_profit_percentage: form.profit ? Number(form.profit) : null,
-        dueDate: form.dueDate ? form.dueDate : null,
-        client: form.client ? form.client : null,
+        target_profit_percentage: form.profit ? Number(form.profit) : null
+        // Removed client and dueDate fields as they're not in the schema
       });
       
       if (error) {
