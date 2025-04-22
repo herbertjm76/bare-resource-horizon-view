@@ -11,9 +11,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash } from "lucide-react";
+import type { Database } from '@/integrations/supabase/types';
+
+type Project = {
+  id: string;
+  name: string;
+  status: Database["public"]["Enums"]["project_status"];
+  client?: string | null;
+  dueDate?: string | null;
+  country?: string;
+  code?: string;
+};
 
 interface ProjectsTableProps {
-  projects: any[];
+  projects: Project[];
   loading: boolean;
   error?: string;
 }
@@ -45,13 +56,13 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'active':
+      case 'in progress':
         return 'default';
-      case 'completed':
+      case 'complete':
         return 'secondary';
       case 'on hold':
         return 'outline';
-      case 'cancelled':
+      case 'planning':
         return 'destructive';
       default:
         return 'default';

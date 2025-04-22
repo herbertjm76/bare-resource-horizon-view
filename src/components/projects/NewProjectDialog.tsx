@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -17,17 +18,21 @@ import { PlusCircle, Percent, Users, FileText, Code, Building, MapPin, CheckSqua
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
+import type { Database } from "@/integrations/supabase/types";
 
 type RoleOption = { id: string; name: string };
 type OfficeOption = { id: string; city: string; country: string };
 type ProjectStageOption = { id: string; stage_name: string; };
 type OfficeStageOption = { id: string; name: string };
 
+// Define the valid project status values based on the database enum
+type ProjectStatus = Database["public"]["Enums"]["project_status"];
+
 const statusOptions = [
-  { label: "Not started", value: "Planning" },
-  { label: "On-going", value: "In Progress" },
-  { label: "Completed", value: "Complete" },
-  { label: "On hold", value: "On Hold" },
+  { label: "Not started", value: "Planning" as ProjectStatus },
+  { label: "On-going", value: "In Progress" as ProjectStatus },
+  { label: "Completed", value: "Complete" as ProjectStatus },
+  { label: "On hold", value: "On Hold" as ProjectStatus },
 ];
 
 type NewProjectForm = {
@@ -37,7 +42,7 @@ type NewProjectForm = {
   country: string;
   profit: string;
   avgRate: string;
-  status: string;
+  status: ProjectStatus | "";
   office: string;
   stages: string[];
   client?: string;
@@ -180,20 +185,19 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     
     setIsLoading(true);
     try {
-      const { error } = await supabase.from('projects').insert([
-        {
-          code: form.code,
-          name: form.name,
-          company_id: company.id,
-          project_manager_id: form.manager === "not_assigned" ? null : (form.manager || null),
-          office_id: form.office || null,
-          status: form.status,
-          country: form.country,
-          target_profit_percentage: form.profit ? Number(form.profit) : null,
-          dueDate: form.dueDate ? form.dueDate : null,
-          client: form.client ? form.client : null,
-        }
-      ]);
+      const { error } = await supabase.from('projects').insert({
+        code: form.code,
+        name: form.name,
+        company_id: company.id,
+        project_manager_id: form.manager === "not_assigned" ? null : (form.manager || null),
+        office_id: form.office || null,
+        status: form.status,
+        country: form.country,
+        target_profit_percentage: form.profit ? Number(form.profit) : null,
+        dueDate: form.dueDate ? form.dueDate : null,
+        client: form.client ? form.client : null,
+      });
+      
       if (error) {
         console.error("Supabase error inserting project:", error);
         toast.error('Failed to create project: ' + error.message);
@@ -463,8 +467,8 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
                 Next
               </Button>
             ) : (
-              <Button type="submit" variant="default" isLoading={isLoading}>
-                Create Project
+              <Button type="submit" variant="default" disabled={isLoading}>
+                {isLoading ? "Creating..." : "Create Project"}
               </Button>
             )}
           </div>
