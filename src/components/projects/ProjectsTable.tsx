@@ -94,7 +94,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({ projects, loading, error 
                 )}
               </TableCell>
               <TableCell>{project.country}</TableCell>
-              <TableCell>{project.office?.name}</TableCell>
+              <TableCell>{project.office?.name || 'Not assigned'}</TableCell>
               <TableCell className="text-right pr-6">
                 <div className="flex justify-end gap-2">
                   <Button variant="ghost" size="icon">
