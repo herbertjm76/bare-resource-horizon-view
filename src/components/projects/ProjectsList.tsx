@@ -31,7 +31,10 @@ export const ProjectsList = () => {
         <ProjectsToolbar />
       </CardHeader>
       <CardContent>
-        <ProjectFilters onFilterChange={setFilters} />
+        <ProjectFilters 
+          onFilterChange={setFilters} 
+          currentFilters={filters}
+        />
         <ProjectsTable 
           projects={filteredProjects} 
           loading={isLoading} 

@@ -9,15 +9,12 @@ import {
 } from "@/components/ui/select";
 import { useProjects } from '@/hooks/useProjects';
 
-type FilterOption = {
-  label: string;
-  value: string;
-};
-
 export const ProjectFilters = ({ 
-  onFilterChange 
+  onFilterChange,
+  currentFilters 
 }: { 
   onFilterChange: (filters: { [key: string]: string }) => void;
+  currentFilters: { [key: string]: string };
 }) => {
   const { projects } = useProjects();
 
@@ -27,15 +24,21 @@ export const ProjectFilters = ({
   const countries = [...new Set(projects.map(p => p.country))];
 
   const handleFilterChange = (value: string, filterKey: string) => {
-    onFilterChange(prev => ({
-      ...prev,
+    // Create a new filters object with the updated value
+    const newFilters = {
+      ...currentFilters,
       [filterKey]: value
-    }));
+    };
+    // Pass the complete new filters object to the parent
+    onFilterChange(newFilters);
   };
 
   return (
     <div className="flex flex-wrap gap-4 mb-6">
-      <Select onValueChange={(value) => handleFilterChange(value, 'status')}>
+      <Select 
+        onValueChange={(value) => handleFilterChange(value, 'status')}
+        value={currentFilters.status || ""}
+      >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Filter by Status" />
         </SelectTrigger>
@@ -49,7 +52,10 @@ export const ProjectFilters = ({
         </SelectContent>
       </Select>
 
-      <Select onValueChange={(value) => handleFilterChange(value, 'stage')}>
+      <Select 
+        onValueChange={(value) => handleFilterChange(value, 'current_stage')}
+        value={currentFilters.current_stage || ""}
+      >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Filter by Stage" />
         </SelectTrigger>
@@ -63,7 +69,10 @@ export const ProjectFilters = ({
         </SelectContent>
       </Select>
 
-      <Select onValueChange={(value) => handleFilterChange(value, 'country')}>
+      <Select 
+        onValueChange={(value) => handleFilterChange(value, 'country')}
+        value={currentFilters.country || ""}
+      >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Filter by Country" />
         </SelectTrigger>
