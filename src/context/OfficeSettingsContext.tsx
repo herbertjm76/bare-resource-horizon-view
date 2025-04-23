@@ -27,15 +27,26 @@ export type Location = {
   code: string;
   emoji?: string;
   company_id: string;
+  color?: string;
+};
+
+export type ProjectStage = {
+  id: string;
+  name: string;
+  order_index: number;
+  company_id: string;
+  color?: string;
 };
 
 type OfficeSettingsContextType = {
   roles: Role[];
   locations: Location[];
   rates: Rate[];
+  office_stages: ProjectStage[];
   setRoles: React.Dispatch<React.SetStateAction<Role[]>>;
   setLocations: React.Dispatch<React.SetStateAction<Location[]>>;
   setRates: React.Dispatch<React.SetStateAction<Rate[]>>;
+  setOfficeStages: React.Dispatch<React.SetStateAction<ProjectStage[]>>;
   loading: boolean;
 };
 
@@ -45,6 +56,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
   const [roles, setRoles] = useState<Role[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [rates, setRates] = useState<Rate[]>([]);
+  const [office_stages, setOfficeStages] = useState<ProjectStage[]>([]);
   const [loading, setLoading] = useState(true);
   const { company } = useCompany();
 
@@ -54,6 +66,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
       setRoles([]);
       setLocations([]);
       setRates([]);
+      setOfficeStages([]);
       return;
     }
 
@@ -71,7 +84,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         const { data: locationsData, error: locationsError } = await supabase
           .from('office_locations')
-          .select('id, city, country, code, emoji, company_id')
+          .select('id, city, country, code, emoji, company_id, color')
           .eq('company_id', company.id);
 
         if (locationsError) throw locationsError;
@@ -82,10 +95,19 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           .eq('company_id', company.id);
 
         if (ratesError) throw ratesError;
+        
+        const { data: stagesData, error: stagesError } = await supabase
+          .from('office_stages')
+          .select('id, name, order_index, company_id, color')
+          .eq('company_id', company.id)
+          .order('order_index', { ascending: true });
+          
+        if (stagesError) throw stagesError;
 
         console.log("Roles data:", rolesData);
         console.log("Locations data:", locationsData);
         console.log("Rates data:", ratesData);
+        console.log("Stages data:", stagesData);
 
         setRoles(Array.isArray(rolesData) ? rolesData.map((r) => ({
           ...r,
@@ -94,7 +116,14 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         setLocations(Array.isArray(locationsData) ? locationsData.map((loc) => ({
           ...loc,
-          company_id: (loc.company_id ?? company.id).toString()
+          company_id: (loc.company_id ?? company.id).toString(),
+          color: loc.color || "#E5DEFF" // Default color if none is set
+        })) : []);
+        
+        setOfficeStages(Array.isArray(stagesData) ? stagesData.map((stage) => ({
+          ...stage,
+          company_id: (stage.company_id ?? company.id).toString(),
+          color: stage.color || "#E5DEFF" // Default color if none is set
         })) : []);
 
         if (Array.isArray(ratesData)) {
@@ -116,6 +145,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         setRoles([]);
         setLocations([]);
         setRates([]);
+        setOfficeStages([]);
       } finally {
         setLoading(false);
       }
@@ -133,6 +163,8 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         setLocations, 
         rates, 
         setRates,
+        office_stages,
+        setOfficeStages,
         loading
       }}
     >

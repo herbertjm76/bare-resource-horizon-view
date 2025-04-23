@@ -73,7 +73,7 @@ export default function useProjectAreas() {
         setLoading(false);
         return;
       }
-      const areaData = {
+      const areaData: Partial<ProjectAreaRow> = {
         code: values.code,
         name: values.country,
         emoji: null,
@@ -117,7 +117,7 @@ export default function useProjectAreas() {
         setLoading(false);
         return;
       }
-      const areaData = {
+      const areaData: Partial<ProjectAreaRow> = {
         code: values.code,
         name: values.country,
         company_id: company.id,
@@ -157,7 +157,7 @@ export default function useProjectAreas() {
     }
   };
 
-  // Bulk Delete Project Areas
+  // --- Bulk Delete Project Areas ---
   const deleteAreas = async (ids: string[]) => {
     setLoading(true);
     setError(null);

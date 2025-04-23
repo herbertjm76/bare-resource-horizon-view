@@ -9,7 +9,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,6 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Database } from '@/integrations/supabase/types';
+
+// Define valid project statuses
+type ProjectStatus = 'In Progress' | 'Not Started' | 'Completed' | 'On Hold';
 
 // --- Load project stage and area colors from DB for rendering ---
 const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
@@ -53,9 +55,6 @@ interface ProjectsTableProps {
   onSelectProject: (projectId: string) => void;
 }
 
-// Define valid project statuses
-type ProjectStatus = 'In Progress' | 'Not Started' | 'Completed' | 'On Hold';
-
 const ProjectsTable: React.FC<ProjectsTableProps> = ({ 
   projects, loading, error,
   editMode = false, onEdit, onDelete,
@@ -65,11 +64,11 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     roles, 
     loading: rolesLoading, 
     locations,
-    office_stages: projectStages = [] 
+    office_stages = []
   } = useOfficeSettings();
 
   // --- Color maps from DB ---
-  const stageColorMap = useStageColorMap(projectStages);
+  const stageColorMap = useStageColorMap(office_stages);
   const areaColorMap = useAreaColorMap(locations);
 
   // --- Handle stage change ---
@@ -88,6 +87,25 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     } catch (err) {
       console.error('Error updating stage:', err);
       toast.error('An error occurred while updating the stage');
+    }
+  };
+
+  // --- Handle status change ---
+  const handleStatusChange = async (projectId: string, newStatus: ProjectStatus) => {
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({ status: newStatus })
+        .eq('id', projectId);
+        
+      if (error) {
+        toast.error('Failed to update status', { description: error.message });
+      } else {
+        toast.success('Status updated');
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+      toast.error('An error occurred while updating the status');
     }
   };
 
@@ -141,6 +159,17 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           {projects.map((project) => {
             const statusColor = getStatusColor(project.status);
             
+            // Find the matching location for this project's country
+            const matchingLocation = locations.find(loc => 
+              loc.country === project.country || loc.code === project.country
+            );
+            
+            // Get the area color for this project's country
+            const areaColor = matchingLocation?.color || "#E5DEFF";
+            
+            // Get the correct code to display
+            const areaCode = matchingLocation?.code || project.country;
+            
             return (
               <TableRow 
                 key={project.id} 
@@ -165,7 +194,22 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   {project.project_manager?.first_name || '-'}
                 </TableCell>
                 <TableCell>
-                  {project.status && (
+                  {editMode ? (
+                    <Select
+                      defaultValue={project.status}
+                      onValueChange={(value) => handleStatusChange(project.id, value as ProjectStatus)}
+                    >
+                      <SelectTrigger className="h-8 w-40">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="In Progress">In Progress</SelectItem>
+                        <SelectItem value="Not Started">Not Started</SelectItem>
+                        <SelectItem value="Completed">Completed</SelectItem>
+                        <SelectItem value="On Hold">On Hold</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
                     <span 
                       className="inline-block px-2 py-1 rounded"
                       style={{
@@ -181,11 +225,11 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   <span
                     className="inline-block px-2 py-1 rounded font-semibold"
                     style={{
-                      background: areaColorMap[project.country] || "#E5DEFF",
+                      background: areaColor,
                       color: "#212172"
                     }}
                   >
-                    {project.country?.toUpperCase()}
+                    {areaCode?.toUpperCase()}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -209,15 +253,19 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                         <SelectValue placeholder="Select stage" />
                       </SelectTrigger>
                       <SelectContent>
-                        {projectStages.map((stage) => (
+                        {office_stages.map((stage) => (
                           <SelectItem 
                             key={stage.id} 
                             value={stage.name}
-                            style={{
-                              backgroundColor: stage.color || "#E5DEFF"
-                            }}
                           >
-                            {stage.name}
+                            <div 
+                              className="px-2 py-0.5 rounded w-full"
+                              style={{
+                                backgroundColor: stage.color || "#E5DEFF"
+                              }}
+                            >
+                              {stage.name}
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>

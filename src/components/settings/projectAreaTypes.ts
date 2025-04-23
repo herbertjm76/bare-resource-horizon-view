@@ -9,6 +9,7 @@ export type ProjectAreaRow = {
   updated_at: string;
   company_id: string | null;
   city?: string;
+  color?: string; // Added color field to match updated DB schema
 };
 
 // The ProjectArea shape as used in the app
@@ -19,6 +20,7 @@ export type ProjectArea = {
   country: string;
   company_id: string | null;
   city?: string;
+  color?: string; // Added color field to match updated DB schema
 };
 
 export type ProjectAreaFormValues = {
@@ -26,4 +28,5 @@ export type ProjectAreaFormValues = {
   country: string;
   region: string;
   city?: string;
+  color?: string; // Added color field for form values
 };
