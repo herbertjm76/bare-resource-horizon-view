@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Command, CommandInput, CommandList, CommandItem, CommandEmpty } from "@/components/ui/command";
-import allCountries from "@/lib/allCountries.json";
+import { allCountries } from "@/lib/countries"; // Updated import
 import { cn } from "@/lib/utils";
 
 export interface CountrySelectProps {

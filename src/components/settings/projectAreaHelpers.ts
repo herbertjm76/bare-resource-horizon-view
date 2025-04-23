@@ -1,4 +1,5 @@
-import allCountries from "@/lib/allCountries.json";
+
+import { allCountries } from "@/lib/countries"; // Updated import
 
 // Pastel background color array
 export const pastelColors = [

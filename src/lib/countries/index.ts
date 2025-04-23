@@ -14,7 +14,8 @@ export const allCountries: Country[] = [
   ...oceaniaCountries
 ].sort((a, b) => a.name.localeCompare(b.name));
 
-export { Country, CountryGroup } from './types';
+// Use 'export type' for re-exporting types when isolatedModules is enabled
+export type { Country, CountryGroup } from './types';
 export { europeanCountries } from './europe';
 export { asianCountries } from './asia';
 export { americanCountries } from './americas';
