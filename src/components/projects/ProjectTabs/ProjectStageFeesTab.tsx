@@ -2,7 +2,13 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import { 
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from "@/components/ui/select";
 import { 
   Popover,
   PopoverContent,
@@ -133,17 +139,21 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
                 />
               </div>
               <div>
-                <Label htmlFor={`status-${stageId}`}>Status</Label>
+                <Label>Status</Label>
                 <Select
-                  id={`status-${stageId}`}
                   value={stageFeeData.status}
                   onValueChange={(value) => updateStageFee(stageId, { 
                     status: value as "Not Billed" | "Invoiced" | "Paid" | "" 
                   })}
                 >
-                  <option value="Not Billed">Not Billed</option>
-                  <option value="Invoiced">Invoiced</option>
-                  <option value="Paid">Paid</option>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Not Billed">Not Billed</SelectItem>
+                    <SelectItem value="Invoiced">Invoiced</SelectItem>
+                    <SelectItem value="Paid">Paid</SelectItem>
+                  </SelectContent>
                 </Select>
               </div>
             </div>

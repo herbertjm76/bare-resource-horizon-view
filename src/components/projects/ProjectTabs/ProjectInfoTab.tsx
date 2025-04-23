@@ -2,7 +2,13 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import { 
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from "@/components/ui/select";
 import { ProjectForm } from "../NewProjectDialog";
 
 interface ProjectInfoTabProps {
@@ -53,18 +59,19 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       {/* Project Manager */}
       <div>
         <Label htmlFor="manager">Project Manager</Label>
-        <Select
-          id="manager"
-          value={form.manager}
-          onValueChange={(value) => onChange("manager", value)}
-        >
-          <option value="">Select a project manager</option>
-          <option value="not_assigned">Not Assigned</option>
-          {managers.map((manager) => (
-            <option key={manager.id} value={manager.id}>
-              {manager.name}
-            </option>
-          ))}
+        <Select value={form.manager} onValueChange={(value) => onChange("manager", value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a project manager" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">Select a project manager</SelectItem>
+            <SelectItem value="not_assigned">Not Assigned</SelectItem>
+            {managers.map((manager) => (
+              <SelectItem key={manager.id} value={manager.id}>
+                {manager.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
       </div>
 
@@ -72,34 +79,42 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="country">Country</Label>
-          <Select
-            id="country"
+          <Select 
             value={form.country}
             onValueChange={(value) => onChange("country", value)}
             required
           >
-            <option value="">Select a country</option>
-            {countries.map((country) => (
-              <option key={country} value={country}>
-                {country}
-              </option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder="Select a country" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Select a country</SelectItem>
+              {countries.map((country) => (
+                <SelectItem key={country} value={country}>
+                  {country}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
         <div>
           <Label htmlFor="office">Office</Label>
           <Select
-            id="office"
             value={form.office}
             onValueChange={(value) => onChange("office", value)}
             required
           >
-            <option value="">Select an office</option>
-            {offices.map((office) => (
-              <option key={office.id} value={office.id}>
-                {office.emoji ? `${office.emoji} ` : ''}{office.city}, {office.country}
-              </option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder="Select an office" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Select an office</SelectItem>
+              {offices.map((office) => (
+                <SelectItem key={office.id} value={office.id}>
+                  {office.emoji ? `${office.emoji} ` : ''}{office.city}, {office.country}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
       </div>
@@ -122,17 +137,21 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         <div>
           <Label htmlFor="status">Status</Label>
           <Select
-            id="status"
             value={form.status || ""}
             onValueChange={(value) => onChange("status", value)}
             required
           >
-            <option value="">Select a status</option>
-            {statusOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder="Select a status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Select a status</SelectItem>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
       </div>
