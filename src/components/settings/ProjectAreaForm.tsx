@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -27,10 +26,10 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
 }) => {
   // Initialize with first color if no color is set
   React.useEffect(() => {
-    if (!form.getValues('color')) {
+    if (!form.getValues('color') && !editing?.color) {
       form.setValue('color', colorPalette[0]);
     }
-  }, [form]);
+  }, [form, editing]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -98,7 +97,7 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
               control={form.control}
               name="color"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-1">
                   <FormLabel>Color</FormLabel>
                   <FormControl>
                     <ColorPicker
