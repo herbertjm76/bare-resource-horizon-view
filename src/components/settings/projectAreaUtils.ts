@@ -1,5 +1,5 @@
 
-import allCountries from "@/lib/allCountries.json";
+import { allCountries } from "@/lib/countries";
 import { getContinentByCountryCode } from "./projectAreaHelpers";
 import type { ProjectArea } from "./projectAreaTypes";
 
