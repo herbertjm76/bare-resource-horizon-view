@@ -39,18 +39,18 @@ type Stage = {
 };
 
 const COLORS = [
-  // Purple
-  "#E5DEFF", "#1A1F2C",
-  // Green
-  "#F2FCE2", "#10b981",
-  // Orange
-  "#FEC6A1", "#F97316",
-  // Pink/Magenta
-  "#FFDEE2", "#D946EF",
-  // Blue
-  "#D3E4FD", "#0ea5e9",
-  // Red
-  "#FDE1D3", "#ea384c"
+  // Blue family
+  "#E6F2FF", "#93C5FD", 
+  // Green family
+  "#E6F4F1", "#6EE7B7", 
+  // Yellow family
+  "#FEF3C7", "#FCD34D", 
+  // Orange family
+  "#FFEDD5", "#FEB041", 
+  // Pink family
+  "#FFE4E6", "#FB7185", 
+  // Purple family
+  "#E5E1FF", "#A78BFA"
 ];
 
 const stageNumberOptions = [...Array(10).keys()].map(n => String(n + 1)).concat("NA");
@@ -391,15 +391,15 @@ export const StagesTab = () => {
                           <button
                             key={color}
                             type="button"
-                            className={`w-7 h-7 rounded-full flex items-center justify-center border transition 
-                              ${field.value === color ? 'ring-2 ring-primary border-primary' : 'border-input'}
+                            className={`w-full h-8 rounded-md flex items-center justify-center transition 
+                              ${field.value === color ? 'ring-2 ring-primary border-primary' : 'border border-input'}
                               hover:scale-105 focus:outline-none`}
                             style={{ backgroundColor: color }}
                             onClick={() => field.onChange(color)}
                             aria-label={color}
                           >
                             {field.value === color && (
-                              <Check className="w-4 h-4 text-white drop-shadow" />
+                              <Check className="w-4 h-4 text-black drop-shadow" />
                             )}
                           </button>
                         ))}
@@ -422,3 +422,5 @@ export const StagesTab = () => {
     </Card>
   );
 };
+
+export { StagesTab };
