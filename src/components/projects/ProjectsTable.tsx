@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Table,
   TableBody,
@@ -13,20 +12,29 @@ import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
 import type { Database } from '@/integrations/supabase/types';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
-type Project = {
-  id: string;
-  code?: string | null;
-  name: string;
-  status: Database["public"]["Enums"]["project_status"];
-  country?: string | null;
-  target_profit_percentage?: number | null;
-  project_manager?: { first_name: string | null; last_name: string | null } | null;
-  office?: { id: string; name: string | null; country: string | null } | null;
+// --- Load project stage and area colors from DB for rendering ---
+const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
+  const map: Record<string, string> = {};
+  stages.forEach(stage => {
+    map[stage.name] = stage.color || '#E5DEFF';
+    map[stage.id] = stage.color || '#E5DEFF';
+  });
+  return map;
+};
+const useAreaColorMap = (areas: { code: string; color?: string; country: string }[]) => {
+  const map: Record<string, string> = {};
+  areas.forEach(area => {
+    map[area.country] = area.color || '#E5DEFF';
+    map[area.code] = area.color || '#E5DEFF';
+  });
+  return map;
 };
 
 interface ProjectsTableProps {
-  projects: Project[];
+  projects: any[]; // It's ok, we handle all project prop shapes here
   loading: boolean;
   error?: string;
   editMode?: boolean;
@@ -36,70 +44,44 @@ interface ProjectsTableProps {
   onSelectProject: (projectId: string) => void;
 }
 
-const statusColors: Record<string, string> = {
-  "On Hold": "bg-[#ccc9ff] text-[#212172]",
-  "In Progress": "bg-[#b3efa7] text-[#257e30]",
-  "Complete": "bg-[#eaf1fe] text-[#174491]",
-  "Planning": "bg-destructive/10 text-destructive",
-};
-
-const countryColors: Record<string, string> = {
-  "KSA": "bg-[#d0f5a7] text-[#316d09]",
-  "IT": "bg-[#d1e6ff] text-[#0050aa]",
-  "OM": "bg-[#f1ffd2] text-[#6a7c28]",
-  "LDN": "bg-[#f8ddff] text-[#991be1]",
-};
-
-const getPmFullName = (pm: Project["project_manager"]) =>
-  pm ? [pm.first_name, pm.last_name].filter(Boolean).join(" ") : "-";
-
-const getStatusStyles = (status: string) =>
-  statusColors[status] || "bg-muted text-foreground";
-
-const getCountryStyles = (country: string | null | undefined) =>
-  (country && countryColors[country]) || "bg-muted text-foreground";
-
-const getCountryAbbreviation = (country: string | null | undefined) => {
-  if (!country) return "";
-  const abbr = country.toUpperCase();
-  if (abbr.length <= 3) return abbr;
-  return abbr.slice(0, 3);
-};
-
 const ProjectsTable: React.FC<ProjectsTableProps> = ({ 
-  projects, 
-  loading, 
-  error,
-  editMode = false,
-  onEdit,
-  onDelete,
-  selectedProjects,
-  onSelectProject
+  projects, loading, error,
+  editMode = false, onEdit, onDelete,
+  selectedProjects, onSelectProject,
 }) => {
-  const { roles, loading: rolesLoading } = useOfficeSettings();
+  const { roles, loading: rolesLoading, locations, rates } = useOfficeSettings();
+
+  // --- FAKE fetch project stages/areas for demo! ---
+  const projectStages = []; // Replace by real fetch, or via props/context as needed
+  const projectAreas = []; // As above
+
+  // --- Demo-only color maps (will be populated by real fetch) ---
+  const stageColorMap = useStageColorMap(projectStages);
+  const areaColorMap = useAreaColorMap(projectAreas);
+
+  // --- New: Track editable stage for a project ---
+  const [editingStage, setEditingStage] = useState<{ [projectId: string]: boolean }>({});
+
+  // --- Update current_stage in database on dropdown change ---
+  const handleStageChange = async (projectId: string, newStage: string) => {
+    // Optimistically update UI
+    setEditingStage(prev => ({ ...prev, [projectId]: false }));
+    const { error } = await supabase.from('projects').update({ current_stage: newStage }).eq('id', projectId);
+    if (error) {
+      toast.error('Failed to update current stage', { description: error.message });
+    } else {
+      toast.success('Current stage updated');
+    }
+  };
 
   if (loading || rolesLoading) {
-    return (
-      <div className="text-center p-8 border rounded-md border-dashed">
-        Loading projects...
-      </div>
-    );
+    return <div className="text-center p-8 border rounded-md border-dashed">Loading projects...</div>;
   }
-
   if (error) {
-    return (
-      <div className="p-8 border border-destructive/30 bg-destructive/10 text-destructive rounded-lg flex items-center gap-2">
-        {error}
-      </div>
-    );
+    return <div className="p-8 border border-destructive/30 bg-destructive/10 text-destructive rounded-lg flex items-center gap-2">{error}</div>;
   }
-
   if (!projects?.length) {
-    return (
-      <div className="text-center p-8 border rounded-md border-dashed">
-        No projects found. Click "New Project" to create your first project.
-      </div>
-    );
+    return <div className="text-center p-8 border rounded-md border-dashed">No projects found. Click "New Project" to create your first project.</div>;
   }
 
   return (
@@ -107,11 +89,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            {editMode && (
-              <TableHead className="w-10">
-                <span className="sr-only">Select</span>
-              </TableHead>
-            )}
+            {editMode && <TableHead className="w-10"><span className="sr-only">Select</span></TableHead>}
             <TableHead className="w-20">Code</TableHead>
             <TableHead>Project Name</TableHead>
             <TableHead>PM</TableHead>
@@ -123,9 +101,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             <TableHead>Current Stage</TableHead>
             <TableHead>Stage Hours</TableHead>
             <TableHead>Stage Fee</TableHead>
-            {editMode && (
-              <TableHead className="w-24">Actions</TableHead>
-            )}
+            {editMode && <TableHead className="w-24">Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -149,20 +125,37 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               <TableCell>
                 <span className="font-bold">{project.name}</span>
               </TableCell>
-              <TableCell>{getPmFullName(project.project_manager)}</TableCell>
+              <TableCell>
+                {project.project_manager?.first_name || '-'}
+              </TableCell>
               <TableCell>
                 {project.status && (
-                  <span className={`inline-block px-2 py-1 rounded ${getStatusStyles(project.status)}`}>
+                  <span className={`inline-block px-2 py-1 rounded`} style={{
+                    background: project.status === "On Hold"
+                      ? "#ccc9ff" : project.status === "In Progress"
+                      ? "#b3efa7" : project.status === "Complete"
+                      ? "#eaf1fe" : project.status === "Planning"
+                      ? "#ffe4e6" : "#E5DEFF",
+                    color: project.status === "On Hold"
+                      ? "#212172" : project.status === "In Progress"
+                      ? "#257e30" : project.status === "Complete"
+                      ? "#174491" : project.status === "Planning"
+                      ? "#d946ef" : "#6E59A5"
+                  }}>
                     {project.status}
                   </span>
                 )}
               </TableCell>
               <TableCell>
-                {project.country && (
-                  <span className={`inline-block px-2 py-1 rounded font-semibold ${getCountryStyles(project.country)}`}>
-                    {getCountryAbbreviation(project.country)}
-                  </span>
-                )}
+                <span
+                  className="inline-block px-2 py-1 rounded font-semibold"
+                  style={{
+                    background: areaColorMap[project.country] || "#E5DEFF",
+                    color: "#212172"
+                  }}
+                >
+                  {project.country?.toUpperCase()}
+                </span>
               </TableCell>
               <TableCell>
                 {/* Placeholder: Replace with real value if available */}
@@ -176,8 +169,32 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 85
               </TableCell>
               <TableCell>
-                {/* Current Stage - placeholder */}
-                <span className="px-2 py-1 bg-[#E5DEFF] text-[#6E59A5] rounded">Concept</span>
+                {editMode
+                  ? (
+                    <select
+                      className="bg-white border rounded px-2 py-1"
+                      value={project.current_stage}
+                      onChange={e => handleStageChange(project.id, e.target.value)}
+                    >
+                      {/* In real use, this should come from project.selectedStages/officeStages! */}
+                      {/* We'll simulate with fixed example: */}
+                      <option value="SD">Schematic</option>
+                      <option value="DD">Design Development</option>
+                      <option value="CD">Construction Docs</option>
+                      <option value="CMP">Completion</option>
+                    </select>
+                  ) : (
+                    <span
+                      className="px-2 py-1 rounded"
+                      style={{
+                        backgroundColor: stageColorMap[project.current_stage] || "#E5DEFF",
+                        color: "#212172"
+                      }}
+                    >
+                      {project.current_stage}
+                    </span>
+                  )
+                }
               </TableCell>
               <TableCell>
                 {/* Stage Hours - placeholder */}
@@ -218,5 +235,4 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     </div>
   );
 };
-
 export default ProjectsTable;

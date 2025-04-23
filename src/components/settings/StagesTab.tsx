@@ -76,57 +76,37 @@ export const StagesTab = () => {
   const fetchStages = async () => {
     setLoading(true);
     if (!company || !company.id) {
-      console.log("No company found in context, cannot fetch stages");
       setStages([]);
       setLoading(false);
       return;
     }
 
-    console.log("Fetching stages for company:", company.id);
-    
     const { data, error } = await supabase
       .from("office_stages")
       .select("*")
       .eq("company_id", company.id)
       .order("order_index", { ascending: true });
-      
+
     if (error) {
-      toast.error("Failed to load stages", {
-        description: error.message
-      });
-      console.error("Error fetching stages:", error);
+      toast.error("Failed to load stages", { description: error.message });
+      setStages([]);
       setLoading(false);
       return;
     }
 
-    console.log("Stages data from Supabase:", data);
-    
-    const legacyData: Record<string, { color: string; number: string }> = {};
-    try {
-      const stored = localStorage.getItem("office_stage_details");
-      if (stored) Object.assign(legacyData, JSON.parse(stored));
-    } catch (e) {
-      console.error("Error parsing localStorage data:", e);
-    }
-    
-    const mappedStages = Array.isArray(data) ? data.map(s => ({
+    const mappedStages = Array.isArray(data) ? data.map((s, idx) => ({
       ...s,
-      color: legacyData[s.id]?.color || COLORS[(s.order_index - 1) % COLORS.length] || "#4f46e5",
-      number: legacyData[s.id]?.number || String(s.order_index),
-      company_id: company.id
+      color: s.color || COLORS[(s.order_index - 1) % COLORS.length] || "#4f46e5",
+      number: s.number || String(s.order_index),
+      company_id: s.company_id || company.id,
     })) : [];
-    
-    console.log("Mapped stages:", mappedStages);
     setStages(mappedStages);
     setLoading(false);
   };
 
   useEffect(() => {
-    if (company) {
-      fetchStages();
-    } else {
-      setStages([]);
-    }
+    if (company) fetchStages();
+    else setStages([]);
   }, [company]);
 
   const persistLocalStageDetails = (id: string, color: string, number: string) => {
@@ -202,25 +182,21 @@ export const StagesTab = () => {
       toast.error("Error", { description: "No company found in context" });
       return;
     }
-    
     setLoading(true);
-    
+
     try {
       if (editingStage) {
         const { error } = await supabase
           .from("office_stages")
-          .update({ 
+          .update({
             name: values.name,
-            company_id: company.id 
+            color: values.color,
+            company_id: company.id,
           })
           .eq("id", editingStage.id)
           .eq("company_id", company.id);
-          
-        if (error) {
-          throw error;
-        }
-        
-        persistLocalStageDetails(editingStage.id, values.color, values.number);
+
+        if (error) throw error;
         toast.success("Stage updated");
       } else {
         const maxOrder = stages.length ? Math.max(...stages.map(s => s.order_index)) : 0;
@@ -229,25 +205,21 @@ export const StagesTab = () => {
           .insert({
             name: values.name,
             order_index: maxOrder + 1,
-            company_id: company.id
+            color: values.color,
+            company_id: company.id,
           })
           .select()
           .single();
-          
-        if (error || !data) {
-          throw error || new Error("No data returned from insertion");
-        }
-        
-        persistLocalStageDetails(data.id, values.color, values.number);
+
+        if (error || !data) throw error || new Error("No data returned from insertion");
         toast.success("Stage added");
       }
-      
       setOpen(false);
       form.reset();
       setEditingStage(null);
       await fetchStages();
     } catch (error: any) {
-      console.error("Error in stage operation:", error);
+      console.error(error);
       toast.error(error.message || "An error occurred");
     } finally {
       setLoading(false);

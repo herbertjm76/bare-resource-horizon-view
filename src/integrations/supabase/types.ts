@@ -341,6 +341,7 @@ export type Database = {
       }
       office_stages: {
         Row: {
+          color: string | null
           company_id: string | null
           created_at: string
           id: string
@@ -349,6 +350,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          color?: string | null
           company_id?: string | null
           created_at?: string
           id?: string
@@ -357,6 +359,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          color?: string | null
           company_id?: string | null
           created_at?: string
           id?: string
@@ -445,6 +448,7 @@ export type Database = {
       project_areas: {
         Row: {
           code: string
+          color: string | null
           company_id: string | null
           created_at: string
           emoji: string | null
@@ -454,6 +458,7 @@ export type Database = {
         }
         Insert: {
           code: string
+          color?: string | null
           company_id?: string | null
           created_at?: string
           emoji?: string | null
@@ -463,6 +468,7 @@ export type Database = {
         }
         Update: {
           code?: string
+          color?: string | null
           company_id?: string | null
           created_at?: string
           emoji?: string | null
