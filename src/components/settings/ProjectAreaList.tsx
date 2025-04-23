@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
@@ -50,15 +51,17 @@ export const ProjectAreaList: React.FC<ProjectAreaListProps> = ({
                   style={editMode && selected.includes(area.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div className="flex items-center gap-3">
-                    <span
+                    <div
                       className="font-bold px-3 py-1 rounded text-base"
                       style={{ 
                         backgroundColor: area.color || '#E5DEFF',
-                        color: '#000000'
+                        color: '#000000',
+                        minWidth: '3rem',
+                        textAlign: 'center'
                       }}
                     >
                       {area.code}
-                    </span>
+                    </div>
                     <span className="font-medium">{area.country}</span>
                     {area.city && <span className="ml-2 text-muted-foreground text-xs">{area.city}</span>}
                     <span className="bg-muted-foreground/10 px-2 py-0.5 rounded text-xs text-muted-foreground ml-2">
