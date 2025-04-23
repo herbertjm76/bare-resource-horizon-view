@@ -1,16 +1,10 @@
 
 import React from 'react';
 import { Check } from 'lucide-react';
+import { projectAreaColors } from './utils/colorUtils';
 
-// Color palette from the provided image
-export const colorPalette = [
-  // Row 1
-  '#F5A3B3', '#F48F8F', '#F47E63', '#F4A363', '#F4C463',
-  // Row 2
-  '#A8E6A8', '#89CFF0', '#6B8FF9', '#9B87F5', '#FFE082',
-  // Row 3
-  '#89E6CF', '#7ECFD6', '#FFF3D4', '#D2C0A7', '#FFE566'
-];
+// Export for direct access if needed
+export const colorPalette = projectAreaColors;
 
 interface ColorPickerProps {
   selectedColor: string;

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -6,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
 import { ProjectAreaFormValues, ProjectArea } from "./projectAreaTypes";
-import { colorPalette, ColorPicker } from './ColorPicker';
+import { ColorPicker, colorPalette } from './ColorPicker';
+import { getDefaultColor } from './utils/colorUtils';
 
 interface ProjectAreaFormProps {
   open: boolean;
@@ -25,13 +25,11 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
   onSubmit,
   onOpenChange,
 }) => {
-  // Initialize with first color if no color is set
   React.useEffect(() => {
     if (!form.getValues('color') && !editing?.color) {
       form.setValue('color', colorPalette[0]);
     } else if (editing?.color) {
-      // Make sure the editing color is set in the form
-      form.setValue('color', editing.color);
+      form.setValue('color', getDefaultColor(editing.color));
     }
   }, [form, editing]);
 

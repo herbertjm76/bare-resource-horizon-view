@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { toProjectArea } from '../projectAreaUtils';
+import { getDefaultColor } from '../utils/colorUtils';
 import type { ProjectAreaFormValues, ProjectArea } from "../projectAreaTypes";
 
 export async function fetchProjectAreas(companyId: string | undefined): Promise<ProjectArea[]> {
@@ -35,7 +36,7 @@ export async function createProjectArea(
     name: values.country,
     emoji: null,
     company_id: companyId,
-    color: values.color || "#E5DEFF" // Ensure color is included
+    color: getDefaultColor(values.color)
   };
 
   const { data, error } = await supabase
@@ -63,7 +64,7 @@ export async function updateProjectArea(
     code: values.code,
     name: values.country,
     company_id: companyId,
-    color: values.color || "#E5DEFF" // Ensure color is included
+    color: getDefaultColor(values.color)
   };
 
   const { error } = await supabase
