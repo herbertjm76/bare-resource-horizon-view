@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -36,7 +37,7 @@ export type ProjectForm = {
   country: string;
   profit: string;
   avgRate: string;
-  status: ProjectStatus | "";
+  status: ProjectStatus | string;
   office: string;
   stages: string[];
   stageFees: Record<string, {
@@ -183,13 +184,14 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
   };
 
   const isProjectInfoValid = () => {
+    // Update validation to accept 'none' as invalid
     return (
       !!form.code &&
       !!form.name &&
-      !!form.country &&
+      form.country && form.country !== 'none' &&
       !!form.profit &&
-      !!form.status &&
-      !!form.office
+      form.status && form.status !== 'none' &&
+      form.office && form.office !== 'none'
     );
   };
 
@@ -220,15 +222,20 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     }
     setIsLoading(true);
     try {
-      const projectStatus = form.status || "Planning";
+      // Make sure we're not submitting 'none' as a value to the database
+      const projectStatus = form.status === 'none' ? "Planning" : (form.status || "Planning");
+      const manager = form.manager === 'none' ? null : (form.manager === "not_assigned" ? null : (form.manager || null));
+      const country = form.country === 'none' ? null : form.country;
+      const office = form.office === 'none' ? null : form.office;
+      
       const { data, error } = await supabase.from('projects').insert({
         code: form.code,
         name: form.name,
         company_id: company.id,
-        project_manager_id: form.manager === "not_assigned" ? null : (form.manager || null),
-        office_id: form.office,
-        status: projectStatus,
-        country: form.country,
+        project_manager_id: manager,
+        office_id: office,
+        status: projectStatus as ProjectStatus,
+        country: country,
         target_profit_percentage: form.profit ? Number(form.profit) : null
       }).select();
 

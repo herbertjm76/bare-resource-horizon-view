@@ -64,7 +64,8 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
             <SelectValue placeholder="Select a project manager" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Select a project manager</SelectItem>
+            {/* Changed empty string to placeholder value */}
+            <SelectItem value="none">Select a project manager</SelectItem>
             <SelectItem value="not_assigned">Not Assigned</SelectItem>
             {managers.map((manager) => (
               <SelectItem key={manager.id} value={manager.id}>
@@ -88,7 +89,8 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
               <SelectValue placeholder="Select a country" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Select a country</SelectItem>
+              {/* Changed empty string to placeholder value */}
+              <SelectItem value="none">Select a country</SelectItem>
               {countries.map((country) => (
                 <SelectItem key={country} value={country}>
                   {country}
@@ -108,7 +110,8 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
               <SelectValue placeholder="Select an office" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Select an office</SelectItem>
+              {/* Changed empty string to placeholder value */}
+              <SelectItem value="none">Select an office</SelectItem>
               {offices.map((office) => (
                 <SelectItem key={office.id} value={office.id}>
                   {office.emoji ? `${office.emoji} ` : ''}{office.city}, {office.country}
@@ -137,7 +140,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         <div>
           <Label htmlFor="status">Status</Label>
           <Select
-            value={form.status || ""}
+            value={form.status || "none"}
             onValueChange={(value) => onChange("status", value)}
             required
           >
@@ -145,7 +148,8 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
               <SelectValue placeholder="Select a status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Select a status</SelectItem>
+              {/* Changed empty string to placeholder value */}
+              <SelectItem value="none">Select a status</SelectItem>
               {statusOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
