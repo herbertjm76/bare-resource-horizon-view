@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ColorPicker } from './ColorPicker';
 
 interface Stage {
   id: string;
@@ -76,7 +76,6 @@ export const StagesTab: React.FC = () => {
     }
     
     try {
-      // Get the next order index
       const nextOrderIndex = stages.length > 0 
         ? Math.max(...stages.map(stage => stage.order_index)) + 1 
         : 0;
@@ -191,23 +190,12 @@ export const StagesTab: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="stageColor" className="text-sm font-medium">
-                  Color
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    id="stageColor"
-                    value={newColor}
-                    onChange={(e) => setNewColor(e.target.value)}
-                    className="h-10 min-w-[3rem] cursor-pointer rounded border"
-                  />
-                  <Input 
-                    value={newColor} 
-                    onChange={(e) => setNewColor(e.target.value)}
-                    placeholder="#E5DEFF" 
-                  />
-                </div>
+                <label className="text-sm font-medium">Color</label>
+                <ColorPicker
+                  selectedColor={newColor}
+                  onColorChange={setNewColor}
+                  className="mt-2"
+                />
               </div>
               <div className="pt-4">
                 <Button onClick={addStage}>Add Stage</Button>
@@ -233,23 +221,12 @@ export const StagesTab: React.FC = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label htmlFor="editStageColor" className="text-sm font-medium">
-                  Color
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    id="editStageColor"
-                    value={editColor}
-                    onChange={(e) => setEditColor(e.target.value)}
-                    className="h-10 min-w-[3rem] cursor-pointer rounded border"
-                  />
-                  <Input 
-                    value={editColor} 
-                    onChange={(e) => setEditColor(e.target.value)}
-                    placeholder="#E5DEFF" 
-                  />
-                </div>
+                <label className="text-sm font-medium">Color</label>
+                <ColorPicker
+                  selectedColor={editColor}
+                  onColorChange={setEditColor}
+                  className="mt-2"
+                />
               </div>
               <div className="pt-4">
                 <Button onClick={updateStage}>Update Stage</Button>

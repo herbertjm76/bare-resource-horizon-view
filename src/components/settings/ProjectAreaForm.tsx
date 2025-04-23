@@ -1,43 +1,19 @@
 
-import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import CountrySelect from "@/components/ui/CountrySelect";
-import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
-import { getContinentByCountryCode } from "./projectAreaHelpers";
-import allCountries from "@/lib/allCountries.json";
-
-export type ProjectAreaFormValues = {
-  code: string;
-  country: string;
-  city?: string;
-  region: string;
-};
-
-export type ProjectArea = {
-  id: string;
-  code: string;
-  city?: string;
-  region: string;
-  country: string;
-};
+import { ProjectAreaFormValues, ProjectArea } from "./projectAreaTypes";
+import { colorPalette, ColorPicker } from './ColorPicker';
 
 interface ProjectAreaFormProps {
   open: boolean;
   loading: boolean;
   editing: ProjectArea | null;
   form: UseFormReturn<ProjectAreaFormValues>;
-  onSubmit: (values: ProjectAreaFormValues) => void;
+  onSubmit: (values: ProjectAreaFormValues) => Promise<void>;
   onOpenChange: (open: boolean) => void;
 }
 
@@ -49,35 +25,20 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
   onSubmit,
   onOpenChange,
 }) => {
-  // Auto-suggest region by continent, always, even if region is already filled
-  const handleCountryChange = (countryName: string, countryCode?: string) => {
-    form.setValue("country", countryName);
-
-    let suggestedRegion = "";
-
-    if (countryCode) {
-      suggestedRegion = getContinentByCountryCode(countryCode);
-    } else {
-      // Fallback to lookup by name in allCountries and then code
-      const country = allCountries.find(c => c.name === countryName);
-      if (country) {
-        suggestedRegion = getContinentByCountryCode(country.code);
-      }
+  // Initialize with first color if no color is set
+  React.useEffect(() => {
+    if (!form.getValues('color')) {
+      form.setValue('color', colorPalette[0]);
     }
-
-    if (suggestedRegion) {
-      form.setValue("region", suggestedRegion, { shouldValidate: true });
-    }
-  };
+  }, [form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         <DialogHeader>
-          <DialogTitle>{editing ? 'Edit' : 'Add'} Project Area</DialogTitle>
-          <DialogDescription>
-            Enter a code, country, city (optional), and assign region.
-          </DialogDescription>
+          <DialogTitle>
+            {editing ? 'Edit Project Area' : 'Add New Project Area'}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -86,13 +47,9 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
               name="code"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code</FormLabel>
+                  <FormLabel>Area Code</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Unique code"
-                      {...field}
-                      disabled={loading}
-                    />
+                    <Input placeholder="NYC" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -105,30 +62,7 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
                 <FormItem>
                   <FormLabel>Country</FormLabel>
                   <FormControl>
-                    <CountrySelect
-                      value={field.value}
-                      onChange={handleCountryChange}
-                      disabled={loading}
-                      placeholder="Select country"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="City (optional)"
-                      {...field}
-                      value={field.value || ""}
-                      disabled={loading}
-                    />
+                    <Input placeholder="United States" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -141,20 +75,47 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
                 <FormItem>
                   <FormLabel>Region</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Region"
-                      {...field}
-                      disabled={loading}
-                    />
+                    <Input placeholder="North America" {...field} />
                   </FormControl>
-                  <span className="text-xs text-muted-foreground">Region is auto-suggested based on country but can be edited.</span>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <DialogFooter>
-              <Button type="submit" disabled={loading}>{editing ? 'Update' : 'Add'} Area</Button>
-            </DialogFooter>
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>City (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="New York" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Color</FormLabel>
+                  <FormControl>
+                    <ColorPicker
+                      selectedColor={field.value || colorPalette[0]}
+                      onColorChange={(color) => field.onChange(color)}
+                      className="mt-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="pt-4">
+              <Button type="submit" disabled={loading}>
+                {editing ? 'Update Area' : 'Add Area'}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>
