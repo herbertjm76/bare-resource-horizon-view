@@ -1,4 +1,3 @@
-
 [
   { "code": "AF", "name": "Afghanistan" },
   { "code": "AX", "name": "Åland Islands" },
@@ -241,7 +240,7 @@
   { "code": "UZ", "name": "Uzbekistan" },
   { "code": "VU", "name": "Vanuatu" },
   { "code": "VE", "name": "Venezuela" },
-  { "code": "VN", "name": "Viet Nam" },
+  { "code": "VN", "name": "Vietnam" },
   { "code": "VG", "name": "Virgin Islands, British" },
   { "code": "VI", "name": "Virgin Islands, U.S." },
   { "code": "WF", "name": "Wallis and Futuna" },
