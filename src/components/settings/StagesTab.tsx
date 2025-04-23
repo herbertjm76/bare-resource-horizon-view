@@ -1,8 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, Check, Palette } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -16,7 +15,6 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
@@ -40,9 +38,19 @@ type Stage = {
   company_id?: string;
 };
 
-const colors = [
-  "#4f46e5", "#0ea5e9", "#10b981", "#f97316", "#ec4899", 
-  "#8b5cf6", "#d946ef", "#6366f1", "#0891b2", "#0d9488"
+const COLORS = [
+  // Purple
+  "#E5DEFF", "#1A1F2C",
+  // Green
+  "#F2FCE2", "#10b981",
+  // Orange
+  "#FEC6A1", "#F97316",
+  // Pink/Magenta
+  "#FFDEE2", "#D946EF",
+  // Blue
+  "#D3E4FD", "#0ea5e9",
+  // Red
+  "#FDE1D3", "#ea384c"
 ];
 
 const stageNumberOptions = [...Array(10).keys()].map(n => String(n + 1)).concat("NA");
@@ -60,7 +68,7 @@ export const StagesTab = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      color: "#4f46e5",
+      color: COLORS[0],
       number: ""
     }
   });
@@ -93,7 +101,6 @@ export const StagesTab = () => {
 
     console.log("Stages data from Supabase:", data);
     
-    // Use localStorage to hydrate color/number for legacy (not persisted)
     const legacyData: Record<string, { color: string; number: string }> = {};
     try {
       const stored = localStorage.getItem("office_stage_details");
@@ -104,7 +111,7 @@ export const StagesTab = () => {
     
     const mappedStages = Array.isArray(data) ? data.map(s => ({
       ...s,
-      color: legacyData[s.id]?.color || colors[(s.order_index - 1) % colors.length] || "#4f46e5",
+      color: legacyData[s.id]?.color || COLORS[(s.order_index - 1) % COLORS.length] || "#4f46e5",
       number: legacyData[s.id]?.number || String(s.order_index),
       company_id: company.id
     })) : [];
@@ -122,7 +129,6 @@ export const StagesTab = () => {
     }
   }, [company]);
 
-  // Save color/number to localStorage (since db doesn't have those columns)
   const persistLocalStageDetails = (id: string, color: string, number: string) => {
     let data: Record<string, { color: string; number: string }> = {};
     try {
@@ -153,7 +159,7 @@ export const StagesTab = () => {
     setEditingStage(stage);
     form.reset({
       name: stage.name,
-      color: stage.color || "#4f46e5",
+      color: stage.color || COLORS[0],
       number: stage.number || "",
       id: stage.id
     });
@@ -201,7 +207,6 @@ export const StagesTab = () => {
     
     try {
       if (editingStage) {
-        // Only the name is persisted, color/number is local
         const { error } = await supabase
           .from("office_stages")
           .update({ 
@@ -218,7 +223,6 @@ export const StagesTab = () => {
         persistLocalStageDetails(editingStage.id, values.color, values.number);
         toast.success("Stage updated");
       } else {
-        // Create in Supabase, then persist UI color/number
         const maxOrder = stages.length ? Math.max(...stages.map(s => s.order_index)) : 0;
         const { data, error } = await supabase
           .from("office_stages")
@@ -328,7 +332,6 @@ export const StagesTab = () => {
         </div>
       </CardContent>
 
-      {/* Add/Edit Dialog */}
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -376,37 +379,31 @@ export const StagesTab = () => {
                 name="color"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Color</FormLabel>
+                    <FormLabel>
+                      <span className="flex items-center gap-2">
+                        <Palette className="w-4 h-4" />
+                        Color
+                      </span>
+                    </FormLabel>
                     <FormControl>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            className="w-full justify-start text-left font-normal"
+                      <div className="grid grid-cols-6 gap-2 my-2">
+                        {COLORS.map((color) => (
+                          <button
+                            key={color}
+                            type="button"
+                            className={`w-7 h-7 rounded-full flex items-center justify-center border transition 
+                              ${field.value === color ? 'ring-2 ring-primary border-primary' : 'border-input'}
+                              hover:scale-105 focus:outline-none`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => field.onChange(color)}
+                            aria-label={color}
                           >
-                            <div className="flex items-center gap-2">
-                              <div 
-                                className="w-4 h-4 rounded-full" 
-                                style={{ backgroundColor: field.value }}
-                              />
-                              <span>{field.value}</span>
-                            </div>
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-64">
-                          <div className="grid grid-cols-5 gap-2">
-                            {colors.map((color) => (
-                              <button
-                                key={color}
-                                type="button"
-                                className={`w-8 h-8 rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${form.watch("color") === color ? "ring-2 ring-purple-500" : ""}`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => form.setValue('color', color)}
-                              />
-                            ))}
-                          </div>
-                        </PopoverContent>
-                      </Popover>
+                            {field.value === color && (
+                              <Check className="w-4 h-4 text-white drop-shadow" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
