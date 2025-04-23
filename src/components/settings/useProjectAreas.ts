@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -6,7 +7,6 @@ import { useCompany } from '@/context/CompanyContext';
 import type {
   ProjectAreaFormValues,
   ProjectArea,
-  ProjectAreaRow,
 } from "./projectAreaTypes";
 import { getAutoRegion, toProjectArea } from './projectAreaUtils';
 import { getPastelColor } from './projectAreaHelpers';
