@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -13,16 +14,13 @@ import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
 import type { Database } from "@/integrations/supabase/types";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import NewProjectStep1Info from "./NewProjectStep1Info";
-import NewProjectStep2Details from "./NewProjectStep2Details";
-import NewProjectStep3Stages from "./NewProjectStep3Stages";
-import NewProjectRateCalculator from "./NewProjectRateCalculator";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
 
 type RoleOption = { id: string; name: string };
 type OfficeOption = { id: string; city: string; country: string; code?: string; emoji?: string };
-type ProjectStageOption = { id: string; stage_name: string; };
 type OfficeStageOption = { id: string; name: string; };
-
 type ProjectStatus = Database["public"]["Enums"]["project_status"];
 
 const statusOptions = [
@@ -54,7 +52,6 @@ type NewProjectForm = {
 
 export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ onProjectCreated }) => {
   const [open, setOpen] = useState(false);
-  const [showRateCalc, setShowRateCalc] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
   const { company } = useCompany();
 
@@ -74,115 +71,51 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
   const [managers, setManagers] = useState<RoleOption[]>([]);
   const [countries, setCountries] = useState<string[]>([]);
   const [offices, setOffices] = useState<OfficeOption[]>([]);
-  const [projectStages, setProjectStages] = useState<ProjectStageOption[]>([]);
-  const [roles, setRoles] = useState<{ id: string; name: string; code: string; }[]>([]);
-  const [roleNumbers, setRoleNumbers] = useState<{ [roleId: string]: number }>({});
   const [officeStages, setOfficeStages] = useState<OfficeStageOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Fetch managers, country, offices, stages
   useEffect(() => {
     const fetchData = async () => {
-      console.log("Fetching data for new project dialog");
       if (!company || !company.id) {
         toast.error("No company context found, cannot load project resources.");
         return;
       }
       try {
-        const { data: mgrs, error: mgrsError } = await supabase
+        const { data: mgrs } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, role')
           .eq('role', 'member')
           .eq('company_id', company.id);
-        if (mgrsError) {
-          console.error("Error fetching managers:", mgrsError);
-          toast.error("Failed to load manager options");
-        } else {
-          setManagers(Array.isArray(mgrs)
-            ? mgrs.map((u) => ({ id: u.id, name: `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() }))
-            : []);
-        }
 
-        const { data: projectAreas, error: areasError } = await supabase
+        setManagers(Array.isArray(mgrs)
+          ? mgrs.map((u) => ({ id: u.id, name: `${u.first_name ?? ''} ${u.last_name ?? ''}`.trim() }))
+          : []);
+
+        const { data: projectAreas } = await supabase
           .from('project_areas')
           .select('name')
           .eq('company_id', company.id);
-        if (areasError) {
-          console.error("Error fetching project areas:", areasError);
-          toast.error("Failed to load country options");
-        } else {
-          const areaNames = Array.from(new Set(Array.isArray(projectAreas)
-            ? projectAreas.map(a => a.name).filter(Boolean)
-            : [])) as string[];
-          setCountries(areaNames);
-        }
 
-        const { data: locations, error: locationsError } = await supabase
+        const areaNames = Array.from(new Set(Array.isArray(projectAreas)
+          ? projectAreas.map(a => a.name).filter(Boolean)
+          : [])) as string[];
+        setCountries(areaNames);
+
+        const { data: locations } = await supabase
           .from('office_locations')
           .select('id, city, country, code, emoji')
           .eq('company_id', company.id);
-        if (locationsError) {
-          console.error("Error fetching office locations:", locationsError);
-          toast.error("Failed to load office options");
-        } else {
-          setOffices(Array.isArray(locations) ? locations : []);
-        }
 
-        const { data: projectStagesData, error: projectStagesError } = await supabase
-          .from('project_stages')
-          .select('id, stage_name')
-          .eq('company_id', company.id);
-        if (projectStagesError) {
-          console.error("Error fetching project stages:", projectStagesError);
-          toast.error("Failed to load project stage options");
-        } else {
-          setProjectStages(Array.isArray(projectStagesData) ? projectStagesData : []);
-        }
+        setOffices(Array.isArray(locations) ? locations : []);
 
-        const { data: officeRoles, error: officeRolesError } = await supabase
-          .from('office_roles')
-          .select('id, name, code')
-          .eq('company_id', company.id);
-        if (officeRolesError) {
-          console.error("Error fetching office roles:", officeRolesError);
-          toast.error("Failed to load office roles");
-        } else {
-          setRoles(Array.isArray(officeRoles) ? officeRoles : []);
-        }
-
-        const { data: officeRates, error: officeRatesError } = await supabase
-          .from('office_rates')
-          .select('id, type, value, unit, reference_id')
-          .eq('company_id', company.id);
-        if (officeRatesError) {
-          console.error("Error fetching office rates:", officeRatesError);
-          toast.error("Failed to load office rates");
-        } else {
-          // Optional: for further use/display in dialog
-        }
-
-        const { data: officeHolidays, error: officeHolidaysError } = await supabase
-          .from('office_holidays')
-          .select('id, name, date')
-          .eq('company_id', company.id);
-        if (officeHolidaysError) {
-          console.error("Error fetching office holidays:", officeHolidaysError);
-          toast.error("Failed to load office holiday options");
-        } else {
-          // Optional: for further use/display in dialog
-        }
-
-        const { data: officeStagesData, error: officeStagesError } = await supabase
+        const { data: officeStagesData } = await supabase
           .from('office_stages')
           .select('id, name')
           .eq('company_id', company.id);
-        if (officeStagesError) {
-          console.error("Error fetching office stages:", officeStagesError);
-          toast.error("Failed to load office stages");
-        } else {
-          setOfficeStages(Array.isArray(officeStagesData) ? officeStagesData : []);
-        }
+
+        setOfficeStages(Array.isArray(officeStagesData) ? officeStagesData : []);
       } catch (error) {
-        console.error("Error fetching project data:", error);
         toast.error("Failed to load project options");
       }
     };
@@ -192,16 +125,14 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     }
   }, [open, company]);
 
+  // --- FORM HANDLERS --- //
+
   const handleChange = (key: keyof NewProjectForm, value: any) => {
     setForm((f) => ({ ...f, [key]: value }));
-    
-    // Initialize stage fees when stages are selected
     if (key === 'stages') {
+      // (Re)initialize stageFees for selected stages
       const newStageFees: Record<string, any> = {};
-      
-      // Create entries for all selected stages
       value.forEach((stageId: string) => {
-        // Only create if it doesn't exist
         if (!form.stageFees[stageId]) {
           newStageFees[stageId] = {
             fee: '',
@@ -212,11 +143,9 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
             invoiceAge: 0
           };
         } else {
-          // Keep existing data
           newStageFees[stageId] = form.stageFees[stageId];
         }
       });
-      
       setForm(prev => ({
         ...prev,
         stageFees: newStageFees
@@ -224,131 +153,139 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     }
   };
 
-  const calculateAvgRate = () => {
-    let total = 0;
-    let count = 0;
-    roles.forEach(role => {
-      const num = roleNumbers[role.id] || 0;
-      if (num > 0) {
-        const dummyRate = 50;
-        total += dummyRate * num;
-        count += num;
-      }
-    });
-    return count > 0 ? (total / count).toFixed(2) : '';
-  };
-
+  // Set single stageFee fields, recalc hours/invoiceAge as needed
   const updateStageFee = (stageId: string, data: Partial<NewProjectForm['stageFees'][string]>) => {
-    setForm(prev => ({
-      ...prev,
-      stageFees: {
-        ...prev.stageFees,
-        [stageId]: {
-          ...prev.stageFees[stageId],
-          ...data
-        }
+    setForm(prev => {
+      // recalc hours if fee or avgRate changes
+      let hours = prev.stageFees[stageId]?.hours ?? '';
+      const feeVal = data.fee ?? prev.stageFees[stageId]?.fee ?? '';
+      const avgRateVal = prev.avgRate;
+      if ((data.fee || data.fee === '') && avgRateVal && parseFloat(avgRateVal) > 0 && parseFloat(feeVal) > 0) {
+        hours = (parseFloat(feeVal) / parseFloat(avgRateVal)).toFixed(2);
+      } else if (!parseFloat(feeVal) || !parseFloat(avgRateVal)) {
+        hours = '';
       }
-    }));
+      // recalc invoiceAge
+      let invoiceAge = prev.stageFees[stageId]?.invoiceAge ?? 0;
+      const invoiceDate = typeof data.invoiceDate !== "undefined" ? data.invoiceDate : prev.stageFees[stageId]?.invoiceDate;
+      if (invoiceDate instanceof Date && !isNaN(invoiceDate.getTime())) {
+        const now = new Date();
+        const diffTime = Math.abs(now.getTime() - invoiceDate.getTime());
+        invoiceAge = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      } else {
+        invoiceAge = 0;
+      }
+      return {
+        ...prev,
+        stageFees: {
+          ...prev.stageFees,
+          [stageId]: {
+            ...prev.stageFees[stageId],
+            ...data,
+            hours,
+            invoiceAge,
+          }
+        }
+      };
+    });
   };
 
-  const handleValidateTabs = () => {
-    if (activeTab === "info") {
-      if (!form.code || !form.name || !form.country || !form.profit || !form.status || !form.office || form.stages.length === 0) {
-        toast.error('Please fill in all required fields in the Info tab.');
-        return false;
-      }
-      return true;
-    }
-    
-    if (activeTab === "stageFees") {
-      // Check if any stage is missing fee
-      for (const stageId of form.stages) {
-        if (!form.stageFees[stageId]?.fee) {
-          toast.error('Please specify fees for all stages.');
-          return false;
-        }
-      }
-      return true;
-    }
-    
-    return true;
+  // --- TABS VALIDATION ---
+
+  const isProjectInfoValid = () => {
+    return (
+      !!form.code &&
+      !!form.name &&
+      !!form.country &&
+      !!form.profit &&
+      !!form.status &&
+      !!form.office
+    );
   };
 
-  const handleTabChange = (newTab: string) => {
-    if (handleValidateTabs()) {
-      setActiveTab(newTab);
-    }
+  const isStageFeesValid = () => {
+    return form.stages.every((stageId) => {
+      return !!form.stageFees[stageId]?.fee;
+    });
   };
+
+  const handleTabChange = (tab: string) => {
+    // Only Project Info tab is required
+    if (tab === "stageFees" && !isProjectInfoValid()) {
+      toast.error("Please fill in all required fields in Project Info before proceeding.");
+      return;
+    }
+    setActiveTab(tab);
+  };
+
+  // --- SUBMIT HANDLER ---
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!handleValidateTabs()) {
+    if (!isProjectInfoValid()) {
+      toast.error("Please complete all required fields.");
+      setActiveTab("info");
       return;
     }
-    
     if (!company || !company.id) {
-      toast.error('No company found for your user. Cannot create project.');
+      toast.error('No company context found.');
       return;
     }
-    
     setIsLoading(true);
     try {
-      // Create project
+      // The status must always be a project_status type, never ""
+      const projectStatus = form.status || "Planning";
+      // Insert project
       const { data, error } = await supabase.from('projects').insert({
         code: form.code,
         name: form.name,
         company_id: company.id,
         project_manager_id: form.manager === "not_assigned" ? null : (form.manager || null),
         office_id: form.office,
-        status: form.status,
+        status: projectStatus,
         country: form.country,
         target_profit_percentage: form.profit ? Number(form.profit) : null
       }).select();
-      
+
       if (error) throw error;
-      
-      const projectId = data[0].id;
-      
-      // Create stage fees
-      const stageFeesPromises = form.stages.map(stageId => {
-        const stageFee = form.stageFees[stageId];
-        return supabase.from('project_stages').insert({
-          project_id: projectId,
-          company_id: company.id,
-          stage_name: officeStages.find(s => s.id === stageId)?.name || 'Unknown Stage',
-          fee: stageFee?.fee ? parseFloat(stageFee.fee) : 0
+      const projectId = data?.[0]?.id;
+
+      // Insert stage fees
+      if (projectId && form.stages.length) {
+        const stageFeesPromises = form.stages.map(stageId => {
+          const feeObj = form.stageFees[stageId];
+          return supabase.from('project_stages').insert({
+            project_id: projectId,
+            company_id: company.id,
+            stage_name: officeStages.find(s => s.id === stageId)?.name ?? "Unknown Stage",
+            fee: feeObj?.fee ? parseFloat(feeObj.fee) : 0
+          });
         });
-      });
-      
-      await Promise.all(stageFeesPromises);
-      
+        await Promise.all(stageFeesPromises);
+      }
+
       setOpen(false);
       toast.success('Project successfully created!');
       setForm({
-        code: "", name: "", manager: "", country: "", 
+        code: "", name: "", manager: "", country: "",
         profit: "", avgRate: "", status: "", office: "", stages: [],
         stageFees: {}
       });
       setActiveTab("info");
-      
       if (typeof onProjectCreated === 'function') {
         onProjectCreated();
       }
     } catch (error: any) {
-      console.error("Error creating project:", error);
       toast.error("Failed to create project: " + (error.message || "Unknown error"));
     } finally {
       setIsLoading(false);
     }
   };
 
+  // --- UI ---
+
   return (
-    <Dialog open={open} onOpenChange={(o) => { 
-      if (!o) setActiveTab("info");
-      setOpen(o); 
-      setShowRateCalc(false); 
-    }}>
+    <Dialog open={open} onOpenChange={(o) => { if (!o) setActiveTab("info"); setOpen(o); }}>
       <DialogTrigger asChild>
         <Button size="sm" variant="default">
           <PlusCircle className="h-4 w-4 mr-2" />
@@ -361,45 +298,186 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
             Add New Project
           </DialogTitle>
         </DialogHeader>
-        
         <form onSubmit={onSubmit}>
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4">
-            <TabsList className="w-full grid grid-cols-3">
+          <Tabs value={activeTab} onValueChange={handleTabChange}>
+            <TabsList className="w-full grid grid-cols-3 mb-6">
               <TabsTrigger value="info">Project Info</TabsTrigger>
               <TabsTrigger value="stageFees">Stage Fees</TabsTrigger>
-              <TabsTrigger value="resources">Resources</TabsTrigger>
+              <TabsTrigger value="financial">Financial Info</TabsTrigger>
             </TabsList>
-            
+
+            {/* TAB 1: PROJECT INFO */}
             <TabsContent value="info">
-              <NewProjectStep1Info 
-                form={form}
-                managers={managers}
-                countries={countries}
-                offices={offices}
-                officeStages={officeStages}
-                statusOptions={statusOptions}
-                onChange={handleChange}
-              />
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="code">Project Code *</Label>
+                    <Input
+                      id="code"
+                      placeholder="P001"
+                      value={form.code}
+                      onChange={e => handleChange("code", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="name">Project Name *</Label>
+                    <Input
+                      id="name"
+                      placeholder="New Project"
+                      value={form.name}
+                      onChange={e => handleChange("name", e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="country">Country *</Label>
+                    <select
+                      id="country"
+                      value={form.country}
+                      onChange={e => handleChange("country", e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      required
+                    >
+                      <option value="">Select a country</option>
+                      {countries.map(country => (
+                        <option key={country} value={country}>{country}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="office">Office *</Label>
+                    <select
+                      id="office"
+                      value={form.office}
+                      onChange={e => handleChange("office", e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      required
+                    >
+                      <option value="">Select an office</option>
+                      {offices.map(office => (
+                        <option key={office.id} value={office.id}>
+                          {office.emoji ? `${office.emoji} ` : ''}{office.city}, {office.country}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="manager">Project Manager</Label>
+                    <select
+                      id="manager"
+                      value={form.manager}
+                      onChange={e => handleChange("manager", e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <option value="">Select a project manager</option>
+                      <option value="not_assigned">Not Assigned</option>
+                      {managers.map(mgr =>
+                        <option key={mgr.id} value={mgr.id}>{mgr.name}</option>
+                      )}
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="status">Status *</Label>
+                    <select
+                      id="status"
+                      value={form.status || ""}
+                      onChange={e => handleChange("status", e.target.value as ProjectStatus)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      required
+                    >
+                      <option value="">Select a status</option>
+                      {statusOptions.map(opt =>
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      )}
+                    </select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="profit">Target Profit % *</Label>
+                    <Input
+                      id="profit"
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={form.profit}
+                      placeholder="30"
+                      onChange={e => handleChange("profit", e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="avgRate">Average Rate (optional)</Label>
+                    <Input
+                      id="avgRate"
+                      type="number"
+                      min={0}
+                      value={form.avgRate}
+                      placeholder="50"
+                      onChange={e => handleChange("avgRate", e.target.value)}
+                    />
+                  </div>
+                </div>
+                {/* Stages */}
+                <div>
+                  <Label>Project Stages</Label>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {officeStages.map(stage => (
+                      <label
+                        key={stage.id}
+                        className={`px-3 py-2 border rounded-md cursor-pointer transition-colors duration-200 ${
+                          form.stages.includes(stage.id)
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-background border-input hover:bg-muted'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          className="sr-only"
+                          checked={form.stages.includes(stage.id)}
+                          onChange={e => {
+                            const updatedStages = e.target.checked
+                              ? [...form.stages, stage.id]
+                              : form.stages.filter(id => id !== stage.id);
+                            handleChange("stages", updatedStages);
+                          }}
+                        />
+                        {stage.name}
+                      </label>
+                    ))}
+                  </div>
+                  {officeStages.length === 0 && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      No stages defined. Please add stages in office settings.
+                    </p>
+                  )}
+                </div>
+              </div>
             </TabsContent>
-            
+
+            {/* TAB 2: STAGE FEES */}
             <TabsContent value="stageFees">
-              <div className="space-y-6 py-4">
+              <div className="space-y-6 py-2">
                 {form.stages.length === 0 ? (
                   <div className="py-6 text-center">
                     <p className="text-muted-foreground">Please select project stages in the Info tab first.</p>
                   </div>
                 ) : (
-                  <>
+                  <div>
                     <div className="mb-4">
-                      <h3 className="text-lg font-medium">Fee Structure</h3>
+                      <h3 className="text-lg font-medium">Stage Fees</h3>
                       <p className="text-sm text-muted-foreground">
-                        Define fees and billing information for each project stage
+                        Set fee and billing info for each stage.
                       </p>
                     </div>
-                    
                     {form.stages.map(stageId => {
-                      const stageName = officeStages.find(stage => stage.id === stageId)?.name || 'Unknown Stage';
-                      const stageFeeData = form.stageFees[stageId] || {
+                      const stage = officeStages.find(s => s.id === stageId);
+                      const stageData = form.stageFees[stageId] || {
                         fee: '',
                         billingMonth: '',
                         status: 'Not Billed',
@@ -407,89 +485,49 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
                         hours: '',
                         invoiceAge: 0
                       };
-                      
-                      // Calculate hours based on fee and average rate
-                      const calculateHours = (fee: string): string => {
-                        if (!fee || !form.avgRate || parseFloat(form.avgRate) === 0) return '';
-                        
-                        const feeValue = parseFloat(fee);
-                        const rateValue = parseFloat(form.avgRate);
-                        
-                        if (isNaN(feeValue) || isNaN(rateValue) || rateValue === 0) return '';
-                        
-                        return (feeValue / rateValue).toFixed(2);
-                      };
-                      
-                      // Calculate invoice age based on invoice date
-                      const calculateInvoiceAge = (invoiceDate: Date | null): number => {
-                        if (!invoiceDate) return 0;
-                        
-                        const today = new Date();
-                        const diffTime = Math.abs(today.getTime() - invoiceDate.getTime());
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                        return diffDays;
-                      };
-                      
-                      // Update calculated values
-                      const hours = calculateHours(stageFeeData.fee);
-                      const invoiceAge = calculateInvoiceAge(stageFeeData.invoiceDate);
-                      
-                      if (hours !== stageFeeData.hours) {
-                        updateStageFee(stageId, { hours });
-                      }
-                      
-                      if (invoiceAge !== stageFeeData.invoiceAge) {
-                        updateStageFee(stageId, { invoiceAge });
-                      }
-                      
                       return (
                         <div key={stageId} className="border p-4 rounded-lg mb-4">
-                          <h4 className="font-semibold mb-4">{stageName}</h4>
-                          
-                          <div className="grid grid-cols-2 gap-4 mb-4">
+                          <h4 className="font-semibold mb-3">{stage?.name ?? "Unknown Stage"}</h4>
+                          <div className="grid grid-cols-2 gap-4 mb-2">
                             <div>
                               <Label htmlFor={`fee-${stageId}`}>Fee</Label>
-                              <input
+                              <Input
                                 id={`fee-${stageId}`}
                                 type="number"
                                 placeholder="0.00"
-                                value={stageFeeData.fee}
-                                onChange={(e) => updateStageFee(stageId, { fee: e.target.value })}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={stageData.fee}
+                                onChange={e => updateStageFee(stageId, { fee: e.target.value })}
                               />
                             </div>
                             <div>
-                              <Label htmlFor={`hours-${stageId}`}>Hours</Label>
-                              <input
+                              <Label htmlFor={`hours-${stageId}`}>Hours (Fee/Rate)</Label>
+                              <Input
                                 id={`hours-${stageId}`}
-                                value={hours}
+                                value={stageData.hours || ""}
                                 readOnly
                                 disabled
-                                className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                               />
                             </div>
                           </div>
-                          
-                          <div className="grid grid-cols-2 gap-4 mb-4">
+                          <div className="grid grid-cols-2 gap-4 mb-2">
                             <div>
                               <Label htmlFor={`billingMonth-${stageId}`}>Billing Month</Label>
-                              <input
+                              <Input
                                 id={`billingMonth-${stageId}`}
-                                placeholder="e.g., April 2025"
-                                value={stageFeeData.billingMonth}
-                                onChange={(e) => updateStageFee(stageId, { billingMonth: e.target.value })}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={stageData.billingMonth}
+                                placeholder="e.g. April 2025"
+                                onChange={e => updateStageFee(stageId, { billingMonth: e.target.value })}
                               />
                             </div>
                             <div>
                               <Label htmlFor={`status-${stageId}`}>Status</Label>
                               <select
                                 id={`status-${stageId}`}
-                                value={stageFeeData.status}
-                                onChange={(e) => updateStageFee(stageId, { 
-                                  status: e.target.value as "Not Billed" | "Invoiced" | "Paid" | "" 
-                                })}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                value={stageData.status}
+                                onChange={e =>
+                                  updateStageFee(stageId, { status: e.target.value as "Not Billed" | "Invoiced" | "Paid" | "" })
+                                }
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                               >
                                 <option value="Not Billed">Not Billed</option>
                                 <option value="Invoiced">Invoiced</option>
@@ -497,104 +535,51 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
                               </select>
                             </div>
                           </div>
-                          
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <Label>Invoice Date</Label>
-                              <input
+                              <Label htmlFor={`invoiceDate-${stageId}`}>Invoice Issued Date</Label>
+                              <Input
+                                id={`invoiceDate-${stageId}`}
                                 type="date"
-                                value={stageFeeData.invoiceDate ? new Date(stageFeeData.invoiceDate).toISOString().split('T')[0] : ''}
-                                onChange={(e) => {
+                                value={stageData.invoiceDate ? new Date(stageData.invoiceDate).toISOString().split('T')[0] : ''}
+                                onChange={e => {
                                   const date = e.target.value ? new Date(e.target.value) : null;
-                                  updateStageFee(stageId, { 
-                                    invoiceDate: date,
-                                    invoiceAge: date ? calculateInvoiceAge(date) : 0
-                                  });
+                                  updateStageFee(stageId, { invoiceDate: date });
                                 }}
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                               />
                             </div>
                             <div>
                               <Label htmlFor={`invoiceAge-${stageId}`}>Invoice Age (Days)</Label>
-                              <input
+                              <Input
                                 id={`invoiceAge-${stageId}`}
-                                value={invoiceAge}
+                                value={stageData.invoiceAge}
                                 readOnly
                                 disabled
-                                className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                               />
                             </div>
                           </div>
                         </div>
                       );
                     })}
-                  </>
+                  </div>
                 )}
               </div>
             </TabsContent>
-            
-            <TabsContent value="resources">
-              <div className="space-y-6 py-4">
-                <div className="mb-4">
-                  <h3 className="text-lg font-medium">Project Resources</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Allocate resources to the project
-                  </p>
-                </div>
-                
-                <div className="text-center py-8 border rounded-md bg-muted/10">
-                  <p className="text-muted-foreground">Resource allocation will be available in a future update</p>
-                </div>
+
+            {/* TAB 3: FINANCIAL INFO */}
+            <TabsContent value="financial">
+              <div className="py-8 text-center text-muted-foreground">
+                Financial project info coming soon.
               </div>
             </TabsContent>
           </Tabs>
-          
-          <div className="flex justify-between mt-8">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => {
-                if (activeTab === "info") return;
-                if (activeTab === "stageFees") handleTabChange("info");
-                if (activeTab === "resources") handleTabChange("stageFees");
-              }}
-              disabled={activeTab === "info"}
-            >
-              Previous
+          {/* Bottom buttons */}
+          <div className="flex justify-end mt-8">
+            <Button type="submit" variant="default" disabled={isLoading}>
+              {isLoading ? "Creating..." : "Create Project"}
             </Button>
-            
-            {activeTab !== "resources" ? (
-              <Button
-                type="button"
-                variant="default"
-                onClick={() => {
-                  if (activeTab === "info") handleTabChange("stageFees");
-                  if (activeTab === "stageFees") handleTabChange("resources");
-                }}
-              >
-                Next
-              </Button>
-            ) : (
-              <Button type="submit" variant="default" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create Project"}
-              </Button>
-            )}
           </div>
         </form>
-        
-        {showRateCalc && (
-          <NewProjectRateCalculator
-            roles={roles}
-            roleNumbers={roleNumbers}
-            setRoleNumbers={setRoleNumbers}
-            calculateAvgRate={calculateAvgRate}
-            onCancel={() => setShowRateCalc(false)}
-            onApply={rate => {
-              handleChange('avgRate', rate);
-              setShowRateCalc(false);
-            }}
-          />
-        )}
       </DialogContent>
     </Dialog>
   );
