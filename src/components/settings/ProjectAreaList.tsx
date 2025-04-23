@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
@@ -52,13 +51,7 @@ export const ProjectAreaList: React.FC<ProjectAreaListProps> = ({
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="font-bold px-3 py-1 rounded text-base"
-                      style={{ 
-                        backgroundColor: area.color || '#E5DEFF',
-                        color: '#000000',
-                        minWidth: '3rem',
-                        textAlign: 'center'
-                      }}
+                      className="font-bold px-3 py-1 rounded text-base text-black"
                     >
                       {area.code}
                     </div>
