@@ -165,46 +165,13 @@ export const StagesTab: React.FC = () => {
         </div>
         
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" size="sm" className="gap-2">
             <Edit className="h-4 w-4" /> Edit
           </Button>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                Add Stage
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Project Stage</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <label htmlFor="stageName" className="text-sm font-medium">
-                    Stage Name
-                  </label>
-                  <Input
-                    id="stageName"
-                    value={newStage}
-                    onChange={(e) => setNewStage(e.target.value)}
-                    placeholder="e.g., Schematic Design"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Color</label>
-                  <ColorPicker
-                    selectedColor={newColor}
-                    onColorChange={setNewColor}
-                    className="mt-2"
-                  />
-                </div>
-                <div className="pt-4">
-                  <Button onClick={addStage}>Add Stage</Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button size="sm" className="gap-2">
+            <Plus className="h-4 w-4" />
+            Add Stage
+          </Button>
         </div>
       </div>
 
