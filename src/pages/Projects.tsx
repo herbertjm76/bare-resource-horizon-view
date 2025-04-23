@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { ProjectsList } from '@/components/projects/ProjectsList';
+import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 
 const HEADER_HEIGHT = 56;
 
@@ -21,7 +23,9 @@ const Projects = () => {
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold tracking-tight text-[#6E59A5]">Projects</h1>
               </div>
-              <ProjectsList />
+              <OfficeSettingsProvider>
+                <ProjectsList />
+              </OfficeSettingsProvider>
             </div>
           </div>
         </div>
