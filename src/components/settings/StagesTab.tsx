@@ -2,18 +2,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { Edit, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { ColorPicker } from './ColorPicker';
 import { defaultStageColor } from './utils/stageColorUtils';
 
@@ -164,133 +156,124 @@ export const StagesTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Project Stages</h2>
-        
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button variant="default">
-              <PlusCircle className="w-4 h-4 mr-2" />
-              Add Stage
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Project Stage</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <label htmlFor="stageName" className="text-sm font-medium">
-                  Stage Name
-                </label>
-                <Input
-                  id="stageName"
-                  value={newStage}
-                  onChange={(e) => setNewStage(e.target.value)}
-                  placeholder="e.g., Schematic Design"
-                />
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h2 className="text-2xl font-bold text-[#6E59A5] mb-1">Project Stages</h2>
+            <p className="text-muted-foreground">
+              Track and manage the different stages of your projects, from initiation to completion
+            </p>
+          </div>
+          
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                Add Stage
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Project Stage</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <div className="space-y-2">
+                  <label htmlFor="stageName" className="text-sm font-medium">
+                    Stage Name
+                  </label>
+                  <Input
+                    id="stageName"
+                    value={newStage}
+                    onChange={(e) => setNewStage(e.target.value)}
+                    placeholder="e.g., Schematic Design"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Color</label>
+                  <ColorPicker
+                    selectedColor={newColor}
+                    onColorChange={setNewColor}
+                    className="mt-2"
+                  />
+                </div>
+                <div className="pt-4">
+                  <Button onClick={addStage}>Add Stage</Button>
+                </div>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Color</label>
-                <ColorPicker
-                  selectedColor={newColor}
-                  onColorChange={setNewColor}
-                  className="mt-2"
-                />
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {loading ? (
+          <div className="text-center py-10">Loading stages...</div>
+        ) : stages.length === 0 ? (
+          <div className="text-center py-10 border rounded-md border-dashed">
+            No project stages defined yet. Click 'Add Stage' to create your first project stage.
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {stages.map((stage) => (
+              <div
+                key={stage.id}
+                className="flex items-center justify-between p-4 border rounded-md hover:bg-accent/50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-12 h-12 rounded flex items-center justify-center text-sm font-medium"
+                    style={{ backgroundColor: stage.color || defaultStageColor }}
+                  >
+                    {stage.name.substring(0, 2).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="font-medium">{stage.name}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Order: {stage.order_index + 1}
+                    </div>
+                  </div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => openEditDialog(stage)}
+                >
+                  <Edit className="h-4 w-4" />
+                </Button>
               </div>
-              <div className="pt-4">
-                <Button onClick={addStage}>Add Stage</Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-        
-        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Project Stage</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <label htmlFor="editStageName" className="text-sm font-medium">
-                  Stage Name
-                </label>
-                <Input
-                  id="editStageName"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Color</label>
-                <ColorPicker
-                  selectedColor={editColor}
-                  onColorChange={setEditColor}
-                  className="mt-2"
-                />
-              </div>
-              <div className="pt-4">
-                <Button onClick={updateStage}>Update Stage</Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            ))}
+          </div>
+        )}
       </div>
       
-      {loading ? (
-        <div className="text-center py-10">Loading stages...</div>
-      ) : stages.length === 0 ? (
-        <div className="text-center py-10 border rounded-md border-dashed">
-          No project stages defined yet. Click 'Add Stage' to create your first project stage.
-        </div>
-      ) : (
-        <div className="border rounded-md overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Color</TableHead>
-                <TableHead className="w-[100px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {stages.map((stage) => (
-                <TableRow key={stage.id}>
-                  <TableCell className="font-medium">{stage.name}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-6 h-6 rounded" 
-                        style={{ backgroundColor: stage.color || defaultStageColor }} 
-                      />
-                      <span>{stage.color || defaultStageColor}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => openEditDialog(stage)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => deleteStage(stage.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Project Stage</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <label htmlFor="editStageName" className="text-sm font-medium">
+                Stage Name
+              </label>
+              <Input
+                id="editStageName"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Color</label>
+              <ColorPicker
+                selectedColor={editColor}
+                onColorChange={setEditColor}
+                className="mt-2"
+              />
+            </div>
+            <div className="pt-4">
+              <Button onClick={updateStage}>Update Stage</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
