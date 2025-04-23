@@ -1,3 +1,4 @@
+
 [
   { "code": "AF", "name": "Afghanistan" },
   { "code": "AX", "name": "Åland Islands" },
@@ -130,7 +131,7 @@
   { "code": "LT", "name": "Lithuania" },
   { "code": "LU", "name": "Luxembourg" },
   { "code": "MO", "name": "Macao" },
-  { "code": "MK", "name": "Macedonia, The Former Yugoslav Republic of" },
+  { "code": "MK", "name": "North Macedonia" },
   { "code": "MG", "name": "Madagascar" },
   { "code": "MW", "name": "Malawi" },
   { "code": "MY", "name": "Malaysia" },
@@ -212,7 +213,7 @@
   { "code": "SD", "name": "Sudan" },
   { "code": "SR", "name": "Suriname" },
   { "code": "SJ", "name": "Svalbard and Jan Mayen" },
-  { "code": "SZ", "name": "Swaziland" },
+  { "code": "SZ", "name": "Eswatini" },
   { "code": "SE", "name": "Sweden" },
   { "code": "CH", "name": "Switzerland" },
   { "code": "SY", "name": "Syrian Arab Republic" },
