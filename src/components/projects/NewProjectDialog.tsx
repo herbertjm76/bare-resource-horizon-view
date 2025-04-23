@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
 import type { Database } from "@/integrations/supabase/types";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import NewProjectStep1Info from "./NewProjectStep1Info";
 import NewProjectStep2Details from "./NewProjectStep2Details";
 import NewProjectStep3Stages from "./NewProjectStep3Stages";
@@ -41,13 +42,20 @@ type NewProjectForm = {
   status: ProjectStatus | "";
   office: string;
   stages: string[];
+  stageFees: Record<string, {
+    fee: string;
+    billingMonth: string;
+    status: "Not Billed" | "Invoiced" | "Paid" | "";
+    invoiceDate: Date | null;
+    hours: string;
+    invoiceAge: number;
+  }>;
 };
 
 export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ onProjectCreated }) => {
   const [open, setOpen] = useState(false);
   const [showRateCalc, setShowRateCalc] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
+  const [activeTab, setActiveTab] = useState("info");
   const { company } = useCompany();
 
   const [form, setForm] = useState<NewProjectForm>({
@@ -60,6 +68,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     status: "",
     office: "",
     stages: [],
+    stageFees: {},
   });
 
   const [managers, setManagers] = useState<RoleOption[]>([]);
@@ -183,7 +192,37 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     }
   }, [open, company]);
 
-  const handleChange = (key: keyof NewProjectForm, value: any) => setForm((f) => ({ ...f, [key]: value }));
+  const handleChange = (key: keyof NewProjectForm, value: any) => {
+    setForm((f) => ({ ...f, [key]: value }));
+    
+    // Initialize stage fees when stages are selected
+    if (key === 'stages') {
+      const newStageFees: Record<string, any> = {};
+      
+      // Create entries for all selected stages
+      value.forEach((stageId: string) => {
+        // Only create if it doesn't exist
+        if (!form.stageFees[stageId]) {
+          newStageFees[stageId] = {
+            fee: '',
+            billingMonth: '',
+            status: 'Not Billed',
+            invoiceDate: null,
+            hours: '',
+            invoiceAge: 0
+          };
+        } else {
+          // Keep existing data
+          newStageFees[stageId] = form.stageFees[stageId];
+        }
+      });
+      
+      setForm(prev => ({
+        ...prev,
+        stageFees: newStageFees
+      }));
+    }
+  };
 
   const calculateAvgRate = () => {
     let total = 0;
@@ -199,42 +238,55 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     return count > 0 ? (total / count).toFixed(2) : '';
   };
 
-  const validateStep = (step: number): boolean => {
-    switch(step) {
-      case 1:
-        return !!form.code && !!form.name;
-      case 2:
-        return !!form.country && !!form.profit && !!form.avgRate && !!form.status && !!form.office;
-      case 3:
-        return form.stages.length > 0;
-      default:
-        return true;
-    }
+  const updateStageFee = (stageId: string, data: Partial<NewProjectForm['stageFees'][string]>) => {
+    setForm(prev => ({
+      ...prev,
+      stageFees: {
+        ...prev.stageFees,
+        [stageId]: {
+          ...prev.stageFees[stageId],
+          ...data
+        }
+      }
+    }));
   };
 
-  const goToNextStep = () => {
-    if (!validateStep(currentStep)) {
-      toast.error("Please fill all required fields in this section");
-      return;
+  const handleValidateTabs = () => {
+    if (activeTab === "info") {
+      if (!form.code || !form.name || !form.country || !form.profit || !form.status || !form.office || form.stages.length === 0) {
+        toast.error('Please fill in all required fields in the Info tab.');
+        return false;
+      }
+      return true;
     }
-    if (currentStep < totalSteps) {
-      setCurrentStep(curr => curr + 1);
+    
+    if (activeTab === "stageFees") {
+      // Check if any stage is missing fee
+      for (const stageId of form.stages) {
+        if (!form.stageFees[stageId]?.fee) {
+          toast.error('Please specify fees for all stages.');
+          return false;
+        }
+      }
+      return true;
     }
+    
+    return true;
   };
 
-  const goToPrevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(curr => curr - 1);
+  const handleTabChange = (newTab: string) => {
+    if (handleValidateTabs()) {
+      setActiveTab(newTab);
     }
   };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.code || !form.name || !form.country || !form.profit || !form.avgRate || !form.status || !form.office || form.stages.length === 0) {
-      toast.error('Please fill in all required fields.');
+    
+    if (!handleValidateTabs()) {
       return;
     }
-
+    
     if (!company || !company.id) {
       toast.error('No company found for your user. Cannot create project.');
       return;
@@ -242,6 +294,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     
     setIsLoading(true);
     try {
+      // Create project
       const { data, error } = await supabase.from('projects').insert({
         code: form.code,
         name: form.name,
@@ -253,23 +306,38 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         target_profit_percentage: form.profit ? Number(form.profit) : null
       }).select();
       
-      if (error) {
-        toast.error('Failed to create project: ' + error.message);
-        return;
-      }
-
+      if (error) throw error;
+      
+      const projectId = data[0].id;
+      
+      // Create stage fees
+      const stageFeesPromises = form.stages.map(stageId => {
+        const stageFee = form.stageFees[stageId];
+        return supabase.from('project_stages').insert({
+          project_id: projectId,
+          company_id: company.id,
+          stage_name: officeStages.find(s => s.id === stageId)?.name || 'Unknown Stage',
+          fee: stageFee?.fee ? parseFloat(stageFee.fee) : 0
+        });
+      });
+      
+      await Promise.all(stageFeesPromises);
+      
       setOpen(false);
       toast.success('Project successfully created!');
       setForm({
         code: "", name: "", manager: "", country: "", 
         profit: "", avgRate: "", status: "", office: "", stages: [],
+        stageFees: {}
       });
-      setCurrentStep(1);
+      setActiveTab("info");
+      
       if (typeof onProjectCreated === 'function') {
         onProjectCreated();
       }
-    } catch (error) {
-      toast.error("Failed to create project");
+    } catch (error: any) {
+      console.error("Error creating project:", error);
+      toast.error("Failed to create project: " + (error.message || "Unknown error"));
     } finally {
       setIsLoading(false);
     }
@@ -277,7 +345,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
 
   return (
     <Dialog open={open} onOpenChange={(o) => { 
-      if (!o) setCurrentStep(1);
+      if (!o) setActiveTab("info");
       setOpen(o); 
       setShowRateCalc(false); 
     }}>
@@ -294,62 +362,216 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
           </DialogTitle>
         </DialogHeader>
         
-        <div className="flex items-center justify-between mb-6">
-          {Array.from({ length: totalSteps }).map((_, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <div 
-                className={`w-8 h-8 flex items-center justify-center rounded-full border-2 mb-1
-                  ${i + 1 === currentStep 
-                    ? 'bg-[#6E59A5] text-white border-[#6E59A5]' 
-                    : i + 1 < currentStep 
-                      ? 'bg-[#D6BCFA] border-[#6E59A5] text-[#6E59A5]' 
-                      : 'bg-white border-gray-300 text-gray-500'}`}
-              >
-                {i + 1}
-              </div>
-              <div className={`text-xs font-medium ${i + 1 === currentStep ? 'text-[#6E59A5]' : 'text-gray-500'}`}>
-                {i === 0 ? 'Info' : i === 1 ? 'Details' : 'Stages'}
-              </div>
-            </div>
-          ))}
-        </div>
-        
         <form onSubmit={onSubmit}>
-          {currentStep === 1 && (
-            <NewProjectStep1Info 
-              form={form}
-              managers={managers}
-              onChange={handleChange}
-            />
-          )}
-          {currentStep === 2 && (
-            <NewProjectStep2Details
-              form={form}
-              countries={countries}
-              offices={offices}
-              statusOptions={statusOptions}
-              onChange={handleChange}
-              onShowRateCalc={() => setShowRateCalc(true)}
-            />
-          )}
-          {currentStep === 3 && (
-            <NewProjectStep3Stages
-              stages={form.stages}
-              setStages={value => handleChange('stages', value)}
-              officeStages={officeStages}
-            />
-          )}
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="mt-4">
+            <TabsList className="w-full grid grid-cols-3">
+              <TabsTrigger value="info">Project Info</TabsTrigger>
+              <TabsTrigger value="stageFees">Stage Fees</TabsTrigger>
+              <TabsTrigger value="resources">Resources</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="info">
+              <NewProjectStep1Info 
+                form={form}
+                managers={managers}
+                countries={countries}
+                offices={offices}
+                officeStages={officeStages}
+                statusOptions={statusOptions}
+                onChange={handleChange}
+              />
+            </TabsContent>
+            
+            <TabsContent value="stageFees">
+              <div className="space-y-6 py-4">
+                {form.stages.length === 0 ? (
+                  <div className="py-6 text-center">
+                    <p className="text-muted-foreground">Please select project stages in the Info tab first.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mb-4">
+                      <h3 className="text-lg font-medium">Fee Structure</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Define fees and billing information for each project stage
+                      </p>
+                    </div>
+                    
+                    {form.stages.map(stageId => {
+                      const stageName = officeStages.find(stage => stage.id === stageId)?.name || 'Unknown Stage';
+                      const stageFeeData = form.stageFees[stageId] || {
+                        fee: '',
+                        billingMonth: '',
+                        status: 'Not Billed',
+                        invoiceDate: null,
+                        hours: '',
+                        invoiceAge: 0
+                      };
+                      
+                      // Calculate hours based on fee and average rate
+                      const calculateHours = (fee: string): string => {
+                        if (!fee || !form.avgRate || parseFloat(form.avgRate) === 0) return '';
+                        
+                        const feeValue = parseFloat(fee);
+                        const rateValue = parseFloat(form.avgRate);
+                        
+                        if (isNaN(feeValue) || isNaN(rateValue) || rateValue === 0) return '';
+                        
+                        return (feeValue / rateValue).toFixed(2);
+                      };
+                      
+                      // Calculate invoice age based on invoice date
+                      const calculateInvoiceAge = (invoiceDate: Date | null): number => {
+                        if (!invoiceDate) return 0;
+                        
+                        const today = new Date();
+                        const diffTime = Math.abs(today.getTime() - invoiceDate.getTime());
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                        return diffDays;
+                      };
+                      
+                      // Update calculated values
+                      const hours = calculateHours(stageFeeData.fee);
+                      const invoiceAge = calculateInvoiceAge(stageFeeData.invoiceDate);
+                      
+                      if (hours !== stageFeeData.hours) {
+                        updateStageFee(stageId, { hours });
+                      }
+                      
+                      if (invoiceAge !== stageFeeData.invoiceAge) {
+                        updateStageFee(stageId, { invoiceAge });
+                      }
+                      
+                      return (
+                        <div key={stageId} className="border p-4 rounded-lg mb-4">
+                          <h4 className="font-semibold mb-4">{stageName}</h4>
+                          
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <Label htmlFor={`fee-${stageId}`}>Fee</Label>
+                              <input
+                                id={`fee-${stageId}`}
+                                type="number"
+                                placeholder="0.00"
+                                value={stageFeeData.fee}
+                                onChange={(e) => updateStageFee(stageId, { fee: e.target.value })}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`hours-${stageId}`}>Hours</Label>
+                              <input
+                                id={`hours-${stageId}`}
+                                value={hours}
+                                readOnly
+                                disabled
+                                className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <Label htmlFor={`billingMonth-${stageId}`}>Billing Month</Label>
+                              <input
+                                id={`billingMonth-${stageId}`}
+                                placeholder="e.g., April 2025"
+                                value={stageFeeData.billingMonth}
+                                onChange={(e) => updateStageFee(stageId, { billingMonth: e.target.value })}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`status-${stageId}`}>Status</Label>
+                              <select
+                                id={`status-${stageId}`}
+                                value={stageFeeData.status}
+                                onChange={(e) => updateStageFee(stageId, { 
+                                  status: e.target.value as "Not Billed" | "Invoiced" | "Paid" | "" 
+                                })}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                <option value="Not Billed">Not Billed</option>
+                                <option value="Invoiced">Invoiced</option>
+                                <option value="Paid">Paid</option>
+                              </select>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label>Invoice Date</Label>
+                              <input
+                                type="date"
+                                value={stageFeeData.invoiceDate ? new Date(stageFeeData.invoiceDate).toISOString().split('T')[0] : ''}
+                                onChange={(e) => {
+                                  const date = e.target.value ? new Date(e.target.value) : null;
+                                  updateStageFee(stageId, { 
+                                    invoiceDate: date,
+                                    invoiceAge: date ? calculateInvoiceAge(date) : 0
+                                  });
+                                }}
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              />
+                            </div>
+                            <div>
+                              <Label htmlFor={`invoiceAge-${stageId}`}>Invoice Age (Days)</Label>
+                              <input
+                                id={`invoiceAge-${stageId}`}
+                                value={invoiceAge}
+                                readOnly
+                                disabled
+                                className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="resources">
+              <div className="space-y-6 py-4">
+                <div className="mb-4">
+                  <h3 className="text-lg font-medium">Project Resources</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Allocate resources to the project
+                  </p>
+                </div>
+                
+                <div className="text-center py-8 border rounded-md bg-muted/10">
+                  <p className="text-muted-foreground">Resource allocation will be available in a future update</p>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
           <div className="flex justify-between mt-8">
             <Button 
               type="button" 
               variant="outline" 
-              onClick={goToPrevStep}
-              disabled={currentStep === 1}
+              onClick={() => {
+                if (activeTab === "info") return;
+                if (activeTab === "stageFees") handleTabChange("info");
+                if (activeTab === "resources") handleTabChange("stageFees");
+              }}
+              disabled={activeTab === "info"}
             >
               Previous
             </Button>
-            {currentStep < totalSteps ? (
-              <Button type="button" variant="default" onClick={goToNextStep}>
+            
+            {activeTab !== "resources" ? (
+              <Button
+                type="button"
+                variant="default"
+                onClick={() => {
+                  if (activeTab === "info") handleTabChange("stageFees");
+                  if (activeTab === "stageFees") handleTabChange("resources");
+                }}
+              >
                 Next
               </Button>
             ) : (
@@ -359,6 +581,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
             )}
           </div>
         </form>
+        
         {showRateCalc && (
           <NewProjectRateCalculator
             roles={roles}
