@@ -2,17 +2,14 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 
-// Combined color palette from both images
+// Color palette from the provided image
 export const colorPalette = [
-  // Blues and Teals
-  '#6B8FF9', '#89A7F8', '#A7C5F9', '#C5E3FA',
-  '#A8E6E6', '#89C7C7', '#69A8A8', '#48D9D9',
-  // Pinks and Purples
-  '#F178B6', '#EE9EC6', '#EBBDD6', '#DBA4DB',
-  '#B6A4DB', '#C9BCE8', '#A094C8', '#8E7BAD',
-  // Additional Colors from second palette
-  '#FFB5BA', '#FF8A80', '#FF7F63', '#FFB74D', '#FFE082',
-  '#AED581', '#4FC3F7', '#7986CB', '#9575CD', '#F8BBD0'
+  // Row 1
+  '#F5A3B3', '#F48F8F', '#F47E63', '#F4A363', '#F4C463',
+  // Row 2
+  '#A8E6A8', '#89CFF0', '#6B8FF9', '#9B87F5', '#FFE082',
+  // Row 3
+  '#89E6CF', '#7ECFD6', '#FFF3D4', '#D2C0A7', '#FFE566'
 ];
 
 interface ColorPickerProps {

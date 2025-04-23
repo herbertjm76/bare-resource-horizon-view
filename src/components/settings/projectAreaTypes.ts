@@ -6,6 +6,7 @@ export interface ProjectArea {
   region: string;
   city?: string;
   color?: string;
+  company_id?: string;
 }
 
 export interface ProjectAreaFormValues {

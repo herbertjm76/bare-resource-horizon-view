@@ -1,7 +1,7 @@
 
 import allCountries from "@/lib/allCountries.json";
 import { getContinentByCountryCode } from "./projectAreaHelpers";
-import type { ProjectArea, ProjectAreaRow } from "./projectAreaTypes";
+import type { ProjectArea } from "./projectAreaTypes";
 
 // Helper: given a country name, find the region
 export function getAutoRegion(country: string): string {
@@ -13,14 +13,14 @@ export function getAutoRegion(country: string): string {
 }
 
 // Helper: convert from DB row to ProjectArea
-export function toProjectArea(area: ProjectAreaRow): ProjectArea {
+export function toProjectArea(area: any): ProjectArea {
   return {
     id: area.id,
     code: area.code,
     region: getAutoRegion(area.name),
     country: area.name,
-    company_id: area.company_id ?? null,
-    city: area.city,
     color: area.color,
+    city: area.city,
+    company_id: area.company_id
   };
 }
