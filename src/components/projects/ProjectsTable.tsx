@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import type { Database } from '@/integrations/supabase/types';
 
 // Import the enum types from the database to ensure type safety
@@ -81,12 +82,14 @@ interface ProjectsTableProps {
   onDelete?: (projectId: string) => void;
   selectedProjects: string[];
   onSelectProject: (projectId: string) => void;
+  refetch: () => void; // Add refetch prop to refresh data
 }
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({ 
   projects, loading, error,
   editMode = false, onEdit, onDelete,
   selectedProjects, onSelectProject,
+  refetch
 }) => {
   const { 
     roles, 
@@ -98,6 +101,78 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   // --- Color maps from DB ---
   const stageColorMap = useStageColorMap(office_stages);
   const areaColorMap = useAreaColorMap(locations);
+
+  // State for editable fields
+  const [editableFields, setEditableFields] = useState<Record<string, Record<string, any>>>({});
+
+  // Initialize editable fields when projects change or edit mode is enabled
+  useEffect(() => {
+    if (projects.length > 0) {
+      const fields: Record<string, Record<string, any>> = {};
+      projects.forEach(project => {
+        fields[project.id] = {
+          name: project.name,
+          code: project.code,
+          profit: project.target_profit_percentage || 0,
+          country: project.country
+        };
+      });
+      setEditableFields(fields);
+    }
+  }, [projects, editMode]);
+
+  // --- Handle field changes ---
+  const handleFieldChange = (projectId: string, field: string, value: any) => {
+    setEditableFields(prev => ({
+      ...prev,
+      [projectId]: {
+        ...prev[projectId],
+        [field]: value
+      }
+    }));
+  };
+
+  // --- Handle field update ---
+  const handleFieldUpdate = async (projectId: string, field: string, value: any) => {
+    try {
+      const updateData: Record<string, any> = {};
+      
+      switch(field) {
+        case 'name':
+          updateData.name = value;
+          break;
+        case 'code':
+          updateData.code = value;
+          break;
+        case 'profit':
+          updateData.target_profit_percentage = value;
+          break;
+        case 'country':
+          updateData.country = value;
+          break;
+        default:
+          break;
+      }
+      
+      if (Object.keys(updateData).length === 0) return;
+      
+      const { error } = await supabase
+        .from('projects')
+        .update(updateData)
+        .eq('id', projectId);
+        
+      if (error) {
+        toast.error(`Failed to update ${field}`, { description: error.message });
+      } else {
+        toast.success(`${field} updated`);
+        // Automatically refresh data after update
+        refetch();
+      }
+    } catch (err) {
+      console.error(`Error updating ${field}:`, err);
+      toast.error(`An error occurred while updating ${field}`);
+    }
+  };
 
   // --- Handle stage change ---
   const handleStageChange = async (projectId: string, newStage: string) => {
@@ -114,6 +189,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         toast.error('Failed to update current stage', { description: error.message });
       } else {
         toast.success('Current stage updated');
+        // Automatically refresh data after update
+        refetch();
       }
     } catch (err) {
       console.error('Error updating stage:', err);
@@ -136,6 +213,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         toast.error('Failed to update status', { description: error.message });
       } else {
         toast.success('Status updated');
+        // Automatically refresh data after update
+        refetch();
       }
     } catch (err) {
       console.error('Error updating status:', err);
@@ -222,9 +301,29 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     />
                   </TableCell>
                 )}
-                <TableCell className="font-semibold">{project.code}</TableCell>
+                <TableCell className="font-semibold">
+                  {editMode ? (
+                    <Input
+                      className="h-8 w-20"
+                      value={editableFields[project.id]?.code || project.code}
+                      onChange={(e) => handleFieldChange(project.id, 'code', e.target.value)}
+                      onBlur={() => handleFieldUpdate(project.id, 'code', editableFields[project.id]?.code)}
+                    />
+                  ) : (
+                    project.code
+                  )}
+                </TableCell>
                 <TableCell>
-                  <span className="font-bold">{project.name}</span>
+                  {editMode ? (
+                    <Input
+                      className="h-8 w-full"
+                      value={editableFields[project.id]?.name || project.name}
+                      onChange={(e) => handleFieldChange(project.id, 'name', e.target.value)}
+                      onBlur={() => handleFieldUpdate(project.id, 'name', editableFields[project.id]?.name)}
+                    />
+                  ) : (
+                    <span className="font-bold">{project.name}</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   {project.project_manager?.first_name || '-'}
@@ -258,22 +357,60 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   )}
                 </TableCell>
                 <TableCell>
-                  <span
-                    className="inline-block px-2 py-1 rounded font-semibold"
-                    style={{
-                      background: areaColor,
-                      color: "#212172"
-                    }}
-                  >
-                    {areaCode?.toUpperCase()}
-                  </span>
+                  {editMode ? (
+                    <Select
+                      defaultValue={project.country}
+                      onValueChange={(value) => handleFieldUpdate(project.id, 'country', value)}
+                    >
+                      <SelectTrigger className="h-8 w-32">
+                        <SelectValue placeholder="Country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {locations.map((location) => (
+                          <SelectItem 
+                            key={location.code} 
+                            value={location.country}
+                          >
+                            <div 
+                              className="px-2 py-0.5 rounded w-full"
+                              style={{
+                                backgroundColor: location.color || "#E5DEFF"
+                              }}
+                            >
+                              {location.code?.toUpperCase()} - {location.country}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <span
+                      className="inline-block px-2 py-1 rounded font-semibold"
+                      style={{
+                        background: areaColor,
+                        color: "#212172"
+                      }}
+                    >
+                      {areaCode?.toUpperCase()}
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell>
                   {/* Placeholder: Replace with real value if available */}
                   82
                 </TableCell>
                 <TableCell>
-                  {project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"}
+                  {editMode ? (
+                    <Input
+                      className="h-8 w-20"
+                      type="number"
+                      value={editableFields[project.id]?.profit || project.target_profit_percentage || 0}
+                      onChange={(e) => handleFieldChange(project.id, 'profit', parseFloat(e.target.value))}
+                      onBlur={() => handleFieldUpdate(project.id, 'profit', editableFields[project.id]?.profit)}
+                    />
+                  ) : (
+                    project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"
+                  )}
                 </TableCell>
                 <TableCell>
                   {/* Placeholder: Replace with real value if available */}

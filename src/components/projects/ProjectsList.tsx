@@ -42,10 +42,6 @@ export const ProjectsList = () => {
     });
   }, [projects, filters]);
 
-  const handleRefresh = () => {
-    refetch();
-  };
-
   const handleProjectCreated = () => {
     refetch();
   };
@@ -144,7 +140,6 @@ export const ProjectsList = () => {
           </p>
         </div>
         <ProjectsToolbar 
-          onRefresh={handleRefresh} 
           onProjectCreated={handleProjectCreated}
           editMode={editMode}
           setEditMode={handleToggleEditMode}
@@ -166,6 +161,7 @@ export const ProjectsList = () => {
           onDelete={handleDeleteProject}
           selectedProjects={selectedProjects}
           onSelectProject={handleSelectProject}
+          refetch={refetch}
         />
       </CardContent>
 
