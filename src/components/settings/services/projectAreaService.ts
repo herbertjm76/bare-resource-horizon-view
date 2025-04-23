@@ -28,14 +28,14 @@ export async function fetchProjectAreas(companyId: string | undefined): Promise<
 
 export async function createProjectArea(
   companyId: string, 
-  values: ProjectAreaFormValues & { color?: string }
+  values: ProjectAreaFormValues
 ): Promise<ProjectArea> {
   const areaData = {
     code: values.code,
     name: values.country,
     emoji: null,
     company_id: companyId,
-    color: values.color
+    color: values.color || "#E5DEFF" // Ensure color is included
   };
 
   const { data, error } = await supabase
@@ -57,13 +57,13 @@ export async function createProjectArea(
 export async function updateProjectArea(
   id: string,
   companyId: string,
-  values: ProjectAreaFormValues & { color?: string }
+  values: ProjectAreaFormValues
 ): Promise<void> {
   const areaData = {
     code: values.code,
     name: values.country,
     company_id: companyId,
-    color: values.color
+    color: values.color || "#E5DEFF" // Ensure color is included
   };
 
   const { error } = await supabase

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -28,6 +29,9 @@ const ProjectAreaForm: React.FC<ProjectAreaFormProps> = ({
   React.useEffect(() => {
     if (!form.getValues('color') && !editing?.color) {
       form.setValue('color', colorPalette[0]);
+    } else if (editing?.color) {
+      // Make sure the editing color is set in the form
+      form.setValue('color', editing.color);
     }
   }, [form, editing]);
 

@@ -18,6 +18,7 @@ const formSchema = z.object({
   country: z.string().min(1, "Country is required"),
   region: z.string().min(1, "Region is required"),
   city: z.string().optional(),
+  color: z.string().min(1, "Color is required"),
 });
 
 export const CountriesTab = () => {
@@ -38,7 +39,7 @@ export const CountriesTab = () => {
 
   const form = useForm<ProjectAreaFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: { code: "", country: "", region: "", city: "" }
+    defaultValues: { code: "", country: "", region: "", city: "", color: "" }
   });
 
   const onOpenChange = (open: boolean) => {
@@ -56,6 +57,7 @@ export const CountriesTab = () => {
       region: area.region ?? getAutoRegion(area.country),
       country: area.country,
       city: area.city,
+      color: area.color || "#E5DEFF", // Ensure color is passed to form
     });
     setOpen(true);
   };
@@ -90,9 +92,17 @@ export const CountriesTab = () => {
     }
     
     if (editing) {
-      await updateArea(editing.id, values);
+      // Explicitly include the color when updating
+      await updateArea(editing.id, {
+        ...values,
+        color: values.color
+      });
     } else {
-      await addArea(values);
+      // Explicitly include the color when adding
+      await addArea({
+        ...values,
+        color: values.color
+      });
     }
     setOpen(false);
     form.reset();
