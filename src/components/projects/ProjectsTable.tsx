@@ -54,9 +54,6 @@ const mapDbToStatus = (dbStatus: DbProjectStatus): ProjectStatus => {
   }
 };
 
-// Valid project stages from the database
-const VALID_PROJECT_STAGES: DbProjectStage[] = ["BD", "SD", "DD", "CD", "CMP"];
-
 // --- Load project stage and area colors from DB for rendering ---
 const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
   const map: Record<string, string> = {};
@@ -180,20 +177,9 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   // --- Handle stage change ---
   const handleStageChange = async (projectId: string, newStage: string) => {
     try {
-      // Validate that the stage is one of the allowed enum values
-      if (!VALID_PROJECT_STAGES.includes(newStage as DbProjectStage)) {
-        toast.error('Invalid project stage', { 
-          description: `Stage must be one of: ${VALID_PROJECT_STAGES.join(', ')}` 
-        });
-        return;
-      }
-      
-      // Convert to a valid DB enum type
-      const dbStage = newStage as DbProjectStage;
-      
       const { error } = await supabase
         .from('projects')
-        .update({ current_stage: dbStage })
+        .update({ current_stage: newStage })
         .eq('id', projectId);
         
       if (error) {
@@ -270,12 +256,13 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             <TableHead>PM</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Country</TableHead>
-            <TableHead>Hours</TableHead>
             <TableHead>%Profit</TableHead>
             <TableHead>AVG Rate</TableHead>
             <TableHead>Current Stage</TableHead>
-            <TableHead>Stage Hours</TableHead>
-            <TableHead>Stage Fee</TableHead>
+            {/* Display all stages as separate columns */}
+            {office_stages.map((stage) => (
+              <TableHead key={stage.id}>{stage.name}</TableHead>
+            ))}
             {editMode && <TableHead className="w-24">Actions</TableHead>}
           </TableRow>
         </TableHeader>
@@ -357,7 +344,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     </Select>
                   ) : (
                     <span 
-                      className="inline-block px-2 py-1 rounded"
+                      className="inline-block px-2 py-1 rounded text-xs"
                       style={{
                         background: statusColor.bg,
                         color: statusColor.text
@@ -396,7 +383,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     </Select>
                   ) : (
                     <span
-                      className="inline-block px-2 py-1 rounded font-semibold"
+                      className="inline-block px-2 py-1 rounded"
                       style={{
                         background: areaColor,
                         color: "#212172"
@@ -405,10 +392,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                       {areaCode?.toUpperCase()}
                     </span>
                   )}
-                </TableCell>
-                <TableCell>
-                  {/* Placeholder: Replace with real value if available */}
-                  82
                 </TableCell>
                 <TableCell>
                   {editMode ? (
@@ -437,28 +420,22 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                         <SelectValue placeholder="Select stage" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* Only show valid stage options from the database enum */}
-                        {VALID_PROJECT_STAGES.map((stage) => {
-                          // Find the matching stage in office_stages if available
-                          const officeStage = office_stages.find(s => s.name === stage);
-                          const stageColor = officeStage?.color || stageColorMap[stage] || "#E5DEFF";
-                          
-                          return (
-                            <SelectItem 
-                              key={stage} 
-                              value={stage}
+                        {/* Show stages from office_stages */}
+                        {office_stages.map((stage) => (
+                          <SelectItem 
+                            key={stage.id} 
+                            value={stage.name}
+                          >
+                            <div 
+                              className="px-2 py-0.5 rounded w-full"
+                              style={{
+                                backgroundColor: stage.color || "#E5DEFF"
+                              }}
                             >
-                              <div 
-                                className="px-2 py-0.5 rounded w-full"
-                                style={{
-                                  backgroundColor: stageColor
-                                }}
-                              >
-                                {stage}
-                              </div>
-                            </SelectItem>
-                          );
-                        })}
+                              {stage.name}
+                            </div>
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   ) : (
@@ -473,14 +450,22 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     </span>
                   )}
                 </TableCell>
-                <TableCell>
-                  {/* Stage Hours - placeholder */}
-                  40
-                </TableCell>
-                <TableCell>
-                  {/* Stage Fee - placeholder */}
-                  $15,000
-                </TableCell>
+                {/* Render stage columns with checkbox or indicator */}
+                {office_stages.map((stage) => {
+                  const isCurrentStage = project.current_stage === stage.name;
+                  return (
+                    <TableCell key={`${project.id}-${stage.id}`} className="text-center">
+                      {isCurrentStage ? (
+                        <div 
+                          className="h-3 w-3 rounded-full mx-auto"
+                          style={{
+                            backgroundColor: stage.color || "#E5DEFF"
+                          }}
+                        />
+                      ) : null}
+                    </TableCell>
+                  );
+                })}
                 {editMode && (
                   <TableCell>
                     <div className="flex items-center gap-2">
