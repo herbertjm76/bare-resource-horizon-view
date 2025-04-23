@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
@@ -10,6 +10,9 @@ import {
   SelectItem
 } from "@/components/ui/select";
 import { ProjectForm } from "../NewProjectDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useCompany } from "@/context/CompanyContext";
+import { toast } from "sonner";
 
 interface ProjectInfoTabProps {
   form: ProjectForm;
@@ -30,6 +33,57 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   statusOptions,
   onChange
 }) => {
+  const { company } = useCompany();
+  const [isCheckingCode, setIsCheckingCode] = useState(false);
+  const [codeError, setCodeError] = useState<string | null>(null);
+
+  const checkProjectCodeUnique = async (code: string) => {
+    if (!code.trim() || !company?.id) return;
+    
+    setIsCheckingCode(true);
+    setCodeError(null);
+    
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('code')
+        .eq('code', code)
+        .eq('company_id', company.id)
+        .limit(1);
+      
+      if (error) {
+        console.error("Error checking project code:", error);
+        toast.error("Failed to validate project code");
+        return;
+      }
+      
+      if (data && data.length > 0) {
+        setCodeError(`Project code "${code}" already exists. Please use a unique code.`);
+      }
+    } catch (err) {
+      console.error("Exception checking project code:", err);
+    } finally {
+      setIsCheckingCode(false);
+    }
+  };
+
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newCode = e.target.value;
+    onChange("code", newCode);
+    
+    // Clear any existing error when the user types
+    if (codeError) setCodeError(null);
+    
+    // Debounce the validation to avoid too many requests
+    const timer = setTimeout(() => {
+      if (newCode.trim()) {
+        checkProjectCodeUnique(newCode);
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  };
+
   return (
     <div className="space-y-4 py-4">
       {/* Project Code & Name */}
@@ -40,9 +94,16 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
             id="code"
             placeholder="P001"
             value={form.code}
-            onChange={(e) => onChange("code", e.target.value)}
+            onChange={handleCodeChange}
             required
+            className={codeError ? "border-red-500" : ""}
           />
+          {isCheckingCode && (
+            <p className="text-xs text-muted-foreground mt-1">Checking code availability...</p>
+          )}
+          {codeError && (
+            <p className="text-xs text-red-500 mt-1">{codeError}</p>
+          )}
         </div>
         <div>
           <Label htmlFor="name">Project Name</Label>

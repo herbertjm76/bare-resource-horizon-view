@@ -73,6 +73,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
   const [offices, setOffices] = useState<OfficeOption[]>([]);
   const [officeStages, setOfficeStages] = useState<OfficeStageOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -126,6 +127,16 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
 
   const handleChange = (key: keyof ProjectForm, value: any) => {
     setForm((f) => ({ ...f, [key]: value }));
+    
+    // Clear any errors for this field
+    if (formErrors[key]) {
+      setFormErrors((prev) => {
+        const newErrors = {...prev};
+        delete newErrors[key];
+        return newErrors;
+      });
+    }
+    
     if (key === 'stages') {
       const newStageFees: Record<string, any> = {};
       value.forEach((stageId: string) => {
@@ -209,6 +220,40 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     setActiveTab(tab);
   };
 
+  const checkProjectCodeUnique = async () => {
+    if (!company || !company.id || !form.code.trim()) {
+      return true; // Skip validation if no company or code
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('projects')
+        .select('code')
+        .eq('code', form.code)
+        .eq('company_id', company.id)
+        .limit(1);
+      
+      if (error) {
+        console.error("Error checking project code:", error);
+        toast.error("Failed to validate project code");
+        return false;
+      }
+      
+      if (data && data.length > 0) {
+        setFormErrors(prev => ({
+          ...prev,
+          code: `Project code "${form.code}" already exists. Please use a unique code.`
+        }));
+        return false;
+      }
+      
+      return true;
+    } catch (err) {
+      console.error("Exception checking project code:", err);
+      return false;
+    }
+  };
+
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isProjectInfoValid()) {
@@ -220,6 +265,15 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       toast.error('No company context found.');
       return;
     }
+    
+    // Check if project code is unique before submitting
+    const isCodeUnique = await checkProjectCodeUnique();
+    if (!isCodeUnique) {
+      toast.error(`Project code "${form.code}" already exists. Please use a unique code.`);
+      setActiveTab("info");
+      return;
+    }
+    
     setIsLoading(true);
     try {
       // Make sure we're not submitting 'none' as a value to the database
@@ -262,6 +316,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         profit: "", avgRate: "", status: "", office: "", stages: [],
         stageFees: {}
       });
+      setFormErrors({});
       setActiveTab("info");
       if (typeof onProjectCreated === 'function') {
         onProjectCreated();
