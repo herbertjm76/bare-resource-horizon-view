@@ -15,6 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ColorPicker } from './ColorPicker';
+import { defaultStageColor } from './utils/stageColorUtils';
 
 interface Stage {
   id: string;
@@ -30,10 +31,10 @@ export const StagesTab: React.FC = () => {
   const [stages, setStages] = useState<Stage[]>([]);
   const [loading, setLoading] = useState(true);
   const [newStage, setNewStage] = useState('');
-  const [newColor, setNewColor] = useState('#E5DEFF');
+  const [newColor, setNewColor] = useState(defaultStageColor);
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
-  const [editColor, setEditColor] = useState('#E5DEFF');
+  const [editColor, setEditColor] = useState(defaultStageColor);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { company } = useCompany();
@@ -95,7 +96,7 @@ export const StagesTab: React.FC = () => {
       if (data && data.length > 0) {
         setStages([...stages, data[0]]);
         setNewStage('');
-        setNewColor('#E5DEFF');
+        setNewColor(defaultStageColor);
         setDialogOpen(false);
         toast.success('Stage added successfully');
       }
@@ -157,7 +158,7 @@ export const StagesTab: React.FC = () => {
   const openEditDialog = (stage: Stage) => {
     setEditId(stage.id);
     setEditName(stage.name);
-    setEditColor(stage.color || '#E5DEFF');
+    setEditColor(stage.color || defaultStageColor);
     setEditDialogOpen(true);
   };
 
@@ -260,9 +261,9 @@ export const StagesTab: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <div 
                         className="w-6 h-6 rounded" 
-                        style={{ backgroundColor: stage.color || '#E5DEFF' }} 
+                        style={{ backgroundColor: stage.color || defaultStageColor }} 
                       />
-                      <span>{stage.color || '#E5DEFF'}</span>
+                      <span>{stage.color || defaultStageColor}</span>
                     </div>
                   </TableCell>
                   <TableCell>
