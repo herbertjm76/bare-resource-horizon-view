@@ -117,9 +117,7 @@ export const CountriesTab = () => {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
         <div>
           <CardTitle className="text-2xl font-semibold mb-1.5">Project Areas</CardTitle>
-          <CardDescription className="text-sm text-muted-foreground">
-            Track which locations you operate projects in, by code, country, city (optional)
-          </CardDescription>
+          {/* Removed duplicate description */}
         </div>
         <CountriesToolbar 
           editMode={editMode} 
@@ -160,3 +158,4 @@ export const CountriesTab = () => {
 };
 
 export default CountriesTab;
+
