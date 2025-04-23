@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -10,10 +11,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2 } from "lucide-react";
-import type { Database } from '@/integrations/supabase/types';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { Database } from '@/integrations/supabase/types';
 
 // --- Load project stage and area colors from DB for rendering ---
 const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
@@ -24,6 +32,7 @@ const useStageColorMap = (stages: { id: string; color?: string; name: string }[]
   });
   return map;
 };
+
 const useAreaColorMap = (areas: { code: string; color?: string; country: string }[]) => {
   const map: Record<string, string> = {};
   areas.forEach(area => {
@@ -44,33 +53,41 @@ interface ProjectsTableProps {
   onSelectProject: (projectId: string) => void;
 }
 
+// Define valid project statuses
+type ProjectStatus = 'In Progress' | 'Not Started' | 'Completed' | 'On Hold';
+
 const ProjectsTable: React.FC<ProjectsTableProps> = ({ 
   projects, loading, error,
   editMode = false, onEdit, onDelete,
   selectedProjects, onSelectProject,
 }) => {
-  const { roles, loading: rolesLoading, locations, rates } = useOfficeSettings();
+  const { 
+    roles, 
+    loading: rolesLoading, 
+    locations,
+    office_stages: projectStages = [] 
+  } = useOfficeSettings();
 
-  // --- FAKE fetch project stages/areas for demo! ---
-  const projectStages = []; // Replace by real fetch, or via props/context as needed
-  const projectAreas = []; // As above
-
-  // --- Demo-only color maps (will be populated by real fetch) ---
+  // --- Color maps from DB ---
   const stageColorMap = useStageColorMap(projectStages);
-  const areaColorMap = useAreaColorMap(projectAreas);
+  const areaColorMap = useAreaColorMap(locations);
 
-  // --- New: Track editable stage for a project ---
-  const [editingStage, setEditingStage] = useState<{ [projectId: string]: boolean }>({});
-
-  // --- Update current_stage in database on dropdown change ---
+  // --- Handle stage change ---
   const handleStageChange = async (projectId: string, newStage: string) => {
-    // Optimistically update UI
-    setEditingStage(prev => ({ ...prev, [projectId]: false }));
-    const { error } = await supabase.from('projects').update({ current_stage: newStage }).eq('id', projectId);
-    if (error) {
-      toast.error('Failed to update current stage', { description: error.message });
-    } else {
-      toast.success('Current stage updated');
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({ current_stage: newStage })
+        .eq('id', projectId);
+        
+      if (error) {
+        toast.error('Failed to update current stage', { description: error.message });
+      } else {
+        toast.success('Current stage updated');
+      }
+    } catch (err) {
+      console.error('Error updating stage:', err);
+      toast.error('An error occurred while updating the stage');
     }
   };
 
@@ -83,6 +100,22 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   if (!projects?.length) {
     return <div className="text-center p-8 border rounded-md border-dashed">No projects found. Click "New Project" to create your first project.</div>;
   }
+
+  // Get status color based on status
+  const getStatusColor = (status: string) => {
+    switch(status) {
+      case 'On Hold':
+        return { bg: "#ccc9ff", text: "#212172" };
+      case 'In Progress':
+        return { bg: "#b3efa7", text: "#257e30" };
+      case 'Completed':
+        return { bg: "#eaf1fe", text: "#174491" };
+      case 'Not Started':
+        return { bg: "#ffe4e6", text: "#d946ef" };
+      default:
+        return { bg: "#E5DEFF", text: "#6E59A5" };
+    }
+  };
 
   return (
     <div className="rounded-md border overflow-x-auto">
@@ -105,84 +138,90 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {projects.map((project) => (
-            <TableRow 
-              key={project.id} 
-              className="align-middle"
-              data-state={selectedProjects.includes(project.id) ? "selected" : undefined}
-            >
-              {editMode && (
-                <TableCell>
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded accent-[#6E59A5]"
-                    checked={selectedProjects.includes(project.id)}
-                    onChange={() => onSelectProject(project.id)}
-                  />
-                </TableCell>
-              )}
-              <TableCell className="font-semibold">{project.code}</TableCell>
-              <TableCell>
-                <span className="font-bold">{project.name}</span>
-              </TableCell>
-              <TableCell>
-                {project.project_manager?.first_name || '-'}
-              </TableCell>
-              <TableCell>
-                {project.status && (
-                  <span className={`inline-block px-2 py-1 rounded`} style={{
-                    background: project.status === "On Hold"
-                      ? "#ccc9ff" : project.status === "In Progress"
-                      ? "#b3efa7" : project.status === "Complete"
-                      ? "#eaf1fe" : project.status === "Planning"
-                      ? "#ffe4e6" : "#E5DEFF",
-                    color: project.status === "On Hold"
-                      ? "#212172" : project.status === "In Progress"
-                      ? "#257e30" : project.status === "Complete"
-                      ? "#174491" : project.status === "Planning"
-                      ? "#d946ef" : "#6E59A5"
-                  }}>
-                    {project.status}
-                  </span>
+          {projects.map((project) => {
+            const statusColor = getStatusColor(project.status);
+            
+            return (
+              <TableRow 
+                key={project.id} 
+                className="align-middle"
+                data-state={selectedProjects.includes(project.id) ? "selected" : undefined}
+              >
+                {editMode && (
+                  <TableCell>
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded accent-[#6E59A5]"
+                      checked={selectedProjects.includes(project.id)}
+                      onChange={() => onSelectProject(project.id)}
+                    />
+                  </TableCell>
                 )}
-              </TableCell>
-              <TableCell>
-                <span
-                  className="inline-block px-2 py-1 rounded font-semibold"
-                  style={{
-                    background: areaColorMap[project.country] || "#E5DEFF",
-                    color: "#212172"
-                  }}
-                >
-                  {project.country?.toUpperCase()}
-                </span>
-              </TableCell>
-              <TableCell>
-                {/* Placeholder: Replace with real value if available */}
-                82
-              </TableCell>
-              <TableCell>
-                {project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"}
-              </TableCell>
-              <TableCell>
-                {/* Placeholder: Replace with real value if available */}
-                85
-              </TableCell>
-              <TableCell>
-                {editMode
-                  ? (
-                    <select
-                      className="bg-white border rounded px-2 py-1"
-                      value={project.current_stage}
-                      onChange={e => handleStageChange(project.id, e.target.value)}
+                <TableCell className="font-semibold">{project.code}</TableCell>
+                <TableCell>
+                  <span className="font-bold">{project.name}</span>
+                </TableCell>
+                <TableCell>
+                  {project.project_manager?.first_name || '-'}
+                </TableCell>
+                <TableCell>
+                  {project.status && (
+                    <span 
+                      className="inline-block px-2 py-1 rounded"
+                      style={{
+                        background: statusColor.bg,
+                        color: statusColor.text
+                      }}
                     >
-                      {/* In real use, this should come from project.selectedStages/officeStages! */}
-                      {/* We'll simulate with fixed example: */}
-                      <option value="SD">Schematic</option>
-                      <option value="DD">Design Development</option>
-                      <option value="CD">Construction Docs</option>
-                      <option value="CMP">Completion</option>
-                    </select>
+                      {project.status}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <span
+                    className="inline-block px-2 py-1 rounded font-semibold"
+                    style={{
+                      background: areaColorMap[project.country] || "#E5DEFF",
+                      color: "#212172"
+                    }}
+                  >
+                    {project.country?.toUpperCase()}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  {/* Placeholder: Replace with real value if available */}
+                  82
+                </TableCell>
+                <TableCell>
+                  {project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"}
+                </TableCell>
+                <TableCell>
+                  {/* Placeholder: Replace with real value if available */}
+                  85
+                </TableCell>
+                <TableCell>
+                  {editMode ? (
+                    <Select
+                      defaultValue={project.current_stage}
+                      onValueChange={(value) => handleStageChange(project.id, value)}
+                    >
+                      <SelectTrigger className="h-8 w-40">
+                        <SelectValue placeholder="Select stage" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {projectStages.map((stage) => (
+                          <SelectItem 
+                            key={stage.id} 
+                            value={stage.name}
+                            style={{
+                              backgroundColor: stage.color || "#E5DEFF"
+                            }}
+                          >
+                            {stage.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   ) : (
                     <span
                       className="px-2 py-1 rounded"
@@ -193,46 +232,47 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     >
                       {project.current_stage}
                     </span>
-                  )
-                }
-              </TableCell>
-              <TableCell>
-                {/* Stage Hours - placeholder */}
-                40
-              </TableCell>
-              <TableCell>
-                {/* Stage Fee - placeholder */}
-                $15,000
-              </TableCell>
-              {editMode && (
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      onClick={() => onEdit?.(project.id)}
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                    >
-                      <Edit className="h-4 w-4" />
-                      <span className="sr-only">Edit</span>
-                    </Button>
-                    <Button
-                      onClick={() => onDelete?.(project.id)}
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </div>
+                  )}
                 </TableCell>
-              )}
-            </TableRow>
-          ))}
+                <TableCell>
+                  {/* Stage Hours - placeholder */}
+                  40
+                </TableCell>
+                <TableCell>
+                  {/* Stage Fee - placeholder */}
+                  $15,000
+                </TableCell>
+                {editMode && (
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => onEdit?.(project.id)}
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8"
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
+                      <Button
+                        onClick={() => onDelete?.(project.id)}
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </div>
+                  </TableCell>
+                )}
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>
   );
 };
+
 export default ProjectsTable;

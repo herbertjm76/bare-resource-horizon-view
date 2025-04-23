@@ -1,396 +1,320 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, Check, Palette } from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle,
-  DialogFooter,
-  DialogDescription
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { PlusCircle, Edit, Trash2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { toast } from 'sonner';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-const formSchema = z.object({
-  name: z.string().min(1, "Stage name is required"),
-  color: z.string().min(1, "Color is required"),
-  number: z.string().min(1, "Stage number is required")
-});
-
-type StageFormValues = z.infer<typeof formSchema> & {
-  id?: string
-};
-
-type Stage = {
+interface Stage {
   id: string;
   name: string;
-  color?: string;
-  number?: string;
   order_index: number;
-  company_id?: string;
-};
+  color?: string;
+  company_id: string;
+  created_at: string;
+  updated_at: string;
+}
 
-const COLORS = [
-  // Blue family
-  "#E6F2FF", "#93C5FD", 
-  // Green family
-  "#E6F4F1", "#6EE7B7", 
-  // Yellow family
-  "#FEF3C7", "#FCD34D", 
-  // Orange family
-  "#FFEDD5", "#FEB041", 
-  // Pink family
-  "#FFE4E6", "#FB7185", 
-  // Purple family
-  "#E5E1FF", "#A78BFA"
-];
-
-const stageNumberOptions = [...Array(10).keys()].map(n => String(n + 1)).concat("NA");
-
-export const StagesTab = () => {
+export const StagesTab: React.FC = () => {
   const [stages, setStages] = useState<Stage[]>([]);
-  const [open, setOpen] = useState(false);
-  const [editingStage, setEditingStage] = useState<Stage | null>(null);
-  const [editMode, setEditMode] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [newStage, setNewStage] = useState('');
+  const [newColor, setNewColor] = useState('#E5DEFF');
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editColor, setEditColor] = useState('#E5DEFF');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { company } = useCompany();
 
-  const form = useForm<StageFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      color: COLORS[0],
-      number: ""
-    }
-  });
-
-  const fetchStages = async () => {
-    setLoading(true);
-    if (!company || !company.id) {
-      setStages([]);
-      setLoading(false);
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("office_stages")
-      .select("*")
-      .eq("company_id", company.id)
-      .order("order_index", { ascending: true });
-
-    if (error) {
-      toast.error("Failed to load stages", { description: error.message });
-      setStages([]);
-      setLoading(false);
-      return;
-    }
-
-    const mappedStages = Array.isArray(data) ? data.map((s, idx) => ({
-      ...s,
-      color: s.color || COLORS[(s.order_index - 1) % COLORS.length] || "#4f46e5",
-      number: s.number || String(s.order_index),
-      company_id: s.company_id || company.id,
-    })) : [];
-    setStages(mappedStages);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (company) fetchStages();
-    else setStages([]);
-  }, [company]);
-
-  const persistLocalStageDetails = (id: string, color: string, number: string) => {
-    let data: Record<string, { color: string; number: string }> = {};
-    try {
-      data = JSON.parse(localStorage.getItem("office_stage_details") || "{}");
-    } catch {/**/}
-    data[id] = { color, number };
-    localStorage.setItem("office_stage_details", JSON.stringify(data));
-  };
-
-  const removeLocalStageDetails = (ids: string[]) => {
-    let data: Record<string, { color: string; number: string }> = {};
-    try {
-      data = JSON.parse(localStorage.getItem("office_stage_details") || "{}");
-      ids.forEach(id => { delete data[id]; });
-      localStorage.setItem("office_stage_details", JSON.stringify(data));
-    } catch {/**/}
-  };
-
-  const onOpenChange = (open: boolean) => {
-    setOpen(open);
-    if (!open) {
-      form.reset();
-      setEditingStage(null);
-    }
-  };
-
-  const handleEdit = (stage: Stage) => {
-    setEditingStage(stage);
-    form.reset({
-      name: stage.name,
-      color: stage.color || COLORS[0],
-      number: stage.number || "",
-      id: stage.id
-    });
-    setOpen(true);
-  };
-
-  const handleSelect = (id: string) => {
-    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  };
-
-  const handleBulkDelete = async () => {
-    if (!company || !company.id) {
-      toast.error("Error", { description: "No company found in context" });
-      return;
-    }
+  React.useEffect(() => {
+    if (!company?.id) return;
     
-    setLoading(true);
-    const { error } = await supabase
-      .from("office_stages")
-      .delete()
-      .in("id", selected)
-      .eq("company_id", company.id);
+    const fetchStages = async () => {
+      setLoading(true);
       
-    if (error) {
-      toast.error("Failed to delete stages", { description: error.message });
-      setLoading(false);
+      try {
+        const { data, error } = await supabase
+          .from('office_stages')
+          .select('*')
+          .eq('company_id', company.id)
+          .order('order_index', { ascending: true });
+        
+        if (error) throw error;
+        setStages(data || []);
+      } catch (error) {
+        console.error('Error fetching stages:', error);
+        toast.error('Failed to load project stages');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchStages();
+  }, [company?.id]);
+
+  const addStage = async () => {
+    if (!company?.id) {
+      toast.error('Company information not available');
       return;
     }
     
-    removeLocalStageDetails(selected);
-    setStages(stages => stages.filter(stage => !selected.includes(stage.id)));
-    setSelected([]);
-    setEditMode(false);
-    setLoading(false);
-    toast.success("Stages deleted", { description: "Selected stages have been deleted." });
-  };
-
-  const onSubmit = async (values: StageFormValues) => {
-    if (!company || !company.id) {
-      toast.error("Error", { description: "No company found in context" });
+    if (!newStage.trim()) {
+      toast.error('Stage name cannot be empty');
       return;
     }
-    setLoading(true);
-
+    
     try {
-      if (editingStage) {
-        const { error } = await supabase
-          .from("office_stages")
-          .update({
-            name: values.name,
-            color: values.color,
-            company_id: company.id,
-          })
-          .eq("id", editingStage.id)
-          .eq("company_id", company.id);
-
-        if (error) throw error;
-        toast.success("Stage updated");
-      } else {
-        const maxOrder = stages.length ? Math.max(...stages.map(s => s.order_index)) : 0;
-        const { data, error } = await supabase
-          .from("office_stages")
-          .insert({
-            name: values.name,
-            order_index: maxOrder + 1,
-            color: values.color,
-            company_id: company.id,
-          })
-          .select()
-          .single();
-
-        if (error || !data) throw error || new Error("No data returned from insertion");
-        toast.success("Stage added");
+      // Get the next order index
+      const nextOrderIndex = stages.length > 0 
+        ? Math.max(...stages.map(stage => stage.order_index)) + 1 
+        : 0;
+      
+      const { data, error } = await supabase
+        .from('office_stages')
+        .insert({
+          name: newStage.trim(),
+          color: newColor,
+          order_index: nextOrderIndex,
+          company_id: company.id
+        })
+        .select();
+      
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        setStages([...stages, data[0]]);
+        setNewStage('');
+        setNewColor('#E5DEFF');
+        setDialogOpen(false);
+        toast.success('Stage added successfully');
       }
-      setOpen(false);
-      form.reset();
-      setEditingStage(null);
-      await fetchStages();
-    } catch (error: any) {
-      console.error(error);
-      toast.error(error.message || "An error occurred");
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Error adding stage:', error);
+      toast.error('Failed to add stage');
     }
+  };
+
+  const updateStage = async () => {
+    if (!editId || !company?.id) return;
+    
+    try {
+      const { error } = await supabase
+        .from('office_stages')
+        .update({
+          name: editName.trim(),
+          color: editColor
+        })
+        .eq('id', editId);
+      
+      if (error) throw error;
+      
+      setStages(stages.map(stage => 
+        stage.id === editId 
+          ? { ...stage, name: editName.trim(), color: editColor }
+          : stage
+      ));
+      
+      setEditDialogOpen(false);
+      toast.success('Stage updated successfully');
+    } catch (error) {
+      console.error('Error updating stage:', error);
+      toast.error('Failed to update stage');
+    }
+  };
+
+  const deleteStage = async (id: string) => {
+    if (!company?.id) return;
+    
+    if (!confirm('Are you sure you want to delete this stage?')) return;
+    
+    try {
+      const { error } = await supabase
+        .from('office_stages')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setStages(stages.filter(stage => stage.id !== id));
+      toast.success('Stage deleted successfully');
+    } catch (error) {
+      console.error('Error deleting stage:', error);
+      toast.error('Failed to delete stage');
+    }
+  };
+
+  const openEditDialog = (stage: Stage) => {
+    setEditId(stage.id);
+    setEditName(stage.name);
+    setEditColor(stage.color || '#E5DEFF');
+    setEditDialogOpen(true);
   };
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
-        <CardTitle>Project Stages</CardTitle>
-        <div className="flex gap-2">
-          <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)} disabled={loading}>
-            <Edit className="h-4 w-4 mr-2" /> Edit
-          </Button>
-          <Button size="sm" onClick={() => setOpen(true)} disabled={loading || !company}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Stage
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="text-sm text-muted-foreground mb-4">
-            Define the standard project stages for your office. These are used across ALL PROJECTS.
-          </div>
-          
-          {!company && (
-            <div className="text-center p-4 border rounded-md border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-800">
-              No company selected. Please select a company to manage project stages.
-            </div>
-          )}
-          
-          {editMode && company && (
-            <div className="flex items-center gap-2 mb-2">
-              <Button
-                variant="destructive"
-                size="sm"
-                disabled={selected.length === 0 || loading}
-                onClick={handleBulkDelete}
-              >
-                <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
-              </Button>
-              <span className="text-xs text-muted-foreground">{selected.length} selected</span>
-            </div>
-          )}
-          
-          {loading ? (
-            <div className="text-center p-4 border rounded-md border-dashed">Loading...</div>
-          ) : company && stages.length > 0 ? (
-            <div className="grid gap-4">
-              {stages.map((stage) => (
-                <div 
-                  key={stage.id}
-                  className={`flex items-center justify-between p-3 border rounded-md ${editMode ? "ring-2" : ""} `}
-                  style={editMode && selected.includes(stage.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: stage.color }} />
-                    <span className="font-medium">{stage.name}</span>
-                    <span className="text-xs bg-muted-foreground/10 rounded px-2">{stage.number}</span>
-                  </div>
-                  {editMode ? (
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 accent-purple-600"
-                      checked={selected.includes(stage.id)}
-                      onChange={() => handleSelect(stage.id)}
-                    />
-                  ) : (
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(stage)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  )}
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold">Project Stages</h2>
+        
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="default">
+              <PlusCircle className="w-4 h-4 mr-2" />
+              Add Stage
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Project Stage</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <label htmlFor="stageName" className="text-sm font-medium">
+                  Stage Name
+                </label>
+                <Input
+                  id="stageName"
+                  value={newStage}
+                  onChange={(e) => setNewStage(e.target.value)}
+                  placeholder="e.g., Schematic Design"
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="stageColor" className="text-sm font-medium">
+                  Color
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    id="stageColor"
+                    value={newColor}
+                    onChange={(e) => setNewColor(e.target.value)}
+                    className="h-10 min-w-[3rem] cursor-pointer rounded border"
+                  />
+                  <Input 
+                    value={newColor} 
+                    onChange={(e) => setNewColor(e.target.value)}
+                    placeholder="#E5DEFF" 
+                  />
                 </div>
-              ))}
+              </div>
+              <div className="pt-4">
+                <Button onClick={addStage}>Add Stage</Button>
+              </div>
             </div>
-          ) : company ? (
-            <div className="text-center p-4 border rounded-md border-dashed">
-              No stages added yet. Click "Add Stage" to get started.
+          </DialogContent>
+        </Dialog>
+        
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Project Stage</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <label htmlFor="editStageName" className="text-sm font-medium">
+                  Stage Name
+                </label>
+                <Input
+                  id="editStageName"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="editStageColor" className="text-sm font-medium">
+                  Color
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    id="editStageColor"
+                    value={editColor}
+                    onChange={(e) => setEditColor(e.target.value)}
+                    className="h-10 min-w-[3rem] cursor-pointer rounded border"
+                  />
+                  <Input 
+                    value={editColor} 
+                    onChange={(e) => setEditColor(e.target.value)}
+                    placeholder="#E5DEFF" 
+                  />
+                </div>
+              </div>
+              <div className="pt-4">
+                <Button onClick={updateStage}>Update Stage</Button>
+              </div>
             </div>
-          ) : null}
+          </DialogContent>
+        </Dialog>
+      </div>
+      
+      {loading ? (
+        <div className="text-center py-10">Loading stages...</div>
+      ) : stages.length === 0 ? (
+        <div className="text-center py-10 border rounded-md border-dashed">
+          No project stages defined yet. Click 'Add Stage' to create your first project stage.
         </div>
-      </CardContent>
-
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{editingStage ? 'Edit' : 'Add'} Project Stage</DialogTitle>
-            <DialogDescription>
-              Enter the details for this project stage.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Stage Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Concept Design" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Stage Number</FormLabel>
-                    <FormControl>
-                      <select {...field} className="w-full border rounded p-2">
-                        <option value="">Select stage number...</option>
-                        {stageNumberOptions.map(n => (
-                          <option key={n} value={n}>{n}</option>
-                        ))}
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      <span className="flex items-center gap-2">
-                        <Palette className="w-4 h-4" />
-                        Color
-                      </span>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="grid grid-cols-6 gap-2 my-2">
-                        {COLORS.map((color) => (
-                          <button
-                            key={color}
-                            type="button"
-                            className={`w-full h-8 rounded-md flex items-center justify-center transition 
-                              ${field.value === color ? 'ring-2 ring-primary border-primary' : 'border border-input'}
-                              hover:scale-105 focus:outline-none`}
-                            style={{ backgroundColor: color }}
-                            onClick={() => field.onChange(color)}
-                            aria-label={color}
-                          >
-                            {field.value === color && (
-                              <Check className="w-4 h-4 text-black drop-shadow" />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <DialogFooter>
-                <Button type="submit" disabled={loading}>
-                  {editingStage ? 'Update' : 'Add'} Stage
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-    </Card>
+      ) : (
+        <div className="border rounded-md overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Color</TableHead>
+                <TableHead className="w-[100px]">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {stages.map((stage) => (
+                <TableRow key={stage.id}>
+                  <TableCell className="font-medium">{stage.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="w-6 h-6 rounded" 
+                        style={{ backgroundColor: stage.color || '#E5DEFF' }} 
+                      />
+                      <span>{stage.color || '#E5DEFF'}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex space-x-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => openEditDialog(stage)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => deleteStage(stage.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+    </div>
   );
 };
+
+export default StagesTab;

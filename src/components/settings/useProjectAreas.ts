@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -44,7 +45,7 @@ export default function useProjectAreas() {
         setAreas([]);
       } else {
         const transformedAreas = Array.isArray(data)
-          ? data.map(area => ({
+          ? data.map(area => toProjectArea({
               ...area,
               color: area.color || "#E5DEFF", // Default pastel if no color saved yet
             }))
@@ -72,7 +73,7 @@ export default function useProjectAreas() {
         setLoading(false);
         return;
       }
-      const areaData: Record<string, any> = {
+      const areaData = {
         code: values.code,
         name: values.country,
         emoji: null,
@@ -91,7 +92,10 @@ export default function useProjectAreas() {
         toast({ title: "Error", description: error?.message, variant: "destructive" });
       }
       if (data) {
-        setAreas(old => [...old, { ...data, color: data.color }]);
+        setAreas(old => [...old, toProjectArea({
+          ...data,
+          color: data.color || "#E5DEFF"
+        })]);
         toast({ title: "Success", description: "Area added successfully." });
       }
     } catch (err) {
@@ -113,7 +117,7 @@ export default function useProjectAreas() {
         setLoading(false);
         return;
       }
-      const areaData: Record<string, any> = {
+      const areaData = {
         code: values.code,
         name: values.country,
         company_id: company.id,
