@@ -22,11 +22,36 @@ import {
 } from "@/components/ui/select";
 import type { Database } from '@/integrations/supabase/types';
 
-// Define valid project statuses to match the database
+// Import the enum types from the database to ensure type safety
+type DbProjectStage = Database["public"]["Enums"]["project_stage"]; // "BD" | "SD" | "DD" | "CD" | "CMP"
+type DbProjectStatus = Database["public"]["Enums"]["project_status"]; // "In Progress" | "On Hold" | "Complete" | "Planning"
+
+// Use our custom types for UI display that may differ from DB types
 type ProjectStatus = 'In Progress' | 'Not Started' | 'Completed' | 'On Hold';
 
-// Define valid project stages to match the database
-type ProjectStage = string; // Use string for flexibility, validation happens in UI
+// Map UI status to DB status for data consistency
+const mapStatusToDb = (status: ProjectStatus): DbProjectStatus => {
+  switch(status) {
+    case 'In Progress': return 'In Progress';
+    case 'Completed': return 'Complete';
+    case 'On Hold': return 'On Hold';
+    case 'Not Started': 
+    default:
+      return 'Planning'; // Map "Not Started" to "Planning" in DB
+  }
+};
+
+// Map DB status to UI status for display
+const mapDbToStatus = (dbStatus: DbProjectStatus): ProjectStatus => {
+  switch(dbStatus) {
+    case 'In Progress': return 'In Progress';
+    case 'Complete': return 'Completed';
+    case 'On Hold': return 'On Hold';
+    case 'Planning': 
+    default:
+      return 'Not Started'; // Map "Planning" to "Not Started" in UI
+  }
+};
 
 // --- Load project stage and area colors from DB for rendering ---
 const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
@@ -75,11 +100,14 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   const areaColorMap = useAreaColorMap(locations);
 
   // --- Handle stage change ---
-  const handleStageChange = async (projectId: string, newStage: ProjectStage) => {
+  const handleStageChange = async (projectId: string, newStage: string) => {
     try {
+      // Convert to a valid DB enum type if possible
+      const dbStage = newStage as DbProjectStage;
+      
       const { error } = await supabase
         .from('projects')
-        .update({ current_stage: newStage })
+        .update({ current_stage: dbStage })
         .eq('id', projectId);
         
       if (error) {
@@ -94,11 +122,14 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   };
 
   // --- Handle status change ---
-  const handleStatusChange = async (projectId: string, newStatus: ProjectStatus) => {
+  const handleStatusChange = async (projectId: string, uiStatus: ProjectStatus) => {
     try {
+      // Map UI status to DB status
+      const dbStatus = mapStatusToDb(uiStatus);
+      
       const { error } = await supabase
         .from('projects')
-        .update({ status: newStatus })
+        .update({ status: dbStatus })
         .eq('id', projectId);
         
       if (error) {
@@ -160,7 +191,9 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         </TableHeader>
         <TableBody>
           {projects.map((project) => {
-            const statusColor = getStatusColor(project.status);
+            // Convert DB status to UI status for display
+            const uiStatus = mapDbToStatus(project.status as DbProjectStatus);
+            const statusColor = getStatusColor(uiStatus);
             
             // Find the matching location for this project's country
             const matchingLocation = locations.find(loc => 
@@ -199,7 +232,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 <TableCell>
                   {editMode ? (
                     <Select
-                      defaultValue={project.status}
+                      defaultValue={uiStatus}
                       onValueChange={(value) => handleStatusChange(project.id, value as ProjectStatus)}
                     >
                       <SelectTrigger className="h-8 w-40">
@@ -220,7 +253,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                         color: statusColor.text
                       }}
                     >
-                      {project.status}
+                      {uiStatus}
                     </span>
                   )}
                 </TableCell>

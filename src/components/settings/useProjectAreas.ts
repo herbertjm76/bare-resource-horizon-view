@@ -74,7 +74,7 @@ export default function useProjectAreas() {
         return;
       }
       
-      // Fixed: Ensure all required fields are provided
+      // Create a properly typed object with all required fields
       const areaData = {
         code: values.code,
         name: values.country,
@@ -120,7 +120,7 @@ export default function useProjectAreas() {
         return;
       }
       
-      // Fixed: Ensure all required fields are provided
+      // Create a properly typed object with all required fields
       const areaData = {
         code: values.code,
         name: values.country,

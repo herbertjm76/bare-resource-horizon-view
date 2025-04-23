@@ -82,13 +82,20 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (rolesError) throw rolesError;
 
-        // Fixed: Ensure we're selecting only fields that exist in the table
-        const { data: locationsData, error: locationsError } = await supabase
-          .from('office_locations')
-          .select('id, city, country, code, emoji, company_id, color')
-          .eq('company_id', company.id);
-
-        if (locationsError) throw locationsError;
+        // Check if office_locations has a color column before attempting to select it
+        let locationsData = [];
+        try {
+          const { data, error } = await supabase
+            .from('office_locations')
+            .select('id, city, country, code, emoji, company_id')
+            .eq('company_id', company.id);
+          
+          if (error) throw error;
+          locationsData = data || [];
+        } catch (locationError) {
+          console.error('Error fetching locations:', locationError);
+          locationsData = [];
+        }
 
         const { data: ratesData, error: ratesError } = await supabase
           .from('office_rates')
@@ -110,31 +117,39 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         console.log("Rates data:", ratesData);
         console.log("Stages data:", stagesData);
 
-        // Fixed: Properly handle data types
+        // Properly handle roles data
         if (Array.isArray(rolesData)) {
           setRoles(rolesData.map((r) => ({
-            ...r,
+            id: r.id,
+            name: r.name,
+            code: r.code,
             company_id: (r.company_id ?? company.id).toString()
           })));
         } else {
           setRoles([]);
         }
 
-        // Fixed: Properly handle locations data
+        // Properly handle locations data
         if (Array.isArray(locationsData)) {
           setLocations(locationsData.map((loc) => ({
-            ...loc,
+            id: loc.id,
+            city: loc.city,
+            country: loc.country,
+            code: loc.code,
+            emoji: loc.emoji,
             company_id: (loc.company_id ?? company.id).toString(),
-            color: loc.color || "#E5DEFF" // Default color if none is set
+            color: "#E5DEFF" // Default color
           })));
         } else {
           setLocations([]);
         }
         
-        // Fixed: Properly handle stages data
+        // Properly handle stages data
         if (Array.isArray(stagesData)) {
           setOfficeStages(stagesData.map((stage) => ({
-            ...stage,
+            id: stage.id,
+            name: stage.name,
+            order_index: stage.order_index,
             company_id: (stage.company_id ?? company.id).toString(),
             color: stage.color || "#E5DEFF" // Default color if none is set
           })));
@@ -142,7 +157,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           setOfficeStages([]);
         }
 
-        // Fixed: Properly handle rates data
+        // Properly handle rates data
         if (Array.isArray(ratesData)) {
           const typedRates: Rate[] = ratesData.map(r => ({
             id: r.id,
