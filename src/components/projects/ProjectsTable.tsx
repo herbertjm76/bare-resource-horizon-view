@@ -73,6 +73,21 @@ const useAreaColorMap = (areas: { code: string; color?: string; country: string 
   return map;
 };
 
+// Add this function to map custom stage names to DB enum values safely
+const mapCustomStageToDB = (stageName: string): DbProjectStage => {
+  // This is a simple mapping based on stage name patterns
+  // You might want to adjust this based on your specific naming conventions
+  const lowerName = stageName.toLowerCase();
+  if (lowerName.includes('bd') || lowerName.includes('business development')) return 'BD';
+  if (lowerName.includes('sd') || lowerName.includes('schematic design')) return 'SD';
+  if (lowerName.includes('dd') || lowerName.includes('design development')) return 'DD';
+  if (lowerName.includes('cd') || lowerName.includes('construction document')) return 'CD';
+  if (lowerName.includes('cmp') || lowerName.includes('complete')) return 'CMP';
+  
+  // Default to 'BD' if no match
+  return 'BD';
+};
+
 interface ProjectsTableProps {
   projects: any[]; // It's ok, we handle all project prop shapes here
   loading: boolean;
@@ -174,12 +189,15 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     }
   };
 
-  // --- Handle stage change ---
+  // --- Handle stage change --- (this is where the error was)
   const handleStageChange = async (projectId: string, newStage: string) => {
     try {
+      // Convert custom stage name to a valid DB enum value
+      const dbStage: DbProjectStage = mapCustomStageToDB(newStage);
+      
       const { error } = await supabase
         .from('projects')
-        .update({ current_stage: newStage })
+        .update({ current_stage: dbStage })
         .eq('id', projectId);
         
       if (error) {
@@ -257,7 +275,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             <TableHead>Status</TableHead>
             <TableHead>Country</TableHead>
             <TableHead>%Profit</TableHead>
-            <TableHead>AVG Rate</TableHead>
             <TableHead>Current Stage</TableHead>
             {/* Display all stages as separate columns */}
             {office_stages.map((stage) => (
@@ -405,10 +422,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                   ) : (
                     project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"
                   )}
-                </TableCell>
-                <TableCell>
-                  {/* Placeholder: Replace with real value if available */}
-                  85
                 </TableCell>
                 <TableCell>
                   {editMode ? (
