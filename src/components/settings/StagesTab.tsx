@@ -160,6 +160,9 @@ export const StagesTab: React.FC = () => {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
         <div>
           <CardTitle className="text-2xl font-semibold mb-1.5">Project Stages</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Define and manage the stages of your projects to track progress effectively
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="gap-2">
