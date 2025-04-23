@@ -1,106 +1,69 @@
 
-import { useState, useEffect } from 'react';
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
+import { useToast } from "@/hooks/use-toast";
+import type { ProjectAreaFormValues, ProjectArea } from "./projectAreaTypes";
+import { useProjectAreasState } from './hooks/useProjectAreasState';
+import { 
+  fetchProjectAreas, 
+  createProjectArea, 
+  updateProjectArea, 
+  deleteProjectAreas 
+} from './services/projectAreaService';
 
-import type {
-  ProjectAreaFormValues,
-  ProjectArea,
-} from "./projectAreaTypes";
-import { getAutoRegion, toProjectArea } from './projectAreaUtils';
-import { getPastelColor } from './projectAreaHelpers';
-
-export { getAutoRegion };
+export { getAutoRegion } from './projectAreaUtils';
 
 export default function useProjectAreas() {
-  const [areas, setAreas] = useState<ProjectArea[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { company, loading: companyLoading } = useCompany();
+  const { 
+    areas, 
+    setAreas, 
+    loading, 
+    setLoading, 
+    error, 
+    setError 
+  } = useProjectAreasState();
 
   useEffect(() => {
     if (companyLoading) return;
     setLoading(true);
     setError(null);
 
-    const fetchAreas = async () => {
-      if (!company || !company.id) {
-        setAreas([]);
-        setLoading(false);
-        setError("No company selected; cannot load areas.");
-        return;
-      }
-      const { data, error } = await supabase
-        .from("project_areas")
-        .select("*")
-        .eq('company_id', company.id)
-        .order("created_at", { ascending: true });
-
-      if (error) {
+    const loadAreas = async () => {
+      try {
+        const loadedAreas = await fetchProjectAreas(company?.id);
+        setAreas(loadedAreas);
+      } catch (err) {
         setError("Failed to load project areas.");
         setAreas([]);
-      } else {
-        const transformedAreas = Array.isArray(data)
-          ? data.map(area => toProjectArea({
-              ...area,
-              color: area.color || "#E5DEFF",
-            }))
-          : [];
-        setAreas(transformedAreas);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
-    fetchAreas();
-  }, [company, companyLoading]);
+    loadAreas();
+  }, [company, companyLoading, setAreas, setError, setLoading]);
 
   const addArea = async (values: ProjectAreaFormValues & { color?: string }) => {
     setLoading(true);
     setError(null);
     try {
-      if (!company || !company.id) {
-        setError("No company selected; cannot save area.");
-        toast({
-          title: "Error",
-          description: "No company selected; cannot save area.",
-          variant: "destructive"
-        });
-        setLoading(false);
-        return;
+      if (!company?.id) {
+        throw new Error("No company selected; cannot save area.");
       }
       
-      const areaColor = values.color || getPastelColor(values.code);
-      
-      const areaData = {
-        code: values.code,
-        name: values.country,
-        emoji: null,
-        company_id: company.id,
-        color: areaColor
-      };
-
-      const { data, error } = await supabase
-        .from("project_areas")
-        .insert(areaData)
-        .select()
-        .single();
-
-      if (error) {
-        setError("Failed to save area.");
-        toast({ title: "Error", description: error?.message, variant: "destructive" });
-      }
-      if (data) {
-        setAreas(old => [...old, toProjectArea({
-          ...data,
-          color: data.color || areaColor
-        })]);
-        toast({ title: "Success", description: "Area added successfully." });
-      }
+      const newArea = await createProjectArea(company.id, values);
+      setAreas(old => [...old, newArea]);
+      toast({ title: "Success", description: "Area added successfully." });
     } catch (err) {
-      setError("An unexpected error occurred.");
-      toast({ title: "Error", description: "An unexpected error occurred. Please try again.", variant: "destructive" });
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setError(errorMessage);
+      toast({ 
+        title: "Error", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
@@ -110,50 +73,34 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
     try {
-      if (!company || !company.id) {
-        setError("No company selected; cannot update area.");
-        toast({ title: "Error", description: "No company selected; cannot update area.", variant: "destructive" });
-        setLoading(false);
-        return;
+      if (!company?.id) {
+        throw new Error("No company selected; cannot update area.");
       }
-      
-      const areaColor = values.color || getPastelColor(values.code);
-      
-      const areaData = {
-        code: values.code,
-        name: values.country,
-        company_id: company.id,
-        color: areaColor
-      };
 
-      const { error } = await supabase
-        .from("project_areas")
-        .update(areaData)
-        .eq("id", id);
-
-      if (error) {
-        setError("Failed to update area.");
-        toast({ title: "Error", description: error?.message, variant: "destructive" });
-      } else {
-        setAreas(areas =>
-          areas.map(area =>
-            area.id === id
-              ? {
-                  ...area,
-                  code: values.code,
-                  country: values.country,
-                  region: values.region,
-                  company_id: company.id,
-                  color: areaColor,
-                }
-              : area
-          )
-        );
-        toast({ title: "Success", description: "Area updated successfully." });
-      }
+      await updateProjectArea(id, company.id, values);
+      setAreas(areas =>
+        areas.map(area =>
+          area.id === id
+            ? {
+                ...area,
+                code: values.code,
+                country: values.country,
+                region: values.region,
+                company_id: company.id,
+                color: values.color,
+              }
+            : area
+        )
+      );
+      toast({ title: "Success", description: "Area updated successfully." });
     } catch (err) {
-      setError("An unexpected error occurred.");
-      toast({ title: "Error", description: "An unexpected error occurred. Please try again.", variant: "destructive" });
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setError(errorMessage);
+      toast({ 
+        title: "Error", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
@@ -163,32 +110,18 @@ export default function useProjectAreas() {
     setLoading(true);
     setError(null);
     try {
-      const { error } = await supabase
-        .from("project_areas")
-        .delete()
-        .in("id", ids);
-
-      if (error) {
-        console.error("Error deleting areas:", error);
-        setError("Failed to delete area(s).");
-        toast({
-          title: "Error",
-          description: "Failed to delete the selected area(s).",
-          variant: "destructive"
-        });
-      } else {
-        setAreas(areas => areas.filter(a => !ids.includes(a.id)));
-        toast({
-          title: "Success",
-          description: `${ids.length} area(s) deleted successfully.`,
-        });
-      }
+      await deleteProjectAreas(ids);
+      setAreas(areas => areas.filter(a => !ids.includes(a.id)));
+      toast({
+        title: "Success",
+        description: `${ids.length} area(s) deleted successfully.`,
+      });
     } catch (err) {
-      console.error("Error deleting areas:", err);
-      setError("An unexpected error occurred.");
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setError(errorMessage);
       toast({
         title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -197,11 +130,11 @@ export default function useProjectAreas() {
   };
 
   return {
-    areas, 
+    areas,
     setAreas,
-    loading, 
+    loading,
     setLoading,
-    error, 
+    error,
     setError,
     addArea,
     updateArea,
