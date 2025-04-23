@@ -73,12 +73,14 @@ export default function useProjectAreas() {
         setLoading(false);
         return;
       }
-      const areaData: Partial<ProjectAreaRow> = {
+      
+      // Fixed: Ensure all required fields are provided
+      const areaData = {
         code: values.code,
         name: values.country,
         emoji: null,
         company_id: company.id,
-        color: values.color || "#E5DEFF",
+        color: values.color || "#E5DEFF"
       };
 
       const { data, error } = await supabase
@@ -117,11 +119,13 @@ export default function useProjectAreas() {
         setLoading(false);
         return;
       }
-      const areaData: Partial<ProjectAreaRow> = {
+      
+      // Fixed: Ensure all required fields are provided
+      const areaData = {
         code: values.code,
         name: values.country,
         company_id: company.id,
-        color: values.color,
+        color: values.color || "#E5DEFF"
       };
 
       const { error } = await supabase
@@ -142,7 +146,7 @@ export default function useProjectAreas() {
                   country: values.country,
                   region: values.region,
                   company_id: company.id,
-                  color: values.color,
+                  color: values.color || "#E5DEFF",
                 }
               : area
           )

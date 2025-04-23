@@ -82,6 +82,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (rolesError) throw rolesError;
 
+        // Fixed: Ensure we're selecting only fields that exist in the table
         const { data: locationsData, error: locationsError } = await supabase
           .from('office_locations')
           .select('id, city, country, code, emoji, company_id, color')
@@ -109,23 +110,39 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         console.log("Rates data:", ratesData);
         console.log("Stages data:", stagesData);
 
-        setRoles(Array.isArray(rolesData) ? rolesData.map((r) => ({
-          ...r,
-          company_id: (r.company_id ?? company.id).toString()
-        })) : []);
+        // Fixed: Properly handle data types
+        if (Array.isArray(rolesData)) {
+          setRoles(rolesData.map((r) => ({
+            ...r,
+            company_id: (r.company_id ?? company.id).toString()
+          })));
+        } else {
+          setRoles([]);
+        }
 
-        setLocations(Array.isArray(locationsData) ? locationsData.map((loc) => ({
-          ...loc,
-          company_id: (loc.company_id ?? company.id).toString(),
-          color: loc.color || "#E5DEFF" // Default color if none is set
-        })) : []);
+        // Fixed: Properly handle locations data
+        if (Array.isArray(locationsData)) {
+          setLocations(locationsData.map((loc) => ({
+            ...loc,
+            company_id: (loc.company_id ?? company.id).toString(),
+            color: loc.color || "#E5DEFF" // Default color if none is set
+          })));
+        } else {
+          setLocations([]);
+        }
         
-        setOfficeStages(Array.isArray(stagesData) ? stagesData.map((stage) => ({
-          ...stage,
-          company_id: (stage.company_id ?? company.id).toString(),
-          color: stage.color || "#E5DEFF" // Default color if none is set
-        })) : []);
+        // Fixed: Properly handle stages data
+        if (Array.isArray(stagesData)) {
+          setOfficeStages(stagesData.map((stage) => ({
+            ...stage,
+            company_id: (stage.company_id ?? company.id).toString(),
+            color: stage.color || "#E5DEFF" // Default color if none is set
+          })));
+        } else {
+          setOfficeStages([]);
+        }
 
+        // Fixed: Properly handle rates data
         if (Array.isArray(ratesData)) {
           const typedRates: Rate[] = ratesData.map(r => ({
             id: r.id,

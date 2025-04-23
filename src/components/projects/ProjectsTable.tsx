@@ -22,8 +22,11 @@ import {
 } from "@/components/ui/select";
 import type { Database } from '@/integrations/supabase/types';
 
-// Define valid project statuses
+// Define valid project statuses to match the database
 type ProjectStatus = 'In Progress' | 'Not Started' | 'Completed' | 'On Hold';
+
+// Define valid project stages to match the database
+type ProjectStage = string; // Use string for flexibility, validation happens in UI
 
 // --- Load project stage and area colors from DB for rendering ---
 const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
@@ -72,7 +75,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   const areaColorMap = useAreaColorMap(locations);
 
   // --- Handle stage change ---
-  const handleStageChange = async (projectId: string, newStage: string) => {
+  const handleStageChange = async (projectId: string, newStage: ProjectStage) => {
     try {
       const { error } = await supabase
         .from('projects')
