@@ -54,6 +54,9 @@ const mapDbToStatus = (dbStatus: DbProjectStatus): ProjectStatus => {
   }
 };
 
+// Valid project stages from the database
+const VALID_PROJECT_STAGES: DbProjectStage[] = ["BD", "SD", "DD", "CD", "CMP"];
+
 // --- Load project stage and area colors from DB for rendering ---
 const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
   const map: Record<string, string> = {};
@@ -177,7 +180,15 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   // --- Handle stage change ---
   const handleStageChange = async (projectId: string, newStage: string) => {
     try {
-      // Convert to a valid DB enum type if possible
+      // Validate that the stage is one of the allowed enum values
+      if (!VALID_PROJECT_STAGES.includes(newStage as DbProjectStage)) {
+        toast.error('Invalid project stage', { 
+          description: `Stage must be one of: ${VALID_PROJECT_STAGES.join(', ')}` 
+        });
+        return;
+      }
+      
+      // Convert to a valid DB enum type
       const dbStage = newStage as DbProjectStage;
       
       const { error } = await supabase
@@ -426,21 +437,28 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                         <SelectValue placeholder="Select stage" />
                       </SelectTrigger>
                       <SelectContent>
-                        {office_stages.map((stage) => (
-                          <SelectItem 
-                            key={stage.id} 
-                            value={stage.name}
-                          >
-                            <div 
-                              className="px-2 py-0.5 rounded w-full"
-                              style={{
-                                backgroundColor: stage.color || "#E5DEFF"
-                              }}
+                        {/* Only show valid stage options from the database enum */}
+                        {VALID_PROJECT_STAGES.map((stage) => {
+                          // Find the matching stage in office_stages if available
+                          const officeStage = office_stages.find(s => s.name === stage);
+                          const stageColor = officeStage?.color || stageColorMap[stage] || "#E5DEFF";
+                          
+                          return (
+                            <SelectItem 
+                              key={stage} 
+                              value={stage}
                             >
-                              {stage.name}
-                            </div>
-                          </SelectItem>
-                        ))}
+                              <div 
+                                className="px-2 py-0.5 rounded w-full"
+                                style={{
+                                  backgroundColor: stageColor
+                                }}
+                              >
+                                {stage}
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                   ) : (
