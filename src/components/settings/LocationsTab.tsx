@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,7 +17,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
-import allCountries from "@/lib/allCountries.json";
+import { allCountries } from "@/lib/countries";
 import CountrySelect from "@/components/ui/CountrySelect";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -67,7 +66,6 @@ export const LocationsTab = () => {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pickerTargetId, setPickerTargetId] = useState<string | null>(null);
 
-  // Fetch locations directly from Supabase
   const fetchLocations = async () => {
     if (!company) return;
     
@@ -92,7 +90,6 @@ export const LocationsTab = () => {
     }
   };
 
-  // Fetch locations on component mount
   useEffect(() => {
     if (company) {
       fetchLocations();
@@ -129,7 +126,6 @@ export const LocationsTab = () => {
     
     setLoading(true);
     try {
-      // Delete from Supabase
       const { error } = await supabase
         .from('office_locations')
         .delete()
@@ -137,7 +133,6 @@ export const LocationsTab = () => {
         
       if (error) throw error;
       
-      // Update local state
       setLocations(locations.filter(row => !selected.includes(row.id)));
       setSelected([]);
       setEditMode(false);
@@ -171,7 +166,6 @@ export const LocationsTab = () => {
     
     setLoading(true);
     try {
-      // Update in Supabase
       const { error } = await supabase
         .from('office_locations')
         .update({ emoji })
@@ -179,7 +173,6 @@ export const LocationsTab = () => {
         
       if (error) throw error;
       
-      // Update local state
       setLocations(
         locations.map(loc =>
           loc.id === pickerTargetId
@@ -217,7 +210,6 @@ export const LocationsTab = () => {
       };
 
       if (editingLocation) {
-        // Update existing location in Supabase
         const { error } = await supabase
           .from('office_locations')
           .update(locationData)
@@ -225,7 +217,6 @@ export const LocationsTab = () => {
           
         if (error) throw error;
         
-        // Update local state
         setLocations(locations.map(row => 
           row.id === editingLocation.id 
             ? { ...locationData, id: editingLocation.id } 
@@ -233,7 +224,6 @@ export const LocationsTab = () => {
         ));
         toast.success("Location updated successfully");
       } else {
-        // Insert new location in Supabase
         const { data, error } = await supabase
           .from('office_locations')
           .insert(locationData)
@@ -241,7 +231,6 @@ export const LocationsTab = () => {
           
         if (error) throw error;
         
-        // Update local state with the returned data that includes the generated ID
         if (data && data.length > 0) {
           setLocations([...locations, data[0]]);
           toast.success("Location added successfully");
