@@ -4,14 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { getPastelColor } from "./projectAreaHelpers";
 
-export type ProjectArea = {
-  id: string;
-  code: string;
-  city?: string;
-  region: string;
-  country: string;
-};
-
 interface ProjectAreaListProps {
   areas: ProjectArea[];
   loading: boolean;
@@ -52,8 +44,9 @@ export const ProjectAreaList: React.FC<ProjectAreaListProps> = ({
           )}
           {areas.length > 0 ? (
             <div className="grid gap-4">
-              {areas.map((area, idx) => {
-                const bg = getPastelColor(idx);
+              {areas.map((area) => {
+                // Use the area's color, or generate a color based on its code
+                const bg = area.color || getPastelColor(area.code);
                 return (
                   <div
                     key={area.id}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -10,8 +9,8 @@ import type {
   ProjectAreaRow,
 } from "./projectAreaTypes";
 import { getAutoRegion, toProjectArea } from './projectAreaUtils';
+import { getPastelColor } from './projectAreaHelpers';
 
-// Note: exports getAutoRegion for legacy/compatibility
 export { getAutoRegion };
 
 export default function useProjectAreas() {
@@ -21,7 +20,6 @@ export default function useProjectAreas() {
   const { toast } = useToast();
   const { company, loading: companyLoading } = useCompany();
 
-  // --- Fetch Project Areas with DB color ---
   useEffect(() => {
     if (companyLoading) return;
     setLoading(true);
@@ -47,7 +45,7 @@ export default function useProjectAreas() {
         const transformedAreas = Array.isArray(data)
           ? data.map(area => toProjectArea({
               ...area,
-              color: area.color || "#E5DEFF", // Default pastel if no color saved yet
+              color: area.color || "#E5DEFF",
             }))
           : [];
         setAreas(transformedAreas);
@@ -58,7 +56,6 @@ export default function useProjectAreas() {
     fetchAreas();
   }, [company, companyLoading]);
 
-  // --- When adding, allow specifying color and persist it! ---
   const addArea = async (values: ProjectAreaFormValues & { color?: string }) => {
     setLoading(true);
     setError(null);
@@ -74,13 +71,14 @@ export default function useProjectAreas() {
         return;
       }
       
-      // Create a properly typed object with all required fields
+      const areaColor = values.color || getPastelColor(values.code);
+      
       const areaData = {
         code: values.code,
         name: values.country,
         emoji: null,
         company_id: company.id,
-        color: values.color || "#E5DEFF"
+        color: areaColor
       };
 
       const { data, error } = await supabase
@@ -96,7 +94,7 @@ export default function useProjectAreas() {
       if (data) {
         setAreas(old => [...old, toProjectArea({
           ...data,
-          color: data.color || "#E5DEFF"
+          color: data.color || areaColor
         })]);
         toast({ title: "Success", description: "Area added successfully." });
       }
@@ -108,7 +106,6 @@ export default function useProjectAreas() {
     }
   };
 
-  // --- When updating area, update color too! ---
   const updateArea = async (id: string, values: ProjectAreaFormValues & { color?: string }) => {
     setLoading(true);
     setError(null);
@@ -120,12 +117,13 @@ export default function useProjectAreas() {
         return;
       }
       
-      // Create a properly typed object with all required fields
+      const areaColor = values.color || getPastelColor(values.code);
+      
       const areaData = {
         code: values.code,
         name: values.country,
         company_id: company.id,
-        color: values.color || "#E5DEFF"
+        color: areaColor
       };
 
       const { error } = await supabase
@@ -146,7 +144,7 @@ export default function useProjectAreas() {
                   country: values.country,
                   region: values.region,
                   company_id: company.id,
-                  color: values.color || "#E5DEFF",
+                  color: areaColor,
                 }
               : area
           )
@@ -161,7 +159,6 @@ export default function useProjectAreas() {
     }
   };
 
-  // --- Bulk Delete Project Areas ---
   const deleteAreas = async (ids: string[]) => {
     setLoading(true);
     setError(null);

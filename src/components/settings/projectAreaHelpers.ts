@@ -84,6 +84,15 @@ export const getContinentByCountryCode = (countryCode: string): string => {
   return "";
 };
 
-export function getPastelColor(index: number) {
-  return pastelColors[index % pastelColors.length];
+// Modify getPastelColor to return a color based on the code or name
+export function getPastelColor(input: string): string {
+  // Use a simple hash function to generate a consistent color based on the input
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash = ((hash << 5) - hash) + input.charCodeAt(i);
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Use the hash to select a color from the pastel array
+  return pastelColors[Math.abs(hash) % pastelColors.length];
 }
