@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Edit, Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 import { ColorPicker } from './ColorPicker';
 import { defaultStageColor } from './utils/stageColorUtils';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Stage {
   id: string;
@@ -155,15 +156,11 @@ export const StagesTab: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-4">
+    <Card className="border shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
         <div>
-          <h2 className="text-2xl font-bold text-[#6E59A5] mb-1">Project Stages</h2>
-          <p className="text-muted-foreground">
-            Track and manage the different stages of your projects, from initiation to completion
-          </p>
+          <CardTitle className="text-2xl font-semibold mb-1.5">Project Stages</CardTitle>
         </div>
-        
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="gap-2">
             <Edit className="h-4 w-4" /> Edit
@@ -173,48 +170,43 @@ export const StagesTab: React.FC = () => {
             Add Stage
           </Button>
         </div>
-      </div>
-
-      <div className="border rounded-lg p-4 bg-white">
-        {loading ? (
-          <div className="text-center py-10">Loading stages...</div>
-        ) : stages.length === 0 ? (
-          <div className="text-center py-10 border-dashed border rounded">
-            No project stages defined yet. Click 'Add Stage' to create your first project stage.
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {stages.map((stage) => (
-              <div
-                key={stage.id}
-                className="flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-md flex items-center justify-center text-sm font-medium"
-                    style={{ backgroundColor: stage.color || defaultStageColor }}
-                  >
-                    {stage.name.substring(0, 2).toUpperCase()}
-                  </div>
-                  <div>
-                    <div className="font-medium">{stage.name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      Order: {stage.order_index + 1}
+      </CardHeader>
+      <CardContent className="pt-2">
+        <div className="border rounded-lg p-4 bg-white">
+          {loading ? (
+            <div className="text-center py-10">Loading stages...</div>
+          ) : stages.length === 0 ? (
+            <div className="text-center py-10 border-dashed border rounded">
+              No project stages defined yet. Click 'Add Stage' to create your first project stage.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {stages.map((stage) => (
+                <div
+                  key={stage.id}
+                  className="flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="font-medium px-3 py-1 rounded"
+                      style={{ backgroundColor: stage.color || defaultStageColor }}
+                    >
+                      {stage.name}
                     </div>
                   </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => openEditDialog(stage)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => openEditDialog(stage)}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </CardContent>
       
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent>
@@ -246,7 +238,7 @@ export const StagesTab: React.FC = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </Card>
   );
 };
 
