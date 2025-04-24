@@ -9,6 +9,13 @@ import { toast } from 'sonner';
 import { ColorPicker } from './ColorPicker';
 import { defaultStageColor } from './utils/stageColorUtils';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Stage {
   id: string;
@@ -31,6 +38,8 @@ export const StagesTab: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { company } = useCompany();
+  const [currentStage, setCurrentStage] = useState('');
+  const [availableStages, setAvailableStages] = useState<Stage[]>([]);
 
   React.useEffect(() => {
     if (!company?.id) return;
@@ -39,6 +48,24 @@ export const StagesTab: React.FC = () => {
       setLoading(true);
       
       try {
+        // Fetch project stages from the database
+        const { data: projectStages, error: projectStagesError } = await supabase
+          .from('project_stages')
+          .select('stage_name')
+          .eq('company_id', company.id)
+          .distinct();
+        
+        if (projectStagesError) throw projectStagesError;
+        
+        if (projectStages) {
+          const uniqueStages = Array.from(new Set(projectStages.map(ps => ps.stage_name)));
+          setAvailableStages(stages.map(s => ({
+            ...s,
+            stage_name: uniqueStages.includes(s.name) ? s.name : ''
+          })));
+        }
+        
+        // Fetch office stages as before
         const { data, error } = await supabase
           .from('office_stages')
           .select('*')
@@ -80,7 +107,8 @@ export const StagesTab: React.FC = () => {
           name: newStage.trim(),
           color: newColor,
           order_index: nextOrderIndex,
-          company_id: company.id
+          company_id: company.id,
+          current_stage: currentStage || null
         })
         .select();
       
@@ -210,6 +238,58 @@ export const StagesTab: React.FC = () => {
           )}
         </div>
       </CardContent>
+      
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Project Stage</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <label htmlFor="stageName" className="text-sm font-medium">
+                Stage Name
+              </label>
+              <Input
+                id="stageName"
+                value={newStage}
+                onChange={(e) => setNewStage(e.target.value)}
+                placeholder="Enter stage name"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Current Stage</label>
+              <Select
+                value={currentStage}
+                onValueChange={setCurrentStage}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select current stage" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableStages.map((stage) => (
+                    <SelectItem key={stage.id} value={stage.name}>
+                      {stage.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Color</label>
+              <ColorPicker
+                selectedColor={newColor}
+                onColorChange={setNewColor}
+                className="mt-2"
+              />
+            </div>
+            <div className="pt-4">
+              <Button onClick={addStage}>Add Stage</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent>
