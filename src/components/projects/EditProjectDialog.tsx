@@ -107,18 +107,33 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
           .eq('project_id', project.id);
 
         console.log("Found project stages:", projectStages);
+        
+        // Also check if project has a current stage
+        const currentStageName = project.current_stage;
+        console.log("Current stage from project:", currentStageName);
 
+        let stageIds: string[] = [];
+        
+        // If we have a current stage, make sure it's in our stages array
+        if (currentStageName) {
+          const matchingStage = stagesArray.find(s => s.name === currentStageName);
+          if (matchingStage) {
+            stageIds.push(matchingStage.id);
+            console.log(`Found matching stage for current stage ${currentStageName}:`, matchingStage.id);
+          }
+        }
+
+        // Add any other stages from project_stages
         if (Array.isArray(projectStages) && projectStages.length > 0) {
           // Map stage names to stage IDs
-          const stageIds = projectStages
-            .map(ps => {
-              // Find the matching office stage by name
-              const matchingStage = stagesArray.find(s => s.name === ps.stage_name);
-              return matchingStage?.id;
-            })
-            .filter(Boolean) as string[];
+          projectStages.forEach(ps => {
+            const matchingStage = stagesArray.find(s => s.name === ps.stage_name);
+            if (matchingStage && !stageIds.includes(matchingStage.id)) {
+              stageIds.push(matchingStage.id);
+            }
+          });
 
-          console.log("Mapped stage IDs:", stageIds);
+          console.log("Final mapped stage IDs:", stageIds);
           console.log("Available office stages:", stagesArray);
 
           const stageFees: Record<string, StageFee> = {};
@@ -141,8 +156,29 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
             stages: stageIds,
             stageFees
           }));
+        } else if (stageIds.length > 0) {
+          // If we have stages from the current stage but no project_stages entries
+          console.log("No project stages found, but using current stage:", stageIds);
+          
+          const stageFees: Record<string, StageFee> = {};
+          stageIds.forEach(id => {
+            stageFees[id] = {
+              fee: '',
+              billingMonth: '',
+              status: 'Not Billed',
+              invoiceDate: null,
+              hours: '',
+              invoiceAge: 0
+            };
+          });
+          
+          setForm(prev => ({
+            ...prev,
+            stages: stageIds,
+            stageFees
+          }));
         } else {
-          console.log("No project stages found for project:", project.id);
+          console.log("No project stages or current stage found for project:", project.id);
         }
       } catch (error) {
         console.error('Error fetching form options:', error);
@@ -153,7 +189,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     if (isOpen) {
       fetchFormOptions();
     }
-  }, [company, isOpen, project.id]);
+  }, [company, isOpen, project.id, project.current_stage]);
 
   const handleChange = (key: keyof typeof form, value: any) => {
     setForm(prev => ({ ...prev, [key]: value }));
