@@ -11,7 +11,6 @@ interface ProjectsTableProps {
   loading: boolean;
   error?: string;
   editMode?: boolean;
-  onEdit?: (projectId: string) => void;
   onDelete?: (projectId: string) => void;
   selectedProjects: string[];
   onSelectProject: (projectId: string) => void;
@@ -22,8 +21,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   projects, 
   loading, 
   error,
-  editMode = false, 
-  onEdit, 
+  editMode = false,
   onDelete,
   selectedProjects, 
   onSelectProject,
@@ -55,7 +53,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               key={project.id}
               project={project}
               editMode={editMode}
-              onEdit={onEdit}
               onDelete={onDelete}
               selected={selectedProjects.includes(project.id)}
               onSelect={onSelectProject}

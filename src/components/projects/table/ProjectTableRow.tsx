@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 interface ProjectTableRowProps {
   project: any;
   editMode: boolean;
+  onEdit?: (projectId: string) => void;
   onDelete?: (projectId: string) => void;
   selected: boolean;
   onSelect: (projectId: string) => void;
@@ -21,6 +23,7 @@ interface ProjectTableRowProps {
 export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   project,
   editMode,
+  onEdit,
   onDelete,
   selected,
   onSelect,

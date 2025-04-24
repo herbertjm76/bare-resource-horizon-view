@@ -60,35 +60,6 @@ export const ProjectsList = () => {
     );
   };
 
-  const handleEditProject = (projectId: string) => {
-    setEditMode(true);
-  };
-
-  const deleteProject = async (projectId: string) => {
-    setIsDeleting(true);
-    try {
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', projectId);
-
-      if (error) throw error;
-
-      toast.success("Project deleted successfully");
-      refetch();
-      setSelectedProjects(prev => prev.filter(id => id !== projectId));
-    } catch (error: any) {
-      toast.error("Failed to delete project", {
-        description: error.message
-      });
-      console.error("Error deleting project:", error);
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteDialog(false);
-      setProjectToDelete(null);
-    }
-  };
-
   const handleDeleteProject = (projectId: string) => {
     setProjectToDelete(projectId);
     setShowDeleteDialog(true);
@@ -155,7 +126,6 @@ export const ProjectsList = () => {
           loading={isLoading} 
           error={error ? error.message : ''}
           editMode={editMode}
-          onEdit={handleEditProject}
           onDelete={handleDeleteProject}
           selectedProjects={selectedProjects}
           onSelectProject={handleSelectProject}
