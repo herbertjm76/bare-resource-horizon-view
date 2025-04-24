@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -36,12 +35,11 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     handleStageChange,
     getStatusColor,
     locations,
-    editableFields
+    editableFields,
+    getAreaByCountry
   } = useProjectTableRow(project, refetch);
 
-  const matchingLocation = locations.find(loc => 
-    loc.country === project.country || loc.code === project.country
-  );
+  const projectArea = getAreaByCountry(project.country);
 
   return (
     <TableRow 
@@ -133,11 +131,11 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           <span
             className="inline-block px-2 py-1 rounded"
             style={{
-              background: matchingLocation?.color || "#E5DEFF",
+              background: projectArea?.color || "#E5DEFF",
               color: "#212172"
             }}
           >
-            {matchingLocation?.code?.toUpperCase() || project.country}
+            {projectArea?.code?.toUpperCase() || project.country}
           </span>
         )}
       </TableCell>

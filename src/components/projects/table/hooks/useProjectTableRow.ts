@@ -5,9 +5,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { mapStatusToDb, mapCustomStageToDB, type ProjectStatus } from '../../utils/projectMappings';
 import { getStatusColor } from '../../hooks/useProjectColors';
+import { useProjectAreas } from '../../hooks/useProjectAreas';
 
 export const useProjectTableRow = (project: any, refetch: () => void) => {
   const { locations } = useOfficeSettings();
+  const { projectAreas, getAreaByCountry } = useProjectAreas();
   const [editableFields, setEditableFields] = useState<Record<string, any>>({});
 
   useEffect(() => {
@@ -110,6 +112,8 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     handleStageChange,
     getStatusColor,
     locations,
-    editableFields
+    editableFields,
+    projectAreas,
+    getAreaByCountry
   };
 };
