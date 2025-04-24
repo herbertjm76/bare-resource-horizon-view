@@ -5,6 +5,9 @@ import type { Database } from '@/integrations/supabase/types';
 type DbProjectStatus = Database["public"]["Enums"]["project_status"];
 export type ProjectStatus = 'In Progress' | 'Not Started' | 'Completed' | 'On Hold';
 
+// Define type for project stage that allows both enum values and string
+export type ProjectStage = Database["public"]["Enums"]["project_stage"] | string;
+
 export const mapStatusToDb = (status: ProjectStatus): DbProjectStatus => {
   switch(status) {
     case 'In Progress': return 'In Progress';
@@ -27,8 +30,8 @@ export const mapDbToStatus = (dbStatus: DbProjectStatus): ProjectStatus => {
   }
 };
 
-// This function is no longer needed as we're using text directly
-// We'll keep it with a string return type for backward compatibility
-export const mapCustomStageToDB = (stageName: string): string => {
-  return stageName;
+// This function is for backward compatibility and type safety
+// It ensures the stage name is properly typed for the database
+export const mapCustomStageToDB = (stageName: string): ProjectStage => {
+  return stageName as ProjectStage;
 };
