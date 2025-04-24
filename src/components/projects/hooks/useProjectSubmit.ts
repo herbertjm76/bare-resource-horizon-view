@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
@@ -112,6 +111,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
           const stageName = stage.name;
           const feeData = form.stageFees?.[stageId];
           const fee = feeData?.fee ? parseFloat(feeData.fee) : 0;
+          const isApplicable = form.stageApplicability?.[stageId] ?? true;
           
           // Check if this stage already exists
           const existingStage = existingStages?.find(s => s.stage_name === stageName);
@@ -120,7 +120,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
             // Update existing stage
             const { error } = await supabase
               .from('project_stages')
-              .update({ fee })
+              .update({ fee, is_applicable: isApplicable })
               .eq('id', existingStage.id);
               
             if (error) {
@@ -140,7 +140,8 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
                 project_id: projectId,
                 company_id: company.id,
                 stage_name: stageName,
-                fee
+                fee,
+                is_applicable: isApplicable
               });
               
             if (error) {

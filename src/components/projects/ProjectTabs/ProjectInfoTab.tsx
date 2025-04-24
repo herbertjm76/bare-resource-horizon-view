@@ -1,18 +1,8 @@
-
-import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { 
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem
-} from "@/components/ui/select";
-import { ProjectForm } from "../NewProjectDialog";
-import { supabase } from "@/integrations/supabase/client";
-import { useCompany } from "@/context/CompanyContext";
-import { toast } from "sonner";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface ProjectInfoTabProps {
   form: ProjectForm;
@@ -22,6 +12,7 @@ interface ProjectInfoTabProps {
   officeStages: Array<{ id: string; name: string }>;
   statusOptions: Array<{ label: string; value: string }>;
   onChange: (key: keyof ProjectForm, value: any) => void;
+  updateStageApplicability: (stageId: string, isChecked: boolean) => void;
 }
 
 export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
@@ -31,7 +22,8 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   offices,
   officeStages,
   statusOptions,
-  onChange
+  onChange,
+  updateStageApplicability
 }) => {
   const { company } = useCompany();
   const [isCheckingCode, setIsCheckingCode] = useState(false);
@@ -239,39 +231,44 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       </div>
 
       {/* Project Stages */}
-      <div>
-        <Label htmlFor="stages">Project Stages</Label>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {officeStages.map((stage) => (
-            <label 
-              key={stage.id} 
-              className={`px-3 py-2 border rounded-md cursor-pointer transition-colors duration-200 ${
-                form.stages.includes(stage.id) 
-                  ? 'bg-primary text-primary-foreground border-primary' 
-                  : 'bg-background border-input hover:bg-muted'
-              }`}
-            >
-              <input
-                type="checkbox"
-                className="sr-only"
-                checked={form.stages.includes(stage.id)}
-                onChange={(e) => {
-                  const updatedStages = e.target.checked
+      <div className="space-y-4">
+        <Label>Project Stages</Label>
+        {officeStages.map((stage) => {
+          const isSelected = form.stages.includes(stage.id);
+          return (
+            <div key={stage.id} className="flex items-center space-x-4">
+              <Checkbox
+                id={`stage-${stage.id}`}
+                checked={isSelected}
+                onCheckedChange={(checked) => {
+                  const newStages = checked
                     ? [...form.stages, stage.id]
-                    : form.stages.filter(id => id !== stage.id);
-                  onChange("stages", updatedStages);
+                    : form.stages.filter(s => s !== stage.id);
+                  onChange('stages', newStages);
                 }}
               />
-              {stage.name}
-            </label>
-          ))}
-        </div>
-        {officeStages.length === 0 && (
-          <p className="text-sm text-muted-foreground mt-2">
-            No stages defined. Please add stages in office settings.
-          </p>
-        )}
+              <Label htmlFor={`stage-${stage.id}`}>{stage.name}</Label>
+              
+              {isSelected && (
+                <Checkbox
+                  id={`stage-applicable-${stage.id}`}
+                  checked={form.stageApplicability?.[stage.id] ?? true}
+                  onCheckedChange={(checked) => updateStageApplicability(stage.id, checked)}
+                />
+              )}
+              {isSelected && (
+                <Label htmlFor={`stage-applicable-${stage.id}`}>Is Applicable</Label>
+              )}
+            </div>
+          );
+        })}
       </div>
+      
+      {officeStages.length === 0 && (
+        <p className="text-sm text-muted-foreground mt-2">
+          No stages defined. Please add stages in office settings.
+        </p>
+      )}
     </div>
   );
 };

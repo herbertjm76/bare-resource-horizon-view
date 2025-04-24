@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -37,7 +36,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     offices,
     officeStages,
     handleChange,
-    updateStageFee
+    updateStageFee,
+    updateStageApplicability
   } = useProjectForm(project, isOpen);
 
   const { handleSubmit } = useProjectSubmit(project.id, refetch, onClose);
@@ -46,10 +46,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     e.preventDefault();
     if (isLoading) return;
     
-    // Log the form state before submission for debugging
     console.log('Submitting form:', form);
-    console.log('Selected stages:', form.stages);
-    console.log('Office stages:', officeStages);
+    console.log('Selected stages and applicability:', form.stages, form.stageApplicability);
     
     await handleSubmit({ ...form, officeStages }, setIsLoading);
   };
@@ -58,9 +56,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl">
-            Edit Project
-          </DialogTitle>
+          <DialogTitle className="text-xl">Edit Project</DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit}>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -77,6 +73,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
                 countries={countries}
                 offices={offices}
                 officeStages={officeStages}
+                updateStageApplicability={updateStageApplicability}
                 statusOptions={[
                   { label: "Not started", value: "Planning" },
                   { label: "On-going", value: "In Progress" },

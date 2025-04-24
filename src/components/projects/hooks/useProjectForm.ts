@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -25,6 +24,7 @@ interface FormState {
   current_stage: string;
   stages: string[];
   stageFees: Record<string, StageFee>;
+  stageApplicability: Record<string, boolean>;
 }
 
 export const useProjectForm = (project: any, isOpen: boolean) => {
@@ -48,6 +48,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     current_stage: project.current_stage || "",
     stages: [],
     stageFees: {},
+    stageApplicability: {},
   });
 
   useEffect(() => {
@@ -93,7 +94,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
 
         const { data: projectStages } = await supabase
           .from('project_stages')
-          .select('stage_name, fee')
+          .select('stage_name, fee, is_applicable')
           .eq('project_id', project.id);
 
         const currentStageName = project.current_stage;
@@ -107,18 +108,16 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
         }
 
         if (Array.isArray(projectStages) && projectStages.length > 0) {
-          projectStages.forEach(ps => {
-            const matchingStage = stagesArray.find(s => s.name === ps.stage_name);
-            if (matchingStage && !stageIds.includes(matchingStage.id)) {
-              stageIds.push(matchingStage.id);
-            }
-          });
+          const stagesMap = new Map();
+          const applicabilityMap: Record<string, boolean> = {};
+          const feesMap: Record<string, StageFee> = {};
 
-          const stageFees: Record<string, StageFee> = {};
-          projectStages.forEach(ps => {
-            const matchingStage = stagesArray.find(s => s.name === ps.stage_name);
+          projectStages?.forEach(ps => {
+            const matchingStage = stagesArray.find(os => os.name === ps.stage_name);
             if (matchingStage) {
-              stageFees[matchingStage.id] = {
+              stagesMap.set(matchingStage.id, true);
+              applicabilityMap[matchingStage.id] = ps.is_applicable ?? true;
+              feesMap[matchingStage.id] = {
                 fee: ps.fee?.toString() || '',
                 billingMonth: '',
                 status: 'Not Billed',
@@ -131,8 +130,9 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
 
           setForm(prev => ({
             ...prev,
-            stages: stageIds,
-            stageFees
+            stages: Array.from(stagesMap.keys()),
+            stageApplicability: applicabilityMap,
+            stageFees: feesMap
           }));
         } else if (stageIds.length > 0) {
           const stageFees: Record<string, StageFee> = {};
@@ -188,6 +188,16 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     }));
   };
 
+  const updateStageApplicability = (stageId: string, isApplicable: boolean) => {
+    setForm(prev => ({
+      ...prev,
+      stageApplicability: {
+        ...prev.stageApplicability,
+        [stageId]: isApplicable
+      }
+    }));
+  };
+
   return {
     form,
     isLoading,
@@ -198,6 +208,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     officeStages,
     formErrors,
     handleChange,
-    updateStageFee
+    updateStageFee,
+    updateStageApplicability
   };
 };

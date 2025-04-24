@@ -509,6 +509,7 @@ export type Database = {
           created_at: string | null
           fee: number
           id: string
+          is_applicable: boolean | null
           project_id: string
           stage_name: string
           updated_at: string | null
@@ -518,6 +519,7 @@ export type Database = {
           created_at?: string | null
           fee: number
           id?: string
+          is_applicable?: boolean | null
           project_id: string
           stage_name: string
           updated_at?: string | null
@@ -527,6 +529,7 @@ export type Database = {
           created_at?: string | null
           fee?: number
           id?: string
+          is_applicable?: boolean | null
           project_id?: string
           stage_name?: string
           updated_at?: string | null
