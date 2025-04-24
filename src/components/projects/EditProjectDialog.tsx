@@ -50,15 +50,9 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     console.log('Submitting form:', form);
     console.log('Selected stages and applicability:', form.stages, form.stageApplicability);
     
-    // Get stage names from selected stage IDs
-    const selectedStageNames = form.stages.map(stageId => {
-      const stage = officeStages.find(os => os.id === stageId);
-      return stage ? stage.name : '';
-    }).filter(Boolean);
-
+    // Pass the entire form data including the officeStages for stage name resolution
     await handleSubmit({ 
       ...form, 
-      stages: selectedStageNames,  // Pass selected stage names to submit handler
       officeStages 
     }, setIsLoading);
   };

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -92,39 +93,52 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
         const stagesArray = Array.isArray(stages) ? stages : [];
         setOfficeStages(stagesArray);
 
+        // Log project data to see what we're working with
+        console.log('Project data:', project);
+        console.log('Project stages:', project.stages);
+        
+        // Fetch project stages from project_stages table
         const { data: projectStages } = await supabase
           .from('project_stages')
           .select('stage_name, fee, is_applicable')
           .eq('project_id', project.id);
 
-        const currentStageName = project.current_stage;
-        let stageIds: string[] = [];
+        console.log('Project stages from DB:', projectStages);
         
-        const selectedStageIds = (project.stages as string[] || [])
-          .map(stageName => {
+        // Map stage names to stage IDs
+        const selectedStageIds: string[] = [];
+        const stageApplicability: Record<string, boolean> = {};
+        const stageFees: Record<string, any> = {};
+        
+        // First handle stages from the project.stages array (text array in projects table)
+        if (Array.isArray(project.stages) && project.stages.length > 0) {
+          project.stages.forEach((stageName: string) => {
             const matchingStage = stagesArray.find(s => s.name === stageName);
-            return matchingStage ? matchingStage.id : null;
-          })
-          .filter(Boolean);
-
-        if (currentStageName) {
-          const matchingStage = stagesArray.find(s => s.name === currentStageName);
-          if (matchingStage) {
-            stageIds.push(matchingStage.id);
-          }
+            if (matchingStage) {
+              selectedStageIds.push(matchingStage.id);
+              stageApplicability[matchingStage.id] = true;
+              stageFees[matchingStage.id] = {
+                fee: '',
+                billingMonth: '',
+                status: 'Not Billed',
+                invoiceDate: null,
+                hours: '',
+                invoiceAge: 0
+              };
+            }
+          });
         }
 
+        // Then overlay data from project_stages table for fees and applicability
         if (Array.isArray(projectStages) && projectStages.length > 0) {
-          const stagesMap = new Map();
-          const applicabilityMap: Record<string, boolean> = {};
-          const feesMap: Record<string, any> = {};
-
-          projectStages?.forEach(ps => {
+          projectStages.forEach(ps => {
             const matchingStage = stagesArray.find(os => os.name === ps.stage_name);
             if (matchingStage) {
-              stagesMap.set(matchingStage.id, true);
-              applicabilityMap[matchingStage.id] = ps.is_applicable ?? true;
-              feesMap[matchingStage.id] = {
+              if (!selectedStageIds.includes(matchingStage.id)) {
+                selectedStageIds.push(matchingStage.id);
+              }
+              stageApplicability[matchingStage.id] = ps.is_applicable ?? true;
+              stageFees[matchingStage.id] = {
                 fee: ps.fee?.toString() || '',
                 billingMonth: '',
                 status: 'Not Billed',
@@ -134,42 +148,29 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
               };
             }
           });
-
-          setForm(prev => ({
-            ...prev,
-            stages: Array.from(stagesMap.keys()),
-            stageApplicability: applicabilityMap,
-            stageFees: feesMap
-          }));
-        } else if (selectedStageIds.length > 0) {
-          const stageFees: Record<string, any> = {};
-          selectedStageIds.forEach(id => {
-            stageFees[id] = {
-              fee: '',
-              billingMonth: '',
-              status: 'Not Billed',
-              invoiceDate: null,
-              hours: '',
-              invoiceAge: 0
-            };
-          });
-          
-          setForm(prev => ({
-            ...prev,
-            stages: selectedStageIds,
-            stageFees
-          }));
         }
+
+        console.log('Mapped stage IDs:', selectedStageIds);
+        console.log('Stage applicability:', stageApplicability);
+        console.log('Stage fees:', stageFees);
+        
+        setForm(prev => ({
+          ...prev,
+          stages: selectedStageIds,
+          stageApplicability,
+          stageFees
+        }));
+
       } catch (error) {
         console.error('Error fetching form options:', error);
         toast.error('Failed to load form options');
       }
     };
 
-    if (isOpen) {
+    if (isOpen && project.id) {
       fetchFormOptions();
     }
-  }, [company, isOpen, project.id, project.current_stage]);
+  }, [company, isOpen, project.id, project.current_stage, project.stages]);
 
   const handleChange = (key: keyof FormState, value: any) => {
     setForm(prev => ({ ...prev, [key]: value }));

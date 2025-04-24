@@ -255,6 +255,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         <Label>Project Stages</Label>
         {officeStages.map((stage) => {
           const isSelected = form.stages.includes(stage.id);
+          const isApplicable = form.stageApplicability?.[stage.id] ?? true;
           return (
             <div key={stage.id} className="flex items-center space-x-4">
               <Checkbox
@@ -272,10 +273,10 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
               {isSelected && updateStageApplicability && (
                 <Checkbox
                   id={`stage-applicable-${stage.id}`}
-                  checked={form.stageApplicability?.[stage.id] ?? true}
+                  checked={isApplicable}
                   onCheckedChange={(checked) => {
                     if (updateStageApplicability) {
-                      updateStageApplicability(stage.id, checked === true);
+                      updateStageApplicability(stage.id, !!checked);
                     }
                   }}
                 />

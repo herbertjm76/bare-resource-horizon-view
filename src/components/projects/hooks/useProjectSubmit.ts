@@ -12,6 +12,14 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
     try {
       console.log('Submitting project update with form data:', form);
       
+      // Get stage names from selected stage IDs
+      const selectedStageNames = form.stages.map((stageId: string) => {
+        const stage = form.officeStages?.find((s: any) => s.id === stageId);
+        return stage ? stage.name : '';
+      }).filter(Boolean);
+
+      console.log('Selected stage names:', selectedStageNames);
+      
       // Prepare update object, ensuring no empty values for UUID fields
       const projectUpdate = {
         code: form.code,
@@ -22,7 +30,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         country: form.country,
         current_stage: form.current_stage,
         target_profit_percentage: form.profit ? Number(form.profit) : null,
-        stages: form.stages || []  // Store selected stage names
+        stages: selectedStageNames
       };
       
       console.log('Project update data:', projectUpdate);
@@ -46,10 +54,10 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       }
 
       console.log('Existing stages:', existingStages);
-      console.log('Selected stages:', form.stages);
+      console.log('Selected stages:', selectedStageNames);
       
       // If no stages are selected, delete all existing stages
-      if (!form.stages || form.stages.length === 0) {
+      if (!selectedStageNames || selectedStageNames.length === 0) {
         if (existingStages && existingStages.length > 0) {
           const { error } = await supabase
             .from('project_stages')
@@ -63,17 +71,11 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         }
       } else {
         // Handle the case where stages are selected
-        const selectedStageNames = new Set(form.stages);
-        const stagesToKeep = new Set();
+        const stagesToKeep = new Set(selectedStageNames);
+        const existingStageNames = new Set(existingStages?.map(s => s.stage_name) || []);
         
         // Find existing stages that match selected stages
         if (existingStages && existingStages.length > 0) {
-          for (const existingStage of existingStages) {
-            if (selectedStageNames.has(existingStage.stage_name)) {
-              stagesToKeep.add(existingStage.stage_name);
-            }
-          }
-          
           // Delete stages that are not selected anymore
           const stagesToDelete = existingStages
             .filter(stage => !stagesToKeep.has(stage.stage_name))
@@ -94,9 +96,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         }
         
         // Now insert or update stages
-        const existingStageNames = new Set(existingStages?.map(s => s.stage_name) || []);
-        
-        for (const stageName of form.stages) {
+        for (const stageName of selectedStageNames) {
           const stage = form.officeStages?.find((s: any) => s.name === stageName);
           if (!stage) continue;
           
