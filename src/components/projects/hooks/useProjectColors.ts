@@ -1,6 +1,4 @@
 
-import { ProjectStage } from '@/integrations/supabase/types';
-
 export const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
   const map: Record<string, string> = {};
   stages.forEach(stage => {

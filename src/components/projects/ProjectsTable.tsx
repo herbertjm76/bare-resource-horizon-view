@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -259,6 +258,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                         { value: 'Completed', label: 'Completed' },
                         { value: 'On Hold', label: 'On Hold' }
                       ]}
+                      onBlur={() => {}}
                     />
                   ) : (
                     <span 
@@ -285,6 +285,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                         label: location.code?.toUpperCase() || '',
                         color: location.color
                       }))}
+                      onBlur={() => {}}
                     />
                   ) : (
                     <span
@@ -325,6 +326,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                         label: stage.name,
                         color: stage.color
                       }))}
+                      onBlur={() => {}}
                     />
                   ) : (
                     <span

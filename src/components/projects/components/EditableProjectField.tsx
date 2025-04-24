@@ -14,7 +14,7 @@ interface EditableFieldProps {
   type: 'text' | 'select';
   value: string;
   onChange: (value: string) => void;
-  onBlur: () => void;
+  onBlur?: () => void; // Made optional
   options?: Array<{ value: string; label: string; color?: string }>;
   className?: string;
 }
@@ -23,7 +23,7 @@ export const EditableProjectField: React.FC<EditableFieldProps> = ({
   type,
   value,
   onChange,
-  onBlur,
+  onBlur = () => {}, // Default no-op function
   options,
   className
 }) => {
