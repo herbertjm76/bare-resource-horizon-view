@@ -599,7 +599,7 @@ export type Database = {
           company_id: string | null
           country: string
           created_at: string | null
-          current_stage: Database["public"]["Enums"]["project_stage"]
+          current_stage: string
           id: string
           name: string
           office_id: string
@@ -614,7 +614,7 @@ export type Database = {
           company_id?: string | null
           country: string
           created_at?: string | null
-          current_stage?: Database["public"]["Enums"]["project_stage"]
+          current_stage: string
           id?: string
           name: string
           office_id: string
@@ -629,7 +629,7 @@ export type Database = {
           company_id?: string | null
           country?: string
           created_at?: string | null
-          current_stage?: Database["public"]["Enums"]["project_stage"]
+          current_stage?: string
           id?: string
           name?: string
           office_id?: string
@@ -677,7 +677,6 @@ export type Database = {
       }
     }
     Enums: {
-      project_stage: "BD" | "SD" | "DD" | "CD" | "CMP"
       project_status: "In Progress" | "On Hold" | "Complete" | "Planning"
       user_role: "owner" | "admin" | "member"
     }
@@ -795,7 +794,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      project_stage: ["BD", "SD", "DD", "CD", "CMP"],
       project_status: ["In Progress", "On Hold", "Complete", "Planning"],
       user_role: ["owner", "admin", "member"],
     },

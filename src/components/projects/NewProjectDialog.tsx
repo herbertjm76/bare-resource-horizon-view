@@ -21,6 +21,7 @@ type RoleOption = { id: string; name: string };
 type OfficeOption = { id: string; city: string; country: string; code?: string; emoji?: string };
 type OfficeStageOption = { id: string; name: string; };
 type ProjectStatus = Database["public"]["Enums"]["project_status"];
+type DbProjectStatus = Database["public"]["Enums"]["project_status"];
 
 const statusOptions = [
   { label: "Not started", value: "Planning" as ProjectStatus },
@@ -281,7 +282,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       
       const currentStage = (form.current_stage === 'none' || !form.current_stage) 
         ? null 
-        : (form.current_stage as ProjectStage);
+        : form.current_stage;
       
       const { data, error } = await supabase.from('projects').insert({
         code: form.code,
@@ -289,7 +290,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         company_id: company.id,
         project_manager_id: manager,
         office_id: office,
-        status: projectStatus as ProjectStatus,
+        status: projectStatus as DbProjectStatus,
         country: country,
         current_stage: currentStage,
         target_profit_percentage: form.profit ? Number(form.profit) : null

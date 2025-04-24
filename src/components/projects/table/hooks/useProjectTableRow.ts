@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { mapStatusToDb, type ProjectStatus, type ProjectStage } from '../../utils/projectMappings';
+import { mapStatusToDb, type ProjectStatus } from '../../utils/projectMappings';
 import { getStatusColor } from '../../hooks/useProjectColors';
 import { useProjectAreas } from '../../hooks/useProjectAreas';
 
@@ -42,7 +41,7 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
           updateData.country = value;
           break;
         case 'current_stage':
-          updateData.current_stage = value as ProjectStage;
+          updateData.current_stage = value;
           
           // Also update the local state
           setEditableFields(prev => ({
@@ -113,10 +112,9 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
         }
       }));
       
-      // Cast to ProjectStage type to satisfy TypeScript
       const { error } = await supabase
         .from('projects')
-        .update({ current_stage: newStage as ProjectStage })
+        .update({ current_stage: newStage })
         .eq('id', projectId);
         
       if (error) {
