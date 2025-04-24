@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -189,8 +190,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
             key={`${project.id}-${stage.id}`} 
             className="text-center"
             style={{
-              backgroundColor: stage.color || "#E5DEFF",
-              opacity: isCurrentStage ? 1 : 0.3
+              backgroundColor: isCurrentStage ? (stage.color || "#E5DEFF") : "#F8F9FA",
+              opacity: isCurrentStage ? 1 : 0.5
             }}
           >
             {isCurrentStage ? (
@@ -232,3 +233,4 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     </TableRow>
   );
 };
+
