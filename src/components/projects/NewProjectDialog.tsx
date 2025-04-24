@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -15,6 +16,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ProjectInfoTab } from "./ProjectTabs/ProjectInfoTab";
 import { ProjectStageFeesTab } from "./ProjectTabs/ProjectStageFeesTab";
+import { mapCustomStageToDB } from './utils/projectMappings';
 
 type RoleOption = { id: string; name: string };
 type OfficeOption = { id: string; city: string; country: string; code?: string; emoji?: string };
@@ -277,7 +279,12 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       const manager = form.manager === 'none' ? null : (form.manager === "not_assigned" ? null : (form.manager || null));
       const country = form.country === 'none' ? null : form.country;
       const office = form.office === 'none' ? null : form.office;
-      const currentStage = form.current_stage === 'none' ? null : form.current_stage;
+      
+      // Convert the current_stage string to a valid DB enum value if needed
+      // If current_stage is 'none' or empty, set it to null
+      const currentStage = (form.current_stage === 'none' || !form.current_stage) 
+        ? null 
+        : mapCustomStageToDB(form.current_stage);
       
       const { data, error } = await supabase.from('projects').insert({
         code: form.code,
@@ -310,8 +317,16 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       setOpen(false);
       toast.success('Project successfully created!');
       setForm({
-        code: "", name: "", manager: "", country: "",
-        profit: "", avgRate: "", status: "", office: "", stages: [],
+        code: "", 
+        name: "", 
+        manager: "", 
+        country: "",
+        profit: "", 
+        avgRate: "", 
+        status: "", 
+        office: "", 
+        current_stage: "",
+        stages: [],
         stageFees: {}
       });
       setFormErrors({});
