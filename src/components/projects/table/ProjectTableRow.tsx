@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -168,7 +169,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           />
         ) : (
           <span
-            className="inline-block px-2 py-1 rounded text-sm"
+            className="inline-block px-2 py-1 rounded text-xs"  // Changed from text-sm to text-xs to match status
             style={{
               backgroundColor: stageColorMap[project.current_stage] || "#E5DEFF",
               color: "#212172"
