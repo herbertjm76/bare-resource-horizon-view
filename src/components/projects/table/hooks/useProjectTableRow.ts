@@ -42,8 +42,7 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
           updateData.country = value;
           break;
         case 'current_stage':
-          // Map the stage name to the correct DB enum value
-          updateData.current_stage = mapCustomStageToDB(value);
+          updateData.current_stage = value;
           
           // Also update the local state
           setEditableFields(prev => ({
@@ -114,13 +113,10 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
         }
       }));
       
-      // Map the stage name to the correct DB enum value
-      const dbStage = mapCustomStageToDB(newStage);
-      console.log('Mapped DB stage:', dbStage);
-      
+      // No need to map, we can directly use the stage name
       const { error } = await supabase
         .from('projects')
-        .update({ current_stage: dbStage })
+        .update({ current_stage: newStage })
         .eq('id', projectId);
         
       if (error) {

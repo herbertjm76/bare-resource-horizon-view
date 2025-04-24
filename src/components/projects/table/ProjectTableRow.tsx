@@ -160,7 +160,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
             type="select"
             className="w-40"
             value={editableFields[project.id]?.current_stage || project.current_stage}
-            onChange={(value) => handleFieldUpdate(project.id, 'current_stage', value)}
+            onChange={(value) => handleStageChange(project.id, value)}
             options={office_stages.map(stage => ({
               value: stage.name,
               label: stage.name,
@@ -169,7 +169,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           />
         ) : (
           <span
-            className="px-2 py-1 rounded"
+            className="inline-block px-2 py-1 rounded text-sm"
             style={{
               backgroundColor: stageColorMap[project.current_stage] || "#E5DEFF",
               color: "#212172"
