@@ -15,7 +15,6 @@ import type { Database } from "@/integrations/supabase/types";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ProjectInfoTab } from "./ProjectTabs/ProjectInfoTab";
 import { ProjectStageFeesTab } from "./ProjectTabs/ProjectStageFeesTab";
-import { mapCustomStageToDB } from './utils/projectMappings';
 
 type RoleOption = { id: string; name: string };
 type OfficeOption = { id: string; city: string; country: string; code?: string; emoji?: string };

@@ -1,5 +1,4 @@
 
-
 import { useState, useEffect } from 'react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';

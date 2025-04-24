@@ -1,3 +1,4 @@
+
 import type { Database } from '@/integrations/supabase/types';
 
 // Note: The DB now uses text type for current_stage instead of an enum
@@ -29,5 +30,5 @@ export const mapDbToStatus = (dbStatus: DbProjectStatus): ProjectStatus => {
 // This function is no longer needed as we're using text directly
 // We'll keep it with a string return type for backward compatibility
 export const mapCustomStageToDB = (stageName: string): string => {
-  return stageName; // Just return the stage name as-is
+  return stageName;
 };
