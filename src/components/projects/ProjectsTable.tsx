@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -12,71 +13,15 @@ import { Edit, Trash2 } from "lucide-react";
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import type { Database } from '@/integrations/supabase/types';
-
-type DbProjectStage = Database["public"]["Enums"]["project_stage"]; // "BD" | "SD" | "DD" | "CD" | "CMP"
-type DbProjectStatus = Database["public"]["Enums"]["project_status"]; // "In Progress" | "On Hold" | "Complete" | "Planning"
-
-type ProjectStatus = 'In Progress' | 'Not Started' | 'Completed' | 'On Hold';
-
-const mapStatusToDb = (status: ProjectStatus): DbProjectStatus => {
-  switch(status) {
-    case 'In Progress': return 'In Progress';
-    case 'Completed': return 'Complete';
-    case 'On Hold': return 'On Hold';
-    case 'Not Started': 
-    default:
-      return 'Planning';
-  }
-};
-
-const mapDbToStatus = (dbStatus: DbProjectStatus): ProjectStatus => {
-  switch(dbStatus) {
-    case 'In Progress': return 'In Progress';
-    case 'Complete': return 'Completed';
-    case 'On Hold': return 'On Hold';
-    case 'Planning': 
-    default:
-      return 'Not Started';
-  }
-};
-
-const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
-  const map: Record<string, string> = {};
-  stages.forEach(stage => {
-    map[stage.name] = stage.color || '#E5DEFF';
-    map[stage.id] = stage.color || '#E5DEFF';
-  });
-  return map;
-};
-
-const useAreaColorMap = (areas: { code: string; color?: string; country: string }[]) => {
-  const map: Record<string, string> = {};
-  areas.forEach(area => {
-    map[area.country] = area.color || '#E5DEFF';
-    map[area.code] = area.color || '#E5DEFF';
-  });
-  return map;
-};
-
-const mapCustomStageToDB = (stageName: string): DbProjectStage => {
-  const lowerName = stageName.toLowerCase();
-  if (lowerName.includes('bd') || lowerName.includes('business development')) return 'BD';
-  if (lowerName.includes('sd') || lowerName.includes('schematic design')) return 'SD';
-  if (lowerName.includes('dd') || lowerName.includes('design development')) return 'DD';
-  if (lowerName.includes('cd') || lowerName.includes('construction document')) return 'CD';
-  if (lowerName.includes('cmp') || lowerName.includes('complete')) return 'CMP';
-  
-  return 'BD';
-};
+import { EditableProjectField } from './components/EditableProjectField';
+import { useStageColorMap, useAreaColorMap, getStatusColor } from './hooks/useProjectColors';
+import { 
+  mapStatusToDb, 
+  mapDbToStatus, 
+  mapCustomStageToDB,
+  type ProjectStatus 
+} from './utils/projectMappings';
 
 interface ProjectsTableProps {
   projects: any[];
@@ -105,7 +50,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 
   const stageColorMap = useStageColorMap(office_stages);
   const areaColorMap = useAreaColorMap(locations);
-
   const [editableFields, setEditableFields] = useState<Record<string, Record<string, any>>>({});
 
   useEffect(() => {
@@ -175,7 +119,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 
   const handleStageChange = async (projectId: string, newStage: string) => {
     try {
-      const dbStage: DbProjectStage = mapCustomStageToDB(newStage);
+      const dbStage = mapCustomStageToDB(newStage);
       
       const { error } = await supabase
         .from('projects')
@@ -225,21 +169,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     return <div className="text-center p-8 border rounded-md border-dashed">No projects found. Click "New Project" to create your first project.</div>;
   }
 
-  const getStatusColor = (status: string) => {
-    switch(status) {
-      case 'On Hold':
-        return { bg: "#ccc9ff", text: "#212172" };
-      case 'In Progress':
-        return { bg: "#b3efa7", text: "#257e30" };
-      case 'Completed':
-        return { bg: "#eaf1fe", text: "#174491" };
-      case 'Not Started':
-        return { bg: "#ffe4e6", text: "#d946ef" };
-      default:
-        return { bg: "#E5DEFF", text: "#6E59A5" };
-    }
-  };
-
   return (
     <div className="rounded-md border overflow-x-auto">
       <Table>
@@ -261,7 +190,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         </TableHeader>
         <TableBody>
           {projects.map((project) => {
-            const uiStatus = mapDbToStatus(project.status as DbProjectStatus);
+            const uiStatus = mapDbToStatus(project.status as Database["public"]["Enums"]["project_status"]);
             const statusColor = getStatusColor(uiStatus);
             
             const matchingLocation = locations.find(loc => 
@@ -287,10 +216,11 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 
                 <TableCell className="font-semibold">
                   {editMode ? (
-                    <Input
-                      className="h-8 w-20"
+                    <EditableProjectField
+                      type="text"
+                      className="w-20"
                       value={editableFields[project.id]?.code || project.code}
-                      onChange={(e) => handleFieldChange(project.id, 'code', e.target.value)}
+                      onChange={(value) => handleFieldChange(project.id, 'code', value)}
                       onBlur={() => handleFieldUpdate(project.id, 'code', editableFields[project.id]?.code)}
                     />
                   ) : (
@@ -300,10 +230,11 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 
                 <TableCell>
                   {editMode ? (
-                    <Input
-                      className="h-8 w-full"
+                    <EditableProjectField
+                      type="text"
+                      className="w-full"
                       value={editableFields[project.id]?.name || project.name}
-                      onChange={(e) => handleFieldChange(project.id, 'name', e.target.value)}
+                      onChange={(value) => handleFieldChange(project.id, 'name', value)}
                       onBlur={() => handleFieldUpdate(project.id, 'name', editableFields[project.id]?.name)}
                     />
                   ) : (
@@ -317,20 +248,18 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 
                 <TableCell>
                   {editMode ? (
-                    <Select
-                      defaultValue={uiStatus}
-                      onValueChange={(value) => handleStatusChange(project.id, value as ProjectStatus)}
-                    >
-                      <SelectTrigger className="h-8 w-40">
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="In Progress">In Progress</SelectItem>
-                        <SelectItem value="Not Started">Not Started</SelectItem>
-                        <SelectItem value="Completed">Completed</SelectItem>
-                        <SelectItem value="On Hold">On Hold</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <EditableProjectField
+                      type="select"
+                      className="w-40"
+                      value={uiStatus}
+                      onChange={(value) => handleStatusChange(project.id, value as ProjectStatus)}
+                      options={[
+                        { value: 'In Progress', label: 'In Progress' },
+                        { value: 'Not Started', label: 'Not Started' },
+                        { value: 'Completed', label: 'Completed' },
+                        { value: 'On Hold', label: 'On Hold' }
+                      ]}
+                    />
                   ) : (
                     <span 
                       className="inline-block px-2 py-0.5 rounded text-xs"
@@ -346,31 +275,17 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 
                 <TableCell>
                   {editMode ? (
-                    <Select
-                      defaultValue={project.country}
-                      onValueChange={(value) => handleFieldUpdate(project.id, 'country', value)}
-                    >
-                      <SelectTrigger className="h-8 w-32">
-                        <SelectValue placeholder="Country" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {locations.map((location) => (
-                          <SelectItem 
-                            key={location.code} 
-                            value={location.country}
-                          >
-                            <div 
-                              className="px-2 py-0.5 rounded w-full"
-                              style={{
-                                backgroundColor: location.color || "#E5DEFF"
-                              }}
-                            >
-                              {location.code?.toUpperCase()}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <EditableProjectField
+                      type="select"
+                      className="w-32"
+                      value={project.country}
+                      onChange={(value) => handleFieldUpdate(project.id, 'country', value)}
+                      options={locations.map(location => ({
+                        value: location.country,
+                        label: location.code?.toUpperCase() || '',
+                        color: location.color
+                      }))}
+                    />
                   ) : (
                     <span
                       className="inline-block px-2 py-1 rounded"
@@ -386,11 +301,11 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 
                 <TableCell>
                   {editMode ? (
-                    <Input
-                      className="h-8 w-20"
-                      type="number"
-                      value={editableFields[project.id]?.profit || project.target_profit_percentage || 0}
-                      onChange={(e) => handleFieldChange(project.id, 'profit', parseFloat(e.target.value))}
+                    <EditableProjectField
+                      type="text"
+                      className="w-20"
+                      value={String(editableFields[project.id]?.profit || project.target_profit_percentage || 0)}
+                      onChange={(value) => handleFieldChange(project.id, 'profit', parseFloat(value))}
                       onBlur={() => handleFieldUpdate(project.id, 'profit', editableFields[project.id]?.profit)}
                     />
                   ) : (
@@ -400,31 +315,17 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                 
                 <TableCell>
                   {editMode ? (
-                    <Select
-                      defaultValue={project.current_stage}
-                      onValueChange={(value) => handleStageChange(project.id, value)}
-                    >
-                      <SelectTrigger className="h-8 w-40">
-                        <SelectValue placeholder="Select stage" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {office_stages.map((stage) => (
-                          <SelectItem 
-                            key={stage.id} 
-                            value={stage.name}
-                          >
-                            <div 
-                              className="px-2 py-0.5 rounded w-full"
-                              style={{
-                                backgroundColor: stage.color || "#E5DEFF"
-                              }}
-                            >
-                              {stage.name}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <EditableProjectField
+                      type="select"
+                      className="w-40"
+                      value={project.current_stage}
+                      onChange={(value) => handleStageChange(project.id, value)}
+                      options={office_stages.map(stage => ({
+                        value: stage.name,
+                        label: stage.name,
+                        color: stage.color
+                      }))}
+                    />
                   ) : (
                     <span
                       className="px-2 py-1 rounded"
