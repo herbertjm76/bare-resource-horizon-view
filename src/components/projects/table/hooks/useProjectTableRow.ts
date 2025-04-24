@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { mapStatusToDb, type ProjectStatus } from '../../utils/projectMappings';
+import { mapStatusToDb, mapCustomStageToDB, type ProjectStatus } from '../../utils/projectMappings';
 import { getStatusColor } from '../../hooks/useProjectColors';
 
 export const useProjectTableRow = (project: any, refetch: () => void) => {
@@ -84,9 +84,12 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
 
   const handleStageChange = async (projectId: string, newStage: string) => {
     try {
+      // Map the stage name to the correct DB enum value
+      const dbStage = mapCustomStageToDB(newStage);
+      
       const { error } = await supabase
         .from('projects')
-        .update({ current_stage: newStage })
+        .update({ current_stage: dbStage })
         .eq('id', projectId);
         
       if (error) {
