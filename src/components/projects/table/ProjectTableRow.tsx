@@ -185,12 +185,19 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
       {office_stages.map((stage) => {
         const isCurrentStage = project.current_stage === stage.name;
         return (
-          <TableCell key={`${project.id}-${stage.id}`} className="text-center">
+          <TableCell 
+            key={`${project.id}-${stage.id}`} 
+            className="text-center"
+            style={{
+              backgroundColor: stage.color || "#E5DEFF",
+              opacity: isCurrentStage ? 1 : 0.3
+            }}
+          >
             {isCurrentStage ? (
               <div 
                 className="h-3 w-3 rounded-full mx-auto"
                 style={{
-                  backgroundColor: stage.color || "#E5DEFF"
+                  backgroundColor: "#212172"
                 }}
               />
             ) : null}
