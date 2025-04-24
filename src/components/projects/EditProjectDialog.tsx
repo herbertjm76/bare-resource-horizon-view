@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -21,6 +20,15 @@ interface EditProjectDialogProps {
   refetch: () => void;
 }
 
+interface StageFee {
+  fee: string;
+  billingMonth: string;
+  status: "Not Billed" | "Invoiced" | "Paid" | "";
+  invoiceDate: Date | null;
+  hours: string;
+  invoiceAge: number;
+}
+
 export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   project,
   isOpen,
@@ -36,17 +44,6 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const [officeStages, setOfficeStages] = useState<Array<{ id: string; name: string }>>([]);
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
-  // Define a proper type for the stageFees object
-  interface StageFee {
-    fee: string;
-    billingMonth: string;
-    status: "Not Billed" | "Invoiced" | "Paid" | "";
-    invoiceDate: Date | null;
-    hours: string;
-    invoiceAge: number;
-  }
-
-  // Update the form state with proper typing for stageFees
   const [form, setForm] = useState({
     code: project.code || "",
     name: project.name || "",
@@ -66,7 +63,6 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
       if (!company || !company.id) return;
       
       try {
-        // Fetch managers
         const { data: mgrs } = await supabase
           .from('profiles')
           .select('id, first_name, last_name')
@@ -79,7 +75,6 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
             }))
           : []);
 
-        // Fetch project areas for countries
         const { data: areas } = await supabase
           .from('project_areas')
           .select('name')
@@ -89,7 +84,6 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
           Array.isArray(areas) ? areas.map(a => a.name).filter(Boolean) : []
         )));
 
-        // Fetch offices
         const { data: locs } = await supabase
           .from('office_locations')
           .select('id, city, country, code, emoji')
@@ -97,32 +91,33 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 
         setOffices(Array.isArray(locs) ? locs : []);
 
-        // Fetch stages
         const { data: stages } = await supabase
           .from('office_stages')
           .select('id, name')
           .eq('company_id', company.id);
 
-        setOfficeStages(Array.isArray(stages) ? stages : []);
+        const stagesArray = Array.isArray(stages) ? stages : [];
+        setOfficeStages(stagesArray);
 
-        // Fetch existing stage fees
-        const { data: existingStages } = await supabase
+        const { data: projectStages } = await supabase
           .from('project_stages')
-          .select('*')
+          .select('stage_name, fee')
           .eq('project_id', project.id);
 
-        if (Array.isArray(existingStages)) {
-          const stageIds = existingStages.map(stage => {
-            const matchingStage = stages?.find(s => s.name === stage.stage_name);
-            return matchingStage?.id;
-          }).filter(Boolean) as string[];
+        if (Array.isArray(projectStages) && projectStages.length > 0) {
+          const stageIds = projectStages
+            .map(ps => {
+              const matchingStage = stagesArray.find(s => s.name === ps.stage_name);
+              return matchingStage?.id;
+            })
+            .filter(Boolean) as string[];
 
           const stageFees: Record<string, StageFee> = {};
-          existingStages.forEach(stage => {
-            const matchingStage = stages?.find(s => s.name === stage.stage_name);
+          projectStages.forEach(ps => {
+            const matchingStage = stagesArray.find(s => s.name === ps.stage_name);
             if (matchingStage) {
               stageFees[matchingStage.id] = {
-                fee: stage.fee?.toString() || '',
+                fee: ps.fee?.toString() || '',
                 billingMonth: '',
                 status: 'Not Billed',
                 invoiceDate: null,
@@ -132,13 +127,17 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
             }
           });
 
+          console.log("Found project stages:", projectStages.length);
+          console.log("Mapped to stage IDs:", stageIds);
+
           setForm(prev => ({
             ...prev,
             stages: stageIds,
             stageFees
           }));
+        } else {
+          console.log("No project stages found for project:", project.id);
         }
-
       } catch (error) {
         console.error('Error fetching form options:', error);
         toast.error('Failed to load form options');
@@ -180,7 +179,6 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     setIsLoading(true);
 
     try {
-      // Update project details
       const { error: projectError } = await supabase
         .from('projects')
         .update({
@@ -197,44 +195,60 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 
       if (projectError) throw projectError;
 
-      // Handle stage fees
       const { data: existingStages } = await supabase
         .from('project_stages')
         .select('id, stage_name')
         .eq('project_id', project.id);
 
-      // Delete existing stages that are no longer selected
-      if (existingStages) {
-        const stagesToDelete = existingStages.filter(stage => {
-          const matchingStage = officeStages.find(s => s.name === stage.stage_name);
-          return !form.stages.includes(matchingStage?.id || '');
-        });
+      console.log("Current stages in form:", form.stages);
+      console.log("Existing stages in DB:", existingStages);
 
-        if (stagesToDelete.length) {
-          await supabase
+      if (existingStages && existingStages.length > 0) {
+        const stagesToKeep = new Set();
+        
+        for (const stageId of form.stages) {
+          const stageName = officeStages.find(s => s.id === stageId)?.name;
+          if (stageName) {
+            const existingStage = existingStages.find(s => s.stage_name === stageName);
+            if (existingStage) {
+              stagesToKeep.add(existingStage.id);
+            }
+          }
+        }
+        
+        const stagesToDelete = existingStages
+          .filter(stage => !stagesToKeep.has(stage.id))
+          .map(stage => stage.id);
+        
+        if (stagesToDelete.length > 0) {
+          console.log("Deleting stages:", stagesToDelete);
+          const { error } = await supabase
             .from('project_stages')
             .delete()
-            .in('id', stagesToDelete.map(s => s.id));
+            .in('id', stagesToDelete);
+            
+          if (error) {
+            console.error("Error deleting stages:", error);
+          }
         }
       }
 
-      // Update or insert stage fees
-      const stagePromises = form.stages.map(stageId => {
+      for (const stageId of form.stages) {
         const stageName = officeStages.find(s => s.id === stageId)?.name;
-        if (!stageName) return null;
-
+        if (!stageName) continue;
+        
         const feeData = form.stageFees[stageId];
         const existingStage = existingStages?.find(s => s.stage_name === stageName);
-
+        
         if (existingStage) {
-          return supabase
+          await supabase
             .from('project_stages')
             .update({
               fee: feeData?.fee ? parseFloat(feeData.fee) : 0
             })
             .eq('id', existingStage.id);
         } else {
-          return supabase
+          await supabase
             .from('project_stages')
             .insert({
               project_id: project.id,
@@ -243,9 +257,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
               fee: feeData?.fee ? parseFloat(feeData.fee) : 0
             });
         }
-      });
-
-      await Promise.all(stagePromises.filter(Boolean));
+      }
 
       toast.success('Project updated successfully');
       refetch();
