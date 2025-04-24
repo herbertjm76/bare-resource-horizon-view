@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -44,14 +43,14 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
 
   return (
     <TableRow 
-      className="align-middle text-sm hover:bg-muted/30"
+      className="align-middle text-xs hover:bg-muted/20"
       data-state={selected ? "selected" : undefined}
     >
       {editMode && (
         <TableCell>
           <input
             type="checkbox"
-            className="h-4 w-4 rounded accent-[#6E59A5]"
+            className="h-3 w-3 rounded accent-[#6E59A5]"
             checked={selected}
             onChange={() => onSelect(project.id)}
           />
