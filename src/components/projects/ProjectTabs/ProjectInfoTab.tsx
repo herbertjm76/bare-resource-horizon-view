@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -125,7 +124,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
             <SelectValue placeholder="Select a project manager" />
           </SelectTrigger>
           <SelectContent>
-            {/* Changed empty string to placeholder value */}
             <SelectItem value="none">Select a project manager</SelectItem>
             <SelectItem value="not_assigned">Not Assigned</SelectItem>
             {managers.map((manager) => (
@@ -150,7 +148,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
               <SelectValue placeholder="Select a country" />
             </SelectTrigger>
             <SelectContent>
-              {/* Changed empty string to placeholder value */}
               <SelectItem value="none">Select a country</SelectItem>
               {countries.map((country) => (
                 <SelectItem key={country} value={country}>
@@ -171,7 +168,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
               <SelectValue placeholder="Select an office" />
             </SelectTrigger>
             <SelectContent>
-              {/* Changed empty string to placeholder value */}
               <SelectItem value="none">Select an office</SelectItem>
               {offices.map((office) => (
                 <SelectItem key={office.id} value={office.id}>
@@ -183,20 +179,26 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         </div>
       </div>
 
-      {/* Profit & Status */}
+      {/* Current Stage & Status */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="profit">Target Profit %</Label>
-          <Input
-            id="profit"
-            type="number"
-            min="0"
-            max="100"
-            placeholder="30"
-            value={form.profit}
-            onChange={(e) => onChange("profit", e.target.value)}
-            required
-          />
+          <Label htmlFor="current_stage">Current Stage</Label>
+          <Select
+            value={form.current_stage || "none"}
+            onValueChange={(value) => onChange("current_stage", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select current stage" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Not Selected</SelectItem>
+              {officeStages.map((stage) => (
+                <SelectItem key={stage.id} value={stage.name}>
+                  {stage.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label htmlFor="status">Status</Label>
@@ -209,7 +211,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
               <SelectValue placeholder="Select a status" />
             </SelectTrigger>
             <SelectContent>
-              {/* Changed empty string to placeholder value */}
               <SelectItem value="none">Select a status</SelectItem>
               {statusOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
@@ -219,6 +220,21 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {/* Profit */}
+      <div>
+        <Label htmlFor="profit">Target Profit %</Label>
+        <Input
+          id="profit"
+          type="number"
+          min="0"
+          max="100"
+          placeholder="30"
+          value={form.profit}
+          onChange={(e) => onChange("profit", e.target.value)}
+          required
+        />
       </div>
 
       {/* Project Stages */}

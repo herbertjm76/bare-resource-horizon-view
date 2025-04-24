@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -29,7 +28,6 @@ const statusOptions = [
   { label: "On hold", value: "On Hold" as ProjectStatus },
 ];
 
-// Export this type for use in tab components
 export type ProjectForm = {
   code: string;
   name: string;
@@ -39,6 +37,7 @@ export type ProjectForm = {
   avgRate: string;
   status: ProjectStatus | string;
   office: string;
+  current_stage: string;
   stages: string[];
   stageFees: Record<string, {
     fee: string;
@@ -64,6 +63,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     avgRate: "",
     status: "",
     office: "",
+    current_stage: "",
     stages: [],
     stageFees: {},
   });
@@ -128,7 +128,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
   const handleChange = (key: keyof ProjectForm, value: any) => {
     setForm((f) => ({ ...f, [key]: value }));
     
-    // Clear any errors for this field
     if (formErrors[key]) {
       setFormErrors((prev) => {
         const newErrors = {...prev};
@@ -195,7 +194,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
   };
 
   const isProjectInfoValid = () => {
-    // Update validation to accept 'none' as invalid
     return (
       !!form.code &&
       !!form.name &&
@@ -266,7 +264,6 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       return;
     }
     
-    // Check if project code is unique before submitting
     const isCodeUnique = await checkProjectCodeUnique();
     if (!isCodeUnique) {
       toast.error(`Project code "${form.code}" already exists. Please use a unique code.`);
@@ -276,11 +273,11 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     
     setIsLoading(true);
     try {
-      // Make sure we're not submitting 'none' as a value to the database
       const projectStatus = form.status === 'none' ? "Planning" : (form.status || "Planning");
       const manager = form.manager === 'none' ? null : (form.manager === "not_assigned" ? null : (form.manager || null));
       const country = form.country === 'none' ? null : form.country;
       const office = form.office === 'none' ? null : form.office;
+      const currentStage = form.current_stage === 'none' ? null : form.current_stage;
       
       const { data, error } = await supabase.from('projects').insert({
         code: form.code,
@@ -290,6 +287,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         office_id: office,
         status: projectStatus as ProjectStatus,
         country: country,
+        current_stage: currentStage,
         target_profit_percentage: form.profit ? Number(form.profit) : null
       }).select();
 
