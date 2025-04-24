@@ -40,6 +40,7 @@ export const useProjects = () => {
             status,
             country,
             target_profit_percentage,
+            current_stage,
             project_manager:profiles(first_name, last_name),
             office:offices(id, name, country)
           `)
