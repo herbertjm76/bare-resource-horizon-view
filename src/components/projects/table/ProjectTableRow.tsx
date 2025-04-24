@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { EditableProjectField } from '../components/EditableProjectField';
 import { useProjectTableRow } from './hooks/useProjectTableRow';
 import type { ProjectStatus } from '../utils/projectMappings';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { EditProjectDialog } from '../EditProjectDialog';
 
 interface ProjectTableRowProps {
   project: any;
@@ -149,7 +151,15 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         )}
       </TableRow>
 
-      
+      {/* Add the EditProjectDialog component */}
+      {showEditDialog && (
+        <EditProjectDialog
+          project={project}
+          isOpen={showEditDialog}
+          onClose={() => setShowEditDialog(false)}
+          refetch={refetch}
+        />
+      )}
     </>
   );
 };
