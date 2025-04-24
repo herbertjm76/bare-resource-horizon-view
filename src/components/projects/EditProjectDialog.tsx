@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -99,18 +100,26 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
         const stagesArray = Array.isArray(stages) ? stages : [];
         setOfficeStages(stagesArray);
 
+        // Fetch the project stages for this specific project
         const { data: projectStages } = await supabase
           .from('project_stages')
           .select('stage_name, fee')
           .eq('project_id', project.id);
 
+        console.log("Found project stages:", projectStages);
+
         if (Array.isArray(projectStages) && projectStages.length > 0) {
+          // Map stage names to stage IDs
           const stageIds = projectStages
             .map(ps => {
+              // Find the matching office stage by name
               const matchingStage = stagesArray.find(s => s.name === ps.stage_name);
               return matchingStage?.id;
             })
             .filter(Boolean) as string[];
+
+          console.log("Mapped stage IDs:", stageIds);
+          console.log("Available office stages:", stagesArray);
 
           const stageFees: Record<string, StageFee> = {};
           projectStages.forEach(ps => {
@@ -126,9 +135,6 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
               };
             }
           });
-
-          console.log("Found project stages:", projectStages.length);
-          console.log("Mapped to stage IDs:", stageIds);
 
           setForm(prev => ({
             ...prev,
