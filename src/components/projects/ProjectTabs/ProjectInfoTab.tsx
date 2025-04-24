@@ -1,8 +1,28 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useCompany } from '@/context/CompanyContext';
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+// Define the ProjectForm interface here since it's needed by the component props
+interface ProjectForm {
+  code: string;
+  name: string;
+  manager: string;
+  country: string;
+  profit: string;
+  avgRate?: string;
+  status: string;
+  office: string;
+  current_stage: string;
+  stages: string[];
+  stageFees: Record<string, any>;
+  stageApplicability?: Record<string, boolean>;
+}
 
 interface ProjectInfoTabProps {
   form: ProjectForm;
@@ -12,7 +32,7 @@ interface ProjectInfoTabProps {
   officeStages: Array<{ id: string; name: string }>;
   statusOptions: Array<{ label: string; value: string }>;
   onChange: (key: keyof ProjectForm, value: any) => void;
-  updateStageApplicability: (stageId: string, isChecked: boolean) => void;
+  updateStageApplicability?: (stageId: string, isChecked: boolean) => void;
 }
 
 export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
@@ -249,14 +269,18 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
               />
               <Label htmlFor={`stage-${stage.id}`}>{stage.name}</Label>
               
-              {isSelected && (
+              {isSelected && updateStageApplicability && (
                 <Checkbox
                   id={`stage-applicable-${stage.id}`}
                   checked={form.stageApplicability?.[stage.id] ?? true}
-                  onCheckedChange={(checked) => updateStageApplicability(stage.id, checked)}
+                  onCheckedChange={(checked) => {
+                    if (updateStageApplicability) {
+                      updateStageApplicability(stage.id, checked === true);
+                    }
+                  }}
                 />
               )}
-              {isSelected && (
+              {isSelected && updateStageApplicability && (
                 <Label htmlFor={`stage-applicable-${stage.id}`}>Is Applicable</Label>
               )}
             </div>

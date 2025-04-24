@@ -49,6 +49,7 @@ export type ProjectForm = {
     hours: string;
     invoiceAge: number;
   }>;
+  stageApplicability: Record<string, boolean>;
 };
 
 export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ onProjectCreated }) => {
@@ -68,6 +69,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     current_stage: "",
     stages: [],
     stageFees: {},
+    stageApplicability: {},
   });
 
   const [managers, setManagers] = useState<RoleOption[]>([]);
@@ -140,6 +142,8 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     
     if (key === 'stages') {
       const newStageFees: Record<string, any> = {};
+      const newStageApplicability: Record<string, boolean> = {...form.stageApplicability};
+      
       value.forEach((stageId: string) => {
         if (!form.stageFees[stageId]) {
           newStageFees[stageId] = {
@@ -153,12 +157,28 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         } else {
           newStageFees[stageId] = form.stageFees[stageId];
         }
+        
+        if (newStageApplicability[stageId] === undefined) {
+          newStageApplicability[stageId] = true;
+        }
       });
+      
       setForm(prev => ({
         ...prev,
-        stageFees: newStageFees
+        stageFees: newStageFees,
+        stageApplicability: newStageApplicability
       }));
     }
+  };
+
+  const updateStageApplicability = (stageId: string, isChecked: boolean) => {
+    setForm(prev => ({
+      ...prev,
+      stageApplicability: {
+        ...prev.stageApplicability,
+        [stageId]: isChecked
+      }
+    }));
   };
 
   const updateStageFee = (stageId: string, data: Partial<ProjectForm['stageFees'][string]>) => {
@@ -325,7 +345,8 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         office: "", 
         current_stage: "",
         stages: [],
-        stageFees: {}
+        stageFees: {},
+        stageApplicability: {}
       });
       setFormErrors({});
       setActiveTab("info");
@@ -370,6 +391,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
                 officeStages={officeStages}
                 statusOptions={statusOptions}
                 onChange={handleChange}
+                updateStageApplicability={updateStageApplicability}
               />
             </TabsContent>
 
