@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { EditableProjectField } from '../components/EditableProjectField';
 import { useProjectTableRow } from './hooks/useProjectTableRow';
 import type { ProjectStatus } from '../utils/projectMappings';
@@ -21,7 +22,6 @@ interface ProjectTableRowProps {
 export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   project,
   editMode,
-  onEdit,
   onDelete,
   selected,
   onSelect,
@@ -203,26 +203,15 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
       
       {editMode && (
         <TableCell>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => onEdit?.(project.id)}
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8"
-            >
-              <Edit className="h-4 w-4" />
-              <span className="sr-only">Edit</span>
-            </Button>
-            <Button
-              onClick={() => onDelete?.(project.id)}
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-              <span className="sr-only">Delete</span>
-            </Button>
-          </div>
+          <Button
+            onClick={() => onDelete?.(project.id)}
+            size="icon"
+            variant="ghost"
+            className="h-8 w-8 text-destructive hover:text-destructive"
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">Delete</span>
+          </Button>
         </TableCell>
       )}
     </TableRow>
