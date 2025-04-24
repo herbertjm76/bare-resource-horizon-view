@@ -44,7 +44,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
 
   return (
     <TableRow 
-      className="align-middle"
+      className="align-middle text-sm hover:bg-muted/30"
       data-state={selected ? "selected" : undefined}
     >
       {editMode && (
