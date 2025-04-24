@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProjectsToolbar from './ProjectsToolbar';
@@ -17,6 +16,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { EditProjectForm } from './components/EditProjectForm';
 
 export const ProjectsList = () => {
   const { projects, isLoading, error, refetch } = useProjects();
@@ -26,6 +32,7 @@ export const ProjectsList = () => {
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
 
   const filteredProjects = useMemo(() => {
     return projects.filter(project => {
@@ -62,8 +69,7 @@ export const ProjectsList = () => {
   };
 
   const handleEditProject = (projectId: string) => {
-    // Future enhancement: Implement the edit functionality
-    toast.info("Edit functionality will be implemented soon");
+    setEditingProjectId(projectId);
   };
 
   const deleteProject = async (projectId: string) => {
@@ -164,6 +170,25 @@ export const ProjectsList = () => {
           refetch={refetch}
         />
       </CardContent>
+
+      <Dialog open={!!editingProjectId} onOpenChange={() => setEditingProjectId(null)}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+          </DialogHeader>
+          {editingProjectId && (
+            <EditProjectForm
+              projectId={editingProjectId}
+              onSuccess={() => {
+                setEditingProjectId(null);
+                refetch();
+                toast.success("Project updated successfully");
+              }}
+              onCancel={() => setEditingProjectId(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
