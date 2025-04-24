@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -23,14 +22,11 @@ import {
 import { Input } from "@/components/ui/input";
 import type { Database } from '@/integrations/supabase/types';
 
-// Import the enum types from the database to ensure type safety
 type DbProjectStage = Database["public"]["Enums"]["project_stage"]; // "BD" | "SD" | "DD" | "CD" | "CMP"
 type DbProjectStatus = Database["public"]["Enums"]["project_status"]; // "In Progress" | "On Hold" | "Complete" | "Planning"
 
-// Use our custom types for UI display that may differ from DB types
 type ProjectStatus = 'In Progress' | 'Not Started' | 'Completed' | 'On Hold';
 
-// Map UI status to DB status for data consistency
 const mapStatusToDb = (status: ProjectStatus): DbProjectStatus => {
   switch(status) {
     case 'In Progress': return 'In Progress';
@@ -38,11 +34,10 @@ const mapStatusToDb = (status: ProjectStatus): DbProjectStatus => {
     case 'On Hold': return 'On Hold';
     case 'Not Started': 
     default:
-      return 'Planning'; // Map "Not Started" to "Planning" in DB
+      return 'Planning';
   }
 };
 
-// Map DB status to UI status for display
 const mapDbToStatus = (dbStatus: DbProjectStatus): ProjectStatus => {
   switch(dbStatus) {
     case 'In Progress': return 'In Progress';
@@ -50,11 +45,10 @@ const mapDbToStatus = (dbStatus: DbProjectStatus): ProjectStatus => {
     case 'On Hold': return 'On Hold';
     case 'Planning': 
     default:
-      return 'Not Started'; // Map "Planning" to "Not Started" in UI
+      return 'Not Started';
   }
 };
 
-// --- Load project stage and area colors from DB for rendering ---
 const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
   const map: Record<string, string> = {};
   stages.forEach(stage => {
@@ -73,10 +67,7 @@ const useAreaColorMap = (areas: { code: string; color?: string; country: string 
   return map;
 };
 
-// Add this function to map custom stage names to DB enum values safely
 const mapCustomStageToDB = (stageName: string): DbProjectStage => {
-  // This is a simple mapping based on stage name patterns
-  // You might want to adjust this based on your specific naming conventions
   const lowerName = stageName.toLowerCase();
   if (lowerName.includes('bd') || lowerName.includes('business development')) return 'BD';
   if (lowerName.includes('sd') || lowerName.includes('schematic design')) return 'SD';
@@ -84,12 +75,11 @@ const mapCustomStageToDB = (stageName: string): DbProjectStage => {
   if (lowerName.includes('cd') || lowerName.includes('construction document')) return 'CD';
   if (lowerName.includes('cmp') || lowerName.includes('complete')) return 'CMP';
   
-  // Default to 'BD' if no match
   return 'BD';
 };
 
 interface ProjectsTableProps {
-  projects: any[]; // It's ok, we handle all project prop shapes here
+  projects: any[];
   loading: boolean;
   error?: string;
   editMode?: boolean;
@@ -97,7 +87,7 @@ interface ProjectsTableProps {
   onDelete?: (projectId: string) => void;
   selectedProjects: string[];
   onSelectProject: (projectId: string) => void;
-  refetch: () => void; // Add refetch prop to refresh data
+  refetch: () => void;
 }
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({ 
@@ -113,14 +103,11 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     office_stages = []
   } = useOfficeSettings();
 
-  // --- Color maps from DB ---
   const stageColorMap = useStageColorMap(office_stages);
   const areaColorMap = useAreaColorMap(locations);
 
-  // State for editable fields
   const [editableFields, setEditableFields] = useState<Record<string, Record<string, any>>>({});
 
-  // Initialize editable fields when projects change or edit mode is enabled
   useEffect(() => {
     if (projects.length > 0) {
       const fields: Record<string, Record<string, any>> = {};
@@ -136,7 +123,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     }
   }, [projects, editMode]);
 
-  // --- Handle field changes ---
   const handleFieldChange = (projectId: string, field: string, value: any) => {
     setEditableFields(prev => ({
       ...prev,
@@ -147,7 +133,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     }));
   };
 
-  // --- Handle field update ---
   const handleFieldUpdate = async (projectId: string, field: string, value: any) => {
     try {
       const updateData: Record<string, any> = {};
@@ -180,7 +165,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         toast.error(`Failed to update ${field}`, { description: error.message });
       } else {
         toast.success(`${field} updated`);
-        // Automatically refresh data after update
         refetch();
       }
     } catch (err) {
@@ -189,10 +173,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     }
   };
 
-  // --- Handle stage change --- (this is where the error was)
   const handleStageChange = async (projectId: string, newStage: string) => {
     try {
-      // Convert custom stage name to a valid DB enum value
       const dbStage: DbProjectStage = mapCustomStageToDB(newStage);
       
       const { error } = await supabase
@@ -204,7 +186,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         toast.error('Failed to update current stage', { description: error.message });
       } else {
         toast.success('Current stage updated');
-        // Automatically refresh data after update
         refetch();
       }
     } catch (err) {
@@ -213,10 +194,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     }
   };
 
-  // --- Handle status change ---
   const handleStatusChange = async (projectId: string, uiStatus: ProjectStatus) => {
     try {
-      // Map UI status to DB status
       const dbStatus = mapStatusToDb(uiStatus);
       
       const { error } = await supabase
@@ -228,7 +207,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         toast.error('Failed to update status', { description: error.message });
       } else {
         toast.success('Status updated');
-        // Automatically refresh data after update
         refetch();
       }
     } catch (err) {
@@ -247,7 +225,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
     return <div className="text-center p-8 border rounded-md border-dashed">No projects found. Click "New Project" to create your first project.</div>;
   }
 
-  // Get status color based on status
   const getStatusColor = (status: string) => {
     switch(status) {
       case 'On Hold':
@@ -276,7 +253,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
             <TableHead>Country</TableHead>
             <TableHead>%Profit</TableHead>
             <TableHead>Current Stage</TableHead>
-            {/* Display all stages as separate columns */}
             {office_stages.map((stage) => (
               <TableHead key={stage.id}>{stage.name}</TableHead>
             ))}
@@ -285,20 +261,12 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
         </TableHeader>
         <TableBody>
           {projects.map((project) => {
-            // Convert DB status to UI status for display
             const uiStatus = mapDbToStatus(project.status as DbProjectStatus);
             const statusColor = getStatusColor(uiStatus);
             
-            // Find the matching location for this project's country
             const matchingLocation = locations.find(loc => 
               loc.country === project.country || loc.code === project.country
             );
-            
-            // Get the area color for this project's country
-            const areaColor = matchingLocation?.color || "#E5DEFF";
-            
-            // Get the correct code to display
-            const areaCode = matchingLocation?.code || project.country;
             
             return (
               <TableRow 
@@ -316,6 +284,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     />
                   </TableCell>
                 )}
+                
                 <TableCell className="font-semibold">
                   {editMode ? (
                     <Input
@@ -328,6 +297,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     project.code
                   )}
                 </TableCell>
+                
                 <TableCell>
                   {editMode ? (
                     <Input
@@ -340,9 +310,11 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     <span className="font-bold">{project.name}</span>
                   )}
                 </TableCell>
+                
                 <TableCell>
                   {project.project_manager?.first_name || '-'}
                 </TableCell>
+                
                 <TableCell>
                   {editMode ? (
                     <Select
@@ -361,7 +333,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     </Select>
                   ) : (
                     <span 
-                      className="inline-block px-2 py-1 rounded text-xs"
+                      className="inline-block px-2 py-0.5 rounded text-xs"
                       style={{
                         background: statusColor.bg,
                         color: statusColor.text
@@ -371,6 +343,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     </span>
                   )}
                 </TableCell>
+                
                 <TableCell>
                   {editMode ? (
                     <Select
@@ -392,7 +365,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                                 backgroundColor: location.color || "#E5DEFF"
                               }}
                             >
-                              {location.code?.toUpperCase()} - {location.country}
+                              {location.code?.toUpperCase()}
                             </div>
                           </SelectItem>
                         ))}
@@ -402,14 +375,15 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     <span
                       className="inline-block px-2 py-1 rounded"
                       style={{
-                        background: areaColor,
+                        background: matchingLocation?.color || "#E5DEFF",
                         color: "#212172"
                       }}
                     >
-                      {areaCode?.toUpperCase()}
+                      {matchingLocation?.code?.toUpperCase() || project.country}
                     </span>
                   )}
                 </TableCell>
+                
                 <TableCell>
                   {editMode ? (
                     <Input
@@ -423,6 +397,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"
                   )}
                 </TableCell>
+                
                 <TableCell>
                   {editMode ? (
                     <Select
@@ -433,7 +408,6 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                         <SelectValue placeholder="Select stage" />
                       </SelectTrigger>
                       <SelectContent>
-                        {/* Show stages from office_stages */}
                         {office_stages.map((stage) => (
                           <SelectItem 
                             key={stage.id} 
@@ -463,7 +437,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     </span>
                   )}
                 </TableCell>
-                {/* Render stage columns with checkbox or indicator */}
+                
                 {office_stages.map((stage) => {
                   const isCurrentStage = project.current_stage === stage.name;
                   return (
@@ -479,6 +453,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
                     </TableCell>
                   );
                 })}
+                
                 {editMode && (
                   <TableCell>
                     <div className="flex items-center gap-2">
