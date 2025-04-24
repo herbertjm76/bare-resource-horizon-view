@@ -4,7 +4,7 @@ import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface ProjectTableHeaderProps {
   editMode: boolean;
-  office_stages: Array<{ id: string; name: string }>;
+  office_stages: Array<{ id: string; name: string; color?: string }>;
 }
 
 export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({ 
@@ -23,7 +23,15 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
         <TableHead>%Profit</TableHead>
         <TableHead>Current Stage</TableHead>
         {office_stages.map((stage) => (
-          <TableHead key={stage.id}>{stage.name}</TableHead>
+          <TableHead 
+            key={stage.id}
+            style={{
+              backgroundColor: stage.color || "#E5DEFF",
+              color: "#212172"
+            }}
+          >
+            {stage.name}
+          </TableHead>
         ))}
         {editMode && <TableHead className="w-24">Actions</TableHead>}
       </TableRow>
