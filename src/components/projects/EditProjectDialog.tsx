@@ -305,4 +305,5 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
         </form>
       </DialogContent>
     </Dialog>
-  </div>
+  );
+};
