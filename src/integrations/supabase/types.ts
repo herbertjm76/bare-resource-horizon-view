@@ -193,41 +193,6 @@ export type Database = {
           },
         ]
       }
-      office_project_stages: {
-        Row: {
-          created_at: string | null
-          id: string
-          office_id: string
-          stage_name: string
-          stage_order: number
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          office_id: string
-          stage_name: string
-          stage_order: number
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          office_id?: string
-          stage_name?: string
-          stage_order?: number
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "office_project_stages_office_id_fkey"
-            columns: ["office_id"]
-            isOneToOne: false
-            referencedRelation: "offices"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       office_rates: {
         Row: {
           company_id: string | null

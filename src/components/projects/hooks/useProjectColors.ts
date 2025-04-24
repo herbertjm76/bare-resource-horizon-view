@@ -1,33 +1,39 @@
 
-export const useStageColorMap = (stages: { id: string; color?: string; name: string }[]) => {
-  const map: Record<string, string> = {};
-  stages.forEach(stage => {
-    map[stage.name] = stage.color || '#E5DEFF';
-    map[stage.id] = stage.color || '#E5DEFF';
-  });
-  return map;
+import { useMemo } from 'react';
+import type { ProjectStatus } from '../utils/projectMappings';
+
+type StatusColor = {
+  bg: string;
+  text: string;
 };
 
-export const useAreaColorMap = (areas: { code: string; color?: string; country: string }[]) => {
-  const map: Record<string, string> = {};
-  areas.forEach(area => {
-    map[area.country] = area.color || '#E5DEFF';
-    map[area.code] = area.color || '#E5DEFF';
-  });
-  return map;
-};
-
-export const getStatusColor = (status: string) => {
-  switch(status) {
-    case 'On Hold':
-      return { bg: "#ccc9ff", text: "#212172" };
+export const getStatusColor = (status: ProjectStatus | string): StatusColor => {
+  switch (status) {
     case 'In Progress':
-      return { bg: "#b3efa7", text: "#257e30" };
-    case 'Completed':
-      return { bg: "#eaf1fe", text: "#174491" };
+      return { bg: '#E2F8F0', text: '#0D9488' };
     case 'Not Started':
-      return { bg: "#ffe4e6", text: "#d946ef" };
+      return { bg: '#E5DEFF', text: '#6E59A5' };
+    case 'Completed':
+      return { bg: '#E0F2FE', text: '#0EA5E9' };
+    case 'On Hold':
+      return { bg: '#FEF3C7', text: '#D97706' };
+    case 'Planning':
+      return { bg: '#E5DEFF', text: '#6E59A5' };
     default:
-      return { bg: "#E5DEFF", text: "#6E59A5" };
+      return { bg: '#F3F4F6', text: '#6B7280' };
   }
+};
+
+export const useStageColorMap = (office_stages: Array<{ name: string; color?: string }>) => {
+  return useMemo(() => {
+    const colorMap: Record<string, string> = {};
+    
+    office_stages.forEach(stage => {
+      if (stage.name) {
+        colorMap[stage.name] = stage.color || '#E5DEFF';
+      }
+    });
+    
+    return colorMap;
+  }, [office_stages]);
 };

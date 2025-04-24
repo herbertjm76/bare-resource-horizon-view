@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 interface NewProjectStep3StagesProps {
   stages: string[];
   setStages: (stages: string[]) => void;
-  officeStages: { id: string; name: string; }[];
+  officeStages: { id: string; name: string; color?: string }[];
 }
 
 const colors = [
