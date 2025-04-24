@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +26,14 @@ interface Stage {
   company_id: string;
   created_at: string;
   updated_at: string;
+  current_stage?: string | null;
+}
+
+interface ProjectStage {
+  id: string;
+  stage_name: string;
+  project_id: string;
+  company_id: string;
 }
 
 export const StagesTab: React.FC = () => {
@@ -39,7 +48,8 @@ export const StagesTab: React.FC = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { company } = useCompany();
   const [currentStage, setCurrentStage] = useState('');
-  const [availableStages, setAvailableStages] = useState<Stage[]>([]);
+  const [editCurrentStage, setEditCurrentStage] = useState('');
+  const [availableStages, setAvailableStages] = useState<string[]>([]);
 
   React.useEffect(() => {
     if (!company?.id) return;
@@ -52,17 +62,14 @@ export const StagesTab: React.FC = () => {
         const { data: projectStages, error: projectStagesError } = await supabase
           .from('project_stages')
           .select('stage_name')
-          .eq('company_id', company.id)
-          .distinct();
+          .eq('company_id', company.id);
         
         if (projectStagesError) throw projectStagesError;
         
-        if (projectStages) {
-          const uniqueStages = Array.from(new Set(projectStages.map(ps => ps.stage_name)));
-          setAvailableStages(stages.map(s => ({
-            ...s,
-            stage_name: uniqueStages.includes(s.name) ? s.name : ''
-          })));
+        // Extract unique stage names
+        if (projectStages && projectStages.length > 0) {
+          const uniqueStageNames = Array.from(new Set(projectStages.map(ps => ps.stage_name)));
+          setAvailableStages(uniqueStageNames);
         }
         
         // Fetch office stages as before
@@ -118,6 +125,7 @@ export const StagesTab: React.FC = () => {
         setStages([...stages, data[0]]);
         setNewStage('');
         setNewColor(defaultStageColor);
+        setCurrentStage('');
         setDialogOpen(false);
         toast.success('Stage added successfully');
       }
@@ -135,7 +143,8 @@ export const StagesTab: React.FC = () => {
         .from('office_stages')
         .update({
           name: editName.trim(),
-          color: editColor
+          color: editColor,
+          current_stage: editCurrentStage || null
         })
         .eq('id', editId);
       
@@ -143,7 +152,12 @@ export const StagesTab: React.FC = () => {
       
       setStages(stages.map(stage => 
         stage.id === editId 
-          ? { ...stage, name: editName.trim(), color: editColor }
+          ? { 
+              ...stage, 
+              name: editName.trim(), 
+              color: editColor,
+              current_stage: editCurrentStage || null
+            }
           : stage
       ));
       
@@ -180,6 +194,7 @@ export const StagesTab: React.FC = () => {
     setEditId(stage.id);
     setEditName(stage.name);
     setEditColor(stage.color || defaultStageColor);
+    setEditCurrentStage(stage.current_stage || '');
     setEditDialogOpen(true);
   };
 
@@ -193,10 +208,7 @@ export const StagesTab: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
-            <Edit className="h-4 w-4" /> Edit
-          </Button>
-          <Button size="sm" className="gap-2">
+          <Button onClick={() => setDialogOpen(true)} size="sm" className="gap-2">
             <Plus className="h-4 w-4" />
             Add Stage
           </Button>
@@ -224,6 +236,11 @@ export const StagesTab: React.FC = () => {
                     >
                       {stage.name}
                     </div>
+                    {stage.current_stage && (
+                      <div className="text-xs text-muted-foreground">
+                        Current Stage: {stage.current_stage}
+                      </div>
+                    )}
                   </div>
                   <Button 
                     variant="ghost" 
@@ -267,9 +284,10 @@ export const StagesTab: React.FC = () => {
                   <SelectValue placeholder="Select current stage" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableStages.map((stage) => (
-                    <SelectItem key={stage.id} value={stage.name}>
-                      {stage.name}
+                  <SelectItem value="">None</SelectItem>
+                  {availableStages.map((stageName) => (
+                    <SelectItem key={stageName} value={stageName}>
+                      {stageName}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -307,6 +325,27 @@ export const StagesTab: React.FC = () => {
                 onChange={(e) => setEditName(e.target.value)}
               />
             </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Current Stage</label>
+              <Select
+                value={editCurrentStage}
+                onValueChange={setEditCurrentStage}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select current stage" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">None</SelectItem>
+                  {availableStages.map((stageName) => (
+                    <SelectItem key={stageName} value={stageName}>
+                      {stageName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
             <div className="space-y-2">
               <label className="text-sm font-medium">Color</label>
               <ColorPicker
