@@ -44,6 +44,15 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
         case 'current_stage':
           // Map the stage name to the correct DB enum value
           updateData.current_stage = mapCustomStageToDB(value);
+          
+          // Also update the local state
+          setEditableFields(prev => ({
+            ...prev,
+            [projectId]: {
+              ...prev[projectId],
+              current_stage: value
+            }
+          }));
           break;
         default:
           break;
@@ -51,12 +60,15 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
       
       if (Object.keys(updateData).length === 0) return;
       
+      console.log(`Updating ${field} with:`, updateData);
+      
       const { error } = await supabase
         .from('projects')
         .update(updateData)
         .eq('id', projectId);
         
       if (error) {
+        console.error(`Error updating ${field}:`, error);
         toast.error(`Failed to update ${field}`, { description: error.message });
       } else {
         toast.success(`${field} updated`);
