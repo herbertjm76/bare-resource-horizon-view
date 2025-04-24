@@ -32,69 +32,121 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         .eq('id', projectId);
 
       if (projectError) throw projectError;
-
-      const { data: existingStages } = await supabase
+      
+      // First, fetch all current project stages to compare
+      const { data: existingStages, error: stagesError } = await supabase
         .from('project_stages')
         .select('id, stage_name')
         .eq('project_id', projectId);
+        
+      if (stagesError) {
+        console.error("Error fetching existing stages:", stagesError);
+        throw stagesError;
+      }
 
-      if (existingStages && existingStages.length > 0) {
+      console.log('Existing stages:', existingStages);
+      console.log('Selected stages:', form.stages);
+      
+      // If no stages are selected, delete all existing stages
+      if (!form.stages || form.stages.length === 0) {
+        if (existingStages && existingStages.length > 0) {
+          const { error } = await supabase
+            .from('project_stages')
+            .delete()
+            .eq('project_id', projectId);
+            
+          if (error) {
+            console.error("Error deleting all stages:", error);
+            throw error;
+          }
+        }
+      } else {
+        // Handle the case where stages are selected
+        const selectedStageNames = new Set();
         const stagesToKeep = new Set();
         
-        for (const stageId of form.stages || []) {
-          const stageName = form.officeStages?.find((s: any) => s.id === stageId)?.name;
-          if (stageName) {
-            const existingStage = existingStages.find(s => s.stage_name === stageName);
-            if (existingStage) {
+        // Get all selected stage names
+        for (const stageId of form.stages) {
+          const stage = form.officeStages?.find((s: any) => s.id === stageId);
+          if (stage) {
+            selectedStageNames.add(stage.name);
+          }
+        }
+        
+        console.log('Selected stage names:', Array.from(selectedStageNames));
+        
+        // Find existing stages that match selected stages
+        if (existingStages && existingStages.length > 0) {
+          for (const existingStage of existingStages) {
+            if (selectedStageNames.has(existingStage.stage_name)) {
               stagesToKeep.add(existingStage.id);
+            }
+          }
+          
+          // Delete stages that are not selected anymore
+          const stagesToDelete = existingStages
+            .filter(stage => !stagesToKeep.has(stage.id))
+            .map(stage => stage.id);
+          
+          if (stagesToDelete.length > 0) {
+            console.log('Deleting stages:', stagesToDelete);
+            const { error } = await supabase
+              .from('project_stages')
+              .delete()
+              .in('id', stagesToDelete);
+              
+            if (error) {
+              console.error("Error deleting stages:", error);
+              throw error;
             }
           }
         }
         
-        const stagesToDelete = existingStages
-          .filter(stage => !stagesToKeep.has(stage.id))
-          .map(stage => stage.id);
+        // Now insert or update stages
+        const existingStageNames = new Set(existingStages?.map(s => s.stage_name) || []);
         
-        if (stagesToDelete.length > 0) {
-          const { error } = await supabase
-            .from('project_stages')
-            .delete()
-            .in('id', stagesToDelete);
+        for (const stageId of form.stages) {
+          const stage = form.officeStages?.find((s: any) => s.id === stageId);
+          if (!stage) continue;
+          
+          const stageName = stage.name;
+          const feeData = form.stageFees?.[stageId];
+          const fee = feeData?.fee ? parseFloat(feeData.fee) : 0;
+          
+          // Check if this stage already exists
+          const existingStage = existingStages?.find(s => s.stage_name === stageName);
+          
+          if (existingStage) {
+            // Update existing stage
+            const { error } = await supabase
+              .from('project_stages')
+              .update({ fee })
+              .eq('id', existingStage.id);
+              
+            if (error) {
+              console.error(`Error updating stage ${stageName}:`, error);
+              throw error;
+            }
+          } else if (!existingStageNames.has(stageName)) {
+            // Insert new stage
+            if (!company?.id) {
+              console.error("Missing company ID for project stage insert");
+              continue;
+            }
             
-          if (error) {
-            console.error("Error deleting stages:", error);
-          }
-        }
-      }
-
-      // Handle stages update/insert
-      for (const stageId of form.stages || []) {
-        const stageName = form.officeStages?.find((s: any) => s.id === stageId)?.name;
-        if (!stageName) continue;
-        
-        const feeData = form.stageFees?.[stageId];
-        const existingStage = existingStages?.find(s => s.stage_name === stageName);
-        
-        if (existingStage) {
-          await supabase
-            .from('project_stages')
-            .update({
-              fee: feeData?.fee ? parseFloat(feeData.fee) : 0
-            })
-            .eq('id', existingStage.id);
-        } else {
-          // Only insert if we have a valid company ID
-          if (company?.id) {
-            await supabase
+            const { error } = await supabase
               .from('project_stages')
               .insert({
                 project_id: projectId,
                 company_id: company.id,
                 stage_name: stageName,
-                fee: feeData?.fee ? parseFloat(feeData.fee) : 0
+                fee
               });
-          } else {
-            console.error("Missing company ID for project stage insert");
+              
+            if (error) {
+              console.error(`Error inserting stage ${stageName}:`, error);
+              throw error;
+            }
           }
         }
       }

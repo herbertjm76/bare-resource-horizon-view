@@ -45,6 +45,12 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLoading) return;
+    
+    // Log the form state before submission for debugging
+    console.log('Submitting form:', form);
+    console.log('Selected stages:', form.stages);
+    console.log('Office stages:', officeStages);
+    
     await handleSubmit({ ...form, officeStages }, setIsLoading);
   };
 
