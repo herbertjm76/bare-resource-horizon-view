@@ -36,6 +36,17 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const [officeStages, setOfficeStages] = useState<Array<{ id: string; name: string }>>([]);
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
+  // Define a proper type for the stageFees object
+  interface StageFee {
+    fee: string;
+    billingMonth: string;
+    status: "Not Billed" | "Invoiced" | "Paid" | "";
+    invoiceDate: Date | null;
+    hours: string;
+    invoiceAge: number;
+  }
+
+  // Update the form state with proper typing for stageFees
   const [form, setForm] = useState({
     code: project.code || "",
     name: project.name || "",
@@ -46,8 +57,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     status: project.status || "",
     office: project.office?.id || "",
     current_stage: project.current_stage || "",
-    stages: [],
-    stageFees: {},
+    stages: [] as string[],
+    stageFees: {} as Record<string, StageFee>,
   });
 
   useEffect(() => {
@@ -106,7 +117,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
             return matchingStage?.id;
           }).filter(Boolean) as string[];
 
-          const stageFees: Record<string, any> = {};
+          const stageFees: Record<string, StageFee> = {};
           existingStages.forEach(stage => {
             const matchingStage = stages?.find(s => s.name === stage.stage_name);
             if (matchingStage) {
@@ -150,7 +161,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     }
   };
 
-  const updateStageFee = (stageId: string, data: Partial<typeof form['stageFees'][string]>) => {
+  const updateStageFee = (stageId: string, data: Partial<StageFee>) => {
     setForm(prev => ({
       ...prev,
       stageFees: {
