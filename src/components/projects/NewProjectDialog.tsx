@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -280,11 +279,9 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       const country = form.country === 'none' ? null : form.country;
       const office = form.office === 'none' ? null : form.office;
       
-      // Convert the current_stage string to a valid DB enum value if needed
-      // If current_stage is 'none' or empty, set it to null
       const currentStage = (form.current_stage === 'none' || !form.current_stage) 
         ? null 
-        : mapCustomStageToDB(form.current_stage);
+        : form.current_stage;
       
       const { data, error } = await supabase.from('projects').insert({
         code: form.code,
