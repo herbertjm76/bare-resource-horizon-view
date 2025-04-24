@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -158,8 +159,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           <EditableProjectField
             type="select"
             className="w-40"
-            value={project.current_stage}
-            onChange={(value) => handleStageChange(project.id, value)}
+            value={editableFields[project.id]?.current_stage || project.current_stage}
+            onChange={(value) => handleFieldUpdate(project.id, 'current_stage', value)}
             options={office_stages.map(stage => ({
               value: stage.name,
               label: stage.name,

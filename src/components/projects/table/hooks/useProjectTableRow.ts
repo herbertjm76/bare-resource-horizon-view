@@ -18,7 +18,8 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
         name: project.name,
         code: project.code,
         profit: project.target_profit_percentage || 0,
-        country: project.country
+        country: project.country,
+        current_stage: project.current_stage
       }
     });
   }, [project]);
@@ -39,6 +40,10 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
           break;
         case 'country':
           updateData.country = value;
+          break;
+        case 'current_stage':
+          // Map the stage name to the correct DB enum value
+          updateData.current_stage = mapCustomStageToDB(value);
           break;
         default:
           break;
@@ -86,8 +91,20 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
 
   const handleStageChange = async (projectId: string, newStage: string) => {
     try {
+      console.log('Updating stage to:', newStage);
+      
+      // Update the editable fields state
+      setEditableFields(prev => ({
+        ...prev,
+        [projectId]: {
+          ...prev[projectId],
+          current_stage: newStage
+        }
+      }));
+      
       // Map the stage name to the correct DB enum value
       const dbStage = mapCustomStageToDB(newStage);
+      console.log('Mapped DB stage:', dbStage);
       
       const { error } = await supabase
         .from('projects')
@@ -95,6 +112,7 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
         .eq('id', projectId);
         
       if (error) {
+        console.error('Database error:', error);
         toast.error('Failed to update current stage', { description: error.message });
       } else {
         toast.success('Current stage updated');
