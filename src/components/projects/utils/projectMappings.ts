@@ -1,6 +1,6 @@
 import type { Database } from '@/integrations/supabase/types';
 
-type DbProjectStage = Database["public"]["Enums"]["project_stage"];
+// Note: The DB now uses text type for current_stage instead of an enum
 type DbProjectStatus = Database["public"]["Enums"]["project_status"];
 export type ProjectStatus = 'In Progress' | 'Not Started' | 'Completed' | 'On Hold';
 
@@ -26,22 +26,8 @@ export const mapDbToStatus = (dbStatus: DbProjectStatus): ProjectStatus => {
   }
 };
 
-export const mapCustomStageToDB = (stageName: string): DbProjectStage => {
-  // First check if the stage name is already a valid DB enum value
-  const validStages: DbProjectStage[] = ['BD', 'SD', 'DD', 'CD', 'CMP'];
-  if (validStages.includes(stageName as DbProjectStage)) {
-    return stageName as DbProjectStage;
-  }
-  
-  // Otherwise, try to map based on name
-  const lowerName = stageName.toLowerCase();
-  if (lowerName.includes('bd') || lowerName.includes('business development')) return 'BD';
-  if (lowerName.includes('sd') || lowerName.includes('schematic design')) return 'SD';
-  if (lowerName.includes('dd') || lowerName.includes('design development')) return 'DD';
-  if (lowerName.includes('cd') || lowerName.includes('construction document')) return 'CD';
-  if (lowerName.includes('cmp') || lowerName.includes('complete')) return 'CMP';
-  
-  // Default to BD if no match is found
-  console.log(`No stage mapping found for "${stageName}", defaulting to BD`);
-  return 'BD';
+// This function is no longer needed as we're using text directly
+// We'll keep it with a string return type for backward compatibility
+export const mapCustomStageToDB = (stageName: string): string => {
+  return stageName; // Just return the stage name as-is
 };

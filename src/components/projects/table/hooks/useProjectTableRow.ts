@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { mapStatusToDb, mapCustomStageToDB, type ProjectStatus } from '../../utils/projectMappings';
+import { mapStatusToDb, type ProjectStatus } from '../../utils/projectMappings';
 import { getStatusColor } from '../../hooks/useProjectColors';
 import { useProjectAreas } from '../../hooks/useProjectAreas';
 
