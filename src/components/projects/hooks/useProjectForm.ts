@@ -100,6 +100,13 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
         const currentStageName = project.current_stage;
         let stageIds: string[] = [];
         
+        const selectedStageIds = (project.stages as string[] || [])
+          .map(stageName => {
+            const matchingStage = stagesArray.find(s => s.name === stageName);
+            return matchingStage ? matchingStage.id : null;
+          })
+          .filter(Boolean);
+
         if (currentStageName) {
           const matchingStage = stagesArray.find(s => s.name === currentStageName);
           if (matchingStage) {
@@ -110,7 +117,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
         if (Array.isArray(projectStages) && projectStages.length > 0) {
           const stagesMap = new Map();
           const applicabilityMap: Record<string, boolean> = {};
-          const feesMap: Record<string, StageFee> = {};
+          const feesMap: Record<string, any> = {};
 
           projectStages?.forEach(ps => {
             const matchingStage = stagesArray.find(os => os.name === ps.stage_name);
@@ -134,9 +141,9 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
             stageApplicability: applicabilityMap,
             stageFees: feesMap
           }));
-        } else if (stageIds.length > 0) {
-          const stageFees: Record<string, StageFee> = {};
-          stageIds.forEach(id => {
+        } else if (selectedStageIds.length > 0) {
+          const stageFees: Record<string, any> = {};
+          selectedStageIds.forEach(id => {
             stageFees[id] = {
               fee: '',
               billingMonth: '',
@@ -149,7 +156,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
           
           setForm(prev => ({
             ...prev,
-            stages: stageIds,
+            stages: selectedStageIds,
             stageFees
           }));
         }

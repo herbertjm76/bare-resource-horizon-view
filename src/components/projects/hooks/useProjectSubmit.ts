@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
@@ -16,11 +17,12 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         code: form.code,
         name: form.name,
         project_manager_id: form.manager && form.manager !== 'not_assigned' ? form.manager : null,
-        office_id: form.office || null, // Ensure we don't send empty string
+        office_id: form.office || null,
         status: form.status,
         country: form.country,
         current_stage: form.current_stage,
-        target_profit_percentage: form.profit ? Number(form.profit) : null
+        target_profit_percentage: form.profit ? Number(form.profit) : null,
+        stages: form.stages || []  // Store selected stage names
       };
       
       console.log('Project update data:', projectUpdate);
@@ -61,30 +63,20 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         }
       } else {
         // Handle the case where stages are selected
-        const selectedStageNames = new Set();
+        const selectedStageNames = new Set(form.stages);
         const stagesToKeep = new Set();
-        
-        // Get all selected stage names
-        for (const stageId of form.stages) {
-          const stage = form.officeStages?.find((s: any) => s.id === stageId);
-          if (stage) {
-            selectedStageNames.add(stage.name);
-          }
-        }
-        
-        console.log('Selected stage names:', Array.from(selectedStageNames));
         
         // Find existing stages that match selected stages
         if (existingStages && existingStages.length > 0) {
           for (const existingStage of existingStages) {
             if (selectedStageNames.has(existingStage.stage_name)) {
-              stagesToKeep.add(existingStage.id);
+              stagesToKeep.add(existingStage.stage_name);
             }
           }
           
           // Delete stages that are not selected anymore
           const stagesToDelete = existingStages
-            .filter(stage => !stagesToKeep.has(stage.id))
+            .filter(stage => !stagesToKeep.has(stage.stage_name))
             .map(stage => stage.id);
           
           if (stagesToDelete.length > 0) {
@@ -104,11 +96,11 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         // Now insert or update stages
         const existingStageNames = new Set(existingStages?.map(s => s.stage_name) || []);
         
-        for (const stageId of form.stages) {
-          const stage = form.officeStages?.find((s: any) => s.id === stageId);
+        for (const stageName of form.stages) {
+          const stage = form.officeStages?.find((s: any) => s.name === stageName);
           if (!stage) continue;
           
-          const stageName = stage.name;
+          const stageId = stage.id;
           const feeData = form.stageFees?.[stageId];
           const fee = feeData?.fee ? parseFloat(feeData.fee) : 0;
           const isApplicable = form.stageApplicability?.[stageId] ?? true;

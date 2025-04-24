@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Dialog,
@@ -49,7 +50,17 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     console.log('Submitting form:', form);
     console.log('Selected stages and applicability:', form.stages, form.stageApplicability);
     
-    await handleSubmit({ ...form, officeStages }, setIsLoading);
+    // Get stage names from selected stage IDs
+    const selectedStageNames = form.stages.map(stageId => {
+      const stage = officeStages.find(os => os.id === stageId);
+      return stage ? stage.name : '';
+    }).filter(Boolean);
+
+    await handleSubmit({ 
+      ...form, 
+      stages: selectedStageNames,  // Pass selected stage names to submit handler
+      officeStages 
+    }, setIsLoading);
   };
 
   return (

@@ -607,6 +607,7 @@ export type Database = {
           name: string
           office_id: string
           project_manager_id: string | null
+          stages: string[] | null
           status: Database["public"]["Enums"]["project_status"]
           target_profit_percentage: number
           temp_office_location_id: string | null
@@ -622,6 +623,7 @@ export type Database = {
           name: string
           office_id: string
           project_manager_id?: string | null
+          stages?: string[] | null
           status?: Database["public"]["Enums"]["project_status"]
           target_profit_percentage: number
           temp_office_location_id?: string | null
@@ -637,6 +639,7 @@ export type Database = {
           name?: string
           office_id?: string
           project_manager_id?: string | null
+          stages?: string[] | null
           status?: Database["public"]["Enums"]["project_status"]
           target_profit_percentage?: number
           temp_office_location_id?: string | null

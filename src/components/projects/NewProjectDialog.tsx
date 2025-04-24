@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -295,6 +296,12 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     
     setIsLoading(true);
     try {
+      // Get stage names from selected stage IDs
+      const selectedStageNames = form.stages.map(stageId => {
+        const stage = officeStages.find(os => os.id === stageId);
+        return stage ? stage.name : '';
+      }).filter(Boolean);
+
       const projectStatus = form.status === 'none' ? "Planning" : (form.status || "Planning");
       const manager = form.manager === 'none' ? null : (form.manager === "not_assigned" ? null : (form.manager || null));
       const country = form.country === 'none' ? null : form.country;
@@ -313,7 +320,8 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         status: projectStatus as DbProjectStatus,
         country: country,
         current_stage: currentStage,
-        target_profit_percentage: form.profit ? Number(form.profit) : null
+        target_profit_percentage: form.profit ? Number(form.profit) : null,
+        stages: selectedStageNames  // New field to store selected stages
       }).select();
 
       if (error) throw error;
@@ -322,11 +330,13 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
       if (projectId && form.stages.length) {
         const stageFeesPromises = form.stages.map(stageId => {
           const feeObj = form.stageFees[stageId];
+          const stage = officeStages.find(s => s.id === stageId);
           return supabase.from('project_stages').insert({
             project_id: projectId,
             company_id: company.id,
-            stage_name: officeStages.find(s => s.id === stageId)?.name ?? "Unknown Stage",
-            fee: feeObj?.fee ? parseFloat(feeObj.fee) : 0
+            stage_name: stage?.name ?? "Unknown Stage",
+            fee: feeObj?.fee ? parseFloat(feeObj.fee) : 0,
+            is_applicable: form.stageApplicability?.[stageId] ?? true
           });
         });
         await Promise.all(stageFeesPromises);
