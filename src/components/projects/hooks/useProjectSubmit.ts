@@ -8,20 +8,27 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
 
   const handleSubmit = async (form: any, setIsLoading: (loading: boolean) => void) => {
     if (setIsLoading) setIsLoading(true);
-
+    
     try {
+      console.log('Submitting project update with form data:', form);
+      
+      // Prepare update object, ensuring no empty values for UUID fields
+      const projectUpdate = {
+        code: form.code,
+        name: form.name,
+        project_manager_id: form.manager && form.manager !== 'not_assigned' ? form.manager : null,
+        office_id: form.office || null, // Ensure we don't send empty string
+        status: form.status,
+        country: form.country,
+        current_stage: form.current_stage,
+        target_profit_percentage: form.profit ? Number(form.profit) : null
+      };
+      
+      console.log('Project update data:', projectUpdate);
+
       const { error: projectError } = await supabase
         .from('projects')
-        .update({
-          code: form.code,
-          name: form.name,
-          project_manager_id: form.manager === 'not_assigned' ? null : form.manager,
-          office_id: form.office,
-          status: form.status,
-          country: form.country,
-          current_stage: form.current_stage,
-          target_profit_percentage: form.profit ? Number(form.profit) : null
-        })
+        .update(projectUpdate)
         .eq('id', projectId);
 
       if (projectError) throw projectError;
@@ -34,7 +41,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       if (existingStages && existingStages.length > 0) {
         const stagesToKeep = new Set();
         
-        for (const stageId of form.stages) {
+        for (const stageId of form.stages || []) {
           const stageName = form.officeStages?.find((s: any) => s.id === stageId)?.name;
           if (stageName) {
             const existingStage = existingStages.find(s => s.stage_name === stageName);
@@ -60,11 +67,12 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         }
       }
 
-      for (const stageId of form.stages) {
+      // Handle stages update/insert
+      for (const stageId of form.stages || []) {
         const stageName = form.officeStages?.find((s: any) => s.id === stageId)?.name;
         if (!stageName) continue;
         
-        const feeData = form.stageFees[stageId];
+        const feeData = form.stageFees?.[stageId];
         const existingStage = existingStages?.find(s => s.stage_name === stageName);
         
         if (existingStage) {
@@ -75,14 +83,19 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
             })
             .eq('id', existingStage.id);
         } else {
-          await supabase
-            .from('project_stages')
-            .insert({
-              project_id: projectId,
-              company_id: company?.id,
-              stage_name: stageName,
-              fee: feeData?.fee ? parseFloat(feeData.fee) : 0
-            });
+          // Only insert if we have a valid company ID
+          if (company?.id) {
+            await supabase
+              .from('project_stages')
+              .insert({
+                project_id: projectId,
+                company_id: company.id,
+                stage_name: stageName,
+                fee: feeData?.fee ? parseFloat(feeData.fee) : 0
+              });
+          } else {
+            console.error("Missing company ID for project stage insert");
+          }
         }
       }
 
