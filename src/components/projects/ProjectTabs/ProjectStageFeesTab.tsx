@@ -41,7 +41,6 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   
   const calculateInvoiceAge = (invoiceDate: Date | null): number => {
     if (!invoiceDate) return 0;
-    
     const today = new Date();
     const diffTime = Math.abs(today.getTime() - invoiceDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -50,13 +49,16 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   
   const calculateHours = (fee: string): string => {
     if (!fee || !form.avgRate || parseFloat(form.avgRate) === 0) return '';
-    
     const feeValue = parseFloat(fee);
     const rateValue = parseFloat(form.avgRate);
-    
     if (isNaN(feeValue) || isNaN(rateValue) || rateValue === 0) return '';
-    
     return (feeValue / rateValue).toFixed(2);
+  };
+
+  const getStageColor = (stageId: string): string => {
+    const stage = officeStages.find(s => s.id === stageId);
+    console.log("Stage found:", stage);
+    return stage?.color || "#E5DEFF"; // Fallback to default color if no color is set
   };
 
   if (form.stages.length === 0) {
@@ -91,6 +93,7 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
             
             const hours = calculateHours(stageFeeData.fee);
             const invoiceAge = calculateInvoiceAge(stageFeeData.invoiceDate);
+            const stageColor = getStageColor(stageId);
             
             if (hours !== stageFeeData.hours) {
               updateStageFee(stageId, { hours });
@@ -99,23 +102,20 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
             if (invoiceAge !== stageFeeData.invoiceAge) {
               updateStageFee(stageId, { invoiceAge });
             }
-
-            const stageColor = getDefaultStageColor(stage.color);
             
-            console.log("Stage ID:", stageId, "Stage name:", stage.name, "Stage color:", stageColor);
+            console.log("Stage:", stage.name, "Color:", stageColor);
             
             return (
               <div key={stageId} className="border rounded-lg overflow-hidden bg-white">
                 <div 
                   className="p-3"
-                  style={{ 
-                    backgroundColor: stageColor,
-                  }}
+                  style={{ backgroundColor: stageColor }}
                 >
                   <h4 className="font-semibold text-white">
                     {getStageNameById(stageId)}
                   </h4>
                 </div>
+                
                 <div className="p-4 space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
