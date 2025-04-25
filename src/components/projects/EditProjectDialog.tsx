@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -45,6 +45,13 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     updateStageFee,
     updateStageApplicability
   } = useProjectForm(project, isOpen);
+
+  // Ensure stages are loaded correctly when project changes
+  useEffect(() => {
+    if (isOpen && project && Array.isArray(project.stages)) {
+      handleChange('stages', project.stages);
+    }
+  }, [project, isOpen]);
 
   const { handleSubmit } = useProjectSubmit(project.id, refetch, onClose);
 
