@@ -54,7 +54,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   const [isCheckingCode, setIsCheckingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [showRateCalc, setShowRateCalc] = useState(false);
-  const [rateOptions, setRateOptions] = useState<Array<{ id: string; name: string; rate?: number }>>([]);
+  const [rateOptions, setRateOptions] = useState<Array<{ id: string; name: string; rate?: number; country?: string }>>([]);
   const [calculatorType, setCalculatorType] = useState<'roles' | 'locations'>('roles');
 
   const checkProjectCodeUnique = async (code: string) => {
@@ -117,25 +117,36 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       let optionsData: { data: any[] } | null = null;
       
       if (type === 'roles') {
-        optionsData = await supabase
+        const { data, error } = await supabase
           .from('office_roles')
           .select('id, name, code')
           .eq('company_id', company?.id);
+          
+        if (error) throw error;
+        optionsData = { data };
       } else {
-        optionsData = await supabase
+        const { data, error } = await supabase
           .from('office_locations')
           .select('id, city as name, country')
           .eq('company_id', company?.id);
+          
+        if (error) throw error;
+        optionsData = { data };
       }
 
       if (optionsData?.data) {
         const enrichedOptions = await Promise.all(optionsData.data.map(async (option) => {
-          const { data: rateData } = await supabase
+          const { data: rateData, error } = await supabase
             .from('office_rates')
             .select('value')
             .eq('reference_id', option.id)
-            .eq('type', type)
+            .eq('type', type === 'roles' ? 'roles' : 'locations')
             .limit(1);
+
+          if (error) {
+            console.error(`Error fetching rate for ${type}:`, error);
+            return { ...option, rate: 0 };
+          }
 
           return {
             ...option,

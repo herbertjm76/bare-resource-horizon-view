@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ interface Option {
   id: string;
   name: string;
   rate?: number;
+  country?: string; // For locations
 }
 
 interface RateCalculatorProps {
@@ -28,6 +29,11 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
   onTypeChange
 }) => {
   const [peopleCount, setPeopleCount] = useState<Record<string, number>>({});
+  
+  // Reset people counts when options or type changes
+  useEffect(() => {
+    setPeopleCount({});
+  }, [type, options]);
 
   const calculateAverageRate = () => {
     let totalCost = 0;
@@ -84,7 +90,12 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
           ) : (
             options.map(option => (
               <div className="flex items-center gap-3" key={option.id}>
-                <span className="w-36 font-medium">{option.name}</span>
+                <div className="w-36 font-medium">
+                  {option.name}
+                  {option.country && type === 'locations' && (
+                    <span className="text-xs text-muted-foreground block">{option.country}</span>
+                  )}
+                </div>
                 <Input
                   type="number"
                   value={peopleCount[option.id] || ''}
