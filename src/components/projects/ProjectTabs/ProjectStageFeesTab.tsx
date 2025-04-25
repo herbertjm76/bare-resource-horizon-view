@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,7 +24,7 @@ import { ProjectForm } from "../NewProjectDialog";
 
 interface ProjectStageFeesTabProps {
   form: ProjectForm;
-  officeStages: Array<{ id: string; name: string }>;
+  officeStages: Array<{ id: string; name: string; color?: string }>;
   updateStageFee: (stageId: string, data: Partial<ProjectForm['stageFees'][string]>) => void;
 }
 
@@ -98,10 +99,23 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
             if (invoiceAge !== stageFeeData.invoiceAge) {
               updateStageFee(stageId, { invoiceAge });
             }
+
+            const stageColor = stage.color || '#E5DEFF';
+            const textColor = '#1F2937'; // Keep text dark for better readability
             
             return (
-              <div key={stageId} className="border p-3 rounded-lg space-y-3">
-                <h4 className="font-semibold">{getStageNameById(stageId)}</h4>
+              <div 
+                key={stageId} 
+                className="border rounded-lg space-y-3" 
+                style={{ 
+                  backgroundColor: `${stageColor}20`, // Using 20% opacity version of the color
+                  borderColor: stageColor,
+                  padding: '0.75rem'
+                }}
+              >
+                <h4 className="font-semibold" style={{ color: textColor }}>
+                  {getStageNameById(stageId)}
+                </h4>
                 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
