@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +30,14 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const [activeTab, setActiveTab] = useState("info");
   const { company } = useCompany();
   
+  useEffect(() => {
+    // When dialog opens, log the project data to verify stage colors are present
+    if (isOpen && project) {
+      console.log('EditProjectDialog - Project data:', project);
+      console.log('EditProjectDialog - Project stages:', project.stages);
+    }
+  }, [isOpen, project]);
+  
   const {
     form,
     isLoading,
@@ -42,6 +50,13 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     updateStageFee,
     updateStageApplicability
   } = useProjectForm(project, isOpen);
+  
+  useEffect(() => {
+    // Log office stages to verify colors are being passed correctly
+    if (officeStages?.length) {
+      console.log('EditProjectDialog - Office stages with colors:', officeStages);
+    }
+  }, [officeStages]);
 
   const { handleSubmit } = useProjectSubmit(project.id, refetch, onClose);
 

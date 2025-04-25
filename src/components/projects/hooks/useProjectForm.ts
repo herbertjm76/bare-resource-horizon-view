@@ -34,7 +34,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
   const [managers, setManagers] = useState<Array<{ id: string; name: string }>>([]);
   const [countries, setCountries] = useState<string[]>([]);
   const [offices, setOffices] = useState<Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>>([]);
-  const [officeStages, setOfficeStages] = useState<Array<{ id: string; name: string }>>([]);
+  const [officeStages, setOfficeStages] = useState<Array<{ id: string; name: string; color?: string }>>([]);
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   const [form, setForm] = useState<FormState>({
@@ -85,12 +85,14 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
 
         setOffices(Array.isArray(locs) ? locs : []);
 
+        // Make sure to explicitly select the color field from office_stages
         const { data: stages } = await supabase
           .from('office_stages')
-          .select('id, name')
+          .select('id, name, color')
           .eq('company_id', company.id);
 
         const stagesArray = Array.isArray(stages) ? stages : [];
+        console.log('useProjectForm - Retrieved stages with colors:', stagesArray);
         setOfficeStages(stagesArray);
 
         // Log project data to see what we're working with

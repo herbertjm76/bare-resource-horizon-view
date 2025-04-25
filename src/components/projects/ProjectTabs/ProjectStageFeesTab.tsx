@@ -21,7 +21,6 @@ import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ProjectForm } from "../NewProjectDialog";
-import { getDefaultStageColor } from "@/components/settings/utils/stageColorUtils";
 
 interface ProjectStageFeesTabProps {
   form: ProjectForm;
@@ -58,11 +57,8 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
 
   const getStageColor = (stageId: string): string => {
     const stage = officeStages.find(s => s.id === stageId);
-    console.log("Stage found:", stage);
-    // Make sure we're using the color property directly from the stage object
-    const color = stage?.color || "#E5DEFF";
-    console.log("Using color:", color);
-    return color;
+    // Directly use the color from the stage object if available
+    return stage?.color || "#E5DEFF";
   };
 
   if (form.stages.length === 0) {
@@ -107,15 +103,15 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
               updateStageFee(stageId, { invoiceAge });
             }
             
-            console.log("Stage:", stage.name, "Color:", stageColor);
+            console.log(`Stage ID: ${stageId}, Name: ${stage.name}, Color from DB: ${stage.color}, Using: ${stageColor}`);
             
             return (
               <div key={stageId} className="border rounded-lg overflow-hidden bg-white">
                 <div 
-                  className="p-3"
+                  className="p-3 text-white"
                   style={{ backgroundColor: stageColor }}
                 >
-                  <h4 className="font-semibold text-white">
+                  <h4 className="font-semibold">
                     {getStageNameById(stageId)}
                   </h4>
                 </div>
