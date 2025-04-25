@@ -1,7 +1,7 @@
 
 import type { FormState } from "../types/projectTypes";
 
-export const useStageManagement = (form: FormState, setForm: (form: FormState) => void) => {
+export const useStageManagement = (form: FormState, setForm: React.Dispatch<React.SetStateAction<FormState>>) => {
   const updateStageFee = (stageId: string, data: Partial<FormState['stageFees'][string]>) => {
     setForm(prev => {
       let hours = prev.stageFees[stageId]?.hours ?? '';
