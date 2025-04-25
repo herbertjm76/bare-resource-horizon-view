@@ -30,7 +30,7 @@ interface ProjectInfoTabProps {
   managers: Array<{ id: string; name: string }>;
   countries: string[];
   offices: Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>;
-  officeStages: Array<{ id: string; name: string }>;
+  officeStages: Array<{ id: string; name: string; color?: string }>;
   statusOptions: Array<{ label: string; value: string }>;
   onChange: (key: keyof ProjectForm, value: any) => void;
   updateStageApplicability?: (stageId: string, isChecked: boolean) => void;
@@ -312,3 +312,4 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
     </div>
   );
 };
+
