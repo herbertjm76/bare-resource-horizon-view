@@ -35,12 +35,16 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       
       console.log('Project update data:', projectUpdate);
 
+      // Update the main project record with the new data
       const { error: projectError } = await supabase
         .from('projects')
         .update(projectUpdate)
         .eq('id', projectId);
 
-      if (projectError) throw projectError;
+      if (projectError) {
+        console.error("Error updating project:", projectError);
+        throw projectError;
+      }
       
       // First, fetch all current project stages to compare
       const { data: existingStages, error: stagesError } = await supabase
@@ -55,6 +59,12 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
 
       console.log('Existing stages:', existingStages);
       console.log('Selected stages:', selectedStageNames);
+      
+      // Check if company ID is available
+      if (!company?.id) {
+        console.error("Missing company ID for project stage operations");
+        throw new Error("Company context is not available");
+      }
       
       // If no stages are selected, delete all existing stages
       if (!selectedStageNames || selectedStageNames.length === 0) {
@@ -74,9 +84,8 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         const stagesToKeep = new Set(selectedStageNames);
         const existingStageNames = new Set(existingStages?.map(s => s.stage_name) || []);
         
-        // Find existing stages that match selected stages
+        // Find existing stages that should be deleted (not selected anymore)
         if (existingStages && existingStages.length > 0) {
-          // Delete stages that are not selected anymore
           const stagesToDelete = existingStages
             .filter(stage => !stagesToKeep.has(stage.stage_name))
             .map(stage => stage.id);
@@ -112,7 +121,12 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
             // Update existing stage
             const { error } = await supabase
               .from('project_stages')
-              .update({ fee, is_applicable: isApplicable })
+              .update({ 
+                fee, 
+                is_applicable: isApplicable,
+                // Ensure company_id is set for RLS
+                company_id: company.id 
+              })
               .eq('id', existingStage.id);
               
             if (error) {
@@ -120,12 +134,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
               throw error;
             }
           } else if (!existingStageNames.has(stageName)) {
-            // Insert new stage
-            if (!company?.id) {
-              console.error("Missing company ID for project stage insert");
-              continue;
-            }
-            
+            // Insert new stage with company_id for RLS
             const { error } = await supabase
               .from('project_stages')
               .insert({
@@ -149,7 +158,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       onClose();
     } catch (error: any) {
       console.error('Error updating project:', error);
-      toast.error('Failed to update project');
+      toast.error('Failed to update project: ' + (error.message || "Unknown error"));
     } finally {
       if (setIsLoading) setIsLoading(false);
     }

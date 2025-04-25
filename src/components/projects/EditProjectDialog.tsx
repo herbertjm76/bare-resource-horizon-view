@@ -12,6 +12,7 @@ import { ProjectStageFeesTab } from "./ProjectTabs/ProjectStageFeesTab";
 import { Button } from "@/components/ui/button";
 import { useProjectForm } from "./hooks/useProjectForm";
 import { useProjectSubmit } from "./hooks/useProjectSubmit";
+import { useCompany } from '@/context/CompanyContext';
 
 interface EditProjectDialogProps {
   project: any;
@@ -27,6 +28,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   refetch
 }) => {
   const [activeTab, setActiveTab] = useState("info");
+  const { company } = useCompany();
   
   const {
     form,
@@ -45,15 +47,17 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLoading) return;
+    if (isLoading || !company) return;
     
-    console.log('Submitting form:', form);
+    console.log('Submitting form with company context:', company.id);
+    console.log('Form data:', form);
     console.log('Selected stages and applicability:', form.stages, form.stageApplicability);
     
-    // Pass the entire form data including the officeStages for stage name resolution
+    // Pass the entire form data including the company context
     await handleSubmit({ 
       ...form, 
-      officeStages 
+      officeStages,
+      company_id: company.id
     }, setIsLoading);
   };
 
