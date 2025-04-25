@@ -44,6 +44,13 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
       : '';
   }, [options, peopleCount]);
 
+  const handleInputChange = (id: string, value: number) => {
+    setPeopleCount(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <Card className="p-6 max-w-lg w-full mx-auto relative z-50 shadow-xl">
@@ -51,33 +58,33 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
           <Calculator className="w-5 h-5" />Average Rate Calculator
         </h2>
         <p className="text-sm text-muted-foreground mb-4">
-          {`Select number of people by ${type === 'roles' ? 'role' : 'location'}`}
+          {`Select number of people by ${type === 'roles' ? 'role' : 'location'} to calculate the average rate.`}
         </p>
         <div className="bg-muted/30 p-4 rounded-md space-y-3 mb-6">
-          {options.map(option => (
-            <div className="flex items-center gap-3" key={option.id}>
-              <span className="w-36 font-medium">{option.name}</span>
-              <Input
-                type="number"
-                value={peopleCount[option.id] || ''}
-                min={0}
-                onChange={e => {
-                  const value = Number(e.target.value) || 0;
-                  setPeopleCount(prev => ({
-                    ...prev,
-                    [option.id]: value
-                  }));
-                }}
-                placeholder="# People"
-                className="w-28"
-              />
-              {option.rate !== undefined && (
-                <span className="text-sm text-muted-foreground">
-                  Rate: ${option.rate.toFixed(2)}
-                </span>
-              )}
-            </div>
-          ))}
+          {options.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No {type} found. Please add {type} in office settings first.
+            </p>
+          ) : (
+            options.map(option => (
+              <div className="flex items-center gap-3" key={option.id}>
+                <span className="w-36 font-medium">{option.name}</span>
+                <Input
+                  type="number"
+                  value={peopleCount[option.id] || ''}
+                  min={0}
+                  onChange={e => handleInputChange(option.id, Number(e.target.value) || 0)}
+                  placeholder="# People"
+                  className="w-28"
+                />
+                {option.rate !== undefined && (
+                  <span className="text-sm text-muted-foreground">
+                    Rate: ${option.rate.toFixed(2)}
+                  </span>
+                )}
+              </div>
+            ))
+          )}
         </div>
         <div className="mb-6 p-3 border rounded-md bg-[#F8F4FF]">
           <div className="flex justify-between items-center">
@@ -86,6 +93,9 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
               ${calculateAverageRate || '--'}
             </span>
           </div>
+          <p className="text-xs text-muted-foreground mt-1">
+            Formula: Sum(Rate × People) ÷ Total People
+          </p>
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="secondary" type="button" onClick={onCancel}>
