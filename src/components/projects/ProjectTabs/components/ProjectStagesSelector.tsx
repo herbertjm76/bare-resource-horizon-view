@@ -17,12 +17,19 @@ export const ProjectStagesSelector: React.FC<ProjectStagesSelectorProps> = ({
   console.log('ProjectStagesSelector - current stages:', stages);
   console.log('ProjectStagesSelector - available office stages:', officeStages);
 
+  // Helper function to check if stage is selected
+  const isStageSelected = (stageId: string) => {
+    const selected = stages.includes(stageId);
+    console.log(`Stage ${stageId} selected:`, selected);
+    return selected;
+  };
+
   return (
     <div className="space-y-4">
       <Label>Project Stages</Label>
       <div className="grid grid-cols-2 gap-3">
         {officeStages.map((stage) => {
-          const isSelected = stages.includes(stage.id);
+          const isSelected = isStageSelected(stage.id);
           const stageColor = stage.color || '#E5DEFF';
           
           console.log(`Stage ${stage.name} (${stage.id}): selected=${isSelected}`);

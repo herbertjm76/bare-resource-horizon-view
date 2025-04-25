@@ -33,6 +33,34 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const { company } = useCompany();
   const isMobile = useIsMobile();
   
+  // Map stage names to stage IDs if project stages are strings (names)
+  const processProjectStages = (project, officeStages) => {
+    if (!project || !project.stages || !officeStages || officeStages.length === 0) {
+      return project;
+    }
+
+    // Check if project stages are already IDs
+    const firstStage = project.stages[0];
+    if (typeof firstStage === 'string' && officeStages.some(s => s.id === firstStage)) {
+      // Stages are already IDs, no need to convert
+      console.log('Project stages are already IDs:', project.stages);
+      return project;
+    }
+
+    // Map stage names to stage IDs
+    console.log('Converting stage names to IDs:', project.stages);
+    const processedProject = {
+      ...project,
+      stages: project.stages.map(stageName => {
+        const stage = officeStages.find(s => s.name === stageName);
+        return stage ? stage.id : null;
+      }).filter(stageId => stageId !== null)
+    };
+
+    console.log('Processed stages:', processedProject.stages);
+    return processedProject;
+  };
+
   const {
     form,
     isLoading,
@@ -46,18 +74,18 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     updateStageApplicability
   } = useProjectForm(project, isOpen);
 
-  // Ensure stages are loaded correctly when project changes
+  // Process stages when officeStages are available
   useEffect(() => {
-    if (isOpen && project) {
-      // Log for debugging
-      console.log('EditProjectDialog - project:', project);
-      console.log('EditProjectDialog - project stages:', project.stages);
+    if (isOpen && project && officeStages && officeStages.length > 0) {
+      const processedProject = processProjectStages(project, officeStages);
+      console.log('EditProjectDialog - processed project stages:', processedProject.stages);
       
-      if (Array.isArray(project.stages)) {
-        handleChange('stages', project.stages);
+      // Update form stages with processed stages
+      if (processedProject.stages.length > 0) {
+        handleChange('stages', processedProject.stages);
       }
     }
-  }, [project, isOpen, handleChange]);
+  }, [isOpen, project, officeStages]);
 
   const { handleSubmit } = useProjectSubmit(project.id, refetch, onClose);
 

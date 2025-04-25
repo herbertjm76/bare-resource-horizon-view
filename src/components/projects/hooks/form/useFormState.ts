@@ -17,6 +17,7 @@ export const useFormState = (project: any) => {
   const initialStageSelections: Record<string, boolean> = {};
   initialStages.forEach((stageId: string) => {
     initialStageSelections[stageId] = true;
+    console.log(`Setting stage ${stageId} to selected`);
   });
   
   const [form, setForm] = useState<FormState>({
