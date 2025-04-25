@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,7 +59,10 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   const getStageColor = (stageId: string): string => {
     const stage = officeStages.find(s => s.id === stageId);
     console.log("Stage found:", stage);
-    return stage?.color || "#E5DEFF"; // Fallback to default color if no color is set
+    // Make sure we're using the color property directly from the stage object
+    const color = stage?.color || "#E5DEFF";
+    console.log("Using color:", color);
+    return color;
   };
 
   if (form.stages.length === 0) {
