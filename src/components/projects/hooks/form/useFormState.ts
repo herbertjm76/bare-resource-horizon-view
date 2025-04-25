@@ -26,7 +26,7 @@ export const useFormState = (project: any) => {
     manager: project.project_manager?.id || "",
     country: project.country || "",
     profit: project.target_profit_percentage?.toString() || "",
-    avgRate: project.avg_rate?.toString() || "",
+    avgRate: project.avg_rate?.toString() || "", // Keep this line but handle null case
     currency: project.currency || "USD",
     status: project.status || "",
     office: project.office?.id || "",

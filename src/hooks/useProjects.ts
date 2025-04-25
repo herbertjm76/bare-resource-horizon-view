@@ -43,7 +43,6 @@ export const useProjects = () => {
             current_stage,
             stages,
             currency,
-            avg_rate,
             project_manager:profiles(id, first_name, last_name),
             office:offices(id, name, country)
           `)
