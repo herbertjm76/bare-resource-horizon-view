@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -245,6 +246,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
             >
               <Calculator className="w-4 h-4" />
             </Button>
+          </div>
         </div>
       </div>
 
