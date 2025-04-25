@@ -27,10 +27,21 @@ interface ProjectStageFeesTabProps {
   updateStageFee: (stageId: string, data: Partial<ProjectForm['stageFees'][string]>) => void;
 }
 
-const months = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
+const generateYearMonths = () => {
+  const currentYear = new Date().getFullYear();
+  const years = [currentYear - 1, currentYear, currentYear + 1];
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  
+  return years.flatMap(year => 
+    months.map(month => ({
+      value: `${month} ${year}`,
+      label: `${month} ${year}`
+    }))
+  );
+};
 
 export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   form,
@@ -42,6 +53,7 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   };
 
   const selectedStages = officeStages.filter(stage => form.stages.includes(stage.id));
+  const billingOptions = generateYearMonths();
   
   const calculateInvoiceAge = (invoiceDate: Date | null): number => {
     if (!invoiceDate) return 0;
@@ -61,7 +73,6 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
 
   const getStageColor = (stageId: string): string => {
     const stage = officeStages.find(s => s.id === stageId);
-    // Directly use the color from the stage object if available
     return stage?.color || "#E5DEFF";
   };
 
@@ -118,17 +129,29 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
               </div>
               
               <div className="p-4 space-y-3">
+                <div>
+                  <Label htmlFor={`fee-${stageId}`} className="text-xs">Fee</Label>
+                  <Input
+                    id={`fee-${stageId}`}
+                    type="number"
+                    placeholder="0.00"
+                    value={stageFeeData.fee}
+                    onChange={(e) => updateStageFee(stageId, { fee: e.target.value })}
+                    className="h-8"
+                  />
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor={`fee-${stageId}`} className="text-xs">Fee</Label>
-                    <Input
-                      id={`fee-${stageId}`}
-                      type="number"
-                      placeholder="0.00"
-                      value={stageFeeData.fee}
-                      onChange={(e) => updateStageFee(stageId, { fee: e.target.value })}
-                      className="h-8"
-                    />
+                    <Label className="text-xs">Currency</Label>
+                    <Select value="USD" disabled>
+                      <SelectTrigger className="h-8">
+                        <SelectValue>USD</SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="USD">USD</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label htmlFor={`hours-${stageId}`} className="text-xs">Hours</Label>
@@ -155,9 +178,9 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
                         <SelectValue placeholder="Select month" />
                       </SelectTrigger>
                       <SelectContent>
-                        {months.map((month) => (
-                          <SelectItem key={month} value={month}>
-                            {month}
+                        {billingOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -197,7 +220,7 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {stageFeeData.invoiceDate ? (
-                            format(stageFeeData.invoiceDate, "PPP")
+                            format(stageFeeData.invoiceDate, "MM/dd/yy")
                           ) : (
                             "Select date"
                           )}
@@ -207,10 +230,19 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
                         <Calendar
                           mode="single"
                           selected={stageFeeData.invoiceDate || undefined}
-                          onSelect={(date) => updateStageFee(stageId, { 
-                            invoiceDate: date || null,
-                            invoiceAge: date ? calculateInvoiceAge(date) : 0
-                          })}
+                          onSelect={(date) => {
+                            updateStageFee(stageId, { 
+                              invoiceDate: date,
+                              invoiceAge: date ? calculateInvoiceAge(date) : 0
+                            });
+                            const popoverElement = document.querySelector('[data-radix-popper-content-id]');
+                            if (popoverElement) {
+                              const closeButton = popoverElement.querySelector('button[aria-label="Close"]');
+                              if (closeButton) {
+                                (closeButton as HTMLButtonElement).click();
+                              }
+                            }
+                          }}
                           initialFocus
                           className="pointer-events-auto"
                         />
