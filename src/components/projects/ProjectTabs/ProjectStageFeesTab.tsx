@@ -1,6 +1,7 @@
 
 import React from "react";
 import { StagesGrid } from "./components/StagesGrid";
+import type { ProjectForm } from "../NewProjectDialog";
 
 interface ProjectStageFeesTabProps {
   form: ProjectForm;
