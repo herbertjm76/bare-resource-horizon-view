@@ -21,6 +21,7 @@ import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ProjectForm } from "../NewProjectDialog";
+import { getDefaultStageColor } from "@/components/settings/utils/stageColorUtils";
 
 interface ProjectStageFeesTabProps {
   form: ProjectForm;
@@ -100,20 +101,22 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
               updateStageFee(stageId, { invoiceAge });
             }
 
-            const stageColor = stage.color || '#E5DEFF';
-            const textColor = '#1F2937'; // Keep text dark for better readability
+            // Get stage color, ensuring it has a default
+            const stageColor = getDefaultStageColor(stage.color);
+            
+            console.log("Stage ID:", stageId, "Stage name:", stage.name, "Stage color:", stageColor);
             
             return (
               <div 
                 key={stageId} 
                 className="border rounded-lg space-y-3" 
                 style={{ 
-                  backgroundColor: `${stageColor}20`, // Using 20% opacity version of the color
+                  backgroundColor: `${stageColor}20`,
                   borderColor: stageColor,
                   padding: '0.75rem'
                 }}
               >
-                <h4 className="font-semibold" style={{ color: textColor }}>
+                <h4 className="font-semibold" style={{ color: '#1F2937' }}>
                   {getStageNameById(stageId)}
                 </h4>
                 

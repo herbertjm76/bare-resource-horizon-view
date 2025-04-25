@@ -82,7 +82,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (rolesError) throw rolesError;
 
-        // Check if office_locations has a color column before attempting to select it
+        // Fetch locations data
         let locationsData = [];
         try {
           const { data, error } = await supabase
@@ -104,6 +104,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         if (ratesError) throw ratesError;
         
+        // Ensure we're selecting the color field from office_stages
         const { data: stagesData, error: stagesError } = await supabase
           .from('office_stages')
           .select('id, name, order_index, company_id, color')
@@ -144,8 +145,9 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
           setLocations([]);
         }
         
-        // Properly handle stages data
+        // Properly handle stages data with colors
         if (Array.isArray(stagesData)) {
+          console.log("Processing stages with colors:", stagesData);
           setOfficeStages(stagesData.map((stage) => ({
             id: stage.id,
             name: stage.name,
