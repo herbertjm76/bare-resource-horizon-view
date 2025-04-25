@@ -1,4 +1,3 @@
-
 export interface StageFee {
   fee: string;
   billingMonth: string;
@@ -22,4 +21,5 @@ export interface FormState {
   stages: string[];
   stageFees: Record<string, StageFee>;
   stageApplicability: Record<string, boolean>;
+  currency: string;
 }

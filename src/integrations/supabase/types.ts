@@ -269,41 +269,6 @@ export type Database = {
           },
         ]
       }
-      office_staff_rates: {
-        Row: {
-          created_at: string | null
-          hourly_rate: number
-          id: string
-          office_id: string
-          title: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          hourly_rate: number
-          id?: string
-          office_id: string
-          title: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          hourly_rate?: number
-          id?: string
-          office_id?: string
-          title?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "office_staff_rates_office_id_fkey"
-            columns: ["office_id"]
-            isOneToOne: false
-            referencedRelation: "offices"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       office_stages: {
         Row: {
           color: string | null
@@ -614,6 +579,7 @@ export type Database = {
           company_id: string | null
           country: string
           created_at: string | null
+          currency: string | null
           current_stage: string
           id: string
           name: string
@@ -630,6 +596,7 @@ export type Database = {
           company_id?: string | null
           country: string
           created_at?: string | null
+          currency?: string | null
           current_stage: string
           id?: string
           name: string
@@ -646,6 +613,7 @@ export type Database = {
           company_id?: string | null
           country?: string
           created_at?: string | null
+          currency?: string | null
           current_stage?: string
           id?: string
           name?: string
