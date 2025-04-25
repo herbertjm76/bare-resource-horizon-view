@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ProjectForm } from "../NewProjectDialog";
+import { CurrencySelect } from "./components/CurrencySelect";
 
 interface ProjectStageFeesTabProps {
   form: ProjectForm;
@@ -55,12 +55,13 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   const selectedStages = officeStages.filter(stage => form.stages.includes(stage.id));
   const billingOptions = generateYearMonths();
   
-  const calculateInvoiceAge = (invoiceDate: Date | null): number => {
-    if (!invoiceDate) return 0;
+  const calculateInvoiceAge = (invoiceDate: Date | null): string => {
+    if (!invoiceDate) return 'N/A';
     const today = new Date();
+    if (invoiceDate > today) return 'N/A';
     const diffTime = Math.abs(today.getTime() - invoiceDate.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return diffDays.toString();
   };
   
   const calculateHours = (fee: string): string => {
@@ -102,7 +103,8 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
             status: 'Not Billed',
             invoiceDate: null,
             hours: '',
-            invoiceAge: 0
+            invoiceAge: 0,
+            currency: 'USD'
           };
           
           const hours = calculateHours(stageFeeData.fee);
@@ -144,14 +146,10 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label className="text-xs">Currency</Label>
-                    <Select value="USD" disabled>
-                      <SelectTrigger className="h-8">
-                        <SelectValue>USD</SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="USD">USD</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <CurrencySelect
+                      value={stageFeeData.currency || 'USD'}
+                      onValueChange={(value) => updateStageFee(stageId, { currency: value })}
+                    />
                   </div>
                   <div>
                     <Label htmlFor={`hours-${stageId}`} className="text-xs">Hours</Label>
@@ -233,7 +231,7 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
                           onSelect={(date) => {
                             updateStageFee(stageId, { 
                               invoiceDate: date,
-                              invoiceAge: date ? calculateInvoiceAge(date) : 0
+                              invoiceAge: date ? calculateInvoiceAge(date) : 'N/A'
                             });
                             const popoverElement = document.querySelector('[data-radix-popper-content-id]');
                             if (popoverElement) {
