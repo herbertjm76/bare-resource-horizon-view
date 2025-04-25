@@ -6,11 +6,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
-import { Check, Percent } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calculator, DollarSign } from 'lucide-react';
 import { ProjectBasicInfo } from './components/ProjectBasicInfo';
 import { ProjectManagerSelect } from './components/ProjectManagerSelect';
 import { ProjectLocationInfo } from './components/ProjectLocationInfo';
 import { ProjectStagesSelector } from './components/ProjectStagesSelector';
+import { RateCalculator } from './components/RateCalculator';
 
 interface ProjectForm {
   code: string;
@@ -46,10 +48,13 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   officeStages,
   statusOptions,
   onChange,
+  updateStageApplicability
 }) => {
   const { company } = useCompany();
   const [isCheckingCode, setIsCheckingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
+  const [showRateCalc, setShowRateCalc] = useState(false);
+  const [roles, setRoles] = useState<Array<{ id: string; name: string; rate?: number }>>([]);
 
   const checkProjectCodeUnique = async (code: string) => {
     if (!code.trim() || !company?.id) return;
@@ -96,6 +101,50 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
     return () => clearTimeout(timer);
   };
 
+  const openRateCalculator = async () => {
+    if (!company?.id) {
+      toast.error("Company context not found");
+      return;
+    }
+
+    try {
+      // Fetch office roles with their rates
+      const { data: officeRoles, error } = await supabase
+        .from('office_roles')
+        .select('id, name, code')
+        .eq('company_id', company.id);
+
+      if (error) throw error;
+
+      // Fetch rates for each role
+      const roles = await Promise.all((officeRoles || []).map(async role => {
+        const { data: rateData } = await supabase
+          .from('office_rates')
+          .select('value')
+          .eq('reference_id', role.id)
+          .eq('type', 'role')
+          .limit(1);
+
+        return {
+          id: role.id,
+          name: role.name,
+          rate: rateData && rateData.length > 0 ? Number(rateData[0].value) : 0
+        };
+      }));
+
+      setRoles(roles);
+      setShowRateCalc(true);
+    } catch (err) {
+      console.error("Error fetching roles:", err);
+      toast.error("Failed to load role data for rate calculator");
+    }
+  };
+
+  const handleApplyRate = (avgRate: string) => {
+    onChange("avgRate", avgRate);
+    setShowRateCalc(false);
+  };
+
   return (
     <div className="space-y-4 py-4">
       <ProjectBasicInfo
@@ -107,11 +156,30 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         onNameChange={(e) => onChange("name", e.target.value)}
       />
 
-      <ProjectManagerSelect
-        value={form.manager}
-        managers={managers}
-        onChange={(value) => onChange("manager", value)}
-      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <ProjectManagerSelect
+          value={form.manager}
+          managers={managers}
+          onChange={(value) => onChange("manager", value)}
+        />
+
+        <div>
+          <Label htmlFor="status" className="block">Status</Label>
+          <Select value={form.status} onValueChange={(value) => onChange("status", value)} required>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Select a status</SelectItem>
+              {statusOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
 
       <ProjectLocationInfo
         country={form.country}
@@ -122,39 +190,47 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         onOfficeChange={(value) => onChange("office", value)}
       />
 
-      <div>
-        <Label htmlFor="status" className="flex items-center gap-1">
-          <Check className="w-4 h-4" />Status
-        </Label>
-        <Select value={form.status} onValueChange={(value) => onChange("status", value)} required>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">Select a status</SelectItem>
-            {statusOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="profit" className="flex items-center gap-1">
+            <DollarSign className="w-4 h-4" />Target Profit
+          </Label>
+          <Input
+            id="profit"
+            type="number"
+            min="0"
+            max="100"
+            placeholder="30"
+            value={form.profit}
+            onChange={(e) => onChange("profit", e.target.value)}
+            required
+          />
+        </div>
 
-      <div>
-        <Label htmlFor="profit" className="flex items-center gap-1">
-          <Percent className="w-4 h-4" />Target Profit %
-        </Label>
-        <Input
-          id="profit"
-          type="number"
-          min="0"
-          max="100"
-          placeholder="30"
-          value={form.profit}
-          onChange={(e) => onChange("profit", e.target.value)}
-          required
-        />
+        <div>
+          <Label htmlFor="avgRate" className="flex items-center gap-1">
+            <Calculator className="w-4 h-4" />Average Rate
+          </Label>
+          <div className="flex gap-2">
+            <Input
+              id="avgRate"
+              type="number"
+              placeholder="Enter rate"
+              value={form.avgRate || ''}
+              onChange={(e) => onChange("avgRate", e.target.value)}
+              required
+            />
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              onClick={openRateCalculator}
+              title="Calculate Average Rate"
+            >
+              <Calculator className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
       </div>
 
       <ProjectStagesSelector
@@ -162,6 +238,14 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         officeStages={officeStages}
         onChange={(stages) => onChange("stages", stages)}
       />
+
+      {showRateCalc && (
+        <RateCalculator
+          roles={roles}
+          onCancel={() => setShowRateCalc(false)}
+          onApply={handleApplyRate}
+        />
+      )}
     </div>
   );
 };

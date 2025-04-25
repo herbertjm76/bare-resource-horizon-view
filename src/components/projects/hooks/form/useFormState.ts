@@ -12,7 +12,7 @@ export const useFormState = (project: any) => {
     manager: project.project_manager?.id || "",
     country: project.country || "",
     profit: project.target_profit_percentage?.toString() || "",
-    avgRate: "",
+    avgRate: project.avg_rate?.toString() || "",
     status: project.status || "",
     office: project.office?.id || "",
     current_stage: project.current_stage || "",
