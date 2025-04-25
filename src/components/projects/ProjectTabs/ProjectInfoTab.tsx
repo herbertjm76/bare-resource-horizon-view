@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -249,6 +250,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
           {officeStages.map((stage) => {
             const isSelected = form.stages.includes(stage.id);
             const isApplicable = form.stageApplicability?.[stage.id] ?? true;
+            const stageColor = stage.color || '#E5DEFF'; // Default color if none set
             
             return (
               <div key={stage.id} className="flex gap-2">
@@ -260,13 +262,17 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
                       : form.stages.filter(s => s !== stage.id);
                     onChange('stages', newStages);
                   }}
-                  className={`w-full justify-start gap-2 ${
+                  className={`w-full justify-start ${
                     isSelected 
-                      ? 'bg-[#6E59A5] text-white hover:bg-[#5D4A94]' 
+                      ? 'text-white hover:opacity-90' 
                       : 'hover:bg-muted'
                   }`}
+                  style={{
+                    backgroundColor: isSelected ? stageColor : 'transparent',
+                    borderColor: stageColor,
+                    borderWidth: '1px'
+                  }}
                 >
-                  {isSelected && <Check className="h-4 w-4" />}
                   {stage.name}
                 </Toggle>
                 
@@ -280,11 +286,16 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
                     }}
                     className={`shrink-0 ${
                       isApplicable 
-                        ? 'bg-[#6E59A5] text-white hover:bg-[#5D4A94]' 
+                        ? 'text-white hover:opacity-90' 
                         : 'hover:bg-muted'
                     }`}
+                    style={{
+                      backgroundColor: isApplicable ? stageColor : 'transparent',
+                      borderColor: stageColor,
+                      borderWidth: '1px'
+                    }}
                   >
-                    <Check className={`h-4 w-4 ${!isApplicable && 'opacity-0'}`} />
+                    {isApplicable ? '✓' : '✗'}
                   </Toggle>
                 )}
               </div>
