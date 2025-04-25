@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,8 +6,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Toggle } from '@/components/ui/toggle';
+import { Check } from 'lucide-react';
 
-// Define the ProjectForm interface here since it's needed by the component props
 interface ProjectForm {
   code: string;
   name: string;
@@ -83,10 +83,8 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
     const newCode = e.target.value;
     onChange("code", newCode);
     
-    // Clear any existing error when the user types
     if (codeError) setCodeError(null);
     
-    // Debounce the validation to avoid too many requests
     const timer = setTimeout(() => {
       if (newCode.trim()) {
         checkProjectCodeUnique(newCode);
@@ -98,7 +96,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
 
   return (
     <div className="space-y-4 py-4">
-      {/* Project Code & Name */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="code">Project Code</Label>
@@ -129,7 +126,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         </div>
       </div>
 
-      {/* Project Manager */}
       <div>
         <Label htmlFor="manager">Project Manager</Label>
         <Select value={form.manager} onValueChange={(value) => onChange("manager", value)}>
@@ -148,7 +144,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         </Select>
       </div>
 
-      {/* Country & Office */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="country">Country</Label>
@@ -192,7 +187,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         </div>
       </div>
 
-      {/* Current Stage & Status */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="current_stage">Current Stage</Label>
@@ -235,7 +229,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         </div>
       </div>
 
-      {/* Profit */}
       <div>
         <Label htmlFor="profit">Target Profit %</Label>
         <Input
@@ -250,50 +243,61 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         />
       </div>
 
-      {/* Project Stages */}
       <div className="space-y-4">
         <Label>Project Stages</Label>
-        {officeStages.map((stage) => {
-          const isSelected = form.stages.includes(stage.id);
-          const isApplicable = form.stageApplicability?.[stage.id] ?? true;
-          return (
-            <div key={stage.id} className="flex items-center space-x-4">
-              <Checkbox
-                id={`stage-${stage.id}`}
-                checked={isSelected}
-                onCheckedChange={(checked) => {
-                  const newStages = checked
-                    ? [...form.stages, stage.id]
-                    : form.stages.filter(s => s !== stage.id);
-                  onChange('stages', newStages);
-                }}
-              />
-              <Label htmlFor={`stage-${stage.id}`}>{stage.name}</Label>
-              
-              {isSelected && updateStageApplicability && (
-                <Checkbox
-                  id={`stage-applicable-${stage.id}`}
-                  checked={isApplicable}
-                  onCheckedChange={(checked) => {
-                    if (updateStageApplicability) {
-                      updateStageApplicability(stage.id, !!checked);
-                    }
+        <div className="grid grid-cols-2 gap-3">
+          {officeStages.map((stage) => {
+            const isSelected = form.stages.includes(stage.id);
+            const isApplicable = form.stageApplicability?.[stage.id] ?? true;
+            
+            return (
+              <div key={stage.id} className="flex gap-2">
+                <Toggle
+                  pressed={isSelected}
+                  onPressedChange={(pressed) => {
+                    const newStages = pressed
+                      ? [...form.stages, stage.id]
+                      : form.stages.filter(s => s !== stage.id);
+                    onChange('stages', newStages);
                   }}
-                />
-              )}
-              {isSelected && updateStageApplicability && (
-                <Label htmlFor={`stage-applicable-${stage.id}`}>Is Applicable</Label>
-              )}
-            </div>
-          );
-        })}
+                  className={`w-full justify-start gap-2 ${
+                    isSelected 
+                      ? 'bg-[#6E59A5] text-white hover:bg-[#5D4A94]' 
+                      : 'hover:bg-muted'
+                  }`}
+                >
+                  {isSelected && <Check className="h-4 w-4" />}
+                  {stage.name}
+                </Toggle>
+                
+                {isSelected && updateStageApplicability && (
+                  <Toggle
+                    pressed={isApplicable}
+                    onPressedChange={(pressed) => {
+                      if (updateStageApplicability) {
+                        updateStageApplicability(stage.id, pressed);
+                      }
+                    }}
+                    className={`shrink-0 ${
+                      isApplicable 
+                        ? 'bg-[#6E59A5] text-white hover:bg-[#5D4A94]' 
+                        : 'hover:bg-muted'
+                    }`}
+                  >
+                    <Check className={`h-4 w-4 ${!isApplicable && 'opacity-0'}`} />
+                  </Toggle>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        
+        {officeStages.length === 0 && (
+          <p className="text-sm text-muted-foreground mt-2">
+            No stages defined. Please add stages in office settings.
+          </p>
+        )}
       </div>
-      
-      {officeStages.length === 0 && (
-        <p className="text-sm text-muted-foreground mt-2">
-          No stages defined. Please add stages in office settings.
-        </p>
-      )}
     </div>
   );
 };
