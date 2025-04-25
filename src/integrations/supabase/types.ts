@@ -505,30 +505,42 @@ export type Database = {
       }
       project_stages: {
         Row: {
+          billing_month: string | null
           company_id: string | null
           created_at: string | null
           fee: number
           id: string
+          invoice_age: number | null
+          invoice_date: string | null
+          invoice_status: string | null
           is_applicable: boolean | null
           project_id: string
           stage_name: string
           updated_at: string | null
         }
         Insert: {
+          billing_month?: string | null
           company_id?: string | null
           created_at?: string | null
           fee: number
           id?: string
+          invoice_age?: number | null
+          invoice_date?: string | null
+          invoice_status?: string | null
           is_applicable?: boolean | null
           project_id: string
           stage_name: string
           updated_at?: string | null
         }
         Update: {
+          billing_month?: string | null
           company_id?: string | null
           created_at?: string | null
           fee?: number
           id?: string
+          invoice_age?: number | null
+          invoice_date?: string | null
+          invoice_status?: string | null
           is_applicable?: boolean | null
           project_id?: string
           stage_name?: string

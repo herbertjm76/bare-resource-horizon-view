@@ -27,6 +27,11 @@ interface ProjectStageFeesTabProps {
   updateStageFee: (stageId: string, data: Partial<ProjectForm['stageFees'][string]>) => void;
 }
 
+const months = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
 export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   form,
   officeStages,
@@ -101,8 +106,6 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
             updateStageFee(stageId, { invoiceAge });
           }
           
-          console.log(`Stage ID: ${stageId}, Name: ${stage.name}, Color from DB: ${stage.color}, Using: ${stageColor}`);
-          
           return (
             <div key={stageId} className="border rounded-lg overflow-hidden bg-white">
               <div 
@@ -142,15 +145,23 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <Label htmlFor={`billingMonth-${stageId}`} className="text-xs">Billing Month</Label>
-                    <Input
-                      id={`billingMonth-${stageId}`}
-                      placeholder="e.g., April 2025"
+                    <Select
                       value={stageFeeData.billingMonth}
-                      onChange={(e) => updateStageFee(stageId, { 
-                        billingMonth: e.target.value 
+                      onValueChange={(value) => updateStageFee(stageId, { 
+                        billingMonth: value 
                       })}
-                      className="h-8"
-                    />
+                    >
+                      <SelectTrigger className="h-8">
+                        <SelectValue placeholder="Select month" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {months.map((month) => (
+                          <SelectItem key={month} value={month}>
+                            {month}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label className="text-xs">Status</Label>
@@ -201,6 +212,7 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
                             invoiceAge: date ? calculateInvoiceAge(date) : 0
                           })}
                           initialFocus
+                          className="pointer-events-auto"
                         />
                       </PopoverContent>
                     </Popover>

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
@@ -114,6 +113,17 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
           const fee = feeData?.fee ? parseFloat(feeData.fee) : 0;
           const isApplicable = form.stageApplicability?.[stageId] ?? true;
           
+          // Prepare stage data with new fields
+          const stageData = {
+            fee,
+            is_applicable: isApplicable,
+            company_id: company.id,
+            billing_month: feeData?.billingMonth || null,
+            invoice_date: feeData?.invoiceDate || null,
+            invoice_status: feeData?.status || 'Not Billed',
+            invoice_age: feeData?.invoiceAge || 0
+          };
+
           // Check if this stage already exists
           const existingStage = existingStages?.find(s => s.stage_name === stageName);
           
@@ -121,12 +131,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
             // Update existing stage
             const { error } = await supabase
               .from('project_stages')
-              .update({ 
-                fee, 
-                is_applicable: isApplicable,
-                // Ensure company_id is set for RLS
-                company_id: company.id 
-              })
+              .update(stageData)
               .eq('id', existingStage.id);
               
             if (error) {
@@ -134,15 +139,13 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
               throw error;
             }
           } else if (!existingStageNames.has(stageName)) {
-            // Insert new stage with company_id for RLS
+            // Insert new stage
             const { error } = await supabase
               .from('project_stages')
               .insert({
                 project_id: projectId,
-                company_id: company.id,
                 stage_name: stageName,
-                fee,
-                is_applicable: isApplicable
+                ...stageData
               });
               
             if (error) {
