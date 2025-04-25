@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -249,56 +248,31 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         <div className="grid grid-cols-2 gap-3">
           {officeStages.map((stage) => {
             const isSelected = form.stages.includes(stage.id);
-            const isApplicable = form.stageApplicability?.[stage.id] ?? true;
             const stageColor = stage.color || '#E5DEFF'; // Default color if none set
             
             return (
-              <div key={stage.id} className="flex gap-2">
-                <Toggle
-                  pressed={isSelected}
-                  onPressedChange={(pressed) => {
-                    const newStages = pressed
-                      ? [...form.stages, stage.id]
-                      : form.stages.filter(s => s !== stage.id);
-                    onChange('stages', newStages);
-                  }}
-                  className={`w-full justify-start ${
-                    isSelected 
-                      ? 'text-white hover:opacity-90' 
-                      : 'hover:bg-muted'
-                  }`}
-                  style={{
-                    backgroundColor: isSelected ? stageColor : 'transparent',
-                    borderColor: stageColor,
-                    borderWidth: '1px'
-                  }}
-                >
-                  {stage.name}
-                </Toggle>
-                
-                {isSelected && updateStageApplicability && (
-                  <Toggle
-                    pressed={isApplicable}
-                    onPressedChange={(pressed) => {
-                      if (updateStageApplicability) {
-                        updateStageApplicability(stage.id, pressed);
-                      }
-                    }}
-                    className={`shrink-0 ${
-                      isApplicable 
-                        ? 'text-white hover:opacity-90' 
-                        : 'hover:bg-muted'
-                    }`}
-                    style={{
-                      backgroundColor: isApplicable ? stageColor : 'transparent',
-                      borderColor: stageColor,
-                      borderWidth: '1px'
-                    }}
-                  >
-                    {isApplicable ? '✓' : '✗'}
-                  </Toggle>
-                )}
-              </div>
+              <Toggle
+                key={stage.id}
+                pressed={isSelected}
+                onPressedChange={(pressed) => {
+                  const newStages = pressed
+                    ? [...form.stages, stage.id]
+                    : form.stages.filter(s => s !== stage.id);
+                  onChange('stages', newStages);
+                }}
+                className={`w-full justify-start ${
+                  isSelected 
+                    ? 'text-white hover:opacity-90' 
+                    : 'hover:bg-muted'
+                }`}
+                style={{
+                  backgroundColor: isSelected ? stageColor : 'transparent',
+                  borderColor: stageColor,
+                  borderWidth: '1px'
+                }}
+              >
+                {stage.name}
+              </Toggle>
             );
           })}
         </div>
@@ -312,4 +286,3 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
     </div>
   );
 };
-
