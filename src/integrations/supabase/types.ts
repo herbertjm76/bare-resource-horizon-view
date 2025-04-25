@@ -473,6 +473,7 @@ export type Database = {
           billing_month: string | null
           company_id: string | null
           created_at: string | null
+          currency: string | null
           fee: number
           id: string
           invoice_age: number | null
@@ -487,6 +488,7 @@ export type Database = {
           billing_month?: string | null
           company_id?: string | null
           created_at?: string | null
+          currency?: string | null
           fee: number
           id?: string
           invoice_age?: number | null
@@ -501,6 +503,7 @@ export type Database = {
           billing_month?: string | null
           company_id?: string | null
           created_at?: string | null
+          currency?: string | null
           fee?: number
           id?: string
           invoice_age?: number | null
