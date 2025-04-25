@@ -14,6 +14,8 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
   // Initialize stage applicability when project and stages are loaded
   useEffect(() => {
     if (isOpen && project && Array.isArray(project.stages) && project.stages.length > 0) {
+      console.log('useProjectForm - Initializing stages from project:', project.stages);
+      
       const stageApplicability: Record<string, boolean> = {};
       
       project.stages.forEach((stageId: string) => {
@@ -22,6 +24,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
       
       setForm(prev => ({
         ...prev,
+        stages: project.stages, // Ensure stages are explicitly set
         stageApplicability
       }));
 
@@ -34,6 +37,8 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
   }, [isOpen, project, setForm]);
 
   const handleChange = (key: keyof typeof form, value: any) => {
+    console.log(`handleChange: ${String(key)} =`, value);
+    
     setForm(prev => ({ ...prev, [key]: value }));
     
     if (formErrors[key]) {
@@ -47,6 +52,8 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     if (key === 'stages') {
       const newStageFees: Record<string, any> = {...form.stageFees};
       const newStageApplicability: Record<string, boolean> = {...form.stageApplicability};
+      
+      console.log('Updating stages to:', value);
       
       value.forEach((stageId: string) => {
         if (!newStageFees[stageId]) {

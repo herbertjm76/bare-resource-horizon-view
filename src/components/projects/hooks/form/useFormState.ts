@@ -13,6 +13,12 @@ export const useFormState = (project: any) => {
   console.log('useFormState - initializing with project:', project);
   console.log('useFormState - initialStages:', initialStages);
   
+  // Create a record of stage selections for easier lookup
+  const initialStageSelections: Record<string, boolean> = {};
+  initialStages.forEach((stageId: string) => {
+    initialStageSelections[stageId] = true;
+  });
+  
   const [form, setForm] = useState<FormState>({
     code: project.code || "",
     name: project.name || "",
@@ -26,7 +32,7 @@ export const useFormState = (project: any) => {
     current_stage: project.current_stage || "",
     stages: initialStages,
     stageFees: {},
-    stageApplicability: {},
+    stageApplicability: initialStageSelections,
   });
 
   return {

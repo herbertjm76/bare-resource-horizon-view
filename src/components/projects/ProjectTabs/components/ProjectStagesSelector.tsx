@@ -14,6 +14,9 @@ export const ProjectStagesSelector: React.FC<ProjectStagesSelectorProps> = ({
   officeStages,
   onChange,
 }) => {
+  console.log('ProjectStagesSelector - current stages:', stages);
+  console.log('ProjectStagesSelector - available office stages:', officeStages);
+
   return (
     <div className="space-y-4">
       <Label>Project Stages</Label>
@@ -22,11 +25,14 @@ export const ProjectStagesSelector: React.FC<ProjectStagesSelectorProps> = ({
           const isSelected = stages.includes(stage.id);
           const stageColor = stage.color || '#E5DEFF';
           
+          console.log(`Stage ${stage.name} (${stage.id}): selected=${isSelected}`);
+          
           return (
             <Toggle
               key={stage.id}
               pressed={isSelected}
               onPressedChange={(pressed) => {
+                console.log(`Toggle ${stage.name} to ${pressed ? 'selected' : 'unselected'}`);
                 const newStages = pressed
                   ? [...stages, stage.id]
                   : stages.filter(s => s !== stage.id);
