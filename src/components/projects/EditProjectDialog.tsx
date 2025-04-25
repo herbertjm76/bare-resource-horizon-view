@@ -14,6 +14,7 @@ import { useProjectSubmit } from "./hooks/useProjectSubmit";
 import { useCompany } from '@/context/CompanyContext';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface EditProjectDialogProps {
   project: any;
