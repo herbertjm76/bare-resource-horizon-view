@@ -1,0 +1,71 @@
+
+import React from "react";
+import { StageCard } from "./StageCard";
+
+interface Stage {
+  id: string;
+  name: string;
+  color?: string;
+}
+
+interface StageFee {
+  fee: string;
+  billingMonth: string;
+  status: "Not Billed" | "Invoiced" | "Paid" | "";
+  invoiceDate: Date | null;
+  hours: string;
+  invoiceAge: string | number;
+  currency: string;
+}
+
+interface StagesGridProps {
+  selectedStages: Stage[];
+  stageFees: Record<string, StageFee>;
+  billingOptions: Array<{ value: string; label: string }>;
+  updateStageFee: (stageId: string, data: Partial<StageFee>) => void;
+  getStageColor: (stageId: string) => string;
+  calculateHours: (fee: string) => string;
+  calculateInvoiceAge: (invoiceDate: Date | null) => string;
+}
+
+export const StagesGrid: React.FC<StagesGridProps> = ({
+  selectedStages,
+  stageFees,
+  billingOptions,
+  updateStageFee,
+  getStageColor,
+  calculateHours,
+  calculateInvoiceAge,
+}) => {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {selectedStages.map((stage) => {
+        const stageFeeData = stageFees[stage.id] || {
+          fee: '',
+          billingMonth: '',
+          status: 'Not Billed',
+          invoiceDate: null,
+          hours: '',
+          invoiceAge: '0',
+          currency: 'USD'
+        };
+        
+        const stageColor = getStageColor(stage.id);
+        
+        return (
+          <StageCard
+            key={stage.id}
+            stageId={stage.id}
+            stageName={stage.name}
+            stageColor={stageColor}
+            stageFeeData={stageFeeData}
+            billingOptions={billingOptions}
+            updateStageFee={updateStageFee}
+            calculateHours={calculateHours}
+            calculateInvoiceAge={calculateInvoiceAge}
+          />
+        );
+      })}
+    </div>
+  );
+};

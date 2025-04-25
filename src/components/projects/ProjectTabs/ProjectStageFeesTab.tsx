@@ -1,26 +1,6 @@
 
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { 
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem
-} from "@/components/ui/select";
-import { 
-  Popover,
-  PopoverContent,
-  PopoverTrigger 
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { ProjectForm } from "../NewProjectDialog";
-import { CurrencySelect } from "./components/CurrencySelect";
+import { StagesGrid } from "./components/StagesGrid";
 
 interface ProjectStageFeesTabProps {
   form: ProjectForm;
@@ -28,33 +8,26 @@ interface ProjectStageFeesTabProps {
   updateStageFee: (stageId: string, data: Partial<ProjectForm['stageFees'][string]>) => void;
 }
 
-const generateYearMonths = () => {
-  const currentYear = new Date().getFullYear();
-  const years = [currentYear - 1, currentYear, currentYear + 1];
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-  
-  return years.flatMap(year => 
-    months.map(month => ({
-      value: `${month} ${year}`,
-      label: `${month} ${year}`
-    }))
-  );
-};
-
 export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   form,
   officeStages,
   updateStageFee
 }) => {
-  const getStageNameById = (id: string) => {
-    return officeStages.find(stage => stage.id === id)?.name || 'Unknown Stage';
+  const generateYearMonths = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [currentYear - 1, currentYear, currentYear + 1];
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    
+    return years.flatMap(year => 
+      months.map(month => ({
+        value: `${month} ${year}`,
+        label: `${month} ${year}`
+      }))
+    );
   };
-
-  const selectedStages = officeStages.filter(stage => form.stages.includes(stage.id));
-  const billingOptions = generateYearMonths();
   
   const calculateInvoiceAge = (invoiceDate: Date | null): string => {
     if (!invoiceDate) return 'N/A';
@@ -78,6 +51,9 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
     return stage?.color || "#E5DEFF";
   };
 
+  const selectedStages = officeStages.filter(stage => form.stages.includes(stage.id));
+  const billingOptions = generateYearMonths();
+
   if (form.stages.length === 0) {
     return (
       <div className="py-6 text-center">
@@ -95,175 +71,15 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {selectedStages.map(stage => {
-          const stageId = stage.id;
-          const stageFeeData = form.stageFees[stageId] || {
-            fee: '',
-            billingMonth: '',
-            status: 'Not Billed',
-            invoiceDate: null,
-            hours: '',
-            invoiceAge: '0',
-            currency: 'USD'
-          };
-          
-          const hours = calculateHours(stageFeeData.fee);
-          const invoiceAge = calculateInvoiceAge(stageFeeData.invoiceDate);
-          const stageColor = getStageColor(stageId);
-          
-          if (hours !== stageFeeData.hours) {
-            updateStageFee(stageId, { hours });
-          }
-          
-          if (invoiceAge !== stageFeeData.invoiceAge) {
-            updateStageFee(stageId, { invoiceAge });
-          }
-          
-          return (
-            <div key={stageId} className="border rounded-lg overflow-hidden bg-white">
-              <div 
-                className="p-3 text-white"
-                style={{ backgroundColor: stageColor }}
-              >
-                <h4 className="font-semibold">
-                  {getStageNameById(stageId)}
-                </h4>
-              </div>
-              
-              <div className="p-4 space-y-3">
-                <div>
-                  <Label htmlFor={`fee-${stageId}`} className="text-xs">Fee</Label>
-                  <Input
-                    id={`fee-${stageId}`}
-                    type="number"
-                    placeholder="0.00"
-                    value={stageFeeData.fee}
-                    onChange={(e) => updateStageFee(stageId, { fee: e.target.value })}
-                    className="h-8"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs">Currency</Label>
-                    <CurrencySelect
-                      value={stageFeeData.currency || 'USD'}
-                      onValueChange={(value) => updateStageFee(stageId, { currency: value })}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor={`hours-${stageId}`} className="text-xs">Hours</Label>
-                    <Input
-                      id={`hours-${stageId}`}
-                      value={hours}
-                      readOnly
-                      disabled
-                      className="h-8 bg-muted"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor={`billingMonth-${stageId}`} className="text-xs">Billing Month</Label>
-                    <Select
-                      value={stageFeeData.billingMonth}
-                      onValueChange={(value) => updateStageFee(stageId, { 
-                        billingMonth: value 
-                      })}
-                    >
-                      <SelectTrigger className="h-8">
-                        <SelectValue placeholder="Select month" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {billingOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs">Status</Label>
-                    <Select
-                      value={stageFeeData.status}
-                      onValueChange={(value) => updateStageFee(stageId, { 
-                        status: value as "Not Billed" | "Invoiced" | "Paid" | "" 
-                      })}
-                    >
-                      <SelectTrigger className="h-8">
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Not Billed">Not Billed</SelectItem>
-                        <SelectItem value="Invoiced">Invoiced</SelectItem>
-                        <SelectItem value="Paid">Paid</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs">Invoice Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal h-8",
-                            !stageFeeData.invoiceDate && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {stageFeeData.invoiceDate ? (
-                            format(stageFeeData.invoiceDate, "MM/dd/yy")
-                          ) : (
-                            "Select date"
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={stageFeeData.invoiceDate || undefined}
-                          onSelect={(date) => {
-                            updateStageFee(stageId, { 
-                              invoiceDate: date,
-                              invoiceAge: date ? calculateInvoiceAge(date) : 'N/A'
-                            });
-                            const popoverElement = document.querySelector('[data-radix-popper-content-id]');
-                            if (popoverElement) {
-                              const closeButton = popoverElement.querySelector('button[aria-label="Close"]');
-                              if (closeButton) {
-                                (closeButton as HTMLButtonElement).click();
-                              }
-                            }
-                          }}
-                          initialFocus
-                          className="pointer-events-auto"
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div>
-                    <Label htmlFor={`invoiceAge-${stageId}`} className="text-xs">Invoice Age (Days)</Label>
-                    <Input
-                      id={`invoiceAge-${stageId}`}
-                      value={invoiceAge}
-                      readOnly
-                      disabled
-                      className="h-8 bg-muted"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <StagesGrid
+        selectedStages={selectedStages}
+        stageFees={form.stageFees}
+        billingOptions={billingOptions}
+        updateStageFee={updateStageFee}
+        getStageColor={getStageColor}
+        calculateHours={calculateHours}
+        calculateInvoiceAge={calculateInvoiceAge}
+      />
     </div>
   );
 };
