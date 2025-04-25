@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -13,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { useProjectForm } from "./hooks/useProjectForm";
 import { useProjectSubmit } from "./hooks/useProjectSubmit";
 import { useCompany } from '@/context/CompanyContext';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface EditProjectDialogProps {
   project: any;
@@ -29,9 +30,9 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState("info");
   const { company } = useCompany();
+  const isMobile = useIsMobile();
   
   useEffect(() => {
-    // When dialog opens, log the project data to verify stage colors are present
     if (isOpen && project) {
       console.log('EditProjectDialog - Project data:', project);
       console.log('EditProjectDialog - Project stages:', project.stages);
@@ -52,7 +53,6 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   } = useProjectForm(project, isOpen);
   
   useEffect(() => {
-    // Log office stages to verify colors are being passed correctly
     if (officeStages?.length) {
       console.log('EditProjectDialog - Office stages with colors:', officeStages);
     }
@@ -68,7 +68,6 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     console.log('Form data:', form);
     console.log('Selected stages and applicability:', form.stages, form.stageApplicability);
     
-    // Pass the entire form data including the company context
     await handleSubmit({ 
       ...form, 
       officeStages,
@@ -78,51 +77,61 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className={cn(
+        "max-w-2xl",
+        isMobile ? "w-[95vw] h-[95vh]" : "w-full max-h-[90vh]",
+        "flex flex-col p-0 gap-0"
+      )}>
+        <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-xl">Edit Project</DialogTitle>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="w-full grid grid-cols-3 mb-6">
+        
+        <form onSubmit={onSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1">
+            <TabsList className="w-full grid grid-cols-3 px-6">
               <TabsTrigger value="info">Project Info</TabsTrigger>
               <TabsTrigger value="stageFees">Stage Fees</TabsTrigger>
               <TabsTrigger value="financial">Financial Info</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="info">
-              <ProjectInfoTab 
-                form={form} 
-                managers={managers}
-                countries={countries}
-                offices={offices}
-                officeStages={officeStages}
-                updateStageApplicability={updateStageApplicability}
-                statusOptions={[
-                  { label: "Not started", value: "Planning" },
-                  { label: "On-going", value: "In Progress" },
-                  { label: "Completed", value: "Complete" },
-                  { label: "On hold", value: "On Hold" }
-                ]}
-                onChange={handleChange}
-              />
-            </TabsContent>
+            <ScrollArea className="flex-1 p-6">
+              <div className="space-y-6">
+                <TabsContent value="info" className="mt-0 space-y-6">
+                  <ProjectInfoTab 
+                    form={form} 
+                    managers={managers}
+                    countries={countries}
+                    offices={offices}
+                    officeStages={officeStages}
+                    updateStageApplicability={updateStageApplicability}
+                    statusOptions={[
+                      { label: "Not started", value: "Planning" },
+                      { label: "On-going", value: "In Progress" },
+                      { label: "Completed", value: "Complete" },
+                      { label: "On hold", value: "On Hold" }
+                    ]}
+                    onChange={handleChange}
+                  />
+                </TabsContent>
 
-            <TabsContent value="stageFees">
-              <ProjectStageFeesTab 
-                form={form}
-                officeStages={officeStages}
-                updateStageFee={updateStageFee}
-              />
-            </TabsContent>
+                <TabsContent value="stageFees" className="mt-0">
+                  <ProjectStageFeesTab 
+                    form={form}
+                    officeStages={officeStages}
+                    updateStageFee={updateStageFee}
+                  />
+                </TabsContent>
 
-            <TabsContent value="financial">
-              <div className="py-8 text-center text-muted-foreground">
-                Financial project info coming soon.
+                <TabsContent value="financial" className="mt-0">
+                  <div className="py-8 text-center text-muted-foreground">
+                    Financial project info coming soon.
+                  </div>
+                </TabsContent>
               </div>
-            </TabsContent>
+            </ScrollArea>
           </Tabs>
-          <div className="flex justify-end mt-8 gap-4">
+          
+          <div className="flex justify-end gap-4 p-6 border-t">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
