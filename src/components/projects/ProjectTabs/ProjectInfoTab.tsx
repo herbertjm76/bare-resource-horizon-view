@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,7 +11,7 @@ import { ProjectBasicInfo } from './components/ProjectBasicInfo';
 import { ProjectManagerSelect } from './components/ProjectManagerSelect';
 import { ProjectLocationInfo } from './components/ProjectLocationInfo';
 import { ProjectStagesSelector } from './components/ProjectStagesSelector';
-import { RateCalculator } from './components/RateCalculator';
+import { RateCalculatorNew } from './components/RateCalculatorNew';
 
 interface ProjectForm {
   code: string;
@@ -53,8 +52,9 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   const { company } = useCompany();
   const [isCheckingCode, setIsCheckingCode] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
+  const [rateCalculatorType, setRateCalculatorType] = useState<'roles' | 'locations'>('roles');
+  const [rateOptions, setRateOptions] = useState<Array<{ id: string; name: string; rate?: number }>>([]);
   const [showRateCalc, setShowRateCalc] = useState(false);
-  const [roles, setRoles] = useState<Array<{ id: string; name: string; rate?: number }>>([]);
 
   const checkProjectCodeUnique = async (code: string) => {
     if (!code.trim() || !company?.id) return;
@@ -101,42 +101,49 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
     return () => clearTimeout(timer);
   };
 
-  const openRateCalculator = async () => {
+  const openRateCalculator = async (type: 'roles' | 'locations') => {
     if (!company?.id) {
       toast.error("Company context not found");
       return;
     }
 
     try {
-      // Fetch office roles with their rates
-      const { data: officeRoles, error } = await supabase
-        .from('office_roles')
-        .select('id, name, code')
-        .eq('company_id', company.id);
+      let optionsData: { data: any[] } | null = null;
+      
+      if (type === 'roles') {
+        optionsData = await supabase
+          .from('office_roles')
+          .select('id, name, code')
+          .eq('company_id', company.id);
+      } else {
+        optionsData = await supabase
+          .from('office_locations')
+          .select('id, city as name, country')
+          .eq('company_id', company.id);
+      }
 
-      if (error) throw error;
+      if (optionsData?.data) {
+        const enrichedOptions = await Promise.all(optionsData.data.map(async (option) => {
+          const { data: rateData } = await supabase
+            .from('office_rates')
+            .select('value')
+            .eq('reference_id', option.id)
+            .eq('type', type)
+            .limit(1);
 
-      // Fetch rates for each role
-      const roles = await Promise.all((officeRoles || []).map(async role => {
-        const { data: rateData } = await supabase
-          .from('office_rates')
-          .select('value')
-          .eq('reference_id', role.id)
-          .eq('type', 'role')
-          .limit(1);
+          return {
+            ...option,
+            rate: rateData && rateData.length > 0 ? Number(rateData[0].value) : 0
+          };
+        }));
 
-        return {
-          id: role.id,
-          name: role.name,
-          rate: rateData && rateData.length > 0 ? Number(rateData[0].value) : 0
-        };
-      }));
-
-      setRoles(roles);
-      setShowRateCalc(true);
+        setRateOptions(enrichedOptions);
+        setRateCalculatorType(type);
+        setShowRateCalc(true);
+      }
     } catch (err) {
-      console.error("Error fetching roles:", err);
-      toast.error("Failed to load role data for rate calculator");
+      console.error(`Error fetching ${type} data:`, err);
+      toast.error(`Failed to load ${type} data for rate calculator`);
     }
   };
 
@@ -224,12 +231,20 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
               type="button"
               size="icon"
               variant="outline"
-              onClick={openRateCalculator}
-              title="Calculate Average Rate"
+              onClick={() => openRateCalculator('roles')}
+              title="Calculate by Roles"
             >
               <Calculator className="w-4 h-4" />
             </Button>
-          </div>
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              onClick={() => openRateCalculator('locations')}
+              title="Calculate by Locations"
+            >
+              <Calculator className="w-4 h-4" />
+            </Button>
         </div>
       </div>
 
@@ -240,8 +255,9 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       />
 
       {showRateCalc && (
-        <RateCalculator
-          roles={roles}
+        <RateCalculatorNew
+          options={rateOptions}
+          type={rateCalculatorType}
           onCancel={() => setShowRateCalc(false)}
           onApply={handleApplyRate}
         />

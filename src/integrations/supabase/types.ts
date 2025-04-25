@@ -578,6 +578,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          average_rate: number | null
           code: string
           company_id: string | null
           country: string
@@ -595,6 +596,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          average_rate?: number | null
           code: string
           company_id?: string | null
           country: string
@@ -612,6 +614,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          average_rate?: number | null
           code?: string
           company_id?: string | null
           country?: string
