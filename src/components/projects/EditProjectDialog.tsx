@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -33,13 +34,6 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const { company } = useCompany();
   const isMobile = useIsMobile();
   
-  useEffect(() => {
-    if (isOpen && project) {
-      console.log('EditProjectDialog - Project data:', project);
-      console.log('EditProjectDialog - Project stages:', project.stages);
-    }
-  }, [isOpen, project]);
-  
   const {
     form,
     isLoading,
@@ -52,22 +46,12 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     updateStageFee,
     updateStageApplicability
   } = useProjectForm(project, isOpen);
-  
-  useEffect(() => {
-    if (officeStages?.length) {
-      console.log('EditProjectDialog - Office stages with colors:', officeStages);
-    }
-  }, [officeStages]);
 
   const { handleSubmit } = useProjectSubmit(project.id, refetch, onClose);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (isLoading || !company) return;
-    
-    console.log('Submitting form with company context:', company.id);
-    console.log('Form data:', form);
-    console.log('Selected stages and applicability:', form.stages, form.stageApplicability);
     
     await handleSubmit({ 
       ...form, 
@@ -78,24 +62,32 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={cn(
-        "max-w-2xl",
-        isMobile ? "w-[95vw] h-[95vh]" : "w-full max-h-[90vh]",
-        "flex flex-col p-0 gap-0"
-      )}>
+      <DialogContent 
+        className={cn(
+          "max-w-2xl",
+          isMobile 
+            ? "w-[95vw] max-h-[95vh] overflow-hidden" 
+            : "w-full max-h-[90vh]",
+          "flex flex-col p-0"
+        )}
+      >
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-xl">Edit Project</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={onSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1">
+          <Tabs 
+            value={activeTab} 
+            onValueChange={setActiveTab} 
+            className="flex flex-col flex-1 overflow-hidden"
+          >
             <TabsList className="w-full grid grid-cols-3 px-6">
               <TabsTrigger value="info">Project Info</TabsTrigger>
               <TabsTrigger value="stageFees">Stage Fees</TabsTrigger>
               <TabsTrigger value="financial">Financial Info</TabsTrigger>
             </TabsList>
 
-            <ScrollArea className="flex-1 p-6">
+            <ScrollArea className="flex-1 overflow-y-auto max-h-[calc(90vh-200px)] p-6">
               <div className="space-y-6">
                 <TabsContent value="info" className="mt-0 space-y-6">
                   <ProjectInfoTab 
@@ -132,7 +124,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
             </ScrollArea>
           </Tabs>
           
-          <div className="flex justify-end gap-4 p-6 border-t">
+          <div className="flex justify-end gap-4 p-6 border-t sticky bottom-0 bg-background">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
