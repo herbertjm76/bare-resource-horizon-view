@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -54,7 +55,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   const [codeError, setCodeError] = useState<string | null>(null);
   const [showRateCalc, setShowRateCalc] = useState(false);
   const [rateOptions, setRateOptions] = useState<Array<{ id: string; name: string; rate?: number }>>([]);
-  const [calculatorType, setRateCalculatorType] = useState<'roles' | 'locations'>('roles');
+  const [calculatorType, setCalculatorType] = useState<'roles' | 'locations'>('roles');
 
   const checkProjectCodeUnique = async (code: string) => {
     if (!code.trim() || !company?.id) return;
@@ -107,7 +108,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       return;
     }
 
-    await loadRateOptions(rateCalculatorType);
+    await loadRateOptions(calculatorType);
     setShowRateCalc(true);
   };
 
@@ -151,8 +152,13 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   };
 
   const handleRateTypeChange = async (type: 'roles' | 'locations') => {
-    setRateCalculatorType(type);
+    setCalculatorType(type);
     await loadRateOptions(type);
+  };
+
+  const handleApplyRate = (avgRate: string) => {
+    onChange("avgRate", avgRate);
+    setShowRateCalc(false);
   };
 
   return (
@@ -251,7 +257,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       {showRateCalc && (
         <RateCalculatorNew
           options={rateOptions}
-          type={rateCalculatorType}
+          type={calculatorType}
           onCancel={() => setShowRateCalc(false)}
           onApply={handleApplyRate}
           onTypeChange={handleRateTypeChange}
