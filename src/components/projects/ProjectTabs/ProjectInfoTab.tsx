@@ -54,7 +54,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   const [codeError, setCodeError] = useState<string | null>(null);
   const [showRateCalc, setShowRateCalc] = useState(false);
   const [rateOptions, setRateOptions] = useState<Array<{ id: string; name: string; rate?: number }>>([]);
-  const [calculatorType, setCalculatorType] = useState<'roles' | 'locations'>('roles');
+  const [calculatorType, setRateCalculatorType] = useState<'roles' | 'locations'>('roles');
 
   const checkProjectCodeUnique = async (code: string) => {
     if (!code.trim() || !company?.id) return;
@@ -107,45 +107,52 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       return;
     }
 
+    await loadRateOptions(rateCalculatorType);
+    setShowRateCalc(true);
+  };
+
+  const loadRateOptions = async (type: 'roles' | 'locations') => {
     try {
-      // First load roles data
-      const rolesData = await supabase
-        .from('office_roles')
-        .select('id, name, code')
-        .eq('company_id', company.id);
+      let optionsData: { data: any[] } | null = null;
       
-      if (!rolesData.data || rolesData.error) {
-        toast.error("Failed to load roles data");
-        return;
+      if (type === 'roles') {
+        optionsData = await supabase
+          .from('office_roles')
+          .select('id, name, code')
+          .eq('company_id', company?.id);
+      } else {
+        optionsData = await supabase
+          .from('office_locations')
+          .select('id, city as name, country')
+          .eq('company_id', company?.id);
       }
 
-      // Enrich roles with rates
-      const enrichedRoles = await Promise.all(rolesData.data.map(async (role) => {
-        const { data: rateData } = await supabase
-          .from('office_rates')
-          .select('value')
-          .eq('reference_id', role.id)
-          .eq('type', 'roles')
-          .limit(1);
+      if (optionsData?.data) {
+        const enrichedOptions = await Promise.all(optionsData.data.map(async (option) => {
+          const { data: rateData } = await supabase
+            .from('office_rates')
+            .select('value')
+            .eq('reference_id', option.id)
+            .eq('type', type)
+            .limit(1);
 
-        return {
-          ...role,
-          rate: rateData && rateData.length > 0 ? Number(rateData[0].value) : 0
-        };
-      }));
+          return {
+            ...option,
+            rate: rateData && rateData.length > 0 ? Number(rateData[0].value) : 0
+          };
+        }));
 
-      setRateOptions(enrichedRoles);
-      setCalculatorType('roles');
-      setShowRateCalc(true);
+        setRateOptions(enrichedOptions);
+      }
     } catch (err) {
-      console.error("Error fetching rate data:", err);
-      toast.error("Failed to load data for rate calculator");
+      console.error(`Error fetching ${type} data:`, err);
+      toast.error(`Failed to load ${type} data for rate calculator`);
     }
   };
 
-  const handleApplyRate = (avgRate: string) => {
-    onChange("avgRate", avgRate);
-    setShowRateCalc(false);
+  const handleRateTypeChange = async (type: 'roles' | 'locations') => {
+    setRateCalculatorType(type);
+    await loadRateOptions(type);
   };
 
   return (
@@ -244,9 +251,10 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       {showRateCalc && (
         <RateCalculatorNew
           options={rateOptions}
-          type={calculatorType}
+          type={rateCalculatorType}
           onCancel={() => setShowRateCalc(false)}
           onApply={handleApplyRate}
+          onTypeChange={handleRateTypeChange}
         />
       )}
     </div>

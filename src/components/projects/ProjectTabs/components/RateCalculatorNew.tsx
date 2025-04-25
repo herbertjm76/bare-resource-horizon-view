@@ -1,10 +1,10 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calculator } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Option {
   id: string;
@@ -17,17 +17,19 @@ interface RateCalculatorProps {
   type: 'roles' | 'locations';
   onCancel: () => void;
   onApply: (avgRate: string) => void;
+  onTypeChange: (type: 'roles' | 'locations') => void;
 }
 
 export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
   options,
   type,
   onCancel,
-  onApply
+  onApply,
+  onTypeChange
 }) => {
   const [peopleCount, setPeopleCount] = useState<Record<string, number>>({});
 
-  const calculateAverageRate = useMemo(() => {
+  const calculateAverageRate = () => {
     let totalCost = 0;
     let totalPeople = 0;
 
@@ -42,7 +44,7 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
     return totalPeople > 0 
       ? (totalCost / totalPeople).toFixed(2) 
       : '';
-  }, [options, peopleCount]);
+  };
 
   const handleInputChange = (id: string, value: number) => {
     setPeopleCount(prev => ({
@@ -57,9 +59,23 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-[#6E59A5]">
           <Calculator className="w-5 h-5" />Average Rate Calculator
         </h2>
+        
+        <div className="mb-4">
+          <Select value={type} onValueChange={onTypeChange}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select calculation basis" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="roles">By Roles</SelectItem>
+              <SelectItem value="locations">By Locations</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <p className="text-sm text-muted-foreground mb-4">
           {`Select number of people by ${type === 'roles' ? 'role' : 'location'} to calculate the average rate.`}
         </p>
+        
         <div className="bg-muted/30 p-4 rounded-md space-y-3 mb-6">
           {options.length === 0 ? (
             <p className="text-sm text-muted-foreground">
@@ -86,25 +102,30 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
             ))
           )}
         </div>
+
         <div className="mb-6 p-3 border rounded-md bg-[#F8F4FF]">
           <div className="flex justify-between items-center">
             <span className="font-medium">Calculated Average Rate:</span>
             <span className="text-[#6E59A5] font-bold text-lg">
-              ${calculateAverageRate || '--'}
+              ${calculateAverageRate() || '--'}
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
             Formula: Sum(Rate × People) ÷ Total People
           </p>
         </div>
+
         <div className="flex justify-end gap-2">
           <Button variant="secondary" type="button" onClick={onCancel}>
             Cancel
           </Button>
           <Button
-            onClick={() => calculateAverageRate && onApply(calculateAverageRate)}
+            onClick={() => {
+              const avgRate = calculateAverageRate();
+              if (avgRate) onApply(avgRate);
+            }}
             type="button"
-            disabled={!calculateAverageRate}
+            disabled={!calculateAverageRate()}
           >
             Apply Rate
           </Button>
