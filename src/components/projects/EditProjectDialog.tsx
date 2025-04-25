@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useProjectForm } from "./hooks/useProjectForm";
 import { useProjectSubmit } from "./hooks/useProjectSubmit";
 import { useCompany } from '@/context/CompanyContext';
+import { X } from "lucide-react";
 
 interface EditProjectDialogProps {
   project: any;
@@ -63,55 +64,99 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-xl">Edit Project</DialogTitle>
+      <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-xl">
+        <DialogHeader className="p-6 pb-0">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-2xl font-bold text-[#1A1F2C]">
+              Edit Project
+            </DialogTitle>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onClose} 
+              className="rounded-full hover:bg-gray-100"
+            >
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close</span>
+            </Button>
+          </div>
         </DialogHeader>
-        <form onSubmit={onSubmit}>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="w-full grid grid-cols-3 mb-6">
-              <TabsTrigger value="info">Project Info</TabsTrigger>
-              <TabsTrigger value="stageFees">Stage Fees</TabsTrigger>
-              <TabsTrigger value="financial">Financial Info</TabsTrigger>
-            </TabsList>
+        
+        <form onSubmit={onSubmit} className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="border-b">
+              <TabsList className="w-full h-14 p-0 bg-transparent gap-1 justify-start pl-6">
+                <TabsTrigger 
+                  value="info" 
+                  className="data-[state=active]:bg-white data-[state=active]:shadow-none rounded-b-none rounded-t-lg h-14 px-8"
+                >
+                  Project Info
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="stageFees" 
+                  className="data-[state=active]:bg-white data-[state=active]:shadow-none rounded-b-none rounded-t-lg h-14 px-8"
+                >
+                  Stage Fees
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="financial" 
+                  className="data-[state=active]:bg-white data-[state=active]:shadow-none rounded-b-none rounded-t-lg h-14 px-8"
+                >
+                  Financial Info
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-            <TabsContent value="info">
-              <ProjectInfoTab 
-                form={form} 
-                managers={managers}
-                countries={countries}
-                offices={offices}
-                officeStages={officeStages}
-                updateStageApplicability={updateStageApplicability}
-                statusOptions={[
-                  { label: "Not started", value: "Planning" },
-                  { label: "On-going", value: "In Progress" },
-                  { label: "Completed", value: "Complete" },
-                  { label: "On hold", value: "On Hold" }
-                ]}
-                onChange={handleChange}
-              />
-            </TabsContent>
+            <div className="px-6">
+              <TabsContent value="info" className="mt-0 pt-4">
+                <ProjectInfoTab 
+                  form={form} 
+                  managers={managers}
+                  countries={countries}
+                  offices={offices}
+                  officeStages={officeStages}
+                  updateStageApplicability={updateStageApplicability}
+                  statusOptions={[
+                    { label: "Not started", value: "Planning" },
+                    { label: "On-going", value: "In Progress" },
+                    { label: "Completed", value: "Complete" },
+                    { label: "On hold", value: "On Hold" }
+                  ]}
+                  onChange={handleChange}
+                />
+              </TabsContent>
 
-            <TabsContent value="stageFees">
-              <ProjectStageFeesTab 
-                form={form}
-                officeStages={officeStages}
-                updateStageFee={updateStageFee}
-              />
-            </TabsContent>
+              <TabsContent value="stageFees" className="mt-0 pt-4">
+                <ProjectStageFeesTab 
+                  form={form}
+                  officeStages={officeStages}
+                  updateStageFee={updateStageFee}
+                />
+              </TabsContent>
 
-            <TabsContent value="financial">
-              <div className="py-8 text-center text-muted-foreground">
-                Financial project info coming soon.
-              </div>
-            </TabsContent>
+              <TabsContent value="financial" className="mt-0 pt-4">
+                <div className="py-12 text-center text-muted-foreground">
+                  <p className="text-lg">Financial project info coming soon.</p>
+                  <p className="text-sm mt-2">This feature is under development.</p>
+                </div>
+              </TabsContent>
+            </div>
           </Tabs>
-          <div className="flex justify-end mt-8 gap-4">
-            <Button type="button" variant="outline" onClick={onClose}>
+          
+          <div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="px-6"
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              disabled={isLoading} 
+              className="px-6"
+            >
               {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </div>
