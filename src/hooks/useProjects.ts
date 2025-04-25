@@ -41,7 +41,9 @@ export const useProjects = () => {
             country,
             target_profit_percentage,
             current_stage,
-            project_manager:profiles(first_name, last_name),
+            stages,
+            currency,
+            project_manager:profiles(id, first_name, last_name),
             office:offices(id, name, country)
           `)
           .eq('company_id', company.id);

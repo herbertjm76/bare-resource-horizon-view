@@ -9,6 +9,10 @@ export const useFormState = (project: any) => {
   // Initialize the stages array from the project data
   const initialStages = Array.isArray(project.stages) ? project.stages : [];
   
+  // Log for debugging
+  console.log('useFormState - initializing with project:', project);
+  console.log('useFormState - initialStages:', initialStages);
+  
   const [form, setForm] = useState<FormState>({
     code: project.code || "",
     name: project.name || "",

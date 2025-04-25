@@ -24,6 +24,12 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
         ...prev,
         stageApplicability
       }));
+
+      // Fetch stage fees data if available
+      if (project.id) {
+        console.log('Initializing stage fees for project:', project.id);
+        // This would be handled by useStageManagement or other data loading logic
+      }
     }
   }, [isOpen, project, setForm]);
 
@@ -39,11 +45,11 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     }
     
     if (key === 'stages') {
-      const newStageFees: Record<string, any> = {};
+      const newStageFees: Record<string, any> = {...form.stageFees};
       const newStageApplicability: Record<string, boolean> = {...form.stageApplicability};
       
       value.forEach((stageId: string) => {
-        if (!form.stageFees[stageId]) {
+        if (!newStageFees[stageId]) {
           newStageFees[stageId] = {
             fee: '',
             billingMonth: '',
@@ -53,8 +59,6 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
             invoiceAge: 0,
             currency: form.currency || 'USD'
           };
-        } else {
-          newStageFees[stageId] = form.stageFees[stageId];
         }
         
         if (newStageApplicability[stageId] === undefined) {
@@ -62,9 +66,19 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
         }
       });
       
+      // Cleanup removed stages
+      const stagesToKeep = Object.keys(newStageFees).filter(stageId => 
+        value.includes(stageId)
+      );
+      
+      const updatedStageFees: Record<string, any> = {};
+      stagesToKeep.forEach(stageId => {
+        updatedStageFees[stageId] = newStageFees[stageId];
+      });
+      
       setForm(prev => ({
         ...prev,
-        stageFees: newStageFees,
+        stageFees: updatedStageFees,
         stageApplicability: newStageApplicability
       }));
     }

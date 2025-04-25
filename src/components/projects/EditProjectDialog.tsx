@@ -48,10 +48,16 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 
   // Ensure stages are loaded correctly when project changes
   useEffect(() => {
-    if (isOpen && project && Array.isArray(project.stages)) {
-      handleChange('stages', project.stages);
+    if (isOpen && project) {
+      // Log for debugging
+      console.log('EditProjectDialog - project:', project);
+      console.log('EditProjectDialog - project stages:', project.stages);
+      
+      if (Array.isArray(project.stages)) {
+        handleChange('stages', project.stages);
+      }
     }
-  }, [project, isOpen]);
+  }, [project, isOpen, handleChange]);
 
   const { handleSubmit } = useProjectSubmit(project.id, refetch, onClose);
 
