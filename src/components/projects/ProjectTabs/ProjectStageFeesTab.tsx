@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -103,7 +104,7 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
             status: 'Not Billed',
             invoiceDate: null,
             hours: '',
-            invoiceAge: 0,
+            invoiceAge: '0',
             currency: 'USD'
           };
           

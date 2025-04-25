@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
@@ -121,7 +122,8 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
             billing_month: feeData?.billingMonth || null,
             invoice_date: feeData?.invoiceDate || null,
             invoice_status: feeData?.status || 'Not Billed',
-            invoice_age: feeData?.invoiceAge || 0
+            invoice_age: feeData?.invoiceAge ? parseInt(String(feeData.invoiceAge), 10) || 0 : 0,
+            currency: feeData?.currency || 'USD'
           };
 
           // Check if this stage already exists

@@ -48,7 +48,8 @@ export type ProjectForm = {
     status: "Not Billed" | "Invoiced" | "Paid" | "";
     invoiceDate: Date | null;
     hours: string;
-    invoiceAge: number;
+    invoiceAge: string | number; // Changed to allow both string and number types
+    currency: string; // Added currency field
   }>;
   stageApplicability: Record<string, boolean>;
 };
