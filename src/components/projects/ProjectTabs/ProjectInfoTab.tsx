@@ -1,13 +1,16 @@
+
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useCompany } from '@/context/CompanyContext';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Toggle } from '@/components/ui/toggle';
-import { Check } from 'lucide-react';
+import { useCompany } from '@/context/CompanyContext';
+import { Check, Percent } from 'lucide-react';
+import { ProjectBasicInfo } from './components/ProjectBasicInfo';
+import { ProjectManagerSelect } from './components/ProjectManagerSelect';
+import { ProjectLocationInfo } from './components/ProjectLocationInfo';
+import { ProjectStagesSelector } from './components/ProjectStagesSelector';
 
 interface ProjectForm {
   code: string;
@@ -43,7 +46,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   officeStages,
   statusOptions,
   onChange,
-  updateStageApplicability
 }) => {
   const { company } = useCompany();
   const [isCheckingCode, setIsCheckingCode] = useState(false);
@@ -96,141 +98,53 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
 
   return (
     <div className="space-y-4 py-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="code">Project Code</Label>
-          <Input
-            id="code"
-            placeholder="P001"
-            value={form.code}
-            onChange={handleCodeChange}
-            required
-            className={codeError ? "border-red-500" : ""}
-          />
-          {isCheckingCode && (
-            <p className="text-xs text-muted-foreground mt-1">Checking code availability...</p>
-          )}
-          {codeError && (
-            <p className="text-xs text-red-500 mt-1">{codeError}</p>
-          )}
-        </div>
-        <div>
-          <Label htmlFor="name">Project Name</Label>
-          <Input
-            id="name"
-            placeholder="New Project"
-            value={form.name}
-            onChange={(e) => onChange("name", e.target.value)}
-            required
-          />
-        </div>
-      </div>
+      <ProjectBasicInfo
+        code={form.code}
+        name={form.name}
+        codeError={codeError}
+        isCheckingCode={isCheckingCode}
+        onCodeChange={handleCodeChange}
+        onNameChange={(e) => onChange("name", e.target.value)}
+      />
+
+      <ProjectManagerSelect
+        value={form.manager}
+        managers={managers}
+        onChange={(value) => onChange("manager", value)}
+      />
+
+      <ProjectLocationInfo
+        country={form.country}
+        office={form.office}
+        countries={countries}
+        offices={offices}
+        onCountryChange={(value) => onChange("country", value)}
+        onOfficeChange={(value) => onChange("office", value)}
+      />
 
       <div>
-        <Label htmlFor="manager">Project Manager</Label>
-        <Select value={form.manager} onValueChange={(value) => onChange("manager", value)}>
+        <Label htmlFor="status" className="flex items-center gap-1">
+          <Check className="w-4 h-4" />Status
+        </Label>
+        <Select value={form.status} onValueChange={(value) => onChange("status", value)} required>
           <SelectTrigger>
-            <SelectValue placeholder="Select a project manager" />
+            <SelectValue placeholder="Select a status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">Select a project manager</SelectItem>
-            <SelectItem value="not_assigned">Not Assigned</SelectItem>
-            {managers.map((manager) => (
-              <SelectItem key={manager.id} value={manager.id}>
-                {manager.name}
+            <SelectItem value="none">Select a status</SelectItem>
+            {statusOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="country">Country</Label>
-          <Select 
-            value={form.country}
-            onValueChange={(value) => onChange("country", value)}
-            required
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a country" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Select a country</SelectItem>
-              {countries.map((country) => (
-                <SelectItem key={country} value={country}>
-                  {country}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="office">Office</Label>
-          <Select
-            value={form.office}
-            onValueChange={(value) => onChange("office", value)}
-            required
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select an office" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Select an office</SelectItem>
-              {offices.map((office) => (
-                <SelectItem key={office.id} value={office.id}>
-                  {office.emoji ? `${office.emoji} ` : ''}{office.city}, {office.country}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="current_stage">Current Stage</Label>
-          <Select
-            value={form.current_stage || "none"}
-            onValueChange={(value) => onChange("current_stage", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select current stage" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Not Selected</SelectItem>
-              {officeStages.map((stage) => (
-                <SelectItem key={stage.id} value={stage.name}>
-                  {stage.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="status">Status</Label>
-          <Select
-            value={form.status || "none"}
-            onValueChange={(value) => onChange("status", value)}
-            required
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select a status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Select a status</SelectItem>
-              {statusOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
       <div>
-        <Label htmlFor="profit">Target Profit %</Label>
+        <Label htmlFor="profit" className="flex items-center gap-1">
+          <Percent className="w-4 h-4" />Target Profit %
+        </Label>
         <Input
           id="profit"
           type="number"
@@ -243,46 +157,11 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         />
       </div>
 
-      <div className="space-y-4">
-        <Label>Project Stages</Label>
-        <div className="grid grid-cols-2 gap-3">
-          {officeStages.map((stage) => {
-            const isSelected = form.stages.includes(stage.id);
-            const stageColor = stage.color || '#E5DEFF'; // Default color if none set
-            
-            return (
-              <Toggle
-                key={stage.id}
-                pressed={isSelected}
-                onPressedChange={(pressed) => {
-                  const newStages = pressed
-                    ? [...form.stages, stage.id]
-                    : form.stages.filter(s => s !== stage.id);
-                  onChange('stages', newStages);
-                }}
-                className={`w-full justify-start ${
-                  isSelected 
-                    ? 'text-white hover:opacity-90' 
-                    : 'hover:bg-muted'
-                }`}
-                style={{
-                  backgroundColor: isSelected ? stageColor : 'transparent',
-                  borderColor: stageColor,
-                  borderWidth: '1px'
-                }}
-              >
-                {stage.name}
-              </Toggle>
-            );
-          })}
-        </div>
-        
-        {officeStages.length === 0 && (
-          <p className="text-sm text-muted-foreground mt-2">
-            No stages defined. Please add stages in office settings.
-          </p>
-        )}
-      </div>
+      <ProjectStagesSelector
+        stages={form.stages}
+        officeStages={officeStages}
+        onChange={(stages) => onChange("stages", stages)}
+      />
     </div>
   );
 };
