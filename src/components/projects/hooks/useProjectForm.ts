@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -10,7 +9,8 @@ interface StageFee {
   status: "Not Billed" | "Invoiced" | "Paid" | "";
   invoiceDate: Date | null;
   hours: string;
-  invoiceAge: number;
+  invoiceAge: string | number;
+  currency: string;
 }
 
 interface FormState {
@@ -85,7 +85,6 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
 
         setOffices(Array.isArray(locs) ? locs : []);
 
-        // Make sure to explicitly select the color field from office_stages
         const { data: stages } = await supabase
           .from('office_stages')
           .select('id, name, color')
@@ -95,11 +94,9 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
         console.log('useProjectForm - Retrieved stages with colors:', stagesArray);
         setOfficeStages(stagesArray);
 
-        // Log project data to see what we're working with
         console.log('Project data:', project);
         console.log('Project stages:', project.stages);
         
-        // Fetch project stages from project_stages table
         const { data: projectStages } = await supabase
           .from('project_stages')
           .select('stage_name, fee, is_applicable')
@@ -107,12 +104,10 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
 
         console.log('Project stages from DB:', projectStages);
         
-        // Map stage names to stage IDs
         const selectedStageIds: string[] = [];
         const stageApplicability: Record<string, boolean> = {};
         const stageFees: Record<string, any> = {};
         
-        // First handle stages from the project.stages array (text array in projects table)
         if (Array.isArray(project.stages) && project.stages.length > 0) {
           project.stages.forEach((stageName: string) => {
             const matchingStage = stagesArray.find(s => s.name === stageName);
@@ -125,13 +120,13 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
                 status: 'Not Billed',
                 invoiceDate: null,
                 hours: '',
-                invoiceAge: 0
+                invoiceAge: 0,
+                currency: ''
               };
             }
           });
         }
 
-        // Then overlay data from project_stages table for fees and applicability
         if (Array.isArray(projectStages) && projectStages.length > 0) {
           projectStages.forEach(ps => {
             const matchingStage = stagesArray.find(os => os.name === ps.stage_name);
@@ -146,7 +141,8 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
                 status: 'Not Billed',
                 invoiceDate: null,
                 hours: '',
-                invoiceAge: 0
+                invoiceAge: 0,
+                currency: ''
               };
             }
           });
