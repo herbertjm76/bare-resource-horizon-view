@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -101,122 +100,123 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
               updateStageFee(stageId, { invoiceAge });
             }
 
-            // Get stage color, ensuring it has a default
             const stageColor = getDefaultStageColor(stage.color);
             
             console.log("Stage ID:", stageId, "Stage name:", stage.name, "Stage color:", stageColor);
             
             return (
-              <div 
-                key={stageId} 
-                className="border rounded-lg space-y-3" 
-                style={{ 
-                  backgroundColor: `${stageColor}20`,
-                  borderColor: stageColor,
-                  padding: '0.75rem'
-                }}
-              >
-                <h4 className="font-semibold" style={{ color: '#1F2937' }}>
-                  {getStageNameById(stageId)}
-                </h4>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor={`fee-${stageId}`} className="text-xs">Fee</Label>
-                    <Input
-                      id={`fee-${stageId}`}
-                      type="number"
-                      placeholder="0.00"
-                      value={stageFeeData.fee}
-                      onChange={(e) => updateStageFee(stageId, { fee: e.target.value })}
-                      className="h-8"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor={`hours-${stageId}`} className="text-xs">Hours</Label>
-                    <Input
-                      id={`hours-${stageId}`}
-                      value={hours}
-                      readOnly
-                      disabled
-                      className="h-8 bg-muted"
-                    />
-                  </div>
+              <div key={stageId} className="border rounded-lg overflow-hidden bg-white">
+                <div 
+                  className="p-3"
+                  style={{ 
+                    backgroundColor: stageColor,
+                  }}
+                >
+                  <h4 className="font-semibold text-white">
+                    {getStageNameById(stageId)}
+                  </h4>
                 </div>
+                <div className="p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor={`fee-${stageId}`} className="text-xs">Fee</Label>
+                      <Input
+                        id={`fee-${stageId}`}
+                        type="number"
+                        placeholder="0.00"
+                        value={stageFeeData.fee}
+                        onChange={(e) => updateStageFee(stageId, { fee: e.target.value })}
+                        className="h-8"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor={`hours-${stageId}`} className="text-xs">Hours</Label>
+                      <Input
+                        id={`hours-${stageId}`}
+                        value={hours}
+                        readOnly
+                        disabled
+                        className="h-8 bg-muted"
+                      />
+                    </div>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label htmlFor={`billingMonth-${stageId}`} className="text-xs">Billing Month</Label>
-                    <Input
-                      id={`billingMonth-${stageId}`}
-                      placeholder="e.g., April 2025"
-                      value={stageFeeData.billingMonth}
-                      onChange={(e) => updateStageFee(stageId, { billingMonth: e.target.value })}
-                      className="h-8"
-                    />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor={`billingMonth-${stageId}`} className="text-xs">Billing Month</Label>
+                      <Input
+                        id={`billingMonth-${stageId}`}
+                        placeholder="e.g., April 2025"
+                        value={stageFeeData.billingMonth}
+                        onChange={(e) => updateStageFee(stageId, { 
+                          billingMonth: e.target.value 
+                        })}
+                        className="h-8"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Status</Label>
+                      <Select
+                        value={stageFeeData.status}
+                        onValueChange={(value) => updateStageFee(stageId, { 
+                          status: value as "Not Billed" | "Invoiced" | "Paid" | "" 
+                        })}
+                      >
+                        <SelectTrigger className="h-8">
+                          <SelectValue placeholder="Select a status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Not Billed">Not Billed</SelectItem>
+                          <SelectItem value="Invoiced">Invoiced</SelectItem>
+                          <SelectItem value="Paid">Paid</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div>
-                    <Label className="text-xs">Status</Label>
-                    <Select
-                      value={stageFeeData.status}
-                      onValueChange={(value) => updateStageFee(stageId, { 
-                        status: value as "Not Billed" | "Invoiced" | "Paid" | "" 
-                      })}
-                    >
-                      <SelectTrigger className="h-8">
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Not Billed">Not Billed</SelectItem>
-                        <SelectItem value="Invoiced">Invoiced</SelectItem>
-                        <SelectItem value="Paid">Paid</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-xs">Invoice Date</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal h-8",
-                            !stageFeeData.invoiceDate && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {stageFeeData.invoiceDate ? (
-                            format(stageFeeData.invoiceDate, "PPP")
-                          ) : (
-                            "Select date"
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={stageFeeData.invoiceDate || undefined}
-                          onSelect={(date) => updateStageFee(stageId, { 
-                            invoiceDate: date || null,
-                            invoiceAge: date ? calculateInvoiceAge(date) : 0
-                          })}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div>
-                    <Label htmlFor={`invoiceAge-${stageId}`} className="text-xs">Invoice Age (Days)</Label>
-                    <Input
-                      id={`invoiceAge-${stageId}`}
-                      value={invoiceAge}
-                      readOnly
-                      disabled
-                      className="h-8 bg-muted"
-                    />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs">Invoice Date</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal h-8",
+                              !stageFeeData.invoiceDate && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {stageFeeData.invoiceDate ? (
+                              format(stageFeeData.invoiceDate, "PPP")
+                            ) : (
+                              "Select date"
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={stageFeeData.invoiceDate || undefined}
+                            onSelect={(date) => updateStageFee(stageId, { 
+                              invoiceDate: date || null,
+                              invoiceAge: date ? calculateInvoiceAge(date) : 0
+                            })}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <div>
+                      <Label htmlFor={`invoiceAge-${stageId}`} className="text-xs">Invoice Age (Days)</Label>
+                      <Input
+                        id={`invoiceAge-${stageId}`}
+                        value={invoiceAge}
+                        readOnly
+                        disabled
+                        className="h-8 bg-muted"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
