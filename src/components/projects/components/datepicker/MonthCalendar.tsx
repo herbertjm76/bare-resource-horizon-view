@@ -63,16 +63,25 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="p-0 w-64 bg-popover z-50" 
+        className="p-0 w-64 bg-popover z-[100]" 
         align="start"
         sideOffset={4}
+        onInteractOutside={(e) => {
+          e.preventDefault();
+          setOpen(false);
+        }}
       >
-        <div className="p-4" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="p-4" 
+          onClick={(e) => e.stopPropagation()}
+          onPointerDownCapture={(e) => e.stopPropagation()}
+        >
           <div className="flex items-center justify-between mb-4">
             <Button
               type="button"
               variant="outline"
               className="h-7 w-7 p-0"
+              onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -86,6 +95,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
               type="button"
               variant="outline"
               className="h-7 w-7 p-0"
+              onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -101,6 +111,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
               <Button
                 key={month}
                 type="button"
+                onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
