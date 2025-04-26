@@ -138,7 +138,7 @@ export const LocationsTab = () => {
       
       setLocations(locations.filter(location => location.id !== id));
       toast.success('Location deleted successfully');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error deleting location:', error);
       toast.error('Failed to delete location');
     }
@@ -277,7 +277,6 @@ export const LocationsTab = () => {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Locations</CardTitle>
         <div className="flex gap-2">
-          
           <Button size="sm" onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add Location
@@ -299,8 +298,7 @@ export const LocationsTab = () => {
               {locations.map((row) => (
                 <div
                   key={row.id}
-                  className={`flex items-center justify-between p-3 border rounded-md `}
-                  style={{}}
+                  className="flex items-center justify-between p-3 border rounded-md group hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <button
@@ -311,15 +309,17 @@ export const LocationsTab = () => {
                     >
                       {row.emoji || flagEmoji(row.code)}
                     </button>
-                    <span className="font-medium">{row.city}, {row.country} <span className="text-xs text-muted-foreground ml-1">({row.code})</span></span>
+                    <span className="font-medium">
+                      {row.city}, {row.country} 
+                      <span className="text-xs text-muted-foreground ml-1">({row.code})</span>
+                    </span>
                   </div>
                   
-                  
                   <ItemActions 
-                    onEdit={() => handleEdit(row)}
                     onDelete={() => handleDeleteLocation(row.id)}
+                    showDelete={true}
+                    onEdit={() => handleEdit(row)}
                   />
-                  
                 </div>
               ))}
             </div>
