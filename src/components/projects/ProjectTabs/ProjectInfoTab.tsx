@@ -114,7 +114,8 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
 
   const loadRateOptions = async (type: 'roles' | 'locations') => {
     try {
-      let optionsData: { data: any[] } | null = null;
+      console.log(`Loading ${type} data for rate calculator...`);
+      let fetchedData = [];
       
       if (type === 'roles') {
         const { data, error } = await supabase
@@ -122,43 +123,66 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
           .select('id, name, code')
           .eq('company_id', company?.id);
           
-        if (error) throw error;
-        optionsData = { data };
+        if (error) {
+          console.error(`Error fetching roles:`, error);
+          toast.error(`Failed to load roles data for rate calculator`);
+          return;
+        }
+        fetchedData = data || [];
       } else {
         const { data, error } = await supabase
           .from('office_locations')
           .select('id, city as name, country')
           .eq('company_id', company?.id);
           
-        if (error) throw error;
-        optionsData = { data };
+        if (error) {
+          console.error(`Error fetching locations:`, error);
+          toast.error(`Failed to load locations data for rate calculator`);
+          return;
+        }
+        fetchedData = data || [];
       }
 
-      if (optionsData?.data) {
-        const enrichedOptions = await Promise.all(optionsData.data.map(async (option) => {
-          const { data: rateData, error } = await supabase
-            .from('office_rates')
-            .select('value')
-            .eq('reference_id', option.id)
-            .eq('type', type === 'roles' ? 'roles' : 'locations')
-            .limit(1);
+      console.log(`Fetched ${fetchedData.length} ${type} records:`, fetchedData);
+      
+      if (fetchedData.length > 0) {
+        const enrichedOptions = await Promise.all(fetchedData.map(async (option) => {
+          try {
+            const { data: rateData, error } = await supabase
+              .from('office_rates')
+              .select('value')
+              .eq('reference_id', option.id)
+              .eq('type', type)
+              .limit(1);
 
-          if (error) {
-            console.error(`Error fetching rate for ${type}:`, error);
+            if (error) {
+              console.error(`Error fetching rate for ${type} ${option.name}:`, error);
+              return { ...option, rate: 0 };
+            }
+
+            const rate = rateData && rateData.length > 0 ? Number(rateData[0].value) : 0;
+            console.log(`Rate for ${option.name}: ${rate}`);
+            
+            return {
+              ...option,
+              rate
+            };
+          } catch (err) {
+            console.error(`Exception fetching rate for ${option.name}:`, err);
             return { ...option, rate: 0 };
           }
-
-          return {
-            ...option,
-            rate: rateData && rateData.length > 0 ? Number(rateData[0].value) : 0
-          };
         }));
 
+        console.log(`Enriched ${type} options:`, enrichedOptions);
         setRateOptions(enrichedOptions);
+      } else {
+        setRateOptions([]);
+        toast.info(`No ${type} found for this company`);
       }
     } catch (err) {
-      console.error(`Error fetching ${type} data:`, err);
+      console.error(`Error in loadRateOptions for ${type}:`, err);
       toast.error(`Failed to load ${type} data for rate calculator`);
+      setRateOptions([]);
     }
   };
 
