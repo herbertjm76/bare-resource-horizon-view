@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -354,6 +353,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
         country: "",
         profit: "", 
         avgRate: "", 
+        currency: "USD", // Added the missing currency field
         status: "", 
         office: "", 
         current_stage: "",

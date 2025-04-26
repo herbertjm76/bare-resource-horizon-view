@@ -1,4 +1,5 @@
 
+// This file already exists with StageFee but it's being imported from the wrong location
 export interface StageFee {
   fee: string;
   billingMonth: Date | string | null;
