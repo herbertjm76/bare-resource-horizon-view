@@ -79,7 +79,7 @@ export const InvoiceDatePicker = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-auto p-0 z-[60]" 
+        className="w-auto p-0 z-[60] bg-popover shadow-md" 
         align="start"
         sideOffset={4}
         avoidCollisions={true}
@@ -108,7 +108,10 @@ export const InvoiceDatePicker = ({
             <Button
               variant="outline"
               className="w-full text-sm"
-              onClick={handleTodayClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleTodayClick();
+              }}
               type="button"
             >
               Today
@@ -119,4 +122,3 @@ export const InvoiceDatePicker = ({
     </Popover>
   );
 };
-

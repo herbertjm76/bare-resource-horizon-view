@@ -36,7 +36,6 @@ export const MonthCalendar = ({
   ];
   
   const currentYear = new Date().getFullYear();
-  // Include some years in the past and future
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
   const handleMonthSelect = (month: string) => {
@@ -70,7 +69,13 @@ export const MonthCalendar = ({
           {value ? format(value, "MMMM yyyy") : "Select Month"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-4 z-50" align="start">
+      <PopoverContent 
+        className="w-auto p-4 z-[60] bg-popover shadow-md" 
+        align="start"
+        sideOffset={4}
+        avoidCollisions={true}
+        collisionPadding={8}
+      >
         <div className="mb-4">
           <Select
             value={value ? value.getFullYear().toString() : currentYear.toString()}
@@ -79,7 +84,7 @@ export const MonthCalendar = ({
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select Year" />
             </SelectTrigger>
-            <SelectContent position="popper" className="z-[60]">
+            <SelectContent position="popper" className="z-[65]">
               {years.map((year) => (
                 <SelectItem key={year} value={year.toString()}>
                   {year}
@@ -95,10 +100,14 @@ export const MonthCalendar = ({
             return (
               <Button
                 key={month}
-                onClick={() => handleMonthSelect(month)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMonthSelect(month);
+                }}
                 variant={isSelected ? "default" : "outline"}
                 className="h-10"
                 size="sm"
+                type="button"
               >
                 {month.substring(0, 3)}
               </Button>
