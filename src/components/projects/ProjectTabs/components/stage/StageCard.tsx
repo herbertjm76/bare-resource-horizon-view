@@ -9,6 +9,7 @@ interface StageCardProps {
   stageName: string;
   stageColor: string;
   stageFeeData: StageFee;
+  billingOptions: Array<{ value: string; label: string }>;
   updateStageFee: (stageId: string, data: Partial<StageFee>) => void;
   calculateHours: (fee: string) => string;
   calculateInvoiceAge: (invoiceDate: Date | null) => string;
@@ -19,6 +20,7 @@ export const StageCard: React.FC<StageCardProps> = ({
   stageName,
   stageColor,
   stageFeeData,
+  billingOptions,
   updateStageFee,
   calculateHours,
   calculateInvoiceAge,
@@ -29,6 +31,7 @@ export const StageCard: React.FC<StageCardProps> = ({
       <StageForm
         stageId={stageId}
         stageFeeData={stageFeeData}
+        billingOptions={billingOptions}
         updateStageFee={updateStageFee}
         calculateHours={calculateHours}
         calculateInvoiceAge={calculateInvoiceAge}

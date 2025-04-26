@@ -17,6 +17,7 @@ import type { StageFee } from "../../../hooks/types/projectTypes";
 interface StageFormProps {
   stageId: string;
   stageFeeData: StageFee;
+  billingOptions: Array<{ value: string; label: string }>;
   updateStageFee: (stageId: string, data: Partial<StageFee>) => void;
   calculateHours: (fee: string) => string;
   calculateInvoiceAge: (invoiceDate: Date | null) => string;
@@ -25,6 +26,7 @@ interface StageFormProps {
 export const StageForm: React.FC<StageFormProps> = ({
   stageId,
   stageFeeData,
+  billingOptions,
   updateStageFee,
   calculateHours,
   calculateInvoiceAge,
