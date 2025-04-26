@@ -277,9 +277,7 @@ export const LocationsTab = () => {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Locations</CardTitle>
         <div className="flex gap-2">
-          <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)}>
-            <Edit className="h-4 w-4 mr-2" /> {editMode ? "Done" : "Edit"}
-          </Button>
+          
           <Button size="sm" onClick={() => setOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add Location
@@ -291,19 +289,7 @@ export const LocationsTab = () => {
           <div className="text-sm text-muted-foreground mb-4">
             Manage your office locations. Each location consists of a city and a country.
           </div>
-          {editMode && (
-            <div className="flex items-center gap-2 mb-2">
-              <Button
-                variant="destructive"
-                size="sm"
-                disabled={selected.length === 0 || isLoading}
-                onClick={handleBulkDelete}
-              >
-                {isLoading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Trash2 className="h-4 w-4 mr-1" />} Delete Selected
-              </Button>
-              <span className="text-xs text-muted-foreground">{selected.length} selected</span>
-            </div>
-          )}
+          
           {isLoading ? (
             <div className="flex justify-center items-center p-8">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -313,8 +299,8 @@ export const LocationsTab = () => {
               {locations.map((row) => (
                 <div
                   key={row.id}
-                  className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"}`}
-                  style={editMode && selected.includes(row.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
+                  className={`flex items-center justify-between p-3 border rounded-md `}
+                  style={{}}
                 >
                   <div className="flex items-center gap-3">
                     <button
@@ -327,19 +313,13 @@ export const LocationsTab = () => {
                     </button>
                     <span className="font-medium">{row.city}, {row.country} <span className="text-xs text-muted-foreground ml-1">({row.code})</span></span>
                   </div>
-                  {editMode ? (
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 accent-purple-600"
-                      checked={selected.includes(row.id)}
-                      onChange={() => handleSelect(row.id)}
-                    />
-                  ) : (
-                    <ItemActions 
-                      onEdit={() => handleEdit(row)}
-                      onDelete={() => handleDeleteLocation(row.id)}
-                    />
-                  )}
+                  
+                  
+                  <ItemActions 
+                    onEdit={() => handleEdit(row)}
+                    onDelete={() => handleDeleteLocation(row.id)}
+                  />
+                  
                 </div>
               ))}
             </div>
@@ -440,3 +420,5 @@ export const LocationsTab = () => {
     </Card>
   );
 };
+
+export default LocationsTab;
