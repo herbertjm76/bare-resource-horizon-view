@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
@@ -154,6 +153,58 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
               console.error(`Error inserting stage ${stageName}:`, error);
               throw error;
             }
+          }
+        }
+      }
+
+      // Process stage fees
+      for (const stageId of form.stages) {
+        const feeData = form.stageFees?.[stageId];
+        if (!feeData) continue;
+
+        // Convert billing month string to Date
+        const billingMonth = feeData.billingMonth ? new Date(feeData.billingMonth) : null;
+        
+        // Prepare fee data
+        const feeRecord = {
+          project_id: projectId,
+          stage_id: stageId,
+          company_id: company.id,
+          fee: feeData.fee ? parseFloat(feeData.fee) : 0,
+          billing_month: billingMonth,
+          invoice_date: feeData.invoiceDate,
+          invoice_status: feeData.status || 'Not Billed',
+          currency: feeData.currency || 'USD'
+        };
+
+        // Check if fee record exists
+        const { data: existingFee } = await supabase
+          .from('project_fees')
+          .select('id')
+          .eq('project_id', projectId)
+          .eq('stage_id', stageId)
+          .single();
+
+        if (existingFee) {
+          // Update existing fee
+          const { error: updateError } = await supabase
+            .from('project_fees')
+            .update(feeRecord)
+            .eq('id', existingFee.id);
+
+          if (updateError) {
+            console.error('Error updating fee:', updateError);
+            throw updateError;
+          }
+        } else {
+          // Insert new fee
+          const { error: insertError } = await supabase
+            .from('project_fees')
+            .insert(feeRecord);
+
+          if (insertError) {
+            console.error('Error inserting fee:', insertError);
+            throw insertError;
           }
         }
       }

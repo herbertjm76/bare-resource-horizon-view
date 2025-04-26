@@ -416,6 +416,70 @@ export type Database = {
           },
         ]
       }
+      project_fees: {
+        Row: {
+          billing_month: string | null
+          company_id: string
+          created_at: string | null
+          currency: string | null
+          fee: number
+          id: string
+          invoice_date: string | null
+          invoice_status: string | null
+          project_id: string
+          stage_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          billing_month?: string | null
+          company_id: string
+          created_at?: string | null
+          currency?: string | null
+          fee?: number
+          id?: string
+          invoice_date?: string | null
+          invoice_status?: string | null
+          project_id: string
+          stage_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          billing_month?: string | null
+          company_id?: string
+          created_at?: string | null
+          currency?: string | null
+          fee?: number
+          id?: string
+          invoice_date?: string | null
+          invoice_status?: string | null
+          project_id?: string
+          stage_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_fees_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_fees_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_fees_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "project_stages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_resources: {
         Row: {
           company_id: string | null
