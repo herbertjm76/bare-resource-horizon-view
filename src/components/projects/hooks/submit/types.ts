@@ -20,6 +20,7 @@ export interface ProjectSubmitData {
   }>;
   stageApplicability: Record<string, boolean>;
   officeStages?: Array<{ id: string; name: string; color?: string }>;
+  company_id?: string; // Added company_id property as optional
 }
 
 export interface ProjectUpdateData {
@@ -27,7 +28,7 @@ export interface ProjectUpdateData {
   name: string;
   project_manager_id: string | null;
   office_id: string | null;
-  status: string;
+  status: "In Progress" | "On Hold" | "Complete" | "Planning"; // Fixed status to use specific literal types
   country: string | null;
   current_stage: string | null;
   target_profit_percentage: number | null;

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -33,21 +32,17 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const { company } = useCompany();
   const isMobile = useIsMobile();
   
-  // Map stage names to stage IDs if project stages are strings (names)
   const processProjectStages = (project, officeStages) => {
     if (!project || !project.stages || !officeStages || officeStages.length === 0) {
       return project;
     }
 
-    // Check if project stages are already IDs
     const firstStage = project.stages[0];
     if (typeof firstStage === 'string' && officeStages.some(s => s.id === firstStage)) {
-      // Stages are already IDs, no need to convert
       console.log('Project stages are already IDs:', project.stages);
       return project;
     }
 
-    // Map stage names to stage IDs
     console.log('Converting stage names to IDs:', project.stages);
     const processedProject = {
       ...project,
@@ -74,13 +69,11 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     updateStageApplicability
   } = useProjectForm(project, isOpen);
 
-  // Process stages when officeStages are available
   useEffect(() => {
     if (isOpen && project && officeStages && officeStages.length > 0) {
       const processedProject = processProjectStages(project, officeStages);
       console.log('EditProjectDialog - processed project stages:', processedProject.stages);
       
-      // Update form stages with processed stages
       if (processedProject.stages.length > 0) {
         handleChange('stages', processedProject.stages);
       }
@@ -95,8 +88,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     
     await handleSubmit({ 
       ...form, 
-      officeStages,
-      company_id: company.id
+      officeStages
     }, setIsLoading);
   };
 

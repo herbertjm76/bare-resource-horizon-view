@@ -1,12 +1,19 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { mapStatusToDb } from "../../utils/projectMappings";
 import type { ProjectUpdateData } from "./types";
 
 export const useProjectUpdate = () => {
   const updateProject = async (projectId: string, projectUpdate: ProjectUpdateData) => {
+    // Map the status to the correct database enum value
+    const mappedStatus = mapStatusToDb(projectUpdate.status);
+    
     const { error: projectError } = await supabase
       .from('projects')
-      .update(projectUpdate)
+      .update({ 
+        ...projectUpdate,
+        status: mappedStatus 
+      })
       .eq('id', projectId);
 
     if (projectError) {
