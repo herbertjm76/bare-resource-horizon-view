@@ -106,11 +106,10 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
                 <DropdownMenuTrigger asChild>
                   <Button 
                     variant="outline" 
-                    className="w-[140px] h-8 justify-between"
+                    className="h-8 px-2 min-w-[100px]"
                     type="button"
                   >
                     {months[currentMonth]}
-                    <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
@@ -137,11 +136,10 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
                 <DropdownMenuTrigger asChild>
                   <Button 
                     variant="outline" 
-                    className="w-[100px] h-8 justify-between"
+                    className="h-8 px-2 min-w-[70px]"
                     type="button"
                   >
                     {currentYearValue}
-                    <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
