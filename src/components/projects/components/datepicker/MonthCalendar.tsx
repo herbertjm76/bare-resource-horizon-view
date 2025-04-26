@@ -1,11 +1,21 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { 
+  Popover, 
+  PopoverContent, 
+  PopoverTrigger 
+} from "@/components/ui/popover";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue, 
+} from "@/components/ui/select";
 import { CalendarIcon } from "lucide-react";
 import { format } from 'date-fns';
 import { cn } from "@/lib/utils";
-import { DatePickerNavigation } from './DatePickerNavigation';
 
 interface MonthCalendarProps {
   value?: Date;
@@ -26,19 +36,24 @@ export const MonthCalendar = ({
   ];
   
   const currentYear = new Date().getFullYear();
+  // Include some years in the past and future
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
-  const handleMonthSelect = (month: number) => {
-    const date = value ? new Date(value) : new Date();
-    date.setMonth(month);
-    onChange(date);
-    setOpen(false);
+  const handleMonthSelect = (month: string) => {
+    const monthIndex = months.indexOf(month);
+    if (monthIndex !== -1) {
+      const newDate = new Date(value || new Date());
+      newDate.setMonth(monthIndex);
+      onChange(newDate);
+      setOpen(false);
+    }
   };
 
-  const handleYearSelect = (year: number) => {
-    const date = value ? new Date(value) : new Date();
-    date.setFullYear(year);
-    onChange(date);
+  const handleYearChange = (selectedYear: string) => {
+    const year = parseInt(selectedYear, 10);
+    const newDate = value ? new Date(value) : new Date();
+    newDate.setFullYear(year);
+    onChange(newDate);
   };
 
   return (
@@ -52,41 +67,43 @@ export const MonthCalendar = ({
           )}
         >
           {showIcon && <CalendarIcon className="mr-2 h-4 w-4" />}
-          {value ? format(value, "MMMM yyyy") : "Month"}
+          {value ? format(value, "MMMM yyyy") : "Select Month"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-3">
-          {/* Year selector */}
-          <div className="flex mb-3">
-            <select
-              className="flex-1 px-2 py-1 border border-gray-200 rounded"
-              value={value ? value.getFullYear() : currentYear}
-              onChange={(e) => handleYearSelect(Number(e.target.value))}
-            >
-              {years.map(year => (
-                <option key={year} value={year}>{year}</option>
+      <PopoverContent className="w-auto p-4 z-50" align="start">
+        <div className="mb-4">
+          <Select
+            value={value ? value.getFullYear().toString() : currentYear.toString()}
+            onValueChange={handleYearChange}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Year" />
+            </SelectTrigger>
+            <SelectContent position="popper" className="z-[60]">
+              {years.map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
+                </SelectItem>
               ))}
-            </select>
-          </div>
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Month buttons */}
-          <div className="grid grid-cols-3 gap-1">
-            {months.map((month, index) => (
+        <div className="grid grid-cols-3 gap-2">
+          {months.map((month) => {
+            const isSelected = value && value.getMonth() === months.indexOf(month);
+            return (
               <Button
                 key={month}
-                variant="outline"
+                onClick={() => handleMonthSelect(month)}
+                variant={isSelected ? "default" : "outline"}
+                className="h-10"
                 size="sm"
-                className={cn(
-                  "h-9",
-                  value && value.getMonth() === index && "bg-primary text-primary-foreground"
-                )}
-                onClick={() => handleMonthSelect(index)}
               >
                 {month.substring(0, 3)}
               </Button>
-            ))}
-          </div>
+            );
+          })}
         </div>
       </PopoverContent>
     </Popover>

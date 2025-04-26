@@ -97,7 +97,7 @@ export const StageForm: React.FC<StageFormProps> = ({
             <SelectTrigger className="h-8">
               <SelectValue placeholder="Select a status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="z-[60]">
               <SelectItem value="Not Billed">Not Billed</SelectItem>
               <SelectItem value="Invoiced">Invoiced</SelectItem>
               <SelectItem value="Paid">Paid</SelectItem>

@@ -12,14 +12,14 @@ interface InvoiceDatePickerProps {
   value: Date | undefined;
   onChange: (date: Date | undefined) => void;
   onToday: () => void;
-  showIcon?: boolean; // New prop
+  showIcon?: boolean;
 }
 
 export const InvoiceDatePicker = ({ 
   value, 
   onChange, 
   onToday, 
-  showIcon = true // Default to true for backward compatibility
+  showIcon = true
 }: InvoiceDatePickerProps) => {
   const [calendarDate, setCalendarDate] = React.useState<Date>(value || new Date());
   const [open, setOpen] = React.useState(false);
@@ -79,9 +79,13 @@ export const InvoiceDatePicker = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-auto p-0 z-50" 
+        className="w-auto p-0" 
         align="start"
         sideOffset={4}
+        avoidCollisions={true}
+        collisionPadding={8}
+        sticky="always"
+        className="z-[60]"
       >
         <div className="p-3 pointer-events-auto">
           <DatePickerNavigation
