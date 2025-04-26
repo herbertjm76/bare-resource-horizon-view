@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 
 export const useRateCalculator = () => {
   const { company } = useCompany();
+  const { locations, roles } = useOfficeSettings();
   const [showRateCalc, setShowRateCalc] = useState(false);
   const [rateOptions, setRateOptions] = useState<Array<{ id: string; name: string; rate?: number; country?: string }>>([]);
   const [calculatorType, setCalculatorType] = useState<'roles' | 'locations'>('roles');
@@ -13,67 +15,82 @@ export const useRateCalculator = () => {
   const loadRateOptions = async (type: 'roles' | 'locations') => {
     try {
       console.log(`Loading ${type} data for rate calculator...`);
-      let fetchedData = [];
       
+      // First get base data from context or fetch if needed
+      let baseData = [];
       if (type === 'roles') {
-        const { data, error } = await supabase
-          .from('office_roles')
-          .select('id, name, code')
-          .eq('company_id', company?.id);
-          
-        if (error) {
-          console.error(`Error fetching roles:`, error);
-          toast.error(`Failed to load roles data for rate calculator`);
-          return;
-        }
-        fetchedData = data || [];
+        baseData = roles;
+        console.log(`Using ${roles.length} roles from context`);
       } else {
-        const { data, error } = await supabase
-          .from('office_locations')
-          .select('id, city as name, country')
-          .eq('company_id', company?.id);
-          
-        if (error) {
-          console.error(`Error fetching locations:`, error);
-          toast.error(`Failed to load locations data for rate calculator`);
-          return;
-        }
-        fetchedData = data || [];
+        baseData = locations;
+        console.log(`Using ${locations.length} locations from context`);
       }
 
-      console.log(`Fetched ${fetchedData.length} ${type} records:`, fetchedData);
-      
-      if (fetchedData.length > 0) {
-        const enrichedOptions = await Promise.all(fetchedData.map(async (option) => {
-          try {
-            const rateType = type === 'roles' ? 'role' : 'location';
+      if (baseData.length === 0) {
+        console.log(`No ${type} data found in context, fetching from database`);
+        if (type === 'roles') {
+          const { data, error } = await supabase
+            .from('office_roles')
+            .select('id, name, code')
+            .eq('company_id', company?.id);
             
-            console.log(`Fetching rates for ${type} ${option.name}, reference_id: ${option.id}, using type: ${rateType}`);
-            
-            const { data: rateData, error } = await supabase
-              .from('office_rates')
-              .select('value')
-              .eq('reference_id', option.id)
-              .eq('type', rateType)
-              .limit(1);
-
-            if (error) {
-              console.error(`Error fetching rate for ${type} ${option.name}:`, error);
-              return { ...option, rate: 0 };
-            }
-
-            const rate = rateData && rateData.length > 0 ? Number(rateData[0].value) : 0;
-            console.log(`Rate for ${option.name}: ${rate}`);
-            
-            return {
-              ...option,
-              rate
-            };
-          } catch (err) {
-            console.error(`Exception fetching rate for ${option.name}:`, err);
-            return { ...option, rate: 0 };
+          if (error) {
+            console.error(`Error fetching roles:`, error);
+            toast.error(`Failed to load roles data for rate calculator`);
+            return;
           }
-        }));
+          baseData = data || [];
+        } else {
+          const { data, error } = await supabase
+            .from('office_locations')
+            .select('id, city as name, country')
+            .eq('company_id', company?.id);
+            
+          if (error) {
+            console.error(`Error fetching locations:`, error);
+            toast.error(`Failed to load locations data for rate calculator`);
+            return;
+          }
+          baseData = data || [];
+        }
+      }
+
+      console.log(`Using ${baseData.length} ${type} records:`, baseData);
+      
+      if (baseData.length > 0) {
+        const rateType = type === 'roles' ? 'role' : 'location';
+        
+        // Get all rates in a single query for better performance
+        const { data: allRates, error: ratesError } = await supabase
+          .from('office_rates')
+          .select('reference_id, value')
+          .eq('type', rateType)
+          .eq('company_id', company?.id);
+
+        if (ratesError) {
+          console.error(`Error fetching ${type} rates:`, ratesError);
+          toast.error(`Failed to load rates for ${type}`);
+          return;
+        }
+
+        console.log(`Fetched ${allRates?.length || 0} rates for ${type}`);
+        
+        // Create a map of reference_id to rate for easy lookup
+        const rateMap = new Map();
+        if (allRates) {
+          allRates.forEach(rate => {
+            rateMap.set(rate.reference_id, Number(rate.value));
+          });
+        }
+        
+        // Map the base data to include rates
+        const enrichedOptions = baseData.map(option => {
+          const rate = rateMap.get(option.id) || 0;
+          return {
+            ...option,
+            rate
+          };
+        });
 
         console.log(`Enriched ${type} options:`, enrichedOptions);
         setRateOptions(enrichedOptions);

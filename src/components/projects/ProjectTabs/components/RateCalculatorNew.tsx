@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Calculator } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
 
 interface Option {
   id: string;
@@ -33,7 +34,7 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
   // Reset people counts when options or type changes
   useEffect(() => {
     console.log(`RateCalculator: Type changed to ${type}, resetting people counts`);
-    console.log(`RateCalculator: Received ${options.length} options`);
+    console.log(`RateCalculator: Received ${options.length} options:`, options);
     setPeopleCount({});
   }, [type, options]);
 
@@ -61,6 +62,19 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
     }));
   };
 
+  // Log any issues with the options data to help with debugging
+  useEffect(() => {
+    if (options.length === 0) {
+      console.log(`No ${type} options available`);
+    } else {
+      console.log(`${options.length} ${type} options loaded`);
+      const missingRates = options.filter(opt => opt.rate === undefined || opt.rate === null);
+      if (missingRates.length > 0) {
+        console.log(`${missingRates.length} ${type} are missing rates:`, missingRates);
+      }
+    }
+  }, [options, type]);
+
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <Card className="p-6 max-w-lg w-full mx-auto relative z-50 shadow-xl">
@@ -84,7 +98,7 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
           {`Select number of people by ${type === 'roles' ? 'role' : 'location'} to calculate the average rate.`}
         </p>
         
-        <div className="bg-muted/30 p-4 rounded-md space-y-3 mb-6">
+        <div className="bg-muted/30 p-4 rounded-md space-y-3 mb-6 max-h-[300px] overflow-y-auto">
           {options.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               No {type} found. Please add {type} in office settings first.
@@ -106,9 +120,13 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
                   placeholder="# People"
                   className="w-28"
                 />
-                {option.rate !== undefined && (
+                {option.rate !== undefined ? (
                   <span className="text-sm text-muted-foreground">
                     Rate: ${option.rate.toFixed(2)}
+                  </span>
+                ) : (
+                  <span className="text-sm text-red-500">
+                    No rate set
                   </span>
                 )}
               </div>
@@ -135,7 +153,11 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
           <Button
             onClick={() => {
               const avgRate = calculateAverageRate();
-              if (avgRate) onApply(avgRate);
+              if (avgRate) {
+                onApply(avgRate);
+              } else {
+                toast.warning("Please add people to calculate an average rate");
+              }
             }}
             type="button"
             disabled={!calculateAverageRate()}
