@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
@@ -162,8 +163,9 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         const feeData = form.stageFees?.[stageId];
         if (!feeData) continue;
 
-        // Convert billing month string to Date
-        const billingMonth = feeData.billingMonth ? new Date(feeData.billingMonth) : null;
+        // Format dates as ISO strings for Supabase
+        const billingMonth = feeData.billingMonth ? new Date(feeData.billingMonth).toISOString() : null;
+        const invoiceDate = feeData.invoiceDate ? new Date(feeData.invoiceDate).toISOString() : null;
         
         // Prepare fee data
         const feeRecord = {
@@ -172,7 +174,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
           company_id: company.id,
           fee: feeData.fee ? parseFloat(feeData.fee) : 0,
           billing_month: billingMonth,
-          invoice_date: feeData.invoiceDate,
+          invoice_date: invoiceDate,
           invoice_status: feeData.status || 'Not Billed',
           currency: feeData.currency || 'USD'
         };
