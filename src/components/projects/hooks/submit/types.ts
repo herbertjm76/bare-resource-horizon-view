@@ -28,7 +28,7 @@ export interface ProjectUpdateData {
   name: string;
   project_manager_id: string | null;
   office_id: string | null;
-  status: "In Progress" | "On Hold" | "Complete" | "Planning"; // Fixed status to use specific literal types
+  status: string; // Changed to string to accept any status value which will be mapped correctly
   country: string | null;
   current_stage: string | null;
   target_profit_percentage: number | null;

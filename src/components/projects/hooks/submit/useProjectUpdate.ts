@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { mapStatusToDb } from "../../utils/projectMappings";
 import type { ProjectUpdateData } from "./types";
+import type { Database } from "@/integrations/supabase/types";
 
 export const useProjectUpdate = () => {
   const updateProject = async (projectId: string, projectUpdate: ProjectUpdateData) => {

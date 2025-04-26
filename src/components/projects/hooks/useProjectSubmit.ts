@@ -32,7 +32,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         name: form.name,
         project_manager_id: form.manager && form.manager !== 'not_assigned' ? form.manager : null,
         office_id: form.office || null,
-        status: mapStatusToDb(form.status),
+        status: mapStatusToDb(form.status), // Using the mapper function
         country: form.country,
         current_stage: form.current_stage,
         target_profit_percentage: form.profit ? Number(form.profit) : null,
@@ -44,7 +44,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       // Update the main project record and get existing stages
       const { existingStages } = await updateProject(projectId, {
         ...projectUpdate,
-        status: form.status as "In Progress" | "On Hold" | "Complete" | "Planning"
+        status: form.status // Pass string status which will be handled by updateProject
       });
 
       // Check if company ID is available
