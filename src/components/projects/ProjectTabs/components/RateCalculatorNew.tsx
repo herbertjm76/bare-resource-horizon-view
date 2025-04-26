@@ -95,7 +95,7 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
                     {option.name}
                   </div>
                   {option.country && type === 'locations' && (
-                    <span className="text-sm text-muted-foreground block">
+                    <span className="text-sm text-black/70 font-medium block">
                       {option.country}
                     </span>
                   )}
