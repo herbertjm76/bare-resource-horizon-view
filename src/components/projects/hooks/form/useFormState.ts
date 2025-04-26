@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import type { FormState } from "../types/projectTypes";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,6 +54,8 @@ export const useFormState = (project: any) => {
           return;
         }
         
+        console.log("Project stages loaded:", projectStages);
+        
         const { data: feesData, error: feesError } = await supabase
           .from('project_fees')
           .select('*')
@@ -64,6 +67,8 @@ export const useFormState = (project: any) => {
           return;
         }
         
+        console.log("Project fees loaded:", feesData);
+        
         const { data: officeStages, error: officeStagesError } = await supabase
           .from('office_stages')
           .select('*')
@@ -74,6 +79,8 @@ export const useFormState = (project: any) => {
           setIsLoading(false);
           return;
         }
+        
+        console.log("Office stages loaded:", officeStages);
         
         if (initialStages.length > 0 && officeStages && officeStages.length > 0) {
           const stageFees: Record<string, any> = {};
@@ -88,9 +95,16 @@ export const useFormState = (project: any) => {
               continue;
             }
             
-            const projectStage = projectStages?.find(s => s.stage_name === officeStage.name);
+            console.log(`Found office stage:`, officeStage);
             
+            // Find the project stage that matches the office stage name
+            const projectStage = projectStages?.find(s => s.stage_name === officeStage.name);
+            console.log(`Project stage for ${officeStage.name}:`, projectStage);
+            
+            // Find fee data using the office stage ID 
+            // This is the key fix - we need to properly match fees by stage_id
             const feeData = feesData?.find(fee => fee.stage_id === stageId);
+            console.log(`Fee data for stage ${stageId}:`, feeData);
             
             if (!projectStage) {
               console.log(`No project stage found for ${officeStage.name}`);
