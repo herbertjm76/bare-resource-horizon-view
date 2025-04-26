@@ -38,18 +38,19 @@ export type ProjectForm = {
   country: string;
   profit: string;
   avgRate: string;
+  currency: string;
   status: ProjectStatus | string;
   office: string;
   current_stage: string;
   stages: string[];
   stageFees: Record<string, {
     fee: string;
-    billingMonth: string;
+    billingMonth: Date | string | null;
     status: "Not Billed" | "Invoiced" | "Paid" | "";
     invoiceDate: Date | null;
     hours: string;
-    invoiceAge: string | number; // Changed to allow both string and number types
-    currency: string; // Added currency field
+    invoiceAge: string | number;
+    currency: string;
   }>;
   stageApplicability: Record<string, boolean>;
 };
@@ -66,6 +67,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     country: "",
     profit: "",
     avgRate: "",
+    currency: "USD", // Added default currency
     status: "",
     office: "",
     current_stage: "",

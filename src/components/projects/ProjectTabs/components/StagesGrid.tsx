@@ -1,21 +1,12 @@
 
 import React from "react";
 import { StageCard } from "./stage/StageCard";
+import type { StageFee } from "../../../hooks/types/projectTypes";
 
 interface Stage {
   id: string;
   name: string;
   color?: string;
-}
-
-interface StageFee {
-  fee: string;
-  billingMonth: string;
-  status: "Not Billed" | "Invoiced" | "Paid" | "";
-  invoiceDate: Date | null;
-  hours: string;
-  invoiceAge: string | number;
-  currency: string;
 }
 
 interface StagesGridProps {
@@ -42,7 +33,7 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
       {selectedStages.map((stage) => {
         const stageFeeData = stageFees[stage.id] || {
           fee: '',
-          billingMonth: '',
+          billingMonth: null,
           status: 'Not Billed',
           invoiceDate: null,
           hours: '',
