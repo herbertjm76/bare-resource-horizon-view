@@ -49,6 +49,8 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
           invoiceAge: '0',
           currency: 'USD'
         });
+      } else {
+        console.log(`Stage ${stage.id} already has fee data:`, stageFees[stage.id]);
       }
     });
   }, [selectedStages, stageFees, updateStageFee, isDataLoaded]);

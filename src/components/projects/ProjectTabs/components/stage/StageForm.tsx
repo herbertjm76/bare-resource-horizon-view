@@ -41,14 +41,17 @@ export const StageForm: React.FC<StageFormProps> = ({
     });
   };
 
-  // Safe access to fee value
+  // Safe access to fee value with fallbacks
   const feeValue = stageFeeData?.fee || "";
   const statusValue = stageFeeData?.status || "Not Billed";
   const currencyValue = stageFeeData?.currency || "USD";
+  
+  // Ensure billingMonth is a proper Date object if it exists
   const billingMonth = stageFeeData?.billingMonth instanceof Date ? stageFeeData.billingMonth : 
-                       (typeof stageFeeData?.billingMonth === 'string' && stageFeeData.billingMonth ? 
+                      (typeof stageFeeData?.billingMonth === 'string' && stageFeeData.billingMonth ? 
                         new Date(stageFeeData.billingMonth) : undefined);
 
+  // Ensure invoiceDate is a proper Date object if it exists
   const invoiceDate = stageFeeData?.invoiceDate instanceof Date ? stageFeeData.invoiceDate : 
                      (typeof stageFeeData?.invoiceDate === 'string' && stageFeeData.invoiceDate ?
                       new Date(stageFeeData.invoiceDate) : undefined);
@@ -62,7 +65,10 @@ export const StageForm: React.FC<StageFormProps> = ({
           type="number"
           placeholder="0.00"
           value={feeValue}
-          onChange={(e) => updateStageFee(stageId, { fee: e.target.value })}
+          onChange={(e) => {
+            console.log(`Updating fee for stage ${stageId} to ${e.target.value}`);
+            updateStageFee(stageId, { fee: e.target.value });
+          }}
           className="h-8"
         />
       </div>
@@ -72,7 +78,10 @@ export const StageForm: React.FC<StageFormProps> = ({
           <Label className="text-xs">Currency</Label>
           <CurrencyPicker
             value={currencyValue}
-            onValueChange={(value) => updateStageFee(stageId, { currency: value })}
+            onValueChange={(value) => {
+              console.log(`Updating currency for stage ${stageId} to ${value}`);
+              updateStageFee(stageId, { currency: value });
+            }}
           />
         </div>
         <div>
@@ -93,9 +102,8 @@ export const StageForm: React.FC<StageFormProps> = ({
           <MonthCalendar
             value={billingMonth}
             onChange={(date) => {
-              updateStageFee(stageId, { 
-                billingMonth: date || null
-              });
+              console.log(`Updating billing month for stage ${stageId} to ${date}`);
+              updateStageFee(stageId, { billingMonth: date || null });
             }}
             showIcon={false}
           />
@@ -104,9 +112,12 @@ export const StageForm: React.FC<StageFormProps> = ({
           <Label className="text-xs">Status</Label>
           <Select
             value={statusValue}
-            onValueChange={(value) => updateStageFee(stageId, { 
-              status: value as "Not Billed" | "Invoiced" | "Paid" | "" 
-            })}
+            onValueChange={(value) => {
+              console.log(`Updating status for stage ${stageId} to ${value}`);
+              updateStageFee(stageId, { 
+                status: value as "Not Billed" | "Invoiced" | "Paid" | "" 
+              });
+            }}
           >
             <SelectTrigger className="h-8">
               <SelectValue placeholder="Select a status" />
@@ -126,6 +137,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           <InvoiceDatePicker
             value={invoiceDate}
             onChange={(date) => {
+              console.log(`Updating invoice date for stage ${stageId} to ${date}`);
               updateStageFee(stageId, { 
                 invoiceDate: date,
                 invoiceAge: date ? calculateInvoiceAge(date) : 'N/A'

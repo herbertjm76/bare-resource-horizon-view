@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { StagesGrid } from "./components/StagesGrid";
 import type { FormState } from "../hooks/types/projectTypes";
 import { toast } from "sonner";
@@ -23,10 +23,12 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   console.log("ProjectStageFeesTab - officeStages:", officeStages);
 
   // Check if stage fees are loaded correctly
-  React.useEffect(() => {
-    if (form.stages.length > 0 && Object.keys(form.stageFees).length === 0 && isDataLoaded) {
+  useEffect(() => {
+    if (isDataLoaded && form.stages.length > 0 && Object.keys(form.stageFees).length === 0) {
       console.log("Warning: Stages selected but no fee data available");
       toast.warning("No fee data available for selected stages");
+    } else if (isDataLoaded && Object.keys(form.stageFees).length > 0) {
+      console.log("Stage fee data loaded successfully:", form.stageFees);
     }
   }, [form.stages, form.stageFees, isDataLoaded]);
 
@@ -73,7 +75,7 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   const billingOptions = generateYearMonths();
 
   console.log("Selected stages for fees:", selectedStages);
-  console.log("Are there any stage fees?", Object.keys(form.stageFees).length > 0);
+  console.log("Stage fees available:", Object.keys(form.stageFees).length > 0);
 
   if (form.stages.length === 0) {
     return (
