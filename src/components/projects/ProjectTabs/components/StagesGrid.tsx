@@ -1,6 +1,6 @@
 
 import React from "react";
-import { StageCard } from "./StageCard";
+import { StageCard } from "./stage/StageCard";
 
 interface Stage {
   id: string;
