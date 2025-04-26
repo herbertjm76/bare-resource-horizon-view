@@ -16,6 +16,7 @@ type RatesListProps = {
   getRateName: (rate: any) => string;
   onAddRate: () => void;
   onEditRate: (rate: any) => void;
+  onDeleteRate: (rate: any) => void;
 };
 
 export const RatesList = ({ 
@@ -24,7 +25,8 @@ export const RatesList = ({
   rates, 
   getRateName, 
   onAddRate, 
-  onEditRate 
+  onEditRate,
+  onDeleteRate 
 }: RatesListProps) => {
   return (
     <div>
@@ -55,6 +57,7 @@ export const RatesList = ({
               unit={rate.unit}
               type={rate.type}
               onEdit={() => onEditRate(rate)}
+              onDelete={() => onDeleteRate(rate)}
             />
           ))}
         </div>

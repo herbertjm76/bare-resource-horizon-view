@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { cn } from "@/lib/utils";
 import { ItemActions } from '../common/ItemActions';
 
 interface RateCardProps {
@@ -9,9 +8,10 @@ interface RateCardProps {
   unit: string;
   type: "role" | "location";
   onEdit?: () => void;
+  onDelete?: () => void;
 }
 
-export const RateCard = ({ name, value, unit, type, onEdit }: RateCardProps) => {
+export const RateCard = ({ name, value, unit, type, onEdit, onDelete }: RateCardProps) => {
   return (
     <div className="group flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
       <div className="flex flex-col gap-1">
@@ -23,7 +23,7 @@ export const RateCard = ({ name, value, unit, type, onEdit }: RateCardProps) => 
           </span>
         </div>
       </div>
-      {onEdit && <ItemActions onEdit={onEdit} showDelete={false} />}
+      <ItemActions onEdit={onEdit} onDelete={onDelete} showDelete={true} />
     </div>
   );
 };

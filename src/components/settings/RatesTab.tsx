@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,8 @@ import { useCompany } from '@/context/CompanyContext';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { RatesList } from './rates/RatesList';
 import { useRates } from './rates/useRates';
+import { toast } from 'react-toastify';
+import { supabase } from '@/lib/supabase';
 
 export const RatesTab = () => {
   const { company } = useCompany();
@@ -33,6 +34,25 @@ export const RatesTab = () => {
 
   const roleRates = rates.filter(rate => rate.type === 'role');
   const locationRates = rates.filter(rate => rate.type === 'location');
+
+  const handleDeleteRate = async (rate: any) => {
+    if (!company) return;
+    
+    try {
+      const { error } = await supabase
+        .from('office_rates')
+        .delete()
+        .eq('id', rate.id);
+        
+      if (error) throw error;
+      
+      setRates(rates.filter(r => r.id !== rate.id));
+      toast.success('Rate deleted successfully');
+    } catch (error) {
+      console.error('Error deleting rate:', error);
+      toast.error('Failed to delete rate');
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -64,6 +84,7 @@ export const RatesTab = () => {
                 setOpen(true);
               }}
               onEditRate={handleEdit}
+              onDeleteRate={handleDeleteRate}
             />
             <RatesList
               title="Location Rates"
@@ -75,6 +96,7 @@ export const RatesTab = () => {
                 setOpen(true);
               }}
               onEditRate={handleEdit}
+              onDeleteRate={handleDeleteRate}
             />
           </div>
 
