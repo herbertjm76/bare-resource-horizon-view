@@ -13,10 +13,7 @@ interface RateCardProps {
 
 export const RateCard = ({ name, value, unit, type, onEdit }: RateCardProps) => {
   return (
-    <div className={cn(
-      "group flex items-center justify-between p-4 border rounded-lg transition-all duration-200 hover:border-[#6E59A5]/20 hover:bg-[#6E59A5]/5",
-      "relative overflow-hidden"
-    )}>
+    <div className="group flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
       <div className="flex flex-col gap-1">
         <div className="font-medium text-[#6E59A5]">{name}</div>
         <div className="text-sm text-muted-foreground flex items-center gap-2">
