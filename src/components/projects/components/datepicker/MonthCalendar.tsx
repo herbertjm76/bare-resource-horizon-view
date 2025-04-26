@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-import { format, setMonth, setYear } from "date-fns";
+import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface MonthCalendarProps {
@@ -26,9 +26,8 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
   );
 
   const months = [
-    "January", "February", "March", "April",
-    "May", "June", "July", "August",
-    "September", "October", "November", "December"
+    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
 
   const handleYearChange = (increment: number) => {
@@ -40,7 +39,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
       const newDate = new Date(selectedYear, monthIndex, 1);
       onChange(newDate);
     } else {
-      const newDate = setMonth(setYear(value, selectedYear), monthIndex);
+      const newDate = new Date(selectedYear, monthIndex);
       onChange(newDate);
     }
   };
@@ -62,10 +61,10 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        className="p-0 w-[280px] z-[60] bg-popover" 
+        className="p-0 w-64 z-[60] bg-popover" 
         align="start"
       >
-        <div className="p-3">
+        <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <Button
               type="button"
@@ -94,13 +93,13 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
                 onClick={() => handleMonthSelect(index)}
                 variant="ghost"
                 className={cn(
-                  "h-9",
+                  "h-8",
                   value?.getMonth() === index && 
                   value?.getFullYear() === selectedYear && 
                   "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                 )}
               >
-                {month.slice(0, 3)}
+                {month}
               </Button>
             ))}
           </div>
