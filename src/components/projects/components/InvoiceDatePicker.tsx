@@ -29,19 +29,22 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     }
   };
 
-  const handleMonthChange = (monthIndex: number) => {
+  const handleMonthChange = (e: React.MouseEvent, monthIndex: number) => {
+    e.preventDefault();
     const newDate = new Date(calendarDate);
     newDate.setMonth(monthIndex);
     setCalendarDate(newDate);
   };
 
-  const handleYearChange = (year: number) => {
+  const handleYearChange = (e: React.MouseEvent, year: number) => {
+    e.preventDefault();
     const newDate = new Date(calendarDate);
     newDate.setFullYear(year);
     setCalendarDate(newDate);
   };
 
-  const handleTodayClick = () => {
+  const handleTodayClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     const today = new Date();
     onChange(today);
     setCalendarDate(today);
@@ -95,7 +98,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
                 {months.map((month, index) => (
                   <DropdownMenuItem 
                     key={month} 
-                    onClick={() => handleMonthChange(index)}
+                    onClick={(e) => handleMonthChange(e, index)}
                     className={cn(
                       "cursor-pointer",
                       currentMonth === index && "bg-accent text-accent-foreground"
@@ -119,7 +122,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
                 {years.map((year) => (
                   <DropdownMenuItem 
                     key={year} 
-                    onClick={() => handleYearChange(year)}
+                    onClick={(e) => handleYearChange(e, year)}
                     className={cn(
                       "cursor-pointer",
                       currentYearValue === year && "bg-accent text-accent-foreground"
@@ -152,18 +155,18 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
           </div>
 
           <Calendar
-            key={calendarDate.toISOString()} // forces re-render
+            key={calendarDate.toISOString()}
             mode="single"
             selected={value}
             onSelect={onDateSelect}
-            month={calendarDate} // controls visible month
-            onMonthChange={setCalendarDate} // keeps nav arrows in sync
+            month={calendarDate}
+            onMonthChange={setCalendarDate}
             className="p-0 pointer-events-auto"
             formatters={{
-              formatCaption: () => "" // hides default caption
+              formatCaption: () => ""
             }}
           />
-          
+
           <div className="mt-3">
             <Button
               variant="outline"
@@ -179,4 +182,3 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     </Popover>
   );
 };
-
