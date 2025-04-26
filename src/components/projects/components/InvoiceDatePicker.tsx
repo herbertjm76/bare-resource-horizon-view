@@ -184,6 +184,10 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             formatters={{
               formatCaption: () => ""
             }}
+            components={{
+              IconLeft: () => null,  // Hide default left arrow
+              IconRight: () => null, // Hide default right arrow
+            }}
           />
 
           <div className="mt-3">
