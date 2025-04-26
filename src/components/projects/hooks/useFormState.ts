@@ -28,7 +28,7 @@ export const useFormState = (project: any) => {
     manager: project.project_manager?.id || "",
     country: project.country || "",
     profit: project.target_profit_percentage?.toString() || "",
-    avgRate: project.avg_rate?.toString() || "", // Keep this line but handle null case
+    avgRate: project.avg_rate?.toString() || "",
     currency: project.currency || "USD",
     status: project.status || "",
     office: project.office?.id || "",
@@ -43,29 +43,46 @@ export const useFormState = (project: any) => {
     const loadProjectFees = async () => {
       if (!project?.id) return;
 
-      const { data: fees, error } = await supabase
-        .from('project_fees')
+      // First get the project stages
+      const { data: projectStages, error: stagesError } = await supabase
+        .from('project_stages')
         .select('*')
         .eq('project_id', project.id);
 
-      if (error) {
-        console.error('Error loading project fees:', error);
+      if (stagesError) {
+        console.error('Error loading project stages:', stagesError);
         return;
       }
 
-      if (fees) {
+      if (projectStages) {
         const stageFees: Record<string, any> = {};
-        fees.forEach(fee => {
-          stageFees[fee.stage_id] = {
-            fee: fee.fee.toString(),
-            billingMonth: fee.billing_month,
-            status: fee.invoice_status,
-            invoiceDate: fee.invoice_date ? new Date(fee.invoice_date) : null,
+        
+        // For each project stage, get or initialize its fee data
+        for (const stage of projectStages) {
+          // Get the corresponding office stage name
+          const officeStageName = stage.stage_name;
+          const officeStage = form.officeStages?.find(s => s.name === officeStageName);
+          
+          if (!officeStage) continue;
+
+          // Get fee data for this stage
+          const { data: feeData } = await supabase
+            .from('project_fees')
+            .select('*')
+            .eq('project_id', project.id)
+            .eq('stage_id', stage.id)
+            .single();
+
+          stageFees[officeStage.id] = {
+            fee: feeData?.fee?.toString() || stage.fee?.toString() || '',
+            billingMonth: feeData?.billing_month || stage.billing_month || '',
+            status: feeData?.invoice_status || stage.invoice_status || 'Not Billed',
+            invoiceDate: feeData?.invoice_date ? new Date(feeData.invoice_date) : null,
             hours: '',
-            invoiceAge: '',
-            currency: fee.currency
+            invoiceAge: feeData?.invoice_age || stage.invoice_age || '0',
+            currency: feeData?.currency || stage.currency || 'USD'
           };
-        });
+        }
 
         setForm(prev => ({
           ...prev,

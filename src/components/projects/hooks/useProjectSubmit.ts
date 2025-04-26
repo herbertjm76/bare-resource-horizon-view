@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
@@ -104,128 +103,103 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
           }
         }
         
-        // Now insert or update stages
+        // Now handle stages and their fees
         for (const stageName of selectedStageNames) {
-          const stage = form.officeStages?.find((s: any) => s.name === stageName);
-          if (!stage) continue;
+          const officeStage = form.officeStages?.find((s: any) => s.name === stageName);
+          if (!officeStage) continue;
           
-          const stageId = stage.id;
+          const stageId = officeStage.id;
           const feeData = form.stageFees?.[stageId];
           const fee = feeData?.fee ? parseFloat(feeData.fee) : 0;
           const isApplicable = form.stageApplicability?.[stageId] ?? true;
           
-          // Prepare stage data with new fields
-          const stageData = {
-            fee,
-            is_applicable: isApplicable,
-            company_id: company.id,
-            billing_month: feeData?.billingMonth || null,
-            invoice_date: feeData?.invoiceDate || null,
-            invoice_status: feeData?.status || 'Not Billed',
-            invoice_age: feeData?.invoiceAge ? parseInt(String(feeData.invoiceAge), 10) || 0 : 0,
-            currency: feeData?.currency || 'USD'
-          };
-
-          // Check if this stage already exists
-          const existingStage = existingStages?.find(s => s.stage_name === stageName);
+          // First, get or create the project_stage record
+          let projectStage = existingStages?.find(s => s.stage_name === stageName);
           
-          if (existingStage) {
-            // Update existing stage
-            const { error } = await supabase
-              .from('project_stages')
-              .update(stageData)
-              .eq('id', existingStage.id);
-              
-            if (error) {
-              console.error(`Error updating stage ${stageName}:`, error);
-              throw error;
-            }
-          } else if (!existingStageNames.has(stageName)) {
-            // Insert new stage
-            const { error } = await supabase
+          if (!projectStage) {
+            // Create new project_stage
+            const { data: newStage, error: newStageError } = await supabase
               .from('project_stages')
               .insert({
                 project_id: projectId,
                 stage_name: stageName,
-                ...stageData
-              });
-              
-            if (error) {
-              console.error(`Error inserting stage ${stageName}:`, error);
-              throw error;
+                fee,
+                is_applicable: isApplicable,
+                company_id: company.id,
+                billing_month: feeData?.billingMonth || null,
+                invoice_date: feeData?.invoiceDate ? feeData.invoiceDate.toISOString() : null,
+                invoice_status: feeData?.status || 'Not Billed',
+                invoice_age: feeData?.invoiceAge ? parseInt(String(feeData.invoiceAge), 10) || 0 : 0,
+                currency: feeData?.currency || 'USD'
+              })
+              .select()
+              .single();
+
+            if (newStageError) {
+              console.error(`Error creating stage ${stageName}:`, newStageError);
+              throw newStageError;
+            }
+            
+            projectStage = newStage;
+          } else {
+            // Update existing project_stage
+            const { error: updateError } = await supabase
+              .from('project_stages')
+              .update({
+                fee,
+                is_applicable: isApplicable,
+                billing_month: feeData?.billingMonth || null,
+                invoice_date: feeData?.invoiceDate ? feeData.invoiceDate.toISOString() : null,
+                invoice_status: feeData?.status || 'Not Billed',
+                invoice_age: feeData?.invoiceAge ? parseInt(String(feeData.invoiceAge), 10) || 0 : 0,
+                currency: feeData?.currency || 'USD'
+              })
+              .eq('id', projectStage.id);
+
+            if (updateError) {
+              console.error(`Error updating stage ${stageName}:`, updateError);
+              throw updateError;
             }
           }
-        }
-      }
 
-      // Get updated project stages after all modifications
-      const { data: updatedProjectStages } = await supabase
-        .from('project_stages')
-        .select('id, stage_name')
-        .eq('project_id', projectId);
-        
-      console.log('Updated project stages:', updatedProjectStages);
-      
-      // Process stage fees - only for stages that have corresponding project_stages records
-      for (const stageId of form.stages) {
-        const feeData = form.stageFees?.[stageId];
-        if (!feeData) continue;
-        
-        // Get the stage name corresponding to this ID
-        const stageName = form.officeStages?.find((s: any) => s.id === stageId)?.name;
-        if (!stageName) continue;
-        
-        // Find the project_stage record with this stage name
-        const projectStage = updatedProjectStages?.find(s => s.stage_name === stageName);
-        if (!projectStage) {
-          console.log(`No project_stage record found for stage ${stageName}, skipping fee update`);
-          continue;
-        }
-
-        // Format dates as ISO strings for Supabase
-        const billingMonth = feeData.billingMonth ? new Date(feeData.billingMonth).toISOString() : null;
-        const invoiceDate = feeData.invoiceDate ? new Date(feeData.invoiceDate).toISOString() : null;
-        
-        // Prepare fee data with the project_stage ID (not the office_stage ID)
-        const feeRecord = {
-          project_id: projectId,
-          stage_id: projectStage.id, // Use the project_stage.id here, not the office_stage.id
-          company_id: company.id,
-          fee: feeData.fee ? parseFloat(feeData.fee) : 0,
-          billing_month: billingMonth,
-          invoice_date: invoiceDate,
-          invoice_status: feeData.status || 'Not Billed',
-          currency: feeData.currency || 'USD'
-        };
-
-        // Check if fee record exists
-        const { data: existingFee } = await supabase
-          .from('project_fees')
-          .select('id')
-          .eq('project_id', projectId)
-          .eq('stage_id', projectStage.id) // Again, using project_stage.id
-          .single();
-
-        if (existingFee) {
-          // Update existing fee
-          const { error: updateError } = await supabase
+          // Check if fee record exists and update/create accordingly
+          const { data: existingFee } = await supabase
             .from('project_fees')
-            .update(feeRecord)
-            .eq('id', existingFee.id);
+            .select('id')
+            .eq('project_id', projectId)
+            .eq('stage_id', projectStage.id)
+            .single();
 
-          if (updateError) {
-            console.error('Error updating fee:', updateError);
-            throw updateError;
-          }
-        } else {
-          // Insert new fee
-          const { error: insertError } = await supabase
-            .from('project_fees')
-            .insert(feeRecord);
+          const feeRecord = {
+            project_id: projectId,
+            stage_id: projectStage.id,
+            company_id: company.id,
+            fee: fee,
+            billing_month: feeData?.billingMonth || null,
+            invoice_date: feeData?.invoiceDate ? feeData.invoiceDate.toISOString() : null,
+            invoice_status: feeData?.status || 'Not Billed',
+            currency: feeData?.currency || 'USD'
+          };
 
-          if (insertError) {
-            console.error('Error inserting fee:', insertError);
-            throw insertError;
+          if (existingFee) {
+            const { error: updateError } = await supabase
+              .from('project_fees')
+              .update(feeRecord)
+              .eq('id', existingFee.id);
+
+            if (updateError) {
+              console.error('Error updating fee:', updateError);
+              throw updateError;
+            }
+          } else {
+            const { error: insertError } = await supabase
+              .from('project_fees')
+              .insert(feeRecord);
+
+            if (insertError) {
+              console.error('Error inserting fee:', insertError);
+              throw insertError;
+            }
           }
         }
       }
