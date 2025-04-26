@@ -21,7 +21,6 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
   
   const { updateStageFee, updateStageApplicability } = useStageManagement(form, setForm);
 
-  // Initialize stage applicability when project and stages are loaded
   useEffect(() => {
     if (isOpen && project && Array.isArray(project.stages) && project.stages.length > 0 && officeStages?.length > 0) {
       console.log('useProjectForm - Initializing stages from project:', project.stages);
@@ -56,59 +55,6 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     }
   }, [isOpen, project, officeStages, setForm]);
 
-  const handleChange = (key: keyof typeof form, value: any) => {
-    console.log(`handleChange: ${String(key)} =`, value);
-    
-    setForm(prev => ({ ...prev, [key]: value }));
-    
-    if (formErrors[key]) {
-      setFormErrors(prev => {
-        const newErrors = {...prev};
-        delete newErrors[key];
-        return newErrors;
-      });
-    }
-    
-    if (key === 'stages') {
-      const newStageFees: Record<string, any> = {...form.stageFees};
-      const newStageApplicability: Record<string, boolean> = {...form.stageApplicability};
-      
-      console.log('Updating stages to:', value);
-      
-      value.forEach((stageId: string) => {
-        if (!newStageFees[stageId]) {
-          newStageFees[stageId] = {
-            fee: '',
-            billingMonth: null,
-            status: 'Not Billed',
-            invoiceDate: null,
-            hours: '',
-            invoiceAge: 0,
-            currency: form.currency || 'USD'
-          };
-        }
-        
-        if (newStageApplicability[stageId] === undefined) {
-          newStageApplicability[stageId] = true;
-        }
-      });
-      
-      // Remove stages that are no longer selected
-      const updatedStageFees: Record<string, any> = {};
-      Object.keys(newStageFees).forEach(stageId => {
-        if (value.includes(stageId)) {
-          updatedStageFees[stageId] = newStageFees[stageId];
-        }
-      });
-      
-      setForm(prev => ({
-        ...prev,
-        stageFees: updatedStageFees,
-        stageApplicability: newStageApplicability
-      }));
-    }
-  };
-
   return {
     form,
     isLoading,
@@ -118,7 +64,58 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     offices,
     officeStages,
     formErrors,
-    handleChange,
+    handleChange: (key: keyof typeof form, value: any) => {
+      console.log(`handleChange: ${String(key)} =`, value);
+      
+      setForm(prev => ({ ...prev, [key]: value }));
+      
+      if (formErrors[key]) {
+        setFormErrors(prev => {
+          const newErrors = {...prev};
+          delete newErrors[key];
+          return newErrors;
+        });
+      }
+      
+      if (key === 'stages') {
+        const newStageFees: Record<string, any> = {...form.stageFees};
+        const newStageApplicability: Record<string, boolean> = {...form.stageApplicability};
+        
+        console.log('Updating stages to:', value);
+        
+        value.forEach((stageId: string) => {
+          if (!newStageFees[stageId]) {
+            newStageFees[stageId] = {
+              fee: '',
+              billingMonth: null,
+              status: 'Not Billed',
+              invoiceDate: null,
+              hours: '',
+              invoiceAge: 0,
+              currency: form.currency || 'USD'
+            };
+          }
+          
+          if (newStageApplicability[stageId] === undefined) {
+            newStageApplicability[stageId] = true;
+          }
+        });
+        
+        // Remove stages that are no longer selected
+        const updatedStageFees: Record<string, any> = {};
+        Object.keys(newStageFees).forEach(stageId => {
+          if (value.includes(stageId)) {
+            updatedStageFees[stageId] = newStageFees[stageId];
+          }
+        });
+        
+        setForm(prev => ({
+          ...prev,
+          stageFees: updatedStageFees,
+          stageApplicability: newStageApplicability
+        }));
+      }
+    },
     updateStageFee,
     updateStageApplicability,
     isDataLoaded
