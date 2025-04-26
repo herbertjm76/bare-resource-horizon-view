@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { ProjectDialogTabs } from "./dialog/ProjectDialogTabs";
 import { ProjectDialogContent } from "./dialog/ProjectDialogContent";
 import { ProjectDialogActions } from "./dialog/ProjectDialogActions";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EditProjectDialogProps {
   project: any;
@@ -31,6 +33,41 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const [activeTab, setActiveTab] = useState("info");
   const { company } = useCompany();
   const isMobile = useIsMobile();
+  const [loadedProject, setLoadedProject] = useState(project);
+  
+  // Fetch complete project data with all related information
+  useEffect(() => {
+    if (isOpen && project?.id) {
+      const fetchCompleteProject = async () => {
+        try {
+          // Get full project data
+          const { data: projectData, error } = await supabase
+            .from('projects')
+            .select(`
+              *,
+              project_manager:project_manager_id (id, first_name, last_name),
+              office:office_id (id, city, country)
+            `)
+            .eq('id', project.id)
+            .single();
+          
+          if (error) {
+            console.error('Error fetching project details:', error);
+            return;
+          }
+          
+          if (projectData) {
+            console.log('Complete project data loaded:', projectData);
+            setLoadedProject(projectData);
+          }
+        } catch (err) {
+          console.error('Error in fetchCompleteProject:', err);
+        }
+      };
+      
+      fetchCompleteProject();
+    }
+  }, [isOpen, project?.id]);
   
   const processProjectStages = (project, officeStages) => {
     if (!project || !project.stages || !officeStages || officeStages.length === 0) {
@@ -67,20 +104,20 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     handleChange,
     updateStageFee,
     updateStageApplicability
-  } = useProjectForm(project, isOpen);
+  } = useProjectForm(loadedProject, isOpen);
 
   useEffect(() => {
-    if (isOpen && project && officeStages && officeStages.length > 0) {
-      const processedProject = processProjectStages(project, officeStages);
+    if (isOpen && loadedProject && officeStages && officeStages.length > 0) {
+      const processedProject = processProjectStages(loadedProject, officeStages);
       console.log('EditProjectDialog - processed project stages:', processedProject.stages);
       
       if (processedProject.stages.length > 0) {
         handleChange('stages', processedProject.stages);
       }
     }
-  }, [isOpen, project, officeStages]);
+  }, [isOpen, loadedProject, officeStages]);
 
-  const { handleSubmit } = useProjectSubmit(project.id, refetch, onClose);
+  const { handleSubmit } = useProjectSubmit(loadedProject.id, refetch, onClose);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

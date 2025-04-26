@@ -31,6 +31,8 @@ export const StageForm: React.FC<StageFormProps> = ({
   calculateHours,
   calculateInvoiceAge,
 }) => {
+  console.log(`StageForm for ${stageId}:`, stageFeeData);
+  
   const handleToday = () => {
     const today = new Date();
     updateStageFee(stageId, { 
@@ -47,7 +49,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           id={`fee-${stageId}`}
           type="number"
           placeholder="0.00"
-          value={stageFeeData.fee}
+          value={stageFeeData.fee || ""}
           onChange={(e) => updateStageFee(stageId, { fee: e.target.value })}
           className="h-8"
         />
@@ -57,7 +59,7 @@ export const StageForm: React.FC<StageFormProps> = ({
         <div>
           <Label className="text-xs">Currency</Label>
           <CurrencyPicker
-            value={stageFeeData.currency}
+            value={stageFeeData.currency || "USD"}
             onValueChange={(value) => updateStageFee(stageId, { currency: value })}
           />
         </div>
@@ -65,7 +67,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           <Label htmlFor={`hours-${stageId}`} className="text-xs">Hours</Label>
           <Input
             id={`hours-${stageId}`}
-            value={calculateHours(stageFeeData.fee)}
+            value={calculateHours(stageFeeData.fee || "")}
             readOnly
             disabled
             className="h-8 bg-muted"
@@ -89,7 +91,7 @@ export const StageForm: React.FC<StageFormProps> = ({
         <div>
           <Label className="text-xs">Status</Label>
           <Select
-            value={stageFeeData.status}
+            value={stageFeeData.status || "Not Billed"}
             onValueChange={(value) => updateStageFee(stageId, { 
               status: value as "Not Billed" | "Invoiced" | "Paid" | "" 
             })}
@@ -125,7 +127,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           <Label htmlFor={`invoiceAge-${stageId}`} className="text-xs">Invoice Age (Days)</Label>
           <Input
             id={`invoiceAge-${stageId}`}
-            value={calculateInvoiceAge(stageFeeData.invoiceDate)}
+            value={calculateInvoiceAge(stageFeeData.invoiceDate || null)}
             readOnly
             disabled
             className="h-8 bg-muted"

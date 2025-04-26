@@ -1,12 +1,12 @@
 
 import React from "react";
 import { StagesGrid } from "./components/StagesGrid";
-import type { ProjectForm } from "../NewProjectDialog";
+import type { FormState } from "../hooks/types/projectTypes";
 
 interface ProjectStageFeesTabProps {
-  form: ProjectForm;
+  form: FormState;
   officeStages: Array<{ id: string; name: string; color?: string }>;
-  updateStageFee: (stageId: string, data: Partial<ProjectForm['stageFees'][string]>) => void;
+  updateStageFee: (stageId: string, data: Partial<FormState['stageFees'][string]>) => void;
 }
 
 export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
@@ -14,6 +14,11 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   officeStages,
   updateStageFee
 }) => {
+  console.log("ProjectStageFeesTab - form:", form);
+  console.log("ProjectStageFeesTab - stages:", form.stages);
+  console.log("ProjectStageFeesTab - stageFees:", form.stageFees);
+  console.log("ProjectStageFeesTab - officeStages:", officeStages);
+
   const generateYearMonths = () => {
     const currentYear = new Date().getFullYear();
     const years = [currentYear - 1, currentYear, currentYear + 1];
@@ -54,6 +59,8 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
 
   const selectedStages = officeStages.filter(stage => form.stages.includes(stage.id));
   const billingOptions = generateYearMonths();
+
+  console.log("Selected stages for fees:", selectedStages);
 
   if (form.stages.length === 0) {
     return (
