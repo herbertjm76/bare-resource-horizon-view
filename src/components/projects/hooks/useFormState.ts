@@ -73,13 +73,23 @@ export const useFormState = (project: any) => {
             .eq('stage_id', stage.id)
             .single();
 
+          // Calculate invoice age if we have an invoice date
+          const invoiceDate = feeData?.invoice_date ? new Date(feeData.invoice_date) : null;
+          let invoiceAge = '0';
+          
+          if (invoiceDate && !isNaN(invoiceDate.getTime())) {
+            const now = new Date();
+            const diffTime = Math.abs(now.getTime() - invoiceDate.getTime());
+            invoiceAge = Math.ceil(diffTime / (1000 * 60 * 60 * 24)).toString();
+          }
+
           stageFees[officeStage.id] = {
             fee: feeData?.fee?.toString() || stage.fee?.toString() || '',
             billingMonth: feeData?.billing_month || stage.billing_month || '',
             status: feeData?.invoice_status || stage.invoice_status || 'Not Billed',
             invoiceDate: feeData?.invoice_date ? new Date(feeData.invoice_date) : null,
             hours: '',
-            invoiceAge: feeData?.invoice_age || stage.invoice_age || '0',
+            invoiceAge: invoiceAge,
             currency: feeData?.currency || stage.currency || 'USD'
           };
         }
