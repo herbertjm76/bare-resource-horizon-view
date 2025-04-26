@@ -10,12 +10,14 @@ interface MonthCalendarProps {
   value: Date | undefined;
   onChange: (date: Date | undefined) => void;
   className?: string;
+  showIcon?: boolean; // New prop
 }
 
 export const MonthCalendar: React.FC<MonthCalendarProps> = ({
   value,
   onChange,
-  className
+  className,
+  showIcon = true // Default to true for backward compatibility
 }) => {
   const [year, setYear] = useState(value?.getFullYear() || new Date().getFullYear());
   const [open, setOpen] = useState(false);
@@ -51,7 +53,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
             className
           )}
         >
-          <CalendarDays className="mr-2 h-4 w-4" />
+          {showIcon && <CalendarDays className="mr-2 h-4 w-4" />}
           {value ? format(value, "MMMM yyyy") : "Select billing month"}
         </Button>
       </PopoverTrigger>

@@ -83,6 +83,7 @@ export const StageForm: React.FC<StageFormProps> = ({
                 billingMonth: date ? date.toISOString() : '' 
               });
             }}
+            showIcon={false} // New prop to remove icon
           />
         </div>
         <div>
@@ -117,6 +118,7 @@ export const StageForm: React.FC<StageFormProps> = ({
               });
             }}
             onToday={handleToday}
+            showIcon={false} // New prop to remove icon
           />
         </div>
         <div>

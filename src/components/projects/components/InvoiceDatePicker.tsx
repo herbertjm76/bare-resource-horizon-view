@@ -12,9 +12,15 @@ interface InvoiceDatePickerProps {
   value: Date | undefined;
   onChange: (date: Date | undefined) => void;
   onToday: () => void;
+  showIcon?: boolean; // New prop
 }
 
-export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePickerProps) => {
+export const InvoiceDatePicker = ({ 
+  value, 
+  onChange, 
+  onToday, 
+  showIcon = true // Default to true for backward compatibility
+}: InvoiceDatePickerProps) => {
   const [calendarDate, setCalendarDate] = React.useState<Date>(value || new Date());
   const [open, setOpen] = React.useState(false);
 
@@ -68,7 +74,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             !value && "text-muted-foreground"
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          {showIcon && <CalendarIcon className="mr-2 h-4 w-4" />}
           {value ? format(value, "MM/dd/yyyy") : "Select date"}
         </Button>
       </PopoverTrigger>
