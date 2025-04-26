@@ -147,7 +147,6 @@ export const StageCard: React.FC<StageCardProps> = ({
                     !stageFeeData.invoiceDate && "text-muted-foreground"
                   )}
                 >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
                   {stageFeeData.invoiceDate ? (
                     format(stageFeeData.invoiceDate, "MM/dd/yyyy")
                   ) : (
@@ -168,50 +167,27 @@ export const StageCard: React.FC<StageCardProps> = ({
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
                   formatters={{
-                    formatCaption: (date, options) => format(date, "yyyy"),
-                    formatMonthCaption: (date, options) => format(date, "MMMM")
+                    formatCaption: (date, options) => {
+                      const year = format(date, "yyyy");
+                      const month = format(date, "MMMM");
+                      return (
+                        <div className="flex items-center justify-between w-full px-8">
+                          <span>{month}</span>
+                          <span>{year}</span>
+                        </div>
+                      );
+                    }
                   }}
                   footer={
-                    <div className="mt-3 flex items-center justify-between px-3 pb-2">
+                    <div className="mt-3 p-3">
                       <Button
                         variant="outline"
-                        className="text-sm"
+                        className="w-full text-sm"
                         onClick={handleToday}
                         type="button"
                       >
                         Today
                       </Button>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            const popoverElement = document.querySelector('[data-radix-popper-content-id]');
-                            if (popoverElement) {
-                              const closeButton = popoverElement.querySelector('button[aria-label="Close"]');
-                              if (closeButton) {
-                                (closeButton as HTMLButtonElement).click();
-                              }
-                            }
-                          }}
-                          type="button"
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            const popoverElement = document.querySelector('[data-radix-popper-content-id]');
-                            if (popoverElement) {
-                              const closeButton = popoverElement.querySelector('button[aria-label="Close"]');
-                              if (closeButton) {
-                                (closeButton as HTMLButtonElement).click();
-                              }
-                            }
-                          }}
-                          type="button"
-                        >
-                          Confirm
-                        </Button>
-                      </div>
                     </div>
                   }
                 />
