@@ -20,6 +20,17 @@ export const RatesTab = () => {
       return;
     }
 
+    // Check if a rate already exists for this role/location
+    const isDuplicate = rates.some(rate => 
+      rate.type === values.type && 
+      rate.reference_id === values.reference_id
+    );
+
+    if (isDuplicate) {
+      toast.error(`A rate for this ${values.type} already exists`);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
         .from('office_rates')
@@ -37,13 +48,12 @@ export const RatesTab = () => {
       if (error) throw error;
       
       if (data) {
-        // Explicitly cast the rate type to ensure it matches the expected "role" | "location" union type
         const newRate = {
           ...data[0],
-          type: data[0].type === "role" ? "role" : "location",
-          unit: data[0].unit === "hour" || data[0].unit === "day" || data[0].unit === "week" 
+          type: data[0].type === "role" ? "role" as const : "location" as const,
+          unit: (data[0].unit === "hour" || data[0].unit === "day" || data[0].unit === "week" 
             ? data[0].unit 
-            : "hour",
+            : "hour") as "hour" | "day" | "week",
           value: Number(data[0].value)
         };
         
