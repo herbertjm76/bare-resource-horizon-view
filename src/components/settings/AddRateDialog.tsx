@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -22,18 +22,30 @@ type AddRateDialogProps = {
   locations: Array<{ id: string; city: string; country: string }>;
   onCancel: () => void;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
+  editingRate?: any;
 };
 
-export const AddRateDialog = ({ roles, locations, onCancel, onSubmit }: AddRateDialogProps) => {
+export const AddRateDialog = ({ roles, locations, onCancel, onSubmit, editingRate }: AddRateDialogProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      type: "role",
-      reference_id: "",
-      value: 0,
-      unit: "hour"
+      type: editingRate?.type || "role",
+      reference_id: editingRate?.reference_id || "",
+      value: editingRate?.value || 0,
+      unit: editingRate?.unit || "hour"
     }
   });
+
+  useEffect(() => {
+    if (editingRate) {
+      form.reset({
+        type: editingRate.type,
+        reference_id: editingRate.reference_id,
+        value: editingRate.value,
+        unit: editingRate.unit
+      });
+    }
+  }, [editingRate, form]);
 
   const rateType = form.watch("type");
 
@@ -42,7 +54,9 @@ export const AddRateDialog = ({ roles, locations, onCancel, onSubmit }: AddRateD
       <Card className="p-6 max-w-lg w-full mx-auto relative z-50 shadow-xl">
         <div className="flex items-center gap-3 mb-6">
           <Calculator className="w-5 h-5 text-[#6E59A5]" />
-          <h2 className="text-lg font-semibold text-[#6E59A5]">Set Rate</h2>
+          <h2 className="text-lg font-semibold text-[#6E59A5]">
+            {editingRate ? 'Edit Rate' : 'Set Rate'}
+          </h2>
         </div>
         
         <Form {...form}>
@@ -56,6 +70,7 @@ export const AddRateDialog = ({ roles, locations, onCancel, onSubmit }: AddRateD
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    value={field.value}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select type" />
@@ -149,7 +164,7 @@ export const AddRateDialog = ({ roles, locations, onCancel, onSubmit }: AddRateD
                 Cancel
               </Button>
               <Button type="submit">
-                Add Rate
+                {editingRate ? 'Update Rate' : 'Add Rate'}
               </Button>
             </div>
           </form>

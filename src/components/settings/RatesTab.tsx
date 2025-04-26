@@ -12,7 +12,14 @@ import { useRates } from './rates/useRates';
 export const RatesTab = () => {
   const { company } = useCompany();
   const { roles, locations, rates, setRates } = useOfficeSettings();
-  const { open, setOpen, handleSubmit } = useRates(rates, setRates, company);
+  const { 
+    open, 
+    setOpen, 
+    handleSubmit, 
+    handleEdit,
+    editingRate,
+    setEditingRate 
+  } = useRates(rates, setRates, company);
 
   const getRateName = (rate: any) => {
     if (rate.type === 'role') {
@@ -37,7 +44,10 @@ export const RatesTab = () => {
               Manage rates for roles and locations across your organization
             </p>
           </div>
-          <Button size="sm" onClick={() => setOpen(true)} className="h-9">
+          <Button size="sm" onClick={() => {
+            setEditingRate(null);
+            setOpen(true);
+          }} className="h-9">
             <Plus className="h-4 w-4 mr-2" />
             Add Rate
           </Button>
@@ -49,14 +59,22 @@ export const RatesTab = () => {
               type="role"
               rates={roleRates}
               getRateName={getRateName}
-              onAddRate={() => setOpen(true)}
+              onAddRate={() => {
+                setEditingRate(null);
+                setOpen(true);
+              }}
+              onEditRate={handleEdit}
             />
             <RatesList
               title="Location Rates"
               type="location"
               rates={locationRates}
               getRateName={getRateName}
-              onAddRate={() => setOpen(true)}
+              onAddRate={() => {
+                setEditingRate(null);
+                setOpen(true);
+              }}
+              onEditRate={handleEdit}
             />
           </div>
 
@@ -64,8 +82,12 @@ export const RatesTab = () => {
             <AddRateDialog
               roles={roles}
               locations={locations}
-              onCancel={() => setOpen(false)}
+              onCancel={() => {
+                setOpen(false);
+                setEditingRate(null);
+              }}
               onSubmit={handleSubmit}
+              editingRate={editingRate}
             />
           )}
         </CardContent>

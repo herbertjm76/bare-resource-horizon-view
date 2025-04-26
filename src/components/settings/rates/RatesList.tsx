@@ -15,9 +15,17 @@ type RatesListProps = {
   }>;
   getRateName: (rate: any) => string;
   onAddRate: () => void;
+  onEditRate: (rate: any) => void;
 };
 
-export const RatesList = ({ title, type, rates, getRateName, onAddRate }: RatesListProps) => {
+export const RatesList = ({ 
+  title, 
+  type, 
+  rates, 
+  getRateName, 
+  onAddRate, 
+  onEditRate 
+}: RatesListProps) => {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
@@ -46,7 +54,7 @@ export const RatesList = ({ title, type, rates, getRateName, onAddRate }: RatesL
               value={rate.value}
               unit={rate.unit}
               type={rate.type}
-              onEdit={() => {/* Add edit handler */}}
+              onEdit={() => onEditRate(rate)}
             />
           ))}
         </div>
