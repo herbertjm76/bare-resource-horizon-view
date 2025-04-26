@@ -1,7 +1,7 @@
+
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ItemActions } from '../common/ItemActions';
 
 interface RateCardProps {
   name: string;
@@ -26,14 +26,7 @@ export const RateCard = ({ name, value, unit, type, onEdit }: RateCardProps) => 
           </span>
         </div>
       </div>
-      <Button 
-        variant="ghost" 
-        size="icon"
-        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-        onClick={onEdit}
-      >
-        <Pencil className="h-4 w-4" />
-      </Button>
+      {onEdit && <ItemActions onEdit={onEdit} showDelete={false} />}
     </div>
   );
 };

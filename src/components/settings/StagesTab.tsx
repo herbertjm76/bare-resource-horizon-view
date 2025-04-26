@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ItemActions } from './common/ItemActions';
 
 interface Stage {
   id: string;
@@ -58,7 +58,6 @@ export const StagesTab: React.FC = () => {
       setLoading(true);
       
       try {
-        // Fetch project stages from the database
         const { data: projectStages, error: projectStagesError } = await supabase
           .from('project_stages')
           .select('stage_name')
@@ -66,13 +65,11 @@ export const StagesTab: React.FC = () => {
         
         if (projectStagesError) throw projectStagesError;
         
-        // Extract unique stage names
         if (projectStages && projectStages.length > 0) {
           const uniqueStageNames = Array.from(new Set(projectStages.map(ps => ps.stage_name)));
           setAvailableStages(uniqueStageNames);
         }
         
-        // Fetch office stages as before
         const { data, error } = await supabase
           .from('office_stages')
           .select('*')
@@ -227,7 +224,7 @@ export const StagesTab: React.FC = () => {
               {stages.map((stage) => (
                 <div
                   key={stage.id}
-                  className="flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors"
+                  className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div
@@ -242,13 +239,10 @@ export const StagesTab: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => openEditDialog(stage)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
+                  <ItemActions 
+                    onEdit={() => openEditDialog(stage)}
+                    onDelete={() => deleteStage(stage.id)}
+                  />
                 </div>
               ))}
             </div>

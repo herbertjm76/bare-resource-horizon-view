@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +26,7 @@ import { Role, useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
+import { ItemActions } from './common/ItemActions';
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -164,20 +164,16 @@ export const RolesTab = () => {
             {roles.map((role) => (
               <div
                 key={role.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
+                className="group flex items-center justify-between p-4 border rounded-lg hover:border-[#6E59A5]/20 hover:bg-[#6E59A5]/5 transition-all duration-200"
               >
                 <div>
                   <div className="font-medium">{role.name}</div>
                   <div className="text-sm text-muted-foreground">Code: {role.code}</div>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => handleEditRole(role)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleDeleteRole(role.id)}>
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
+                <ItemActions 
+                  onEdit={() => handleEditRole(role)}
+                  onDelete={() => handleDeleteRole(role.id)}
+                />
               </div>
             ))}
           </div>

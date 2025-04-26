@@ -1,89 +1,93 @@
-
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
-import type { ProjectArea } from "./projectAreaTypes";
+import { Checkbox } from "@/components/ui/checkbox";
+import { cn } from "@/lib/utils";
+import { ProjectArea } from "./projectAreaTypes";
+import { ItemActions } from './common/ItemActions';
 
 interface ProjectAreaListProps {
   areas: ProjectArea[];
   loading: boolean;
-  error: string | null;
+  error: any;
   editMode: boolean;
   selected: string[];
   onEdit: (area: ProjectArea) => void;
-  onSelect: (id: string) => void;
-  onBulkDelete: () => void;
+  onSelect?: (id: string) => void;
+  onBulkDelete?: () => void;
 }
 
-export const ProjectAreaList: React.FC<ProjectAreaListProps> = ({
-  areas, loading, error, editMode, selected, onEdit, onSelect, onBulkDelete
-}) => {
+const ProjectAreaList = ({ 
+  areas,
+  loading,
+  error,
+  editMode,
+  selected,
+  onEdit,
+  onSelect,
+  onBulkDelete
+}: ProjectAreaListProps) => {
   return (
     <div className="space-y-4">
       {loading ? (
-        <div className="text-center text-muted-foreground">Loading...</div>
+        <div className="text-center py-6">Loading areas...</div>
       ) : error ? (
-        <div className="text-center text-destructive">{error}</div>
+        <div className="text-center py-6 text-red-500">Error: {error.message}</div>
+      ) : areas.length === 0 ? (
+        <div className="text-center py-6 text-muted-foreground">No project areas defined yet.</div>
       ) : (
-        <>
-          <div className="text-sm text-muted-foreground mb-4">
-            Track which locations you operate projects in, by code, country, city (optional), and region.
-          </div>
-          {editMode && (
-            <div className="flex items-center gap-2 mb-2">
-              <Button
-                variant="destructive"
-                size="sm"
-                disabled={selected.length === 0}
-                onClick={onBulkDelete}
-              >
-                <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
-              </Button>
-              <span className="text-xs text-muted-foreground">{selected.length} selected</span>
-            </div>
-          )}
-          {areas.length > 0 ? (
-            <div className="grid gap-4">
-              {areas.map((area) => (
-                <div
-                  key={area.id}
-                  className={`flex items-center justify-between p-3 border rounded-md ${editMode ? "ring-2" : ""}`}
-                  style={editMode && selected.includes(area.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="font-bold px-3 py-1 rounded text-base text-black"
-                      style={{ backgroundColor: area.color || '#E5DEFF' }}
-                    >
-                      {area.code}
-                    </div>
-                    <span className="font-medium">{area.country}</span>
-                    {area.city && <span className="ml-2 text-muted-foreground text-xs">{area.city}</span>}
-                    <span className="bg-muted-foreground/10 px-2 py-0.5 rounded text-xs text-muted-foreground ml-2">
-                      {area.region}
-                    </span>
+        <div className="space-y-2">
+          {areas.map((area) => (
+            <div
+              key={area.id}
+              className={cn(
+                "group flex items-center justify-between p-4 border rounded-lg transition-colors",
+                "hover:border-[#6E59A5]/20 hover:bg-[#6E59A5]/5",
+                editMode && "cursor-pointer"
+              )}
+              onClick={() => editMode && onSelect && onSelect(area.id)}
+            >
+              <div className="flex items-center gap-4">
+                {editMode && onSelect && (
+                  <Checkbox
+                    checked={selected.includes(area.id)}
+                    onCheckedChange={() => onSelect(area.id)}
+                    id={area.id}
+                  />
+                )}
+                <div className="flex flex-col">
+                  <div className="font-medium text-[#6E59A5]">{area.country}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {area.city ? `${area.city}, ` : ''}{area.region} ({area.code})
                   </div>
-                  {editMode ? (
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 accent-purple-600"
-                      checked={selected.includes(area.id)}
-                      onChange={() => onSelect(area.id)}
-                    />
-                  ) : (
-                    <Button variant="ghost" size="sm" onClick={() => onEdit(area)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  )}
                 </div>
-              ))}
+              </div>
+              <div className="flex items-center gap-2">
+                {editMode ? (
+                  <Checkbox
+                    checked={selected.includes(area.id)}
+                    onCheckedChange={() => onSelect(area.id)}
+                    id={area.id}
+                  />
+                ) : (
+                  <ItemActions 
+                    onEdit={() => onEdit(area)}
+                    onDelete={undefined}
+                    showDelete={false}
+                  />
+                )}
+              </div>
             </div>
-          ) : (
-            <div className="text-center p-4 border rounded-md border-dashed">
-              No project areas yet. Click "Add Area" to get started.
-            </div>
+          ))}
+          {editMode && selected.length > 0 && onBulkDelete && (
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              onClick={onBulkDelete}
+              className="ml-auto block"
+            >
+              Delete Selected
+            </Button>
           )}
-        </>
+        </div>
       )}
     </div>
   );
