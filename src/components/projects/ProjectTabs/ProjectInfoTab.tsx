@@ -148,11 +148,17 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       if (fetchedData.length > 0) {
         const enrichedOptions = await Promise.all(fetchedData.map(async (option) => {
           try {
+            // This is the critical fix: type parameter should be either 'role' or 'location' (singular)
+            // instead of 'roles' or 'locations' (plural)
+            const rateType = type === 'roles' ? 'role' : 'location';
+            
+            console.log(`Fetching rates for ${type} ${option.name}, reference_id: ${option.id}, using type: ${rateType}`);
+            
             const { data: rateData, error } = await supabase
               .from('office_rates')
               .select('value')
               .eq('reference_id', option.id)
-              .eq('type', type)
+              .eq('type', rateType)
               .limit(1);
 
             if (error) {

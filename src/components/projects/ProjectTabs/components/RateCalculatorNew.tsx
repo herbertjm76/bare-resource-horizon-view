@@ -32,6 +32,8 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
   
   // Reset people counts when options or type changes
   useEffect(() => {
+    console.log(`RateCalculator: Type changed to ${type}, resetting people counts`);
+    console.log(`RateCalculator: Received ${options.length} options`);
     setPeopleCount({});
   }, [type, options]);
 
