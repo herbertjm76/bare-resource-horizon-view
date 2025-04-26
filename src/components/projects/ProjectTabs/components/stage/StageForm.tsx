@@ -77,13 +77,13 @@ export const StageForm: React.FC<StageFormProps> = ({
         <div>
           <Label className="text-xs">Billing Month</Label>
           <MonthCalendar
-            value={stageFeeData.billingMonth ? new Date(stageFeeData.billingMonth) : undefined}
+            value={stageFeeData.billingMonth instanceof Date ? stageFeeData.billingMonth : undefined}
             onChange={(date) => {
               updateStageFee(stageId, { 
-                billingMonth: date ? date.toISOString() : '' 
+                billingMonth: date || null
               });
             }}
-            showIcon={false} // New prop to remove icon
+            showIcon={false}
           />
         </div>
         <div>
@@ -118,7 +118,7 @@ export const StageForm: React.FC<StageFormProps> = ({
               });
             }}
             onToday={handleToday}
-            showIcon={false} // New prop to remove icon
+            showIcon={false}
           />
         </div>
         <div>

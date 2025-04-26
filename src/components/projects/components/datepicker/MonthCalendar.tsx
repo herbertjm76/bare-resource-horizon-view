@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -51,7 +52,7 @@ export const MonthCalendar = ({
           )}
         >
           {showIcon && <CalendarIcon className="mr-2 h-4 w-4" />}
-          {value ? format(value, "MMMM yyyy") : "Select"}
+          {value ? format(value, "MMMM yyyy") : "Month"}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">

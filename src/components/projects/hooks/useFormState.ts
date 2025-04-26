@@ -83,9 +83,24 @@ export const useFormState = (project: any) => {
             invoiceAge = Math.ceil(diffTime / (1000 * 60 * 60 * 24)).toString();
           }
 
+          // Format billing month as a Date object if it's a string
+          let billingMonth = null;
+          if (feeData?.billing_month) {
+            try {
+              // Try to parse the billing month which might be in different formats
+              billingMonth = new Date(feeData.billing_month);
+              if (isNaN(billingMonth.getTime())) {
+                billingMonth = null;
+              }
+            } catch (error) {
+              console.error('Error parsing billing month:', error);
+              billingMonth = null;
+            }
+          }
+
           stageFees[officeStage.id] = {
             fee: feeData?.fee?.toString() || stage.fee?.toString() || '',
-            billingMonth: feeData?.billing_month || stage.billing_month || '',
+            billingMonth: billingMonth || (stage.billing_month ? new Date(stage.billing_month) : null),
             status: feeData?.invoice_status || stage.invoice_status || 'Not Billed',
             invoiceDate: feeData?.invoice_date ? new Date(feeData.invoice_date) : null,
             hours: '',
