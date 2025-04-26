@@ -181,12 +181,14 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             month={calendarDate}
             onMonthChange={setCalendarDate}
             className="p-0 pointer-events-auto"
-            formatters={{
-              formatCaption: () => ""
+            classNames={{
+              nav: "hidden",
+              caption: "hidden"
             }}
             components={{
-              IconLeft: () => null,  // Hide default left arrow
-              IconRight: () => null, // Hide default right arrow
+              IconLeft: () => null,
+              IconRight: () => null,
+              Caption: () => null
             }}
           />
 
@@ -205,3 +207,4 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     </Popover>
   );
 };
+
