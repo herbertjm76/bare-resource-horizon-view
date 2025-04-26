@@ -79,13 +79,12 @@ export const InvoiceDatePicker = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-auto p-0" 
+        className="w-auto p-0 z-[60]" 
         align="start"
         sideOffset={4}
         avoidCollisions={true}
         collisionPadding={8}
         sticky="always"
-        className="z-[60]"
       >
         <div className="p-3 pointer-events-auto">
           <DatePickerNavigation
@@ -120,3 +119,4 @@ export const InvoiceDatePicker = ({
     </Popover>
   );
 };
+
