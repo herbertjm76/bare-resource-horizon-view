@@ -43,6 +43,13 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     setCalendarDate(newDate);
   };
 
+  const handleTodayClick = () => {
+    const today = new Date();
+    onChange(today);
+    setCalendarDate(today);
+    onToday();
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -64,7 +71,9 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
               onValueChange={handleMonthChange}
             >
               <SelectTrigger className="w-[140px] h-8">
-                <SelectValue placeholder="Select month" />
+                <SelectValue placeholder="Select month">
+                  {months[calendarDate.getMonth()]}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {months.map((month, index) => (
@@ -79,7 +88,9 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
               onValueChange={handleYearChange}
             >
               <SelectTrigger className="w-[100px] h-8">
-                <SelectValue placeholder="Select year" />
+                <SelectValue placeholder="Select year">
+                  {calendarDate.getFullYear()}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {years.map((year) => (
@@ -95,6 +106,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             selected={value}
             onSelect={onDateSelect}
             defaultMonth={calendarDate}
+            month={calendarDate}
             className={cn("p-0 pointer-events-auto")}
             formatters={{
               formatCaption: () => ""
@@ -104,7 +116,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             <Button
               variant="outline"
               className="w-full text-sm"
-              onClick={onToday}
+              onClick={handleTodayClick}
               type="button"
             >
               Today
@@ -115,4 +127,3 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     </Popover>
   );
 };
-
