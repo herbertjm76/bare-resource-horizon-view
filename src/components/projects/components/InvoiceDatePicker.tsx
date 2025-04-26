@@ -3,8 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format, addYears, subYears } from 'date-fns';
+import { format } from 'date-fns';
 import { cn } from "@/lib/utils";
 
 interface InvoiceDatePickerProps {
@@ -15,6 +14,7 @@ interface InvoiceDatePickerProps {
 
 export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePickerProps) => {
   const [calendarDate, setCalendarDate] = React.useState<Date>(value || new Date());
+  const [showMonthPicker, setShowMonthPicker] = React.useState(false);
 
   const onDateSelect = (date: Date | undefined) => {
     if (date) {
@@ -23,11 +23,25 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     }
   };
 
-  const navigateYear = (direction: 'prev' | 'next') => {
-    const newDate = direction === 'prev' 
-      ? subYears(calendarDate, 1)
-      : addYears(calendarDate, 1);
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const currentYear = calendarDate.getFullYear();
+  const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
+
+  const handleYearClick = (year: number) => {
+    const newDate = new Date(calendarDate);
+    newDate.setFullYear(year);
     setCalendarDate(newDate);
+  };
+
+  const handleMonthClick = (monthIndex: number) => {
+    const newDate = new Date(calendarDate);
+    newDate.setMonth(monthIndex);
+    setCalendarDate(newDate);
+    setShowMonthPicker(false);
   };
 
   return (
@@ -45,26 +59,42 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <div className="p-3">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col gap-2 mb-4">
+            <div className="grid grid-cols-3 gap-1">
+              {years.map((year) => (
+                <Button
+                  key={year}
+                  variant={year === calendarDate.getFullYear() ? "default" : "outline"}
+                  size="sm"
+                  className="h-7"
+                  onClick={() => handleYearClick(year)}
+                >
+                  {year}
+                </Button>
+              ))}
+            </div>
             <Button
               variant="outline"
-              size="icon"
-              className="h-7 w-7"
-              onClick={() => navigateYear('prev')}
+              onClick={() => setShowMonthPicker(!showMonthPicker)}
+              className="w-full justify-between"
             >
-              <ChevronLeft className="h-4 w-4" />
+              {format(calendarDate, "MMMM")}
             </Button>
-            <span className="font-semibold">
-              {format(calendarDate, "yyyy")}
-            </span>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-7 w-7"
-              onClick={() => navigateYear('next')}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+            {showMonthPicker && (
+              <div className="grid grid-cols-3 gap-1">
+                {months.map((month, index) => (
+                  <Button
+                    key={month}
+                    variant={index === calendarDate.getMonth() ? "default" : "outline"}
+                    size="sm"
+                    className="h-7"
+                    onClick={() => handleMonthClick(index)}
+                  >
+                    {month.slice(0, 3)}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
           <Calendar
             mode="single"
@@ -73,7 +103,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             defaultMonth={calendarDate}
             className={cn("p-0 pointer-events-auto")}
             formatters={{
-              formatCaption: (date) => format(date, "MMMM")
+              formatCaption: () => ""
             }}
           />
           <div className="mt-3">
@@ -91,3 +121,4 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     </Popover>
   );
 };
+
