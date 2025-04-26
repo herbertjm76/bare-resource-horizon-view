@@ -54,15 +54,15 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       }
 
       // Handle stages and fees
-      await handleStageSubmit(
+      await handleStageSubmit({
         projectId,
-        company.id,
+        companyId: company.id,
         selectedStageNames,
         existingStages,
-        form.stageFees,
-        form.stageApplicability,
-        form.officeStages || []
-      );
+        stageFees: form.stageFees,
+        stageApplicability: form.stageApplicability,
+        officeStages: form.officeStages || []
+      });
 
       toast.success('Project updated successfully');
       refetch();
