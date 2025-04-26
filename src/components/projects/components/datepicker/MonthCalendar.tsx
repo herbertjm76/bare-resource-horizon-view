@@ -25,18 +25,18 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   ];
 
-  const handleMonthClick = (e: React.MouseEvent, monthIndex: number) => {
-    e.preventDefault();
-    e.stopPropagation(); // Prevents Popover from auto-closing
+  const handleMonthClick = (monthIndex: number) => {
     const selectedDate = new Date(year, monthIndex);
     onChange(selectedDate);
     setOpen(false);
   };
 
-  const handleYearChange = (e: React.MouseEvent, direction: 'prev' | 'next') => {
-    e.preventDefault();
-    e.stopPropagation();
-    setYear((prev) => direction === 'prev' ? prev - 1 : prev + 1);
+  const handlePrevYear = () => {
+    setYear(prev => prev - 1);
+  };
+
+  const handleNextYear = () => {
+    setYear(prev => prev + 1);
   };
 
   return (
@@ -55,40 +55,47 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
           {value ? format(value, "MMMM yyyy") : "Select billing month"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-4 z-50" align="start">
-        <div className="flex items-center justify-between mb-4">
-          <button
+      <PopoverContent 
+        className="w-64 p-4" 
+        align="start"
+        sideOffset={4}
+        style={{ zIndex: 999 }}
+        onInteractOutside={(e) => e.preventDefault()}
+        forceMount
+      >
+        <div className="flex items-center justify-between mb-4 pointer-events-auto">
+          <Button
             type="button"
-            onClick={(e) => handleYearChange(e, 'prev')}
-            className="text-gray-600 hover:text-black"
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={handlePrevYear}
           >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
           <span className="font-semibold">{year}</span>
-          <button
+          <Button
             type="button"
-            onClick={(e) => handleYearChange(e, 'next')}
-            className="text-gray-600 hover:text-black"
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            onClick={handleNextYear}
           >
-            <ChevronRight className="w-4 h-4" />
-          </button>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2 pointer-events-auto">
           {months.map((month, index) => (
-            <button
+            <Button
               key={month}
               type="button"
-              onClick={(e) => handleMonthClick(e, index)}
-              className={cn(
-                "py-1 px-2 text-sm rounded hover:bg-gray-100 w-full text-left",
-                value?.getMonth() === index && 
-                value?.getFullYear() === year && 
-                "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
-              )}
+              variant={value?.getMonth() === index && value?.getFullYear() === year ? "default" : "outline"}
+              className="py-1 px-2 text-sm h-auto"
+              onClick={() => handleMonthClick(index)}
             >
               {month}
-            </button>
+            </Button>
           ))}
         </div>
       </PopoverContent>
