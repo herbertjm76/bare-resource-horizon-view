@@ -4,29 +4,29 @@ import { Users, Calendar, ChartBar, Bell } from 'lucide-react';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-500 to-purple-400">
+    <div className="min-h-screen bg-gradient-to-br from-[#251F4E] via-[#6E59A5] to-[#D553CA]">
       {/* Navigation */}
-      <nav className="fixed w-full bg-white/5 backdrop-blur-md z-50">
+      <nav className="fixed w-full bg-white shadow-md z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
             <div className="text-2xl font-semibold">
               <span className="text-black">Bare</span>
-              <span className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">Resource</span>
+              <span className="bg-gradient-to-r from-[#251F4E] via-[#6E59A5] to-[#D553CA] bg-clip-text text-transparent">Resource</span>
             </div>
             
             {/* Navigation Links */}
-            <div className="hidden md:flex items-center space-x-8 text-white">
-              <Link to="#features" className="hover:text-purple-200 transition-colors">Features</Link>
-              <Link to="#benefits" className="hover:text-purple-200 transition-colors">Benefits</Link>
-              <Link to="#testimonials" className="hover:text-purple-200 transition-colors">Testimonials</Link>
-              <Link to="#pricing" className="hover:text-purple-200 transition-colors">Pricing</Link>
+            <div className="hidden md:flex items-center space-x-8 text-gray-700">
+              <Link to="#features" className="hover:text-purple-600 transition-colors">Features</Link>
+              <Link to="#benefits" className="hover:text-purple-600 transition-colors">Benefits</Link>
+              <Link to="#testimonials" className="hover:text-purple-600 transition-colors">Testimonials</Link>
+              <Link to="#pricing" className="hover:text-purple-600 transition-colors">Pricing</Link>
             </div>
             
             {/* CTA Button */}
             <Link
               to="/auth"
-              className="bg-white text-purple-600 px-6 py-2 rounded-lg font-medium hover:bg-purple-50 transition-colors shadow-lg"
+              className="bg-gradient-to-r from-[#251F4E] via-[#6E59A5] to-[#D553CA] text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg"
             >
               Get Started
             </Link>
