@@ -1,9 +1,11 @@
+
 import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ProjectArea } from "./projectAreaTypes";
 import { ItemActions } from './common/ItemActions';
+import { getDefaultColor } from './utils/colorUtils';
 
 interface ProjectAreaListProps {
   areas: ProjectArea[];
@@ -54,10 +56,20 @@ const ProjectAreaList = ({
                     id={area.id}
                   />
                 )}
-                <div className="flex flex-col">
-                  <div className="font-medium text-[#6E59A5]">{area.country}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {area.city ? `${area.city}, ` : ''}{area.region} ({area.code})
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="text-white font-bold px-2 py-1 rounded text-xs uppercase"
+                    style={{ 
+                      backgroundColor: getDefaultColor(area.color) 
+                    }}
+                  >
+                    {area.code}
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="font-medium text-[#6E59A5]">{area.country}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {area.city ? `${area.city}, ` : ''}{area.region} 
+                    </div>
                   </div>
                 </div>
               </div>
@@ -94,3 +106,4 @@ const ProjectAreaList = ({
 };
 
 export default ProjectAreaList;
+
