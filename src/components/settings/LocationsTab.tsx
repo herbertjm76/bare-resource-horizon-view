@@ -21,6 +21,7 @@ import { allCountries } from "@/lib/countries";
 import CountrySelect from "@/components/ui/CountrySelect";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { ItemActions } from './common/ItemActions';
 
 const customIconList = [
   "❤️", "🧡", "💛", "💚", "💙", "💜", "🩷", "🤍", "🖤", "🤎",
@@ -119,6 +120,28 @@ export const LocationsTab = () => {
 
   const handleSelect = (id: string) => {
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const handleDeleteLocation = async (id: string) => {
+    if (!company) {
+      toast.error('No company selected');
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('office_locations')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setLocations(locations.filter(location => location.id !== id));
+      toast.success('Location deleted successfully');
+    } catch (error: any) {
+      console.error('Error deleting location:', error);
+      toast.error('Failed to delete location');
+    }
   };
 
   const handleBulkDelete = async () => {
@@ -312,9 +335,10 @@ export const LocationsTab = () => {
                       onChange={() => handleSelect(row.id)}
                     />
                   ) : (
-                    <Button variant="ghost" size="sm" onClick={() => handleEdit(row)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
+                    <ItemActions 
+                      onEdit={() => handleEdit(row)}
+                      onDelete={() => handleDeleteLocation(row.id)}
+                    />
                   )}
                 </div>
               ))}

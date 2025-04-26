@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -72,8 +71,7 @@ const ProjectAreaList = ({
                 ) : (
                   <ItemActions 
                     onEdit={() => onEdit(area)}
-                    onDelete={undefined}
-                    showDelete={false}
+                    onDelete={() => onSelect && onSelect(area.id)}
                   />
                 )}
               </div>
