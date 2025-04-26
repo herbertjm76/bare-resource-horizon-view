@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -95,7 +94,7 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
                     {option.name}
                   </div>
                   {option.country && type === 'locations' && (
-                    <span className="text-xs text-muted-foreground block">
+                    <span className="text-sm text-muted-foreground block">
                       {option.country}
                     </span>
                   )}
@@ -109,11 +108,11 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
                   className="w-28"
                 />
                 {option.rate !== undefined ? (
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-sm text-muted-foreground">
                     Rate: ${option.rate.toFixed(2)}
                   </span>
                 ) : (
-                  <span className="text-xs text-red-500">
+                  <span className="text-sm text-red-500">
                     No rate set
                   </span>
                 )}
