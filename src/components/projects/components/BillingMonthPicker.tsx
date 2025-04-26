@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { format, addYears, subYears } from 'date-fns';
 import { cn } from "@/lib/utils";
 import { 
@@ -54,6 +54,7 @@ export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps)
             !value && "text-muted-foreground"
           )}
         >
+          <CalendarDays className="mr-2 h-4 w-4" />
           {value ? format(value, "MMMM yyyy") : "Select billing month"}
         </Button>
       </PopoverTrigger>
@@ -83,6 +84,7 @@ export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps)
                     key={year} 
                     onClick={() => handleYearChange(year)}
                     className={cn(
+                      "cursor-pointer",
                       calendarDate.getFullYear() === year && "bg-accent text-accent-foreground"
                     )}
                   >

@@ -3,8 +3,8 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format } from 'date-fns';
+import { ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
+import { format, addMonths, subMonths } from 'date-fns';
 import { cn } from "@/lib/utils";
 import { 
   DropdownMenu, 
@@ -20,8 +20,10 @@ interface InvoiceDatePickerProps {
 }
 
 export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePickerProps) => {
+  // Use value or fallback to current date for the calendar navigation state
   const [calendarDate, setCalendarDate] = React.useState<Date>(value || new Date());
-
+  
+  // Handle date selection from the calendar
   const onDateSelect = (date: Date | undefined) => {
     if (date) {
       onChange(date);
@@ -29,18 +31,21 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     }
   };
 
-  const handleMonthChange = (newMonth: number) => {
+  // Handle month selection from the dropdown
+  const handleMonthChange = (monthIndex: number) => {
     const newDate = new Date(calendarDate);
-    newDate.setMonth(newMonth);
+    newDate.setMonth(monthIndex);
     setCalendarDate(newDate);
   };
 
+  // Handle year selection from the dropdown
   const handleYearChange = (year: number) => {
     const newDate = new Date(calendarDate);
     newDate.setFullYear(year);
     setCalendarDate(newDate);
   };
 
+  // Handle Today button click
   const handleTodayClick = () => {
     const today = new Date();
     onChange(today);
@@ -48,23 +53,26 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     onToday();
   };
 
+  // Month navigation with arrows
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newDate = direction === 'prev' 
+      ? subMonths(calendarDate, 1)
+      : addMonths(calendarDate, 1);
+    setCalendarDate(newDate);
+  };
+
+  // Months array for the dropdown
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
 
+  // Generate years array for the dropdown (current year ±5 years)
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    const newDate = new Date(calendarDate);
-    if (direction === 'prev') {
-      newDate.setMonth(newDate.getMonth() - 1);
-    } else {
-      newDate.setMonth(newDate.getMonth() + 1);
-    }
-    setCalendarDate(newDate);
-  };
+  const currentMonth = calendarDate.getMonth();
+  const currentYearValue = calendarDate.getFullYear();
 
   return (
     <Popover>
@@ -76,6 +84,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             !value && "text-muted-foreground"
           )}
         >
+          <CalendarIcon className="mr-2 h-4 w-4" />
           {value ? format(value, "MM/dd/yyyy") : "Select date"}
         </Button>
       </PopoverTrigger>
@@ -86,7 +95,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-[140px] h-8 justify-between">
-                  {months[calendarDate.getMonth()]}
+                  {months[currentMonth]}
                   <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
@@ -96,7 +105,8 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
                     key={month} 
                     onClick={() => handleMonthChange(index)}
                     className={cn(
-                      calendarDate.getMonth() === index && "bg-accent text-accent-foreground"
+                      "cursor-pointer",
+                      currentMonth === index && "bg-accent text-accent-foreground"
                     )}
                   >
                     {month}
@@ -109,7 +119,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-[100px] h-8 justify-between">
-                  {calendarDate.getFullYear()}
+                  {currentYearValue}
                   <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
@@ -119,7 +129,8 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
                     key={year} 
                     onClick={() => handleYearChange(year)}
                     className={cn(
-                      calendarDate.getFullYear() === year && "bg-accent text-accent-foreground"
+                      "cursor-pointer",
+                      currentYearValue === year && "bg-accent text-accent-foreground"
                     )}
                   >
                     {year}
@@ -154,11 +165,12 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             onSelect={onDateSelect}
             defaultMonth={calendarDate}
             month={calendarDate}
-            className={cn("p-0 pointer-events-auto")}
+            className="p-0 pointer-events-auto"
             formatters={{
               formatCaption: () => ""
             }}
           />
+          
           <div className="mt-3">
             <Button
               variant="outline"
