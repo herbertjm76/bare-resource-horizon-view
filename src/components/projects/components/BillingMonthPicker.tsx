@@ -3,7 +3,8 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format, addMonths, subMonths } from 'date-fns';
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { format, addYears, subYears } from 'date-fns';
 import { cn } from "@/lib/utils";
 
 interface BillingMonthPickerProps {
@@ -12,6 +13,22 @@ interface BillingMonthPickerProps {
 }
 
 export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps) => {
+  const [calendarDate, setCalendarDate] = React.useState<Date>(value || new Date());
+
+  const onMonthSelect = (date: Date | undefined) => {
+    if (date) {
+      onChange(date);
+      setCalendarDate(date);
+    }
+  };
+
+  const navigateYear = (direction: 'prev' | 'next') => {
+    const newDate = direction === 'prev' 
+      ? subYears(calendarDate, 1)
+      : addYears(calendarDate, 1);
+    setCalendarDate(newDate);
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -26,32 +43,44 @@ export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps)
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <Calendar
-          mode="single"
-          selected={value}
-          onSelect={onChange}
-          initialFocus
-          className={cn("p-3 pointer-events-auto")}
-          defaultMonth={value}
-          formatters={{
-            formatCaption: (date) => {
-              const year = format(date, "yyyy");
-              const month = format(date, "MMMM");
-              return (
-                <div className="flex items-center justify-between w-full px-8">
-                  <span>{month}</span>
-                  <span>{year}</span>
-                </div>
-              );
-            }
-          }}
-          disabled={(date) => {
-            return date.getDate() !== 1;
-          }}
-          fromDate={new Date(2020, 0, 1)}
-          toDate={addMonths(new Date(), 24)}
-        />
+        <div className="p-3">
+          <div className="flex items-center justify-between mb-4">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => navigateYear('prev')}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="font-semibold">
+              {format(calendarDate, "yyyy")}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => navigateYear('next')}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <Calendar
+            mode="single"
+            selected={value}
+            onSelect={onMonthSelect}
+            defaultMonth={calendarDate}
+            className={cn("p-0 pointer-events-auto")}
+            disabled={(date) => {
+              return date.getDate() !== 1;
+            }}
+            formatters={{
+              formatCaption: () => ''
+            }}
+          />
+        </div>
       </PopoverContent>
     </Popover>
   );
 };
+
