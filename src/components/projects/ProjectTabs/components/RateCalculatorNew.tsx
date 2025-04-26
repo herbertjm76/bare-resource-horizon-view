@@ -31,10 +31,7 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
 }) => {
   const [peopleCount, setPeopleCount] = useState<Record<string, number>>({});
   
-  // Reset people counts when options or type changes
   useEffect(() => {
-    console.log(`RateCalculator: Type changed to ${type}, resetting people counts`);
-    console.log(`RateCalculator: Received ${options.length} options:`, options);
     setPeopleCount({});
   }, [type, options]);
 
@@ -61,19 +58,6 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
       [id]: value
     }));
   };
-
-  // Log any issues with the options data to help with debugging
-  useEffect(() => {
-    if (options.length === 0) {
-      console.log(`No ${type} options available`);
-    } else {
-      console.log(`${options.length} ${type} options loaded`);
-      const missingRates = options.filter(opt => opt.rate === undefined || opt.rate === null);
-      if (missingRates.length > 0) {
-        console.log(`${missingRates.length} ${type} are missing rates:`, missingRates);
-      }
-    }
-  }, [options, type]);
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
@@ -106,10 +90,14 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
           ) : (
             options.map(option => (
               <div className="flex items-center gap-3" key={option.id}>
-                <div className="w-36 font-medium">
-                  {option.name}
+                <div className="w-36">
+                  <div className="font-medium text-sm text-foreground">
+                    {option.name}
+                  </div>
                   {option.country && type === 'locations' && (
-                    <span className="text-xs text-muted-foreground block">{option.country}</span>
+                    <span className="text-xs text-muted-foreground block">
+                      {option.country}
+                    </span>
                   )}
                 </div>
                 <Input
@@ -121,11 +109,11 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
                   className="w-28"
                 />
                 {option.rate !== undefined ? (
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     Rate: ${option.rate.toFixed(2)}
                   </span>
                 ) : (
-                  <span className="text-sm text-red-500">
+                  <span className="text-xs text-red-500">
                     No rate set
                   </span>
                 )}
@@ -136,8 +124,8 @@ export const RateCalculatorNew: React.FC<RateCalculatorProps> = ({
 
         <div className="mb-6 p-3 border rounded-md bg-[#F8F4FF]">
           <div className="flex justify-between items-center">
-            <span className="font-medium">Calculated Average Rate:</span>
-            <span className="text-[#6E59A5] font-bold text-lg">
+            <span className="font-medium text-sm">Calculated Average Rate:</span>
+            <span className="text-[#6E59A5] font-bold text-base">
               ${calculateAverageRate() || '--'}
             </span>
           </div>
