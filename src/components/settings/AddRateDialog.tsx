@@ -1,0 +1,153 @@
+
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Calculator } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const formSchema = z.object({
+  type: z.enum(["role", "location"]),
+  reference_id: z.string().min(1, "Please select an item"),
+  value: z.number().min(0, "Rate must be greater than or equal to 0"),
+  unit: z.enum(["hour", "day", "week"])
+});
+
+type AddRateDialogProps = {
+  roles: Array<{ id: string; name: string }>;
+  locations: Array<{ id: string; city: string; country: string }>;
+  onCancel: () => void;
+  onSubmit: (values: z.infer<typeof formSchema>) => void;
+};
+
+export const AddRateDialog = ({ roles, locations, onCancel, onSubmit }: AddRateDialogProps) => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      type: "role",
+      reference_id: "",
+      value: 0,
+      unit: "hour"
+    }
+  });
+
+  const rateType = form.watch("type");
+
+  return (
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+      <Card className="p-6 max-w-lg w-full mx-auto relative z-50 shadow-xl">
+        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-[#6E59A5]">
+          <Calculator className="w-5 h-5" />Set Rate
+        </h2>
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="role">By Roles</SelectItem>
+                      <SelectItem value="location">By Locations</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+
+            <div className="bg-muted/30 p-4 rounded-md space-y-4">
+              <FormField
+                control={form.control}
+                name="reference_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder={`Select ${rateType === 'role' ? 'role' : 'location'}`} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {rateType === 'role'
+                          ? roles.map((role) => (
+                              <SelectItem key={role.id} value={role.id}>
+                                {role.name}
+                              </SelectItem>
+                            ))
+                          : locations.map((location) => (
+                              <SelectItem key={location.id} value={location.id}>
+                                {location.city}, {location.country}
+                              </SelectItem>
+                            ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex items-center gap-4">
+                <FormField
+                  control={form.control}
+                  name="value"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Rate value"
+                          {...field}
+                          onChange={e => field.onChange(parseFloat(e.target.value))}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="unit"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="hour">Per Hour</SelectItem>
+                          <SelectItem value="day">Per Day</SelectItem>
+                          <SelectItem value="week">Per Week</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-6">
+              <Button variant="secondary" type="button" onClick={onCancel}>
+                Cancel
+              </Button>
+              <Button type="submit">
+                Add Rate
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </Card>
+    </div>
+  );
+};
