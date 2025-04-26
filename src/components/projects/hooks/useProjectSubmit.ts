@@ -158,19 +158,38 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         }
       }
 
-      // Process stage fees
+      // Get updated project stages after all modifications
+      const { data: updatedProjectStages } = await supabase
+        .from('project_stages')
+        .select('id, stage_name')
+        .eq('project_id', projectId);
+        
+      console.log('Updated project stages:', updatedProjectStages);
+      
+      // Process stage fees - only for stages that have corresponding project_stages records
       for (const stageId of form.stages) {
         const feeData = form.stageFees?.[stageId];
         if (!feeData) continue;
+        
+        // Get the stage name corresponding to this ID
+        const stageName = form.officeStages?.find((s: any) => s.id === stageId)?.name;
+        if (!stageName) continue;
+        
+        // Find the project_stage record with this stage name
+        const projectStage = updatedProjectStages?.find(s => s.stage_name === stageName);
+        if (!projectStage) {
+          console.log(`No project_stage record found for stage ${stageName}, skipping fee update`);
+          continue;
+        }
 
         // Format dates as ISO strings for Supabase
         const billingMonth = feeData.billingMonth ? new Date(feeData.billingMonth).toISOString() : null;
         const invoiceDate = feeData.invoiceDate ? new Date(feeData.invoiceDate).toISOString() : null;
         
-        // Prepare fee data
+        // Prepare fee data with the project_stage ID (not the office_stage ID)
         const feeRecord = {
           project_id: projectId,
-          stage_id: stageId,
+          stage_id: projectStage.id, // Use the project_stage.id here, not the office_stage.id
           company_id: company.id,
           fee: feeData.fee ? parseFloat(feeData.fee) : 0,
           billing_month: billingMonth,
@@ -184,7 +203,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
           .from('project_fees')
           .select('id')
           .eq('project_id', projectId)
-          .eq('stage_id', stageId)
+          .eq('stage_id', projectStage.id) // Again, using project_stage.id
           .single();
 
         if (existingFee) {

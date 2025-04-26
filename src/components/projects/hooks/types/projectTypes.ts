@@ -16,11 +16,12 @@ export interface FormState {
   country: string;
   profit: string;
   avgRate: string;
+  currency: string;
   status: string;
   office: string;
   current_stage: string;
   stages: string[];
   stageFees: Record<string, StageFee>;
   stageApplicability: Record<string, boolean>;
-  currency: string;
+  officeStages?: Array<{ id: string; name: string; color?: string }>;
 }
