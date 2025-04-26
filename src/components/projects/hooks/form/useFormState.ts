@@ -67,7 +67,30 @@ export const useFormState = (
         }
 
         console.log("Loaded fees data:", feesData);
-
+        
+        // Also fetch project stages to get the mapping between stage IDs and stage names
+        const { data: projectStagesData, error: projectStagesError } = await supabase
+          .from('project_stages')
+          .select('id, stage_name')
+          .eq('project_id', project.id);
+          
+        if (projectStagesError) {
+          console.error('Error loading project stages:', projectStagesError);
+          toast.error("Failed to load project stages data");
+          setIsLoading(false);
+          return;
+        }
+        
+        console.log("Loaded project stages data:", projectStagesData);
+        
+        // Create a mapping from stage_name to ID for lookup
+        const stageNameToIdMap = new Map();
+        if (projectStagesData) {
+          projectStagesData.forEach(stage => {
+            stageNameToIdMap.set(stage.stage_name, stage.id);
+          });
+        }
+        
         // Process the stage fees
         const stageFees: Record<string, any> = {};
         
@@ -79,13 +102,16 @@ export const useFormState = (
             return;
           }
           
-          // Find fee data for this stage
-          const feeData = feesData?.find(fee => fee.stage_id === stageId);
+          // Find the project stage ID that corresponds to this office stage name
+          const projectStageId = stageNameToIdMap.get(stage.name);
+          
+          // Find fee data for this stage using the project stage ID
+          const feeData = feesData?.find(fee => fee.stage_id === projectStageId);
           
           if (feeData) {
-            console.log(`Found fee data for stage ${stageId}:`, feeData);
+            console.log(`Found fee data for stage ${stageId} (${stage.name}):`, feeData);
           } else {
-            console.log(`No fee data found for stage ${stageId}`);
+            console.log(`No fee data found for stage ${stageId} (${stage.name})`);
           }
           
           // Calculate invoice age if we have an invoice date

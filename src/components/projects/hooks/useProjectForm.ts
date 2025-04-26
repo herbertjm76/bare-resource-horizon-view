@@ -3,7 +3,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { useFormState } from './form/useFormState';
 import { useFormOptions } from './form/useFormOptions';
 import { useStageManagement } from './form/useStageManagement';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export const useProjectForm = (project: any, isOpen: boolean) => {
   const { company } = useCompany();
@@ -20,12 +20,15 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
   } = useFormState(project, officeStages);
   
   const { updateStageFee, updateStageApplicability } = useStageManagement(form, setForm);
-  
+
   // Debug log to track when stages are being initialized
   useEffect(() => {
-    console.log("useProjectForm - Current form stages:", form.stages);
-    console.log("useProjectForm - Current form stage fees:", form.stageFees);
-  }, [form.stages, form.stageFees]);
+    if (isOpen && officeStages.length > 0) {
+      console.log("useProjectForm - Current form stages:", form.stages);
+      console.log("useProjectForm - Current form stage fees:", form.stageFees);
+      console.log("useProjectForm - Available office stages:", officeStages);
+    }
+  }, [form.stages, form.stageFees, officeStages, isOpen]);
 
   useEffect(() => {
     if (isOpen && project && officeStages?.length > 0) {

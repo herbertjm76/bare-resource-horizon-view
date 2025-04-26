@@ -61,19 +61,27 @@ export const useStageSubmit = () => {
 
     console.log("Processing stages for submission:", selectedStageNames);
 
+    // Create a map from stage IDs to stage names
+    const stageIdToNameMap = new Map();
+    officeStages.forEach(stage => {
+      stageIdToNameMap.set(stage.id, stage.name);
+    });
+
     // Handle stages and their fees
-    for (const stageName of selectedStageNames) {
-      const officeStage = officeStages.find(s => s.name === stageName);
-      if (!officeStage) {
-        console.warn(`Office stage not found for ${stageName}`);
+    for (const stageId of Object.keys(stageApplicability)) {
+      if (!stageApplicability[stageId]) continue;
+      
+      const stageName = stageIdToNameMap.get(stageId);
+      if (!stageName) {
+        console.warn(`Stage name not found for ID ${stageId}`);
         continue;
       }
       
-      const stageId = officeStage.id;
       const feeData = stageFees[stageId];
       
       if (!feeData) {
         console.warn(`No fee data found for stage ${stageId} (${stageName})`);
+        continue;
       }
       
       const fee = feeData?.fee ? parseFloat(feeData.fee) : 0;
