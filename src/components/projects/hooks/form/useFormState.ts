@@ -46,7 +46,7 @@ export const useFormState = (
       console.log("Loading project data for ID:", project.id, "with code:", project.code);
 
       try {
-        // Fetch project fees data
+        // Fetch project fees data directly from the project_fees table
         const { data: feesData, error: feesError } = await supabase
           .from('project_fees')
           .select('*')
@@ -66,6 +66,12 @@ export const useFormState = (
         
         for (const stage of officeStages) {
           const feeData = feesData?.find(fee => fee.stage_id === stage.id);
+          
+          if (feeData) {
+            console.log(`Found fee data for stage ${stage.id}:`, feeData);
+          } else {
+            console.log(`No fee data found for stage ${stage.id}`);
+          }
           
           // Calculate invoice age
           const invoiceDate = feeData?.invoice_date ? new Date(feeData.invoice_date) : null;
