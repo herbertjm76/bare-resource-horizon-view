@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { FormState } from '../hooks/types/projectTypes';
 import { checkProjectCodeUnique, isProjectInfoValid } from './NewProjectValidation';
 import { toast } from 'sonner';
+import { mapStatusToDb } from '../utils/projectMappings';
 
 export const submitNewProject = async (
   form: FormState,
@@ -33,13 +34,16 @@ export const submitNewProject = async (
       return stage ? stage.name : '';
     }).filter(Boolean);
 
+    // Map the status to the correct database enum value
+    const mappedStatus = mapStatusToDb(projectStatus);
+
     const { data, error } = await supabase.from('projects').insert({
       code: form.code,
       name: form.name,
       company_id: companyId,
       project_manager_id: manager,
       office_id: office,
-      status: projectStatus,
+      status: mappedStatus,
       country: country,
       current_stage: currentStage,
       target_profit_percentage: form.profit ? Number(form.profit) : null,
