@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { StageFee } from "../../../hooks/types/projectTypes";
+import { MonthCalendar } from "../../../components/datepicker/MonthCalendar";
 
 interface StageFormProps {
   stageId: string;
@@ -76,7 +76,7 @@ export const StageForm: React.FC<StageFormProps> = ({
       <div className="grid grid-cols-2 gap-3">
         <div>
           <Label className="text-xs">Billing Month</Label>
-          <BillingMonthPicker
+          <MonthCalendar
             value={stageFeeData.billingMonth ? new Date(stageFeeData.billingMonth) : undefined}
             onChange={(date) => {
               updateStageFee(stageId, { 
