@@ -7,6 +7,8 @@ import { useEffect } from 'react';
 
 export const useProjectForm = (project: any, isOpen: boolean) => {
   const { company } = useCompany();
+  const { managers, countries, offices, officeStages } = useFormOptions(company, isOpen);
+  
   const { 
     form, 
     setForm, 
@@ -15,9 +17,8 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     isLoading, 
     setIsLoading, 
     isDataLoaded 
-  } = useFormState(project);
+  } = useFormState(project, officeStages);
   
-  const { managers, countries, offices, officeStages } = useFormOptions(company, isOpen);
   const { updateStageFee, updateStageApplicability } = useStageManagement(form, setForm);
 
   // Initialize stage applicability when project and stages are loaded
