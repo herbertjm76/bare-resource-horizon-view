@@ -25,9 +25,6 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
     value?.getFullYear() || new Date().getFullYear()
   );
   const [open, setOpen] = React.useState(false);
-  
-  // Reference to detect clicks outside the component
-  const contentRef = React.useRef<HTMLDivElement>(null);
 
   const months = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -39,15 +36,55 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
   };
 
   const handleMonthSelect = (monthIndex: number) => {
-    if (!value) {
-      const newDate = new Date(selectedYear, monthIndex, 1);
-      onChange(newDate);
-    } else {
-      const newDate = new Date(selectedYear, monthIndex);
-      onChange(newDate);
-    }
-    setOpen(false); // Close the popover after selection
+    const newDate = new Date(selectedYear, monthIndex, 1);
+    onChange(newDate);
+    setOpen(false);
   };
+
+  // Simplified implementation with direct DOM-level click handlers
+  // This should bypass React's event system issues if any exist
+  React.useEffect(() => {
+    if (!open) return;
+    
+    // Add click handlers after component renders
+    const addClickHandlers = () => {
+      // Year navigation buttons
+      const prevYearBtn = document.getElementById('month-calendar-prev-year');
+      const nextYearBtn = document.getElementById('month-calendar-next-year');
+      
+      if (prevYearBtn) {
+        prevYearBtn.onclick = (e) => {
+          e.stopPropagation();
+          handleYearChange(-1);
+        };
+      }
+      
+      if (nextYearBtn) {
+        nextYearBtn.onclick = (e) => {
+          e.stopPropagation();
+          handleYearChange(1);
+        };
+      }
+      
+      // Month buttons
+      months.forEach((month, index) => {
+        const monthBtn = document.getElementById(`month-calendar-month-${index}`);
+        if (monthBtn) {
+          monthBtn.onclick = (e) => {
+            e.stopPropagation();
+            handleMonthSelect(index);
+          };
+        }
+      });
+    };
+
+    // Short delay to ensure DOM elements are available
+    const timeoutId = setTimeout(addClickHandlers, 50);
+    
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [open, selectedYear]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -66,61 +103,46 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="p-0 w-64 bg-popover z-[9999]" 
+        className="w-64 p-0" 
         align="start"
         sideOffset={4}
-        onInteractOutside={() => setOpen(false)}
-        forceMount
+        style={{ zIndex: 9999 }}
       >
-        <div 
-          ref={contentRef}
-          className="p-4 bg-background rounded-md" 
-        >
+        <div className="p-4 bg-popover rounded-md">
           <div className="flex items-center justify-between mb-4">
-            <Button
+            <button
+              id="month-calendar-prev-year"
               type="button"
-              variant="outline"
-              className="h-7 w-7 p-0"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleYearChange(-1);
-              }}
+              className="h-7 w-7 p-0 flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
             >
               <ChevronLeft className="h-4 w-4" />
-            </Button>
+            </button>
             <div className="font-semibold">{selectedYear}</div>
-            <Button
+            <button
+              id="month-calendar-next-year"
               type="button"
-              variant="outline"
-              className="h-7 w-7 p-0"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleYearChange(1);
-              }}
+              className="h-7 w-7 p-0 flex items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
             >
               <ChevronRight className="h-4 w-4" />
-            </Button>
+            </button>
           </div>
           
           <div className="grid grid-cols-3 gap-2">
             {months.map((month, index) => (
-              <Button
+              <button
                 key={month}
+                id={`month-calendar-month-${index}`}
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleMonthSelect(index);
-                }}
-                variant="ghost"
                 className={cn(
-                  "h-8",
+                  "h-8 text-sm px-2 py-1 rounded-md",
+                  "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
                   value?.getMonth() === index && 
                   value?.getFullYear() === selectedYear && 
                   "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground"
                 )}
               >
                 {month}
-              </Button>
+              </button>
             ))}
           </div>
         </div>
