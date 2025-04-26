@@ -35,8 +35,12 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
   
   // Ensure all selected stages have fee data
   useEffect(() => {
-    if (!isDataLoaded) return;
+    if (!isDataLoaded) {
+      console.log("Data not loaded yet, skipping stage fee initialization");
+      return;
+    }
 
+    console.log("Initializing stage fees for selected stages:", selectedStages);
     selectedStages.forEach(stage => {
       if (!stageFees[stage.id]) {
         console.log(`Creating missing fee data for stage ${stage.id}`);

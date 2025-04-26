@@ -12,6 +12,7 @@ export const useFormState = (
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
+  // Initialize form with project data
   const initialStages = Array.isArray(project.stages) ? project.stages : [];
   
   const initialStageSelections: Record<string, boolean> = {};
@@ -35,18 +36,19 @@ export const useFormState = (
     stageApplicability: initialStageSelections,
   });
 
+  // Load project fees when the component is mounted
   useEffect(() => {
-    const loadProjectData = async () => {
-      if (!project?.id || !officeStages.length) {
-        console.log("Skipping data load - missing project ID or office stages");
+    const loadProjectFees = async () => {
+      if (!project?.id || officeStages.length === 0) {
+        console.log("Skipping fees data load - missing project ID or office stages");
         return;
       }
 
       setIsLoading(true);
-      console.log("Loading project data for ID:", project.id, "with code:", project.code);
+      console.log("Loading project fees data for ID:", project.id, "with code:", project.code);
 
       try {
-        // Fetch project fees data directly from the project_fees table
+        // Directly fetch project fees from the project_fees table using project_id
         const { data: feesData, error: feesError } = await supabase
           .from('project_fees')
           .select('*')
@@ -61,10 +63,12 @@ export const useFormState = (
 
         console.log("Loaded fees data:", feesData);
 
-        // Process fees data for each stage
+        // Process the stage fees
         const stageFees: Record<string, any> = {};
         
-        for (const stage of officeStages) {
+        // Initialize fees for all applicable office stages
+        officeStages.forEach(stage => {
+          // Find fee data for this stage
           const feeData = feesData?.find(fee => fee.stage_id === stage.id);
           
           if (feeData) {
@@ -73,7 +77,7 @@ export const useFormState = (
             console.log(`No fee data found for stage ${stage.id}`);
           }
           
-          // Calculate invoice age
+          // Calculate invoice age if we have an invoice date
           const invoiceDate = feeData?.invoice_date ? new Date(feeData.invoice_date) : null;
           let invoiceAge = '0';
           
@@ -83,7 +87,7 @@ export const useFormState = (
             invoiceAge = Math.ceil(diffTime / (1000 * 60 * 60 * 24)).toString();
           }
 
-          // Parse billing month
+          // Parse billing month to ensure it's a proper Date object
           let billingMonth = null;
           if (feeData?.billing_month) {
             try {
@@ -97,7 +101,7 @@ export const useFormState = (
             }
           }
 
-          // Set the fee data for this stage
+          // Set fee data for this stage
           stageFees[stage.id] = {
             fee: feeData?.fee?.toString() || '',
             billingMonth: billingMonth,
@@ -107,10 +111,11 @@ export const useFormState = (
             invoiceAge: invoiceAge,
             currency: feeData?.currency || form.currency || 'USD'
           };
-        }
+        });
 
         console.log("Processed stage fees:", stageFees);
 
+        // Update the form state with the loaded stage fees
         setForm(prev => ({
           ...prev,
           stageFees
@@ -118,14 +123,14 @@ export const useFormState = (
 
         setIsDataLoaded(true);
       } catch (error) {
-        console.error("Error in loadProjectData:", error);
-        toast.error("Error loading project data");
+        console.error("Error in loadProjectFees:", error);
+        toast.error("Error loading project fee data");
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadProjectData();
+    loadProjectFees();
   }, [project?.id, officeStages, form.currency]);
 
   return {

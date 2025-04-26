@@ -49,12 +49,18 @@ export const StageForm: React.FC<StageFormProps> = ({
   // Ensure billingMonth is a proper Date object if it exists
   const billingMonth = stageFeeData?.billingMonth instanceof Date ? stageFeeData.billingMonth : 
                       (typeof stageFeeData?.billingMonth === 'string' && stageFeeData.billingMonth ? 
-                        new Date(stageFeeData.billingMonth) : undefined);
+                        new Date(stageFeeData.billingMonth) : null);
 
   // Ensure invoiceDate is a proper Date object if it exists
   const invoiceDate = stageFeeData?.invoiceDate instanceof Date ? stageFeeData.invoiceDate : 
                      (typeof stageFeeData?.invoiceDate === 'string' && stageFeeData.invoiceDate ?
-                      new Date(stageFeeData.invoiceDate) : undefined);
+                      new Date(stageFeeData.invoiceDate) : null);
+
+  // Calculate hours based on fee and average rate
+  const hours = calculateHours(feeValue);
+
+  // Calculate invoice age based on invoice date
+  const invoiceAge = calculateInvoiceAge(invoiceDate);
 
   return (
     <div className="p-4 space-y-3">
@@ -88,7 +94,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           <Label htmlFor={`hours-${stageId}`} className="text-xs">Hours</Label>
           <Input
             id={`hours-${stageId}`}
-            value={calculateHours(feeValue)}
+            value={hours}
             readOnly
             disabled
             className="h-8 bg-muted"
@@ -151,7 +157,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           <Label htmlFor={`invoiceAge-${stageId}`} className="text-xs">Invoice Age (Days)</Label>
           <Input
             id={`invoiceAge-${stageId}`}
-            value={calculateInvoiceAge(invoiceDate || null)}
+            value={invoiceAge}
             readOnly
             disabled
             className="h-8 bg-muted"

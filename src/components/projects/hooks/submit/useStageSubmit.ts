@@ -50,15 +50,29 @@ export const useStageSubmit = () => {
       }
     }
 
+    console.log("Processing stages for submission:", selectedStageNames);
+    console.log("Office stages:", officeStages);
+    console.log("Stage fees data:", stageFees);
+
     // Handle stages and their fees
     for (const stageName of selectedStageNames) {
       const officeStage = officeStages.find(s => s.name === stageName);
-      if (!officeStage) continue;
+      if (!officeStage) {
+        console.warn(`Office stage not found for ${stageName}`);
+        continue;
+      }
       
       const stageId = officeStage.id;
       const feeData = stageFees[stageId];
+      
+      if (!feeData) {
+        console.warn(`No fee data found for stage ${stageId} (${stageName})`);
+      }
+      
       const fee = feeData?.fee ? parseFloat(feeData.fee) : 0;
       const isApplicable = stageApplicability[stageId] ?? true;
+      
+      console.log(`Submitting stage ${stageName} (${stageId}) with fee:`, fee);
       
       await handleSingleStage(
         projectId,
@@ -84,6 +98,8 @@ export const useStageSubmit = () => {
     let projectStage = existingStages?.find(s => s.stage_name === stageName);
     
     if (!projectStage) {
+      console.log(`Creating new project stage for ${stageName}`);
+      
       const { data: newStage, error: newStageError } = await supabase
         .from('project_stages')
         .insert({
@@ -107,7 +123,10 @@ export const useStageSubmit = () => {
       }
       
       projectStage = newStage;
+      console.log(`Created new project stage:`, projectStage);
     } else {
+      console.log(`Updating existing project stage ${projectStage.id} for ${stageName}`);
+      
       const { error: updateError } = await supabase
         .from('project_stages')
         .update({
@@ -127,6 +146,7 @@ export const useStageSubmit = () => {
       }
     }
 
+    console.log(`Handling stage fee for ${stageName}`);
     await handleStageFee(projectId, companyId, projectStage.id, fee, feeData);
   };
 
@@ -137,12 +157,19 @@ export const useStageSubmit = () => {
     fee: number,
     feeData: any
   ) => {
-    const { data: existingFee } = await supabase
+    console.log(`Checking for existing fee record for stage ${stageId}`);
+    
+    const { data: existingFee, error: lookupError } = await supabase
       .from('project_fees')
       .select('id')
       .eq('project_id', projectId)
       .eq('stage_id', stageId)
-      .single();
+      .maybeSingle();
+      
+    if (lookupError) {
+      console.error('Error checking for existing fee:', lookupError);
+      throw lookupError;
+    }
 
     const feeRecord = {
       project_id: projectId,
@@ -156,6 +183,8 @@ export const useStageSubmit = () => {
     };
 
     if (existingFee) {
+      console.log(`Updating existing fee record ${existingFee.id} for stage ${stageId}`);
+      
       const { error: updateError } = await supabase
         .from('project_fees')
         .update(feeRecord)
@@ -165,7 +194,11 @@ export const useStageSubmit = () => {
         console.error('Error updating fee:', updateError);
         throw updateError;
       }
+      
+      console.log(`Fee record updated successfully`);
     } else {
+      console.log(`Creating new fee record for stage ${stageId}`);
+      
       const { error: insertError } = await supabase
         .from('project_fees')
         .insert(feeRecord);
@@ -174,6 +207,8 @@ export const useStageSubmit = () => {
         console.error('Error inserting fee:', insertError);
         throw insertError;
       }
+      
+      console.log(`New fee record created successfully`);
     }
   };
 
