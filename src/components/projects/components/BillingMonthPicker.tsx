@@ -6,6 +6,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, addYears, subYears } from 'date-fns';
 import { cn } from "@/lib/utils";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 interface BillingMonthPickerProps {
   value: Date | undefined;
@@ -21,6 +27,15 @@ export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps)
       setCalendarDate(date);
     }
   };
+
+  const handleYearChange = (year: number) => {
+    const newDate = new Date(calendarDate);
+    newDate.setFullYear(year);
+    setCalendarDate(newDate);
+  };
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
   const navigateYear = (direction: 'prev' | 'next') => {
     const newDate = direction === 'prev' 
@@ -53,9 +68,30 @@ export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps)
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="font-semibold">
-              {format(calendarDate, "yyyy")}
-            </span>
+            
+            {/* Year Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="h-8 px-4">
+                  {calendarDate.getFullYear()}
+                  <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="max-h-[300px] overflow-y-auto">
+                {years.map((year) => (
+                  <DropdownMenuItem 
+                    key={year} 
+                    onClick={() => handleYearChange(year)}
+                    className={cn(
+                      calendarDate.getFullYear() === year && "bg-accent text-accent-foreground"
+                    )}
+                  >
+                    {year}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            
             <Button
               variant="outline"
               size="icon"
@@ -70,6 +106,7 @@ export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps)
             selected={value}
             onSelect={onMonthSelect}
             defaultMonth={calendarDate}
+            month={calendarDate}
             className={cn("p-0 pointer-events-auto")}
             disabled={(date) => {
               return date.getDate() !== 1;
@@ -83,4 +120,3 @@ export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps)
     </Popover>
   );
 };
-

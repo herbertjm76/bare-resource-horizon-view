@@ -3,9 +3,15 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from 'date-fns';
 import { cn } from "@/lib/utils";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 interface InvoiceDatePickerProps {
   value: Date | undefined;
@@ -23,23 +29,15 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     }
   };
 
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
-
-  const currentYear = calendarDate.getFullYear();
-  const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
-
-  const handleMonthChange = (monthIndex: string) => {
+  const handleMonthChange = (newMonth: number) => {
     const newDate = new Date(calendarDate);
-    newDate.setMonth(parseInt(monthIndex));
+    newDate.setMonth(newMonth);
     setCalendarDate(newDate);
   };
 
-  const handleYearChange = (year: string) => {
+  const handleYearChange = (year: number) => {
     const newDate = new Date(calendarDate);
-    newDate.setFullYear(parseInt(year));
+    newDate.setFullYear(year);
     setCalendarDate(newDate);
   };
 
@@ -48,6 +46,24 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     onChange(today);
     setCalendarDate(today);
     onToday();
+  };
+
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    const newDate = new Date(calendarDate);
+    if (direction === 'prev') {
+      newDate.setMonth(newDate.getMonth() - 1);
+    } else {
+      newDate.setMonth(newDate.getMonth() + 1);
+    }
+    setCalendarDate(newDate);
   };
 
   return (
@@ -66,41 +82,72 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
       <PopoverContent className="w-auto p-0" align="start">
         <div className="p-3">
           <div className="flex gap-2 mb-4">
-            <Select
-              value={calendarDate.getMonth().toString()}
-              onValueChange={handleMonthChange}
-            >
-              <SelectTrigger className="w-[140px] h-8">
-                <SelectValue placeholder="Select month">
+            {/* Month Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-[140px] h-8 justify-between">
                   {months[calendarDate.getMonth()]}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
+                  <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="max-h-[300px] overflow-y-auto">
                 {months.map((month, index) => (
-                  <SelectItem key={month} value={index.toString()}>
+                  <DropdownMenuItem 
+                    key={month} 
+                    onClick={() => handleMonthChange(index)}
+                    className={cn(
+                      calendarDate.getMonth() === index && "bg-accent text-accent-foreground"
+                    )}
+                  >
                     {month}
-                  </SelectItem>
+                  </DropdownMenuItem>
                 ))}
-              </SelectContent>
-            </Select>
-            <Select
-              value={calendarDate.getFullYear().toString()}
-              onValueChange={handleYearChange}
-            >
-              <SelectTrigger className="w-[100px] h-8">
-                <SelectValue placeholder="Select year">
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Year Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-[100px] h-8 justify-between">
                   {calendarDate.getFullYear()}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
+                  <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="max-h-[300px] overflow-y-auto">
                 {years.map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
+                  <DropdownMenuItem 
+                    key={year} 
+                    onClick={() => handleYearChange(year)}
+                    className={cn(
+                      calendarDate.getFullYear() === year && "bg-accent text-accent-foreground"
+                    )}
+                  >
                     {year}
-                  </SelectItem>
+                  </DropdownMenuItem>
                 ))}
-              </SelectContent>
-            </Select>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
+
+          <div className="flex mb-4">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-7 w-7 mr-auto"
+              onClick={() => navigateMonth('prev')}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-7 w-7 ml-auto"
+              onClick={() => navigateMonth('next')}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
           <Calendar
             mode="single"
             selected={value}
