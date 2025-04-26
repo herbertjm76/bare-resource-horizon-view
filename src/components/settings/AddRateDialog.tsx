@@ -40,22 +40,24 @@ export const AddRateDialog = ({ roles, locations, onCancel, onSubmit }: AddRateD
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <Card className="p-6 max-w-lg w-full mx-auto relative z-50 shadow-xl">
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-[#6E59A5]">
-          <Calculator className="w-5 h-5" />Set Rate
-        </h2>
+        <div className="flex items-center gap-3 mb-6">
+          <Calculator className="w-5 h-5 text-[#6E59A5]" />
+          <h2 className="text-lg font-semibold text-[#6E59A5]">Set Rate</h2>
+        </div>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="type"
               render={({ field }) => (
                 <FormItem>
+                  <FormLabel>Rate Type</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className="w-full">
                       <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -67,15 +69,18 @@ export const AddRateDialog = ({ roles, locations, onCancel, onSubmit }: AddRateD
               )}
             />
 
-            <div className="bg-muted/30 p-4 rounded-md space-y-4">
+            <div className="bg-muted/30 p-6 rounded-lg space-y-6">
               <FormField
                 control={form.control}
                 name="reference_id"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>{rateType === 'role' ? 'Role' : 'Location'}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <SelectTrigger>
-                        <SelectValue placeholder={`Select ${rateType === 'role' ? 'role' : 'location'}`} />
+                        <SelectValue 
+                          placeholder={`Select ${rateType === 'role' ? 'role' : 'location'}`} 
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {rateType === 'role'
@@ -96,16 +101,17 @@ export const AddRateDialog = ({ roles, locations, onCancel, onSubmit }: AddRateD
                 )}
               />
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-start gap-4">
                 <FormField
                   control={form.control}
                   name="value"
                   render={({ field }) => (
                     <FormItem className="flex-1">
+                      <FormLabel>Rate Value</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
-                          placeholder="Rate value"
+                          placeholder="0.00"
                           {...field}
                           onChange={e => field.onChange(parseFloat(e.target.value))}
                         />
@@ -120,6 +126,7 @@ export const AddRateDialog = ({ roles, locations, onCancel, onSubmit }: AddRateD
                   name="unit"
                   render={({ field }) => (
                     <FormItem className="flex-1">
+                      <FormLabel>Per Unit</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <SelectTrigger>
                           <SelectValue placeholder="Select unit" />
@@ -137,7 +144,7 @@ export const AddRateDialog = ({ roles, locations, onCancel, onSubmit }: AddRateD
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="flex justify-end gap-3 mt-6">
               <Button variant="secondary" type="button" onClick={onCancel}>
                 Cancel
               </Button>
