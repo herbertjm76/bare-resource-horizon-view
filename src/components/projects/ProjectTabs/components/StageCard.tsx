@@ -1,10 +1,7 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
 import { 
   Select,
   SelectContent,
@@ -12,14 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Popover,
-  PopoverContent,
-  PopoverTrigger 
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { CurrencySelect } from "./CurrencySelect";
 import { BillingMonthPicker } from "../../components/BillingMonthPicker";
+import { InvoiceDatePicker } from "../../components/InvoiceDatePicker";
 import { CurrencyPicker } from "../../components/CurrencyPicker";
 
 interface StageFee {
@@ -138,61 +129,16 @@ export const StageCard: React.FC<StageCardProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label className="text-xs">Invoice Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal h-8",
-                    !stageFeeData.invoiceDate && "text-muted-foreground"
-                  )}
-                >
-                  {stageFeeData.invoiceDate ? (
-                    format(stageFeeData.invoiceDate, "MM/dd/yyyy")
-                  ) : (
-                    "Select date"
-                  )}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={stageFeeData.invoiceDate || undefined}
-                  onSelect={(date) => {
-                    updateStageFee(stageId, { 
-                      invoiceDate: date,
-                      invoiceAge: date ? calculateInvoiceAge(date) : 'N/A'
-                    });
-                  }}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                  formatters={{
-                    formatCaption: (date, options) => {
-                      const year = format(date, "yyyy");
-                      const month = format(date, "MMMM");
-                      return (
-                        <div className="flex items-center justify-between w-full px-8">
-                          <span>{month}</span>
-                          <span>{year}</span>
-                        </div>
-                      );
-                    }
-                  }}
-                  footer={
-                    <div className="mt-3 p-3">
-                      <Button
-                        variant="outline"
-                        className="w-full text-sm"
-                        onClick={handleToday}
-                        type="button"
-                      >
-                        Today
-                      </Button>
-                    </div>
-                  }
-                />
-              </PopoverContent>
-            </Popover>
+            <InvoiceDatePicker
+              value={stageFeeData.invoiceDate || undefined}
+              onChange={(date) => {
+                updateStageFee(stageId, { 
+                  invoiceDate: date,
+                  invoiceAge: date ? calculateInvoiceAge(date) : 'N/A'
+                });
+              }}
+              onToday={handleToday}
+            />
           </div>
           <div>
             <Label htmlFor={`invoiceAge-${stageId}`} className="text-xs">Invoice Age (Days)</Label>

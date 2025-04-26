@@ -3,15 +3,16 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format, addMonths, subMonths } from 'date-fns';
+import { format } from 'date-fns';
 import { cn } from "@/lib/utils";
 
-interface BillingMonthPickerProps {
+interface InvoiceDatePickerProps {
   value: Date | undefined;
   onChange: (date: Date | undefined) => void;
+  onToday: () => void;
 }
 
-export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps) => {
+export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePickerProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -22,7 +23,7 @@ export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps)
             !value && "text-muted-foreground"
           )}
         >
-          {value ? format(value, "MMMM yyyy") : "Select billing month"}
+          {value ? format(value, "MM/dd/yyyy") : "Select date"}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
@@ -32,7 +33,6 @@ export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps)
           onSelect={onChange}
           initialFocus
           className={cn("p-3 pointer-events-auto")}
-          defaultMonth={value}
           formatters={{
             formatCaption: (date) => {
               const year = format(date, "yyyy");
@@ -45,11 +45,18 @@ export const BillingMonthPicker = ({ value, onChange }: BillingMonthPickerProps)
               );
             }
           }}
-          disabled={(date) => {
-            return date.getDate() !== 1;
-          }}
-          fromDate={new Date(2020, 0, 1)}
-          toDate={addMonths(new Date(), 24)}
+          footer={
+            <div className="mt-3 p-3">
+              <Button
+                variant="outline"
+                className="w-full text-sm"
+                onClick={onToday}
+                type="button"
+              >
+                Today
+              </Button>
+            </div>
+          }
         />
       </PopoverContent>
     </Popover>
