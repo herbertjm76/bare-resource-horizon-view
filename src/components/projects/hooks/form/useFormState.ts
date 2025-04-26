@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import type { FormState } from "../types/projectTypes";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,10 +8,8 @@ export const useFormState = (project: any) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   
-  // Initialize the stages array from the project data
   const initialStages = Array.isArray(project.stages) ? project.stages : [];
   
-  // Create a record of stage selections for easier lookup
   const initialStageSelections: Record<string, boolean> = {};
   initialStages.forEach((stageId: string) => {
     initialStageSelections[stageId] = true;
@@ -34,7 +31,6 @@ export const useFormState = (project: any) => {
     stageApplicability: initialStageSelections,
   });
   
-  // Load project stages and fees when initializing
   React.useEffect(() => {
     const loadProjectData = async () => {
       if (!project?.id) {
@@ -46,7 +42,6 @@ export const useFormState = (project: any) => {
       console.log("Loading project data for project:", project.id);
 
       try {
-        // First get the project stages
         const { data: projectStages, error: stagesError } = await supabase
           .from('project_stages')
           .select('*')
@@ -58,7 +53,6 @@ export const useFormState = (project: any) => {
           return;
         }
         
-        // Get project fees
         const { data: feesData, error: feesError } = await supabase
           .from('project_fees')
           .select('*')
@@ -70,7 +64,6 @@ export const useFormState = (project: any) => {
           return;
         }
         
-        // Get all office stages for this company to have the mapping
         const { data: officeStages, error: officeStagesError } = await supabase
           .from('office_stages')
           .select('*')
@@ -82,15 +75,12 @@ export const useFormState = (project: any) => {
           return;
         }
         
-        // Create stageFees map for the form
         if (initialStages.length > 0 && officeStages && officeStages.length > 0) {
           const stageFees: Record<string, any> = {};
           
-          // Process each stage from project.stages (which should be stage IDs)
           for (const stageId of initialStages) {
             console.log(`Processing stage ID: ${stageId}`);
             
-            // Find the office stage
             const officeStage = officeStages.find(s => s.id === stageId);
             
             if (!officeStage) {
@@ -98,15 +88,12 @@ export const useFormState = (project: any) => {
               continue;
             }
             
-            // Find the project stage by name
             const projectStage = projectStages?.find(s => s.stage_name === officeStage.name);
             
-            // Find the fee data using the current stageId (office stage ID)
             const feeData = feesData?.find(fee => fee.stage_id === stageId);
             
             if (!projectStage) {
               console.log(`No project stage found for ${officeStage.name}`);
-              // Initialize with default values
               stageFees[stageId] = {
                 fee: '',
                 billingMonth: null,
@@ -119,7 +106,6 @@ export const useFormState = (project: any) => {
               continue;
             }
             
-            // Calculate invoice age if we have an invoice date
             const invoiceDate = feeData?.invoice_date ? new Date(feeData.invoice_date) : null;
             let invoiceAge = '0';
             
@@ -129,7 +115,6 @@ export const useFormState = (project: any) => {
               invoiceAge = Math.ceil(diffTime / (1000 * 60 * 60 * 24)).toString();
             }
 
-            // Format billing month as a Date object if it's a string
             let billingMonth = null;
             if (feeData?.billing_month) {
               try {
@@ -143,7 +128,6 @@ export const useFormState = (project: any) => {
               }
             }
 
-            // Set the stage fee data keyed by the office stage ID
             stageFees[stageId] = {
               fee: feeData?.fee?.toString() || projectStage.fee?.toString() || '',
               billingMonth: billingMonth || (projectStage.billing_month ? new Date(projectStage.billing_month) : null),
