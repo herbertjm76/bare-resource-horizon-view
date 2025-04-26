@@ -64,19 +64,21 @@ export const MonthCalendar = ({
             "w-full justify-start text-left font-normal h-8",
             !value && "text-muted-foreground"
           )}
+          type="button"
         >
           {showIcon && <CalendarIcon className="mr-2 h-4 w-4" />}
           {value ? format(value, "MMMM yyyy") : "Select Month"}
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-auto p-4 z-[60] bg-popover shadow-md" 
+        className="w-auto p-4 bg-popover shadow-md" 
+        style={{ zIndex: 999 }}
         align="start"
         sideOffset={4}
         avoidCollisions={true}
-        collisionPadding={8}
+        collisionPadding={16}
       >
-        <div className="mb-4">
+        <div className="mb-4 relative">
           <Select
             value={value ? value.getFullYear().toString() : currentYear.toString()}
             onValueChange={handleYearChange}
@@ -84,9 +86,17 @@ export const MonthCalendar = ({
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Select Year" />
             </SelectTrigger>
-            <SelectContent position="popper" className="z-[65]">
+            <SelectContent 
+              position="popper" 
+              style={{ zIndex: 1000 }}
+              className="bg-popover shadow-md pointer-events-auto"
+            >
               {years.map((year) => (
-                <SelectItem key={year} value={year.toString()}>
+                <SelectItem 
+                  key={year} 
+                  value={year.toString()}
+                  onSelect={(e) => e.stopPropagation()}
+                >
                   {year}
                 </SelectItem>
               ))}
@@ -94,13 +104,14 @@ export const MonthCalendar = ({
           </Select>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2 pointer-events-auto">
           {months.map((month) => {
             const isSelected = value && value.getMonth() === months.indexOf(month);
             return (
               <Button
                 key={month}
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   handleMonthSelect(month);
                 }}
