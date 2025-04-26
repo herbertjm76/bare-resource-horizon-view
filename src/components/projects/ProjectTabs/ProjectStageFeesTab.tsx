@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { StagesGrid } from "./components/StagesGrid";
 import type { FormState } from "../hooks/types/projectTypes";
+import { toast } from "sonner";
 
 interface ProjectStageFeesTabProps {
   form: FormState;
@@ -19,10 +20,12 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   console.log("ProjectStageFeesTab - stageFees:", form.stageFees);
   console.log("ProjectStageFeesTab - officeStages:", officeStages);
 
-  // Log whenever stageFees changes
+  // Check if stage fees are loaded correctly
   useEffect(() => {
-    console.log("StageFees changed:", form.stageFees);
-  }, [form.stageFees]);
+    if (form.stages.length > 0 && Object.keys(form.stageFees).length === 0) {
+      console.log("Warning: Stages selected but no fee data available");
+    }
+  }, [form.stages, form.stageFees]);
 
   const generateYearMonths = () => {
     const currentYear = new Date().getFullYear();

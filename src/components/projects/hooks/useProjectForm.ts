@@ -7,34 +7,53 @@ import { useEffect } from 'react';
 
 export const useProjectForm = (project: any, isOpen: boolean) => {
   const { company } = useCompany();
-  const { form, setForm, formErrors, setFormErrors, isLoading, setIsLoading } = useFormState(project);
+  const { 
+    form, 
+    setForm, 
+    formErrors, 
+    setFormErrors, 
+    isLoading, 
+    setIsLoading, 
+    isDataLoaded 
+  } = useFormState(project);
+  
   const { managers, countries, offices, officeStages } = useFormOptions(company, isOpen);
   const { updateStageFee, updateStageApplicability } = useStageManagement(form, setForm);
 
   // Initialize stage applicability when project and stages are loaded
   useEffect(() => {
-    if (isOpen && project && Array.isArray(project.stages) && project.stages.length > 0) {
+    if (isOpen && project && Array.isArray(project.stages) && project.stages.length > 0 && officeStages?.length > 0) {
       console.log('useProjectForm - Initializing stages from project:', project.stages);
       
       const stageApplicability: Record<string, boolean> = {};
+      let stagesToSet = project.stages;
       
-      project.stages.forEach((stageId: string) => {
+      // Check if we need to convert from names to IDs
+      if (typeof project.stages[0] === 'string' && !officeStages.some(s => s.id === project.stages[0])) {
+        console.log('Converting stage names to IDs for selection');
+        
+        stagesToSet = project.stages
+          .map(stageName => {
+            const stage = officeStages.find(s => s.name === stageName);
+            return stage ? stage.id : null;
+          })
+          .filter(Boolean);
+      }
+      
+      stagesToSet.forEach((stageId: string) => {
         stageApplicability[stageId] = true;
       });
       
+      console.log('Setting stage selections:', stageApplicability);
+      console.log('Setting stages array:', stagesToSet);
+      
       setForm(prev => ({
         ...prev,
-        stages: project.stages, // Ensure stages are explicitly set
+        stages: stagesToSet, 
         stageApplicability
       }));
-
-      // Fetch stage fees data if available
-      if (project.id) {
-        console.log('Initializing stage fees for project:', project.id);
-        // This would be handled by useStageManagement or other data loading logic
-      }
     }
-  }, [isOpen, project, setForm]);
+  }, [isOpen, project, officeStages, setForm]);
 
   const handleChange = (key: keyof typeof form, value: any) => {
     console.log(`handleChange: ${String(key)} =`, value);
@@ -59,7 +78,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
         if (!newStageFees[stageId]) {
           newStageFees[stageId] = {
             fee: '',
-            billingMonth: '',
+            billingMonth: null,
             status: 'Not Billed',
             invoiceDate: null,
             hours: '',
@@ -73,14 +92,12 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
         }
       });
       
-      // Cleanup removed stages
-      const stagesToKeep = Object.keys(newStageFees).filter(stageId => 
-        value.includes(stageId)
-      );
-      
+      // Remove stages that are no longer selected
       const updatedStageFees: Record<string, any> = {};
-      stagesToKeep.forEach(stageId => {
-        updatedStageFees[stageId] = newStageFees[stageId];
+      Object.keys(newStageFees).forEach(stageId => {
+        if (value.includes(stageId)) {
+          updatedStageFees[stageId] = newStageFees[stageId];
+        }
       });
       
       setForm(prev => ({
@@ -102,6 +119,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     formErrors,
     handleChange,
     updateStageFee,
-    updateStageApplicability
+    updateStageApplicability,
+    isDataLoaded
   };
 };

@@ -7,11 +7,11 @@ import React from "react";
 export const useFormState = (project: any) => {
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   
   // Initialize the stages array from the project data
   const initialStages = Array.isArray(project.stages) ? project.stages : [];
   
-  // Log for debugging
   console.log('useFormState - initializing with project:', project);
   console.log('useFormState - initialStages:', initialStages);
   
@@ -28,7 +28,7 @@ export const useFormState = (project: any) => {
     manager: project.project_manager?.id || "",
     country: project.country || "",
     profit: project.target_profit_percentage?.toString() || "",
-    avgRate: project.average_rate?.toString() || "", // Using average_rate to match DB field
+    avgRate: project.average_rate?.toString() || "", 
     currency: project.currency || "USD",
     status: project.status || "",
     office: project.office?.id || "",
@@ -38,41 +38,19 @@ export const useFormState = (project: any) => {
     stageApplicability: initialStageSelections,
   });
   
-  // Load project fees when initializing
+  // Load project stages and fees when initializing
   React.useEffect(() => {
-    const loadProjectFees = async () => {
-      if (!project?.id) return;
-      console.log("Loading project fees for project:", project.id);
+    const loadProjectData = async () => {
+      if (!project?.id) {
+        console.log("No project ID available, skipping data load");
+        return;
+      }
+      
+      setIsLoading(true);
+      console.log("Loading project data for project:", project.id);
 
       try {
-        // First get all office stages
-        const { data: officeStageData, error: officeStageError } = await supabase
-          .from('office_stages')
-          .select('*')
-          .eq('company_id', project.company_id);
-          
-        if (officeStageError) {
-          console.error('Error loading office stages:', officeStageError);
-          return;
-        }
-        
-        const officeStages = officeStageData || [];
-        console.log("Office stages loaded:", officeStages);
-
-        // Then get all project fees directly
-        const { data: feesData, error: feesError } = await supabase
-          .from('project_fees')
-          .select('*')
-          .eq('project_id', project.id);
-          
-        if (feesError) {
-          console.error('Error loading project fees:', feesError);
-          return;
-        }
-        
-        console.log("Project fees loaded:", feesData);
-        
-        // Also get project stages for reference
+        // First get the project stages
         const { data: projectStages, error: stagesError } = await supabase
           .from('project_stages')
           .select('*')
@@ -80,15 +58,45 @@ export const useFormState = (project: any) => {
 
         if (stagesError) {
           console.error('Error loading project stages:', stagesError);
+          setIsLoading(false);
           return;
         }
-
+        
         console.log("Project stages loaded:", projectStages);
+        
+        // Get project fees
+        const { data: feesData, error: feesError } = await supabase
+          .from('project_fees')
+          .select('*')
+          .eq('project_id', project.id);
 
-        if (projectStages && projectStages.length > 0 && officeStages && officeStages.length > 0) {
+        if (feesError) {
+          console.error('Error loading project fees:', feesError);
+          setIsLoading(false);
+          return;
+        }
+        
+        console.log("Project fees loaded:", feesData);
+        
+        // Get all office stages for this company to have the mapping
+        const { data: officeStages, error: officeStagesError } = await supabase
+          .from('office_stages')
+          .select('*')
+          .eq('company_id', project.company_id);
+          
+        if (officeStagesError) {
+          console.error('Error loading office stages:', officeStagesError);
+          setIsLoading(false);
+          return;
+        }
+        
+        console.log("Office stages loaded:", officeStages);
+        
+        // Create stageFees map for the form
+        if (initialStages.length > 0 && officeStages && officeStages.length > 0) {
           const stageFees: Record<string, any> = {};
           
-          // Process each stage from project.stages
+          // Process each stage from project.stages (which should be stage IDs)
           for (const stageId of initialStages) {
             console.log(`Processing stage ID: ${stageId}`);
             
@@ -103,10 +111,11 @@ export const useFormState = (project: any) => {
             console.log("Found matching office stage:", officeStage);
             
             // Find the project stage by name
-            const projectStage = projectStages.find(s => s.stage_name === officeStage.name);
+            const projectStage = projectStages?.find(s => s.stage_name === officeStage.name);
             
             if (!projectStage) {
               console.log(`No project stage found for ${officeStage.name}`);
+              // Initialize with default values
               stageFees[stageId] = {
                 fee: '',
                 billingMonth: null,
@@ -171,12 +180,16 @@ export const useFormState = (project: any) => {
             };
           });
         }
+        
+        setIsDataLoaded(true);
       } catch (error) {
-        console.error("Error in loadProjectFees:", error);
+        console.error("Error in loadProjectData:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    loadProjectFees();
+    loadProjectData();
   }, [project?.id, project?.company_id, initialStages]);
 
   return {
@@ -185,6 +198,7 @@ export const useFormState = (project: any) => {
     formErrors,
     setFormErrors,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    isDataLoaded
   };
 };

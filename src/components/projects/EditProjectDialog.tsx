@@ -16,6 +16,7 @@ import { ProjectDialogTabs } from "./dialog/ProjectDialogTabs";
 import { ProjectDialogContent } from "./dialog/ProjectDialogContent";
 import { ProjectDialogActions } from "./dialog/ProjectDialogActions";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface EditProjectDialogProps {
   project: any;
@@ -34,12 +35,14 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const { company } = useCompany();
   const isMobile = useIsMobile();
   const [loadedProject, setLoadedProject] = useState(project);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Fetch complete project data with all related information
   useEffect(() => {
     if (isOpen && project?.id) {
       const fetchCompleteProject = async () => {
         try {
+          setIsLoading(true);
           console.log('Fetching complete project data for:', project.id);
           
           // Get full project data
@@ -48,13 +51,15 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
             .select(`
               *,
               project_manager:project_manager_id (id, first_name, last_name),
-              office:office_id (id, city, country)
+              office:office_id (id, name, country)
             `)
             .eq('id', project.id)
             .single();
           
           if (error) {
             console.error('Error fetching project details:', error);
+            toast.error("Failed to load project details");
+            setIsLoading(false);
             return;
           }
           
@@ -64,6 +69,9 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
           }
         } catch (err) {
           console.error('Error in fetchCompleteProject:', err);
+          toast.error("Error loading project data");
+        } finally {
+          setIsLoading(false);
         }
       };
       
@@ -76,13 +84,18 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
       return project;
     }
 
-    const firstStage = project.stages[0];
-    if (typeof firstStage === 'string' && officeStages.some(s => s.id === firstStage)) {
-      console.log('Project stages are already IDs:', project.stages);
-      return project;
+    // If stages are already IDs, return as is
+    if (project.stages.length > 0 && typeof project.stages[0] === 'string') {
+      const firstStage = project.stages[0];
+      if (officeStages.some(s => s.id === firstStage)) {
+        console.log('Project stages are already IDs:', project.stages);
+        return project;
+      }
     }
 
     console.log('Converting stage names to IDs:', project.stages);
+    
+    // Map stage names to IDs
     const processedProject = {
       ...project,
       stages: project.stages.map(stageName => {
@@ -97,8 +110,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 
   const {
     form,
-    isLoading,
-    setIsLoading,
+    isLoading: formLoading,
+    setIsLoading: setFormLoading,
     managers,
     countries,
     offices,
@@ -113,11 +126,11 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
       const processedProject = processProjectStages(loadedProject, officeStages);
       console.log('EditProjectDialog - processed project stages:', processedProject.stages);
       
-      if (processedProject.stages.length > 0) {
+      if (processedProject.stages && processedProject.stages.length > 0) {
         handleChange('stages', processedProject.stages);
       }
     }
-  }, [isOpen, loadedProject, officeStages]);
+  }, [isOpen, loadedProject, officeStages, handleChange]);
   
   // Debug stage fees data when form changes
   useEffect(() => {
@@ -127,18 +140,21 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     }
   }, [form, form?.stageFees]);
 
-  const { handleSubmit } = useProjectSubmit(loadedProject.id, refetch, onClose);
+  const { handleSubmit } = useProjectSubmit(loadedProject?.id, refetch, onClose);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLoading || !company) return;
+    if (formLoading || !company) return;
     
     console.log("Submitting form with stageFees:", form.stageFees);
     await handleSubmit({ 
       ...form, 
       officeStages
-    }, setIsLoading);
+    }, setFormLoading);
   };
+
+  // Show loading state if we're loading the project or form data
+  const dialogLoading = isLoading || formLoading;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -155,34 +171,43 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
           <DialogTitle className="text-xl">Edit Project</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={onSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <Tabs 
-            value={activeTab} 
-            onValueChange={setActiveTab}
-            className="flex flex-col flex-1 overflow-hidden"
-          >
-            <ProjectDialogTabs 
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+        {dialogLoading && (
+          <div className="flex items-center justify-center p-8">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+            <span className="ml-2">Loading project data...</span>
+          </div>
+        )}
+        
+        {!dialogLoading && (
+          <form onSubmit={onSubmit} className="flex flex-col flex-1 overflow-hidden">
+            <Tabs 
+              value={activeTab} 
+              onValueChange={setActiveTab}
+              className="flex flex-col flex-1 overflow-hidden"
+            >
+              <ProjectDialogTabs 
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+              />
+              
+              <ProjectDialogContent 
+                form={form}
+                managers={managers}
+                countries={countries}
+                offices={offices}
+                officeStages={officeStages}
+                updateStageApplicability={updateStageApplicability}
+                updateStageFee={updateStageFee}
+                handleChange={handleChange}
+              />
+            </Tabs>
             
-            <ProjectDialogContent 
-              form={form}
-              managers={managers}
-              countries={countries}
-              offices={offices}
-              officeStages={officeStages}
-              updateStageApplicability={updateStageApplicability}
-              updateStageFee={updateStageFee}
-              handleChange={handleChange}
+            <ProjectDialogActions 
+              isLoading={formLoading}
+              onClose={onClose}
             />
-          </Tabs>
-          
-          <ProjectDialogActions 
-            isLoading={isLoading}
-            onClose={onClose}
-          />
-        </form>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );
