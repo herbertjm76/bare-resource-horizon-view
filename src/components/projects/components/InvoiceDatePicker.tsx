@@ -20,10 +20,8 @@ interface InvoiceDatePickerProps {
 }
 
 export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePickerProps) => {
-  // Use value or fallback to current date for the calendar navigation state
   const [calendarDate, setCalendarDate] = React.useState<Date>(value || new Date());
-  
-  // Handle date selection from the calendar
+
   const onDateSelect = (date: Date | undefined) => {
     if (date) {
       onChange(date);
@@ -31,21 +29,18 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     }
   };
 
-  // Handle month selection from the dropdown
   const handleMonthChange = (monthIndex: number) => {
     const newDate = new Date(calendarDate);
     newDate.setMonth(monthIndex);
     setCalendarDate(newDate);
   };
 
-  // Handle year selection from the dropdown
   const handleYearChange = (year: number) => {
     const newDate = new Date(calendarDate);
     newDate.setFullYear(year);
     setCalendarDate(newDate);
   };
 
-  // Handle Today button click
   const handleTodayClick = () => {
     const today = new Date();
     onChange(today);
@@ -53,7 +48,6 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     onToday();
   };
 
-  // Month navigation with arrows
   const navigateMonth = (direction: 'prev' | 'next') => {
     const newDate = direction === 'prev' 
       ? subMonths(calendarDate, 1)
@@ -61,13 +55,11 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     setCalendarDate(newDate);
   };
 
-  // Months array for the dropdown
   const months = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
   ];
 
-  // Generate years array for the dropdown (current year ±5 years)
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
@@ -160,14 +152,15 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
           </div>
 
           <Calendar
+            key={calendarDate.toISOString()} // forces re-render
             mode="single"
             selected={value}
             onSelect={onDateSelect}
-            defaultMonth={calendarDate}
-            month={calendarDate}
+            month={calendarDate} // controls visible month
+            onMonthChange={setCalendarDate} // keeps nav arrows in sync
             className="p-0 pointer-events-auto"
             formatters={{
-              formatCaption: () => ""
+              formatCaption: () => "" // hides default caption
             }}
           />
           
@@ -186,3 +179,4 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     </Popover>
   );
 };
+
