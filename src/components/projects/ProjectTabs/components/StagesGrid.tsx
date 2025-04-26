@@ -1,7 +1,7 @@
 
 import React from "react";
 import { StageCard } from "./stage/StageCard";
-import type { StageFee } from "../../../hooks/types/projectTypes";
+import type { StageFee } from "../../../../components/projects/hooks/types/projectTypes";
 
 interface Stage {
   id: string;
