@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +19,8 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { CurrencySelect } from "./CurrencySelect";
+import { BillingMonthPicker } from "../../components/BillingMonthPicker";
+import { CurrencyPicker } from "../../components/CurrencyPicker";
 
 interface StageFee {
   fee: string;
@@ -77,8 +78,8 @@ export const StageCard: React.FC<StageCardProps> = ({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label className="text-xs">Currency</Label>
-            <CurrencySelect
-              value={stageFeeData.currency || 'USD'}
+            <CurrencyPicker
+              value={stageFeeData.currency}
               onValueChange={(value) => updateStageFee(stageId, { currency: value })}
             />
           </div>
@@ -96,22 +97,15 @@ export const StageCard: React.FC<StageCardProps> = ({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label htmlFor={`billingMonth-${stageId}`} className="text-xs">Billing Month</Label>
-            <Select
-              value={stageFeeData.billingMonth}
-              onValueChange={(value) => updateStageFee(stageId, { billingMonth: value })}
-            >
-              <SelectTrigger className="h-8">
-                <SelectValue placeholder="Select month" />
-              </SelectTrigger>
-              <SelectContent>
-                {billingOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label className="text-xs">Billing Month</Label>
+            <BillingMonthPicker
+              value={stageFeeData.billingMonth ? new Date(stageFeeData.billingMonth) : undefined}
+              onChange={(date) => {
+                updateStageFee(stageId, { 
+                  billingMonth: date ? date.toISOString() : '' 
+                });
+              }}
+            />
           </div>
           <div>
             <Label className="text-xs">Status</Label>
