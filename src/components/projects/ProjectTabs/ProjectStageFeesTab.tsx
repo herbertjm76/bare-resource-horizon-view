@@ -21,16 +21,7 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   console.log("ProjectStageFeesTab - stages:", form.stages);
   console.log("ProjectStageFeesTab - stageFees:", form.stageFees);
   console.log("ProjectStageFeesTab - officeStages:", officeStages);
-
-  // Check if stage fees are loaded correctly
-  useEffect(() => {
-    if (isDataLoaded && form.stages.length > 0 && Object.keys(form.stageFees).length === 0) {
-      console.log("Warning: Stages selected but no fee data available");
-      toast.warning("No fee data available for selected stages");
-    } else if (isDataLoaded && Object.keys(form.stageFees).length > 0) {
-      console.log("Stage fee data loaded successfully:", form.stageFees);
-    }
-  }, [form.stages, form.stageFees, isDataLoaded]);
+  console.log("ProjectStageFeesTab - isDataLoaded:", isDataLoaded);
 
   const generateYearMonths = () => {
     const currentYear = new Date().getFullYear();
@@ -70,12 +61,17 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
     return stage?.color || "#E5DEFF";
   };
 
-  // Make sure we're using the stages IDs from form.stages
+  // Get the actual office stage objects for the selected stage IDs
   const selectedStages = officeStages.filter(stage => form.stages.includes(stage.id));
   const billingOptions = generateYearMonths();
 
   console.log("Selected stages for fees:", selectedStages);
-  console.log("Stage fees available:", Object.keys(form.stageFees).length > 0);
+  
+  if (isDataLoaded) {
+    console.log("Stage fees loaded:", form.stageFees);
+  } else {
+    console.log("Stage fees not loaded yet");
+  }
 
   if (form.stages.length === 0) {
     return (

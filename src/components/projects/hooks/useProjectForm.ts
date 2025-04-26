@@ -3,7 +3,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { useFormState } from './form/useFormState';
 import { useFormOptions } from './form/useFormOptions';
 import { useStageManagement } from './form/useStageManagement';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export const useProjectForm = (project: any, isOpen: boolean) => {
   const { company } = useCompany();
@@ -20,26 +20,49 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
   } = useFormState(project, officeStages);
   
   const { updateStageFee, updateStageApplicability } = useStageManagement(form, setForm);
+  
+  // Debug log to track when stages are being initialized
+  useEffect(() => {
+    console.log("useProjectForm - Current form stages:", form.stages);
+    console.log("useProjectForm - Current form stage fees:", form.stageFees);
+  }, [form.stages, form.stageFees]);
 
   useEffect(() => {
-    if (isOpen && project && Array.isArray(project.stages) && project.stages.length > 0 && officeStages?.length > 0) {
-      console.log('useProjectForm - Initializing stages from project:', project.stages);
+    if (isOpen && project && officeStages?.length > 0) {
+      console.log('useProjectForm - Processing project stages:', project.stages);
       
-      const stageApplicability: Record<string, boolean> = {};
-      let stagesToSet = project.stages;
+      let stagesToSet: string[] = [];
       
-      // Check if we need to convert from names to IDs
-      if (typeof project.stages[0] === 'string' && !officeStages.some(s => s.id === project.stages[0])) {
-        console.log('Converting stage names to IDs for selection');
-        
-        stagesToSet = project.stages
-          .map(stageName => {
-            const stage = officeStages.find(s => s.name === stageName);
-            return stage ? stage.id : null;
-          })
-          .filter(Boolean);
+      // Handle different stage formats (names vs ids)
+      if (Array.isArray(project.stages)) {
+        if (project.stages.length > 0) {
+          const firstStage = project.stages[0];
+          
+          // Check if we have stage names or ids
+          if (typeof firstStage === 'string') {
+            // If the first stage doesn't match any office stage ID, assume we have stage names
+            const isStageId = officeStages.some(s => s.id === firstStage);
+            
+            if (isStageId) {
+              // We already have stage IDs
+              stagesToSet = [...project.stages];
+              console.log('Using existing stage IDs:', stagesToSet);
+            } else {
+              // We have stage names, convert to IDs
+              stagesToSet = project.stages
+                .map((stageName: string) => {
+                  const stage = officeStages.find(s => s.name === stageName);
+                  return stage ? stage.id : null;
+                })
+                .filter(Boolean);
+              console.log('Converted stage names to IDs:', stagesToSet);  
+            }
+          }
+        }
       }
       
+      // Set stage applicability
+      const stageApplicability: Record<string, boolean> = {};
       stagesToSet.forEach((stageId: string) => {
         stageApplicability[stageId] = true;
       });
@@ -47,11 +70,13 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
       console.log('Setting stage selections:', stageApplicability);
       console.log('Setting stages array:', stagesToSet);
       
-      setForm(prev => ({
-        ...prev,
-        stages: stagesToSet, 
-        stageApplicability
-      }));
+      if (stagesToSet.length > 0) {
+        setForm(prev => ({
+          ...prev,
+          stages: stagesToSet, 
+          stageApplicability
+        }));
+      }
     }
   }, [isOpen, project, officeStages, setForm]);
 
@@ -91,7 +116,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
               status: 'Not Billed',
               invoiceDate: null,
               hours: '',
-              invoiceAge: 0,
+              invoiceAge: '0',
               currency: form.currency || 'USD'
             };
           }

@@ -39,8 +39,13 @@ export const useFormState = (
   // Load project fees when the component is mounted
   useEffect(() => {
     const loadProjectFees = async () => {
-      if (!project?.id || officeStages.length === 0) {
-        console.log("Skipping fees data load - missing project ID or office stages");
+      if (!project?.id) {
+        console.log("No project ID, skipping fee data load");
+        return;
+      }
+
+      if (officeStages.length === 0) {
+        console.log("No office stages available, waiting for office stages to load");
         return;
       }
 
@@ -66,15 +71,21 @@ export const useFormState = (
         // Process the stage fees
         const stageFees: Record<string, any> = {};
         
-        // Initialize fees for all applicable office stages
-        officeStages.forEach(stage => {
+        // Initialize fees for all selected stages
+        form.stages.forEach(stageId => {
+          const stage = officeStages.find(s => s.id === stageId);
+          if (!stage) {
+            console.warn(`Stage with ID ${stageId} not found in office stages`);
+            return;
+          }
+          
           // Find fee data for this stage
-          const feeData = feesData?.find(fee => fee.stage_id === stage.id);
+          const feeData = feesData?.find(fee => fee.stage_id === stageId);
           
           if (feeData) {
-            console.log(`Found fee data for stage ${stage.id}:`, feeData);
+            console.log(`Found fee data for stage ${stageId}:`, feeData);
           } else {
-            console.log(`No fee data found for stage ${stage.id}`);
+            console.log(`No fee data found for stage ${stageId}`);
           }
           
           // Calculate invoice age if we have an invoice date
@@ -102,7 +113,7 @@ export const useFormState = (
           }
 
           // Set fee data for this stage
-          stageFees[stage.id] = {
+          stageFees[stageId] = {
             fee: feeData?.fee?.toString() || '',
             billingMonth: billingMonth,
             status: feeData?.invoice_status || 'Not Billed',
@@ -131,7 +142,7 @@ export const useFormState = (
     };
 
     loadProjectFees();
-  }, [project?.id, officeStages, form.currency]);
+  }, [project?.id, officeStages, form.stages]);
 
   return {
     form,

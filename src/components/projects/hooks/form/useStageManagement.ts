@@ -1,57 +1,75 @@
 
-import type { FormState } from "../types/projectTypes";
+import { useState } from "react";
+import type { FormState, StageFee } from "../types/projectTypes";
 
 export const useStageManagement = (form: FormState, setForm: React.Dispatch<React.SetStateAction<FormState>>) => {
-  const updateStageFee = (stageId: string, data: Partial<FormState['stageFees'][string]>) => {
+  const updateStageApplicability = (stageId: string, isChecked: boolean) => {
+    // Update stage applicability
+    const stageApplicability = { ...form.stageApplicability };
+    stageApplicability[stageId] = isChecked;
+    
+    // Update stages list
+    let stages: string[] = [...form.stages];
+    
+    if (isChecked && !stages.includes(stageId)) {
+      stages.push(stageId);
+    } else if (!isChecked && stages.includes(stageId)) {
+      stages = stages.filter(id => id !== stageId);
+    }
+    
+    // Initialize fee data if needed
+    const stageFees = { ...form.stageFees };
+    if (isChecked && !stageFees[stageId]) {
+      stageFees[stageId] = {
+        fee: '',
+        billingMonth: null,
+        status: 'Not Billed',
+        invoiceDate: null,
+        hours: '',
+        invoiceAge: '0',
+        currency: form.currency
+      };
+    }
+    
+    setForm(prev => ({
+      ...prev,
+      stages,
+      stageApplicability,
+      stageFees
+    }));
+  };
+  
+  const updateStageFee = (stageId: string, data: Partial<StageFee>) => {
+    console.log(`Updating fee data for stage ${stageId}:`, data);
+    
     setForm(prev => {
-      let hours = prev.stageFees[stageId]?.hours ?? '';
-      const feeVal = data.fee ?? prev.stageFees[stageId]?.fee ?? '';
-      const avgRateVal = prev.avgRate;
+      const updatedStageFees = { ...prev.stageFees };
       
-      if ((data.fee || data.fee === '') && avgRateVal && parseFloat(avgRateVal) > 0 && parseFloat(feeVal) > 0) {
-        hours = (parseFloat(feeVal) / parseFloat(avgRateVal)).toFixed(2);
-      } else if (!parseFloat(feeVal) || !parseFloat(avgRateVal)) {
-        hours = '';
+      // Ensure we have a fee object for this stage
+      if (!updatedStageFees[stageId]) {
+        updatedStageFees[stageId] = {
+          fee: '',
+          billingMonth: null,
+          status: 'Not Billed',
+          invoiceDate: null,
+          hours: '',
+          invoiceAge: '0',
+          currency: prev.currency
+        };
       }
-
-      let invoiceAge = prev.stageFees[stageId]?.invoiceAge ?? 0;
-      const invoiceDate = typeof data.invoiceDate !== "undefined" ? data.invoiceDate : prev.stageFees[stageId]?.invoiceDate;
       
-      if (invoiceDate instanceof Date && !isNaN(invoiceDate.getTime())) {
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - invoiceDate.getTime());
-        invoiceAge = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      } else {
-        invoiceAge = 0;
-      }
-
+      // Update the fee data
+      updatedStageFees[stageId] = {
+        ...updatedStageFees[stageId],
+        ...data
+      };
+      
       return {
         ...prev,
-        stageFees: {
-          ...prev.stageFees,
-          [stageId]: {
-            ...prev.stageFees[stageId],
-            ...data,
-            hours,
-            invoiceAge,
-          }
-        }
+        stageFees: updatedStageFees
       };
     });
   };
-
-  const updateStageApplicability = (stageId: string, isApplicable: boolean) => {
-    setForm(prev => ({
-      ...prev,
-      stageApplicability: {
-        ...prev.stageApplicability,
-        [stageId]: isApplicable
-      }
-    }));
-  };
-
-  return {
-    updateStageFee,
-    updateStageApplicability
-  };
+  
+  return { updateStageApplicability, updateStageFee };
 };

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import type { StageFee } from "../../../../projects/hooks/types/projectTypes";
 import { MonthCalendar } from "../../../components/datepicker/MonthCalendar";
+import { format } from "date-fns";
 
 interface StageFormProps {
   stageId: string;
@@ -46,15 +47,27 @@ export const StageForm: React.FC<StageFormProps> = ({
   const statusValue = stageFeeData?.status || "Not Billed";
   const currencyValue = stageFeeData?.currency || "USD";
   
+  // Debug the date values
+  console.log(`Stage ${stageId} billing month:`, stageFeeData?.billingMonth);
+  console.log(`Stage ${stageId} invoice date:`, stageFeeData?.invoiceDate);
+  
   // Ensure billingMonth is a proper Date object if it exists
   const billingMonth = stageFeeData?.billingMonth instanceof Date ? stageFeeData.billingMonth : 
                       (typeof stageFeeData?.billingMonth === 'string' && stageFeeData.billingMonth ? 
                         new Date(stageFeeData.billingMonth) : null);
 
+  if (billingMonth) {
+    console.log(`Stage ${stageId} parsed billing month:`, billingMonth, format(billingMonth, 'yyyy-MM-dd'));
+  }
+
   // Ensure invoiceDate is a proper Date object if it exists
   const invoiceDate = stageFeeData?.invoiceDate instanceof Date ? stageFeeData.invoiceDate : 
                      (typeof stageFeeData?.invoiceDate === 'string' && stageFeeData.invoiceDate ?
                       new Date(stageFeeData.invoiceDate) : null);
+                      
+  if (invoiceDate) {
+    console.log(`Stage ${stageId} parsed invoice date:`, invoiceDate, format(invoiceDate, 'yyyy-MM-dd'));
+  }
 
   // Calculate hours based on fee and average rate
   const hours = calculateHours(feeValue);
@@ -146,7 +159,7 @@ export const StageForm: React.FC<StageFormProps> = ({
               console.log(`Updating invoice date for stage ${stageId} to ${date}`);
               updateStageFee(stageId, { 
                 invoiceDate: date,
-                invoiceAge: date ? calculateInvoiceAge(date) : 'N/A'
+                invoiceAge: date ? calculateInvoiceAge(date) : '0'
               });
             }}
             onToday={handleToday}

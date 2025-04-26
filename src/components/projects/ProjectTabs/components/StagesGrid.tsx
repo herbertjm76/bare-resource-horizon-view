@@ -33,35 +33,10 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
   console.log("StagesGrid rendering with stages:", selectedStages);
   console.log("StagesGrid stageFees:", stageFees);
   
-  // Ensure all selected stages have fee data
-  useEffect(() => {
-    if (!isDataLoaded) {
-      console.log("Data not loaded yet, skipping stage fee initialization");
-      return;
-    }
-
-    console.log("Initializing stage fees for selected stages:", selectedStages);
-    selectedStages.forEach(stage => {
-      if (!stageFees[stage.id]) {
-        console.log(`Creating missing fee data for stage ${stage.id}`);
-        updateStageFee(stage.id, {
-          fee: '',
-          billingMonth: null,
-          status: 'Not Billed',
-          invoiceDate: null,
-          hours: '',
-          invoiceAge: '0',
-          currency: 'USD'
-        });
-      } else {
-        console.log(`Stage ${stage.id} already has fee data:`, stageFees[stage.id]);
-      }
-    });
-  }, [selectedStages, stageFees, updateStageFee, isDataLoaded]);
-  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {selectedStages.map((stage) => {
+        // Make sure we have fee data for this stage
         const stageFeeData = stageFees[stage.id] || {
           fee: '',
           billingMonth: null,
