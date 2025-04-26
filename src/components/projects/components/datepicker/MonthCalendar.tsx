@@ -25,6 +25,9 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
     value?.getFullYear() || new Date().getFullYear()
   );
   const [open, setOpen] = React.useState(false);
+  
+  // Reference to detect clicks outside the component
+  const contentRef = React.useRef<HTMLDivElement>(null);
 
   const months = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -63,46 +66,39 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="p-0 w-64 bg-popover z-[100]" 
+        className="p-0 w-64 bg-popover z-[9999]" 
         align="start"
         sideOffset={4}
-        onInteractOutside={(e) => {
-          e.preventDefault();
-          setOpen(false);
-        }}
+        onInteractOutside={() => setOpen(false)}
+        forceMount
       >
         <div 
-          className="p-4" 
-          onClick={(e) => e.stopPropagation()}
-          onPointerDownCapture={(e) => e.stopPropagation()}
+          ref={contentRef}
+          className="p-4 bg-background rounded-md" 
         >
           <div className="flex items-center justify-between mb-4">
             <Button
               type="button"
               variant="outline"
               className="h-7 w-7 p-0"
-              onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => {
-                e.preventDefault();
                 e.stopPropagation();
                 handleYearChange(-1);
               }}
             >
-              <ChevronLeft className="h-4 w-4 pointer-events-none" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="font-semibold">{selectedYear}</div>
             <Button
               type="button"
               variant="outline"
               className="h-7 w-7 p-0"
-              onMouseDown={(e) => e.stopPropagation()}
               onClick={(e) => {
-                e.preventDefault();
                 e.stopPropagation();
                 handleYearChange(1);
               }}
             >
-              <ChevronRight className="h-4 w-4 pointer-events-none" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
           
@@ -111,9 +107,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
               <Button
                 key={month}
                 type="button"
-                onMouseDown={(e) => e.stopPropagation()}
                 onClick={(e) => {
-                  e.preventDefault();
                   e.stopPropagation();
                   handleMonthSelect(index);
                 }}
