@@ -1,3 +1,4 @@
+
 import React from "react";
 import { StagesGrid } from "./components/StagesGrid";
 import type { FormState } from "../hooks/types/projectTypes";
@@ -23,8 +24,9 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
 
   // Check if stage fees are loaded correctly
   React.useEffect(() => {
-    if (form.stages.length > 0 && Object.keys(form.stageFees).length === 0 && !isDataLoaded) {
+    if (form.stages.length > 0 && Object.keys(form.stageFees).length === 0 && isDataLoaded) {
       console.log("Warning: Stages selected but no fee data available");
+      toast.warning("No fee data available for selected stages");
     }
   }, [form.stages, form.stageFees, isDataLoaded]);
 

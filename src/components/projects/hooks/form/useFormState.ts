@@ -43,7 +43,7 @@ export const useFormState = (
       }
 
       setIsLoading(true);
-      console.log("Loading project data for ID:", project.id);
+      console.log("Loading project data for ID:", project.id, "with code:", project.code);
 
       try {
         // Fetch project fees data
@@ -91,6 +91,7 @@ export const useFormState = (
             }
           }
 
+          // Set the fee data for this stage
           stageFees[stage.id] = {
             fee: feeData?.fee?.toString() || '',
             billingMonth: billingMonth,
