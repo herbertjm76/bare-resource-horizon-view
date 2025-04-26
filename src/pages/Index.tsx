@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Users, Calendar, ChartBar, Bell } from 'lucide-react';
 
@@ -40,10 +41,10 @@ const Index = () => {
             {/* Hero Text */}
             <div className="space-y-6">
               <h1 className="text-5xl font-bold text-white leading-tight">
-                Resource Intelligence Made Simple
+                Project Management with Resource Intelligence
               </h1>
               <p className="text-xl text-white/80">
-                Make confident staffing decisions with clear resource insights
+                Make smarter project decisions with powerful resource insights
               </p>
               <div className="flex gap-4">
                 <button className="bg-white text-purple-600 px-8 py-3 rounded-lg font-medium hover:bg-purple-50 transition-colors">
@@ -69,41 +70,41 @@ const Index = () => {
       <div className="bg-white py-24" id="features">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Smart Insights, Simple Decisions</h2>
-            <p className="text-xl text-gray-600">Everything you need to make data-driven resource management decisions</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Project Management, Elevated</h2>
+            <p className="text-xl text-gray-600">Everything you need to run successful projects with intelligent resource planning</p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
             {/* Feature Cards */}
             <FeatureCard
               icon={<Users className="w-8 h-8 text-purple-500" />}
-              title="Workload Analysis"
-              description="Get clear insights into team capacity and identify resource bottlenecks early."
+              title="Smart Project Planning"
+              description="Plan projects with confidence using AI-powered resource allocation insights."
             />
             <FeatureCard
               icon={<ChartBar className="w-8 h-8 text-purple-500" />}
-              title="Staffing Intelligence"
-              description="Know exactly when to hire based on project demands and team capacity."
+              title="Resource Intelligence"
+              description="Make data-driven staffing decisions with real-time capacity analysis."
             />
             <FeatureCard
               icon={<Calendar className="w-8 h-8 text-purple-500" />}
-              title="Resource Optimization"
-              description="Balance workloads effectively and prevent team burnout."
+              title="Team Management"
+              description="Optimize team workloads and prevent burnout with smart scheduling."
             />
             <FeatureCard
               icon={<Calendar className="w-8 h-8 text-purple-500" />}
-              title="Project Planning"
-              description="Plan resources with confidence using data-driven insights."
+              title="Project Tracking"
+              description="Monitor project progress and resource utilization in real-time."
             />
             <FeatureCard
               icon={<ChartBar className="w-8 h-8 text-purple-500" />}
-              title="Performance Metrics"
-              description="Track resource utilization and project profitability in real-time."
+              title="Performance Analytics"
+              description="Get detailed insights into project performance and team productivity."
             />
             <FeatureCard
               icon={<Bell className="w-8 h-8 text-purple-500" />}
-              title="Smart Alerts"
-              description="Get notified of resource conflicts and capacity issues before they impact projects."
+              title="Proactive Alerts"
+              description="Stay ahead with early warnings for project risks and resource conflicts."
             />
           </div>
         </div>
