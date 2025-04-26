@@ -87,4 +87,3 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
     </div>
   );
 };
-

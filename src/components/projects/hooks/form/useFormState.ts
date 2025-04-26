@@ -2,10 +2,11 @@
 import { useState, useEffect } from "react";
 import type { FormState } from "../types/projectTypes";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const useFormState = (
   project: any,
-  officeStages: Array<{ id: string; name: string }> = []
+  officeStages: Array<{ id: string; name: string; color?: string }> = []
 ) => {
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -53,6 +54,8 @@ export const useFormState = (
 
         if (feesError) {
           console.error('Error loading project fees:', feesError);
+          toast.error("Failed to load project fee data");
+          setIsLoading(false);
           return;
         }
 
@@ -95,7 +98,7 @@ export const useFormState = (
             invoiceDate: feeData?.invoice_date ? new Date(feeData.invoice_date) : null,
             hours: '',
             invoiceAge: invoiceAge,
-            currency: feeData?.currency || 'USD'
+            currency: feeData?.currency || form.currency || 'USD'
           };
         }
 
@@ -109,13 +112,14 @@ export const useFormState = (
         setIsDataLoaded(true);
       } catch (error) {
         console.error("Error in loadProjectData:", error);
+        toast.error("Error loading project data");
       } finally {
         setIsLoading(false);
       }
     };
 
     loadProjectData();
-  }, [project?.id, officeStages]);
+  }, [project?.id, officeStages, form.currency]);
 
   return {
     form,
