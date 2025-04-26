@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,8 +8,8 @@ import { useCompany } from '@/context/CompanyContext';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { RatesList } from './rates/RatesList';
 import { useRates } from './rates/useRates';
-import { toast } from 'react-toastify';
-import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export const RatesTab = () => {
   const { company } = useCompany();
