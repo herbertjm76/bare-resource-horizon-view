@@ -1,10 +1,10 @@
 
 import React from 'react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
@@ -24,6 +24,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
   const [selectedYear, setSelectedYear] = React.useState<number>(
     value?.getFullYear() || new Date().getFullYear()
   );
+  const [open, setOpen] = React.useState(false);
 
   const months = [
     "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -42,11 +43,12 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
       const newDate = new Date(selectedYear, monthIndex);
       onChange(newDate);
     }
+    setOpen(false); // Close the popover after selection
   };
 
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           type="button"
           variant="outline"
@@ -59,29 +61,38 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
           <CalendarDays className="mr-2 h-4 w-4" />
           {value ? format(value, "MMMM yyyy") : "Select billing month"}
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        className="p-0 w-64 z-[60] bg-popover" 
+      </PopoverTrigger>
+      <PopoverContent 
+        className="p-0 w-64 bg-popover z-50" 
         align="start"
+        sideOffset={4}
       >
-        <div className="p-4">
+        <div className="p-4" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between mb-4">
             <Button
               type="button"
               variant="outline"
               className="h-7 w-7 p-0"
-              onClick={() => handleYearChange(-1)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleYearChange(-1);
+              }}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4 pointer-events-none" />
             </Button>
             <div className="font-semibold">{selectedYear}</div>
             <Button
               type="button"
               variant="outline"
               className="h-7 w-7 p-0"
-              onClick={() => handleYearChange(1)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleYearChange(1);
+              }}
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4 pointer-events-none" />
             </Button>
           </div>
           
@@ -90,7 +101,11 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
               <Button
                 key={month}
                 type="button"
-                onClick={() => handleMonthSelect(index)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleMonthSelect(index);
+                }}
                 variant="ghost"
                 className={cn(
                   "h-8",
@@ -104,7 +119,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
             ))}
           </div>
         </div>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </PopoverContent>
+    </Popover>
   );
 };
