@@ -49,6 +49,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
+          type="button"
           variant="outline"
           className={cn(
             "w-full justify-start text-left font-normal h-8",
@@ -61,24 +62,24 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
-        className="p-0 w-[280px] z-[60]" 
+        className="p-0 w-[280px] z-[60] bg-popover" 
         align="start"
       >
         <div className="p-3">
           <div className="flex items-center justify-between mb-4">
             <Button
+              type="button"
               variant="outline"
-              size="icon"
-              className="h-7 w-7"
+              className="h-7 w-7 p-0"
               onClick={() => handleYearChange(-1)}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="font-semibold">{selectedYear}</div>
             <Button
+              type="button"
               variant="outline"
-              size="icon"
-              className="h-7 w-7"
+              className="h-7 w-7 p-0"
               onClick={() => handleYearChange(1)}
             >
               <ChevronRight className="h-4 w-4" />
@@ -89,6 +90,7 @@ export const MonthCalendar: React.FC<MonthCalendarProps> = ({
             {months.map((month, index) => (
               <Button
                 key={month}
+                type="button"
                 onClick={() => handleMonthSelect(index)}
                 variant="ghost"
                 className={cn(
