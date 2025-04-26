@@ -21,6 +21,7 @@ export const useNewProjectFormState = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(true); // For new projects, data is considered loaded
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
 
   const handleChange = (key: keyof FormState, value: any) => {
@@ -73,6 +74,8 @@ export const useNewProjectFormState = () => {
     setFormErrors,
     isLoading,
     setIsLoading,
+    isDataLoaded,
+    setIsDataLoaded,
     handleChange
   };
 };

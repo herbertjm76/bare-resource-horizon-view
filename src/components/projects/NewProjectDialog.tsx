@@ -35,6 +35,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
     setForm,
     isLoading,
     setIsLoading,
+    isDataLoaded,
     handleChange
   } = useNewProjectFormState();
 
@@ -99,6 +100,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
               offices={offices}
               officeStages={officeStages}
               handleChange={handleChange}
+              isDataLoaded={isDataLoaded}
               updateStageApplicability={(stageId: string, isChecked: boolean) => {
                 setForm(prev => ({
                   ...prev,
