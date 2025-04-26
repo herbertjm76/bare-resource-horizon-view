@@ -27,6 +27,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
     if (date) {
       onChange(date);
       setCalendarDate(date);
+      setOpen(false); // Close popover after date selection
     }
   };
 
@@ -82,22 +83,33 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
           {value ? format(value, "MM/dd/yyyy") : "Select date"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
-        <div className="p-3">
+      <PopoverContent 
+        className="w-auto p-0 z-50" 
+        align="start"
+        sideOffset={4}
+      >
+        <div className="p-3 pointer-events-auto">
           <div className="flex gap-2 mb-4">
             {/* Month Dropdown */}
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-[140px] h-8 justify-between">
+                <Button 
+                  variant="outline" 
+                  className="w-[140px] h-8 justify-between"
+                  type="button"
+                >
                   {months[currentMonth]}
                   <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="max-h-[300px] overflow-y-auto">
+              <DropdownMenuContent 
+                align="start" 
+                className="max-h-[300px] overflow-y-auto z-[60]"
+              >
                 {months.map((month, index) => (
                   <DropdownMenuItem 
                     key={month} 
-                    onClick={() => handleMonthChange(index)}
+                    onSelect={() => handleMonthChange(index)}
                     className={cn(
                       "cursor-pointer",
                       currentMonth === index && "bg-accent text-accent-foreground"
@@ -110,18 +122,25 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             </DropdownMenu>
 
             {/* Year Dropdown */}
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-[100px] h-8 justify-between">
+                <Button 
+                  variant="outline" 
+                  className="w-[100px] h-8 justify-between"
+                  type="button"
+                >
                   {currentYearValue}
                   <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="max-h-[300px] overflow-y-auto">
+              <DropdownMenuContent 
+                align="start" 
+                className="max-h-[300px] overflow-y-auto z-[60]"
+              >
                 {years.map((year) => (
                   <DropdownMenuItem 
                     key={year} 
-                    onClick={() => handleYearChange(year)}
+                    onSelect={() => handleYearChange(year)}
                     className={cn(
                       "cursor-pointer",
                       currentYearValue === year && "bg-accent text-accent-foreground"
@@ -162,7 +181,7 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
             onSelect={onDateSelect}
             month={calendarDate}
             onMonthChange={setCalendarDate}
-            className="p-0"
+            className="p-0 pointer-events-auto"
             formatters={{
               formatCaption: () => ""
             }}
