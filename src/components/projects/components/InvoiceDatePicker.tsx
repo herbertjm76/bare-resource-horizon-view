@@ -89,84 +89,85 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
         sideOffset={4}
       >
         <div className="p-3 pointer-events-auto">
-          <div className="flex gap-2 mb-4">
-            {/* Month Dropdown */}
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="w-[140px] h-8 justify-between"
-                  type="button"
-                >
-                  {months[currentMonth]}
-                  <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="start" 
-                className="max-h-[300px] overflow-y-auto z-[60]"
-              >
-                {months.map((month, index) => (
-                  <DropdownMenuItem 
-                    key={month} 
-                    onSelect={() => handleMonthChange(index)}
-                    className={cn(
-                      "cursor-pointer",
-                      currentMonth === index && "bg-accent text-accent-foreground"
-                    )}
-                  >
-                    {month}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Year Dropdown */}
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="w-[100px] h-8 justify-between"
-                  type="button"
-                >
-                  {currentYearValue}
-                  <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="start" 
-                className="max-h-[300px] overflow-y-auto z-[60]"
-              >
-                {years.map((year) => (
-                  <DropdownMenuItem 
-                    key={year} 
-                    onSelect={() => handleYearChange(year)}
-                    className={cn(
-                      "cursor-pointer",
-                      currentYearValue === year && "bg-accent text-accent-foreground"
-                    )}
-                  >
-                    {year}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-
-          <div className="flex mb-4">
+          <div className="flex items-center justify-between mb-4">
             <Button
               variant="outline"
               size="icon"
-              className="h-7 w-7 mr-auto"
+              className="h-7 w-7"
               onClick={() => navigateMonth('prev')}
               type="button"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
+
+            <div className="flex gap-2">
+              {/* Month Dropdown */}
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="w-[140px] h-8 justify-between"
+                    type="button"
+                  >
+                    {months[currentMonth]}
+                    <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="start" 
+                  className="max-h-[300px] overflow-y-auto z-[60]"
+                >
+                  {months.map((month, index) => (
+                    <DropdownMenuItem 
+                      key={month} 
+                      onSelect={() => handleMonthChange(index)}
+                      className={cn(
+                        "cursor-pointer",
+                        currentMonth === index && "bg-accent text-accent-foreground"
+                      )}
+                    >
+                      {month}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Year Dropdown */}
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="w-[100px] h-8 justify-between"
+                    type="button"
+                  >
+                    {currentYearValue}
+                    <ChevronRight className="h-4 w-4 rotate-90 ml-2 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="start" 
+                  className="max-h-[300px] overflow-y-auto z-[60]"
+                >
+                  {years.map((year) => (
+                    <DropdownMenuItem 
+                      key={year} 
+                      onSelect={() => handleYearChange(year)}
+                      className={cn(
+                        "cursor-pointer",
+                        currentYearValue === year && "bg-accent text-accent-foreground"
+                      )}
+                    >
+                      {year}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
             <Button
               variant="outline"
               size="icon"
-              className="h-7 w-7 ml-auto"
+              className="h-7 w-7"
               onClick={() => navigateMonth('next')}
               type="button"
             >
