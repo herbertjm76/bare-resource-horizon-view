@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { StageFee } from "../../../hooks/types/projectTypes";
+import type { StageFee } from "../../../../hooks/types/projectTypes";
 import { MonthCalendar } from "../../../components/datepicker/MonthCalendar";
 
 interface StageFormProps {

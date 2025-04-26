@@ -40,6 +40,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     if (isOpen && project?.id) {
       const fetchCompleteProject = async () => {
         try {
+          console.log('Fetching complete project data for:', project.id);
+          
           // Get full project data
           const { data: projectData, error } = await supabase
             .from('projects')
@@ -116,6 +118,14 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
       }
     }
   }, [isOpen, loadedProject, officeStages]);
+  
+  // Debug stage fees data when form changes
+  useEffect(() => {
+    if (form && form.stageFees) {
+      console.log("Current stage fees in form:", form.stageFees);
+      console.log("Stage fees keys:", Object.keys(form.stageFees));
+    }
+  }, [form, form?.stageFees]);
 
   const { handleSubmit } = useProjectSubmit(loadedProject.id, refetch, onClose);
 
@@ -123,6 +133,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     e.preventDefault();
     if (isLoading || !company) return;
     
+    console.log("Submitting form with stageFees:", form.stageFees);
     await handleSubmit({ 
       ...form, 
       officeStages

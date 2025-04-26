@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { StagesGrid } from "./components/StagesGrid";
 import type { FormState } from "../hooks/types/projectTypes";
 
@@ -18,6 +18,11 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   console.log("ProjectStageFeesTab - stages:", form.stages);
   console.log("ProjectStageFeesTab - stageFees:", form.stageFees);
   console.log("ProjectStageFeesTab - officeStages:", officeStages);
+
+  // Log whenever stageFees changes
+  useEffect(() => {
+    console.log("StageFees changed:", form.stageFees);
+  }, [form.stageFees]);
 
   const generateYearMonths = () => {
     const currentYear = new Date().getFullYear();
@@ -57,10 +62,12 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
     return stage?.color || "#E5DEFF";
   };
 
+  // Make sure we're using the stages IDs from form.stages
   const selectedStages = officeStages.filter(stage => form.stages.includes(stage.id));
   const billingOptions = generateYearMonths();
 
   console.log("Selected stages for fees:", selectedStages);
+  console.log("Are there any stage fees?", Object.keys(form.stageFees).length > 0);
 
   if (form.stages.length === 0) {
     return (

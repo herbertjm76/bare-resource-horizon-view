@@ -28,7 +28,7 @@ export const useFormState = (project: any) => {
     manager: project.project_manager?.id || "",
     country: project.country || "",
     profit: project.target_profit_percentage?.toString() || "",
-    avgRate: project.average_rate?.toString() || "", // Changed from avg_rate to average_rate to match DB field
+    avgRate: project.average_rate?.toString() || "", // Using average_rate to match DB field
     currency: project.currency || "USD",
     status: project.status || "",
     office: project.office?.id || "",
@@ -45,7 +45,34 @@ export const useFormState = (project: any) => {
       console.log("Loading project fees for project:", project.id);
 
       try {
-        // First get the project stages
+        // First get all office stages
+        const { data: officeStageData, error: officeStageError } = await supabase
+          .from('office_stages')
+          .select('*')
+          .eq('company_id', project.company_id);
+          
+        if (officeStageError) {
+          console.error('Error loading office stages:', officeStageError);
+          return;
+        }
+        
+        const officeStages = officeStageData || [];
+        console.log("Office stages loaded:", officeStages);
+
+        // Then get all project fees directly
+        const { data: feesData, error: feesError } = await supabase
+          .from('project_fees')
+          .select('*')
+          .eq('project_id', project.id);
+          
+        if (feesError) {
+          console.error('Error loading project fees:', feesError);
+          return;
+        }
+        
+        console.log("Project fees loaded:", feesData);
+        
+        // Also get project stages for reference
         const { data: projectStages, error: stagesError } = await supabase
           .from('project_stages')
           .select('*')
@@ -58,47 +85,46 @@ export const useFormState = (project: any) => {
 
         console.log("Project stages loaded:", projectStages);
 
-        // Also fetch all office stages to match with project stages
-        const { data: officeStageData } = await supabase
-          .from('office_stages')
-          .select('*')
-          .eq('company_id', project.company_id);
-
-        console.log("Office stages loaded:", officeStageData);
-        const officeStages = officeStageData || [];
-
-        if (projectStages && projectStages.length > 0) {
+        if (projectStages && projectStages.length > 0 && officeStages && officeStages.length > 0) {
           const stageFees: Record<string, any> = {};
           
-          // For each project stage, get or initialize its fee data
-          for (const stage of projectStages) {
-            console.log("Processing stage:", stage);
+          // Process each stage from project.stages
+          for (const stageId of initialStages) {
+            console.log(`Processing stage ID: ${stageId}`);
             
-            // Get the corresponding office stage by name
-            const officeStageName = stage.stage_name;
-            const officeStage = officeStages.find(s => s.name === officeStageName);
+            // Find the office stage
+            const officeStage = officeStages.find(s => s.id === stageId);
             
             if (!officeStage) {
-              console.log(`No matching office stage found for ${officeStageName}`);
+              console.log(`No matching office stage found for ID ${stageId}`);
               continue;
             }
             
             console.log("Found matching office stage:", officeStage);
-
-            // Get fee data for this stage
-            const { data: feeData, error: feeError } = await supabase
-              .from('project_fees')
-              .select('*')
-              .eq('project_id', project.id)
-              .eq('stage_id', stage.id)
-              .maybeSingle();
-
-            if (feeError) {
-              console.error(`Error loading fee data for stage ${stage.id}:`, feeError);
+            
+            // Find the project stage by name
+            const projectStage = projectStages.find(s => s.stage_name === officeStage.name);
+            
+            if (!projectStage) {
+              console.log(`No project stage found for ${officeStage.name}`);
+              stageFees[stageId] = {
+                fee: '',
+                billingMonth: null,
+                status: 'Not Billed',
+                invoiceDate: null,
+                hours: '',
+                invoiceAge: '0',
+                currency: 'USD'
+              };
+              continue;
             }
             
-            console.log("Fee data loaded:", feeData);
-
+            console.log("Found matching project stage:", projectStage);
+            
+            // Find fee data for this stage
+            const feeData = feesData?.find(fee => fee.stage_id === projectStage.id);
+            console.log("Fee data for this stage:", feeData);
+            
             // Calculate invoice age if we have an invoice date
             const invoiceDate = feeData?.invoice_date ? new Date(feeData.invoice_date) : null;
             let invoiceAge = '0';
@@ -113,7 +139,6 @@ export const useFormState = (project: any) => {
             let billingMonth = null;
             if (feeData?.billing_month) {
               try {
-                // Try to parse the billing month which might be in different formats
                 billingMonth = new Date(feeData.billing_month);
                 if (isNaN(billingMonth.getTime())) {
                   billingMonth = null;
@@ -124,17 +149,18 @@ export const useFormState = (project: any) => {
               }
             }
 
-            stageFees[officeStage.id] = {
-              fee: feeData?.fee?.toString() || stage.fee?.toString() || '',
-              billingMonth: billingMonth || (stage.billing_month ? new Date(stage.billing_month) : null),
-              status: feeData?.invoice_status || stage.invoice_status || 'Not Billed',
+            // Set the stage fee data keyed by the office stage ID
+            stageFees[stageId] = {
+              fee: feeData?.fee?.toString() || projectStage.fee?.toString() || '',
+              billingMonth: billingMonth || (projectStage.billing_month ? new Date(projectStage.billing_month) : null),
+              status: feeData?.invoice_status || projectStage.invoice_status || 'Not Billed',
               invoiceDate: feeData?.invoice_date ? new Date(feeData.invoice_date) : null,
               hours: '',
               invoiceAge: invoiceAge,
-              currency: feeData?.currency || stage.currency || 'USD'
+              currency: feeData?.currency || projectStage.currency || 'USD'
             };
             
-            console.log(`Stage fee data for ${officeStage.id} set:`, stageFees[officeStage.id]);
+            console.log(`Stage fee data for ${stageId} set:`, stageFees[stageId]);
           }
 
           setForm(prev => {
@@ -144,8 +170,6 @@ export const useFormState = (project: any) => {
               stageFees
             };
           });
-        } else {
-          console.log("No project stages found");
         }
       } catch (error) {
         console.error("Error in loadProjectFees:", error);
@@ -153,7 +177,7 @@ export const useFormState = (project: any) => {
     };
 
     loadProjectFees();
-  }, [project?.id, project?.company_id]);
+  }, [project?.id, project?.company_id, initialStages]);
 
   return {
     form,

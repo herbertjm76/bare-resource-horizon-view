@@ -28,6 +28,9 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
   calculateHours,
   calculateInvoiceAge,
 }) => {
+  console.log("StagesGrid rendering with stages:", selectedStages);
+  console.log("StagesGrid stageFees:", stageFees);
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {selectedStages.map((stage) => {
@@ -42,6 +45,8 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
         };
         
         const stageColor = getStageColor(stage.id);
+        
+        console.log(`Rendering stage ${stage.id} (${stage.name}) with data:`, stageFeeData);
         
         return (
           <StageCard
