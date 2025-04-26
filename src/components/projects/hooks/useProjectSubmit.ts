@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
 import { useProjectUpdate } from './submit/useProjectUpdate';
 import { useStageSubmit } from './submit/useStageSubmit';
-import { mapStatusToDb } from "./utils/projectMappings";
+import { mapStatusToDb } from "../utils/projectMappings"; // Fixed import path
 import type { ProjectSubmitData } from './submit/types';
 
 export const useProjectSubmit = (projectId: string, refetch: () => void, onClose: () => void) => {
