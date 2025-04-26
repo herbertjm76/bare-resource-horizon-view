@@ -1,5 +1,4 @@
-
-import React, { useEffect } from "react";
+import React from "react";
 import { StagesGrid } from "./components/StagesGrid";
 import type { FormState } from "../hooks/types/projectTypes";
 import { toast } from "sonner";
@@ -8,12 +7,14 @@ interface ProjectStageFeesTabProps {
   form: FormState;
   officeStages: Array<{ id: string; name: string; color?: string }>;
   updateStageFee: (stageId: string, data: Partial<FormState['stageFees'][string]>) => void;
+  isDataLoaded: boolean;
 }
 
 export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   form,
   officeStages,
-  updateStageFee
+  updateStageFee,
+  isDataLoaded
 }) => {
   console.log("ProjectStageFeesTab - form:", form);
   console.log("ProjectStageFeesTab - stages:", form.stages);
@@ -21,11 +22,11 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   console.log("ProjectStageFeesTab - officeStages:", officeStages);
 
   // Check if stage fees are loaded correctly
-  useEffect(() => {
-    if (form.stages.length > 0 && Object.keys(form.stageFees).length === 0) {
+  React.useEffect(() => {
+    if (form.stages.length > 0 && Object.keys(form.stageFees).length === 0 && !isDataLoaded) {
       console.log("Warning: Stages selected but no fee data available");
     }
-  }, [form.stages, form.stageFees]);
+  }, [form.stages, form.stageFees, isDataLoaded]);
 
   const generateYearMonths = () => {
     const currentYear = new Date().getFullYear();
@@ -97,6 +98,7 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
         getStageColor={getStageColor}
         calculateHours={calculateHours}
         calculateInvoiceAge={calculateInvoiceAge}
+        isDataLoaded={isDataLoaded}
       />
     </div>
   );

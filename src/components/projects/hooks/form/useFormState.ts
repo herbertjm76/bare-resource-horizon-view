@@ -12,14 +12,10 @@ export const useFormState = (project: any) => {
   // Initialize the stages array from the project data
   const initialStages = Array.isArray(project.stages) ? project.stages : [];
   
-  console.log('useFormState - initializing with project:', project);
-  console.log('useFormState - initialStages:', initialStages);
-  
   // Create a record of stage selections for easier lookup
   const initialStageSelections: Record<string, boolean> = {};
   initialStages.forEach((stageId: string) => {
     initialStageSelections[stageId] = true;
-    console.log(`Setting stage ${stageId} to selected`);
   });
   
   const [form, setForm] = useState<FormState>({
@@ -62,8 +58,6 @@ export const useFormState = (project: any) => {
           return;
         }
         
-        console.log("Project stages loaded:", projectStages);
-        
         // Get project fees
         const { data: feesData, error: feesError } = await supabase
           .from('project_fees')
@@ -76,8 +70,6 @@ export const useFormState = (project: any) => {
           return;
         }
         
-        console.log("Project fees loaded:", feesData);
-        
         // Get all office stages for this company to have the mapping
         const { data: officeStages, error: officeStagesError } = await supabase
           .from('office_stages')
@@ -89,8 +81,6 @@ export const useFormState = (project: any) => {
           setIsLoading(false);
           return;
         }
-        
-        console.log("Office stages loaded:", officeStages);
         
         // Create stageFees map for the form
         if (initialStages.length > 0 && officeStages && officeStages.length > 0) {
@@ -108,10 +98,11 @@ export const useFormState = (project: any) => {
               continue;
             }
             
-            console.log("Found matching office stage:", officeStage);
-            
             // Find the project stage by name
             const projectStage = projectStages?.find(s => s.stage_name === officeStage.name);
+            
+            // Find the fee data using the current stageId (office stage ID)
+            const feeData = feesData?.find(fee => fee.stage_id === stageId);
             
             if (!projectStage) {
               console.log(`No project stage found for ${officeStage.name}`);
@@ -127,12 +118,6 @@ export const useFormState = (project: any) => {
               };
               continue;
             }
-            
-            console.log("Found matching project stage:", projectStage);
-            
-            // Find fee data for this stage
-            const feeData = feesData?.find(fee => fee.stage_id === projectStage.id);
-            console.log("Fee data for this stage:", feeData);
             
             // Calculate invoice age if we have an invoice date
             const invoiceDate = feeData?.invoice_date ? new Date(feeData.invoice_date) : null;
@@ -168,8 +153,6 @@ export const useFormState = (project: any) => {
               invoiceAge: invoiceAge,
               currency: feeData?.currency || projectStage.currency || 'USD'
             };
-            
-            console.log(`Stage fee data for ${stageId} set:`, stageFees[stageId]);
           }
 
           setForm(prev => {
@@ -202,3 +185,4 @@ export const useFormState = (project: any) => {
     isDataLoaded
   };
 };
+

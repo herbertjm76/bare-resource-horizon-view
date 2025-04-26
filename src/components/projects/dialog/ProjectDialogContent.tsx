@@ -14,6 +14,7 @@ interface ProjectDialogContentProps {
   updateStageApplicability: (stageId: string, isChecked: boolean) => void;
   updateStageFee: (stageId: string, data: any) => void;
   handleChange: (key: string, value: any) => void;
+  isDataLoaded: boolean;
 }
 
 export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
@@ -25,6 +26,7 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
   updateStageApplicability,
   updateStageFee,
   handleChange,
+  isDataLoaded,
 }) => {
   return (
     <ScrollArea className="flex-1 overflow-y-auto max-h-[calc(90vh-200px)] p-6">
@@ -52,6 +54,7 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
             form={form}
             officeStages={officeStages}
             updateStageFee={updateStageFee}
+            isDataLoaded={isDataLoaded}
           />
         </TabsContent>
 
@@ -64,3 +67,4 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
     </ScrollArea>
   );
 };
+

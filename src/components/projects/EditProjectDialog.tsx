@@ -118,7 +118,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     officeStages,
     handleChange,
     updateStageFee,
-    updateStageApplicability
+    updateStageApplicability,
+    isDataLoaded
   } = useProjectForm(loadedProject, isOpen);
 
   useEffect(() => {
@@ -199,6 +200,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
                 updateStageApplicability={updateStageApplicability}
                 updateStageFee={updateStageFee}
                 handleChange={handleChange}
+                isDataLoaded={isDataLoaded}
               />
             </Tabs>
             
@@ -212,3 +214,4 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     </Dialog>
   );
 };
+

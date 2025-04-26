@@ -17,6 +17,7 @@ interface StagesGridProps {
   getStageColor: (stageId: string) => string;
   calculateHours: (fee: string) => string;
   calculateInvoiceAge: (invoiceDate: Date | null) => string;
+  isDataLoaded: boolean;
 }
 
 export const StagesGrid: React.FC<StagesGridProps> = ({
@@ -27,12 +28,15 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
   getStageColor,
   calculateHours,
   calculateInvoiceAge,
+  isDataLoaded
 }) => {
   console.log("StagesGrid rendering with stages:", selectedStages);
   console.log("StagesGrid stageFees:", stageFees);
   
   // Ensure all selected stages have fee data
   useEffect(() => {
+    if (!isDataLoaded) return;
+
     selectedStages.forEach(stage => {
       if (!stageFees[stage.id]) {
         console.log(`Creating missing fee data for stage ${stage.id}`);
@@ -47,7 +51,7 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
         });
       }
     });
-  }, [selectedStages, stageFees, updateStageFee]);
+  }, [selectedStages, stageFees, updateStageFee, isDataLoaded]);
   
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -83,3 +87,4 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
     </div>
   );
 };
+
