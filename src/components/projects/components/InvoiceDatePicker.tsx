@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { format } from 'date-fns';
 import { cn } from "@/lib/utils";
 
@@ -14,7 +15,6 @@ interface InvoiceDatePickerProps {
 
 export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePickerProps) => {
   const [calendarDate, setCalendarDate] = React.useState<Date>(value || new Date());
-  const [showMonthPicker, setShowMonthPicker] = React.useState(false);
 
   const onDateSelect = (date: Date | undefined) => {
     if (date) {
@@ -31,17 +31,16 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
   const currentYear = calendarDate.getFullYear();
   const years = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
-  const handleYearClick = (year: number) => {
+  const handleMonthChange = (monthIndex: string) => {
     const newDate = new Date(calendarDate);
-    newDate.setFullYear(year);
+    newDate.setMonth(parseInt(monthIndex));
     setCalendarDate(newDate);
   };
 
-  const handleMonthClick = (monthIndex: number) => {
+  const handleYearChange = (year: string) => {
     const newDate = new Date(calendarDate);
-    newDate.setMonth(monthIndex);
+    newDate.setFullYear(parseInt(year));
     setCalendarDate(newDate);
-    setShowMonthPicker(false);
   };
 
   return (
@@ -59,42 +58,37 @@ export const InvoiceDatePicker = ({ value, onChange, onToday }: InvoiceDatePicke
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <div className="p-3">
-          <div className="flex flex-col gap-2 mb-4">
-            <div className="grid grid-cols-3 gap-1">
-              {years.map((year) => (
-                <Button
-                  key={year}
-                  variant={year === calendarDate.getFullYear() ? "default" : "outline"}
-                  size="sm"
-                  className="h-7"
-                  onClick={() => handleYearClick(year)}
-                >
-                  {year}
-                </Button>
-              ))}
-            </div>
-            <Button
-              variant="outline"
-              onClick={() => setShowMonthPicker(!showMonthPicker)}
-              className="w-full justify-between"
+          <div className="flex gap-2 mb-4">
+            <Select
+              value={calendarDate.getMonth().toString()}
+              onValueChange={handleMonthChange}
             >
-              {format(calendarDate, "MMMM")}
-            </Button>
-            {showMonthPicker && (
-              <div className="grid grid-cols-3 gap-1">
+              <SelectTrigger className="w-[140px] h-8">
+                <SelectValue placeholder="Select month" />
+              </SelectTrigger>
+              <SelectContent>
                 {months.map((month, index) => (
-                  <Button
-                    key={month}
-                    variant={index === calendarDate.getMonth() ? "default" : "outline"}
-                    size="sm"
-                    className="h-7"
-                    onClick={() => handleMonthClick(index)}
-                  >
-                    {month.slice(0, 3)}
-                  </Button>
+                  <SelectItem key={month} value={index.toString()}>
+                    {month}
+                  </SelectItem>
                 ))}
-              </div>
-            )}
+              </SelectContent>
+            </Select>
+            <Select
+              value={calendarDate.getFullYear().toString()}
+              onValueChange={handleYearChange}
+            >
+              <SelectTrigger className="w-[100px] h-8">
+                <SelectValue placeholder="Select year" />
+              </SelectTrigger>
+              <SelectContent>
+                {years.map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <Calendar
             mode="single"
