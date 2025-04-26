@@ -37,7 +37,17 @@ export const RatesTab = () => {
       if (error) throw error;
       
       if (data) {
-        setRates([...rates, data[0]]);
+        // Explicitly cast the rate type to ensure it matches the expected "role" | "location" union type
+        const newRate = {
+          ...data[0],
+          type: data[0].type === "role" ? "role" : "location",
+          unit: data[0].unit === "hour" || data[0].unit === "day" || data[0].unit === "week" 
+            ? data[0].unit 
+            : "hour",
+          value: Number(data[0].value)
+        };
+        
+        setRates([...rates, newRate]);
         toast.success('Rate added successfully');
         setOpen(false);
       }
