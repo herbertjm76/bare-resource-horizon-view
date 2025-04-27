@@ -16,6 +16,9 @@ export const ProjectStageFeesTabContent: React.FC<ProjectStageFeesTabContentProp
   updateStageFee,
   isDataLoaded,
 }) => {
+  console.log("ProjectStageFeesTabContent - form stageFees:", form.stageFees);
+  console.log("ProjectStageFeesTabContent - isDataLoaded:", isDataLoaded);
+  
   return (
     <TabsContent value="stageFees" className="mt-0">
       <ProjectStageFeesTab 

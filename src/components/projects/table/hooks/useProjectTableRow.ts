@@ -30,6 +30,8 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
       if (!project?.id) return;
       
       try {
+        console.log('Fetching stage fees for project:', project.id);
+        
         const { data, error } = await supabase
           .from('project_fees')
           .select('stage_id, fee')
@@ -41,11 +43,14 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
         }
         
         if (data) {
+          console.log('Stage fees data received:', data);
+          
           const feeMap = data.reduce((acc, { stage_id, fee }) => {
             acc[stage_id] = fee;
             return acc;
           }, {} as Record<string, number>);
           
+          console.log('Processed stage fees map:', feeMap);
           setStageFees(feeMap);
         }
       } catch (err) {
@@ -163,7 +168,8 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     }
   };
 
-  const getStageFee = (projectId: string, stageId: string): number | null => {
+  const getStageFee = (stageId: string): number | null => {
+    console.log('Getting stage fee for stageId:', stageId, 'from stageFees:', stageFees);
     return stageFees[stageId] || null;
   };
 
@@ -175,6 +181,7 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     locations,
     editableFields,
     getAreaByCountry,
-    getStageFee
+    getStageFee,
+    stageFees
   };
 };
