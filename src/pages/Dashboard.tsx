@@ -176,13 +176,13 @@ const Dashboard: React.FC = () => {
   return (
     <AuthGuard>
       <SidebarProvider>
-        <div className="flex flex-col w-full min-h-screen">
+        <div className="flex flex-col w-full min-h-screen bg-background">
           <div className="flex flex-1 w-full">
             <DashboardSidebar />
             <div className="flex-1 flex flex-col">
               <AppHeader />
               <div style={{ height: HEADER_HEIGHT }} />
-              <div className="flex-1 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-8">
+              <div className="flex-1 bg-background p-8">
                 <div className="max-w-6xl mx-auto">
                   <DashboardHeader userName={profile?.first_name || user?.email?.split('@')[0] || 'User'} />
                   <DashboardMetrics />
