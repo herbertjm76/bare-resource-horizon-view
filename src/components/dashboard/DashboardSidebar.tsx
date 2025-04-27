@@ -20,23 +20,29 @@ export function DashboardSidebar() {
   const isMobile = useIsMobile();
   const collapsed = state === "collapsed";
 
+  const handleToggleSidebar = () => {
+    console.log("Dashboard toggling sidebar, current state:", collapsed ? "collapsed" : "expanded");
+    toggleSidebar();
+  };
+
   const renderSidebarContent = () => (
     <div className="relative w-full h-full">
-      {/* Back-plate gradient */}
-      <div className="fixed inset-y-0 left-0 w-[220px] -z-10 transition-all duration-300"
+      {/* Back-plate gradient - with pointer-events-none to prevent click interference */}
+      <div className="fixed inset-y-0 left-0 w-[220px] -z-10 transition-all duration-300 pointer-events-none"
            style={{ width: collapsed ? '72px' : '220px' }}>
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#1E1745_0%,#171E47_45%,#0E183C_100%)]" />
       </div>
 
-      {/* Top highlight gradient */}
+      {/* Top highlight gradient - also with pointer-events-none */}
       <div className="fixed inset-x-0 top-0 h-28 -z-10 pointer-events-none
         bg-[radial-gradient(120%_30%_at_50%_0%,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_70%)]" />
 
-      <SidebarLogo collapsed={collapsed} toggleSidebar={toggleSidebar} />
+      <SidebarLogo collapsed={collapsed} toggleSidebar={handleToggleSidebar} />
       <SidebarNavigation 
         items={navigationItems} 
         collapsed={collapsed}
         currentPath={location.pathname}
+        onItemClick={() => isMobile && setOpenMobile(false)}
       />
     </div>
   );
