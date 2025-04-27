@@ -64,7 +64,7 @@ export function DashboardSidebar() {
 
   return (
     <Sidebar 
-      className="bg-transparent border-r border-[#7d8086] pt-0 transition-all duration-300 fixed left-0 top-0 bottom-0 z-40 min-h-screen"
+      className="bg-transparent fixed left-0 top-0 z-40 h-screen border-r border-[#7d8086] pt-0 transition-all duration-300"
       collapsible="icon"
       style={{ marginTop: 0, width: collapsed ? '80px' : '220px' }}
     >

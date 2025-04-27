@@ -11,11 +11,11 @@ const HEADER_HEIGHT = 56;
 const Projects = () => {
   return (
     <SidebarProvider>
-      <div className="w-full min-h-screen flex flex-row">
+      <div className="w-full min-h-screen flex">
         <div className="flex-shrink-0">
           <DashboardSidebar />
         </div>
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col ml-[220px] transition-all duration-300">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
