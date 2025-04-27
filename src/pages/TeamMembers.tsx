@@ -85,23 +85,19 @@ const TeamMembersPage = () => {
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
-            <div className="max-w-6xl mx-auto space-y-8 w-full">
-              <div className="flex justify-center">
-                <div className="w-full">
-                  <h1 className="text-3xl font-bold tracking-tight text-brand-primary text-center mb-8">Members</h1>
-                  {userId ? (
-                    <TeamManagement
-                      teamMembers={teamMembers}
-                      inviteUrl={inviteUrl}
-                      userRole={userProfile?.role || 'member'}
-                    />
-                  ) : (
-                    <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
-                      <p className="text-white">Loading authentication details...</p>
-                    </div>
-                  )}
+            <div className="max-w-6xl mx-auto space-y-8">
+              <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Members</h1>
+              {userId ? (
+                <TeamManagement
+                  teamMembers={teamMembers}
+                  inviteUrl={inviteUrl}
+                  userRole={userProfile?.role || 'member'}
+                />
+              ) : (
+                <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+                  <p className="text-white">Loading authentication details...</p>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
