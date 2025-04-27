@@ -1,3 +1,4 @@
+
 import { Menu } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 import {
@@ -19,6 +20,25 @@ export function DashboardSidebar() {
   const isMobile = useIsMobile();
   const collapsed = state === "collapsed";
 
+  const renderSidebarContent = () => (
+    <>
+      {/* Gradient background */}
+      <div className="absolute inset-0 -z-10 
+        bg-[linear-gradient(180deg,#1E1745_0%,#171E47_45%,#0E183C_100%)]" />
+
+      {/* Top glow effect */}
+      <div className="pointer-events-none absolute inset-0 -z-10 
+        bg-[radial-gradient(120%_30%_at_50%_0%,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_70%)]" />
+
+      <SidebarLogo collapsed={collapsed} toggleSidebar={toggleSidebar} />
+      <SidebarNavigation 
+        items={navigationItems} 
+        collapsed={collapsed}
+        currentPath={location.pathname}
+      />
+    </>
+  );
+
   if (isMobile) {
     return (
       <>
@@ -33,13 +53,8 @@ export function DashboardSidebar() {
         
         <Sheet open={openMobile} onOpenChange={setOpenMobile}>
           <SheetContent side="left" className="p-0 w-[220px]">
-            <div className="flex flex-col h-full bg-[#8E9196]">
-              <SidebarLogo collapsed={false} toggleSidebar={toggleSidebar} />
-              <SidebarNavigation 
-                items={navigationItems} 
-                currentPath={location.pathname}
-                onItemClick={() => setOpenMobile(false)}
-              />
+            <div className="flex flex-col h-full relative">
+              {renderSidebarContent()}
             </div>
           </SheetContent>
         </Sheet>
@@ -49,18 +64,13 @@ export function DashboardSidebar() {
 
   return (
     <Sidebar 
-      className="bg-[#8E9196] border-r border-[#7d8086] pt-0 transition-all duration-300 fixed left-0 top-0 bottom-0 z-40 min-h-screen"
+      className="bg-transparent border-r border-[#7d8086] pt-0 transition-all duration-300 fixed left-0 top-0 bottom-0 z-40 min-h-screen"
       collapsible="icon"
       style={{ marginTop: 0, width: collapsed ? '80px' : '220px' }}
     >
-      <SidebarContent className="p-0">
+      <SidebarContent className="p-0 relative">
         <SidebarGroup>
-          <SidebarLogo collapsed={collapsed} toggleSidebar={toggleSidebar} />
-          <SidebarNavigation 
-            items={navigationItems} 
-            collapsed={collapsed}
-            currentPath={location.pathname}
-          />
+          {renderSidebarContent()}
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
