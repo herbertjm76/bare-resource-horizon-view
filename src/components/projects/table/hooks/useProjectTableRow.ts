@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,7 +7,7 @@ import { getStatusColor } from '../../hooks/useProjectColors';
 import { useProjectAreas } from '../../hooks/useProjectAreas';
 
 export const useProjectTableRow = (project: any, refetch: () => void) => {
-  const { locations } = useOfficeSettings();
+  const { locations, office_stages } = useOfficeSettings();
   const { projectAreas, getAreaByCountry } = useProjectAreas();
   const [editableFields, setEditableFields] = useState<Record<string, any>>({});
   const [stageFees, setStageFees] = useState<Record<string, number>>({});
@@ -32,6 +31,16 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
       try {
         console.log('Fetching stage fees for project:', project.id);
         
+        const stageNameToIdMap: Record<string, string> = {};
+        
+        if (office_stages && office_stages.length > 0) {
+          office_stages.forEach(stage => {
+            stageNameToIdMap[stage.name] = stage.id;
+          });
+        }
+        
+        console.log('Stage name to ID mapping:', stageNameToIdMap);
+        
         const { data, error } = await supabase
           .from('project_fees')
           .select('stage_id, fee')
@@ -45,13 +54,34 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
         if (data) {
           console.log('Stage fees data received:', data);
           
-          const feeMap = data.reduce((acc, { stage_id, fee }) => {
-            acc[stage_id] = Number(fee);
-            return acc;
-          }, {} as Record<string, number>);
+          const feesByOfficeStageId: Record<string, number> = {};
           
-          console.log('Processed stage fees map:', feeMap);
-          setStageFees(feeMap);
+          for (const feeRecord of data) {
+            try {
+              const { data: stageData } = await supabase
+                .from('office_stages')
+                .select('name')
+                .eq('id', feeRecord.stage_id)
+                .single();
+                
+              if (stageData && stageData.name) {
+                const stageName = stageData.name;
+                const officeStageId = stageNameToIdMap[stageName];
+                
+                if (officeStageId) {
+                  feesByOfficeStageId[officeStageId] = Number(feeRecord.fee);
+                  console.log(`Mapped fee ${feeRecord.fee} for stage "${stageName}" to office stage ID ${officeStageId}`);
+                } else {
+                  console.log(`Could not find an office stage with name "${stageName}"`);
+                }
+              }
+            } catch (stageError) {
+              console.error('Error getting stage name:', stageError);
+            }
+          }
+          
+          console.log('Processed stage fees map by office stage ID:', feesByOfficeStageId);
+          setStageFees(feesByOfficeStageId);
         }
       } catch (err) {
         console.error('Error in fetchStageFees:', err);
@@ -59,7 +89,7 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     };
     
     fetchStageFees();
-  }, [project.id]);
+  }, [project.id, office_stages]);
 
   const handleFieldUpdate = async (projectId: string, field: string, value: any) => {
     try {
@@ -184,11 +214,11 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
       current_stage: project.current_stage,
     };
 
-    // Add stage fees to the row object
     Object.keys(stageFees).forEach(stageId => {
       row[stageId] = stageFees[stageId];
     });
 
+    console.log('Built project row with fees:', row);
     return row;
   };
 
@@ -204,4 +234,3 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     buildProjectRow
   };
 };
-

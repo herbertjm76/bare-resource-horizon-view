@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,9 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
 
   const projectArea = getAreaByCountry(project.country);
   const row = buildProjectRow();
+  
+  console.log(`ProjectTableRow - Project ${project.id} row data:`, row);
+  console.log(`ProjectTableRow - Office stages:`, office_stages);
 
   return (
     <>
@@ -109,6 +113,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         
         {office_stages.map((stage) => {
           const fee = row[stage.id];
+          console.log(`Stage ${stage.name} (${stage.id}): Fee = ${fee}`);
           return (
             <TableCell 
               key={`${project.id}-${stage.id}`} 
