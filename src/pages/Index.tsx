@@ -61,7 +61,7 @@ const Index = () => {
               <img 
                 src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
                 alt="Team collaboration illustration"
-                className="w-1/2 h-auto rounded-2xl shadow-2xl"
+                className="w-[60%] h-auto rounded-2xl shadow-2xl"
               />
             </div>
           </div>
