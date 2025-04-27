@@ -15,20 +15,20 @@ interface HolidaysListProps {
 export const HolidaysList: React.FC<HolidaysListProps> = ({ holidays }) => {
   return (
     <div className="w-full">
-      <h3 className="text-2xl font-semibold text-gray-800 mb-4">Upcoming Holidays</h3>
-      <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-800 mb-2">Upcoming Holidays</h3>
+      <div className="space-y-2">
         {holidays.map((holiday, index) => (
           <div key={index} className="flex items-center justify-between">
-            <div className="flex gap-4 items-center">
-              <span className="text-xl font-semibold">
+            <div className="flex gap-2 items-center">
+              <span className="text-sm font-semibold">
                 {new Date(holiday.date).toLocaleDateString('en-US', {
                   day: '2-digit',
                   month: 'short'
                 }).toUpperCase()}
               </span>
-              <span className="text-xl">{holiday.name}</span>
+              <span className="text-sm">{holiday.name}</span>
             </div>
-            <span className="text-xl text-gray-600">{holiday.offices.join(', ')}</span>
+            <span className="text-sm text-gray-600">{holiday.offices.join(', ')}</span>
           </div>
         ))}
       </div>

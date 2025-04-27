@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Filter } from 'lucide-react';
 import {
@@ -18,7 +17,6 @@ import { HolidaysList } from './HolidaysList';
 import { StaffAvailability } from './StaffAvailability';
 import { HerbieChat } from './HerbieChat';
 
-// Mock data kept the same but updated values to match mockup
 const mockData = {
   activeResources: 96,
   activeProjects: 55,
@@ -59,7 +57,6 @@ const mockData = {
 export const DashboardMetrics = () => {
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
   
-  // Get today's date in the format "SUNDAY, APRIL 27, 2025"
   const today = new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
     month: 'long', 
@@ -68,11 +65,11 @@ export const DashboardMetrics = () => {
   }).toUpperCase();
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-xl text-gray-800 mb-1">TODAY IS</h2>
-          <p className="text-3xl font-bold">{today}</p>
+          <h2 className="text-sm text-gray-600 mb-0.5">TODAY IS</h2>
+          <p className="text-2xl font-bold">{today}</p>
         </div>
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-gray-600" />
@@ -94,27 +91,24 @@ export const DashboardMetrics = () => {
         </div>
       </div>
 
-      {/* Main Layout Grid */}
-      <div className="grid grid-cols-12 gap-6">
-        {/* Section A: Left column with KPIs */}
+      <div className="grid grid-cols-12 gap-4">
         <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-6">
-              <div className="space-y-6">
+            <CardContent className="p-4">
+              <div className="space-y-4">
                 <div>
-                  <p className="text-kpi font-bold text-brand-violet">{mockData.activeResources}</p>
-                  <p className="text-xl">Active members</p>
+                  <p className="text-4xl font-bold text-brand-violet">{mockData.activeResources}</p>
+                  <p className="text-base">Active members</p>
                 </div>
                 <div>
-                  <p className="text-kpi font-bold text-brand-violet">{mockData.activeProjects}</p>
-                  <p className="text-xl">Live projects</p>
+                  <p className="text-4xl font-bold text-brand-violet">{mockData.activeProjects}</p>
+                  <p className="text-base">Live projects</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Section B: Center column with utilization gauges */}
         <div className="col-span-6">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
             <CardContent className="p-6">
@@ -149,7 +143,6 @@ export const DashboardMetrics = () => {
           </Card>
         </div>
 
-        {/* Section C: Right column with HERBIE chat */}
         <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
             <CardContent className="p-6 h-full">
@@ -158,7 +151,6 @@ export const DashboardMetrics = () => {
           </Card>
         </div>
 
-        {/* Section D: Holidays list */}
         <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
             <CardContent className="p-6">
@@ -167,7 +159,6 @@ export const DashboardMetrics = () => {
           </Card>
         </div>
 
-        {/* Section E: Staff Availability */}
         <div className="col-span-9">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
             <CardContent className="p-6">
@@ -176,7 +167,6 @@ export const DashboardMetrics = () => {
           </Card>
         </div>
 
-        {/* Section F: Four charts in a row */}
         <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
             <CardContent className="p-6">
