@@ -1,15 +1,10 @@
-
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import type { User, Session } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
-import { DashboardStats } from '@/components/dashboard/DashboardStats';
-import { TeamManagement } from '@/components/dashboard/TeamManagement';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { toast } from 'sonner';
 import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
 import { AppHeader } from '@/components/AppHeader';
 import { useCompany } from '@/context/CompanyContext';
@@ -182,18 +177,8 @@ const Dashboard: React.FC = () => {
             <div className="flex-1 flex flex-col">
               <AppHeader />
               <div style={{ height: HEADER_HEIGHT }} />
-              <div className="flex-1 bg-background p-8">
-                <div className="max-w-6xl mx-auto">
-                  <DashboardHeader userName={profile?.first_name || user?.email?.split('@')[0] || 'User'} />
-                  <DashboardMetrics />
-                  {(profile?.role === 'owner' || profile?.role === 'admin') && (
-                    <TeamManagement 
-                      teamMembers={teamMembers} 
-                      inviteUrl={inviteUrl}
-                      userRole={profile.role}
-                    />
-                  )}
-                </div>
+              <div className="flex-1 bg-background">
+                <DashboardMetrics />
               </div>
             </div>
           </div>

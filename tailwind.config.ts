@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -25,6 +26,10 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         "brand-primary": "#6F4BF6",
+        "brand-violet": "#6F4BF6",
+        "brand-violet-light": "#ECECFB",
+        "brand-gray": "#8E9196",
+        "brand-border": "#F0F0F4", 
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -67,7 +72,17 @@ export default {
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)'
+        sm: 'calc(var(--radius) - 4px)',
+        '2xl': '16px', // As per design specs
+      },
+      boxShadow: {
+        'xs': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+      },
+      fontFamily: {
+        'inter': ['Inter', 'sans-serif'],
+      },
+      fontSize: {
+        'kpi': '48px',
       },
       keyframes: {
         'accordion-down': {

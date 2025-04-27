@@ -1,22 +1,10 @@
+
 import React, { useState } from 'react';
-import {
-  Building,
-  Users,
-  Target,
-  Filter,
-} from 'lucide-react';
+import { Filter } from 'lucide-react';
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -24,41 +12,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  Tooltip,
-} from 'recharts';
+import { Gauge } from './Gauge';
+import { Donut } from './Donut';
+import { HolidaysList } from './HolidaysList';
+import { StaffAvailability } from './StaffAvailability';
+import { HerbieChat } from './HerbieChat';
 
+// Mock data
 const mockData = {
-  teamSize: 47,
-  liveProjects: 17,
+  activeResources: 96,
+  activeProjects: 55,
   utilizationRate: {
-    week: 85,
-    month: 78,
-    quarter: 82
+    days7: 85,
+    days30: 78,
+    days90: 82
   },
-  staffData: {
-    available: [
-      { id: 1, name: 'Carmen Simone', role: 'Developer' },
-      { id: 2, name: 'Akshaya', role: 'Designer' },
-      { id: 3, name: 'Jo Wang', role: 'PM' },
-      { id: 4, name: 'Julia Ile', role: 'Developer' },
-      { id: 5, name: 'Kay Sasiprapakul', role: 'Developer' },
-    ],
-    overloaded: [
-      { id: 6, name: 'Kosmas Silelogiou', role: 'Developer' },
-      { id: 7, name: 'Lee Han-Tse', role: 'Designer' },
-      { id: 8, name: 'Mandy Wan', role: 'PM' },
-    ]
-  },
+  staffData: [
+    { name: 'Carmen Simone', role: 'Developer', availability: 95 },
+    { name: 'Akshaya Patel', role: 'Designer', availability: 72 },
+    { name: 'Jo Wang', role: 'PM', availability: 65 },
+    { name: 'Julia Ile', role: 'Developer', availability: 88 },
+    { name: 'Kay Sasiprapakul', role: 'Developer', availability: 30 },
+    { name: 'Kosmas Silelogiou', role: 'Developer', availability: 45 },
+    { name: 'Lee Han-Tse', role: 'Designer', availability: 60 },
+    { name: 'Mandy Wan', role: 'PM', availability: 75 },
+  ],
   projectsByStatus: [
     { name: 'In Progress', value: 17 },
     { name: 'Complete', value: 2 },
     { name: 'On Hold', value: 2 },
+  ],
+  projectsByStage: [
+    { name: 'Analysis', value: 6 },
+    { name: 'Design', value: 8 },
+    { name: 'Development', value: 14 },
+    { name: 'Testing', value: 3 },
   ],
   projectsByRegion: [
     { name: 'Saudi Arabia', value: 17 },
@@ -70,31 +58,38 @@ const mockData = {
     { name: 'London', value: 22 },
     { name: 'Dubai', value: 10 },
     { name: 'Hong Kong', value: 3 },
+    { name: 'New York', value: 5 },
   ],
   upcomingHolidays: [
-    { date: '2025-05-27', name: 'Memorial Day', office: 'London' },
-    { date: '2025-07-04', name: 'Independence Day', office: 'Dubai' },
+    { date: '2025-05-27', name: 'Memorial Day', offices: ['London'] },
+    { date: '2025-06-15', name: 'Eid al-Adha', offices: ['Dubai', 'Riyadh'] },
+    { date: '2025-07-04', name: 'Independence Day', offices: ['New York'] },
+    { date: '2025-08-12', name: 'Queen\'s Birthday', offices: ['London'] },
+    { date: '2025-08-15', name: 'Indian Independence Day', offices: ['Mumbai'] },
+    { date: '2025-09-01', name: 'Labour Day', offices: ['New York'] },
+    { date: '2025-10-01', name: 'National Day', offices: ['Hong Kong', 'Beijing'] },
   ],
+  offices: ['All Offices', 'London', 'Dubai', 'Hong Kong', 'New York', 'Mumbai', 'Riyadh', 'Beijing'],
 };
 
-const COLORS = ['#4E79A7', '#F28E2B', '#E15759', '#76B7B2'];
-const periods = ['7 Days', '30 Days', '90 Days'] as const;
-type Period = typeof periods[number];
-
 export const DashboardMetrics = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState<Period>('7 Days');
-  const [selectedOffice, setSelectedOffice] = useState('all');
-
-  const filteredMockData = {
-    ...mockData,
-    teamSize: selectedOffice === 'all' ? mockData.teamSize : 
-      mockData.resourcesByOffice.find(o => o.name.toLowerCase() === selectedOffice)?.value || 0,
-  };
+  const [selectedOffice, setSelectedOffice] = useState('All Offices');
+  
+  // Get today's date in the format "Monday, May 1, 2025"
+  const today = new Date().toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    month: 'long', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
 
   return (
-    <div className="space-y-6">
+    <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">Dashboard Overview</h2>
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800">Dashboard Overview</h2>
+          <p className="text-sm text-gray-500">{today}</p>
+        </div>
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-gray-600" />
           <Select
@@ -102,13 +97,12 @@ export const DashboardMetrics = () => {
             onValueChange={setSelectedOffice}
           >
             <SelectTrigger className="w-[180px] bg-white border border-gray-300 text-gray-700">
-              <SelectValue placeholder="All Office" />
+              <SelectValue placeholder="All Offices" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Office</SelectItem>
-              {mockData.resourcesByOffice.map((office) => (
-                <SelectItem key={office.name} value={office.name.toLowerCase()}>
-                  {office.name}
+              {mockData.offices.map((office) => (
+                <SelectItem key={office} value={office}>
+                  {office}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -116,218 +110,119 @@ export const DashboardMetrics = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-700">Total Resources</CardTitle>
-            <Building className="h-4 w-4 text-gray-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{filteredMockData.teamSize}</div>
-            <p className="text-sm text-gray-600 mt-1">Active team members</p>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-gray-700">Live Projects</CardTitle>
-            <Target className="h-4 w-4 text-gray-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-gray-900">{mockData.liveProjects}</div>
-            <p className="text-sm text-gray-600 mt-1">Current active projects</p>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-6">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-700">Resource Utilization Trends</CardTitle>
-          </CardHeader>
-          <CardContent className="flex justify-between gap-4">
-            {periods.map((period) => (
-              <div key={period} className="text-center">
-                <div className="mb-2 text-sm text-gray-600">{period}</div>
-                <div className="relative h-24 w-24">
-                  <svg className="h-full w-full" viewBox="0 0 100 100">
-                    <circle
-                      className="text-gray-100"
-                      strokeWidth="8"
-                      stroke="currentColor"
-                      fill="transparent"
-                      r="40"
-                      cx="50"
-                      cy="50"
-                    />
-                    <circle
-                      className="text-blue-500"
-                      strokeWidth="8"
-                      strokeDasharray={`${mockData.utilizationRate[period === '7 Days' ? 'week' : period === '30 Days' ? 'month' : 'quarter'] * 2.51327} 251.327`}
-                      strokeLinecap="round"
-                      stroke="currentColor"
-                      fill="transparent"
-                      r="40"
-                      cx="50"
-                      cy="50"
-                      transform="rotate(-90 50 50)"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl font-bold text-gray-900">
-                      {mockData.utilizationRate[period === '7 Days' ? 'week' : period === '30 Days' ? 'month' : 'quarter']}%
-                    </span>
-                  </div>
+      {/* Main Layout Grid */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Section A: Left column with Date + KPIs */}
+        <div className="col-span-12 lg:col-span-3">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
+            <CardContent className="p-6">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">Active Resources</h3>
+                  <p className="text-5xl font-bold text-gray-900">{mockData.activeResources}</p>
+                  <p className="text-sm text-gray-500 mt-1">Currently active team members</p>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">Live Projects</h3>
+                  <p className="text-5xl font-bold text-gray-900">{mockData.activeProjects}</p>
+                  <p className="text-sm text-gray-500 mt-1">Active projects in progress</p>
                 </div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-8">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-gray-800">Staff Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="available" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="available">Available Staff ({mockData.staffData.available.length})</TabsTrigger>
-                <TabsTrigger value="overloaded">Overloaded Staff ({mockData.staffData.overloaded.length})</TabsTrigger>
-              </TabsList>
-              <TabsContent value="available" className="h-[300px] overflow-y-auto">
-                <div className="space-y-2">
-                  {mockData.staffData.available.map((staff) => (
-                    <div key={staff.id} className="flex items-center space-x-4 p-2 rounded-lg hover:bg-gray-50">
-                      <Users className="h-5 w-5 text-gray-600" />
-                      <div>
-                        <p className="font-medium text-gray-800">{staff.name}</p>
-                        <p className="text-sm text-gray-600">{staff.role}</p>
-                      </div>
-                    </div>
-                  ))}
+        {/* Section B: Center column with utilization gauges */}
+        <div className="col-span-12 lg:col-span-6">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-6">Resource Utilization</h3>
+              <div className="flex justify-between items-center">
+                <div className="flex-1 flex flex-col items-center">
+                  <Gauge 
+                    value={mockData.utilizationRate.days7} 
+                    max={100} 
+                    title="7 Days"
+                  />
                 </div>
-              </TabsContent>
-              <TabsContent value="overloaded" className="h-[300px] overflow-y-auto">
-                <div className="space-y-2">
-                  {mockData.staffData.overloaded.map((staff) => (
-                    <div key={staff.id} className="flex items-center space-x-4 p-2 rounded-lg hover:bg-gray-50">
-                      <Users className="h-5 w-5 text-gray-600" />
-                      <div>
-                        <p className="font-medium text-gray-800">{staff.name}</p>
-                        <p className="text-sm text-gray-600">{staff.role}</p>
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex-1 flex flex-col items-center">
+                  <Gauge 
+                    value={mockData.utilizationRate.days30} 
+                    max={100} 
+                    title="30 Days"
+                  />
                 </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle className="text-lg font-medium text-gray-800">Upcoming Holidays</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="divide-y divide-gray-200">
-              {mockData.upcomingHolidays.map((holiday) => (
-                <div key={holiday.date} className="py-3">
-                  <div className="flex justify-between text-gray-800">
-                    <span>{holiday.name}</span>
-                    <span>{new Date(holiday.date).toLocaleDateString()}</span>
-                  </div>
-                  <div className="text-sm text-gray-600">{holiday.office}</div>
+                <div className="flex-1 flex flex-col items-center">
+                  <Gauge 
+                    value={mockData.utilizationRate.days90} 
+                    max={100} 
+                    title="90 Days"
+                  />
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-      <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-700">Projects by Status</CardTitle>
-          </CardHeader>
-          <CardContent className="h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={mockData.projectsByStatus}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  label
-                >
-                  {mockData.projectsByStatus.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend verticalAlign="bottom" height={36} />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        {/* Section C: Right column with HERBIE chat */}
+        <div className="col-span-12 lg:col-span-3">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
+            <CardContent className="p-6 h-full">
+              <HerbieChat />
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-700">Projects by Region</CardTitle>
-          </CardHeader>
-          <CardContent className="h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={mockData.projectsByRegion}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  label
-                >
-                  {mockData.projectsByRegion.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend verticalAlign="bottom" height={36} />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        {/* Section D: Holidays list */}
+        <div className="col-span-12 lg:col-span-3">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
+            <CardContent className="p-6">
+              <HolidaysList holidays={mockData.upcomingHolidays} />
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-gray-700">Resources by Office</CardTitle>
-          </CardHeader>
-          <CardContent className="h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={mockData.resourcesByOffice}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  label
-                >
-                  {mockData.resourcesByOffice.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend verticalAlign="bottom" height={36} />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        {/* Section E: Staff Availability */}
+        <div className="col-span-12 lg:col-span-9">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
+            <CardContent className="p-6">
+              <StaffAvailability staffMembers={mockData.staffData} />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Section F: Four charts in a row */}
+        <div className="col-span-12 lg:col-span-3">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
+            <CardContent className="p-6">
+              <Donut data={mockData.projectsByStatus} title="Projects by Status" />
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="col-span-12 lg:col-span-3">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
+            <CardContent className="p-6">
+              <Donut data={mockData.projectsByStage} title="Projects by Stage" />
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="col-span-12 lg:col-span-3">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
+            <CardContent className="p-6">
+              <Donut data={mockData.projectsByRegion} title="Projects by Region" />
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="col-span-12 lg:col-span-3">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
+            <CardContent className="p-6">
+              <Donut data={mockData.resourcesByOffice} title="Resources by Office" />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
