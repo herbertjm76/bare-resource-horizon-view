@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button"
 import { ChevronRight, ChevronLeft } from "lucide-react"
+import LogoIcon from "@/assets/logo.svg"  // Assuming you have a logo SVG
 
 interface SidebarLogoProps {
   collapsed: boolean
@@ -16,21 +17,29 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => {
   return (
     <div className="flex items-center justify-between h-[48px] border-b border-[#7d8086] px-4">
       {collapsed ? (
-        <div className="w-full flex justify-center">
+        <div className="w-full flex items-center justify-center">
+          <img 
+            src={LogoIcon} 
+            alt="BareResource Logo" 
+            className="w-8 h-8 opacity-80 hover:opacity-100 transition-opacity" 
+          />
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={handleToggle}
-            className="text-white hover:bg-[#7d8086]/30 h-12 w-12 rounded-none flex items-center justify-center z-20"
+            className="text-white hover:bg-[#7d8086]/30 h-12 w-12 rounded-none flex items-center justify-center z-20 ml-auto"
           >
-            <div className="flex items-center justify-center w-12 h-12">
-              <ChevronRight className="h-6 w-6" />
-            </div>
+            <ChevronRight className="h-6 w-6" />
           </Button>
         </div>
       ) : (
-        <>
-          <div className="flex items-center gap-2">
+        <div className="flex items-center w-full">
+          <div className="flex items-center gap-2 flex-grow">
+            <img 
+              src={LogoIcon} 
+              alt="BareResource Logo" 
+              className="w-8 h-8 mr-2 opacity-80 hover:opacity-100 transition-opacity" 
+            />
             <span className="text-white font-semibold">BareResource</span>
           </div>
           <Button 
@@ -39,11 +48,9 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => {
             onClick={handleToggle}
             className="text-white hover:bg-[#7d8086]/30 h-12 w-12 rounded-none flex items-center justify-center"
           >
-            <div className="flex items-center justify-center w-12 h-12">
-              <ChevronLeft className="h-6 w-6" />
-            </div>
+            <ChevronLeft className="h-6 w-6" />
           </Button>
-        </>
+        </div>
       )}
     </div>
   )
