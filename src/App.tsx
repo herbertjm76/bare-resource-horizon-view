@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import Join from "./pages/Join";
 import Profile from "./pages/Profile";
 import { CompanyProvider, useCompany } from "./context/CompanyContext";
 import { useEffect } from "react";
+import TeamMembers from "./pages/TeamMembers";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +50,7 @@ const AppRoutes = () => {
       <Route path="/projects" element={<Projects />} />
       <Route path="/office-settings" element={<OfficeSettings />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/team-members" element={<TeamMembers />} />
       
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />

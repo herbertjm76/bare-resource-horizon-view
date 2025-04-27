@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard,
   CalendarDays,
@@ -53,7 +52,7 @@ export const navigationItems = [
     items: [
       {
         title: "Team Members",
-        url: "/team-members",
+        url: "/team-members",  // Updated URL to match the new route
         icon: UserSquare2,
       },
       {
