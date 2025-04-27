@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Users, Calendar, ChartBar, Bell } from 'lucide-react';
 
@@ -57,9 +58,11 @@ const Index = () => {
             
             {/* Hero Image */}
             <div className="relative">
-              <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-                <div className="bg-gradient-to-r from-purple-400 to-purple-600 h-48 w-full"></div>
-              </div>
+              <img 
+                src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
+                alt="Team collaboration illustration"
+                className="w-full h-auto rounded-2xl shadow-2xl"
+              />
             </div>
           </div>
         </div>
