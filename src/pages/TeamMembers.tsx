@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { TeamManagement } from "@/components/dashboard/TeamManagement";
+import TeamInviteControls from "@/components/dashboard/TeamInviteControls";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/components/dashboard/types";
