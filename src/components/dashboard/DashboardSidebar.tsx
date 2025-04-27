@@ -30,7 +30,7 @@ export function DashboardSidebar() {
       {/* Back-plate gradient - with pointer-events-none to prevent click interference */}
       <div className="fixed inset-y-0 left-0 w-[220px] -z-10 transition-all duration-300 pointer-events-none"
            style={{ width: collapsed ? '72px' : '220px' }}>
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#1E1745_0%,#171E47_45%,#0E183C_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#8C50F6_0%,#3F8BF9_45%,#F16BB8_100%)]" />
       </div>
 
       {/* Top highlight gradient - also with pointer-events-none */}
