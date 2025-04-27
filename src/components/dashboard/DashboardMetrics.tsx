@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Filter } from 'lucide-react';
+import { Filter, Activity } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -94,8 +94,8 @@ export const DashboardMetrics = () => {
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-4">
-              <div className="space-y-4">
+            <CardContent className="p-4 flex items-center">
+              <div className="space-y-4 flex-grow">
                 <div>
                   <p className="text-4xl font-bold text-brand-violet">{mockData.activeResources}</p>
                   <p className="text-base">Active members</p>
@@ -104,6 +104,13 @@ export const DashboardMetrics = () => {
                   <p className="text-4xl font-bold text-brand-violet">{mockData.activeProjects}</p>
                   <p className="text-base">Live projects</p>
                 </div>
+              </div>
+              <div className="ml-4 opacity-30">
+                <Activity 
+                  size={64} 
+                  strokeWidth={1.5} 
+                  className="text-brand-violet/30" 
+                />
               </div>
             </CardContent>
           </Card>
