@@ -16,7 +16,7 @@ import { toast } from 'sonner';
 interface InviteMembersDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  companyId: string; // Add companyId prop
+  companyId: string;
 }
 
 const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({

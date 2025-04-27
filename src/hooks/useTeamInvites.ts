@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -23,7 +24,10 @@ export const useTeamInvites = (companyId: string | undefined) => {
         return false;
       }
 
+      // Generate a unique invite code
       const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+      
+      // Insert the invitation record into the database
       const { error } = await supabase
         .from('invites')
         .insert({
@@ -39,6 +43,7 @@ export const useTeamInvites = (companyId: string | undefined) => {
       setInviteEmail('');
       return true;
     } catch (e: any) {
+      console.error('Error sending invite:', e);
       toast.error(e.message || 'Error sending invite.');
       return false;
     } finally {
