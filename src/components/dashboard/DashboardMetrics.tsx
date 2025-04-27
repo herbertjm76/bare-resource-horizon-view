@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Building,
@@ -94,12 +93,12 @@ export const DashboardMetrics = () => {
     <div className="space-y-6">
       <div className="flex justify-end mb-6">
         <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-white/80" />
+          <Filter className="h-4 w-4 text-gray-700" />
           <Select
             value={selectedOffice}
             onValueChange={setSelectedOffice}
           >
-            <SelectTrigger className="w-[180px] bg-white/10 backdrop-blur-md border-white/20 text-white">
+            <SelectTrigger className="w-[180px] bg-white border border-gray-300 text-gray-900">
               <SelectValue placeholder="All Office" />
             </SelectTrigger>
             <SelectContent>
@@ -116,39 +115,38 @@ export const DashboardMetrics = () => {
 
       {/* Top Row - Small Stats */}
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-3 bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="col-span-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Resource</CardTitle>
-            <Building className="h-4 w-4 text-white/80" />
+            <CardTitle className="text-sm font-medium text-gray-700">Resource</CardTitle>
+            <Building className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{filteredMockData.teamSize}</div>
+            <div className="text-2xl font-bold text-gray-900">{filteredMockData.teamSize}</div>
           </CardContent>
         </Card>
 
-        <Card className="col-span-3 bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="col-span-3">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-white">Live Projects</CardTitle>
-            <Target className="h-4 w-4 text-white/80" />
+            <CardTitle className="text-sm font-medium text-gray-700">Live Projects</CardTitle>
+            <Target className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{mockData.liveProjects}</div>
+            <div className="text-2xl font-bold text-gray-900">{mockData.liveProjects}</div>
           </CardContent>
         </Card>
 
-        {/* Utilization Rates */}
-        <Card className="col-span-6 bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="col-span-6">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-white">Resource Utilization</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-700">Resource Utilization</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-between gap-4">
             {periods.map((period) => (
               <div key={period} className="text-center">
-                <div className="mb-2 text-sm text-white/80">{period}</div>
+                <div className="mb-2 text-sm text-gray-500">{period}</div>
                 <div className="relative h-24 w-24">
                   <svg className="h-full w-full" viewBox="0 0 100 100">
                     <circle
-                      className="text-white/20"
+                      className="text-gray-200"
                       strokeWidth="8"
                       stroke="currentColor"
                       fill="transparent"
@@ -170,7 +168,7 @@ export const DashboardMetrics = () => {
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xl font-bold text-white">
+                    <span className="text-xl font-bold text-gray-900">
                       {mockData.utilizationRate[period === '7 Days' ? 'week' : period === '30 Days' ? 'month' : 'quarter']}%
                     </span>
                   </div>
@@ -181,11 +179,10 @@ export const DashboardMetrics = () => {
         </Card>
       </div>
 
-      {/* Middle Row - Staff and Holidays */}
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-8 bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="col-span-8">
           <CardHeader>
-            <CardTitle className="text-lg font-medium text-white">Staff Status</CardTitle>
+            <CardTitle className="text-lg font-medium text-gray-700">Staff Status</CardTitle>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="available" className="w-full">
@@ -223,9 +220,9 @@ export const DashboardMetrics = () => {
           </CardContent>
         </Card>
 
-        <Card className="col-span-4 bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="col-span-4">
           <CardHeader>
-            <CardTitle className="text-lg font-medium text-white">Upcoming Holidays</CardTitle>
+            <CardTitle className="text-lg font-medium text-gray-700">Upcoming Holidays</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="divide-y divide-white/10">
@@ -243,11 +240,10 @@ export const DashboardMetrics = () => {
         </Card>
       </div>
 
-      {/* Bottom Row - Charts */}
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-3 bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="col-span-3">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-white">Projects by Status</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-700">Projects by Status</CardTitle>
           </CardHeader>
           <CardContent className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -270,9 +266,9 @@ export const DashboardMetrics = () => {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3 bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="col-span-3">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-white">Projects by Region</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-700">Projects by Region</CardTitle>
           </CardHeader>
           <CardContent className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
@@ -295,9 +291,9 @@ export const DashboardMetrics = () => {
           </CardContent>
         </Card>
 
-        <Card className="col-span-6 bg-white/10 backdrop-blur-md border-white/20">
+        <Card className="col-span-6">
           <CardHeader>
-            <CardTitle className="text-sm font-medium text-white">Resources by Office</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-700">Resources by Office</CardTitle>
           </CardHeader>
           <CardContent className="h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
