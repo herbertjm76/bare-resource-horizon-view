@@ -20,7 +20,7 @@ interface MemberFormData {
   first_name: string;
   last_name: string;
   email: string;
-  role: string;
+  role: "owner" | "admin" | "member"; // Updated to use the literal union type
   department?: string;
   location?: string;
   job_title?: string;
@@ -135,7 +135,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
               <Label htmlFor="role">System Role</Label>
               <Select 
                 defaultValue={member?.role || "member"}
-                onValueChange={(value) => setValue('role', value)}
+                onValueChange={(value: "owner" | "admin" | "member") => setValue('role', value)} // Type cast for onValueChange
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select role" />

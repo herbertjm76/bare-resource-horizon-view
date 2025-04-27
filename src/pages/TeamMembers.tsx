@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -67,7 +66,7 @@ const TeamMembersPage = () => {
       // For now, we'll just return the profiles with placeholder values for the new fields
       return profiles.map(profile => ({
         ...profile,
-        department: profile.department || 'General',
+        department: profile.department || 'General',  // These properties are now properly defined in the Profile type
         location: profile.location || 'Remote',
         job_title: profile.job_title || 'Team Member'
       })) as Profile[];

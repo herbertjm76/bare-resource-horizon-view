@@ -1,3 +1,4 @@
+
 // TeamManagement.tsx
 
 import React, { useEffect, useState } from 'react';
@@ -13,10 +14,11 @@ import TeamMembersToolbar from './TeamMembersToolbar';
 import MemberDialog from './MemberDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
+// Update the Profile type to include the additional fields
 export type Profile = Database['public']['Tables']['profiles']['Row'] & {
-  department?: string;
-  location?: string;
-  job_title?: string;
+  department: string;
+  location: string;
+  job_title: string;
 };
 
 export type Invite = Database['public']['Tables']['invites']['Row'];
