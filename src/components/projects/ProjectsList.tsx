@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProjectsToolbar from './ProjectsToolbar';
@@ -126,13 +125,11 @@ export const ProjectsList = () => {
   };
 
   return (
-    <Card className="bg-white/90 backdrop-blur-sm border-white/20 shadow-xl">
+    <Card className="border shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
         <div>
-          <CardTitle className="text-2xl font-semibold mb-1.5 bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] bg-clip-text text-transparent">
-            All Projects
-          </CardTitle>
-          <p className="text-sm text-gray-600">
+          <CardTitle className="text-2xl font-semibold mb-1.5">All Projects</CardTitle>
+          <p className="text-sm text-muted-foreground">
             View and manage all your ongoing projects
           </p>
         </div>
