@@ -76,7 +76,7 @@ export function DashboardSidebar() {
       collapsible="icon"
       style={{ marginTop: 0, width: collapsed ? '72px' : '220px' }}
     >
-      <SidebarContent className="p-0">
+      <SidebarContent className="p-0 z-30">
         <SidebarGroup>
           {renderSidebarContent()}
         </SidebarGroup>
