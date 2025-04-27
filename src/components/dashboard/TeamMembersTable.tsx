@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Profile } from "./TeamManagement";
-import { AlertCircle, Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
@@ -12,6 +12,12 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TeamMembersTableProps {
   teamMembers: Profile[];
@@ -40,18 +46,6 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
     }
   };
 
-  if (!teamMembers.length) {
-    return (
-      <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Team Members</h3>
-        <div className="p-4 rounded-md bg-yellow-50 border border-yellow-200 flex items-center gap-3">
-          <AlertCircle className="h-5 w-5 text-yellow-500" />
-          <p className="text-yellow-700">No team members found. If you just logged in, you may need to refresh the page.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <h3 className="text-lg font-medium text-gray-900 mb-4">
@@ -74,7 +68,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
             {teamMembers.map((member) => (
               <TableRow 
                 key={member.id} 
-                className="hover:bg-gray-50"
+                className="group hover:bg-gray-50 transition-colors duration-150"
               >
                 {editMode && (
                   <TableCell>
@@ -95,25 +89,44 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                 <TableCell>{member.location || '—'}</TableCell>
                 {editMode && (
                   <TableCell>
-                    <div className="flex items-center justify-end gap-2">
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 w-8 p-0"
-                        onClick={() => onEditMember && onEditMember(member)}
-                      >
-                        <Edit className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
-                        onClick={() => onDeleteMember && onDeleteMember(member.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Delete</span>
-                      </Button>
+                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0"
+                              onClick={() => onEditMember && onEditMember(member)}
+                            >
+                              <Edit className="h-4 w-4" />
+                              <span className="sr-only">Edit</span>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Edit member details</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                              onClick={() => onDeleteMember && onDeleteMember(member.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              <span className="sr-only">Delete</span>
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Delete member</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
                   </TableCell>
                 )}

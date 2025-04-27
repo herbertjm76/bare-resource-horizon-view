@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -38,7 +37,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
       first_name: '',
       last_name: '',
       email: '',
-      role: 'member',
+      role: 'member' as const,
       department: '',
       location: '',
       job_title: ''
@@ -72,7 +71,8 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
   const onSubmit = (data: MemberFormData) => {
     onSave({
       ...data,
-      id: member?.id  // Include the ID if editing an existing member
+      id: member?.id, // Include the ID if editing an existing member
+      role: data.role // Ensure role is properly typed
     });
   };
 
@@ -84,11 +84,13 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
-            {member ? 'Edit the details for this team member.' : 'Add a new team member to your organization.'}
+            {member 
+              ? 'Update the team member\'s information using the form below.'
+              : 'Add a new team member to your organization using the form below.'}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="grid gap-4 py-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="first_name">First Name</Label>
@@ -172,7 +174,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
