@@ -21,13 +21,15 @@ export function DashboardSidebar() {
   const collapsed = state === "collapsed";
 
   const renderSidebarContent = () => (
-    <>
-      {/* Gradient background */}
-      <div className="absolute inset-0 -z-10 
-        bg-[linear-gradient(180deg,#1E1745_0%,#171E47_45%,#0E183C_100%)]" />
+    <div className="relative w-full h-full">
+      {/* Back-plate gradient */}
+      <div className="fixed inset-y-0 left-0 w-[220px] -z-10 transition-all duration-300"
+           style={{ width: collapsed ? '80px' : '220px' }}>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#1E1745_0%,#171E47_45%,#0E183C_100%)]" />
+      </div>
 
-      {/* Top glow effect */}
-      <div className="pointer-events-none absolute inset-0 -z-10 
+      {/* Top highlight gradient */}
+      <div className="fixed inset-x-0 top-0 h-28 -z-10 pointer-events-none
         bg-[radial-gradient(120%_30%_at_50%_0%,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_70%)]" />
 
       <SidebarLogo collapsed={collapsed} toggleSidebar={toggleSidebar} />
@@ -36,7 +38,7 @@ export function DashboardSidebar() {
         collapsed={collapsed}
         currentPath={location.pathname}
       />
-    </>
+    </div>
   );
 
   if (isMobile) {
@@ -53,7 +55,7 @@ export function DashboardSidebar() {
         
         <Sheet open={openMobile} onOpenChange={setOpenMobile}>
           <SheetContent side="left" className="p-0 w-[220px]">
-            <div className="flex flex-col h-full relative">
+            <div className="flex flex-col h-full">
               {renderSidebarContent()}
             </div>
           </SheetContent>
@@ -68,7 +70,7 @@ export function DashboardSidebar() {
       collapsible="icon"
       style={{ marginTop: 0, width: collapsed ? '80px' : '220px' }}
     >
-      <SidebarContent className="p-0 relative">
+      <SidebarContent className="p-0">
         <SidebarGroup>
           {renderSidebarContent()}
         </SidebarGroup>
