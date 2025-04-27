@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Filter, Activity } from 'lucide-react';
+import { Filter, Activity, Users } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -105,9 +105,14 @@ export const DashboardMetrics = () => {
                   <p className="text-base">Live projects</p>
                 </div>
               </div>
-              <div className="ml-4 opacity-30">
+              <div className="flex flex-col space-y-4 ml-4 opacity-30">
+                <Users 
+                  size={48} 
+                  strokeWidth={1.5} 
+                  className="text-brand-violet/30" 
+                />
                 <Activity 
-                  size={64} 
+                  size={48} 
                   strokeWidth={1.5} 
                   className="text-brand-violet/30" 
                 />
