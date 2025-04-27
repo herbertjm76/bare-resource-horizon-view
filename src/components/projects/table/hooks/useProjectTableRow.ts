@@ -31,58 +31,39 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
       try {
         console.log('Fetching stage fees for project:', project.id);
         
-        const stageNameToIdMap: Record<string, string> = {};
-        
-        if (office_stages && office_stages.length > 0) {
-          office_stages.forEach(stage => {
-            stageNameToIdMap[stage.name] = stage.id;
-          });
-        }
-        
-        console.log('Stage name to ID mapping:', stageNameToIdMap);
-        
-        const { data, error } = await supabase
-          .from('project_fees')
-          .select('stage_id, fee')
+        const { data: projectStagesData, error: stagesError } = await supabase
+          .from('project_stages')
+          .select('stage_name, fee')
           .eq('project_id', project.id);
           
-        if (error) {
-          console.error('Error fetching stage fees:', error);
+        if (stagesError) {
+          console.error('Error fetching project stages:', stagesError);
           return;
         }
+
+        console.log('Project stages data:', projectStagesData);
         
-        if (data) {
-          console.log('Stage fees data received:', data);
-          
-          const feesByOfficeStageId: Record<string, number> = {};
-          
-          for (const feeRecord of data) {
-            try {
-              const { data: stageData } = await supabase
-                .from('office_stages')
-                .select('name')
-                .eq('id', feeRecord.stage_id)
-                .single();
-                
-              if (stageData && stageData.name) {
-                const stageName = stageData.name;
-                const officeStageId = stageNameToIdMap[stageName];
-                
-                if (officeStageId) {
-                  feesByOfficeStageId[officeStageId] = Number(feeRecord.fee);
-                  console.log(`Mapped fee ${feeRecord.fee} for stage "${stageName}" to office stage ID ${officeStageId}`);
-                } else {
-                  console.log(`Could not find an office stage with name "${stageName}"`);
-                }
-              }
-            } catch (stageError) {
-              console.error('Error getting stage name:', stageError);
-            }
+        const feesByStage: Record<string, number> = {};
+        projectStagesData?.forEach(stage => {
+          if (stage.stage_name && stage.fee) {
+            feesByStage[stage.stage_name] = Number(stage.fee);
           }
-          
-          console.log('Processed stage fees map by office stage ID:', feesByOfficeStageId);
-          setStageFees(feesByOfficeStageId);
-        }
+        });
+        
+        console.log('Fees by stage name:', feesByStage);
+        
+        const feesByOfficeStageId: Record<string, number> = {};
+        office_stages.forEach(officeStage => {
+          const fee = feesByStage[officeStage.name];
+          if (fee !== undefined) {
+            feesByOfficeStageId[officeStage.id] = fee;
+            console.log(`Mapped fee ${fee} for stage "${officeStage.name}" to office stage ID ${officeStage.id}`);
+          }
+        });
+        
+        console.log('Final mapped fees by office stage ID:', feesByOfficeStageId);
+        setStageFees(feesByOfficeStageId);
+        
       } catch (err) {
         console.error('Error in fetchStageFees:', err);
       }
@@ -214,8 +195,10 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
       current_stage: project.current_stage,
     };
 
-    Object.keys(stageFees).forEach(stageId => {
-      row[stageId] = stageFees[stageId];
+    office_stages.forEach(stage => {
+      const fee = getStageFee(stage.id);
+      row[stage.id] = fee;
+      console.log(`Setting fee for stage ${stage.name} (${stage.id}):`, fee);
     });
 
     console.log('Built project row with fees:', row);
