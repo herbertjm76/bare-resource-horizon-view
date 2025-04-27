@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Profile } from "./TeamManagement";
@@ -89,7 +88,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                 <TableCell>{member.location || '—'}</TableCell>
                 {editMode && (
                   <TableCell>
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                    <div className="flex items-center justify-end gap-2">
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
