@@ -1,9 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { TeamManagement } from "@/components/dashboard/TeamManagement";
-import TeamInviteControls from "@/components/dashboard/TeamInviteControls";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/components/dashboard/types";
@@ -88,20 +86,7 @@ const TeamMembersPage = () => {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
-              <div className="flex items-center gap-4">
-                <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Members</h1>
-                {userId && userProfile && (
-                  <TeamInviteControls
-                    onAdd={() => {}}
-                    onCopyInvite={() => {
-                      if (inviteUrl) {
-                        navigator.clipboard.writeText(inviteUrl);
-                        toast.success('Invite URL copied to clipboard!');
-                      }
-                    }}
-                  />
-                )}
-              </div>
+              <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Members</h1>
               {userId ? (
                 <TeamManagement
                   teamMembers={teamMembers}
