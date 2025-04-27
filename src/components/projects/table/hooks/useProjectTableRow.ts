@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -173,7 +174,6 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     getStatusColor,
     locations,
     editableFields,
-    projectAreas,
     getAreaByCountry,
     getStageFee
   };
