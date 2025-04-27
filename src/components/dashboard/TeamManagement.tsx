@@ -1,4 +1,3 @@
-
 // TeamManagement.tsx
 
 import React, { useEffect, useState } from 'react';
@@ -13,6 +12,7 @@ import TeamMembersTable from './TeamMembersTable';
 import TeamMembersToolbar from './TeamMembersToolbar';
 import MemberDialog from './MemberDialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { useTeamMembers } from '@/hooks/useTeamMembers';
 
 // Update the Profile type to include the additional fields
 export type Profile = Database['public']['Tables']['profiles']['Row'] & {
@@ -47,10 +47,26 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
   const [currentMember, setCurrentMember] = useState<Profile | null>(null);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
 
-  // Grab companyId from first available member (all team members should have the same company_id)
+  // Get company ID from first team member
   const companyId = teamMembers[0]?.company_id;
+  
+  const { handleSaveMember, isSaving } = useTeamMembers(companyId);
 
-  // Fetch invites for this company
+  const handleSaveMemberWrapper = async (memberData: Partial<Profile>) => {
+    const success = await handleSaveMember(
+      memberData, 
+      Boolean(currentMember)
+    );
+
+    if (success) {
+      setIsAddDialogOpen(false);
+      setIsEditDialogOpen(false);
+      setCurrentMember(null);
+      setRefreshFlag(prev => prev + 1);
+    }
+  };
+
+  // --- Fetch invites for this company ---
   useEffect(() => {
     const fetchInvites = async () => {
       if (userRole === 'owner' || userRole === 'admin') {
@@ -177,28 +193,6 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     }
   };
 
-  const handleSaveMember = async (memberData: Partial<Profile>) => {
-    try {
-      if (currentMember) {
-        // Edit existing member
-        // This is a placeholder - implement actual update logic
-        toast.success("Team member updated successfully");
-        setIsEditDialogOpen(false);
-        setCurrentMember(null);
-      } else {
-        // Add new member
-        // This is a placeholder - implement actual create logic
-        toast.success("New team member added successfully");
-        setIsAddDialogOpen(false);
-      }
-      // Force a refresh of the members list
-      setRefreshFlag(prev => prev + 1);
-    } catch (error) {
-      toast.error("Failed to save team member");
-      console.error(error);
-    }
-  };
-
   return (
     <AuthGuard requiredRole={['owner', 'admin']}>
       <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
@@ -251,8 +245,9 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
             setCurrentMember(null);
           }}
           member={currentMember}
-          onSave={handleSaveMember}
+          onSave={handleSaveMemberWrapper}
           title={isEditDialogOpen ? "Edit Team Member" : "Add Team Member"}
+          isLoading={isSaving}
         />
 
         {/* Delete Confirmation Dialog */}

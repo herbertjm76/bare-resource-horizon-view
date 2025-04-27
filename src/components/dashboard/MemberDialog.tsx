@@ -13,6 +13,7 @@ interface MemberDialogProps {
   member: Profile | null;
   onSave: (data: Partial<Profile>) => void;
   title: string;
+  isLoading?: boolean;
 }
 
 interface MemberFormData {
@@ -30,7 +31,8 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
   onClose,
   member,
   onSave,
-  title
+  title,
+  isLoading = false
 }) => {
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<MemberFormData>({
     defaultValues: {
@@ -175,11 +177,16 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
               Cancel
             </Button>
-            <Button type="submit">
-              {member ? 'Save Changes' : 'Add Member'}
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <span className="mr-2">Saving...</span>
+                  <span className="animate-spin">⏳</span>
+                </>
+              ) : member ? 'Save Changes' : 'Add Member'}
             </Button>
           </DialogFooter>
         </form>
