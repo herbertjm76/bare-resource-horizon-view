@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,7 +46,7 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
           console.log('Stage fees data received:', data);
           
           const feeMap = data.reduce((acc, { stage_id, fee }) => {
-            acc[stage_id] = fee;
+            acc[stage_id] = Number(fee);
             return acc;
           }, {} as Record<string, number>);
           
@@ -167,7 +168,28 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
 
   const getStageFee = (officeStageId: string): number | null => {
     console.log('Getting fee for office stage:', officeStageId, 'Current fees:', stageFees);
-    return stageFees[officeStageId] || null;
+    const fee = stageFees[officeStageId];
+    return fee !== undefined ? fee : null;
+  };
+
+  const buildProjectRow = () => {
+    const row: Record<string, any> = {
+      id: project.id,
+      code: project.code,
+      name: project.name,
+      project_manager: project.project_manager,
+      status: project.status,
+      country: project.country,
+      target_profit_percentage: project.target_profit_percentage,
+      current_stage: project.current_stage,
+    };
+
+    // Add stage fees to the row object
+    Object.keys(stageFees).forEach(stageId => {
+      row[stageId] = stageFees[stageId];
+    });
+
+    return row;
   };
 
   return {
@@ -178,6 +200,8 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     locations,
     editableFields,
     getAreaByCountry,
-    getStageFee
+    getStageFee,
+    buildProjectRow
   };
 };
+

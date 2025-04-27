@@ -39,10 +39,12 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     locations,
     editableFields,
     getAreaByCountry,
-    getStageFee
+    getStageFee,
+    buildProjectRow
   } = useProjectTableRow(project, refetch);
 
   const projectArea = getAreaByCountry(project.country);
+  const row = buildProjectRow();
 
   return (
     <>
@@ -106,13 +108,13 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         </TableCell>
         
         {office_stages.map((stage) => {
-          const fee = getStageFee(stage.id);
+          const fee = row[stage.id];
           return (
             <TableCell 
               key={`${project.id}-${stage.id}`} 
               className="text-center"
             >
-              {fee !== null ? (
+              {fee !== undefined && fee !== null ? (
                 <span className="text-xs">
                   {new Intl.NumberFormat('en-US', {
                     style: 'currency',
