@@ -1,4 +1,3 @@
-
 // TeamManagement.tsx (refactored shell, logic + main state, composes new children)
 
 import React, { useEffect, useState } from 'react';
@@ -111,13 +110,14 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
 
   return (
     <AuthGuard requiredRole={['owner', 'admin']}>
-      <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl mb-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-white">Team Management</h2>
-          <Button onClick={copyInviteUrl} variant="secondary">
-            Copy Invite Link
-          </Button>
-        </div>
+      <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+        {['owner', 'admin'].includes(userRole) && (
+          <TeamMembersTable teamMembers={teamMembers} userRole={userRole} />
+        )}
+
+        {invitees.length > 0 && (
+          <TeamInvitesTable invitees={invitees} copyInviteCode={copyInviteCode} />
+        )}
 
         {['owner', 'admin'].includes(userRole) && (
           <TeamInviteSection
@@ -125,14 +125,11 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
             setInviteEmail={setInviteEmail}
             invLoading={invLoading}
             handleSendInvite={handleSendInvite}
+            inviteUrl={inviteUrl}
+            onCopyInviteUrl={() => copyInviteUrl()}
           />
         )}
-
-        <TeamInvitesTable invitees={invitees} copyInviteCode={copyInviteCode} />
-
-        <TeamMembersTable teamMembers={teamMembers} userRole={userRole} />
       </div>
     </AuthGuard>
   );
 };
-
