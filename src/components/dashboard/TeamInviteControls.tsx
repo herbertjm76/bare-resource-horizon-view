@@ -1,9 +1,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Copy, Send } from 'lucide-react';
-import { useTeamInvites } from '@/hooks/useTeamInvites';
+import InviteMembersDialog from './InviteMembersDialog';
 
 interface TeamInviteControlsProps {
   onAdd: () => void;
@@ -11,34 +10,13 @@ interface TeamInviteControlsProps {
 }
 
 const TeamInviteControls: React.FC<TeamInviteControlsProps> = ({
-  onAdd,
   onCopyInvite
 }) => {
-  const [email, setEmail] = useState('');
-  const {
-    handleSendInvite,
-    setInviteEmail,
-    invLoading
-  } = useTeamInvites(undefined);
-
-  const handleInvite = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setInviteEmail(email);
-    const success = await handleSendInvite(e);
-    if (success) {
-      setEmail('');
-    }
-  };
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
-    <form onSubmit={handleInvite} className="flex-1 flex items-center gap-2">
-      <Input 
-        type="email" 
-        placeholder="Enter email address" 
-        value={email} 
-        onChange={e => setEmail(e.target.value)} 
-      />
-      <Button type="submit" disabled={invLoading}>
+    <div className="flex items-center gap-2">
+      <Button onClick={() => setIsDialogOpen(true)}>
         <Send className="h-4 w-4 mr-2" />
         Invite Member
       </Button>
@@ -47,7 +25,12 @@ const TeamInviteControls: React.FC<TeamInviteControlsProps> = ({
         <Copy className="h-4 w-4 mr-2" />
         Copy Invite Link
       </Button>
-    </form>
+
+      <InviteMembersDialog 
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+      />
+    </div>
   );
 };
 
