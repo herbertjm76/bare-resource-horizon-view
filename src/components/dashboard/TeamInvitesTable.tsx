@@ -2,6 +2,14 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Invite } from './TeamManagement';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
 
 interface TeamInvitesTableProps {
   invitees: Invite[];
@@ -14,41 +22,35 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({ invitees, copyInvit
   }
 
   return (
-    <div className="mb-8">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Pending Invites</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-gray-200">
-              <th className="py-2 px-4 text-left text-gray-600">Email</th>
-              <th className="py-2 px-4 text-left text-gray-600">Status</th>
-              <th className="py-2 px-4 text-left text-gray-600">Sent</th>
-              <th className="py-2 px-4 text-left text-gray-600">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invitees.map((invite) => (
-              <tr key={invite.id} className="border-b border-gray-200">
-                <td className="py-3 px-4 text-gray-900">{invite.email}</td>
-                <td className="py-3 px-4 text-gray-900 capitalize">{invite.status}</td>
-                <td className="py-3 px-4 text-gray-900">
-                  {new Date(invite.created_at).toLocaleDateString()}
-                </td>
-                <td className="py-3 px-4">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyInviteCode(invite.code)}
-                    className="text-gray-700"
-                  >
-                    Copy Link
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Email</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Sent</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {invitees.map((invite) => (
+            <TableRow key={invite.id}>
+              <TableCell>{invite.email}</TableCell>
+              <TableCell className="capitalize">{invite.status}</TableCell>
+              <TableCell>{new Date(invite.created_at).toLocaleDateString()}</TableCell>
+              <TableCell>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyInviteCode(invite.code)}
+                >
+                  Copy Link
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };

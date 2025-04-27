@@ -1,5 +1,3 @@
-// TeamManagement.tsx
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -11,10 +9,11 @@ import TeamInvitesTable from './TeamInvitesTable';
 import TeamMembersTable from './TeamMembersTable';
 import TeamMembersToolbar from './TeamMembersToolbar';
 import MemberDialog from './MemberDialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
+import { Copy, UserPlus } from 'lucide-react';
 
-// Update the Profile type to include the additional fields
 export type Profile = Database['public']['Tables']['profiles']['Row'] & {
   department: string;
   location: string;
@@ -30,24 +29,20 @@ interface TeamManagementProps {
 }
 
 export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagementProps) => {
-  // --- Invite management state and effects ---
   const [invitees, setInvitees] = useState<Invite[]>([]);
   const [inviteEmail, setInviteEmail] = useState('');
   const [invLoading, setInvLoading] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(0);
 
-  // --- Edit mode state ---
   const [editMode, setEditMode] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   
-  // --- Dialog state ---
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentMember, setCurrentMember] = useState<Profile | null>(null);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
 
-  // Get company ID from first team member
   const companyId = teamMembers[0]?.company_id;
   
   const { handleSaveMember, isSaving } = useTeamMembers(companyId);
@@ -66,7 +61,6 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     }
   };
 
-  // --- Fetch invites for this company ---
   useEffect(() => {
     const fetchInvites = async () => {
       if (userRole === 'owner' || userRole === 'admin') {
@@ -87,12 +81,10 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     }
   }, [companyId, userRole, refreshFlag]);
 
-  // Handle sending a new invite
   const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     setInvLoading(true);
 
-    // Generate a unique random code, e.g. 8 characters
     const code = Math.random().toString(36).substring(2, 10).toUpperCase();
 
     try {
@@ -102,7 +94,6 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
         return;
       }
 
-      // Get the current user's ID for created_by
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) {
         toast.error('You must be logged in to send invites');
@@ -110,21 +101,20 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
         return;
       }
 
-      // Insert invite row into supabase
       const { data, error } = await supabase
         .from('invites')
         .insert({
           code,
           company_id: companyId,
           email: inviteEmail,
-          created_by: session.user.id, // Add the required created_by field
+          created_by: session.user.id,
         });
       if (error) {
         toast.error(error.message || 'Failed to send invite');
       } else {
         toast.success('Invite sent!');
         setInviteEmail('');
-        setRefreshFlag(Math.random()); // force re-fetch invites
+        setRefreshFlag(Math.random());
       }
     } catch (e: any) {
       toast.error(e.message || 'Error sending invite.');
@@ -133,13 +123,11 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     }
   };
 
-  // Handle copying the invite link/code for a specific invite
   const copyInviteCode = (code: string) => {
     navigator.clipboard.writeText(`${window.location.origin}/join/${code}`);
     toast.success('Invite link copied!');
   };
 
-  // Handle copying the global inviteUrl
   const copyInviteUrl = () => {
     navigator.clipboard.writeText(inviteUrl);
     toast.success('Invite URL copied to clipboard!');
@@ -163,12 +151,9 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     if (!memberToDelete) return;
     
     try {
-      // Here you would implement the actual delete logic
-      // This is a placeholder - in a real app you'd delete the user from auth and profiles
       toast.success("Team member deleted successfully");
       setMemberToDelete(null);
       setIsDeleteDialogOpen(false);
-      // Force a refresh of the members list
       setRefreshFlag(prev => prev + 1);
     } catch (error) {
       toast.error("Failed to delete team member");
@@ -180,12 +165,9 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     if (!selectedMembers.length) return;
     
     try {
-      // Here you would implement bulk delete logic
-      // This is a placeholder
       toast.success(`${selectedMembers.length} team members deleted successfully`);
       setSelectedMembers([]);
       setEditMode(false);
-      // Force a refresh of the members list
       setRefreshFlag(prev => prev + 1);
     } catch (error) {
       toast.error("Failed to delete team members");
@@ -195,48 +177,62 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
 
   return (
     <AuthGuard requiredRole={['owner', 'admin']}>
-      <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
-        <div className="flex justify-between items-center mb-6">
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold text-foreground">Team Members</h2>
           {['owner', 'admin'].includes(userRole) && (
-            <TeamMembersToolbar
-              editMode={editMode}
-              setEditMode={setEditMode}
-              selectedCount={selectedMembers.length}
-              onBulkDelete={handleBulkDelete}
-              onAdd={handleAddMember}
-            />
+            <div className="flex gap-2">
+              <Button onClick={handleAddMember}>
+                <UserPlus className="h-4 w-4 mr-2" />
+                Invite Member
+              </Button>
+              <Button variant="outline" onClick={() => copyInviteUrl()}>
+                <Copy className="h-4 w-4 mr-2" />
+                Copy Invite Link
+              </Button>
+            </div>
           )}
         </div>
 
-        {['owner', 'admin'].includes(userRole) && (
-          <TeamMembersTable 
-            teamMembers={teamMembers} 
-            userRole={userRole}
-            editMode={editMode}
-            selectedMembers={selectedMembers}
-            setSelectedMembers={setSelectedMembers}
-            onEditMember={handleEditMember}
-            onDeleteMember={handleDeleteMember}
-          />
-        )}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle className="text-lg font-medium">Active Members</CardTitle>
+            {['owner', 'admin'].includes(userRole) && (
+              <TeamMembersToolbar
+                editMode={editMode}
+                setEditMode={setEditMode}
+                selectedCount={selectedMembers.length}
+                onBulkDelete={handleBulkDelete}
+                onAdd={handleAddMember}
+              />
+            )}
+          </CardHeader>
+          <CardContent>
+            {['owner', 'admin'].includes(userRole) && (
+              <TeamMembersTable 
+                teamMembers={teamMembers} 
+                userRole={userRole}
+                editMode={editMode}
+                selectedMembers={selectedMembers}
+                setSelectedMembers={setSelectedMembers}
+                onEditMember={handleEditMember}
+                onDeleteMember={handleDeleteMember}
+              />
+            )}
+          </CardContent>
+        </Card>
 
         {invitees.length > 0 && (
-          <TeamInvitesTable invitees={invitees} copyInviteCode={copyInviteCode} />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg font-medium">Pending Invites</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TeamInvitesTable invitees={invitees} copyInviteCode={copyInviteCode} />
+            </CardContent>
+          </Card>
         )}
 
-        {['owner', 'admin'].includes(userRole) && (
-          <TeamInviteSection
-            inviteEmail={inviteEmail}
-            setInviteEmail={setInviteEmail}
-            invLoading={invLoading}
-            handleSendInvite={handleSendInvite}
-            inviteUrl={inviteUrl}
-            onCopyInviteUrl={() => copyInviteUrl()}
-          />
-        )}
-
-        {/* Member Add/Edit Dialog */}
         <MemberDialog 
           isOpen={isAddDialogOpen || isEditDialogOpen} 
           onClose={() => {
@@ -250,7 +246,6 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
           isLoading={isSaving}
         />
 
-        {/* Delete Confirmation Dialog */}
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
