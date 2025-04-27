@@ -13,7 +13,6 @@ const HEADER_HEIGHT = 56;
 const TeamMembersPage = () => {
   const [userId, setUserId] = useState<string | null>(null);
 
-  // Get session on component mount
   useEffect(() => {
     const getSession = async () => {
       try {
@@ -30,7 +29,6 @@ const TeamMembersPage = () => {
     getSession();
   }, []);
 
-  // Fetch company ID and user role from the profile
   const { data: userProfile } = useQuery({
     queryKey: ['userProfile', userId],
     queryFn: async () => {
@@ -46,11 +44,9 @@ const TeamMembersPage = () => {
     enabled: !!userId
   });
 
-  // Fetch team members for the company with enhanced information
   const { data: teamMembers = [], isLoading } = useQuery({
     queryKey: ['teamMembers', userProfile?.company_id],
     queryFn: async () => {
-      // First fetch all profiles for the company
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('*')
@@ -62,15 +58,12 @@ const TeamMembersPage = () => {
         throw error;
       }
 
-      // Here we would typically join with office_roles or other tables to get additional information
-      // For now, we'll just return the profiles with placeholder values for the new fields
       return profiles.map(profile => {
-        // Create an enhanced profile object that includes our additional fields
         const enhancedProfile: Profile = {
           ...profile,
-          department: 'General',  // Default value since it's not in the database yet
-          location: 'Remote',     // Default value since it's not in the database yet
-          job_title: 'Team Member' // Default value since it's not in the database yet
+          department: 'General',
+          location: 'Remote',
+          job_title: 'Team Member'
         };
         return enhancedProfile;
       });
@@ -78,7 +71,6 @@ const TeamMembersPage = () => {
     enabled: !!userProfile?.company_id
   });
 
-  // Generate invite URL for the company
   const inviteUrl = userProfile?.company_id 
     ? `${window.location.origin}/join/${userProfile.company_id}`
     : '';
@@ -94,7 +86,7 @@ const TeamMembersPage = () => {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
-              <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Members</h1>
               {userId ? (
                 <TeamManagement
                   teamMembers={teamMembers}
