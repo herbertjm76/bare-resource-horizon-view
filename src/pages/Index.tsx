@@ -1,10 +1,9 @@
-
 import { Link } from 'react-router-dom';
 import { Users, Calendar, ChartBar, Bell } from 'lucide-react';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#4A2A93] via-[#1E2C6C] to-[#682A6D]">
+    <div className="min-h-screen bg-gradient-to-br from-[#895CF7] via-[#5669F7] to-[#E64FC4]">
       {/* Navigation */}
       <nav className="fixed w-full bg-white shadow-md z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
