@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -179,7 +180,7 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     <AuthGuard requiredRole={['owner', 'admin']}>
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold text-foreground">Team Members</h2>
+          <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
           {['owner', 'admin'].includes(userRole) && (
             <div className="flex gap-2">
               <Button onClick={handleAddMember}>
@@ -268,3 +269,5 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     </AuthGuard>
   );
 };
+
+export default TeamManagement;
