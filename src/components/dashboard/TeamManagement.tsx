@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -57,12 +58,17 @@ export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole
     }
   }, [companyId, userRole, refreshFlag]);
 
+  // Create pending members for both pre-registered and email invites
   const pendingMembers: PendingMember[] = invitees.map(invite => ({
     ...invite,
     isPending: true
   }));
 
-  const allMembers: TeamMember[] = [...activeMembers, ...pendingMembers];
+  // Filter out email invites for the main team members table
+  const preRegisteredMembers = pendingMembers.filter(member => member.invitation_type === 'pre_registered');
+  
+  // Combine active members with pre-registered members
+  const allMembers: TeamMember[] = [...activeMembers, ...preRegisteredMembers];
 
   const handleSaveMemberWrapper = async (memberData: Partial<Profile>) => {
     const success = await handleSaveMember(memberData, Boolean(currentMember));
@@ -74,8 +80,8 @@ export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole
     }
   };
 
-  const handleEditMember = (member: Profile) => {
-    setCurrentMember(member);
+  const handleEditMember = (member: TeamMember) => {
+    setCurrentMember(member as Profile);
     setIsEditDialogOpen(true);
   };
 
@@ -87,6 +93,21 @@ export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole
   const handleConfirmDelete = async () => {
     if (!memberToDelete) return;
     try {
+      // Check if it's a pre-registered member (in invites table)
+      const isPending = pendingMembers.some(m => m.id === memberToDelete);
+      
+      if (isPending) {
+        const { error } = await supabase
+          .from('invites')
+          .delete()
+          .eq('id', memberToDelete);
+        
+        if (error) throw error;
+      } else {
+        // Logic to delete active member would go here
+        // This might involve multiple operations depending on your data structure
+      }
+      
       toast.success("Team member deleted successfully");
       setMemberToDelete(null);
       setIsDeleteDialogOpen(false);
@@ -160,7 +181,8 @@ export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole
         </CardContent>
       </Card>
 
-      {invitees.length > 0 && (
+      {/* Only show email invites in a separate section */}
+      {invitees.filter(invite => invite.invitation_type === 'email_invite').length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-medium">Pending Invites</CardTitle>

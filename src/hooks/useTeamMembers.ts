@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile } from '@/components/dashboard/types';
@@ -48,11 +49,15 @@ export const useTeamMembers = (companyId: string | undefined) => {
             email: memberData.email,
             company_id: companyId,
             code: Math.random().toString(36).substring(2, 10).toUpperCase(),
-            created_by: session.user.id // Add the required created_by field
+            created_by: session.user.id, // Add the required created_by field
+            invitation_type: 'pre_registered',
+            department: memberData.department,
+            location: memberData.location,
+            job_title: memberData.job_title
           });
 
         if (error) throw error;
-        toast.success('Invitation sent to new team member');
+        toast.success('Pre-registered new team member');
       }
 
       return true;
