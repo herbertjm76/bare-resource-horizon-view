@@ -35,8 +35,8 @@ export const SidebarNavigation = ({
 }: SidebarNavigationProps) => {
   return (
     <>
-      {items.map((section, index) => (
-        <div key={section.label} className={`${index > 0 ? 'mt-8' : 'mt-2'}`}>
+      {items.map((section) => (
+        <div key={section.label} className="mb-2">
           <SidebarGroupLabel className="text-white/70 px-2 pt-4 pb-2">
             {collapsed ? "" : section.label}
           </SidebarGroupLabel>
@@ -51,7 +51,7 @@ export const SidebarNavigation = ({
                       className={`
                         text-white 
                         hover:text-white 
-                        hover:bg-white/10
+                        hover:bg-[#7d8086]
                         rounded-none
                         px-2
                         py-2
@@ -60,8 +60,7 @@ export const SidebarNavigation = ({
                         gap-3
                         transition-all
                         text-sm
-                        relative
-                        ${isActive ? "before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-[#895CF7]" : ""}
+                        ${isActive ? "bg-[#6E59A5] text-white" : ""}
                       `}
                       isActive={isActive}
                       tooltip={collapsed ? item.title : undefined}
@@ -85,3 +84,4 @@ export const SidebarNavigation = ({
     </>
   );
 };
+
