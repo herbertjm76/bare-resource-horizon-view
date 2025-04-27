@@ -35,12 +35,21 @@ export const useTeamMembers = (companyId: string | undefined) => {
         toast.success('Team member updated successfully');
       } else {
         // Create new member through invite system
+        
+        // First get the current user's ID to use as created_by
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user?.id) {
+          toast.error('You must be logged in to invite team members');
+          return false;
+        }
+        
         const { error } = await supabase
           .from('invites')
           .insert({
             email: memberData.email,
             company_id: companyId,
             code: Math.random().toString(36).substring(2, 10).toUpperCase(),
+            created_by: session.user.id // Add the required created_by field
           });
 
         if (error) throw error;
