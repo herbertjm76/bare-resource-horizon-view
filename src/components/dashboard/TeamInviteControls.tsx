@@ -7,10 +7,12 @@ import InviteMembersDialog from './InviteMembersDialog';
 interface TeamInviteControlsProps {
   onAdd: () => void;
   onCopyInvite: () => void;
+  companyId: string; // Add companyId prop
 }
 
 const TeamInviteControls: React.FC<TeamInviteControlsProps> = ({
-  onCopyInvite
+  onCopyInvite,
+  companyId,
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -29,6 +31,7 @@ const TeamInviteControls: React.FC<TeamInviteControlsProps> = ({
       <InviteMembersDialog 
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
+        companyId={companyId}
       />
     </div>
   );

@@ -120,6 +120,7 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
           <TeamInviteControls
             onAdd={() => setIsAddDialogOpen(true)}
             onCopyInvite={copyInviteUrl}
+            companyId={companyId}
           />
         </div>
       )}

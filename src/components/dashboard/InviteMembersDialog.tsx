@@ -6,34 +6,49 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useTeamInvites } from '@/hooks/useTeamInvites';
+import { toast } from 'sonner';
 
 interface InviteMembersDialogProps {
   isOpen: boolean;
   onClose: () => void;
+  companyId: string; // Add companyId prop
 }
 
 const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
   isOpen,
   onClose,
+  companyId,
 }) => {
   const [emails, setEmails] = useState('');
-  const { handleSendInvite, setInviteEmail, invLoading } = useTeamInvites(undefined);
+  const { handleSendInvite, setInviteEmail, invLoading } = useTeamInvites(companyId);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!emails.trim()) {
+      toast.error("Please enter at least one email address");
+      return;
+    }
+    
     const emailList = emails.split(',').map(email => email.trim()).filter(Boolean);
+    let successCount = 0;
     
     for (const email of emailList) {
       setInviteEmail(email);
-      await handleSendInvite(e);
+      const success = await handleSendInvite(e);
+      if (success) successCount++;
     }
     
-    setEmails('');
-    onClose();
+    if (successCount > 0) {
+      toast.success(`Successfully sent ${successCount} invitation${successCount > 1 ? 's' : ''}`);
+      setEmails('');
+      onClose();
+    }
   };
 
   return (
@@ -41,6 +56,9 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Invite Team Members</DialogTitle>
+          <DialogDescription>
+            Send invitations to join your team. Recipients will receive an email with instructions.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleInvite} className="space-y-4">
           <div className="space-y-2">
@@ -62,7 +80,7 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={invLoading || !emails.trim()}>
+            <Button type="submit" disabled={invLoading || !emails.trim()} isLoading={invLoading}>
               Send Invites
             </Button>
           </DialogFooter>
