@@ -1,9 +1,10 @@
+
 import { 
   LayoutDashboard,
   CalendarDays,
-  CalendarRange,
+  BarChart2,  // Using bar-chart-2 for overview as suggested
   Users,
-  Clock,
+  LayoutList,  // Using layout-list for overview
   ScrollText,
   FolderKanban,
   GanttChartSquare,
@@ -31,9 +32,9 @@ export const navigationItems = [
     label: "RESOURCE PLANNING",
     items: [
       {
-        title: "Weekly Planning",
+        title: "Weekly Overview",  // Changed from "Weekly Planning"
         url: "/weekly-planning",
-        icon: CalendarRange,
+        icon: LayoutList,  // Changed icon to layout-list
       },
       {
         title: "Resource Allocation",
@@ -41,9 +42,9 @@ export const navigationItems = [
         icon: Users,
       },
       {
-        title: "Capacity Planning",
+        title: "Overview",  // Changed from "Capacity Planning"
         url: "/capacity-planning",
-        icon: Clock,
+        icon: BarChart2,  // Changed icon to bar-chart-2
       },
     ],
   },
