@@ -4,7 +4,7 @@ import { Users, Calendar, ChartBar, Bell } from 'lucide-react';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#895CF7] via-[#5669F7] to-[#E64FC4]">
+    <div className="min-h-screen hero-gradient">
       {/* Navigation */}
       <nav className="fixed w-full bg-white shadow-md z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,11 +57,11 @@ const Index = () => {
             </div>
             
             {/* Hero Image */}
-            <div className="relative">
+            <div className="relative flex justify-center">
               <img 
                 src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
                 alt="Team collaboration illustration"
-                className="w-full h-auto rounded-2xl shadow-2xl"
+                className="w-1/2 h-auto rounded-2xl shadow-2xl"
               />
             </div>
           </div>

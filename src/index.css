@@ -43,6 +43,10 @@
     --sidebar-accent-foreground: #fff;
     --sidebar-border: #7d8086;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --grad-a: #895CF7;   /* violet  */
+    --grad-b: #5669F7;   /* blue    */ 
+    --grad-c: #E64FC4;   /* pink    */
   }
 
   .dark {
@@ -105,4 +109,14 @@
     0 4px 18px rgba(40,40,76,0.18),
     1px 0px 4px rgba(60,60,100,0.15);
   /* Ensures the shadow is smooth and soft like the PNG */
+}
+
+@layer components {
+  .hero-gradient {
+    background: linear-gradient(145deg, var(--grad-a) 0%, var(--grad-b) 55%, var(--grad-c) 100%);
+  }
+  
+  .btn-primary-gradient {
+    background: linear-gradient(145deg, var(--grad-a), var(--grad-c));
+  }
 }
