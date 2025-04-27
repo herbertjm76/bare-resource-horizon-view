@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Invite } from './types';
@@ -16,7 +17,10 @@ interface TeamInvitesTableProps {
 }
 
 const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({ invitees, copyInviteCode }) => {
-  if (!invitees.length) {
+  // Only show email invites
+  const emailInvites = invitees.filter(invite => invite.invitation_type === 'email_invite');
+  
+  if (!emailInvites.length) {
     return null;
   }
 
@@ -32,7 +36,7 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({ invitees, copyInvit
           </TableRow>
         </TableHeader>
         <TableBody>
-          {invitees.map((invite) => (
+          {emailInvites.map((invite) => (
             <TableRow key={invite.id}>
               <TableCell>{invite.email}</TableCell>
               <TableCell className="capitalize">{invite.status}</TableCell>

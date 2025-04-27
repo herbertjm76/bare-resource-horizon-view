@@ -71,6 +71,7 @@ export type Database = {
           department: string | null
           email: string | null
           id: string
+          invitation_type: string
           job_title: string | null
           location: string | null
           status: string
@@ -85,6 +86,7 @@ export type Database = {
           department?: string | null
           email?: string | null
           id?: string
+          invitation_type?: string
           job_title?: string | null
           location?: string | null
           status?: string
@@ -99,6 +101,7 @@ export type Database = {
           department?: string | null
           email?: string | null
           id?: string
+          invitation_type?: string
           job_title?: string | null
           location?: string | null
           status?: string

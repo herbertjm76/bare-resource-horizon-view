@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Profile, PendingMember, TeamMember } from './types';
-import { Edit, Trash2, Clock } from "lucide-react";
+import { Edit, Trash2, Clock, UserCog } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
@@ -50,6 +49,15 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   const isPendingMember = (member: TeamMember): member is PendingMember => 
     'isPending' in member && member.isPending;
 
+  const getMemberStatus = (member: TeamMember) => {
+    if (!isPendingMember(member)) {
+      return { label: "Active", variant: "default" as const };
+    }
+    return member.invitation_type === 'pre_registered' 
+      ? { label: "Pre-registered", variant: "secondary" as const, icon: UserCog }
+      : { label: "Invited", variant: "secondary" as const, icon: Clock };
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -72,94 +80,95 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {teamMembers.map((member) => (
-              <TableRow 
-                key={member.id} 
-                className="group hover:bg-gray-50 transition-colors duration-150"
-              >
-                {editMode && (
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedMembers.includes(member.id)}
-                      onCheckedChange={() => handleSelectMember(member.id)}
-                    />
+            {teamMembers.map((member) => {
+              const status = getMemberStatus(member);
+              return (
+                <TableRow 
+                  key={member.id} 
+                  className="group hover:bg-gray-50 transition-colors duration-150"
+                >
+                  {editMode && (
+                    <TableCell>
+                      <Checkbox
+                        checked={selectedMembers.includes(member.id)}
+                        onCheckedChange={() => handleSelectMember(member.id)}
+                      />
+                    </TableCell>
+                  )}
+                  <TableCell className="font-medium">
+                    {isPendingMember(member) ? (
+                      <div className="flex items-center gap-2">
+                        {member.email}
+                        <Badge variant={status.variant} className="flex items-center gap-1">
+                          {status.icon && <status.icon className="h-3 w-3" />}
+                          {status.label}
+                        </Badge>
+                      </div>
+                    ) : (
+                      `${member.first_name} ${member.last_name}`
+                    )}
                   </TableCell>
-                )}
-                <TableCell className="font-medium">
-                  {isPendingMember(member) ? (
-                    <div className="flex items-center gap-2">
-                      {member.email}
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        Pending
-                      </Badge>
-                    </div>
-                  ) : (
-                    `${member.first_name} ${member.last_name}`
-                  )}
-                </TableCell>
-                <TableCell>{member.email}</TableCell>
-                <TableCell>
-                  {isPendingMember(member) ? (
-                    <Badge variant="secondary">Invited</Badge>
-                  ) : (
-                    <Badge variant="default">Active</Badge>
-                  )}
-                </TableCell>
-                <TableCell className="capitalize">
-                  {isPendingMember(member) ? "Pending" : member.role}
-                </TableCell>
-                <TableCell>
-                  {isPendingMember(member) ? member.department : "—"}
-                </TableCell>
-                <TableCell>
-                  {isPendingMember(member) ? member.location : "—"}
-                </TableCell>
-                {editMode && (
+                  <TableCell>{member.email}</TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-end gap-2">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 w-8 p-0"
-                              onClick={() => onEditMember && onEditMember(member)}
-                            >
-                              <Edit className="h-4 w-4" />
-                              <span className="sr-only">Edit</span>
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Edit member details</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
+                    <Badge variant={status.variant}>
+                      {status.label}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="capitalize">
+                    {isPendingMember(member) ? "Pending" : member.role}
+                  </TableCell>
+                  <TableCell>
+                    {isPendingMember(member) ? member.department : "—"}
+                  </TableCell>
+                  <TableCell>
+                    {isPendingMember(member) ? member.location : "—"}
+                  </TableCell>
+                  {editMode && (
+                    <TableCell>
+                      <div className="flex items-center justify-end gap-2">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 w-8 p-0"
+                                onClick={() => onEditMember && onEditMember(member)}
+                              >
+                                <Edit className="h-4 w-4" />
+                                <span className="sr-only">Edit</span>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Edit member details</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
 
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
-                              onClick={() => onDeleteMember && onDeleteMember(member.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Delete member</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </div>
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                onClick={() => onDeleteMember && onDeleteMember(member.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Delete</span>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Delete member</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </TableCell>
+                  )}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
