@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { TeamManagement } from "@/components/dashboard/TeamManagement";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,8 +7,24 @@ import { Profile } from "@/components/dashboard/TeamManagement";
 import { toast } from "sonner";
 
 const TeamMembersPage = () => {
-  const { data: session } = await supabase.auth.getSession();
-  const userId = session?.user?.id;
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Get session on component mount
+  useEffect(() => {
+    const getSession = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session?.user) {
+          setUserId(data.session.user.id);
+        }
+      } catch (error) {
+        console.error("Error getting session:", error);
+        toast.error("Failed to authenticate user");
+      }
+    };
+
+    getSession();
+  }, []);
 
   // Fetch company ID and user role from the profile
   const { data: userProfile } = useQuery({
@@ -46,16 +62,24 @@ const TeamMembersPage = () => {
   });
 
   // Generate invite URL for the company
-  const inviteUrl = `${window.location.origin}/join/${userProfile?.company_id}`;
+  const inviteUrl = userProfile?.company_id 
+    ? `${window.location.origin}/join/${userProfile.company_id}`
+    : '';
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 text-white">Team Members</h1>
-      <TeamManagement
-        teamMembers={teamMembers}
-        inviteUrl={inviteUrl}
-        userRole={userProfile?.role || 'member'}
-      />
+      {userId ? (
+        <TeamManagement
+          teamMembers={teamMembers}
+          inviteUrl={inviteUrl}
+          userRole={userProfile?.role || 'member'}
+        />
+      ) : (
+        <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+          <p className="text-white">Loading authentication details...</p>
+        </div>
+      )}
     </div>
   );
 };
