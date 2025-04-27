@@ -165,8 +165,9 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     }
   };
 
-  const getStageFee = (stageId: string): number | null => {
-    return stageFees[stageId] || null;
+  const getStageFee = (officeStageId: string): number | null => {
+    console.log('Getting fee for office stage:', officeStageId, 'Current fees:', stageFees);
+    return stageFees[officeStageId] || null;
   };
 
   return {
@@ -177,7 +178,6 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     locations,
     editableFields,
     getAreaByCountry,
-    getStageFee,
-    stageFees
+    getStageFee
   };
 };
