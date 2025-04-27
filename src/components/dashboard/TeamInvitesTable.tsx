@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Invite } from './TeamManagement';
+import { Invite } from './types';
 import {
   Table,
   TableBody,

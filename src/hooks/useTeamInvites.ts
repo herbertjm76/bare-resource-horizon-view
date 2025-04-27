@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Invite } from '@/components/dashboard/TeamManagement';
+import { Invite } from '@/components/dashboard/types';
 
 export const useTeamInvites = (companyId: string | undefined) => {
   const [inviteEmail, setInviteEmail] = useState('');

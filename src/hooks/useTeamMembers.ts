@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Profile } from '@/components/dashboard/TeamManagement';
+import { Profile } from '@/components/dashboard/types';
 import { toast } from 'sonner';
 
 export const useTeamMembers = (companyId: string | undefined) => {
