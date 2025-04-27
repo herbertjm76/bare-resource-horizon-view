@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Users, Calendar, ChartBar, Bell } from 'lucide-react';
 
@@ -12,7 +11,7 @@ const Index = () => {
             {/* Logo */}
             <div className="text-2xl font-semibold">
               <span className="text-black">Bare</span>
-              <span className="bg-gradient-to-r from-[#251F4E] via-[#6E59A5] to-[#D553CA] bg-clip-text text-transparent">Resource</span>
+              <span className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] bg-clip-text text-transparent">Resource</span>
             </div>
             
             {/* Navigation Links */}
@@ -125,4 +124,3 @@ const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, titl
 );
 
 export default Index;
-
