@@ -61,7 +61,7 @@ export const SidebarNavigation = ({
                         gap-4
                         transition-all
                         text-sm
-                        ${isActive ? "before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-[#6E59A5]" : ""}
+                        ${isActive ? "before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-brand-primary" : ""}
                       `}
                       isActive={isActive}
                       tooltip={collapsed ? item.title : undefined}
