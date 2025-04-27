@@ -40,7 +40,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     getStatusColor,
     locations,
     editableFields,
-    getAreaByCountry
+    getAreaByCountry,
+    getStageFee
   } = useProjectTableRow(project, refetch);
 
   const projectArea = getAreaByCountry(project.country);
@@ -107,20 +108,24 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         </TableCell>
         
         {office_stages.map((stage) => {
-          const isCurrentStage = project.current_stage === stage.name;
+          const fee = getStageFee(project.id, stage.id);
           return (
             <TableCell 
               key={`${project.id}-${stage.id}`} 
               className="text-center"
             >
-              {isCurrentStage ? (
-                <div 
-                  className="h-3 w-3 rounded-full mx-auto"
-                  style={{
-                    backgroundColor: "#212172"
-                  }}
-                />
-              ) : null}
+              {fee ? (
+                <span className="text-xs">
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                  }).format(fee)}
+                </span>
+              ) : (
+                "-"
+              )}
             </TableCell>
           );
         })}
@@ -151,7 +156,6 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         )}
       </TableRow>
 
-      {/* Add the EditProjectDialog component */}
       {showEditDialog && (
         <EditProjectDialog
           project={project}

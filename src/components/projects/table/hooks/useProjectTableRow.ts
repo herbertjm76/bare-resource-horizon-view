@@ -10,6 +10,7 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
   const { locations } = useOfficeSettings();
   const { projectAreas, getAreaByCountry } = useProjectAreas();
   const [editableFields, setEditableFields] = useState<Record<string, any>>({});
+  const [stageFees, setStageFees] = useState<Record<string, number>>({});
 
   useEffect(() => {
     setEditableFields({
@@ -22,6 +23,37 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
       }
     });
   }, [project]);
+
+  useEffect(() => {
+    const fetchStageFees = async () => {
+      if (!project?.id) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('project_fees')
+          .select('stage_id, fee')
+          .eq('project_id', project.id);
+          
+        if (error) {
+          console.error('Error fetching stage fees:', error);
+          return;
+        }
+        
+        if (data) {
+          const feeMap = data.reduce((acc, { stage_id, fee }) => {
+            acc[stage_id] = fee;
+            return acc;
+          }, {} as Record<string, number>);
+          
+          setStageFees(feeMap);
+        }
+      } catch (err) {
+        console.error('Error in fetchStageFees:', err);
+      }
+    };
+    
+    fetchStageFees();
+  }, [project.id]);
 
   const handleFieldUpdate = async (projectId: string, field: string, value: any) => {
     try {
@@ -130,6 +162,10 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     }
   };
 
+  const getStageFee = (projectId: string, stageId: string): number | null => {
+    return stageFees[stageId] || null;
+  };
+
   return {
     handleFieldUpdate,
     handleStatusChange,
@@ -138,6 +174,7 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     locations,
     editableFields,
     projectAreas,
-    getAreaByCountry
+    getAreaByCountry,
+    getStageFee
   };
 };
