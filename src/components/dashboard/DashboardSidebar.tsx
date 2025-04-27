@@ -24,7 +24,7 @@ export function DashboardSidebar() {
     <div className="relative w-full h-full">
       {/* Back-plate gradient */}
       <div className="fixed inset-y-0 left-0 w-[220px] -z-10 transition-all duration-300"
-           style={{ width: collapsed ? '80px' : '220px' }}>
+           style={{ width: collapsed ? '72px' : '220px' }}>
         <div className="absolute inset-0 bg-[linear-gradient(180deg,#1E1745_0%,#171E47_45%,#0E183C_100%)]" />
       </div>
 
@@ -68,7 +68,7 @@ export function DashboardSidebar() {
     <Sidebar 
       className="bg-transparent border-r border-[#7d8086] pt-0 transition-all duration-300 fixed left-0 top-0 bottom-0 z-40 min-h-screen"
       collapsible="icon"
-      style={{ marginTop: 0, width: collapsed ? '80px' : '220px' }}
+      style={{ marginTop: 0, width: collapsed ? '72px' : '220px' }}
     >
       <SidebarContent className="p-0">
         <SidebarGroup>

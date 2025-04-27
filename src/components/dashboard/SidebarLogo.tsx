@@ -8,15 +8,15 @@ interface SidebarLogoProps {
 }
 
 export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => (
-  <div className="flex items-center justify-between h-[64px] border-b border-[#7d8086] px-4">
+  <div className="flex items-center justify-between h-[48px] border-b border-[#7d8086] px-4">
     {collapsed ? (
       <Button 
         variant="ghost" 
         size="icon" 
         onClick={toggleSidebar}
-        className="text-white hover:bg-[#7d8086] h-10 w-10 p-2.5 rounded-full flex items-center justify-center ml-auto"
+        className="text-white hover:bg-[#7d8086]/30 h-12 w-12 rounded-none flex items-center justify-center ml-auto"
       >
-        <ChevronRight className="h-5 w-5" />
+        <ChevronRight className="h-6 w-6" />
       </Button>
     ) : (
       <>
@@ -28,9 +28,9 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => (
           variant="ghost" 
           size="icon" 
           onClick={toggleSidebar}
-          className="text-white hover:bg-[#7d8086] h-10 w-10 p-2.5 rounded-full flex items-center justify-center"
+          className="text-white hover:bg-[#7d8086]/30 h-12 w-12 rounded-none flex items-center justify-center"
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-6 w-6" />
         </Button>
       </>
     )}
