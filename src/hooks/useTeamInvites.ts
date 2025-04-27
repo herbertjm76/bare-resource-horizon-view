@@ -11,20 +11,19 @@ export const useTeamInvites = (companyId: string | undefined) => {
     e.preventDefault();
     setInvLoading(true);
 
-    const code = Math.random().toString(36).substring(2, 10).toUpperCase();
-
     try {
       if (!inviteEmail || !companyId) {
         toast.error("Enter an email to invite.");
-        return;
+        return false;
       }
 
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) {
         toast.error('You must be logged in to send invites');
-        return;
+        return false;
       }
 
+      const code = Math.random().toString(36).substring(2, 10).toUpperCase();
       const { error } = await supabase
         .from('invites')
         .insert({

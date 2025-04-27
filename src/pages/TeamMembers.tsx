@@ -86,7 +86,16 @@ const TeamMembersPage = () => {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
-              <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Members</h1>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Members</h1>
+                  {teamMembers && (
+                    <span className="px-2.5 py-0.5 rounded-full text-sm font-medium bg-brand-primary/10 text-brand-primary">
+                      {teamMembers.length}
+                    </span>
+                  )}
+                </div>
+              </div>
               {userId ? (
                 <TeamManagement
                   teamMembers={teamMembers}
