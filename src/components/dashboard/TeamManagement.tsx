@@ -9,6 +9,7 @@ import AuthGuard from '@/components/AuthGuard';
 import TeamInviteSection from './TeamInviteSection';
 import TeamInvitesTable from './TeamInvitesTable';
 import TeamMembersTable from './TeamMembersTable';
+import TeamMembersToolbar from './TeamMembersToolbar';
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Invite = Database['public']['Tables']['invites']['Row'];
@@ -25,6 +26,10 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
   const [inviteEmail, setInviteEmail] = useState('');
   const [invLoading, setInvLoading] = useState(false);
   const [refreshFlag, setRefreshFlag] = useState(0);
+
+  // --- Edit mode state ---
+  const [editMode, setEditMode] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
   // Grab companyId from first available member (all team members should have the same company_id)
   const companyId = teamMembers[0]?.company_id;
@@ -108,11 +113,38 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     toast.success('Invite URL copied to clipboard!');
   };
 
+  const handleBulkDelete = async () => {
+    if (!selectedMembers.length) return;
+    
+    // Add deletion logic here if needed
+    toast.info('Bulk delete not implemented yet');
+    setSelectedMembers([]);
+    setEditMode(false);
+  };
+
   return (
     <AuthGuard requiredRole={['owner', 'admin']}>
       <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-foreground">Team Members</h2>
+          {['owner', 'admin'].includes(userRole) && (
+            <TeamMembersToolbar
+              editMode={editMode}
+              setEditMode={setEditMode}
+              selectedCount={selectedMembers.length}
+              onBulkDelete={handleBulkDelete}
+            />
+          )}
+        </div>
+
         {['owner', 'admin'].includes(userRole) && (
-          <TeamMembersTable teamMembers={teamMembers} userRole={userRole} />
+          <TeamMembersTable 
+            teamMembers={teamMembers} 
+            userRole={userRole}
+            editMode={editMode}
+            selectedMembers={selectedMembers}
+            setSelectedMembers={setSelectedMembers}
+          />
         )}
 
         {invitees.length > 0 && (
