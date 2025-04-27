@@ -135,3 +135,4 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
     </AuthGuard>
   );
 };
+
