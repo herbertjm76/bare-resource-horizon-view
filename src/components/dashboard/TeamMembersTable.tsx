@@ -1,7 +1,8 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Profile } from './types';
-import { Edit, Trash2 } from "lucide-react";
+import { Profile, PendingMember, TeamMember } from './types';
+import { Edit, Trash2, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
@@ -17,14 +18,15 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 interface TeamMembersTableProps {
-  teamMembers: Profile[];
+  teamMembers: TeamMember[];
   userRole: string;
   editMode?: boolean;
   selectedMembers?: string[];
   setSelectedMembers?: (members: string[]) => void;
-  onEditMember?: (member: Profile) => void;
+  onEditMember?: (member: TeamMember) => void;
   onDeleteMember?: (memberId: string) => void;
 }
 
@@ -45,6 +47,9 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
     }
   };
 
+  const isPendingMember = (member: TeamMember): member is PendingMember => 
+    'isPending' in member && member.isPending;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -59,6 +64,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
               {editMode && <TableHead className="w-10"></TableHead>}
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Status</TableHead>
               <TableHead>System Role</TableHead>
               <TableHead>Department</TableHead>
               <TableHead>Location</TableHead>
@@ -80,14 +86,35 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                   </TableCell>
                 )}
                 <TableCell className="font-medium">
-                  {member.first_name && member.last_name
-                    ? `${member.first_name} ${member.last_name}`
-                    : 'No name provided'}
+                  {isPendingMember(member) ? (
+                    <div className="flex items-center gap-2">
+                      {member.email}
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        Pending
+                      </Badge>
+                    </div>
+                  ) : (
+                    `${member.first_name} ${member.last_name}`
+                  )}
                 </TableCell>
                 <TableCell>{member.email}</TableCell>
-                <TableCell className="capitalize">{member.role}</TableCell>
-                <TableCell>{member.department || '—'}</TableCell>
-                <TableCell>{member.location || '—'}</TableCell>
+                <TableCell>
+                  {isPendingMember(member) ? (
+                    <Badge variant="secondary">Invited</Badge>
+                  ) : (
+                    <Badge variant="default">Active</Badge>
+                  )}
+                </TableCell>
+                <TableCell className="capitalize">
+                  {isPendingMember(member) ? "Pending" : member.role}
+                </TableCell>
+                <TableCell>
+                  {isPendingMember(member) ? member.department : "—"}
+                </TableCell>
+                <TableCell>
+                  {isPendingMember(member) ? member.location : "—"}
+                </TableCell>
                 {editMode && (
                   <TableCell>
                     <div className="flex items-center justify-end gap-2">

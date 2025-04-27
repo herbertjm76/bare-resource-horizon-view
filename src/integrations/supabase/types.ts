@@ -68,8 +68,11 @@ export type Database = {
           company_id: string
           created_at: string
           created_by: string
+          department: string | null
           email: string | null
           id: string
+          job_title: string | null
+          location: string | null
           status: string
         }
         Insert: {
@@ -79,8 +82,11 @@ export type Database = {
           company_id: string
           created_at?: string
           created_by: string
+          department?: string | null
           email?: string | null
           id?: string
+          job_title?: string | null
+          location?: string | null
           status?: string
         }
         Update: {
@@ -90,8 +96,11 @@ export type Database = {
           company_id?: string
           created_at?: string
           created_by?: string
+          department?: string | null
           email?: string | null
           id?: string
+          job_title?: string | null
+          location?: string | null
           status?: string
         }
         Relationships: [
@@ -330,6 +339,58 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      pending_resources: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          hours: number
+          id: string
+          invite_id: string
+          project_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          hours?: number
+          id?: string
+          invite_id: string
+          project_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          hours?: number
+          id?: string
+          invite_id?: string
+          project_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pending_resources_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_resources_invite_id_fkey"
+            columns: ["invite_id"]
+            isOneToOne: false
+            referencedRelation: "invites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pending_resources_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

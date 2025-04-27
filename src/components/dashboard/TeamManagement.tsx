@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,7 +10,7 @@ import TeamInviteControls from './TeamInviteControls';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useTeamInvites } from '@/hooks/useTeamInvites';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Profile, Invite } from './types';
+import { Profile, PendingMember, TeamMember, Invite } from './types';
 
 interface TeamManagementProps {
   teamMembers: Profile[];
@@ -19,7 +18,7 @@ interface TeamManagementProps {
   userRole: string;
 }
 
-export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagementProps) => {
+export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole }: TeamManagementProps) => {
   const [invitees, setInvitees] = useState<Invite[]>([]);
   const [refreshFlag, setRefreshFlag] = useState(0);
   const [editMode, setEditMode] = useState(false);
@@ -31,7 +30,7 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
   const [currentMember, setCurrentMember] = useState<Profile | null>(null);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
 
-  const companyId = teamMembers[0]?.company_id;
+  const companyId = activeMembers[0]?.company_id;
   const { handleSaveMember, isSaving } = useTeamMembers(companyId);
   const { inviteEmail, setInviteEmail, invLoading, handleSendInvite } = useTeamInvites(companyId);
 
@@ -42,6 +41,7 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
           .from('invites')
           .select('*')
           .eq('company_id', companyId)
+          .eq('status', 'pending')
           .order('created_at', { ascending: false });
         
         if (error) {
@@ -56,6 +56,13 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
       fetchInvites();
     }
   }, [companyId, userRole, refreshFlag]);
+
+  const pendingMembers: PendingMember[] = invitees.map(invite => ({
+    ...invite,
+    isPending: true
+  }));
+
+  const allMembers: TeamMember[] = [...activeMembers, ...pendingMembers];
 
   const handleSaveMemberWrapper = async (memberData: Partial<Profile>) => {
     const success = await handleSaveMember(memberData, Boolean(currentMember));
@@ -141,7 +148,7 @@ export const TeamManagement = ({ teamMembers, inviteUrl, userRole }: TeamManagem
         <CardContent>
           {['owner', 'admin'].includes(userRole) && (
             <TeamMembersTable 
-              teamMembers={teamMembers} 
+              teamMembers={allMembers} 
               userRole={userRole}
               editMode={editMode}
               selectedMembers={selectedMembers}
