@@ -16,10 +16,10 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   if (!teamMembers.length) {
     return (
       <div>
-        <h3 className="text-lg font-medium text-white mb-4">Team Members</h3>
-        <div className="p-4 rounded-md bg-yellow-500/10 border border-yellow-500/50 flex items-center gap-3">
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Team Members</h3>
+        <div className="p-4 rounded-md bg-yellow-50 border border-yellow-200 flex items-center gap-3">
           <AlertCircle className="h-5 w-5 text-yellow-500" />
-          <p className="text-white">No team members found. If you just logged in, you may need to refresh the page.</p>
+          <p className="text-yellow-700">No team members found. If you just logged in, you may need to refresh the page.</p>
         </div>
       </div>
     );
@@ -27,32 +27,32 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
 
   return (
     <div>
-      <h3 className="text-lg font-medium text-white mb-4">
+      <h3 className="text-lg font-medium text-gray-900 mb-4">
         Team Members ({teamMembers.length})
       </h3>
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="border-b border-white/10">
-              <th className="py-2 px-4 text-left text-white/80">Name</th>
-              <th className="py-2 px-4 text-left text-white/80">Email</th>
-              <th className="py-2 px-4 text-left text-white/80">Role</th>
-              <th className="py-2 px-4 text-left text-white/80">Actions</th>
+            <tr className="border-b border-gray-200">
+              <th className="py-2 px-4 text-left text-gray-600">Name</th>
+              <th className="py-2 px-4 text-left text-gray-600">Email</th>
+              <th className="py-2 px-4 text-left text-gray-600">Role</th>
+              <th className="py-2 px-4 text-left text-gray-600">Actions</th>
             </tr>
           </thead>
           <tbody>
             {teamMembers.map((member) => (
-              <tr key={member.id} className="border-b border-white/10 hover:bg-white/5">
-                <td className="py-3 px-4 text-white">
+              <tr key={member.id} className="border-b border-gray-200 hover:bg-gray-50">
+                <td className="py-3 px-4 text-gray-900">
                   {member.first_name && member.last_name
                     ? `${member.first_name} ${member.last_name}`
                     : 'No name provided'}
                 </td>
-                <td className="py-3 px-4 text-white">{member.email}</td>
-                <td className="py-3 px-4 text-white capitalize">{member.role}</td>
+                <td className="py-3 px-4 text-gray-900">{member.email}</td>
+                <td className="py-3 px-4 text-gray-900 capitalize">{member.role}</td>
                 <td className="py-3 px-4">
                   {userRole === 'owner' && (
-                    <Button variant="ghost" size="sm" className="text-white">
+                    <Button variant="ghost" size="sm" className="text-gray-700">
                       Manage
                     </Button>
                   )}

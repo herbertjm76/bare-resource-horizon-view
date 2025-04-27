@@ -33,10 +33,10 @@ const StatCard = ({
   title: string; 
   description: string;
 }) => (
-  <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
-    <h2 className="text-xl font-semibold text-white mb-4 flex items-center">
+  <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 shadow-sm">
+    <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
       {icon} {title}
     </h2>
-    <p className="text-white/80">{description}</p>
+    <p className="text-gray-600">{description}</p>
   </div>
 );
