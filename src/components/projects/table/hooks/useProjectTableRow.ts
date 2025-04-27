@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -81,7 +80,6 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
         case 'current_stage':
           updateData.current_stage = value;
           
-          // Also update the local state
           setEditableFields(prev => ({
             ...prev,
             [projectId]: {
@@ -141,7 +139,6 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
     try {
       console.log('Updating stage to:', newStage);
       
-      // Update the editable fields state
       setEditableFields(prev => ({
         ...prev,
         [projectId]: {
@@ -169,7 +166,6 @@ export const useProjectTableRow = (project: any, refetch: () => void) => {
   };
 
   const getStageFee = (stageId: string): number | null => {
-    console.log('Getting stage fee for stageId:', stageId, 'from stageFees:', stageFees);
     return stageFees[stageId] || null;
   };
 

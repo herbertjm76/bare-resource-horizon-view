@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,6 @@ import { Edit, Trash2 } from "lucide-react";
 import { EditableProjectField } from '../components/EditableProjectField';
 import { useProjectTableRow } from './hooks/useProjectTableRow';
 import type { ProjectStatus } from '../utils/projectMappings';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { EditProjectDialog } from '../EditProjectDialog';
 
 interface ProjectTableRowProps {
@@ -41,8 +39,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     locations,
     editableFields,
     getAreaByCountry,
-    getStageFee,
-    stageFees
+    getStageFee
   } = useProjectTableRow(project, refetch);
 
   const projectArea = getAreaByCountry(project.country);
