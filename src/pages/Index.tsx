@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Users, Calendar, ChartBar, Bell } from 'lucide-react';
 
@@ -11,7 +12,7 @@ const Index = () => {
             {/* Logo */}
             <div className="text-2xl font-semibold">
               <span className="text-black">Bare</span>
-              <span className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] bg-clip-text text-transparent">Resource</span>
+              <span className="bg-gradient-to-r from-[#251F4E] via-[#6E59A5] to-[#D553CA] bg-clip-text text-transparent">Resource</span>
             </div>
             
             {/* Navigation Links */}
@@ -25,7 +26,7 @@ const Index = () => {
             {/* CTA Button */}
             <Link
               to="/auth"
-              className="bg-gradient-to-r from-[#251F4E] via-[#6E59A5] to-[#D553CA] text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg"
+              className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg"
             >
               Get Started
             </Link>
@@ -124,3 +125,4 @@ const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, titl
 );
 
 export default Index;
+
