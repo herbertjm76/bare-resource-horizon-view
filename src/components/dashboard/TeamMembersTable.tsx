@@ -2,8 +2,16 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Profile } from "./TeamManagement";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Edit, Trash2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
 
 interface TeamMembersTableProps {
   teamMembers: Profile[];
@@ -11,6 +19,8 @@ interface TeamMembersTableProps {
   editMode?: boolean;
   selectedMembers?: string[];
   setSelectedMembers?: (members: string[]) => void;
+  onEditMember?: (member: Profile) => void;
+  onDeleteMember?: (memberId: string) => void;
 }
 
 const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
@@ -18,7 +28,9 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   userRole,
   editMode = false,
   selectedMembers = [],
-  setSelectedMembers = () => {}
+  setSelectedMembers = () => {},
+  onEditMember,
+  onDeleteMember
 }) => {
   const handleSelectMember = (memberId: string) => {
     if (selectedMembers.includes(memberId)) {
@@ -46,45 +58,69 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
         Team Members ({teamMembers.length})
       </h3>
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-gray-200">
-              {editMode && <th className="py-2 px-4 text-left text-gray-600"></th>}
-              <th className="py-2 px-4 text-left text-gray-600">Name</th>
-              <th className="py-2 px-4 text-left text-gray-600">Email</th>
-              <th className="py-2 px-4 text-left text-gray-600">Role</th>
-              <th className="py-2 px-4 text-left text-gray-600">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {editMode && <TableHead className="w-10"></TableHead>}
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>System Role</TableHead>
+              <TableHead>Department</TableHead>
+              <TableHead>Location</TableHead>
+              {editMode && <TableHead className="w-20"></TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {teamMembers.map((member) => (
-              <tr key={member.id} className="border-b border-gray-200 hover:bg-gray-50">
+              <TableRow 
+                key={member.id} 
+                className="hover:bg-gray-50"
+              >
                 {editMode && (
-                  <td className="py-3 px-4">
+                  <TableCell>
                     <Checkbox
                       checked={selectedMembers.includes(member.id)}
                       onCheckedChange={() => handleSelectMember(member.id)}
                     />
-                  </td>
+                  </TableCell>
                 )}
-                <td className="py-3 px-4 text-gray-900">
+                <TableCell className="font-medium">
                   {member.first_name && member.last_name
                     ? `${member.first_name} ${member.last_name}`
                     : 'No name provided'}
-                </td>
-                <td className="py-3 px-4 text-gray-900">{member.email}</td>
-                <td className="py-3 px-4 text-gray-900 capitalize">{member.role}</td>
-                <td className="py-3 px-4">
-                  {userRole === 'owner' && (
-                    <Button variant="ghost" size="sm" className="text-gray-700">
-                      Manage
-                    </Button>
-                  )}
-                </td>
-              </tr>
+                </TableCell>
+                <TableCell>{member.email}</TableCell>
+                <TableCell className="capitalize">{member.role}</TableCell>
+                <TableCell>{member.department || '—'}</TableCell>
+                <TableCell>{member.location || '—'}</TableCell>
+                {editMode && (
+                  <TableCell>
+                    <div className="flex items-center justify-end gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0"
+                        onClick={() => onEditMember && onEditMember(member)}
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit</span>
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                        onClick={() => onDeleteMember && onDeleteMember(member.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </div>
+                  </TableCell>
+                )}
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

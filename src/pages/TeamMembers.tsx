@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -46,11 +47,12 @@ const TeamMembersPage = () => {
     enabled: !!userId
   });
 
-  // Fetch team members for the company
+  // Fetch team members for the company with enhanced information
   const { data: teamMembers = [], isLoading } = useQuery({
     queryKey: ['teamMembers', userProfile?.company_id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First fetch all profiles for the company
+      const { data: profiles, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('company_id', userProfile?.company_id)
@@ -60,7 +62,15 @@ const TeamMembersPage = () => {
         toast.error('Failed to load team members');
         throw error;
       }
-      return data as Profile[];
+
+      // Here we would typically join with office_roles or other tables to get additional information
+      // For now, we'll just return the profiles with placeholder values for the new fields
+      return profiles.map(profile => ({
+        ...profile,
+        department: profile.department || 'General',
+        location: profile.location || 'Remote',
+        job_title: profile.job_title || 'Team Member'
+      })) as Profile[];
     },
     enabled: !!userProfile?.company_id
   });
