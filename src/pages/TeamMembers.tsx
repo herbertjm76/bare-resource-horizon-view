@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -64,12 +65,16 @@ const TeamMembersPage = () => {
 
       // Here we would typically join with office_roles or other tables to get additional information
       // For now, we'll just return the profiles with placeholder values for the new fields
-      return profiles.map(profile => ({
-        ...profile,
-        department: profile.department || 'General',  // These properties are now properly defined in the Profile type
-        location: profile.location || 'Remote',
-        job_title: profile.job_title || 'Team Member'
-      })) as Profile[];
+      return profiles.map(profile => {
+        // Create an enhanced profile object that includes our additional fields
+        const enhancedProfile: Profile = {
+          ...profile,
+          department: 'General',  // Default value since it's not in the database yet
+          location: 'Remote',     // Default value since it's not in the database yet
+          job_title: 'Team Member' // Default value since it's not in the database yet
+        };
+        return enhancedProfile;
+      });
     },
     enabled: !!userProfile?.company_id
   });
