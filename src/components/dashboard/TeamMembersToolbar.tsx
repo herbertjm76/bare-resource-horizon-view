@@ -1,23 +1,34 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Plus, Trash2 } from "lucide-react";
 
 interface TeamMembersToolbarProps {
   editMode: boolean;
   setEditMode: (mode: boolean) => void;
   selectedCount: number;
   onBulkDelete?: () => void;
+  onAdd?: () => void;
 }
 
 const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({ 
   editMode,
   setEditMode,
   selectedCount,
-  onBulkDelete
+  onBulkDelete,
+  onAdd
 }) => {
   return (
     <div className="flex items-center gap-2">
+      <Button 
+        variant="default"
+        size="sm"
+        className="mr-2"
+        onClick={onAdd}
+      >
+        <Plus className="h-4 w-4 mr-1" />
+        Add Member
+      </Button>
       <Button 
         variant={editMode ? "secondary" : "outline"}
         size="sm"
