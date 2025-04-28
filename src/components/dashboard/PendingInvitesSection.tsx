@@ -44,12 +44,10 @@ const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({
               Invite Member
             </Button>
             
-            {!editMode && (
-              <Button variant="outline" onClick={onCopyInvite}>
-                <Copy className="h-4 w-4 mr-2" />
-                Copy Invite Link
-              </Button>
-            )}
+            <Button variant="outline" onClick={onCopyInvite}>
+              <Copy className="h-4 w-4 mr-2" />
+              Copy Invite Link
+            </Button>
             
             {invites.length > 0 && (
               <Button 

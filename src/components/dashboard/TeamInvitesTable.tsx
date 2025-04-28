@@ -42,10 +42,8 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
             <TableHead>Email</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Sent</TableHead>
-            {!editMode ? (
+            {editMode && (
               <TableHead>Actions</TableHead>
-            ) : (
-              <TableHead>Edit Actions</TableHead>
             )}
           </TableRow>
         </TableHeader>
@@ -55,17 +53,8 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
               <TableCell>{invite.email}</TableCell>
               <TableCell className="capitalize">{invite.status}</TableCell>
               <TableCell>{new Date(invite.created_at).toLocaleDateString()}</TableCell>
-              <TableCell>
-                {!editMode ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyInviteCode(invite.code)}
-                  >
-                    <Copy className="h-4 w-4 mr-1" />
-                    Copy Link
-                  </Button>
-                ) : (
+              {editMode && (
+                <TableCell>
                   <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
@@ -85,8 +74,8 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
                       Delete
                     </Button>
                   </div>
-                )}
-              </TableCell>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
