@@ -11,11 +11,13 @@ import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useTeamInvites } from '@/hooks/useTeamInvites';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Profile, PendingMember, TeamMember, Invite } from './types';
+
 interface TeamManagementProps {
   teamMembers: Profile[];
   inviteUrl: string;
   userRole: string;
 }
+
 export const TeamManagement = ({
   teamMembers: activeMembers,
   inviteUrl,
@@ -41,6 +43,7 @@ export const TeamManagement = ({
     invLoading,
     handleSendInvite
   } = useTeamInvites(companyId);
+
   useEffect(() => {
     const fetchInvites = async () => {
       if (userRole === 'owner' || userRole === 'admin') {
@@ -62,17 +65,15 @@ export const TeamManagement = ({
     }
   }, [companyId, userRole, refreshFlag]);
 
-  // Create pending members for both pre-registered and email invites
   const pendingMembers: PendingMember[] = invitees.map(invite => ({
     ...invite,
     isPending: true
   }));
 
-  // Filter out email invites for the main team members table
   const preRegisteredMembers = pendingMembers.filter(member => member.invitation_type === 'pre_registered');
 
-  // Combine active members with pre-registered members
   const allMembers: TeamMember[] = [...activeMembers, ...preRegisteredMembers];
+
   const handleSaveMemberWrapper = async (memberData: Partial<Profile>) => {
     const success = await handleSaveMember(memberData, Boolean(currentMember));
     if (success) {
@@ -82,18 +83,20 @@ export const TeamManagement = ({
       setRefreshFlag(prev => prev + 1);
     }
   };
+
   const handleEditMember = (member: TeamMember) => {
     setCurrentMember(member as Profile);
     setIsEditDialogOpen(true);
   };
+
   const handleDeleteMember = (memberId: string) => {
     setMemberToDelete(memberId);
     setIsDeleteDialogOpen(true);
   };
+
   const handleConfirmDelete = async () => {
     if (!memberToDelete) return;
     try {
-      // Check if it's a pre-registered member (in invites table)
       const isPending = pendingMembers.some(m => m.id === memberToDelete);
       if (isPending) {
         const {
@@ -101,18 +104,17 @@ export const TeamManagement = ({
         } = await supabase.from('invites').delete().eq('id', memberToDelete);
         if (error) throw error;
       } else {
-        // Logic to delete active member would go here
-        // This might involve multiple operations depending on your data structure
+        toast.success("Team member deleted successfully");
+        setMemberToDelete(null);
+        setIsDeleteDialogOpen(false);
+        setRefreshFlag(prev => prev + 1);
       }
-      toast.success("Team member deleted successfully");
-      setMemberToDelete(null);
-      setIsDeleteDialogOpen(false);
-      setRefreshFlag(prev => prev + 1);
     } catch (error) {
       toast.error("Failed to delete team member");
       console.error(error);
     }
   };
+
   const handleBulkDelete = async () => {
     if (!selectedMembers.length) return;
     try {
@@ -125,14 +127,17 @@ export const TeamManagement = ({
       console.error(error);
     }
   };
+
   const copyInviteUrl = () => {
     navigator.clipboard.writeText(inviteUrl);
     toast.success('Invite URL copied to clipboard!');
   };
+
   const copyInviteCode = (code: string) => {
     navigator.clipboard.writeText(`${window.location.origin}/join/${code}`);
     toast.success('Invite link copied!');
   };
+
   return <div className="space-y-6">
       {['owner', 'admin'].includes(userRole) && <div className="flex justify-end">
           <TeamInviteControls onAdd={() => setIsAddDialogOpen(true)} onCopyInvite={copyInviteUrl} companyId={companyId} />
@@ -144,11 +149,10 @@ export const TeamManagement = ({
           {['owner', 'admin'].includes(userRole) && <TeamMembersToolbar editMode={editMode} setEditMode={setEditMode} selectedCount={selectedMembers.length} onBulkDelete={handleBulkDelete} onAdd={() => setIsAddDialogOpen(true)} />}
         </CardHeader>
         <CardContent>
-          <TeamMembersTable teamMembers={allMembers} userRole={userRole} editMode={editMode} selectedMembers={selectedMembers} setSelectedMembers={setSelectedMembers} onEditMember={handleEditMember} onDeleteMember={handleDeleteMember} />}
+          <TeamMembersTable teamMembers={allMembers} userRole={userRole} editMode={editMode} selectedMembers={selectedMembers} setSelectedMembers={setSelectedMembers} onEditMember={handleEditMember} onDeleteMember={handleDeleteMember} />
         </CardContent>
       </Card>
 
-      {/* Only show email invites in a separate section */}
       {invitees.filter(invite => invite.invitation_type === 'email_invite').length > 0 && <Card>
           <CardHeader>
             <CardTitle className="text-lg font-medium">Pending Invites</CardTitle>
@@ -170,4 +174,5 @@ export const TeamManagement = ({
     }} onConfirm={handleConfirmDelete} />
     </div>;
 };
+
 export default TeamManagement;
