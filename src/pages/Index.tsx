@@ -10,9 +10,16 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             {/* Logo */}
-            <div className="text-2xl font-semibold">
-              <span className="text-black">Bare</span>
-              <span className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] bg-clip-text text-transparent">Resource</span>
+            <div className="flex items-center">
+              <img 
+                src="/lovable-uploads/4ee866b4-50c7-498d-9317-98f506ede564.png"
+                alt="BareResource Logo" 
+                className="w-[20px] h-[20px] p-[1px] mr-2" 
+              />
+              <span className="text-2xl font-semibold">
+                <span className="text-black">Bare</span>
+                <span className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] bg-clip-text text-transparent">Resource</span>
+              </span>
             </div>
             
             {/* Navigation Links */}
