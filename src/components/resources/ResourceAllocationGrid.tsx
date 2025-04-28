@@ -81,8 +81,12 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               Project / Resource
             </th>
             {weeks.map((week, i) => (
-              <th key={i} className="p-2 border-b text-center font-medium">
-                Week of {week.label}
+              <th key={i} className="p-2 border-b text-center font-medium relative" style={{ minWidth: '80px', height: '100px' }}>
+                <div className="absolute bottom-0 left-0 right-0 flex justify-center">
+                  <div className="transform -rotate-90 origin-bottom-left translate-y-full whitespace-nowrap pb-2 text-sm">
+                    Week of {week.label}
+                  </div>
+                </div>
               </th>
             ))}
             <th className="p-2 border-b text-center font-medium">
