@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Profile, PendingMember, TeamMember } from './types';
@@ -62,16 +61,14 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <span className="px-2.5 py-0.5 rounded-full text-sm font-medium bg-brand-primary/10 text-brand-primary">
-          {teamMembers.length} {teamMembers.length === 1 ? 'Member' : 'Members'}
-        </span>
+        <h3 className="text-2xl font-semibold tracking-tight text-brand-primary">Registration List</h3>
       </div>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               {editMode && <TableHead className="w-10"></TableHead>}
-              <TableHead>Name</TableHead>
+              <TableHead>Full Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>System Role</TableHead>
@@ -83,6 +80,10 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
           <TableBody>
             {teamMembers.map((member) => {
               const status = getMemberStatus(member);
+              const fullName = isPendingMember(member) 
+                ? `${member.first_name || ''} ${member.last_name || ''}`.trim() || member.email
+                : `${member.first_name} ${member.last_name}`;
+
               return (
                 <TableRow 
                   key={member.id} 
@@ -96,15 +97,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                       />
                     </TableCell>
                   )}
-                  <TableCell className="font-medium">
-                    {isPendingMember(member) ? (
-                      (member.first_name && member.last_name) 
-                        ? `${member.first_name} ${member.last_name}`
-                        : member.email
-                    ) : (
-                      `${member.first_name} ${member.last_name}`
-                    )}
-                  </TableCell>
+                  <TableCell className="font-medium">{fullName}</TableCell>
                   <TableCell>{member.email}</TableCell>
                   <TableCell>
                     <Badge variant={status.variant}>
