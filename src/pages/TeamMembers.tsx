@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -63,13 +64,7 @@ const TeamMembersPage = () => {
       }
 
       return profiles.map(profile => {
-        const baseProfile = profile as Profile;
-        
-        const enhancedProfile: Profile = {
-          ...baseProfile,
-        };
-        
-        return enhancedProfile;
+        return profile as Profile;
       });
     },
     enabled: !!userProfile?.company_id
