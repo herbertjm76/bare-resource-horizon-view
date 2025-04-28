@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -51,6 +52,7 @@ const TeamMembersPage = () => {
   } = useQuery({
     queryKey: ['teamMembers', userProfile?.company_id],
     queryFn: async () => {
+      // Fetch profiles from the database
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('*')
@@ -62,9 +64,11 @@ const TeamMembersPage = () => {
         throw error;
       }
 
+      // Enhance profiles with virtual fields that don't exist in the database
       return profiles.map(profile => {
         const baseProfile = profile as Profile;
         
+        // Add virtual fields for UI display
         const enhancedProfile: Profile = {
           ...baseProfile,
           department: baseProfile.department || 'General',
