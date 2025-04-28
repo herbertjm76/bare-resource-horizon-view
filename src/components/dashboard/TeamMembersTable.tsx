@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Profile, PendingMember, TeamMember } from './types';
@@ -40,7 +41,8 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
     if (!isPendingMember(member)) {
       return {
         label: "Active",
-        variant: "default" as const
+        variant: "default" as const,
+        className: "bg-[#D946EF] hover:bg-[#D946EF]/80 border-transparent text-white"
       };
     }
     return member.invitation_type === 'pre_registered' ? {
@@ -56,9 +58,6 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
 
   return <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-2xl font-semibold tracking-tight text-brand-primary">
-          Registration List
-        </h3>
         <span className="px-2.5 py-0.5 rounded-full text-sm font-medium bg-brand-primary/10 text-brand-primary text-left">
           {teamMembers.length} {teamMembers.length === 1 ? 'Member' : 'Members'}
         </span>
@@ -88,7 +87,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                   <TableCell className="font-medium">{fullName}</TableCell>
                   <TableCell>{member.email}</TableCell>
                   <TableCell>
-                    <Badge variant={status.variant}>
+                    <Badge variant={status.variant} className={status.className}>
                       {status.label}
                     </Badge>
                   </TableCell>
