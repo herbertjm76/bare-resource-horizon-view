@@ -52,8 +52,12 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
               <TableCell className="w-[30%]">{invite.email}</TableCell>
               <TableCell className="w-[20%]">
                 <Badge 
-                  variant="outline" 
-                  className={invite.status === 'active' ? 'bg-[#D946EF] text-white' : 'capitalize'}
+                  variant="default"
+                  className={
+                    invite.status?.toLowerCase() === 'active' 
+                      ? 'bg-[#D946EF] hover:bg-[#D946EF]/80 border-transparent text-white' 
+                      : 'capitalize'
+                  }
                 >
                   {invite.status}
                 </Badge>
