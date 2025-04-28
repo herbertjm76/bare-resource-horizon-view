@@ -95,11 +95,6 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
                 </div>
               </th>
             ))}
-            
-            {/* Total Hours column */}
-            <th className="p-2 border-b text-center font-medium" style={{ width: '60px', minWidth: '60px' }}>
-              Total Hours
-            </th>
           </tr>
         </thead>
         <tbody>

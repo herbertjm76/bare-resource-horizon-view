@@ -1,12 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/AddResourceDialog';
+import { toast } from 'sonner';
 
 interface ProjectRowProps {
-  project: any; // Using any for now, we'll type this properly later
+  project: any;
   weeks: {
     startDate: Date;
     label: string;
@@ -23,15 +24,60 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   onToggleExpand 
 }) => {
   const [showAddResource, setShowAddResource] = useState(false);
-  
-  // Mock data for resources - this would come from your database in a real app
-  const mockResources = [
+  const [resources, setResources] = useState([
     { id: '1', name: 'John Smith', role: 'Designer', allocations: {} },
     { id: '2', name: 'Sarah Jones', role: 'Developer', allocations: {} },
-  ];
+  ]);
   
-  // Calculate the total hours across all resources (placeholder for now)
-  const totalHours = 24;
+  // Track all allocations by resource and week
+  const [projectAllocations, setProjectAllocations] = useState<Record<string, Record<string, number>>>({});
+  
+  // Sum up all resource hours for each week
+  const weeklyProjectHours = React.useMemo(() => {
+    const weekHours: Record<string, number> = {};
+    
+    // Initialize all weeks with 0 hours
+    weeks.forEach(week => {
+      const weekKey = week.startDate.toISOString().split('T')[0];
+      weekHours[weekKey] = 0;
+    });
+    
+    // Sum up hours across all resources
+    Object.values(projectAllocations).forEach(resourceAlloc => {
+      Object.entries(resourceAlloc).forEach(([weekKey, hours]) => {
+        if (weekHours[weekKey] !== undefined) {
+          weekHours[weekKey] += hours;
+        }
+      });
+    });
+    
+    return weekHours;
+  }, [projectAllocations, weeks]);
+  
+  // Handle resource allocation changes
+  const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
+    setProjectAllocations(prev => ({
+      ...prev,
+      [resourceId]: {
+        ...(prev[resourceId] || {}),
+        [weekKey]: hours
+      }
+    }));
+  };
+  
+  // Handle resource deletion
+  const handleDeleteResource = (resourceId: string) => {
+    setResources(prev => prev.filter(r => r.id !== resourceId));
+    setProjectAllocations(prev => {
+      const newAllocations = { ...prev };
+      delete newAllocations[resourceId];
+      return newAllocations;
+    });
+  };
+  
+  const getWeekKey = (startDate: Date) => {
+    return startDate.toISOString().split('T')[0];
+  };
   
   return (
     <>
@@ -56,33 +102,35 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         <td className="p-1 border-b"></td>
         
         {/* Week allocation cells */}
-        {weeks.map((week, i) => (
-          <td key={i} className="p-0 border-b text-center text-muted-foreground w-10">
-            {/* This would show total hours for this project in this week */}
-            {isExpanded ? '' : '8h'}
-          </td>
-        ))}
-        
-        {/* Total hours cell */}
-        <td className="p-2 border-b text-center font-medium">
-          {totalHours}h
-        </td>
+        {weeks.map((week) => {
+          const weekKey = getWeekKey(week.startDate);
+          const projectHours = weeklyProjectHours[weekKey] || 0;
+          
+          return (
+            <td key={weekKey} className="p-0 border-b text-center text-muted-foreground w-10">
+              {/* Show week totals for the project */}
+              {isExpanded ? '' : `${projectHours}h`}
+            </td>
+          );
+        })}
       </tr>
       
       {/* Resource rows when project is expanded */}
-      {isExpanded && mockResources.map(resource => (
+      {isExpanded && resources.map(resource => (
         <ResourceRow 
           key={resource.id} 
           resource={resource} 
           weeks={weeks} 
           projectId={project.id}
+          onAllocationChange={handleAllocationChange}
+          onDeleteResource={handleDeleteResource}
         />
       ))}
       
       {/* Add resource row when project is expanded */}
       {isExpanded && (
-        <tr className="bg-muted/10">
-          <td className="sticky left-0 bg-muted/10 z-10 p-2 border-b">
+        <tr className="bg-muted/5">
+          <td className="sticky left-0 bg-muted/5 z-10 p-2 border-b">
             <Button 
               variant="ghost" 
               size="sm" 
@@ -100,7 +148,6 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           {weeks.map((_, i) => (
             <td key={i} className="p-0 border-b w-10"></td>
           ))}
-          <td className="p-2 border-b"></td>
         </tr>
       )}
       
@@ -109,9 +156,16 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           projectId={project.id}
           onClose={() => setShowAddResource(false)}
           onAdd={(resource) => {
-            console.log('Add resource:', resource);
+            const newResource = {
+              id: resource.staffId,
+              name: resource.name,
+              role: 'Team Member', // Default role
+              allocations: {}
+            };
+            
+            setResources(prev => [...prev, newResource]);
             setShowAddResource(false);
-            // Here you would update your resources data
+            toast.success(`${resource.name} added to project`);
           }}
         />
       )}

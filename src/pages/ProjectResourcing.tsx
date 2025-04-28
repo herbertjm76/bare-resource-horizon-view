@@ -15,7 +15,7 @@ const ProjectResourcing = () => {
     country: "all",
     manager: "all",
     startDate: new Date(),
-    weeksToShow: 8,
+    weeksToShow: 12, // Default increased to 12 weeks
   });
   
   const handleFilterChange = (newFilters: Partial<typeof filters>) => {
