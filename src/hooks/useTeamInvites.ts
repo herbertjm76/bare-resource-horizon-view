@@ -8,7 +8,7 @@ export const useTeamInvites = (companyId: string | undefined) => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [invLoading, setInvLoading] = useState(false);
 
-  const handleSendInvite = async (e: React.FormEvent) => {
+  const handleSendInvite = async (e: React.FormEvent, firstName?: string, lastName?: string) => {
     e.preventDefault();
     setInvLoading(true);
 
@@ -24,10 +24,8 @@ export const useTeamInvites = (companyId: string | undefined) => {
         return false;
       }
 
-      // Generate a unique invite code
       const code = Math.random().toString(36).substring(2, 10).toUpperCase();
       
-      // Insert the invitation record into the database
       const { error } = await supabase
         .from('invites')
         .insert({
@@ -35,6 +33,8 @@ export const useTeamInvites = (companyId: string | undefined) => {
           company_id: companyId,
           email: inviteEmail,
           created_by: session.user.id,
+          first_name: firstName || null,
+          last_name: lastName || null
         });
 
       if (error) throw error;

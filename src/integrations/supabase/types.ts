@@ -70,9 +70,11 @@ export type Database = {
           created_by: string
           department: string | null
           email: string | null
+          first_name: string | null
           id: string
           invitation_type: string
           job_title: string | null
+          last_name: string | null
           location: string | null
           status: string
         }
@@ -85,9 +87,11 @@ export type Database = {
           created_by: string
           department?: string | null
           email?: string | null
+          first_name?: string | null
           id?: string
           invitation_type?: string
           job_title?: string | null
+          last_name?: string | null
           location?: string | null
           status?: string
         }
@@ -100,9 +104,11 @@ export type Database = {
           created_by?: string
           department?: string | null
           email?: string | null
+          first_name?: string | null
           id?: string
           invitation_type?: string
           job_title?: string | null
+          last_name?: string | null
           location?: string | null
           status?: string
         }
