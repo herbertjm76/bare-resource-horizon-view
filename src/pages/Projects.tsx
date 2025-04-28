@@ -1,10 +1,13 @@
+
 import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { ProjectsList } from '@/components/projects/ProjectsList';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
+
 const HEADER_HEIGHT = 56;
+
 const Projects = () => {
   return <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
@@ -30,4 +33,5 @@ const Projects = () => {
       </div>
     </SidebarProvider>;
 };
+
 export default Projects;
