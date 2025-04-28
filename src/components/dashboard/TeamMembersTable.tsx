@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Profile, PendingMember, TeamMember } from './types';
@@ -62,6 +63,9 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-2xl font-semibold tracking-tight text-brand-primary">Registration List</h3>
+        <span className="px-2.5 py-0.5 rounded-full text-sm font-medium bg-brand-primary/10 text-brand-primary">
+          {teamMembers.length} {teamMembers.length === 1 ? 'Member' : 'Members'}
+        </span>
       </div>
       <div className="overflow-x-auto">
         <Table>
