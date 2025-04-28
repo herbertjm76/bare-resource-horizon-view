@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,9 +12,14 @@ import OfficeSettings from "./pages/OfficeSettings";
 import Auth from "./pages/Auth";
 import Join from "./pages/Join";
 import Profile from "./pages/Profile";
+import TeamMembers from "./pages/TeamMembers";
+import TeamWorkload from "./pages/TeamWorkload";
+import TeamAnnualLeave from "./pages/TeamAnnualLeave";
+import WeeklyOverview from "./pages/WeeklyOverview";
+import ProjectResourcing from "./pages/ProjectResourcing";
+import Help from "./pages/Help";
 import { CompanyProvider, useCompany } from "./context/CompanyContext";
 import { useEffect } from "react";
-import TeamMembers from "./pages/TeamMembers";
 
 const queryClient = new QueryClient();
 
@@ -47,10 +53,15 @@ const AppRoutes = () => {
       
       {/* Company-specific routes */}
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/weekly-overview" element={<WeeklyOverview />} />
+      <Route path="/project-resourcing" element={<ProjectResourcing />} />
       <Route path="/projects" element={<Projects />} />
-      <Route path="/office-settings" element={<OfficeSettings />} />
-      <Route path="/profile" element={<Profile />} />
       <Route path="/team-members" element={<TeamMembers />} />
+      <Route path="/team-workload" element={<TeamWorkload />} />
+      <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
+      <Route path="/office-settings" element={<OfficeSettings />} />
+      <Route path="/help" element={<Help />} />
+      <Route path="/profile" element={<Profile />} />
       
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />

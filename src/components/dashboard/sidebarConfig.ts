@@ -1,14 +1,14 @@
+
 import { 
   LayoutDashboard,
-  CalendarDays,
-  BarChart2,  // Using bar-chart-2 for overview as suggested
-  Users,
-  LayoutList,  // Using layout-list for overview
-  ScrollText,
-  FolderKanban,
+  LayoutList,
   GanttChartSquare,
+  FolderKanban,
   UserSquare2,
-  Flag
+  Briefcase,
+  Calendar,
+  Flag,
+  HelpCircle
 } from "lucide-react"
 
 export const navigationItems = [
@@ -21,29 +21,24 @@ export const navigationItems = [
         icon: LayoutDashboard,
       },
       {
-        title: "Calendar",
-        url: "/calendar",
-        icon: CalendarDays,
+        title: "Weekly Overview",
+        url: "/weekly-overview",
+        icon: LayoutList,
       },
     ],
   },
   {
-    label: "RESOURCE PLANNING",
+    label: "PROJECT MANAGEMENT",
     items: [
       {
-        title: "Weekly Overview",  // Changed from "Weekly Planning"
-        url: "/weekly-planning",
-        icon: LayoutList,  // Changed icon to layout-list
+        title: "Project Resourcing",
+        url: "/project-resourcing",
+        icon: GanttChartSquare,
       },
       {
-        title: "Resource Allocation",
-        url: "/resource-allocation",
-        icon: Users,
-      },
-      {
-        title: "Overview",  // Changed from "Capacity Planning"
-        url: "/capacity-planning",
-        icon: BarChart2,  // Changed icon to bar-chart-2
+        title: "All Projects",
+        url: "/projects",
+        icon: FolderKanban,
       },
     ],
   },
@@ -52,38 +47,33 @@ export const navigationItems = [
     items: [
       {
         title: "Team Members",
-        url: "/team-members",  // Updated URL to match the new route
+        url: "/team-members",
         icon: UserSquare2,
       },
       {
-        title: "Skills & Roles",
-        url: "/skills-roles",
-        icon: ScrollText,
+        title: "Team Workload",
+        url: "/team-workload",
+        icon: Briefcase,
+      },
+      {
+        title: "Team Annual Leave",
+        url: "/team-annual-leave",
+        icon: Calendar,
       },
     ],
   },
   {
-    label: "PROJECTS",
-    items: [
-      {
-        title: "All Projects",
-        url: "/projects",
-        icon: FolderKanban,
-      },
-      {
-        title: "Project Resourcing",
-        url: "/project-resourcing",
-        icon: GanttChartSquare,
-      },
-    ],
-  },
-  {
-    label: "SYSTEM",
+    label: "SETTINGS",
     items: [
       {
         title: "Office Settings",
         url: "/office-settings",
         icon: Flag,
+      },
+      {
+        title: "Help",
+        url: "/help",
+        icon: HelpCircle,
       },
     ],
   },
