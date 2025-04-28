@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Send, Trash2 } from 'lucide-react';
 
 interface TeamInvitesTableProps {
@@ -39,19 +40,26 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[40%]">Email</TableHead>
+            <TableHead className="w-[30%]">Email</TableHead>
             <TableHead className="w-[20%]">Status</TableHead>
             <TableHead className="w-[20%]">Sent</TableHead>
-            <TableHead className="w-[20%]">Actions</TableHead>
+            <TableHead className="w-[30%]"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {emailInvites.map((invite) => (
             <TableRow key={invite.id}>
-              <TableCell className="w-[40%]">{invite.email}</TableCell>
-              <TableCell className="w-[20%] capitalize">{invite.status}</TableCell>
-              <TableCell className="w-[20%]">{new Date(invite.created_at).toLocaleDateString()}</TableCell>
+              <TableCell className="w-[30%]">{invite.email}</TableCell>
               <TableCell className="w-[20%]">
+                <Badge 
+                  variant="outline" 
+                  className={invite.status === 'active' ? 'bg-[#D946EF] text-white' : 'capitalize'}
+                >
+                  {invite.status}
+                </Badge>
+              </TableCell>
+              <TableCell className="w-[20%]">{new Date(invite.created_at).toLocaleDateString()}</TableCell>
+              <TableCell className="w-[30%]">
                 {editMode ? (
                   <div className="flex items-center gap-2">
                     <Button
