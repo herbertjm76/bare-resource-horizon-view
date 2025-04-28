@@ -13,12 +13,12 @@ export interface Profile extends BaseProfile {
 
 export type Invite = Database['public']['Tables']['invites']['Row'];
 
-export interface PendingMember extends Invite {
+export interface PendingMember extends Omit<Invite, 'first_name' | 'last_name'> {
   isPending: true;
   fullName?: string;
   role?: string; // Role property which can come from the invite
-  first_name?: string; // Adding first_name property
-  last_name?: string; // Adding last_name property
+  first_name?: string; // Adding first_name as optional explicitly
+  last_name?: string; // Adding last_name as optional explicitly
 }
 
 export type InvitationType = 'email_invite' | 'pre_registered';
