@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,39 +11,45 @@ import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useTeamInvites } from '@/hooks/useTeamInvites';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Profile, PendingMember, TeamMember, Invite } from './types';
-
 interface TeamManagementProps {
   teamMembers: Profile[];
   inviteUrl: string;
   userRole: string;
 }
-
-export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole }: TeamManagementProps) => {
+export const TeamManagement = ({
+  teamMembers: activeMembers,
+  inviteUrl,
+  userRole
+}: TeamManagementProps) => {
   const [invitees, setInvitees] = useState<Invite[]>([]);
   const [refreshFlag, setRefreshFlag] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
-  
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentMember, setCurrentMember] = useState<Profile | null>(null);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
-
   const companyId = activeMembers[0]?.company_id;
-  const { handleSaveMember, isSaving } = useTeamMembers(companyId);
-  const { inviteEmail, setInviteEmail, invLoading, handleSendInvite } = useTeamInvites(companyId);
-
+  const {
+    handleSaveMember,
+    isSaving
+  } = useTeamMembers(companyId);
+  const {
+    inviteEmail,
+    setInviteEmail,
+    invLoading,
+    handleSendInvite
+  } = useTeamInvites(companyId);
   useEffect(() => {
     const fetchInvites = async () => {
       if (userRole === 'owner' || userRole === 'admin') {
-        const { data: invites, error } = await supabase
-          .from('invites')
-          .select('*')
-          .eq('company_id', companyId)
-          .eq('status', 'pending')
-          .order('created_at', { ascending: false });
-        
+        const {
+          data: invites,
+          error
+        } = await supabase.from('invites').select('*').eq('company_id', companyId).eq('status', 'pending').order('created_at', {
+          ascending: false
+        });
         if (error) {
           toast.error('Failed to load invites');
         } else {
@@ -52,7 +57,6 @@ export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole
         }
       }
     };
-    
     if (companyId) {
       fetchInvites();
     }
@@ -66,10 +70,9 @@ export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole
 
   // Filter out email invites for the main team members table
   const preRegisteredMembers = pendingMembers.filter(member => member.invitation_type === 'pre_registered');
-  
+
   // Combine active members with pre-registered members
   const allMembers: TeamMember[] = [...activeMembers, ...preRegisteredMembers];
-
   const handleSaveMemberWrapper = async (memberData: Partial<Profile>) => {
     const success = await handleSaveMember(memberData, Boolean(currentMember));
     if (success) {
@@ -79,35 +82,28 @@ export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole
       setRefreshFlag(prev => prev + 1);
     }
   };
-
   const handleEditMember = (member: TeamMember) => {
     setCurrentMember(member as Profile);
     setIsEditDialogOpen(true);
   };
-
   const handleDeleteMember = (memberId: string) => {
     setMemberToDelete(memberId);
     setIsDeleteDialogOpen(true);
   };
-
   const handleConfirmDelete = async () => {
     if (!memberToDelete) return;
     try {
       // Check if it's a pre-registered member (in invites table)
       const isPending = pendingMembers.some(m => m.id === memberToDelete);
-      
       if (isPending) {
-        const { error } = await supabase
-          .from('invites')
-          .delete()
-          .eq('id', memberToDelete);
-        
+        const {
+          error
+        } = await supabase.from('invites').delete().eq('id', memberToDelete);
         if (error) throw error;
       } else {
         // Logic to delete active member would go here
         // This might involve multiple operations depending on your data structure
       }
-      
       toast.success("Team member deleted successfully");
       setMemberToDelete(null);
       setIsDeleteDialogOpen(false);
@@ -117,7 +113,6 @@ export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole
       console.error(error);
     }
   };
-
   const handleBulkDelete = async () => {
     if (!selectedMembers.length) return;
     try {
@@ -130,92 +125,49 @@ export const TeamManagement = ({ teamMembers: activeMembers, inviteUrl, userRole
       console.error(error);
     }
   };
-
   const copyInviteUrl = () => {
     navigator.clipboard.writeText(inviteUrl);
     toast.success('Invite URL copied to clipboard!');
   };
-
   const copyInviteCode = (code: string) => {
     navigator.clipboard.writeText(`${window.location.origin}/join/${code}`);
     toast.success('Invite link copied!');
   };
-
-  return (
-    <div className="space-y-6">
-      {['owner', 'admin'].includes(userRole) && (
-        <div className="flex justify-end">
-          <TeamInviteControls
-            onAdd={() => setIsAddDialogOpen(true)}
-            onCopyInvite={copyInviteUrl}
-            companyId={companyId}
-          />
-        </div>
-      )}
+  return <div className="space-y-6">
+      {['owner', 'admin'].includes(userRole) && <div className="flex justify-end">
+          <TeamInviteControls onAdd={() => setIsAddDialogOpen(true)} onCopyInvite={copyInviteUrl} companyId={companyId} />
+        </div>}
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-lg font-medium">Team Members</CardTitle>
-          {['owner', 'admin'].includes(userRole) && (
-            <TeamMembersToolbar
-              editMode={editMode}
-              setEditMode={setEditMode}
-              selectedCount={selectedMembers.length}
-              onBulkDelete={handleBulkDelete}
-              onAdd={() => setIsAddDialogOpen(true)}
-            />
-          )}
+          <CardTitle className="text-lg font-medium">Team Registered</CardTitle>
+          {['owner', 'admin'].includes(userRole) && <TeamMembersToolbar editMode={editMode} setEditMode={setEditMode} selectedCount={selectedMembers.length} onBulkDelete={handleBulkDelete} onAdd={() => setIsAddDialogOpen(true)} />}
         </CardHeader>
         <CardContent>
-          {['owner', 'admin'].includes(userRole) && (
-            <TeamMembersTable 
-              teamMembers={allMembers} 
-              userRole={userRole}
-              editMode={editMode}
-              selectedMembers={selectedMembers}
-              setSelectedMembers={setSelectedMembers}
-              onEditMember={handleEditMember}
-              onDeleteMember={handleDeleteMember}
-            />
-          )}
+          {['owner', 'admin'].includes(userRole) && <TeamMembersTable teamMembers={allMembers} userRole={userRole} editMode={editMode} selectedMembers={selectedMembers} setSelectedMembers={setSelectedMembers} onEditMember={handleEditMember} onDeleteMember={handleDeleteMember} />}
         </CardContent>
       </Card>
 
       {/* Only show email invites in a separate section */}
-      {invitees.filter(invite => invite.invitation_type === 'email_invite').length > 0 && (
-        <Card>
+      {invitees.filter(invite => invite.invitation_type === 'email_invite').length > 0 && <Card>
           <CardHeader>
             <CardTitle className="text-lg font-medium">Pending Invites</CardTitle>
           </CardHeader>
           <CardContent>
             <TeamInvitesTable invitees={invitees} copyInviteCode={copyInviteCode} />
           </CardContent>
-        </Card>
-      )}
+        </Card>}
 
-      <MemberDialog 
-        isOpen={isAddDialogOpen || isEditDialogOpen} 
-        onClose={() => {
-          setIsAddDialogOpen(false);
-          setIsEditDialogOpen(false);
-          setCurrentMember(null);
-        }}
-        member={currentMember}
-        onSave={handleSaveMemberWrapper}
-        title={isEditDialogOpen ? "Edit Team Member" : "Add Team Member"}
-        isLoading={isSaving}
-      />
+      <MemberDialog isOpen={isAddDialogOpen || isEditDialogOpen} onClose={() => {
+      setIsAddDialogOpen(false);
+      setIsEditDialogOpen(false);
+      setCurrentMember(null);
+    }} member={currentMember} onSave={handleSaveMemberWrapper} title={isEditDialogOpen ? "Edit Team Member" : "Add Team Member"} isLoading={isSaving} />
 
-      <DeleteMemberDialog 
-        isOpen={isDeleteDialogOpen}
-        onClose={() => {
-          setIsDeleteDialogOpen(false);
-          setMemberToDelete(null);
-        }}
-        onConfirm={handleConfirmDelete}
-      />
-    </div>
-  );
+      <DeleteMemberDialog isOpen={isDeleteDialogOpen} onClose={() => {
+      setIsDeleteDialogOpen(false);
+      setMemberToDelete(null);
+    }} onConfirm={handleConfirmDelete} />
+    </div>;
 };
-
 export default TeamManagement;
