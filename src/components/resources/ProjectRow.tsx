@@ -36,6 +36,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   return (
     <>
       <tr className="hover:bg-muted/30">
+        {/* Project name cell */}
         <td 
           className="sticky left-0 bg-background z-10 p-2 border-b cursor-pointer"
           onClick={onToggleExpand}
@@ -51,6 +52,10 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           </div>
         </td>
         
+        {/* Empty cell for the "WEEK OF" column */}
+        <td className="p-2 border-b"></td>
+        
+        {/* Week allocation cells */}
         {weeks.map((week, i) => (
           <td key={i} className="p-2 border-b text-center text-muted-foreground">
             {/* This would show total hours for this project in this week */}
@@ -58,11 +63,13 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           </td>
         ))}
         
+        {/* Total hours cell */}
         <td className="p-2 border-b text-center font-medium">
           {totalHours}h
         </td>
       </tr>
       
+      {/* Resource rows when project is expanded */}
       {isExpanded && mockResources.map(resource => (
         <ResourceRow 
           key={resource.id} 
@@ -72,6 +79,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         />
       ))}
       
+      {/* Add resource row when project is expanded */}
       {isExpanded && (
         <tr className="bg-muted/10">
           <td className="sticky left-0 bg-muted/10 z-10 p-2 border-b">
@@ -85,6 +93,10 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
               Add Resource
             </Button>
           </td>
+          
+          {/* Empty cell for the "WEEK OF" column */}
+          <td className="p-2 border-b"></td>
+          
           {weeks.map((_, i) => (
             <td key={i} className="p-2 border-b"></td>
           ))}

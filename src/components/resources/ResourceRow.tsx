@@ -42,6 +42,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({ resource, weeks, proje
 
   return (
     <tr className="bg-muted/5 hover:bg-muted/10">
+      {/* Resource name and role cell */}
       <td className="sticky left-0 bg-muted/5 z-10 p-2 border-b">
         <div className="flex items-center pl-8">
           <div className="flex-1">
@@ -54,6 +55,10 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({ resource, weeks, proje
         </div>
       </td>
       
+      {/* Empty cell for the "WEEK OF" column */}
+      <td className="p-1 border-b"></td>
+      
+      {/* Week allocation input cells */}
       {weeks.map((week) => {
         const weekKey = getWeekKey(week.startDate);
         const hours = allocations[weekKey] || 0;
@@ -72,6 +77,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({ resource, weeks, proje
         );
       })}
       
+      {/* Total hours cell */}
       <td className="p-2 border-b text-center font-medium">
         {totalHours}h
       </td>
