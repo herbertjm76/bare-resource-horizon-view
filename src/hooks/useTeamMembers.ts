@@ -83,21 +83,33 @@ export const useTeamMembers = (companyId: string | undefined) => {
       setIsDeleting(true);
       
       if (isPending) {
+        console.log('Deleting pending member from invites table:', memberId);
         // Delete from invites table
         const { error } = await supabase
           .from('invites')
           .delete()
           .eq('id', memberId);
           
-        if (error) throw error;
+        if (error) {
+          console.error('Error deleting from invites:', error);
+          throw error;
+        }
+        
+        console.log('Successfully deleted from invites table');
       } else {
+        console.log('Deleting active member from profiles table:', memberId);
         // Delete from profiles table
         const { error } = await supabase
           .from('profiles')
           .delete()
           .eq('id', memberId);
           
-        if (error) throw error;
+        if (error) {
+          console.error('Error deleting from profiles:', error);
+          throw error;
+        }
+        
+        console.log('Successfully deleted from profiles table');
       }
       
       toast.success('Team member deleted successfully');

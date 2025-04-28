@@ -51,9 +51,11 @@ export const TeamManagement = ({
     handleSendInvite
   } = useTeamInvites(companyId);
 
+  // Fetch invites whenever refreshFlag changes to ensure UI is updated
   useEffect(() => {
     const fetchInvites = async () => {
       if (userRole === 'owner' || userRole === 'admin') {
+        console.log('Fetching invites - refresh flag:', refreshFlag);
         const {
           data: invites,
           error
@@ -62,7 +64,9 @@ export const TeamManagement = ({
         });
         if (error) {
           toast.error('Failed to load invites');
+          console.error('Error fetching invites:', error);
         } else {
+          console.log('Fetched invites:', invites?.length || 0);
           setInvitees(invites ?? []);
         }
       }
@@ -107,13 +111,16 @@ export const TeamManagement = ({
   const handleConfirmDelete = async () => {
     if (!memberToDelete) return;
     
+    console.log('Deleting member:', memberToDelete, 'isPending:', isPendingMemberToDelete);
     const success = await handleDeleteMember(memberToDelete, isPendingMemberToDelete);
     
     if (success) {
       setMemberToDelete(null);
       setIsPendingMemberToDelete(false);
       setIsDeleteDialogOpen(false);
+      // Increment refresh flag to trigger data refetch
       setRefreshFlag(prev => prev + 1);
+      console.log('Delete successful, refreshFlag updated');
     }
   };
 

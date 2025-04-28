@@ -13,6 +13,7 @@ const HEADER_HEIGHT = 56;
 
 const TeamMembersPage = () => {
   const [userId, setUserId] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     const getSession = async () => {
@@ -48,10 +49,12 @@ const TeamMembersPage = () => {
 
   const {
     data: teamMembers = [],
-    isLoading
+    isLoading,
+    refetch: refetchTeamMembers
   } = useQuery({
-    queryKey: ['teamMembers', userProfile?.company_id],
+    queryKey: ['teamMembers', userProfile?.company_id, refreshTrigger],
     queryFn: async () => {
+      console.log('Fetching team members, refresh trigger:', refreshTrigger);
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('*')
@@ -67,8 +70,38 @@ const TeamMembersPage = () => {
         return profile as Profile;
       });
     },
-    enabled: !!userProfile?.company_id
+    enabled: !!userProfile?.company_id,
+    refetchInterval: 5000 // Add polling to keep data fresh
   });
+
+  // Listen for realtime changes to profiles table
+  useEffect(() => {
+    if (!userProfile?.company_id) return;
+    
+    const channel = supabase
+      .channel('team-members-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'profiles',
+        filter: `company_id=eq.${userProfile.company_id}`
+      }, () => {
+        refetchTeamMembers();
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'invites',
+        filter: `company_id=eq.${userProfile.company_id}`
+      }, () => {
+        refetchTeamMembers();
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [userProfile?.company_id, refetchTeamMembers]);
 
   const inviteUrl = userProfile?.company_id ? `${window.location.origin}/join/${userProfile.company_id}` : '';
 
