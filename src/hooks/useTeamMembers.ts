@@ -25,7 +25,9 @@ export const useTeamMembers = (companyId: string | undefined) => {
             last_name: memberData.last_name,
             email: memberData.email,
             role: memberData.role,
-            // Store these values as metadata since they don't exist in the profiles table
+            department: memberData.department,
+            location: memberData.location,
+            job_title: memberData.job_title,
             updated_at: new Date().toISOString()
           })
           .eq('id', memberData.id);
