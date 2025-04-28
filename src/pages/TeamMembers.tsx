@@ -7,9 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/components/dashboard/types";
 import { toast } from "sonner";
 import { AppHeader } from '@/components/AppHeader';
+
 const HEADER_HEIGHT = 56;
+
 const TeamMembersPage = () => {
   const [userId, setUserId] = useState<string | null>(null);
+
   useEffect(() => {
     const getSession = async () => {
       try {
@@ -26,6 +29,7 @@ const TeamMembersPage = () => {
     };
     getSession();
   }, []);
+
   const {
     data: userProfile
   } = useQuery({
@@ -40,35 +44,39 @@ const TeamMembersPage = () => {
     },
     enabled: !!userId
   });
+
   const {
     data: teamMembers = [],
     isLoading
   } = useQuery({
     queryKey: ['teamMembers', userProfile?.company_id],
     queryFn: async () => {
-      const {
-        data: profiles,
-        error
-      } = await supabase.from('profiles').select('*').eq('company_id', userProfile?.company_id).order('created_at', {
-        ascending: false
-      });
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('company_id', userProfile?.company_id)
+        .order('created_at', { ascending: false });
+
       if (error) {
         toast.error('Failed to load team members');
         throw error;
       }
+
       return profiles.map(profile => {
         const enhancedProfile: Profile = {
           ...profile,
-          department: 'General',
-          location: 'Remote',
-          job_title: 'Team Member'
+          department: profile.department || 'General',
+          location: profile.location || 'Remote',
+          job_title: profile.job_title || 'Team Member'
         };
         return enhancedProfile;
       });
     },
     enabled: !!userProfile?.company_id
   });
+
   const inviteUrl = userProfile?.company_id ? `${window.location.origin}/join/${userProfile.company_id}` : '';
+
   return <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
         <div className="flex-shrink-0">
@@ -91,4 +99,5 @@ const TeamMembersPage = () => {
       </div>
     </SidebarProvider>;
 };
+
 export default TeamMembersPage;

@@ -140,11 +140,11 @@ export const TeamManagement = ({
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-lg font-medium">Team Registered</CardTitle>
+          <CardTitle className="text-lg font-medium">Team Members</CardTitle>
           {['owner', 'admin'].includes(userRole) && <TeamMembersToolbar editMode={editMode} setEditMode={setEditMode} selectedCount={selectedMembers.length} onBulkDelete={handleBulkDelete} onAdd={() => setIsAddDialogOpen(true)} />}
         </CardHeader>
         <CardContent>
-          {['owner', 'admin'].includes(userRole) && <TeamMembersTable teamMembers={allMembers} userRole={userRole} editMode={editMode} selectedMembers={selectedMembers} setSelectedMembers={setSelectedMembers} onEditMember={handleEditMember} onDeleteMember={handleDeleteMember} />}
+          <TeamMembersTable teamMembers={allMembers} userRole={userRole} editMode={editMode} selectedMembers={selectedMembers} setSelectedMembers={setSelectedMembers} onEditMember={handleEditMember} onDeleteMember={handleDeleteMember} />}
         </CardContent>
       </Card>
 
@@ -154,7 +154,7 @@ export const TeamManagement = ({
             <CardTitle className="text-lg font-medium">Pending Invites</CardTitle>
           </CardHeader>
           <CardContent>
-            <TeamInvitesTable invitees={invitees} copyInviteCode={copyInviteCode} />
+            <TeamInvitesTable invitees={invitees.filter(invite => invite.invitation_type === 'email_invite')} copyInviteCode={copyInviteCode} />
           </CardContent>
         </Card>}
 
