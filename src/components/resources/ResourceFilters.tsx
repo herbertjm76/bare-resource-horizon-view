@@ -66,7 +66,7 @@ export const ResourceFilters: React.FC<ResourceFiltersProps> = ({
           <SelectValue placeholder="Filter by Office" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Offices</SelectItem>
+          <SelectItem value="all">All Offices</SelectItem>
           {offices.map((office) => (
             <SelectItem key={office} value={office}>
               {office}
@@ -83,7 +83,7 @@ export const ResourceFilters: React.FC<ResourceFiltersProps> = ({
           <SelectValue placeholder="Filter by Country" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Countries</SelectItem>
+          <SelectItem value="all">All Countries</SelectItem>
           {countries.map((country) => (
             <SelectItem key={country} value={country}>
               {country}
@@ -100,7 +100,7 @@ export const ResourceFilters: React.FC<ResourceFiltersProps> = ({
           <SelectValue placeholder="Filter by Project Manager" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Project Managers</SelectItem>
+          <SelectItem value="all">All Project Managers</SelectItem>
           {managers.map((manager) => (
             <SelectItem key={manager.id} value={manager.id}>
               {manager.name}

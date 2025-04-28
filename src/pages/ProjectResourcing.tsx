@@ -11,9 +11,9 @@ const HEADER_HEIGHT = 56;
 
 const ProjectResourcing = () => {
   const [filters, setFilters] = useState({
-    office: '',
-    country: '',
-    manager: '',
+    office: "all",
+    country: "all",
+    manager: "all",
     startDate: new Date(),
     weeksToShow: 8,
   });

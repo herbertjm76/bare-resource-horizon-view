@@ -37,9 +37,9 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   
   // Filter projects based on selected filters
   const filteredProjects = projects.filter(project => {
-    if (filters.office && project.office?.name !== filters.office) return false;
-    if (filters.country && project.country !== filters.country) return false;
-    if (filters.manager && project.project_manager?.id !== filters.manager) return false;
+    if (filters.office !== "all" && project.office?.name !== filters.office) return false;
+    if (filters.country !== "all" && project.country !== filters.country) return false;
+    if (filters.manager !== "all" && project.project_manager?.id !== filters.manager) return false;
     return true;
   });
   
