@@ -28,7 +28,7 @@ type Invite = Database['public']['Tables']['invites']['Row'];
 interface AddResourceDialogProps {
   projectId: string;
   onClose: () => void;
-  onAdd: (resource: { staffId: string, name: string, role?: string }) => void;
+  onAdd: (resource: { staffId: string, name: string, role?: string, isPending?: boolean }) => void;
 }
 
 type ResourceOption = {
@@ -135,7 +135,8 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
       onAdd({ 
         staffId: resource.id, 
         name: resource.name,
-        role: resource.role
+        role: resource.role,
+        isPending: resource.type === 'pre-registered'
       });
     } catch (err: any) {
       console.error('Error adding resource:', err);

@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, UserPlus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/AddResourceDialog';
 import { toast } from 'sonner';
