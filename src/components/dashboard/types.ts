@@ -16,7 +16,9 @@ export type Invite = Database['public']['Tables']['invites']['Row'];
 export interface PendingMember extends Invite {
   isPending: true;
   fullName?: string;
-  role?: string; // Added role property which can come from the invite
+  role?: string; // Role property which can come from the invite
+  first_name?: string; // Adding first_name property
+  last_name?: string; // Adding last_name property
 }
 
 export type InvitationType = 'email_invite' | 'pre_registered';

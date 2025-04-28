@@ -98,7 +98,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                   )}
                   <TableCell className="font-medium">
                     {isPendingMember(member) ? (
-                      member.first_name && member.last_name 
+                      (member.first_name && member.last_name) 
                         ? `${member.first_name} ${member.last_name}`
                         : member.email
                     ) : (
