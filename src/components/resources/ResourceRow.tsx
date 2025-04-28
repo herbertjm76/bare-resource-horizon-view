@@ -83,9 +83,6 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
         </div>
       </td>
       
-      {/* Empty cell for the "WEEK OF" column */}
-      <td className="p-0 border-b"></td>
-      
       {/* Week allocation input cells */}
       {weeks.map((week) => {
         const weekKey = getWeekKey(week.startDate);
