@@ -64,13 +64,17 @@ const TeamMembersPage = () => {
       }
 
       return profiles.map(profile => {
-        // Cast the base profile to our extended Profile type and add default values
+        // First create a properly typed object with the base profile data
+        const baseProfile = profile as Profile;
+        
+        // Then add our additional properties with default values
         const enhancedProfile: Profile = {
-          ...profile,
-          department: profile.department || 'General',
-          location: profile.location || 'Remote',
-          job_title: profile.job_title || 'Team Member'
+          ...baseProfile,
+          department: baseProfile.department || 'General',
+          location: baseProfile.location || 'Remote',
+          job_title: baseProfile.job_title || 'Team Member'
         };
+        
         return enhancedProfile;
       });
     },
