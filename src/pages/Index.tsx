@@ -7,7 +7,7 @@ import Footer from '../components/landing/Footer';
 
 const Index = () => {
   return (
-    <div className="min-h-screen hero-gradient">
+    <div className="min-h-screen">
       <Navbar />
       <Hero />
       <Features />
@@ -18,4 +18,3 @@ const Index = () => {
 };
 
 export default Index;
-

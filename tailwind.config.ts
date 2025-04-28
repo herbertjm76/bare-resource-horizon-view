@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,9 @@ export default {
       },
     },
     extend: {
+      backgroundImage: {
+        hero: 'linear-gradient(145deg, #895CF7 0%, #5669F7 55%, #E64FC4 100%)',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
