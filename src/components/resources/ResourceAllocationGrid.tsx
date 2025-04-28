@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { addDays, format, startOfWeek, addWeeks } from 'date-fns';
@@ -24,18 +23,16 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   const { projects, isLoading } = useProjects();
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
   
-  // Generate week headers (always start on Monday)
   const mondayOfStartDate = startOfWeek(startDate, { weekStartsOn: 1 });
   const weeks = Array.from({ length: weeksToShow }, (_, i) => {
     const weekStart = addWeeks(mondayOfStartDate, i);
     return {
       startDate: weekStart,
-      label: format(weekStart, 'MMM d'),
+      label: format(weekStart, 'MMM dd'),
       days: Array.from({ length: 7 }, (_, j) => addDays(weekStart, j))
     };
   });
   
-  // Filter projects based on selected filters
   const filteredProjects = projects.filter(project => {
     if (filters.office !== "all" && project.office?.name !== filters.office) return false;
     if (filters.country !== "all" && project.country !== filters.country) return false;
@@ -80,11 +77,18 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
             <th className="sticky left-0 bg-muted/50 z-10 p-2 border-b text-left font-medium" style={{ minWidth: '250px' }}>
               Project / Resource
             </th>
+            <th className="p-2 border-b text-center font-medium relative" style={{ minWidth: '80px', height: '100px' }}>
+              <div className="absolute bottom-0 left-0 right-0 flex justify-center">
+                <div className="transform -rotate-90 origin-bottom-left translate-y-full whitespace-nowrap pb-2 text-sm font-semibold">
+                  WEEK OF
+                </div>
+              </div>
+            </th>
             {weeks.map((week, i) => (
               <th key={i} className="p-2 border-b text-center font-medium relative" style={{ minWidth: '80px', height: '100px' }}>
                 <div className="absolute bottom-0 left-0 right-0 flex justify-center">
                   <div className="transform -rotate-90 origin-bottom-left translate-y-full whitespace-nowrap pb-2 text-sm">
-                    Week of {week.label}
+                    {week.label}
                   </div>
                 </div>
               </th>
