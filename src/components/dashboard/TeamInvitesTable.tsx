@@ -10,18 +10,22 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { Copy, Edit } from 'lucide-react';
+import { Copy, Send, Trash2 } from 'lucide-react';
 
 interface TeamInvitesTableProps {
   invitees: Invite[];
   copyInviteCode: (code: string) => void;
-  onEditInvite: (invite: Invite) => void;
+  editMode?: boolean;
+  onResendInvite?: (invite: Invite) => void;
+  onDeleteInvite?: (inviteId: string) => void;
 }
 
 const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({ 
   invitees, 
   copyInviteCode,
-  onEditInvite 
+  editMode = false,
+  onResendInvite,
+  onDeleteInvite
 }) => {
   // Only show email invites
   const emailInvites = invitees.filter(invite => invite.invitation_type === 'email_invite');
@@ -38,7 +42,11 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
             <TableHead>Email</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Sent</TableHead>
-            <TableHead>Actions</TableHead>
+            {!editMode ? (
+              <TableHead>Actions</TableHead>
+            ) : (
+              <TableHead>Edit Actions</TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -48,7 +56,7 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
               <TableCell className="capitalize">{invite.status}</TableCell>
               <TableCell>{new Date(invite.created_at).toLocaleDateString()}</TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
+                {!editMode ? (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -57,15 +65,27 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
                     <Copy className="h-4 w-4 mr-1" />
                     Copy Link
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onEditInvite(invite)}
-                  >
-                    <Edit className="h-4 w-4 mr-1" />
-                    Edit
-                  </Button>
-                </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onResendInvite && onResendInvite(invite)}
+                    >
+                      <Send className="h-4 w-4 mr-1" />
+                      Resend
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                      onClick={() => onDeleteInvite && onDeleteInvite(invite.id)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Delete
+                    </Button>
+                  </div>
+                )}
               </TableCell>
             </TableRow>
           ))}

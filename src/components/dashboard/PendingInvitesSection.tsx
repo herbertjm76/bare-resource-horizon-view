@@ -4,15 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import TeamInvitesTable from './TeamInvitesTable';
 import { Invite } from './types';
 import { Button } from '@/components/ui/button';
-import { Copy, Send, Plus } from 'lucide-react';
+import { Copy, Send, Edit } from 'lucide-react';
 
 interface PendingInvitesSectionProps {
   invites: Invite[];
   copyInviteCode: (code: string) => void;
   onCopyInvite: () => void;
   onInviteMember: () => void;
-  onEditInvite: (invite: Invite) => void;
+  onResendInvite?: (invite: Invite) => void;
+  onDeleteInvite?: (inviteId: string) => void;
   showControls: boolean;
+  editMode: boolean;
+  onToggleEditMode: () => void;
 }
 
 const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({
@@ -20,8 +23,11 @@ const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({
   copyInviteCode,
   onCopyInvite,
   onInviteMember,
-  onEditInvite,
-  showControls = true
+  onResendInvite,
+  onDeleteInvite,
+  showControls = true,
+  editMode = false,
+  onToggleEditMode
 }) => {
   if (invites.length === 0 && !showControls) {
     return null;
@@ -38,10 +44,22 @@ const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({
               Invite Member
             </Button>
             
-            <Button variant="outline" onClick={onCopyInvite}>
-              <Copy className="h-4 w-4 mr-2" />
-              Copy Invite Link
-            </Button>
+            {!editMode && (
+              <Button variant="outline" onClick={onCopyInvite}>
+                <Copy className="h-4 w-4 mr-2" />
+                Copy Invite Link
+              </Button>
+            )}
+            
+            {invites.length > 0 && (
+              <Button 
+                variant={editMode ? "default" : "outline"} 
+                onClick={onToggleEditMode}
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                {editMode ? "Done" : "Edit"}
+              </Button>
+            )}
           </div>
         )}
       </CardHeader>
@@ -50,7 +68,9 @@ const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({
           <TeamInvitesTable 
             invitees={invites} 
             copyInviteCode={copyInviteCode} 
-            onEditInvite={onEditInvite}
+            editMode={editMode}
+            onResendInvite={onResendInvite}
+            onDeleteInvite={onDeleteInvite}
           />
         ) : (
           <div className="text-center py-4 text-muted-foreground">

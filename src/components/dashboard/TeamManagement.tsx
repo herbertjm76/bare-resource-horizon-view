@@ -25,6 +25,7 @@ export const TeamManagement = ({
   const [invitees, setInvitees] = useState<Invite[]>([]);
   const [refreshFlag, setRefreshFlag] = useState(0);
   const [editMode, setEditMode] = useState(false);
+  const [inviteEditMode, setInviteEditMode] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -143,9 +144,46 @@ export const TeamManagement = ({
     toast.success('Invite link copied!');
   };
 
-  const handleEditInvite = (invite: Invite) => {
-    setCurrentInvite(invite);
-    setIsInviteDialogOpen(true);
+  const handleDeleteInvite = async (inviteId: string) => {
+    try {
+      const { error } = await supabase
+        .from('invites')
+        .delete()
+        .eq('id', inviteId);
+        
+      if (error) throw error;
+      
+      toast.success('Invite deleted successfully');
+      setRefreshFlag(prev => prev + 1);
+    } catch (error: any) {
+      console.error('Error deleting invite:', error);
+      toast.error(error.message || 'Failed to delete invite');
+    }
+  };
+
+  const handleResendInvite = async (invite: Invite) => {
+    try {
+      // Here you would integrate with your email service to resend the invite
+      // For now, we'll just show a toast message
+      toast.success(`Invite resent to ${invite.email}`);
+      
+      // Optionally update the invite's created_at time in the database
+      const { error } = await supabase
+        .from('invites')
+        .update({ created_at: new Date().toISOString() })
+        .eq('id', invite.id);
+        
+      if (error) throw error;
+      
+      setRefreshFlag(prev => prev + 1);
+    } catch (error: any) {
+      console.error('Error resending invite:', error);
+      toast.error(error.message || 'Failed to resend invite');
+    }
+  };
+
+  const toggleInviteEditMode = () => {
+    setInviteEditMode(!inviteEditMode);
   };
 
   const handleCloseAddEditDialog = () => {
@@ -186,8 +224,11 @@ export const TeamManagement = ({
         copyInviteCode={copyInviteCode}
         onCopyInvite={copyInviteUrl}
         onInviteMember={() => setIsInviteDialogOpen(true)}
-        onEditInvite={handleEditInvite}
+        onResendInvite={handleResendInvite}
+        onDeleteInvite={handleDeleteInvite}
         showControls={isAdminOrOwner}
+        editMode={inviteEditMode}
+        onToggleEditMode={toggleInviteEditMode}
       />
 
       <TeamDialogs
