@@ -18,7 +18,7 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => {
       {collapsed ? (
         <div className="w-full flex items-center justify-center">
           <img 
-            src="/lovable-uploads/3865e409-9078-4560-94f4-6eb9e546d8c1.png"
+            src="/lovable-uploads/4ee866b4-50c7-498d-9317-98f506ede564.png"
             alt="BareResource Logo" 
             className="w-[43px] h-[43px] opacity-80 hover:opacity-100 transition-opacity" 
           />
@@ -35,7 +35,7 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => {
         <div className="flex items-center w-full">
           <div className="flex items-center flex-grow">
             <img 
-              src="/lovable-uploads/3865e409-9078-4560-94f4-6eb9e546d8c1.png"
+              src="/lovable-uploads/4ee866b4-50c7-498d-9317-98f506ede564.png"
               alt="BareResource Logo" 
               className="w-[50px] h-[50px] opacity-80 hover:opacity-100 transition-opacity" 
             />
