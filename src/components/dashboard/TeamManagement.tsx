@@ -96,7 +96,8 @@ export const TeamManagement = ({
     setIsEditDialogOpen(true);
   };
 
-  const handleDeleteMember = (memberId: string) => {
+  // Renamed from handleDeleteMember to openDeleteDialog to avoid conflict
+  const openDeleteDialog = (memberId: string) => {
     const isPending = pendingMembers.some(m => m.id === memberId);
     setMemberToDelete(memberId);
     setIsPendingMemberToDelete(isPending);
@@ -157,7 +158,15 @@ export const TeamManagement = ({
           {['owner', 'admin'].includes(userRole) && <TeamMembersToolbar editMode={editMode} setEditMode={setEditMode} selectedCount={selectedMembers.length} onBulkDelete={handleBulkDelete} onAdd={() => setIsAddDialogOpen(true)} />}
         </CardHeader>
         <CardContent>
-          <TeamMembersTable teamMembers={allMembers} userRole={userRole} editMode={editMode} selectedMembers={selectedMembers} setSelectedMembers={setSelectedMembers} onEditMember={handleEditMember} onDeleteMember={handleDeleteMember} />
+          <TeamMembersTable 
+            teamMembers={allMembers} 
+            userRole={userRole} 
+            editMode={editMode} 
+            selectedMembers={selectedMembers} 
+            setSelectedMembers={setSelectedMembers} 
+            onEditMember={handleEditMember} 
+            onDeleteMember={openDeleteDialog} 
+          />
         </CardContent>
       </Card>
 
