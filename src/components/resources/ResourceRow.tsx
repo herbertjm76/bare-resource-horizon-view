@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 
 interface ResourceRowProps {
   resource: {
@@ -11,6 +12,7 @@ interface ResourceRowProps {
     name: string;
     role: string;
     allocations: Record<string, number>;
+    isPending?: boolean;
   };
   weeks: {
     startDate: Date;
@@ -62,7 +64,12 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
       <td className="sticky left-0 bg-muted/10 z-10 p-2 border-b">
         <div className="flex items-center pl-8">
           <div className="flex-1">
-            <div className="font-medium">{resource.name}</div>
+            <div className="font-medium flex items-center gap-2">
+              {resource.name}
+              {resource.isPending && (
+                <Badge variant="pending" className="text-xs">Pending</Badge>
+              )}
+            </div>
             <div className="text-xs text-muted-foreground">{resource.role}</div>
           </div>
           <Button 

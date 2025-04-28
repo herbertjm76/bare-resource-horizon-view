@@ -166,40 +166,16 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
                   </div>
                 )}
                 
-                {resourceOptions.length > 0 && resourceOptions.some(r => r.type === 'active') && (
-                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
-                    Active Members
-                  </div>
-                )}
-                
-                {resourceOptions
-                  .filter(member => member.type === 'active')
-                  .map(member => (
-                    <SelectItem key={member.id} value={member.id}>
-                      <div className="flex items-center justify-between w-full">
-                        <span>{member.name}</span>
-                      </div>
-                    </SelectItem>
-                  ))
-                }
-                
-                {resourceOptions.length > 0 && resourceOptions.some(r => r.type === 'pre-registered') && (
-                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground mt-2">
-                    Pre-registered Members
-                  </div>
-                )}
-                
-                {resourceOptions
-                  .filter(member => member.type === 'pre-registered')
-                  .map(member => (
-                    <SelectItem key={member.id} value={member.id}>
-                      <div className="flex items-center justify-between w-full">
-                        <span>{member.name}</span>
+                {resourceOptions.map(member => (
+                  <SelectItem key={member.id} value={member.id}>
+                    <div className="flex items-center justify-between w-full">
+                      <span>{member.name}</span>
+                      {member.type === 'pre-registered' && (
                         <Badge variant="outline" className="ml-2 text-xs">Pending</Badge>
-                      </div>
-                    </SelectItem>
-                  ))
-                }
+                      )}
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
