@@ -89,16 +89,27 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
         const hours = allocations[weekKey] || 0;
         
         return (
-          <td key={weekKey} className="p-0 border-b text-center w-10">
-            <Input
-              type="number"
-              min="0"
-              max="40"
-              value={hours.toString()}  // Always display a value, even if it's 0
-              onChange={(e) => handleAllocationChange(weekKey, e.target.value)}
-              className="w-10 h-8 text-center mx-auto px-0 text-xs"
-              style={{ appearance: 'textfield' }} // Removes the spinner buttons on some browsers
-            />
+          <td key={weekKey} className="p-0 border-b text-center w-12 relative">
+            <div className="allocation-input-container">
+              <Input
+                type="number"
+                min="0"
+                max="40"
+                step="0.5"
+                value={hours.toString()}
+                onChange={(e) => handleAllocationChange(weekKey, e.target.value)}
+                className="w-12 h-8 text-center mx-auto px-0 text-xs rounded-sm border-muted focus:border-brand-violet-light"
+                style={{ 
+                  appearance: 'textfield',
+                  backgroundColor: hours > 0 ? 'rgba(155, 135, 245, 0.1)' : 'transparent'
+                }}
+              />
+              {hours > 0 && (
+                <span className="absolute right-1 top-0.5 text-xs font-medium text-brand-violet-light">
+                  h
+                </span>
+              )}
+            </div>
           </td>
         );
       })}

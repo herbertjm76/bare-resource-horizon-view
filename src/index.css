@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -97,6 +98,17 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Remove default number input arrows */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
 }
 
 /* 
@@ -109,6 +121,16 @@
     0 4px 18px rgba(40,40,76,0.18),
     1px 0px 4px rgba(60,60,100,0.15);
   /* Ensures the shadow is smooth and soft like the PNG */
+}
+
+/* Resource allocation input styling */
+.allocation-input-container {
+  position: relative;
+  display: inline-block;
+}
+
+.allocation-input-container input:focus {
+  box-shadow: 0 0 0 2px rgba(137, 92, 247, 0.2);
 }
 
 @layer components {
