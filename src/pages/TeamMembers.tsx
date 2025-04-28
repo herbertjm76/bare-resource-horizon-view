@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -63,6 +64,7 @@ const TeamMembersPage = () => {
       }
 
       return profiles.map(profile => {
+        // Cast the base profile to our extended Profile type and add default values
         const enhancedProfile: Profile = {
           ...profile,
           department: profile.department || 'General',
