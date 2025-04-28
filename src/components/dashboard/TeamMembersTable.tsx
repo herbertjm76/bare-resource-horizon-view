@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+
 interface TeamMembersTableProps {
   teamMembers: TeamMember[];
   userRole: string;
@@ -15,6 +16,7 @@ interface TeamMembersTableProps {
   onEditMember?: (member: TeamMember) => void;
   onDeleteMember?: (memberId: string) => void;
 }
+
 const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   teamMembers,
   userRole,
@@ -31,7 +33,9 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
       setSelectedMembers([...selectedMembers, memberId]);
     }
   };
+
   const isPendingMember = (member: TeamMember): member is PendingMember => 'isPending' in member && member.isPending;
+
   const getMemberStatus = (member: TeamMember) => {
     if (!isPendingMember(member)) {
       return {
@@ -49,10 +53,12 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
       icon: Clock
     };
   };
+
   return <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-2xl font-semibold tracking-tight text-brand-primary">
-      </h3>
+          Registration List
+        </h3>
         <span className="px-2.5 py-0.5 rounded-full text-sm font-medium bg-brand-primary/10 text-brand-primary text-left">
           {teamMembers.length} {teamMembers.length === 1 ? 'Member' : 'Members'}
         </span>
@@ -133,4 +139,5 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
       </div>
     </div>;
 };
+
 export default TeamMembersTable;
