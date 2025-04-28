@@ -34,7 +34,7 @@ const ProjectResourcing = () => {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background overflow-x-auto">
+          <div className="flex-1 p-4 sm:p-8 bg-background overflow-hidden">
             <div className="mx-auto space-y-8">
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Project Resourcing</h1>
@@ -45,7 +45,7 @@ const ProjectResourcing = () => {
               
               <ResourceFilters filters={filters} onFilterChange={handleFilterChange} />
               
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto w-full" style={{ maxHeight: 'calc(100vh - 300px)' }}>
                 <ResourceAllocationGrid 
                   startDate={filters.startDate}
                   weeksToShow={filters.weeksToShow}

@@ -90,9 +90,10 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
               type="number"
               min="0"
               max="40"
-              value={hours || ''}
+              value={hours.toString()}  // Always display a value, even if it's 0
               onChange={(e) => handleAllocationChange(weekKey, e.target.value)}
               className="w-10 h-8 text-center mx-auto px-0 text-xs"
+              style={{ appearance: 'textfield' }} // Removes the spinner buttons on some browsers
             />
           </td>
         );

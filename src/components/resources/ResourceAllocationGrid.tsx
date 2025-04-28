@@ -70,9 +70,12 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     );
   }
 
+  // Calculate the total width based on number of weeks
+  const tableWidth = Math.max(800, weeksToShow * 40 + 250); // 40px per week + 250px for left columns
+
   return (
-    <div className="overflow-auto">
-      <table className="min-w-full border-collapse">
+    <div className="overflow-x-auto">
+      <table className="min-w-full border-collapse" style={{ width: tableWidth + 'px' }}>
         <thead className="bg-muted/50">
           <tr>
             {/* Project/Resource column */}

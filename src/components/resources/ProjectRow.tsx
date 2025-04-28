@@ -101,15 +101,14 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         {/* Empty cell for the "WEEK OF" column */}
         <td className="p-1 border-b"></td>
         
-        {/* Week allocation cells */}
+        {/* Week allocation cells - always show project totals */}
         {weeks.map((week) => {
           const weekKey = getWeekKey(week.startDate);
           const projectHours = weeklyProjectHours[weekKey] || 0;
           
           return (
-            <td key={weekKey} className="p-0 border-b text-center text-muted-foreground w-10">
-              {/* Show week totals for the project */}
-              {isExpanded ? '' : `${projectHours}h`}
+            <td key={weekKey} className="p-0 border-b text-center font-medium w-10">
+              <div className="py-2 px-1">{projectHours}h</div>
             </td>
           );
         })}
@@ -159,7 +158,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
             const newResource = {
               id: resource.staffId,
               name: resource.name,
-              role: 'Team Member', // Default role
+              role: resource.role || 'Team Member', // Include role if available
               allocations: {}
             };
             
