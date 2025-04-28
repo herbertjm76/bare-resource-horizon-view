@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { Copy, Send, Trash2 } from 'lucide-react';
+import { Send, Trash2 } from 'lucide-react';
 
 interface TeamInvitesTableProps {
   invitees: Invite[];
@@ -42,9 +42,7 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
             <TableHead>Email</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Sent</TableHead>
-            {editMode && (
-              <TableHead>Actions</TableHead>
-            )}
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -53,8 +51,8 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
               <TableCell>{invite.email}</TableCell>
               <TableCell className="capitalize">{invite.status}</TableCell>
               <TableCell>{new Date(invite.created_at).toLocaleDateString()}</TableCell>
-              {editMode && (
-                <TableCell>
+              <TableCell>
+                {editMode ? (
                   <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
@@ -74,8 +72,10 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
                       Delete
                     </Button>
                   </div>
-                </TableCell>
-              )}
+                ) : (
+                  <div className="h-9"></div> // Empty space holder to maintain layout
+                )}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
