@@ -20,7 +20,7 @@ interface ResourceFiltersProps {
     startDate: Date;
     weeksToShow: number;
   };
-  onFilterChange: (filters: Partial<typeof ResourceFiltersProps.prototype.filters>) => void;
+  onFilterChange: (filters: Partial<ResourceFiltersProps['filters']>) => void;
 }
 
 export const ResourceFilters: React.FC<ResourceFiltersProps> = ({ 
