@@ -60,7 +60,7 @@ export const SidebarNavigation = ({
                         gap-4
                         transition-all
                         text-sm
-                        ${isActive ? "before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-brand-primary text-brand-primary" : ""}
+                        ${isActive ? "before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-brand-primary" : ""}
                       `}
                       isActive={isActive}
                       tooltip={collapsed ? item.title : undefined}
@@ -71,7 +71,11 @@ export const SidebarNavigation = ({
                         onClick={onItemClick}
                       >
                         <item.icon className={`h-[22px] w-[22px] min-w-[22px] ${isActive ? "text-brand-primary" : ""}`} />
-                        {!collapsed && <span className="font-medium">{item.title}</span>}
+                        {!collapsed && (
+                          <span className={`font-medium ${isActive ? "text-brand-primary" : ""}`}>
+                            {item.title}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -84,4 +88,3 @@ export const SidebarNavigation = ({
     </>
   );
 };
-

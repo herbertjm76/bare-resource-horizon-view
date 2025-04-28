@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button"
 import { ChevronRight, ChevronLeft } from "lucide-react"
 import LogoIcon from "@/assets/logo.svg"
@@ -20,7 +21,7 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => {
           <img 
             src={LogoIcon} 
             alt="BareResource Logo" 
-            className="w-6 h-6 opacity-80 hover:opacity-100 transition-opacity" 
+            className="w-5 h-5 opacity-80 hover:opacity-100 transition-opacity" 
           />
           <Button 
             variant="ghost" 
@@ -37,7 +38,7 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => {
             <img 
               src={LogoIcon} 
               alt="BareResource Logo" 
-              className="w-8 h-8 mr-2 opacity-80 hover:opacity-100 transition-opacity" 
+              className="w-6 h-6 mr-2 opacity-80 hover:opacity-100 transition-opacity" 
             />
             <span className="text-white font-semibold">BareResource</span>
           </div>
