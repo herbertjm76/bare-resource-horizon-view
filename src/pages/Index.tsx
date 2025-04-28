@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Users, Calendar, ChartBar, Bell } from 'lucide-react';
 import { Facebook, Linkedin, Twitter, Instagram } from 'lucide-react';
@@ -14,7 +15,7 @@ const Index = () => {
               <img 
                 src="/lovable-uploads/4ee866b4-50c7-498d-9317-98f506ede564.png"
                 alt="BareResource Logo" 
-                className="w-[20px] h-[20px] p-[1px] mr-2" 
+                className="w-[36px] h-[36px] p-[1px] mr-2" 
               />
               <span className="text-2xl font-semibold">
                 <span className="text-black">Bare</span>
