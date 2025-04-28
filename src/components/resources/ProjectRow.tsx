@@ -53,11 +53,11 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         </td>
         
         {/* Empty cell for the "WEEK OF" column */}
-        <td className="p-2 border-b"></td>
+        <td className="p-1 border-b"></td>
         
         {/* Week allocation cells */}
         {weeks.map((week, i) => (
-          <td key={i} className="p-2 border-b text-center text-muted-foreground">
+          <td key={i} className="p-0 border-b text-center text-muted-foreground w-10">
             {/* This would show total hours for this project in this week */}
             {isExpanded ? '' : '8h'}
           </td>
@@ -95,10 +95,10 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           </td>
           
           {/* Empty cell for the "WEEK OF" column */}
-          <td className="p-2 border-b"></td>
+          <td className="p-1 border-b"></td>
           
           {weeks.map((_, i) => (
-            <td key={i} className="p-2 border-b"></td>
+            <td key={i} className="p-0 border-b w-10"></td>
           ))}
           <td className="p-2 border-b"></td>
         </tr>

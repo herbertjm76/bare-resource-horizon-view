@@ -56,7 +56,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({ resource, weeks, proje
       </td>
       
       {/* Empty cell for the "WEEK OF" column */}
-      <td className="p-1 border-b"></td>
+      <td className="p-0 border-b"></td>
       
       {/* Week allocation input cells */}
       {weeks.map((week) => {
@@ -64,21 +64,21 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({ resource, weeks, proje
         const hours = allocations[weekKey] || 0;
         
         return (
-          <td key={weekKey} className="p-1 border-b text-center">
+          <td key={weekKey} className="p-0 border-b text-center w-10">
             <Input
               type="number"
               min="0"
               max="40"
               value={hours || ''}
               onChange={(e) => handleAllocationChange(weekKey, e.target.value)}
-              className="w-16 h-8 text-center mx-auto"
+              className="w-10 h-8 text-center mx-auto px-0 text-xs"
             />
           </td>
         );
       })}
       
       {/* Total hours cell */}
-      <td className="p-2 border-b text-center font-medium">
+      <td className="p-1 border-b text-center font-medium">
         {totalHours}h
       </td>
     </tr>

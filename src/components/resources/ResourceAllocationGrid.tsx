@@ -81,23 +81,23 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
             </th>
             
             {/* Week Of label column */}
-            <th className="p-2 border-b text-center font-medium" style={{ minWidth: '80px' }}>
-              <div className="flex justify-center items-center h-12">
-                <span className="font-semibold text-sm">WEEK OF</span>
+            <th className="p-2 border-b text-center font-medium" style={{ width: '40px', minWidth: '40px' }}>
+              <div className="flex justify-center items-center h-20">
+                <span className="font-semibold text-xs whitespace-nowrap transform -rotate-90 origin-center">WEEK OF</span>
               </div>
             </th>
             
             {/* Date columns */}
             {weeks.map((week, i) => (
-              <th key={i} className="p-2 border-b text-center font-medium" style={{ minWidth: '80px' }}>
-                <div className="flex justify-center items-center h-12">
-                  <span className="text-sm">{week.label}</span>
+              <th key={i} className="p-0 border-b text-center font-medium" style={{ width: '40px', minWidth: '40px' }}>
+                <div className="flex justify-center items-center h-20">
+                  <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center">{week.label}</span>
                 </div>
               </th>
             ))}
             
             {/* Total Hours column */}
-            <th className="p-2 border-b text-center font-medium">
+            <th className="p-2 border-b text-center font-medium" style={{ width: '60px', minWidth: '60px' }}>
               Total Hours
             </th>
           </tr>
