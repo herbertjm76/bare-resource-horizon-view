@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -93,7 +92,7 @@ const TeamMembersPage = () => {
         }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
-              <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
+              <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Registration List</h1>
               {userId ? <TeamManagement teamMembers={teamMembers} inviteUrl={inviteUrl} userRole={userProfile?.role || 'member'} /> : <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
                   <p className="text-white">Loading authentication details...</p>
                 </div>}
