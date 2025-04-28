@@ -10,7 +10,8 @@ type StatusStyle = {
   icon?: React.ComponentType<{ className?: string }>;
 };
 
-type StatusType = 'active' | 'pre_registered' | 'invited' | 'pending';
+// Update the type to allow for string values beyond our defined statuses
+type StatusType = 'active' | 'pre_registered' | 'invited' | 'pending' | string;
 
 // Consistent color palette for status badges
 export const getStatusStyle = (status: StatusType): StatusStyle => {
@@ -41,7 +42,7 @@ export const getStatusStyle = (status: StatusType): StatusStyle => {
       };
     default:
       return {
-        label: status.charAt(0).toUpperCase() + status.slice(1),
+        label: typeof status === 'string' ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown',
         variant: 'secondary',
         className: 'bg-[#8E9196] hover:bg-[#8E9196]/80 border-transparent text-white'
       };
