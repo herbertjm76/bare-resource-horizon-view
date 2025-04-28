@@ -20,7 +20,7 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => {
           <img 
             src="/lovable-uploads/4ee866b4-50c7-498d-9317-98f506ede564.png"
             alt="BareResource Logo" 
-            className="w-[17.2px] h-[17.2px] opacity-80 hover:opacity-100 transition-opacity p-[10px]" 
+            className="w-[17.2px] h-[17.2px] opacity-80 hover:opacity-100 transition-opacity p-[1px]" 
           />
           <Button 
             variant="ghost" 
@@ -37,7 +37,7 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => {
             <img 
               src="/lovable-uploads/4ee866b4-50c7-498d-9317-98f506ede564.png"
               alt="BareResource Logo" 
-              className="w-[20px] h-[20px] opacity-80 hover:opacity-100 transition-opacity p-[10px]" 
+              className="w-[20px] h-[20px] opacity-80 hover:opacity-100 transition-opacity p-[1px]" 
             />
             <span className="text-white font-semibold">BareResource</span>
           </div>
