@@ -46,8 +46,7 @@ export const SidebarNavigation = ({
                 const isActive = currentPath === item.url;
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
+                    <SidebarMenuButton asChild
                       className={`
                         relative
                         text-white 
@@ -61,7 +60,7 @@ export const SidebarNavigation = ({
                         gap-4
                         transition-all
                         text-sm
-                        ${isActive ? "before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-brand-primary" : ""}
+                        ${isActive ? "before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-brand-primary text-brand-primary" : ""}
                       `}
                       isActive={isActive}
                       tooltip={collapsed ? item.title : undefined}
@@ -71,7 +70,7 @@ export const SidebarNavigation = ({
                         className="flex items-center gap-4 w-full"
                         onClick={onItemClick}
                       >
-                        <item.icon className="h-[22px] w-[22px] min-w-[22px]" />
+                        <item.icon className={`h-[22px] w-[22px] min-w-[22px] ${isActive ? "text-brand-primary" : ""}`} />
                         {!collapsed && <span className="font-medium">{item.title}</span>}
                       </Link>
                     </SidebarMenuButton>
@@ -85,3 +84,4 @@ export const SidebarNavigation = ({
     </>
   );
 };
+
