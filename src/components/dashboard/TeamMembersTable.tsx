@@ -97,13 +97,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                   )}
                   <TableCell className="font-medium">
                     {isPendingMember(member) ? (
-                      <div className="flex items-center gap-2">
-                        {member.email}
-                        <Badge variant={status.variant} className="flex items-center gap-1">
-                          {status.icon && <status.icon className="h-3 w-3" />}
-                          {status.label}
-                        </Badge>
-                      </div>
+                      member.email
                     ) : (
                       `${member.first_name} ${member.last_name}`
                     )}
@@ -115,13 +109,13 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                     </Badge>
                   </TableCell>
                   <TableCell className="capitalize">
-                    {isPendingMember(member) ? "Pending" : member.role}
+                    {isPendingMember(member) ? member.role : member.role}
                   </TableCell>
                   <TableCell>
-                    {isPendingMember(member) ? member.department : "—"}
+                    {member.department || "—"}
                   </TableCell>
                   <TableCell>
-                    {isPendingMember(member) ? member.location : "—"}
+                    {member.location || "—"}
                   </TableCell>
                   {editMode && (
                     <TableCell>

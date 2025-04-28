@@ -10,7 +10,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
   const handleSaveMember = async (memberData: Partial<Profile>, isEditing: boolean) => {
     if (!companyId) {
       toast.error('Company ID is required');
-      return;
+      return false;
     }
 
     try {
@@ -35,8 +35,6 @@ export const useTeamMembers = (companyId: string | undefined) => {
         toast.success('Team member updated successfully');
       } else {
         // Create new member through invite system
-        
-        // First get the current user's ID to use as created_by
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user?.id) {
           toast.error('You must be logged in to invite team members');
@@ -49,11 +47,14 @@ export const useTeamMembers = (companyId: string | undefined) => {
             email: memberData.email,
             company_id: companyId,
             code: Math.random().toString(36).substring(2, 10).toUpperCase(),
-            created_by: session.user.id, // Add the required created_by field
+            created_by: session.user.id,
             invitation_type: 'pre_registered',
+            first_name: memberData.first_name,
+            last_name: memberData.last_name,
             department: memberData.department,
             location: memberData.location,
-            job_title: memberData.job_title
+            job_title: memberData.job_title,
+            role: memberData.role
           });
 
         if (error) throw error;
