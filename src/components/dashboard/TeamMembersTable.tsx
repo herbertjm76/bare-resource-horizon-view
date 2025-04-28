@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Profile, PendingMember, TeamMember } from './types';
@@ -97,7 +98,9 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                   )}
                   <TableCell className="font-medium">
                     {isPendingMember(member) ? (
-                      member.email
+                      member.first_name && member.last_name 
+                        ? `${member.first_name} ${member.last_name}`
+                        : member.email
                     ) : (
                       `${member.first_name} ${member.last_name}`
                     )}
@@ -109,7 +112,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                     </Badge>
                   </TableCell>
                   <TableCell className="capitalize">
-                    {isPendingMember(member) ? member.role : member.role}
+                    {isPendingMember(member) ? (member.role || "member") : member.role}
                   </TableCell>
                   <TableCell>
                     {member.department || "—"}
