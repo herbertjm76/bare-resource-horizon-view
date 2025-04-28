@@ -5,11 +5,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useTeamInvites } from '@/hooks/useTeamInvites';
 import { Profile, PendingMember, TeamMember, Invite } from './types';
-import TeamInviteControls from './TeamInviteControls';
 import TeamHeader from './TeamHeader';
 import TeamMemberSection from './TeamMemberSection';
 import PendingInvitesSection from './PendingInvitesSection';
 import TeamDialogs from './TeamDialogs';
+import InviteMembersDialog from './InviteMembersDialog';
 
 interface TeamManagementProps {
   teamMembers: Profile[];
@@ -29,7 +29,9 @@ export const TeamManagement = ({
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
   const [currentMember, setCurrentMember] = useState<Profile | null>(null);
+  const [currentInvite, setCurrentInvite] = useState<Invite | null>(null);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
   const [isPendingMemberToDelete, setIsPendingMemberToDelete] = useState(false);
   
@@ -141,6 +143,11 @@ export const TeamManagement = ({
     toast.success('Invite link copied!');
   };
 
+  const handleEditInvite = (invite: Invite) => {
+    setCurrentInvite(invite);
+    setIsInviteDialogOpen(true);
+  };
+
   const handleCloseAddEditDialog = () => {
     setIsAddDialogOpen(false);
     setIsEditDialogOpen(false);
@@ -152,18 +159,15 @@ export const TeamManagement = ({
     setMemberToDelete(null);
   };
 
+  const handleCloseInviteDialog = () => {
+    setIsInviteDialogOpen(false);
+    setCurrentInvite(null);
+  };
+
+  const isAdminOrOwner = ['owner', 'admin'].includes(userRole);
+
   return (
     <div className="space-y-6">
-      {['owner', 'admin'].includes(userRole) && (
-        <div className="flex justify-end">
-          <TeamInviteControls 
-            onAdd={() => setIsAddDialogOpen(true)} 
-            onCopyInvite={copyInviteUrl} 
-            companyId={companyId} 
-          />
-        </div>
-      )}
-
       <TeamMemberSection
         teamMembers={allMembers}
         userRole={userRole}
@@ -177,12 +181,14 @@ export const TeamManagement = ({
         onAdd={() => setIsAddDialogOpen(true)}
       />
 
-      {emailInvites.length > 0 && (
-        <PendingInvitesSection 
-          invites={emailInvites} 
-          copyInviteCode={copyInviteCode} 
-        />
-      )}
+      <PendingInvitesSection 
+        invites={emailInvites}
+        copyInviteCode={copyInviteCode}
+        onCopyInvite={copyInviteUrl}
+        onInviteMember={() => setIsInviteDialogOpen(true)}
+        onEditInvite={handleEditInvite}
+        showControls={isAdminOrOwner}
+      />
 
       <TeamDialogs
         isAddDialogOpen={isAddDialogOpen}
@@ -195,6 +201,13 @@ export const TeamManagement = ({
         onConfirmDelete={handleConfirmDelete}
         isSaving={isSaving}
         isDeleting={isDeleting}
+      />
+
+      <InviteMembersDialog
+        isOpen={isInviteDialogOpen}
+        onClose={handleCloseInviteDialog}
+        companyId={companyId}
+        currentInvite={currentInvite}
       />
     </div>
   );

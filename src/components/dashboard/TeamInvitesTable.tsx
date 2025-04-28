@@ -10,13 +10,19 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
+import { Copy, Edit } from 'lucide-react';
 
 interface TeamInvitesTableProps {
   invitees: Invite[];
   copyInviteCode: (code: string) => void;
+  onEditInvite: (invite: Invite) => void;
 }
 
-const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({ invitees, copyInviteCode }) => {
+const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({ 
+  invitees, 
+  copyInviteCode,
+  onEditInvite 
+}) => {
   // Only show email invites
   const emailInvites = invitees.filter(invite => invite.invitation_type === 'email_invite');
   
@@ -42,13 +48,24 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({ invitees, copyInvit
               <TableCell className="capitalize">{invite.status}</TableCell>
               <TableCell>{new Date(invite.created_at).toLocaleDateString()}</TableCell>
               <TableCell>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyInviteCode(invite.code)}
-                >
-                  Copy Link
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyInviteCode(invite.code)}
+                  >
+                    <Copy className="h-4 w-4 mr-1" />
+                    Copy Link
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onEditInvite(invite)}
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

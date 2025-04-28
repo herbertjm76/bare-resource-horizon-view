@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,11 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTeamInvites } from '@/hooks/useTeamInvites';
 import { toast } from 'sonner';
+import { Invite } from './types';
+import { supabase } from '@/integrations/supabase/client';
 
 interface InviteMembersDialogProps {
   isOpen: boolean;
   onClose: () => void;
   companyId: string;
+  currentInvite?: Invite | null;
 }
 
 interface InviteeData {
@@ -29,12 +32,65 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
   isOpen,
   onClose,
   companyId,
+  currentInvite
 }) => {
   const [invitees, setInvitees] = useState<InviteeData[]>([{ email: '', firstName: '', lastName: '' }]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const { handleSendInvite, setInviteEmail, invLoading } = useTeamInvites(companyId);
+
+  useEffect(() => {
+    if (currentInvite) {
+      setInvitees([{
+        email: currentInvite.email || '',
+        firstName: currentInvite.first_name || '',
+        lastName: currentInvite.last_name || ''
+      }]);
+      setIsEditing(true);
+    } else {
+      setInvitees([{ email: '', firstName: '', lastName: '' }]);
+      setIsEditing(false);
+    }
+  }, [currentInvite, isOpen]);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (isEditing && currentInvite) {
+      await handleUpdateInvite();
+    } else {
+      await handleSendInvites(e);
+    }
+  };
+
+  const handleUpdateInvite = async () => {
+    if (!currentInvite || !invitees[0]) return;
+    
+    setIsUpdating(true);
+    try {
+      const { error } = await supabase
+        .from('invites')
+        .update({
+          email: invitees[0].email,
+          first_name: invitees[0].firstName || null,
+          last_name: invitees[0].lastName || null
+        })
+        .eq('id', currentInvite.id);
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast.success('Invite updated successfully');
+      onClose();
+    } catch (error: any) {
+      toast.error('Failed to update invite: ' + error.message);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleSendInvites = async (e: React.FormEvent) => {
     const validInvitees = invitees.filter(inv => inv.email.trim());
     
     if (validInvitees.length === 0) {
@@ -58,7 +114,9 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
   };
 
   const addInvitee = () => {
-    setInvitees([...invitees, { email: '', firstName: '', lastName: '' }]);
+    if (!isEditing) {
+      setInvitees([...invitees, { email: '', firstName: '', lastName: '' }]);
+    }
   };
 
   const updateInvitee = (index: number, field: keyof InviteeData, value: string) => {
@@ -71,9 +129,11 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Invite Team Members</DialogTitle>
+          <DialogTitle>{isEditing ? 'Edit Invite' : 'Invite Team Members'}</DialogTitle>
           <DialogDescription>
-            Send invitations to join your team. Recipients will receive an email with instructions.
+            {isEditing 
+              ? 'Update invitation details' 
+              : 'Send invitations to join your team. Recipients will receive an email with instructions.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleInvite} className="space-y-4">
@@ -86,6 +146,7 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
                   value={invitee.email}
                   onChange={(e) => updateInvitee(index, 'email', e.target.value)}
                   className="col-span-3 sm:col-span-1"
+                  disabled={isEditing && currentInvite?.status !== 'pending'}
                 />
                 <Input
                   placeholder="First Name"
@@ -102,20 +163,25 @@ const InviteMembersDialog: React.FC<InviteMembersDialogProps> = ({
               </div>
             ))}
           </div>
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={addInvitee}
-            className="w-full"
-          >
-            Add Another
-          </Button>
+          {!isEditing && (
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={addInvitee}
+              className="w-full"
+            >
+              Add Another
+            </Button>
+          )}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={invLoading || !invitees.some(i => i.email.trim())}>
-              Send Invites
+            <Button 
+              type="submit" 
+              disabled={isUpdating || invLoading || !invitees.some(i => i.email.trim())}
+            >
+              {isEditing ? 'Update Invite' : 'Send Invites'}
             </Button>
           </DialogFooter>
         </form>
