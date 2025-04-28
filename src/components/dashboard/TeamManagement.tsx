@@ -11,13 +11,11 @@ import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useTeamInvites } from '@/hooks/useTeamInvites';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Profile, PendingMember, TeamMember, Invite } from './types';
-
 interface TeamManagementProps {
   teamMembers: Profile[];
   inviteUrl: string;
   userRole: string;
 }
-
 export const TeamManagement = ({
   teamMembers: activeMembers,
   inviteUrl,
@@ -43,7 +41,6 @@ export const TeamManagement = ({
     invLoading,
     handleSendInvite
   } = useTeamInvites(companyId);
-
   useEffect(() => {
     const fetchInvites = async () => {
       if (userRole === 'owner' || userRole === 'admin') {
@@ -64,16 +61,12 @@ export const TeamManagement = ({
       fetchInvites();
     }
   }, [companyId, userRole, refreshFlag]);
-
   const pendingMembers: PendingMember[] = invitees.map(invite => ({
     ...invite,
     isPending: true
   }));
-
   const preRegisteredMembers = pendingMembers.filter(member => member.invitation_type === 'pre_registered');
-
   const allMembers: TeamMember[] = [...activeMembers, ...preRegisteredMembers];
-
   const handleSaveMemberWrapper = async (memberData: Partial<Profile>) => {
     const success = await handleSaveMember(memberData, Boolean(currentMember));
     if (success) {
@@ -83,17 +76,14 @@ export const TeamManagement = ({
       setRefreshFlag(prev => prev + 1);
     }
   };
-
   const handleEditMember = (member: TeamMember) => {
     setCurrentMember(member as Profile);
     setIsEditDialogOpen(true);
   };
-
   const handleDeleteMember = (memberId: string) => {
     setMemberToDelete(memberId);
     setIsDeleteDialogOpen(true);
   };
-
   const handleConfirmDelete = async () => {
     if (!memberToDelete) return;
     try {
@@ -114,7 +104,6 @@ export const TeamManagement = ({
       console.error(error);
     }
   };
-
   const handleBulkDelete = async () => {
     if (!selectedMembers.length) return;
     try {
@@ -127,17 +116,14 @@ export const TeamManagement = ({
       console.error(error);
     }
   };
-
   const copyInviteUrl = () => {
     navigator.clipboard.writeText(inviteUrl);
     toast.success('Invite URL copied to clipboard!');
   };
-
   const copyInviteCode = (code: string) => {
     navigator.clipboard.writeText(`${window.location.origin}/join/${code}`);
     toast.success('Invite link copied!');
   };
-
   return <div className="space-y-6">
       {['owner', 'admin'].includes(userRole) && <div className="flex justify-end">
           <TeamInviteControls onAdd={() => setIsAddDialogOpen(true)} onCopyInvite={copyInviteUrl} companyId={companyId} />
@@ -145,7 +131,7 @@ export const TeamManagement = ({
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-          <CardTitle className="text-lg font-medium">Team Members</CardTitle>
+          <CardTitle className="text-lg font-medium">Registration List</CardTitle>
           {['owner', 'admin'].includes(userRole) && <TeamMembersToolbar editMode={editMode} setEditMode={setEditMode} selectedCount={selectedMembers.length} onBulkDelete={handleBulkDelete} onAdd={() => setIsAddDialogOpen(true)} />}
         </CardHeader>
         <CardContent>
@@ -174,5 +160,4 @@ export const TeamManagement = ({
     }} onConfirm={handleConfirmDelete} />
     </div>;
 };
-
 export default TeamManagement;
