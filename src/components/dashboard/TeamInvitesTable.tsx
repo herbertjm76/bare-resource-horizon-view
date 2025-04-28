@@ -39,19 +39,19 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Email</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Sent</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="w-[40%]">Email</TableHead>
+            <TableHead className="w-[20%]">Status</TableHead>
+            <TableHead className="w-[20%]">Sent</TableHead>
+            <TableHead className="w-[20%]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {emailInvites.map((invite) => (
             <TableRow key={invite.id}>
-              <TableCell>{invite.email}</TableCell>
-              <TableCell className="capitalize">{invite.status}</TableCell>
-              <TableCell>{new Date(invite.created_at).toLocaleDateString()}</TableCell>
-              <TableCell>
+              <TableCell className="w-[40%]">{invite.email}</TableCell>
+              <TableCell className="w-[20%] capitalize">{invite.status}</TableCell>
+              <TableCell className="w-[20%]">{new Date(invite.created_at).toLocaleDateString()}</TableCell>
+              <TableCell className="w-[20%]">
                 {editMode ? (
                   <div className="flex items-center gap-2">
                     <Button
