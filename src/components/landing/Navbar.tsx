@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 
 const Navbar = () => {
@@ -27,10 +26,10 @@ const Navbar = () => {
             <Link to="#pricing" className="hover:text-purple-600 transition-colors">Pricing</Link>
           </div>
           
-          {/* CTA Button */}
+          {/* CTA Button - Added sm:px-6 for smaller padding on mobile */}
           <Link
             to="/auth"
-            className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg"
+            className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg text-sm sm:text-base"
           >
             Get Started
           </Link>
@@ -41,4 +40,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
