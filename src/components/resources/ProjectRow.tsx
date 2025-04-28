@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, UserPlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -80,10 +81,10 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   
   return (
     <>
-      <tr className="hover:bg-muted/30">
+      <tr className="bg-brand-violet-light hover:bg-brand-violet-light/80">
         {/* Project name cell */}
         <td 
-          className="sticky left-0 bg-background z-10 p-2 border-b cursor-pointer"
+          className="sticky left-0 bg-brand-violet-light hover:bg-brand-violet-light/80 z-10 p-2 border-b cursor-pointer"
           onClick={onToggleExpand}
         >
           <div className="flex items-center">
@@ -124,8 +125,8 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
       
       {/* Add resource row when project is expanded */}
       {isExpanded && (
-        <tr className="bg-muted/5">
-          <td className="sticky left-0 bg-muted/5 z-10 p-2 border-b">
+        <tr className="bg-muted/5 hover:bg-muted/10">
+          <td className="sticky left-0 bg-muted/5 hover:bg-muted/10 z-10 p-2 border-b">
             <Button 
               variant="ghost" 
               size="sm" 
