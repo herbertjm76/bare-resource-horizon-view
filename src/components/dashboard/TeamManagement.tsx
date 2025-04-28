@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,11 +12,13 @@ import { useTeamMembers } from '@/hooks/useTeamMembers';
 import { useTeamInvites } from '@/hooks/useTeamInvites';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Profile, PendingMember, TeamMember, Invite } from './types';
+
 interface TeamManagementProps {
   teamMembers: Profile[];
   inviteUrl: string;
   userRole: string;
 }
+
 export const TeamManagement = ({
   teamMembers: activeMembers,
   inviteUrl,
@@ -30,17 +33,24 @@ export const TeamManagement = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentMember, setCurrentMember] = useState<Profile | null>(null);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
+  const [isPendingMemberToDelete, setIsPendingMemberToDelete] = useState(false);
+  
   const companyId = activeMembers[0]?.company_id;
+  
   const {
     handleSaveMember,
-    isSaving
+    handleDeleteMember,
+    isSaving,
+    isDeleting
   } = useTeamMembers(companyId);
+  
   const {
     inviteEmail,
     setInviteEmail,
     invLoading,
     handleSendInvite
   } = useTeamInvites(companyId);
+
   useEffect(() => {
     const fetchInvites = async () => {
       if (userRole === 'owner' || userRole === 'admin') {
@@ -57,16 +67,20 @@ export const TeamManagement = ({
         }
       }
     };
+    
     if (companyId) {
       fetchInvites();
     }
   }, [companyId, userRole, refreshFlag]);
+
   const pendingMembers: PendingMember[] = invitees.map(invite => ({
     ...invite,
     isPending: true
   }));
+  
   const preRegisteredMembers = pendingMembers.filter(member => member.invitation_type === 'pre_registered');
   const allMembers: TeamMember[] = [...activeMembers, ...preRegisteredMembers];
+
   const handleSaveMemberWrapper = async (memberData: Partial<Profile>) => {
     const success = await handleSaveMember(memberData, Boolean(currentMember));
     if (success) {
@@ -76,37 +90,42 @@ export const TeamManagement = ({
       setRefreshFlag(prev => prev + 1);
     }
   };
+
   const handleEditMember = (member: TeamMember) => {
     setCurrentMember(member as Profile);
     setIsEditDialogOpen(true);
   };
+
   const handleDeleteMember = (memberId: string) => {
+    const isPending = pendingMembers.some(m => m.id === memberId);
     setMemberToDelete(memberId);
+    setIsPendingMemberToDelete(isPending);
     setIsDeleteDialogOpen(true);
   };
+
   const handleConfirmDelete = async () => {
     if (!memberToDelete) return;
-    try {
-      const isPending = pendingMembers.some(m => m.id === memberToDelete);
-      if (isPending) {
-        const {
-          error
-        } = await supabase.from('invites').delete().eq('id', memberToDelete);
-        if (error) throw error;
-      } else {
-        toast.success("Team member deleted successfully");
-        setMemberToDelete(null);
-        setIsDeleteDialogOpen(false);
-        setRefreshFlag(prev => prev + 1);
-      }
-    } catch (error) {
-      toast.error("Failed to delete team member");
-      console.error(error);
+    
+    const success = await handleDeleteMember(memberToDelete, isPendingMemberToDelete);
+    
+    if (success) {
+      setMemberToDelete(null);
+      setIsPendingMemberToDelete(false);
+      setIsDeleteDialogOpen(false);
+      setRefreshFlag(prev => prev + 1);
     }
   };
+
   const handleBulkDelete = async () => {
     if (!selectedMembers.length) return;
+    
     try {
+      const deletePromises = selectedMembers.map(memberId => {
+        const isPending = pendingMembers.some(m => m.id === memberId);
+        return handleDeleteMember(memberId, isPending);
+      });
+      
+      await Promise.all(deletePromises);
       toast.success(`${selectedMembers.length} team members deleted successfully`);
       setSelectedMembers([]);
       setEditMode(false);
@@ -116,14 +135,17 @@ export const TeamManagement = ({
       console.error(error);
     }
   };
+
   const copyInviteUrl = () => {
     navigator.clipboard.writeText(inviteUrl);
     toast.success('Invite URL copied to clipboard!');
   };
+
   const copyInviteCode = (code: string) => {
     navigator.clipboard.writeText(`${window.location.origin}/join/${code}`);
     toast.success('Invite link copied!');
   };
+
   return <div className="space-y-6">
       {['owner', 'admin'].includes(userRole) && <div className="flex justify-end">
           <TeamInviteControls onAdd={() => setIsAddDialogOpen(true)} onCopyInvite={copyInviteUrl} companyId={companyId} />
@@ -154,10 +176,16 @@ export const TeamManagement = ({
       setCurrentMember(null);
     }} member={currentMember} onSave={handleSaveMemberWrapper} title={isEditDialogOpen ? "Edit Team Member" : "Add Team Member"} isLoading={isSaving} />
 
-      <DeleteMemberDialog isOpen={isDeleteDialogOpen} onClose={() => {
-      setIsDeleteDialogOpen(false);
-      setMemberToDelete(null);
-    }} onConfirm={handleConfirmDelete} />
+      <DeleteMemberDialog 
+        isOpen={isDeleteDialogOpen} 
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setMemberToDelete(null);
+        }} 
+        onConfirm={handleConfirmDelete} 
+        isLoading={isDeleting}
+      />
     </div>;
 };
+
 export default TeamManagement;

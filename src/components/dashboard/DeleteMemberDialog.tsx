@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 
 interface DeleteMemberDialogProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface DeleteMemberDialogProps {
   onConfirm: () => void;
   isBulkDelete?: boolean;
   count?: number;
+  isLoading?: boolean;
 }
 
 const DeleteMemberDialog: React.FC<DeleteMemberDialogProps> = ({
@@ -24,7 +26,8 @@ const DeleteMemberDialog: React.FC<DeleteMemberDialogProps> = ({
   onClose,
   onConfirm,
   isBulkDelete = false,
-  count = 0
+  count = 0,
+  isLoading = false
 }) => {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -39,11 +42,22 @@ const DeleteMemberDialog: React.FC<DeleteMemberDialogProps> = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>
+          <AlertDialogCancel onClick={onClose} disabled={isLoading}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} className="bg-red-600 hover:bg-red-700">
-            Delete
+          <AlertDialogAction 
+            onClick={onConfirm} 
+            className="bg-red-600 hover:bg-red-700"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting
+              </>
+            ) : (
+              'Delete'
+            )}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 export const useTeamMembers = (companyId: string | undefined) => {
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleSaveMember = async (memberData: Partial<Profile>, isEditing: boolean) => {
     if (!companyId) {
@@ -72,8 +73,48 @@ export const useTeamMembers = (companyId: string | undefined) => {
     }
   };
 
+  const handleDeleteMember = async (memberId: string, isPending: boolean = false) => {
+    if (!companyId) {
+      toast.error('Company ID is required');
+      return false;
+    }
+
+    try {
+      setIsDeleting(true);
+      
+      if (isPending) {
+        // Delete from invites table
+        const { error } = await supabase
+          .from('invites')
+          .delete()
+          .eq('id', memberId);
+          
+        if (error) throw error;
+      } else {
+        // Delete from profiles table
+        const { error } = await supabase
+          .from('profiles')
+          .delete()
+          .eq('id', memberId);
+          
+        if (error) throw error;
+      }
+      
+      toast.success('Team member deleted successfully');
+      return true;
+    } catch (error: any) {
+      console.error('Error deleting team member:', error);
+      toast.error(error.message || 'Failed to delete team member');
+      return false;
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return {
     handleSaveMember,
-    isSaving
+    handleDeleteMember,
+    isSaving,
+    isDeleting
   };
 };
