@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import { getStatusStyle } from "./utils/statusColors";
 
 interface TeamMembersTableProps {
   teamMembers: TeamMember[];
@@ -39,21 +40,9 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
 
   const getMemberStatus = (member: TeamMember) => {
     if (!isPendingMember(member)) {
-      return {
-        label: "Active",
-        variant: "default" as const,
-        className: "bg-[#D946EF] hover:bg-[#D946EF]/80 border-transparent text-white"
-      };
+      return getStatusStyle('active');
     }
-    return member.invitation_type === 'pre_registered' ? {
-      label: "Pre-registered",
-      variant: "secondary" as const,
-      icon: UserCog
-    } : {
-      label: "Invited",
-      variant: "secondary" as const,
-      icon: Clock
-    };
+    return getStatusStyle(member.invitation_type === 'pre_registered' ? 'pre_registered' : 'invited');
   };
 
   return <div className="space-y-4">

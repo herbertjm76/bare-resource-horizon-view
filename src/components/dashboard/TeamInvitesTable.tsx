@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Send, Trash2 } from 'lucide-react';
+import { getStatusStyle } from './utils/statusColors';
 
 interface TeamInvitesTableProps {
   invitees: Invite[];
@@ -47,49 +48,52 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {emailInvites.map((invite) => (
-            <TableRow key={invite.id}>
-              <TableCell className="w-[30%]">{invite.email}</TableCell>
-              <TableCell className="w-[20%]">
-                <Badge 
-                  variant="default"
-                  className={
-                    invite.status?.toLowerCase() === 'active' 
-                      ? 'bg-[#D946EF] hover:bg-[#D946EF]/80 border-transparent text-white' 
-                      : 'capitalize'
-                  }
-                >
-                  {invite.status}
-                </Badge>
-              </TableCell>
-              <TableCell className="w-[20%]">{new Date(invite.created_at).toLocaleDateString()}</TableCell>
-              <TableCell className="w-[30%]">
-                {editMode ? (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onResendInvite && onResendInvite(invite)}
-                    >
-                      <Send className="h-4 w-4 mr-1" />
-                      Resend
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                      onClick={() => onDeleteInvite && onDeleteInvite(invite.id)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Delete
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="h-9"></div> // Empty space holder to maintain layout
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
+          {emailInvites.map((invite) => {
+            const statusStyle = 
+              invite.status?.toLowerCase() === 'active' 
+                ? getStatusStyle('active')
+                : getStatusStyle('invited');
+              
+            return (
+              <TableRow key={invite.id}>
+                <TableCell className="w-[30%]">{invite.email}</TableCell>
+                <TableCell className="w-[20%]">
+                  <Badge 
+                    variant={statusStyle.variant}
+                    className={statusStyle.className}
+                  >
+                    {invite.status || 'Invited'}
+                  </Badge>
+                </TableCell>
+                <TableCell className="w-[20%]">{new Date(invite.created_at).toLocaleDateString()}</TableCell>
+                <TableCell className="w-[30%]">
+                  {editMode ? (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onResendInvite && onResendInvite(invite)}
+                      >
+                        <Send className="h-4 w-4 mr-1" />
+                        Resend
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                        onClick={() => onDeleteInvite && onDeleteInvite(invite.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="h-9"></div> // Empty space holder to maintain layout
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </div>
