@@ -62,6 +62,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
+        <h3 className="text-lg font-medium">Registration List</h3>
         <span className="px-2.5 py-0.5 rounded-full text-sm font-medium bg-brand-primary/10 text-brand-primary">
           {teamMembers.length} {teamMembers.length === 1 ? 'Member' : 'Members'}
         </span>
@@ -71,7 +72,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
           <TableHeader>
             <TableRow>
               {editMode && <TableHead className="w-10"></TableHead>}
-              <TableHead>Name</TableHead>
+              <TableHead>Full Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>System Role</TableHead>
