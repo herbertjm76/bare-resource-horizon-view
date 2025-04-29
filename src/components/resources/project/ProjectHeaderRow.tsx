@@ -2,7 +2,7 @@
 import React from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { MilestoneInfo, Continuity } from '../milestones/MilestoneVisualizer';
+import { MilestoneInfo, Continuity } from '../milestones/types';
 import { DraggableMilestoneVisualizer } from '../milestones/DraggableMilestoneVisualizer';
 
 interface ProjectHeaderRowProps {
@@ -53,7 +53,7 @@ export const ProjectHeaderRow: React.FC<ProjectHeaderRowProps> = ({
   };
   
   return (
-    <tr className={`border-t border-b border-gray-200 ${headerBgClass}`}>
+    <tr className={`border-t border-b border-gray-200 ${headerBgClass} ${isDragging ? 'relative z-30' : ''}`}>
       {/* Resource count column */}
       <td className={`sticky left-0 z-10 p-2 w-12 text-center ${headerBgClass}`}>
         {/* Counter moved to the project name cell */}

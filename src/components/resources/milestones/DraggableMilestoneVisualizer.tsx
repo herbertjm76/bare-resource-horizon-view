@@ -78,23 +78,30 @@ export const DraggableMilestoneVisualizer: React.FC<DraggableMilestoneVisualizer
   };
 
   // Apply styles based on drag and drop state
-  const dropIndicatorStyle = isOver && canDrop ? 'border-2 border-dashed border-primary' : '';
-  const dragStyle = isCurrentlyDragging ? 'opacity-50' : '';
+  const dropIndicatorStyle = isOver && canDrop ? 'border-2 border-dashed border-primary ring-2 ring-primary/20' : '';
+  const dragStyle = isCurrentlyDragging ? 'opacity-40' : '';
+  const hoverStyle = canDrop && !isOver ? 'hover:border-2 hover:border-dashed hover:border-primary/50' : '';
 
   return (
     <div 
       ref={combineRefs}
-      className={`cursor-grab ${dropIndicatorStyle} ${dragStyle}`}
+      className={`relative cursor-grab rounded-md transition-all duration-150 ${dropIndicatorStyle} ${dragStyle} ${hoverStyle}`}
     >
-      <MilestoneVisualizer
-        weekKey={weekKey}
-        weekLabel={weekLabel}
-        milestone={milestone}
-        milestoneColor={milestoneColor}
-        continuity={continuity}
-        stageColorMap={stageColorMap}
-        onSetMilestone={onSetMilestone}
-      />
+      {/* Visual indicator when hovering over a drop target */}
+      {isOver && canDrop && (
+        <div className="absolute inset-0 bg-primary/10 rounded-md z-0"></div>
+      )}
+      <div className="relative z-10">
+        <MilestoneVisualizer
+          weekKey={weekKey}
+          weekLabel={weekLabel}
+          milestone={milestone}
+          milestoneColor={milestoneColor}
+          continuity={continuity}
+          stageColorMap={stageColorMap}
+          onSetMilestone={onSetMilestone}
+        />
+      </div>
     </div>
   );
 };

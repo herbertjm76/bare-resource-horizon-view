@@ -9,7 +9,7 @@ import { ProjectHeaderRow } from './project/ProjectHeaderRow';
 import { AddResourceRow } from './project/AddResourceRow';
 import { useProjectMilestones } from './hooks/useProjectMilestones';
 import { useProjectAllocations } from './hooks/useProjectAllocations';
-import { MilestoneInfo } from './milestones/MilestoneVisualizer';
+import { MilestoneInfo } from './milestones/types';
 
 interface ProjectRowProps {
   project: any;
@@ -56,7 +56,8 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     handleDrop,
     handleDragEnd,
     isDragging,
-    dragItem
+    dragItem,
+    dragSourceWeek
   } = useProjectMilestones(stageColorMap);
   
   const { 
