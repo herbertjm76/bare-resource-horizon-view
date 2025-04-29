@@ -84,16 +84,16 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   });
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full border-collapse" style={{ width: tableWidth + 'px' }}>
-        <thead className="bg-muted/50">
+    <div className="overflow-x-auto border rounded-lg">
+      <table className="min-w-full border-collapse divide-y divide-gray-200" style={{ width: tableWidth + 'px' }}>
+        <thead className="bg-muted/50 sticky top-0 z-20">
           <tr>
             {/* Resources count column */}
-            <th className="sticky left-0 bg-muted/50 z-10 p-2 border-b text-center font-medium w-12">
+            <th className="sticky left-0 bg-muted/50 z-20 p-2 border-b text-center font-medium w-12">
               {/* Empty header for the counter column */}
             </th>
             {/* Project/Resource column */}
-            <th className="sticky left-12 bg-muted/50 z-10 p-2 border-b text-left font-medium" style={{ minWidth: '250px' }}>
+            <th className="sticky left-12 bg-muted/50 z-20 p-2 border-b text-left font-medium" style={{ minWidth: '250px' }}>
               Project / Resource
             </th>
             

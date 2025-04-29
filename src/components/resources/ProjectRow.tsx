@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronDown, UserPlus, Circle, Square, Diamond, Flag } from 'lucide-react';
+import { ChevronRight, ChevronDown, UserPlus, Circle, Square, Flag } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/AddResourceDialog';
@@ -21,11 +21,11 @@ interface ProjectRowProps {
   isEven?: boolean;
 }
 
-type MilestoneType = 'none' | 'milestone' | 'kickoff' | 'delivery';
+type MilestoneType = 'none' | 'milestone' | 'kickoff' | 'workshop' | 'deadline';
 type MilestoneInfo = {
   type: MilestoneType;
   stage?: string; // Optional stage name
-  icon?: 'circle' | 'square' | 'diamond' | 'flag';
+  icon?: 'circle' | 'square' | 'flag';
 };
 
 export const ProjectRow: React.FC<ProjectRowProps> = ({
@@ -129,8 +129,10 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         return <Circle className="h-3 w-3" />;
       case 'kickoff':
         return <Square className="h-3 w-3" />;
-      case 'delivery':
-        return <Diamond className="h-3 w-3" />;
+      case 'workshop':
+        return <Circle className="h-3 w-3" />;
+      case 'deadline':
+        return <Flag className="h-3 w-3" />;
       default:
         return null;
     }
@@ -144,6 +146,22 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     return undefined;
   };
 
+  // Check if there's a milestone in the adjacent week
+  const hasContinuousStage = (weekIndex: number, currentMilestone: MilestoneInfo | undefined) => {
+    if (!currentMilestone || !currentMilestone.stage) return false;
+    
+    const prevWeekKey = weekIndex > 0 ? getWeekKey(weeks[weekIndex - 1].startDate) : null;
+    const nextWeekKey = weekIndex < weeks.length - 1 ? getWeekKey(weeks[weekIndex + 1].startDate) : null;
+    
+    const prevMilestone = prevWeekKey ? weekMilestones[prevWeekKey] : undefined;
+    const nextMilestone = nextWeekKey ? weekMilestones[nextWeekKey] : undefined;
+    
+    const leftContinuous = prevMilestone?.stage === currentMilestone.stage && !prevMilestone.type;
+    const rightContinuous = nextMilestone?.stage === currentMilestone.stage && !nextMilestone.type;
+    
+    return { left: leftContinuous, right: rightContinuous };
+  };
+
   // Base background color for project rows
   const rowBgClass = isEven 
     ? "bg-white hover:bg-gray-50" 
@@ -155,14 +173,14 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     : "bg-brand-violet-light hover:bg-brand-violet-light/90";
 
   return <>
-      <tr className={`border-t border-gray-200 ${headerBgClass}`}>
+      <tr className={`border-t border-b border-gray-200 ${headerBgClass}`}>
         {/* Resource count column */}
-        <td className={`sticky left-0 z-10 p-2 border-b w-12 text-center ${headerBgClass}`}>
+        <td className={`sticky left-0 z-10 p-2 w-12 text-center ${headerBgClass}`}>
           {/* Counter moved to the project name cell */}
         </td>
 
         {/* Project name cell with the counter on the right */}
-        <td className={`sticky left-12 z-10 p-2 border-b cursor-pointer ${headerBgClass}`} onClick={onToggleExpand}>
+        <td className={`sticky left-12 z-10 p-2 cursor-pointer ${headerBgClass}`} onClick={onToggleExpand}>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Button variant="ghost" size="icon" className="h-6 w-6 p-0 mr-2">
@@ -182,30 +200,46 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         </td>
         
         {/* Week allocation cells - always show project totals */}
-        {weeks.map(week => {
+        {weeks.map((week, weekIndex) => {
         const weekKey = getWeekKey(week.startDate);
         const projectHours = weeklyProjectHours[weekKey] || 0;
         const milestone = weekMilestones[weekKey];
         const milestoneColor = milestone ? getMilestoneColor(milestone) : undefined;
+        const continuity = milestone?.stage ? hasContinuousStage(weekIndex, milestone) : { left: false, right: false };
         
-        return <td key={weekKey} className="p-0 border-b text-center font-medium w-8">
+        return <td key={weekKey} className="p-0 border-b text-center font-medium w-8 relative">
               <div className="flex flex-col items-center">
                 {/* Milestone/Stage indicator area - clickable */}
                 <Popover>
                   <PopoverTrigger asChild>
                     <div className="w-full h-7 cursor-pointer flex justify-center items-center">
                       {milestone && milestone.type !== 'none' ? (
-                        <div className="flex items-center justify-center h-4">
-                          {getMilestoneIcon(milestone.type)}
+                        <div className="relative flex items-center justify-center h-4 w-full">
+                          <div 
+                            className={`absolute h-2 ${continuity.left ? 'rounded-r-full' : 'rounded-full'} ${continuity.right ? 'rounded-l-full' : 'rounded-full'}`}
+                            style={{
+                              backgroundColor: milestoneColor || '#E5DEFF',
+                              width: 'calc(100% - 2px)',
+                              left: continuity.left ? '-1px' : '1px',
+                              right: continuity.right ? '-1px' : '1px'
+                            }}
+                          />
+                          <div className="relative z-10">
+                            {getMilestoneIcon(milestone.type)}
+                          </div>
                         </div>
-                      ) : (
+                      ) : milestone?.stage ? (
                         <div 
-                          className="h-2 w-4/5 rounded-full mx-auto mt-1"
+                          className={`h-2 ${continuity.left ? 'rounded-r-full' : 'rounded-l-full'} ${continuity.right ? 'rounded-l-full' : 'rounded-r-full'}`}
                           style={{
-                            backgroundColor: milestoneColor || 'transparent',
-                            transition: 'background-color 0.2s'
+                            backgroundColor: milestoneColor || '#E5DEFF',
+                            width: continuity.left || continuity.right ? 'calc(100% + 2px)' : '80%',
+                            marginLeft: continuity.left ? '-1px' : '0',
+                            marginRight: continuity.right ? '-1px' : '0'
                           }}
                         />
+                      ) : (
+                        <div className="h-2 w-4/5 opacity-0 rounded-full" />
                       )}
                     </div>
                   </PopoverTrigger>
@@ -216,7 +250,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                       {/* Project stage selector */}
                       <div className="space-y-2">
                         <h5 className="text-xs font-medium">Set Stage</h5>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-2 gap-2">
                           {project.officeStages?.map((stage: any) => (
                             <TooltipProvider key={stage.id}>
                               <Tooltip>
@@ -272,28 +306,6 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                                   variant="outline" 
                                   className="h-7 px-2 py-1"
                                   onClick={() => setWeekMilestone(weekKey, { 
-                                    type: 'milestone',
-                                    stage: milestone?.stage,
-                                    icon: 'circle'
-                                  })}
-                                >
-                                  <Circle className="h-3 w-3 mr-1" /> Milestone
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Regular milestone</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline"
-                                  className="h-7 px-2 py-1"
-                                  onClick={() => setWeekMilestone(weekKey, { 
                                     type: 'kickoff',
                                     stage: milestone?.stage,
                                     icon: 'square'
@@ -316,16 +328,38 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                                   variant="outline"
                                   className="h-7 px-2 py-1"
                                   onClick={() => setWeekMilestone(weekKey, { 
-                                    type: 'delivery',
+                                    type: 'workshop',
                                     stage: milestone?.stage,
-                                    icon: 'diamond'
+                                    icon: 'circle'
                                   })}
                                 >
-                                  <Diamond className="h-3 w-3 mr-1" /> Delivery
+                                  <Circle className="h-3 w-3 mr-1" /> Workshop
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p>Project delivery</p>
+                                <p>Project workshop</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="h-7 px-2 py-1"
+                                  onClick={() => setWeekMilestone(weekKey, { 
+                                    type: 'deadline',
+                                    stage: milestone?.stage,
+                                    icon: 'flag'
+                                  })}
+                                >
+                                  <Flag className="h-3 w-3 mr-1" /> Deadline
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Project deadline</p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
