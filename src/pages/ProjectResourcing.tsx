@@ -6,6 +6,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { ResourceAllocationGrid } from '@/components/resources/ResourceAllocationGrid';
 import { ResourceFilters } from '@/components/resources/ResourceFilters';
 import { format } from 'date-fns';
+import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 
 const HEADER_HEIGHT = 56;
 
@@ -46,11 +47,13 @@ const ProjectResourcing = () => {
               <ResourceFilters filters={filters} onFilterChange={handleFilterChange} />
               
               <div className="overflow-x-auto w-full" style={{ maxHeight: 'calc(100vh - 300px)' }}>
-                <ResourceAllocationGrid 
-                  startDate={filters.startDate}
-                  weeksToShow={filters.weeksToShow}
-                  filters={filters}
-                />
+                <OfficeSettingsProvider>
+                  <ResourceAllocationGrid 
+                    startDate={filters.startDate}
+                    weeksToShow={filters.weeksToShow}
+                    filters={filters}
+                  />
+                </OfficeSettingsProvider>
               </div>
             </div>
           </div>
