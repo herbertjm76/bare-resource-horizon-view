@@ -1,7 +1,8 @@
 
 import React, { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { MilestoneVisualizer, MilestoneInfo, Continuity } from './MilestoneVisualizer';
+import { MilestoneVisualizer } from './MilestoneVisualizer';
+import { MilestoneInfo, Continuity } from './types';
 
 interface DraggableMilestoneVisualizerProps {
   weekKey: string;
