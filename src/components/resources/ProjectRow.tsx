@@ -28,6 +28,9 @@ type MilestoneInfo = {
   icon?: 'circle' | 'square' | 'flag';
 };
 
+// Define a type for continuity to ensure we handle both cases properly
+type Continuity = { left: boolean; right: boolean } | false;
+
 export const ProjectRow: React.FC<ProjectRowProps> = ({
   project,
   weeks,
@@ -147,7 +150,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   };
 
   // Check if there's a milestone in the adjacent week
-  const hasContinuousStage = (weekIndex: number, currentMilestone: MilestoneInfo | undefined) => {
+  const hasContinuousStage = (weekIndex: number, currentMilestone: MilestoneInfo | undefined): Continuity => {
     if (!currentMilestone || !currentMilestone.stage) return false;
     
     const prevWeekKey = weekIndex > 0 ? getWeekKey(weeks[weekIndex - 1].startDate) : null;
@@ -205,7 +208,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         const projectHours = weeklyProjectHours[weekKey] || 0;
         const milestone = weekMilestones[weekKey];
         const milestoneColor = milestone ? getMilestoneColor(milestone) : undefined;
-        const continuity = milestone?.stage ? hasContinuousStage(weekIndex, milestone) : { left: false, right: false };
+        const continuity = milestone?.stage ? hasContinuousStage(weekIndex, milestone) : false;
         
         return <td key={weekKey} className="p-0 border-b text-center font-medium w-8 relative">
               <div className="flex flex-col items-center">
@@ -216,12 +219,12 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                       {milestone && milestone.type !== 'none' ? (
                         <div className="relative flex items-center justify-center h-4 w-full">
                           <div 
-                            className={`absolute h-2 ${continuity.left ? 'rounded-r-full' : 'rounded-full'} ${continuity.right ? 'rounded-l-full' : 'rounded-full'}`}
+                            className={`absolute h-2 ${continuity && continuity.left ? 'rounded-r-full' : 'rounded-full'} ${continuity && continuity.right ? 'rounded-l-full' : 'rounded-full'}`}
                             style={{
                               backgroundColor: milestoneColor || '#E5DEFF',
                               width: 'calc(100% - 2px)',
-                              left: continuity.left ? '-1px' : '1px',
-                              right: continuity.right ? '-1px' : '1px'
+                              left: continuity && continuity.left ? '-1px' : '1px',
+                              right: continuity && continuity.right ? '-1px' : '1px'
                             }}
                           />
                           <div className="relative z-10">
@@ -230,12 +233,12 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                         </div>
                       ) : milestone?.stage ? (
                         <div 
-                          className={`h-2 ${continuity.left ? 'rounded-r-full' : 'rounded-l-full'} ${continuity.right ? 'rounded-l-full' : 'rounded-r-full'}`}
+                          className={`h-2 ${continuity && continuity.left ? 'rounded-r-full' : 'rounded-l-full'} ${continuity && continuity.right ? 'rounded-l-full' : 'rounded-r-full'}`}
                           style={{
                             backgroundColor: milestoneColor || '#E5DEFF',
-                            width: continuity.left || continuity.right ? 'calc(100% + 2px)' : '80%',
-                            marginLeft: continuity.left ? '-1px' : '0',
-                            marginRight: continuity.right ? '-1px' : '0'
+                            width: continuity ? 'calc(100% + 2px)' : '80%',
+                            marginLeft: continuity && continuity.left ? '-1px' : '0',
+                            marginRight: continuity && continuity.right ? '-1px' : '0'
                           }}
                         />
                       ) : (
