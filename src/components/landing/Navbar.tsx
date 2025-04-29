@@ -1,4 +1,6 @@
+
 import { Link } from 'react-router-dom';
+import logoSvg from '@/assets/logo.svg';
 
 const Navbar = () => {
   return (
@@ -8,9 +10,9 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center">
             <img 
-              src="/lovable-uploads/4ee866b4-50c7-498d-9317-98f506ede564.png"
+              src={logoSvg}
               alt="BareResource Logo" 
-              className="w-[36px] h-[36px] p-[1px] mr-2" 
+              className="w-[36px] h-[36px] mr-2" 
             />
             <span className="text-2xl font-semibold">
               <span className="text-black">Bare</span>
@@ -26,7 +28,7 @@ const Navbar = () => {
             <Link to="#pricing" className="hover:text-purple-600 transition-colors">Pricing</Link>
           </div>
           
-          {/* CTA Button - Added sm:px-6 for smaller padding on mobile */}
+          {/* CTA Button */}
           <Link
             to="/auth"
             className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg text-sm sm:text-base"

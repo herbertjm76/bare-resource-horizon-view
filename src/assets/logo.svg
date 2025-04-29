@@ -1,13 +1,16 @@
 
 <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M100 0C156 0 200 44 200 100C200 156 156 200 100 200H0V0H100Z" fill="#D3D3D3"/>
-  <path d="M100 0C156 0 200 44 200 100C200 156 156 200 100 200H50V0H100Z" fill="url(#gradient)"/>
+  <!-- Left B in light gray -->
+  <path d="M28 25C28 25 50 25 65 25C80 25 95 35 95 55C95 75 80 85 65 85C80 85 100 95 100 115C100 135 85 145 70 145C55 145 28 145 28 145V25Z" fill="#D3D3D3"/>
+  
+  <!-- Right B with gradient -->
+  <path d="M72 25C72 25 94 25 109 25C124 25 139 35 139 55C139 75 124 85 109 85C124 85 144 95 144 115C144 135 129 145 114 145C99 145 72 145 72 145V25Z" fill="url(#gradient)"/>
+  
   <defs>
-    <linearGradient id="gradient" x1="125" y1="0" x2="125" y2="200" gradientUnits="userSpaceOnUse">
+    <linearGradient id="gradient" x1="108" y1="25" x2="108" y2="145" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stopColor="#FF6B6B"/>
       <stop offset="50%" stopColor="#9B6BFF"/>
       <stop offset="100%" stopColor="#6B9BFF"/>
     </linearGradient>
   </defs>
 </svg>
-

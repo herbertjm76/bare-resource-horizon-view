@@ -1,3 +1,6 @@
+
+import logoSvg from '@/assets/logo.svg';
+
 const Hero = () => {
   return (
     <div className="relative pt-20 bg-hero">
@@ -23,11 +26,13 @@ const Hero = () => {
           
           {/* Hero Image */}
           <div className="relative flex justify-center">
-            <img 
-              src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
-              alt="Team collaboration illustration"
-              className="w-[75%] h-auto rounded-2xl shadow-2xl"
-            />
+            <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-2xl">
+              <img 
+                src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
+                alt="Team collaboration illustration"
+                className="w-full rounded-xl"
+              />
+            </div>
           </div>
         </div>
       </div>
