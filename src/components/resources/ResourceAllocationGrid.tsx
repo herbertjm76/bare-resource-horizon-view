@@ -5,6 +5,7 @@ import { addDays, format, startOfWeek, addWeeks } from 'date-fns';
 import { ProjectRow } from '@/components/resources/ProjectRow';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 
 interface ResourceAllocationGridProps {
   startDate: Date;
@@ -22,6 +23,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   filters
 }) => {
   const { projects, isLoading } = useProjects();
+  const { office_stages } = useOfficeSettings();
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
   
   const mondayOfStartDate = startOfWeek(startDate, { weekStartsOn: 1 });
@@ -75,10 +77,10 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
 
   // Enhance projects with office stages data
   const projectsWithStageData = filteredProjects.map(project => {
-    // Add office stages data to projects for milestone display
+    // Use office_stages from context instead of trying to access project.office.stages
     return {
       ...project,
-      officeStages: project.office?.stages || []
+      officeStages: office_stages || []
     };
   });
 
