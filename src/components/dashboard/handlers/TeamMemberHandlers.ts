@@ -16,7 +16,8 @@ export const useTeamMemberHandlers = (
     // Ensure we correctly set the isPending flag based on current member
     if (currentMember && 'isPending' in currentMember && currentMember.isPending) {
       console.log('Current member is pending, setting isPending flag');
-      memberData.isPending = true;
+      // Use type assertion to tell TypeScript we know this is a PendingMember
+      (memberData as Partial<PendingMember>).isPending = true;
     }
     
     try {
