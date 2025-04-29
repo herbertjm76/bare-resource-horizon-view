@@ -88,8 +88,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
             .from('invites')
             .update(updateData)
             .eq('id', memberData.id)
-            .eq('company_id', companyId)  // Add company_id check for security
-            .select();
+            .eq('company_id', companyId);  // Add company_id check for security
 
           if (error) {
             console.error('Error updating pre-registered member:', error);
@@ -101,20 +100,22 @@ export const useTeamMembers = (companyId: string | undefined) => {
           toast.success('Pre-registered member updated successfully');
           return true;
         } else {
-          // Update existing active member in profiles table
+          // Update existing active member in profiles table ONLY
           console.log('Updating active member in profiles table:', memberData);
           
-          // Extract only the fields we need to update, ensuring we don't include any properties that don't exist in profiles
+          // Extract only the fields we need to update in the profiles table
           const updateData = {
             first_name: memberData.first_name,
             last_name: memberData.last_name,
-            email: memberData.email,
-            role: memberData.role as UserRole, // Cast to ensure correct type
             department: memberData.department,
             location: memberData.location,
             job_title: memberData.job_title,
+            role: memberData.role as UserRole, // Cast to ensure correct type
             updated_at: new Date().toISOString()
           };
+          
+          // IMPORTANT: Do not update email in the profiles table as this would cause
+          // inconsistency with the auth.users table that we cannot directly update
           
           console.log('Update data being sent to profiles table:', updateData);
           console.log('User ID for update:', memberData.id);
@@ -123,8 +124,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
             .from('profiles')
             .update(updateData)
             .eq('id', memberData.id)
-            .eq('company_id', companyId)  // Add company_id check for security
-            .select();
+            .eq('company_id', companyId);  // Add company_id check for security
 
           if (error) {
             console.error('Error updating active member:', error);

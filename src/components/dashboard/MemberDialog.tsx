@@ -72,15 +72,16 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
   }, [member, reset]);
 
   const handleFormSubmit = (data: MemberFormData) => {
-    const memberIsPending = isPendingMember(member);
+    const isPending = isPendingMember(member);
     
+    // Create a consistent data structure for both profile and pending member
     const formData: Partial<Profile | PendingMember> = {
       ...data,
       id: member?.id
     };
     
     // If editing a pending member, ensure the proper flags are set
-    if (memberIsPending) {
+    if (isPending) {
       console.log('Submitting form for a pending member, preserving isPending flag');
       (formData as Partial<PendingMember>).isPending = true;
       (formData as Partial<PendingMember>).invitation_type = 'pre_registered';
