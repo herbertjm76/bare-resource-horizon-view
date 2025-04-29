@@ -25,7 +25,7 @@ const MemberForm: React.FC<MemberFormProps> = ({
   const { register, handleSubmit, setValue, formState: { errors } } = form;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(() => {})} className="space-y-4">
       <div className="grid gap-4">
         <PersonalInfoFields register={register} errors={errors} />
         <ContactInfoFields register={register} errors={errors} />

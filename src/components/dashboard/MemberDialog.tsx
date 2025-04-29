@@ -63,7 +63,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
     }
   }, [member, reset]);
 
-  const onSubmit = handleSubmit((data: MemberFormData) => {
+  const onSubmit = (data: MemberFormData) => {
     // If we're editing a member and it's a pending member, include the isPending flag
     if (member && 'isPending' in member) {
       onSave({
@@ -79,7 +79,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         role: data.role
       });
     }
-  });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
