@@ -70,8 +70,8 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     );
   }
 
-  // Calculate the total width based on number of weeks
-  const tableWidth = Math.max(800, weeksToShow * 50 + 250); // 50px per week + 250px for left columns
+  // Calculate the total width based on number of weeks, but make columns tighter
+  const tableWidth = Math.max(800, weeksToShow * 40 + 250); // 40px per week + 250px for left columns
 
   return (
     <div className="overflow-x-auto">
@@ -83,9 +83,9 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               Project / Resource
             </th>
             
-            {/* Date columns - removed WEEK OF column */}
+            {/* Date columns - more compact columns */}
             {weeks.map((week, i) => (
-              <th key={i} className="p-0 border-b text-center font-medium" style={{ width: '50px', minWidth: '50px' }}>
+              <th key={i} className="p-0 border-b text-center font-medium" style={{ width: '40px', minWidth: '40px' }}>
                 <div className="flex justify-center items-center h-20">
                   <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center">{week.label}</span>
                 </div>

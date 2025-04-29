@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, UserPlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -101,8 +102,8 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         {weeks.map(week => {
         const weekKey = getWeekKey(week.startDate);
         const projectHours = weeklyProjectHours[weekKey] || 0;
-        return <td key={weekKey} className="p-0 border-b text-center font-medium w-10">
-              <div className="py-[8px] px-px">{projectHours}h</div>
+        return <td key={weekKey} className="p-0 border-b text-center font-medium w-8">
+              <div className="py-[8px] px-0">{projectHours}h</div>
             </td>;
       })}
       </tr>
@@ -119,7 +120,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
             </Button>
           </td>
           
-          {weeks.map((_, i) => <td key={i} className="p-0 border-b w-10"></td>)}
+          {weeks.map((_, i) => <td key={i} className="p-0 border-b w-8"></td>)}
         </tr>}
       
       {showAddResource && <AddResourceDialog projectId={project.id} onClose={() => setShowAddResource(false)} onAdd={resource => {

@@ -89,7 +89,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
         const hours = allocations[weekKey] || 0;
         
         return (
-          <td key={weekKey} className="p-0 border-b text-center w-12 relative">
+          <td key={weekKey} className="p-0 border-b text-center w-8 relative">
             <div className="allocation-input-container">
               <Input
                 type="number"
@@ -98,14 +98,14 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
                 step="0.5"
                 value={hours.toString()}
                 onChange={(e) => handleAllocationChange(weekKey, e.target.value)}
-                className="w-12 h-8 text-center mx-auto px-0 text-xs rounded-sm border-muted focus:border-brand-violet-light"
+                className="w-8 h-8 text-center mx-auto px-0 text-xs rounded-sm border-muted focus:border-brand-violet-light"
                 style={{ 
                   appearance: 'textfield',
                   backgroundColor: hours > 0 ? 'rgba(155, 135, 245, 0.1)' : 'transparent'
                 }}
               />
               {hours > 0 && (
-                <span className="absolute right-1 top-0.5 text-xs font-medium text-brand-violet-light">
+                <span className="absolute right-0 top-0.5 text-xs font-medium text-brand-violet-light">
                   h
                 </span>
               )}
