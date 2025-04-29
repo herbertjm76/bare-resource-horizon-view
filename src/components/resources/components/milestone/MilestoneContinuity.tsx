@@ -18,11 +18,11 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Default state - empty dotted outline
+  // Default state - empty solid outline
   if (!milestone) {
     return (
       <div 
-        className="h-[4px] w-full border border-dashed border-gray-300 bg-transparent hover:border-gray-400 transition-colors cursor-pointer rounded"
+        className="h-[4px] w-full border border-solid border-gray-300 bg-transparent hover:border-gray-400 transition-colors cursor-pointer rounded"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       />
@@ -37,11 +37,11 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Outline effect with fill on hover */}
+        {/* Solid outline effect with fill on hover */}
         <div 
           className={`absolute h-[4px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'} transition-all group-hover:h-[6px]`}
           style={{
-            backgroundColor: isHovered ? milestoneColor || '#E5DEFF' : 'transparent',
+            backgroundColor: isHovered ? milestoneColor || '#9b87f5' : 'transparent',
             borderWidth: '1px',
             borderStyle: 'solid',
             borderColor: milestoneColor || '#9b87f5',
@@ -64,7 +64,7 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
       <div 
         className={`h-[4px] w-full ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'} cursor-pointer hover:h-[6px] transition-all`}
         style={{
-          backgroundColor: isHovered ? milestoneColor || '#E5DEFF' : 'transparent',
+          backgroundColor: isHovered ? milestoneColor || '#9b87f5' : 'transparent',
           borderWidth: '1px',
           borderStyle: 'solid',
           borderColor: milestoneColor || '#9b87f5',
@@ -79,7 +79,7 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
   // Default state (no milestone or stage)
   return (
     <div 
-      className="h-[4px] w-full border border-dashed border-gray-300 bg-transparent hover:border-gray-400 transition-colors cursor-pointer rounded"
+      className="h-[4px] w-full border border-solid border-gray-300 bg-transparent hover:border-gray-400 transition-colors cursor-pointer rounded"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     />
