@@ -14,10 +14,16 @@ export const useTeamMemberHandlers = (
     console.log('Saving member data:', memberData);
     
     // Ensure we correctly set the isPending flag based on current member
-    if (currentMember && 'isPending' in currentMember && currentMember.isPending) {
+    const isPendingMember = currentMember && 'isPending' in currentMember && currentMember.isPending;
+    if (isPendingMember) {
       console.log('Current member is pending, setting isPending flag');
       // Use type assertion to tell TypeScript we know this is a PendingMember
       (memberData as Partial<PendingMember>).isPending = true;
+      
+      // Also ensure invitation_type is set for pending members
+      if (!('invitation_type' in memberData)) {
+        (memberData as Partial<PendingMember>).invitation_type = 'pre_registered';
+      }
     }
     
     try {

@@ -22,9 +22,12 @@ export const useTeamMembers = (companyId: string | undefined) => {
       setIsSaving(true);
       console.log('Starting to save member with data:', memberData);
       
-      // Determine if this is a pending member by checking the isPending flag
-      const isPendingMember = 'isPending' in memberData && memberData.isPending === true;
-      console.log('Is this a pending member?', isPendingMember);
+      // Enhanced detection of pending members
+      // Check both the explicit isPending flag and the specific presence of invitation_type
+      const isPendingMember = ('isPending' in memberData && memberData.isPending === true) || 
+                             ('invitation_type' in memberData && memberData.invitation_type !== undefined);
+      
+      console.log('Is this a pending member?', isPendingMember, 'Member data:', memberData);
 
       if (isEditing && memberData.id) {
         if (isPendingMember) {
