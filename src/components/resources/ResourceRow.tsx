@@ -1,17 +1,15 @@
 
-import React from 'react';
-import { Input } from '@/components/ui/input';
+import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
 
 interface ResourceRowProps {
   resource: {
     id: string;
     name: string;
     role: string;
-    allocations: Record<string, number>;
+    allocations?: Record<string, number>;
     isPending?: boolean;
   };
   weeks: {
@@ -21,97 +19,91 @@ interface ResourceRowProps {
   }[];
   projectId: string;
   onAllocationChange: (resourceId: string, weekKey: string, hours: number) => void;
-  onDeleteResource?: (resourceId: string) => void;
+  onDeleteResource: (resourceId: string) => void;
+  isEven?: boolean;
 }
 
-export const ResourceRow: React.FC<ResourceRowProps> = ({ 
-  resource, 
-  weeks, 
+export const ResourceRow: React.FC<ResourceRowProps> = ({
+  resource,
+  weeks,
   projectId,
   onAllocationChange,
-  onDeleteResource
+  onDeleteResource,
+  isEven = false
 }) => {
-  const [allocations, setAllocations] = React.useState<Record<string, number>>(
-    resource.allocations || {}
-  );
-  
+  const [allocations, setAllocations] = useState<Record<string, number>>(resource.allocations || {});
+
+  // Base background color for project rows
+  const rowBgClass = isEven 
+    ? "bg-white hover:bg-gray-50" 
+    : "bg-gray-50 hover:bg-gray-100";
+
   const handleAllocationChange = (weekKey: string, value: string) => {
-    const numValue = Math.min(40, Math.max(0, Number(value) || 0));
+    const numValue = parseInt(value, 10);
+    const hours = isNaN(numValue) ? 0 : numValue;
     
+    // Update local state
     setAllocations(prev => ({
       ...prev,
-      [weekKey]: numValue
+      [weekKey]: hours
     }));
     
-    // Notify parent component to update project totals
-    onAllocationChange(resource.id, weekKey, numValue);
-  };
-  
-  const handleDeleteResource = () => {
-    if (onDeleteResource) {
-      onDeleteResource(resource.id);
-      toast.success(`${resource.name} removed from project`);
-    }
+    // Propagate change to parent
+    onAllocationChange(resource.id, weekKey, hours);
   };
   
   const getWeekKey = (startDate: Date) => {
     return startDate.toISOString().split('T')[0];
   };
-
+  
   return (
-    <tr className="bg-muted/10 hover:bg-muted/20">
-      {/* Empty cell for counter column */}
-      <td className="sticky left-0 bg-muted/10 hover:bg-muted/20 z-10 border-b w-12"></td>
+    <tr className={`border-b ${rowBgClass}`}>
+      {/* Fixed counter column */}
+      <td className={`sticky left-0 z-10 p-2 w-12 ${rowBgClass}`}></td>
       
-      {/* Resource name and role cell */}
-      <td className="sticky left-12 bg-muted/10 hover:bg-muted/20 z-10 p-2 border-b">
-        <div className="flex items-center pl-8">
-          <div className="flex-1">
-            <div className="font-medium flex items-center gap-2">
-              {resource.name}
-              {resource.isPending && (
-                <Badge variant="pending" className="text-xs">Pending</Badge>
-              )}
+      {/* Resource info column */}
+      <td className={`sticky left-12 z-10 p-2 ${rowBgClass}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="ml-8">
+              <div className="font-medium text-sm">
+                {resource.name} 
+                {resource.isPending && <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded">Pending</span>}
+              </div>
+              <div className="text-xs text-muted-foreground">{resource.role}</div>
             </div>
-            <div className="text-xs text-muted-foreground">{resource.role}</div>
           </div>
           <Button 
             variant="ghost" 
-            size="icon" 
-            className="h-6 w-6 text-muted-foreground hover:text-destructive"
-            onClick={handleDeleteResource}
+            size="sm" 
+            className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-muted-foreground hover:text-destructive"
+            onClick={() => {
+              onDeleteResource(resource.id);
+              toast.info(`${resource.name} removed from project`);
+            }}
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5" />
+            <span className="sr-only">Delete resource</span>
           </Button>
         </div>
       </td>
       
-      {/* Week allocation input cells */}
-      {weeks.map((week) => {
+      {/* Allocation input cells */}
+      {weeks.map(week => {
         const weekKey = getWeekKey(week.startDate);
-        const hours = allocations[weekKey] || 0;
+        const hoursValue = allocations[weekKey] || 0;
         
         return (
-          <td key={weekKey} className="p-0 border-b text-center w-8 relative">
+          <td key={weekKey} className="p-0 text-center w-8">
             <div className="allocation-input-container">
-              <Input
+              <input
                 type="number"
                 min="0"
-                max="40"
-                step="0.5"
-                value={hours.toString()}
+                max="168"
+                value={hoursValue || ''}
                 onChange={(e) => handleAllocationChange(weekKey, e.target.value)}
-                className="w-8 h-8 text-center mx-auto px-0 text-xs rounded-sm border-muted focus:border-brand-violet-light"
-                style={{ 
-                  appearance: 'textfield',
-                  backgroundColor: hours > 0 ? 'rgba(155, 135, 245, 0.1)' : 'transparent'
-                }}
+                className="w-full h-10 p-0 text-center bg-transparent border-0 focus:ring-0 focus:outline-none focus:border-brand-violet"
               />
-              {hours > 0 && (
-                <span className="absolute right-0 top-0.5 text-xs font-medium text-brand-violet-light">
-                  h
-                </span>
-              )}
             </div>
           </td>
         );

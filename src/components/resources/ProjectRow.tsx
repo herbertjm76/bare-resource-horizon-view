@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronDown, UserPlus, CircleDot, Square, Diamond } from 'lucide-react';
+import { ChevronRight, ChevronDown, UserPlus, Circle, Square, Diamond, Flag } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/AddResourceDialog';
 import { toast } from 'sonner';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useStageColorMap } from '@/components/projects/hooks/useProjectColors';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ProjectRowProps {
   project: any;
@@ -17,20 +18,22 @@ interface ProjectRowProps {
   }[];
   isExpanded: boolean;
   onToggleExpand: () => void;
+  isEven?: boolean;
 }
 
 type MilestoneType = 'none' | 'milestone' | 'kickoff' | 'delivery';
 type MilestoneInfo = {
   type: MilestoneType;
   stage?: string; // Optional stage name
-  icon?: 'circle' | 'square' | 'diamond';
+  icon?: 'circle' | 'square' | 'diamond' | 'flag';
 };
 
 export const ProjectRow: React.FC<ProjectRowProps> = ({
   project,
   weeks,
   isExpanded,
-  onToggleExpand
+  onToggleExpand,
+  isEven = false
 }) => {
   const [showAddResource, setShowAddResource] = useState(false);
   const [resources, setResources] = useState([{
@@ -123,7 +126,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   const getMilestoneIcon = (type: MilestoneType) => {
     switch (type) {
       case 'milestone':
-        return <CircleDot className="h-3 w-3" />;
+        return <Circle className="h-3 w-3" />;
       case 'kickoff':
         return <Square className="h-3 w-3" />;
       case 'delivery':
@@ -141,15 +144,25 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     return undefined;
   };
 
+  // Base background color for project rows
+  const rowBgClass = isEven 
+    ? "bg-white hover:bg-gray-50" 
+    : "bg-gray-50 hover:bg-gray-100";
+  
+  // Header row background
+  const headerBgClass = isEven 
+    ? "bg-brand-violet-light/70 hover:bg-brand-violet-light" 
+    : "bg-brand-violet-light hover:bg-brand-violet-light/90";
+
   return <>
-      <tr className="bg-brand-violet-light hover:bg-brand-violet-light/80">
+      <tr className={`border-t border-gray-200 ${headerBgClass}`}>
         {/* Resource count column */}
-        <td className="sticky left-0 bg-brand-violet-light hover:bg-brand-violet-light/80 z-10 p-2 border-b w-12 text-center">
+        <td className={`sticky left-0 z-10 p-2 border-b w-12 text-center ${headerBgClass}`}>
           {/* Counter moved to the project name cell */}
         </td>
 
         {/* Project name cell with the counter on the right */}
-        <td className="sticky left-12 bg-brand-violet-light hover:bg-brand-violet-light/80 z-10 p-2 border-b cursor-pointer" onClick={onToggleExpand}>
+        <td className={`sticky left-12 z-10 p-2 border-b cursor-pointer ${headerBgClass}`} onClick={onToggleExpand}>
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Button variant="ghost" size="icon" className="h-6 w-6 p-0 mr-2">
@@ -180,84 +193,160 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                 {/* Milestone/Stage indicator area - clickable */}
                 <Popover>
                   <PopoverTrigger asChild>
-                    <div 
-                      className="w-full h-5 cursor-pointer flex justify-center items-center"
-                      style={{
-                        backgroundColor: milestoneColor || 'transparent',
-                        transition: 'background-color 0.2s'
-                      }}
-                    >
-                      {milestone && milestone.type !== 'none' && getMilestoneIcon(milestone.type)}
+                    <div className="w-full h-7 cursor-pointer flex justify-center items-center">
+                      {milestone && milestone.type !== 'none' ? (
+                        <div className="flex items-center justify-center h-4">
+                          {getMilestoneIcon(milestone.type)}
+                        </div>
+                      ) : (
+                        <div 
+                          className="h-2 w-4/5 rounded-full mx-auto mt-1"
+                          style={{
+                            backgroundColor: milestoneColor || 'transparent',
+                            transition: 'background-color 0.2s'
+                          }}
+                        />
+                      )}
                     </div>
                   </PopoverTrigger>
-                  <PopoverContent className="w-56 p-2" align="center">
+                  <PopoverContent className="w-64 p-3" align="center">
                     <div className="space-y-3">
                       <h4 className="font-medium text-sm">Week of {week.label}</h4>
                       
                       {/* Project stage selector */}
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         <h5 className="text-xs font-medium">Set Stage</h5>
-                        <div className="flex flex-wrap gap-1">
+                        <div className="grid grid-cols-3 gap-2">
                           {project.officeStages?.map((stage: any) => (
-                            <button
-                              key={stage.id}
-                              className="h-4 w-4 rounded-sm cursor-pointer"
-                              style={{ backgroundColor: stage.color || '#E5DEFF' }}
-                              onClick={() => setWeekMilestone(weekKey, { 
-                                type: 'none',
-                                stage: stage.name
-                              })}
-                              title={stage.name}
-                            />
+                            <TooltipProvider key={stage.id}>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    className="flex items-center space-x-1 px-2 py-1 rounded hover:bg-muted"
+                                    onClick={() => setWeekMilestone(weekKey, { 
+                                      type: 'none',
+                                      stage: stage.name
+                                    })}
+                                  >
+                                    <div 
+                                      className="h-3 w-3 rounded-sm flex-shrink-0"
+                                      style={{ backgroundColor: stage.color || '#E5DEFF' }}
+                                    />
+                                    <span className="text-xs truncate">{stage.name}</span>
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>{stage.name}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           ))}
-                          <button 
-                            className="h-4 w-4 rounded-sm border border-gray-300 cursor-pointer"
-                            onClick={() => setWeekMilestone(weekKey, { type: 'none' })}
-                            title="Clear"
-                          />
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button 
+                                  className="flex items-center space-x-1 px-2 py-1 rounded hover:bg-muted"
+                                  onClick={() => setWeekMilestone(weekKey, { type: 'none' })}
+                                >
+                                  <div className="h-3 w-3 rounded-sm border border-gray-300 flex-shrink-0" />
+                                  <span className="text-xs">Clear</span>
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Remove stage</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </div>
                       </div>
                       
                       {/* Milestone type selector */}
-                      <div className="space-y-1">
+                      <div className="space-y-2">
                         <h5 className="text-xs font-medium">Set Milestone</h5>
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="h-7 px-2 py-1"
-                            onClick={() => setWeekMilestone(weekKey, { 
-                              type: 'milestone',
-                              stage: milestone?.stage,
-                              icon: 'circle'
-                            })}
-                          >
-                            <CircleDot className="h-3 w-3 mr-1" /> Milestone
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            className="h-7 px-2 py-1"
-                            onClick={() => setWeekMilestone(weekKey, { 
-                              type: 'kickoff',
-                              stage: milestone?.stage,
-                              icon: 'square'
-                            })}
-                          >
-                            <Square className="h-3 w-3 mr-1" /> Kickoff
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            className="h-7 px-2 py-1"
-                            onClick={() => setWeekMilestone(weekKey, { 
-                              type: 'delivery',
-                              stage: milestone?.stage,
-                              icon: 'diamond'
-                            })}
-                          >
-                            <Diamond className="h-3 w-3 mr-1" /> Delivery
-                          </Button>
+                        <div className="flex flex-wrap gap-2">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline" 
+                                  className="h-7 px-2 py-1"
+                                  onClick={() => setWeekMilestone(weekKey, { 
+                                    type: 'milestone',
+                                    stage: milestone?.stage,
+                                    icon: 'circle'
+                                  })}
+                                >
+                                  <Circle className="h-3 w-3 mr-1" /> Milestone
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Regular milestone</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="h-7 px-2 py-1"
+                                  onClick={() => setWeekMilestone(weekKey, { 
+                                    type: 'kickoff',
+                                    stage: milestone?.stage,
+                                    icon: 'square'
+                                  })}
+                                >
+                                  <Square className="h-3 w-3 mr-1" /> Kickoff
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Project kickoff</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="h-7 px-2 py-1"
+                                  onClick={() => setWeekMilestone(weekKey, { 
+                                    type: 'delivery',
+                                    stage: milestone?.stage,
+                                    icon: 'diamond'
+                                  })}
+                                >
+                                  <Diamond className="h-3 w-3 mr-1" /> Delivery
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Project delivery</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="h-7 px-2 py-1"
+                                  onClick={() => setWeekMilestone(weekKey, { type: 'none' })}
+                                >
+                                  Clear
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Remove milestone</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </div>
                       </div>
                     </div>
@@ -274,33 +363,50 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
       </tr>
       
       {/* Resource rows when project is expanded */}
-      {isExpanded && resources.map(resource => <ResourceRow key={resource.id} resource={resource} weeks={weeks} projectId={project.id} onAllocationChange={handleAllocationChange} onDeleteResource={handleDeleteResource} />)}
+      {isExpanded && resources.map(resource => (
+        <ResourceRow 
+          key={resource.id} 
+          resource={resource} 
+          weeks={weeks} 
+          projectId={project.id} 
+          onAllocationChange={handleAllocationChange} 
+          onDeleteResource={handleDeleteResource}
+          isEven={isEven}
+        />
+      ))}
       
       {/* Add resource row when project is expanded */}
-      {isExpanded && <tr className="bg-muted/5 hover:bg-muted/10">
-          <td className="sticky left-0 bg-muted/5 hover:bg-muted/10 z-10 border-b w-12"></td>
-          <td className="sticky left-12 bg-muted/5 hover:bg-muted/10 z-10 p-2 border-b">
+      {isExpanded && (
+        <tr className={`border-b ${rowBgClass}`}>
+          <td className={`sticky left-0 z-10 w-12 ${rowBgClass}`}></td>
+          <td className={`sticky left-12 z-10 p-2 ${rowBgClass}`}>
             <Button variant="ghost" size="sm" className="ml-8 text-muted-foreground" onClick={() => setShowAddResource(true)}>
               <UserPlus className="h-4 w-4 mr-2" />
               Add Resource
             </Button>
           </td>
           
-          {weeks.map((_, i) => <td key={i} className="p-0 border-b w-8"></td>)}
-        </tr>}
+          {weeks.map((_, i) => <td key={i} className="p-0 w-8"></td>)}
+        </tr>
+      )}
       
-      {showAddResource && <AddResourceDialog projectId={project.id} onClose={() => setShowAddResource(false)} onAdd={resource => {
-      const newResource = {
-        id: resource.staffId,
-        name: resource.name,
-        role: resource.role || 'Team Member',
-        // Include role if available
-        allocations: {},
-        isPending: resource.isPending
-      };
-      setResources(prev => [...prev, newResource]);
-      setShowAddResource(false);
-      toast.success(`${resource.name} added to project`);
-    }} />}
+      {showAddResource && (
+        <AddResourceDialog 
+          projectId={project.id} 
+          onClose={() => setShowAddResource(false)} 
+          onAdd={resource => {
+            const newResource = {
+              id: resource.staffId,
+              name: resource.name,
+              role: resource.role || 'Team Member',
+              allocations: {},
+              isPending: resource.isPending
+            };
+            setResources(prev => [...prev, newResource]);
+            setShowAddResource(false);
+            toast.success(`${resource.name} added to project`);
+          }} 
+        />
+      )}
     </>;
 };

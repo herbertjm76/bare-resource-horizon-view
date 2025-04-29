@@ -77,7 +77,6 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
 
   // Enhance projects with office stages data
   const projectsWithStageData = filteredProjects.map(project => {
-    // Use office_stages from context instead of trying to access project.office.stages
     return {
       ...project,
       officeStages: office_stages || []
@@ -108,14 +107,15 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
             ))}
           </tr>
         </thead>
-        <tbody>
-          {projectsWithStageData.map(project => (
+        <tbody className="divide-y divide-gray-200">
+          {projectsWithStageData.map((project, index) => (
             <ProjectRow 
               key={project.id}
               project={project}
               weeks={weeks}
               isExpanded={expandedProjects.includes(project.id)}
               onToggleExpand={() => toggleProjectExpanded(project.id)}
+              isEven={index % 2 === 0}
             />
           ))}
         </tbody>
