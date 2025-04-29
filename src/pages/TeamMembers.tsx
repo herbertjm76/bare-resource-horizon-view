@@ -73,8 +73,16 @@ const TeamMembersPage = () => {
       });
     },
     enabled: !!userProfile?.company_id,
-    refetchInterval: 5000 // Add polling to keep data fresh
+    refetchInterval: 5000, // Add polling to keep data fresh
+    staleTime: 3000 // Consider data stale after 3 seconds
   });
+
+  // Manual refresh function that can be called from children
+  const triggerRefresh = () => {
+    console.log('Manual refresh triggered');
+    setRefreshTrigger(prev => prev + 1);
+    refetchTeamMembers();
+  };
 
   // Listen for realtime changes
   useEffect(() => {
@@ -126,6 +134,7 @@ const TeamMembersPage = () => {
                   teamMembers={teamMembers} 
                   inviteUrl={inviteUrl} 
                   userRole={userProfile?.role || 'member'} 
+                  onRefresh={triggerRefresh}
                 />
               ) : (
                 <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">

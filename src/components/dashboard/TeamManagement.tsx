@@ -14,12 +14,14 @@ interface TeamManagementProps {
   teamMembers: Profile[];
   inviteUrl: string;
   userRole: string;
+  onRefresh?: () => void; // Add optional callback for parent to refresh data
 }
 
 export const TeamManagement = ({
   teamMembers: activeMembers,
   inviteUrl,
-  userRole
+  userRole,
+  onRefresh
 }: TeamManagementProps) => {
   const companyId = activeMembers[0]?.company_id;
   
@@ -33,6 +35,14 @@ export const TeamManagement = ({
     selectedMembers,
     setSelectedMembers
   } = useTeamMembersState(companyId, userRole);
+
+  // Custom trigger that combines local and parent refresh
+  const handleRefresh = () => {
+    triggerRefresh();
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
 
   const {
     isAddDialogOpen,
@@ -56,7 +66,7 @@ export const TeamManagement = ({
     copyInviteCode,
     deleteInvite,
     resendInvite
-  } = useInviteActions(triggerRefresh);
+  } = useInviteActions(handleRefresh);
 
   const {
     handleSaveMemberWrapper,
@@ -64,7 +74,7 @@ export const TeamManagement = ({
     handleBulkDelete,
     isSaving,
     isDeleting
-  } = useTeamMemberHandlers(companyId, triggerRefresh);
+  } = useTeamMemberHandlers(companyId, handleRefresh);
 
   // Combine active members and pre-registered members
   const allMembers: TeamMember[] = [...activeMembers, ...preRegisteredMembers];
@@ -82,6 +92,7 @@ export const TeamManagement = ({
     const success = await handleConfirmDelete(memberToDelete, isPendingMemberToDelete);
     if (success) {
       closeDeleteDialog();
+      handleRefresh(); // Ensure refresh after delete
     }
   };
 
@@ -89,6 +100,7 @@ export const TeamManagement = ({
     const success = await handleSaveMemberWrapper(memberData, currentMember);
     if (success) {
       closeAddEditDialog();
+      handleRefresh(); // Ensure refresh after save
     }
   };
 
@@ -96,6 +108,7 @@ export const TeamManagement = ({
     handleBulkDelete(selectedMembers, preRegisteredMembers);
     setSelectedMembers([]);
     setEditMode(false);
+    handleRefresh(); // Ensure refresh after bulk delete
   };
 
   // State for invite section edit mode
