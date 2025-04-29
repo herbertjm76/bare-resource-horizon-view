@@ -1,9 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronDown, UserPlus } from 'lucide-react';
+import { ChevronRight, ChevronDown, UserPlus, CircleDot, Square, Diamond } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/AddResourceDialog';
 import { toast } from 'sonner';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useStageColorMap } from '@/components/projects/hooks/useProjectColors';
+
 interface ProjectRowProps {
   project: any;
   weeks: {
@@ -14,6 +18,14 @@ interface ProjectRowProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
 }
+
+type MilestoneType = 'none' | 'milestone' | 'kickoff' | 'delivery';
+type MilestoneInfo = {
+  type: MilestoneType;
+  stage?: string; // Optional stage name
+  icon?: 'circle' | 'square' | 'diamond';
+};
+
 export const ProjectRow: React.FC<ProjectRowProps> = ({
   project,
   weeks,
@@ -35,6 +47,12 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
 
   // Track all allocations by resource and week
   const [projectAllocations, setProjectAllocations] = useState<Record<string, Record<string, number>>>({});
+
+  // Track milestones and stages for each week
+  const [weekMilestones, setWeekMilestones] = useState<Record<string, MilestoneInfo>>({});
+  
+  // Get stage colors from the project if available
+  const stageColorMap = useStageColorMap(project?.officeStages || []);
 
   // Sum up all resource hours for each week
   const weeklyProjectHours = React.useMemo(() => {
@@ -79,9 +97,50 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
       return newAllocations;
     });
   };
+
+  // Set milestone or stage for a specific week
+  const setWeekMilestone = (weekKey: string, milestoneInfo: MilestoneInfo) => {
+    setWeekMilestones(prev => ({
+      ...prev,
+      [weekKey]: milestoneInfo
+    }));
+    
+    // Show toast message
+    if (milestoneInfo.type === 'none') {
+      toast.info("Milestone removed");
+    } else if (milestoneInfo.stage) {
+      toast.success(`Stage ${milestoneInfo.stage} set for week of ${weekKey}`);
+    } else {
+      toast.success(`${milestoneInfo.type} set for week of ${weekKey}`);
+    }
+  };
+
   const getWeekKey = (startDate: Date) => {
     return startDate.toISOString().split('T')[0];
   };
+
+  // Get milestone icon component
+  const getMilestoneIcon = (type: MilestoneType) => {
+    switch (type) {
+      case 'milestone':
+        return <CircleDot className="h-3 w-3" />;
+      case 'kickoff':
+        return <Square className="h-3 w-3" />;
+      case 'delivery':
+        return <Diamond className="h-3 w-3" />;
+      default:
+        return null;
+    }
+  };
+
+  // Get milestone color based on stage
+  const getMilestoneColor = (milestone: MilestoneInfo) => {
+    if (milestone.stage && stageColorMap[milestone.stage]) {
+      return stageColorMap[milestone.stage];
+    }
+    return undefined;
+  };
+
   return <>
       <tr className="bg-brand-violet-light hover:bg-brand-violet-light/80">
         {/* Resource count column */}
@@ -113,9 +172,102 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         {weeks.map(week => {
         const weekKey = getWeekKey(week.startDate);
         const projectHours = weeklyProjectHours[weekKey] || 0;
+        const milestone = weekMilestones[weekKey];
+        const milestoneColor = milestone ? getMilestoneColor(milestone) : undefined;
+        
         return <td key={weekKey} className="p-0 border-b text-center font-medium w-8">
-              <div className="py-[8px] px-0">
-                <span className="text-[15px] font-bold">{projectHours}h</span>
+              <div className="flex flex-col items-center">
+                {/* Milestone/Stage indicator area - clickable */}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <div 
+                      className="w-full h-5 cursor-pointer flex justify-center items-center"
+                      style={{
+                        backgroundColor: milestoneColor || 'transparent',
+                        transition: 'background-color 0.2s'
+                      }}
+                    >
+                      {milestone && milestone.type !== 'none' && getMilestoneIcon(milestone.type)}
+                    </div>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56 p-2" align="center">
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-sm">Week of {week.label}</h4>
+                      
+                      {/* Project stage selector */}
+                      <div className="space-y-1">
+                        <h5 className="text-xs font-medium">Set Stage</h5>
+                        <div className="flex flex-wrap gap-1">
+                          {project.officeStages?.map((stage: any) => (
+                            <button
+                              key={stage.id}
+                              className="h-4 w-4 rounded-sm cursor-pointer"
+                              style={{ backgroundColor: stage.color || '#E5DEFF' }}
+                              onClick={() => setWeekMilestone(weekKey, { 
+                                type: 'none',
+                                stage: stage.name
+                              })}
+                              title={stage.name}
+                            />
+                          ))}
+                          <button 
+                            className="h-4 w-4 rounded-sm border border-gray-300 cursor-pointer"
+                            onClick={() => setWeekMilestone(weekKey, { type: 'none' })}
+                            title="Clear"
+                          />
+                        </div>
+                      </div>
+                      
+                      {/* Milestone type selector */}
+                      <div className="space-y-1">
+                        <h5 className="text-xs font-medium">Set Milestone</h5>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="h-7 px-2 py-1"
+                            onClick={() => setWeekMilestone(weekKey, { 
+                              type: 'milestone',
+                              stage: milestone?.stage,
+                              icon: 'circle'
+                            })}
+                          >
+                            <CircleDot className="h-3 w-3 mr-1" /> Milestone
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="h-7 px-2 py-1"
+                            onClick={() => setWeekMilestone(weekKey, { 
+                              type: 'kickoff',
+                              stage: milestone?.stage,
+                              icon: 'square'
+                            })}
+                          >
+                            <Square className="h-3 w-3 mr-1" /> Kickoff
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="h-7 px-2 py-1"
+                            onClick={() => setWeekMilestone(weekKey, { 
+                              type: 'delivery',
+                              stage: milestone?.stage,
+                              icon: 'diamond'
+                            })}
+                          >
+                            <Diamond className="h-3 w-3 mr-1" /> Delivery
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                
+                {/* Hours display */}
+                <div className="py-[8px] px-0">
+                  <span className="text-[15px] font-bold">{projectHours}h</span>
+                </div>
               </div>
             </td>;
       })}

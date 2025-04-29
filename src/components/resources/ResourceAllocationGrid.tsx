@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { addDays, format, startOfWeek, addWeeks } from 'date-fns';
@@ -72,6 +73,15 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   // Calculate the total width based on number of weeks, but make columns tighter
   const tableWidth = Math.max(800, weeksToShow * 40 + 262); // 40px per week + 262px for left columns (250 + 12)
 
+  // Enhance projects with office stages data
+  const projectsWithStageData = filteredProjects.map(project => {
+    // Add office stages data to projects for milestone display
+    return {
+      ...project,
+      officeStages: project.office?.stages || []
+    };
+  });
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full border-collapse" style={{ width: tableWidth + 'px' }}>
@@ -97,7 +107,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
           </tr>
         </thead>
         <tbody>
-          {filteredProjects.map(project => (
+          {projectsWithStageData.map(project => (
             <ProjectRow 
               key={project.id}
               project={project}
