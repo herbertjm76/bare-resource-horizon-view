@@ -11,7 +11,13 @@ export const useTeamMemberHandlers = (
   const { handleSaveMember, handleDeleteMember, isSaving, isDeleting } = useTeamMembers(companyId);
 
   const handleSaveMemberWrapper = async (memberData: Partial<Profile | PendingMember>, currentMember: TeamMember | null) => {
-    console.log('Saving member data:', memberData, 'Is pending:', 'isPending' in memberData);
+    console.log('Saving member data:', memberData);
+    
+    // Ensure we correctly set the isPending flag based on current member
+    if (currentMember && 'isPending' in currentMember && currentMember.isPending) {
+      console.log('Current member is pending, setting isPending flag');
+      memberData.isPending = true;
+    }
     
     try {
       const success = await handleSaveMember(memberData, Boolean(currentMember));

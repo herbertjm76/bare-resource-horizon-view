@@ -20,12 +20,14 @@ export const useTeamMembers = (companyId: string | undefined) => {
 
     try {
       setIsSaving(true);
+      console.log('Starting to save member with data:', memberData);
+      
+      // Determine if this is a pending member by checking the isPending flag
+      const isPendingMember = 'isPending' in memberData && memberData.isPending === true;
+      console.log('Is this a pending member?', isPendingMember);
 
       if (isEditing && memberData.id) {
-        // Check if this is a pre-registered member (from invites table)
-        const isPending = 'isPending' in memberData && memberData.isPending === true;
-        
-        if (isPending) {
+        if (isPendingMember) {
           // Update pre-registered member in invites table
           console.log('Updating pre-registered member in invites table:', memberData);
           
@@ -42,7 +44,10 @@ export const useTeamMembers = (companyId: string | undefined) => {
             })
             .eq('id', memberData.id);
 
-          if (error) throw error;
+          if (error) {
+            console.error('Error updating pre-registered member:', error);
+            throw error;
+          }
           toast.success('Pre-registered member updated successfully');
         } else {
           // Update existing active member in profiles table
@@ -62,7 +67,10 @@ export const useTeamMembers = (companyId: string | undefined) => {
             })
             .eq('id', memberData.id);
 
-          if (error) throw error;
+          if (error) {
+            console.error('Error updating active member:', error);
+            throw error;
+          }
           toast.success('Team member updated successfully');
         }
       } else {
@@ -74,7 +82,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
         }
         
         // When creating a new pre-registered member, we use the invites table
-        // and NOT the auth.users table directly (which would cause permission errors)
+        console.log('Creating new pre-registered member in invites table');
         const { error } = await supabase
           .from('invites')
           .insert({
@@ -91,7 +99,10 @@ export const useTeamMembers = (companyId: string | undefined) => {
             role: memberData.role as UserRole // Cast to ensure correct type
           });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error creating pre-registered member:', error);
+          throw error;
+        }
         toast.success('Pre-registered new team member');
       }
 

@@ -39,6 +39,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
 
   useEffect(() => {
     if (member) {
+      console.log('Populating form with member data:', member, 'isPending:', 'isPending' in member);
       // Pre-fill form with member data if editing
       reset({
         first_name: member.first_name || '',
@@ -64,15 +65,17 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
   }, [member, reset]);
 
   const handleFormSubmit = (data: MemberFormData) => {
-    // If we're editing a member and it's a pending member, include the isPending flag
+    // Check if we're editing a member and if it's a pending member, include the isPending flag
     if (member && 'isPending' in member) {
+      console.log('Submitting form for a pending member, preserving isPending flag');
       onSave({
         ...data,
         id: member.id,
-        isPending: true,
+        isPending: true, // Explicitly set to true for pending members
         role: data.role
       });
     } else {
+      console.log('Submitting form for an active member or new member');
       onSave({
         ...data,
         id: member?.id,
