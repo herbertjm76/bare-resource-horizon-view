@@ -3,7 +3,7 @@ import React from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { MilestoneInfo, Continuity } from '../milestones/MilestoneVisualizer';
-import { MilestoneVisualizer } from '../milestones/MilestoneVisualizer';
+import { DraggableMilestoneVisualizer } from '../milestones/DraggableMilestoneVisualizer';
 
 interface ProjectHeaderRowProps {
   project: any;
@@ -22,6 +22,11 @@ interface ProjectHeaderRowProps {
   setWeekMilestone: (weekKey: string, milestoneInfo: MilestoneInfo) => void;
   getMilestoneColor: (milestone: MilestoneInfo) => string | undefined;
   headerBgClass: string;
+  handleDragStart: (weekKey: string) => void;
+  handleDrop: (weekKey: string) => void;
+  handleDragEnd: () => void;
+  isDragging: boolean;
+  dragItem: MilestoneInfo | null;
 }
 
 export const ProjectHeaderRow: React.FC<ProjectHeaderRowProps> = ({
@@ -37,6 +42,11 @@ export const ProjectHeaderRow: React.FC<ProjectHeaderRowProps> = ({
   setWeekMilestone,
   getMilestoneColor,
   headerBgClass,
+  handleDragStart,
+  handleDrop,
+  handleDragEnd,
+  isDragging,
+  dragItem,
 }) => {
   const getWeekKey = (startDate: Date) => {
     return startDate.toISOString().split('T')[0];
@@ -80,8 +90,8 @@ export const ProjectHeaderRow: React.FC<ProjectHeaderRowProps> = ({
         return (
           <td key={weekKey} className="p-0 border-b text-center font-medium w-8 relative">
             <div className="flex flex-col items-center">
-              {/* Milestone/Stage indicator area - clickable */}
-              <MilestoneVisualizer
+              {/* Milestone/Stage indicator area - now draggable */}
+              <DraggableMilestoneVisualizer
                 weekKey={weekKey}
                 weekLabel={week.label}
                 milestone={milestone}
@@ -89,6 +99,10 @@ export const ProjectHeaderRow: React.FC<ProjectHeaderRowProps> = ({
                 continuity={continuity}
                 stageColorMap={stageColorMap}
                 onSetMilestone={setWeekMilestone}
+                onDragStart={handleDragStart}
+                onDrop={handleDrop}
+                onDragEnd={handleDragEnd}
+                isDragging={isDragging}
               />
               
               {/* Hours display */}
