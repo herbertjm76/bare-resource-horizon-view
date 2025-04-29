@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronDown, UserPlus, Circle, Square, Flag } from 'lucide-react';
+import { ChevronRight, ChevronDown, UserPlus, Circle, Square, Diamond } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/AddResourceDialog';
@@ -25,7 +24,7 @@ type MilestoneType = 'none' | 'milestone' | 'kickoff' | 'workshop' | 'deadline';
 type MilestoneInfo = {
   type: MilestoneType;
   stage?: string; // Optional stage name
-  icon?: 'circle' | 'square' | 'flag';
+  icon?: 'circle' | 'square' | 'diamond';
 };
 
 // Define a type for continuity to ensure we handle both cases properly
@@ -129,13 +128,13 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   const getMilestoneIcon = (type: MilestoneType) => {
     switch (type) {
       case 'milestone':
-        return <Circle className="h-3 w-3" />;
+        return <Circle className="h-3 w-3" fill="black" />;
       case 'kickoff':
-        return <Square className="h-3 w-3" />;
+        return <Square className="h-3 w-3" fill="black" />;
       case 'workshop':
-        return <Circle className="h-3 w-3" />;
+        return <Circle className="h-3 w-3" fill="black" />;
       case 'deadline':
-        return <Flag className="h-3 w-3" />;
+        return <Diamond className="h-3 w-3" fill="black" />;
       default:
         return null;
     }
@@ -215,9 +214,9 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                 {/* Milestone/Stage indicator area - clickable */}
                 <Popover>
                   <PopoverTrigger asChild>
-                    <div className="w-full h-7 cursor-pointer flex justify-center items-center">
+                    <div className="w-full h-5 cursor-pointer flex justify-center items-center">
                       {milestone && milestone.type !== 'none' ? (
-                        <div className="relative flex items-center justify-center h-4 w-full">
+                        <div className="relative flex items-center justify-center h-3 w-full">
                           <div 
                             className={`absolute h-2 ${continuity && continuity.left ? 'rounded-r-full' : 'rounded-full'} ${continuity && continuity.right ? 'rounded-l-full' : 'rounded-full'}`}
                             style={{
@@ -314,7 +313,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                                     icon: 'square'
                                   })}
                                 >
-                                  <Square className="h-3 w-3 mr-1" /> Kickoff
+                                  <Square className="h-3 w-3 mr-1" fill="black" /> Kickoff
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
@@ -336,7 +335,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                                     icon: 'circle'
                                   })}
                                 >
-                                  <Circle className="h-3 w-3 mr-1" /> Workshop
+                                  <Circle className="h-3 w-3 mr-1" fill="black" /> Workshop
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
@@ -355,10 +354,10 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                                   onClick={() => setWeekMilestone(weekKey, { 
                                     type: 'deadline',
                                     stage: milestone?.stage,
-                                    icon: 'flag'
+                                    icon: 'diamond'
                                   })}
                                 >
-                                  <Flag className="h-3 w-3 mr-1" /> Deadline
+                                  <Diamond className="h-3 w-3 mr-1" fill="black" /> Deadline
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
@@ -391,7 +390,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                 </Popover>
                 
                 {/* Hours display */}
-                <div className="py-[8px] px-0">
+                <div className="py-[6px] px-0">
                   <span className="text-[15px] font-bold">{projectHours}h</span>
                 </div>
               </div>
