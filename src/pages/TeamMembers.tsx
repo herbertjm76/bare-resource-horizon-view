@@ -32,6 +32,7 @@ const TeamMembersPage = () => {
     getSession();
   }, []);
 
+  // Fetch user profile
   const {
     data: userProfile
   } = useQuery({
@@ -47,6 +48,7 @@ const TeamMembersPage = () => {
     enabled: !!userId
   });
 
+  // Fetch team members with refetch capability
   const {
     data: teamMembers = [],
     isLoading,
@@ -74,7 +76,7 @@ const TeamMembersPage = () => {
     refetchInterval: 5000 // Add polling to keep data fresh
   });
 
-  // Listen for realtime changes to profiles table
+  // Listen for realtime changes
   useEffect(() => {
     if (!userProfile?.company_id) return;
     
@@ -107,27 +109,35 @@ const TeamMembersPage = () => {
 
   const inviteUrl = userProfile?.company_id ? `${window.location.origin}/join/${userProfile.company_id}` : '';
 
-  return <SidebarProvider>
+  return (
+    <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
         <div className="flex-shrink-0">
           <DashboardSidebar />
         </div>
         <div className="flex-1 flex flex-col">
           <AppHeader />
-          <div style={{
-          height: HEADER_HEIGHT
-        }} />
+          <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
               <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
-              {userId ? <TeamManagement teamMembers={teamMembers} inviteUrl={inviteUrl} userRole={userProfile?.role || 'member'} /> : <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+              {userId ? (
+                <TeamManagement 
+                  teamMembers={teamMembers} 
+                  inviteUrl={inviteUrl} 
+                  userRole={userProfile?.role || 'member'} 
+                />
+              ) : (
+                <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
                   <p className="text-white">Loading authentication details...</p>
-                </div>}
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-    </SidebarProvider>;
+    </SidebarProvider>
+  );
 };
 
 export default TeamMembersPage;
