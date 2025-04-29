@@ -60,8 +60,11 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
 
   return (
     <tr className="bg-muted/10 hover:bg-muted/20">
+      {/* Empty cell for counter column */}
+      <td className="sticky left-0 bg-muted/10 hover:bg-muted/20 z-10 border-b w-12"></td>
+      
       {/* Resource name and role cell */}
-      <td className="sticky left-0 bg-muted/10 hover:bg-muted/20 z-10 p-2 border-b">
+      <td className="sticky left-12 bg-muted/10 hover:bg-muted/20 z-10 p-2 border-b">
         <div className="flex items-center pl-8">
           <div className="flex-1">
             <div className="font-medium flex items-center gap-2">

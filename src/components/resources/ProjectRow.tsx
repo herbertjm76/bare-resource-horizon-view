@@ -85,8 +85,17 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   };
   return <>
       <tr className="bg-brand-violet-light hover:bg-brand-violet-light/80">
+        {/* Resource count column */}
+        <td className="sticky left-0 bg-brand-violet-light hover:bg-brand-violet-light/80 z-10 p-2 border-b w-12 text-center">
+          {!isExpanded && (
+            <div className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-brand-violet text-white text-xs font-medium">
+              {resources.length}
+            </div>
+          )}
+        </td>
+
         {/* Project name cell */}
-        <td className="sticky left-0 bg-brand-violet-light hover:bg-brand-violet-light/80 z-10 p-2 border-b cursor-pointer" onClick={onToggleExpand}>
+        <td className="sticky left-12 bg-brand-violet-light hover:bg-brand-violet-light/80 z-10 p-2 border-b cursor-pointer" onClick={onToggleExpand}>
           <div className="flex items-center">
             <Button variant="ghost" size="icon" className="h-6 w-6 p-0 mr-2">
               {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -103,7 +112,9 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         const weekKey = getWeekKey(week.startDate);
         const projectHours = weeklyProjectHours[weekKey] || 0;
         return <td key={weekKey} className="p-0 border-b text-center font-medium w-8">
-              <div className="py-[8px] px-0">{projectHours}h</div>
+              <div className="py-[8px] px-0">
+                <span className="text-[9px] font-bold">{projectHours}h</span>
+              </div>
             </td>;
       })}
       </tr>
@@ -113,7 +124,8 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
       
       {/* Add resource row when project is expanded */}
       {isExpanded && <tr className="bg-muted/5 hover:bg-muted/10">
-          <td className="sticky left-0 bg-muted/5 hover:bg-muted/10 z-10 p-2 border-b">
+          <td className="sticky left-0 bg-muted/5 hover:bg-muted/10 z-10 border-b w-12"></td>
+          <td className="sticky left-12 bg-muted/5 hover:bg-muted/10 z-10 p-2 border-b">
             <Button variant="ghost" size="sm" className="ml-8 text-muted-foreground" onClick={() => setShowAddResource(true)}>
               <UserPlus className="h-4 w-4 mr-2" />
               Add Resource
