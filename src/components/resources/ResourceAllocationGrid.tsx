@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { addDays, format, startOfWeek, addWeeks } from 'date-fns';
@@ -5,7 +6,6 @@ import { ProjectRow } from '@/components/resources/ProjectRow';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
-import { DragDropContext } from './DragDropContext';
 
 interface ResourceAllocationGridProps {
   startDate: Date;
@@ -84,44 +84,42 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   });
 
   return (
-    <DragDropContext>
-      <div className="overflow-x-auto border rounded-lg">
-        <table className="min-w-full border-collapse divide-y divide-gray-200" style={{ width: tableWidth + 'px' }}>
-          <thead className="bg-muted/50 sticky top-0 z-20">
-            <tr>
-              {/* Resources count column */}
-              <th className="sticky left-0 bg-muted/50 z-20 p-2 border-b text-center font-medium w-12">
-                {/* Empty header for the counter column */}
+    <div className="overflow-x-auto border rounded-lg">
+      <table className="min-w-full border-collapse divide-y divide-gray-200" style={{ width: tableWidth + 'px' }}>
+        <thead className="bg-muted/50 sticky top-0 z-20">
+          <tr>
+            {/* Resources count column */}
+            <th className="sticky left-0 bg-muted/50 z-20 p-2 border-b text-center font-medium w-12">
+              {/* Empty header for the counter column */}
+            </th>
+            {/* Project/Resource column */}
+            <th className="sticky left-12 bg-muted/50 z-20 p-2 border-b text-left font-medium" style={{ minWidth: '250px' }}>
+              Project / Resource
+            </th>
+            
+            {/* Date columns - more compact columns */}
+            {weeks.map((week, i) => (
+              <th key={i} className="p-0 border-b text-center font-medium" style={{ width: '40px', minWidth: '40px' }}>
+                <div className="flex justify-center items-center h-20">
+                  <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center">{week.label}</span>
+                </div>
               </th>
-              {/* Project/Resource column */}
-              <th className="sticky left-12 bg-muted/50 z-20 p-2 border-b text-left font-medium" style={{ minWidth: '250px' }}>
-                Project / Resource
-              </th>
-              
-              {/* Date columns - more compact columns */}
-              {weeks.map((week, i) => (
-                <th key={i} className="p-0 border-b text-center font-medium" style={{ width: '40px', minWidth: '40px' }}>
-                  <div className="flex justify-center items-center h-20">
-                    <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center">{week.label}</span>
-                  </div>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {projectsWithStageData.map((project, index) => (
-              <ProjectRow 
-                key={project.id}
-                project={project}
-                weeks={weeks}
-                isExpanded={expandedProjects.includes(project.id)}
-                onToggleExpand={() => toggleProjectExpanded(project.id)}
-                isEven={index % 2 === 0}
-              />
             ))}
-          </tbody>
-        </table>
-      </div>
-    </DragDropContext>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {projectsWithStageData.map((project, index) => (
+            <ProjectRow 
+              key={project.id}
+              project={project}
+              weeks={weeks}
+              isExpanded={expandedProjects.includes(project.id)}
+              onToggleExpand={() => toggleProjectExpanded(project.id)}
+              isEven={index % 2 === 0}
+            />
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };

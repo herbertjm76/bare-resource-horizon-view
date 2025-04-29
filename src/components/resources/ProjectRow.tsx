@@ -9,7 +9,7 @@ import { ProjectHeaderRow } from './project/ProjectHeaderRow';
 import { AddResourceRow } from './project/AddResourceRow';
 import { useProjectMilestones } from './hooks/useProjectMilestones';
 import { useProjectAllocations } from './hooks/useProjectAllocations';
-import { MilestoneInfo } from './milestones/types';
+import { MilestoneInfo } from './milestones/MilestoneVisualizer';
 
 interface ProjectRowProps {
   project: any;
@@ -47,25 +47,8 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   const stageColorMap = useStageColorMap(project?.officeStages || []);
   
   // Initialize milestone and allocation hooks
-  const { 
-    weekMilestones, 
-    setWeekMilestone, 
-    getMilestoneColor, 
-    hasContinuousStage,
-    handleDragStart,
-    handleDrop,
-    handleDragEnd,
-    isDragging,
-    dragItem,
-    dragSourceWeek
-  } = useProjectMilestones(stageColorMap);
-  
-  const { 
-    projectAllocations, 
-    weeklyProjectHours, 
-    handleAllocationChange, 
-    setProjectAllocations 
-  } = useProjectAllocations(weeks);
+  const { weekMilestones, setWeekMilestone, getMilestoneColor, hasContinuousStage } = useProjectMilestones(stageColorMap);
+  const { projectAllocations, weeklyProjectHours, handleAllocationChange, setProjectAllocations } = useProjectAllocations(weeks);
 
   // Handle resource deletion
   const handleDeleteResource = (resourceId: string) => {
@@ -107,11 +90,6 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         setWeekMilestone={setWeekMilestone}
         getMilestoneColor={getMilestoneColor}
         headerBgClass={headerBgClass}
-        handleDragStart={handleDragStart}
-        handleDrop={handleDrop}
-        handleDragEnd={handleDragEnd}
-        isDragging={isDragging}
-        dragItem={dragItem}
       />
       
       {/* Resource rows when project is expanded */}

@@ -2,8 +2,8 @@
 import React from 'react';
 import { ChevronRight, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { MilestoneInfo, Continuity } from '../milestones/types';
-import { DraggableMilestoneVisualizer } from '../milestones/DraggableMilestoneVisualizer';
+import { MilestoneInfo, Continuity } from '../milestones/MilestoneVisualizer';
+import { MilestoneVisualizer } from '../milestones/MilestoneVisualizer';
 
 interface ProjectHeaderRowProps {
   project: any;
@@ -22,11 +22,6 @@ interface ProjectHeaderRowProps {
   setWeekMilestone: (weekKey: string, milestoneInfo: MilestoneInfo) => void;
   getMilestoneColor: (milestone: MilestoneInfo) => string | undefined;
   headerBgClass: string;
-  handleDragStart: (weekKey: string) => void;
-  handleDrop: (weekKey: string) => void;
-  handleDragEnd: () => void;
-  isDragging: boolean;
-  dragItem: MilestoneInfo | null;
 }
 
 export const ProjectHeaderRow: React.FC<ProjectHeaderRowProps> = ({
@@ -42,18 +37,13 @@ export const ProjectHeaderRow: React.FC<ProjectHeaderRowProps> = ({
   setWeekMilestone,
   getMilestoneColor,
   headerBgClass,
-  handleDragStart,
-  handleDrop,
-  handleDragEnd,
-  isDragging,
-  dragItem,
 }) => {
   const getWeekKey = (startDate: Date) => {
     return startDate.toISOString().split('T')[0];
   };
   
   return (
-    <tr className={`border-t border-b border-gray-200 ${headerBgClass} ${isDragging ? 'relative z-30' : ''}`}>
+    <tr className={`border-t border-b border-gray-200 ${headerBgClass}`}>
       {/* Resource count column */}
       <td className={`sticky left-0 z-10 p-2 w-12 text-center ${headerBgClass}`}>
         {/* Counter moved to the project name cell */}
@@ -90,8 +80,8 @@ export const ProjectHeaderRow: React.FC<ProjectHeaderRowProps> = ({
         return (
           <td key={weekKey} className="p-0 border-b text-center font-medium w-8 relative">
             <div className="flex flex-col items-center">
-              {/* Milestone/Stage indicator area - now draggable */}
-              <DraggableMilestoneVisualizer
+              {/* Milestone/Stage indicator area - clickable */}
+              <MilestoneVisualizer
                 weekKey={weekKey}
                 weekLabel={week.label}
                 milestone={milestone}
@@ -99,10 +89,6 @@ export const ProjectHeaderRow: React.FC<ProjectHeaderRowProps> = ({
                 continuity={continuity}
                 stageColorMap={stageColorMap}
                 onSetMilestone={setWeekMilestone}
-                onDragStart={handleDragStart}
-                onDrop={handleDrop}
-                onDragEnd={handleDragEnd}
-                isDragging={isDragging}
               />
               
               {/* Hours display */}
