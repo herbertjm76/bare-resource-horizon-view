@@ -34,8 +34,7 @@ export const useInviteActions = (triggerRefresh: () => void) => {
 
   const resendInvite = async (invite: Invite) => {
     try {
-      toast.success(`Invite resent to ${invite.email}`);
-      
+      // Update created_at to current time instead of using updated_at
       const { error } = await supabase
         .from('invites')
         .update({ created_at: new Date().toISOString() })
@@ -43,6 +42,7 @@ export const useInviteActions = (triggerRefresh: () => void) => {
         
       if (error) throw error;
       
+      toast.success(`Invite resent to ${invite.email}`);
       triggerRefresh();
     } catch (error: any) {
       console.error('Error resending invite:', error);
