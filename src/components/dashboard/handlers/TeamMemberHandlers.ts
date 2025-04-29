@@ -56,6 +56,12 @@ export const useTeamMemberHandlers = (
           triggerRefresh();
         }, 3000);
         
+        // Add a fourth refresh after an even longer delay
+        setTimeout(() => {
+          console.log('Triggering fourth delayed refresh (5000ms) after successful save');
+          triggerRefresh();
+        }, 5000);
+        
         return true;
       } else {
         console.error('Save operation returned false');
@@ -90,6 +96,12 @@ export const useTeamMemberHandlers = (
           console.log('Triggering second delayed refresh (1500ms) after successful delete');
           triggerRefresh();
         }, 1500);
+        
+        // Add a third refresh after a longer delay
+        setTimeout(() => {
+          console.log('Triggering third delayed refresh (3000ms) after successful delete');
+          triggerRefresh();
+        }, 3000);
         
         toast.success(isPendingMemberToDelete ? 'Pre-registered member deleted successfully' : 'Team member deleted successfully');
         return true;
@@ -128,6 +140,11 @@ export const useTeamMemberHandlers = (
         console.log('Triggering second delayed refresh (1500ms) after bulk delete');
         triggerRefresh();
       }, 1500);
+      
+      setTimeout(() => {
+        console.log('Triggering third delayed refresh (3000ms) after bulk delete');
+        triggerRefresh();
+      }, 3000);
       
       if (successCount > 0) {
         toast.success(`${successCount} team member${successCount > 1 ? 's' : ''} deleted successfully`);
