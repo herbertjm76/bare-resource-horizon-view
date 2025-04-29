@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, UserPlus, Circle, Square, Diamond } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -106,18 +105,29 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
 
   // Set milestone or stage for a specific week
   const setWeekMilestone = (weekKey: string, milestoneInfo: MilestoneInfo) => {
-    setWeekMilestones(prev => ({
-      ...prev,
-      [weekKey]: milestoneInfo
-    }));
-    
-    // Show toast message
-    if (milestoneInfo.type === 'none') {
-      toast.info("Milestone removed");
-    } else if (milestoneInfo.stage) {
-      toast.success(`Stage ${milestoneInfo.stage} set for week of ${weekKey}`);
+    // When clearing, remove the entry completely from the object
+    if (milestoneInfo.type === 'none' && !milestoneInfo.stage) {
+      setWeekMilestones(prev => {
+        const newMilestones = { ...prev };
+        delete newMilestones[weekKey];
+        return newMilestones;
+      });
+      toast.info("Milestone and stage removed");
     } else {
-      toast.success(`${milestoneInfo.type} set for week of ${weekKey}`);
+      // Otherwise update/add the milestone info
+      setWeekMilestones(prev => ({
+        ...prev,
+        [weekKey]: milestoneInfo
+      }));
+      
+      // Show toast message
+      if (milestoneInfo.type === 'none') {
+        toast.info("Milestone removed");
+      } else if (milestoneInfo.stage) {
+        toast.success(`Stage ${milestoneInfo.stage} set for week of ${weekKey}`);
+      } else {
+        toast.success(`${milestoneInfo.type} set for week of ${weekKey}`);
+      }
     }
   };
 
