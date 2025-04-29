@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, UserPlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/AddResourceDialog';
 import { toast } from 'sonner';
-
 interface ProjectRowProps {
   project: any;
   weeks: {
@@ -16,32 +14,38 @@ interface ProjectRowProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
 }
-
-export const ProjectRow: React.FC<ProjectRowProps> = ({ 
-  project, 
-  weeks, 
-  isExpanded, 
-  onToggleExpand 
+export const ProjectRow: React.FC<ProjectRowProps> = ({
+  project,
+  weeks,
+  isExpanded,
+  onToggleExpand
 }) => {
   const [showAddResource, setShowAddResource] = useState(false);
-  const [resources, setResources] = useState([
-    { id: '1', name: 'John Smith', role: 'Designer', allocations: {} },
-    { id: '2', name: 'Sarah Jones', role: 'Developer', allocations: {} },
-  ]);
-  
+  const [resources, setResources] = useState([{
+    id: '1',
+    name: 'John Smith',
+    role: 'Designer',
+    allocations: {}
+  }, {
+    id: '2',
+    name: 'Sarah Jones',
+    role: 'Developer',
+    allocations: {}
+  }]);
+
   // Track all allocations by resource and week
   const [projectAllocations, setProjectAllocations] = useState<Record<string, Record<string, number>>>({});
-  
+
   // Sum up all resource hours for each week
   const weeklyProjectHours = React.useMemo(() => {
     const weekHours: Record<string, number> = {};
-    
+
     // Initialize all weeks with 0 hours
     weeks.forEach(week => {
       const weekKey = week.startDate.toISOString().split('T')[0];
       weekHours[weekKey] = 0;
     });
-    
+
     // Sum up hours across all resources
     Object.values(projectAllocations).forEach(resourceAlloc => {
       Object.entries(resourceAlloc).forEach(([weekKey, hours]) => {
@@ -50,10 +54,9 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         }
       });
     });
-    
     return weekHours;
   }, [projectAllocations, weeks]);
-  
+
   // Handle resource allocation changes
   const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
     setProjectAllocations(prev => ({
@@ -64,29 +67,25 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
       }
     }));
   };
-  
+
   // Handle resource deletion
   const handleDeleteResource = (resourceId: string) => {
     setResources(prev => prev.filter(r => r.id !== resourceId));
     setProjectAllocations(prev => {
-      const newAllocations = { ...prev };
+      const newAllocations = {
+        ...prev
+      };
       delete newAllocations[resourceId];
       return newAllocations;
     });
   };
-  
   const getWeekKey = (startDate: Date) => {
     return startDate.toISOString().split('T')[0];
   };
-  
-  return (
-    <>
+  return <>
       <tr className="bg-brand-violet-light hover:bg-brand-violet-light/80">
         {/* Project name cell */}
-        <td 
-          className="sticky left-0 bg-brand-violet-light hover:bg-brand-violet-light/80 z-10 p-2 border-b cursor-pointer"
-          onClick={onToggleExpand}
-        >
+        <td className="sticky left-0 bg-brand-violet-light hover:bg-brand-violet-light/80 z-10 p-2 border-b cursor-pointer" onClick={onToggleExpand}>
           <div className="flex items-center">
             <Button variant="ghost" size="icon" className="h-6 w-6 p-0 mr-2">
               {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -99,70 +98,42 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         </td>
         
         {/* Week allocation cells - always show project totals */}
-        {weeks.map((week) => {
-          const weekKey = getWeekKey(week.startDate);
-          const projectHours = weeklyProjectHours[weekKey] || 0;
-          
-          return (
-            <td key={weekKey} className="p-0 border-b text-center font-medium w-10">
-              <div className="py-2 px-1">{projectHours}h</div>
-            </td>
-          );
-        })}
+        {weeks.map(week => {
+        const weekKey = getWeekKey(week.startDate);
+        const projectHours = weeklyProjectHours[weekKey] || 0;
+        return <td key={weekKey} className="p-0 border-b text-center font-medium w-10">
+              <div className="py-[8px] px-px">{projectHours}h</div>
+            </td>;
+      })}
       </tr>
       
       {/* Resource rows when project is expanded */}
-      {isExpanded && resources.map(resource => (
-        <ResourceRow 
-          key={resource.id} 
-          resource={resource} 
-          weeks={weeks} 
-          projectId={project.id}
-          onAllocationChange={handleAllocationChange}
-          onDeleteResource={handleDeleteResource}
-        />
-      ))}
+      {isExpanded && resources.map(resource => <ResourceRow key={resource.id} resource={resource} weeks={weeks} projectId={project.id} onAllocationChange={handleAllocationChange} onDeleteResource={handleDeleteResource} />)}
       
       {/* Add resource row when project is expanded */}
-      {isExpanded && (
-        <tr className="bg-muted/5 hover:bg-muted/10">
+      {isExpanded && <tr className="bg-muted/5 hover:bg-muted/10">
           <td className="sticky left-0 bg-muted/5 hover:bg-muted/10 z-10 p-2 border-b">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="ml-8 text-muted-foreground"
-              onClick={() => setShowAddResource(true)}
-            >
+            <Button variant="ghost" size="sm" className="ml-8 text-muted-foreground" onClick={() => setShowAddResource(true)}>
               <UserPlus className="h-4 w-4 mr-2" />
               Add Resource
             </Button>
           </td>
           
-          {weeks.map((_, i) => (
-            <td key={i} className="p-0 border-b w-10"></td>
-          ))}
-        </tr>
-      )}
+          {weeks.map((_, i) => <td key={i} className="p-0 border-b w-10"></td>)}
+        </tr>}
       
-      {showAddResource && (
-        <AddResourceDialog 
-          projectId={project.id}
-          onClose={() => setShowAddResource(false)}
-          onAdd={(resource) => {
-            const newResource = {
-              id: resource.staffId,
-              name: resource.name,
-              role: resource.role || 'Team Member', // Include role if available
-              allocations: {},
-              isPending: resource.isPending
-            };
-            
-            setResources(prev => [...prev, newResource]);
-            setShowAddResource(false);
-            toast.success(`${resource.name} added to project`);
-          }}
-        />
-      )}
-    </>
-  );
+      {showAddResource && <AddResourceDialog projectId={project.id} onClose={() => setShowAddResource(false)} onAdd={resource => {
+      const newResource = {
+        id: resource.staffId,
+        name: resource.name,
+        role: resource.role || 'Team Member',
+        // Include role if available
+        allocations: {},
+        isPending: resource.isPending
+      };
+      setResources(prev => [...prev, newResource]);
+      setShowAddResource(false);
+      toast.success(`${resource.name} added to project`);
+    }} />}
+    </>;
 };
