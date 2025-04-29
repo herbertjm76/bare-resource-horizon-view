@@ -63,9 +63,7 @@ export const MilestonePopover: React.FC<MilestonePopoverProps> = ({
                 className={`absolute h-[4px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
                 style={{
                   backgroundColor: milestoneColor || '#E5DEFF',
-                  width: 'calc(300% - 2px)', // 3x wider
-                  left: continuity && continuity.left ? '-100%' : '-100%', // Adjust position to center
-                  right: continuity && continuity.right ? '-100%' : '-100%' // Adjust position to center
+                  width: '100%', // Changed from 300% to 100%
                 }}
               />
               <div className="relative z-10">
@@ -74,12 +72,9 @@ export const MilestonePopover: React.FC<MilestonePopoverProps> = ({
             </div>
           ) : milestone?.stage ? (
             <div 
-              className={`h-[4px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
+              className={`h-[4px] w-full ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
               style={{
                 backgroundColor: milestoneColor || '#E5DEFF',
-                width: '300%', // 3x wider
-                marginLeft: continuity && continuity.left ? '-100%' : '-100%', // Adjust position to center
-                marginRight: continuity && continuity.right ? '-100%' : '-100%' // Adjust position to center
               }}
             />
           ) : (
