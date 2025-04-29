@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
+import { Input } from "@/components/ui/input";
 
 interface ResourceRowProps {
   resource: {
@@ -95,14 +96,15 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
         
         return (
           <td key={weekKey} className="p-0 text-center w-8">
-            <div className="allocation-input-container">
-              <input
+            <div className="allocation-input-container px-0.5">
+              <Input
                 type="number"
                 min="0"
                 max="168"
-                value={hoursValue || ''}
+                value={hoursValue > 0 ? hoursValue : ''}
                 onChange={(e) => handleAllocationChange(weekKey, e.target.value)}
-                className="w-full h-10 p-0 text-center bg-transparent border-0 focus:ring-0 focus:outline-none focus:border-brand-violet"
+                className="w-full h-8 px-1 text-center text-sm border-gray-200 focus:border-brand-violet"
+                placeholder="0"
               />
             </div>
           </td>

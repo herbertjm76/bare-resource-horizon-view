@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronDown, UserPlus, Circle, Square, Diamond } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -233,12 +234,12 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                       {milestone && milestone.type !== 'none' ? (
                         <div className={`relative flex items-center ${alignment} h-3 w-full`}>
                           <div 
-                            className={`absolute h-[1.33px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
+                            className={`absolute h-[4px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
                             style={{
                               backgroundColor: milestoneColor || '#E5DEFF',
-                              width: 'calc(100% - 2px)',
-                              left: continuity && continuity.left ? '-1px' : '1px',
-                              right: continuity && continuity.right ? '-1px' : '1px'
+                              width: 'calc(300% - 2px)', // 3x wider
+                              left: continuity && continuity.left ? '-100%' : '-100%', // Adjust position to center
+                              right: continuity && continuity.right ? '-100%' : '-100%' // Adjust position to center
                             }}
                           />
                           <div className="relative z-10">
@@ -247,16 +248,16 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                         </div>
                       ) : milestone?.stage ? (
                         <div 
-                          className={`h-[1.33px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
+                          className={`h-[4px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
                           style={{
                             backgroundColor: milestoneColor || '#E5DEFF',
-                            width: '100%',
-                            marginLeft: continuity && continuity.left ? '-1px' : '0',
-                            marginRight: continuity && continuity.right ? '-1px' : '0'
+                            width: '300%', // 3x wider
+                            marginLeft: continuity && continuity.left ? '-100%' : '-100%', // Adjust position to center
+                            marginRight: continuity && continuity.right ? '-100%' : '-100%' // Adjust position to center
                           }}
                         />
                       ) : (
-                        <div className="h-[1.33px] w-4/5 border border-dotted border-gray-300 opacity-30 rounded" />
+                        <div className="h-[4px] w-full border border-dotted border-gray-300 opacity-30 rounded" />
                       )}
                     </div>
                   </PopoverTrigger>
