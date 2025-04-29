@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { MilestoneInfo, Continuity } from '../../hooks/useWeekMilestones';
 import { MilestoneIcon } from './MilestoneIcon';
 
@@ -16,21 +16,37 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
   milestoneColor,
   alignment
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  // Default state - empty dotted outline
   if (!milestone) {
     return (
-      <div className="h-[4px] w-full border border-dotted border-gray-300 opacity-30 rounded hover:opacity-70 transition-opacity cursor-pointer" />
+      <div 
+        className="h-[4px] w-full border border-dashed border-gray-300 bg-transparent hover:border-gray-400 transition-colors cursor-pointer rounded"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      />
     );
   }
   
+  // Milestone with icon
   if (milestone.type !== 'none') {
     return (
-      <div className={`relative flex items-center ${alignment} h-3 w-full group cursor-pointer`}>
+      <div 
+        className={`relative flex items-center ${alignment} h-3 w-full group cursor-pointer`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Outline effect with fill on hover */}
         <div 
           className={`absolute h-[4px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'} transition-all group-hover:h-[6px]`}
           style={{
-            backgroundColor: milestoneColor || '#E5DEFF',
-            width: '100%', // Ensures the line stays within cell bounds
-            maxWidth: '100%', // Add a maxWidth constraint
+            backgroundColor: isHovered ? milestoneColor || '#E5DEFF' : 'transparent',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderColor: milestoneColor || '#9b87f5',
+            width: '100%',
+            maxWidth: '100%',
             left: 0,
             right: 0
           }}
@@ -42,19 +58,30 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
     );
   }
   
+  // Stage only (no milestone)
   if (milestone.stage) {
     return (
       <div 
         className={`h-[4px] w-full ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'} cursor-pointer hover:h-[6px] transition-all`}
         style={{
-          backgroundColor: milestoneColor || '#E5DEFF',
-          maxWidth: '100%', // Add a maxWidth constraint
+          backgroundColor: isHovered ? milestoneColor || '#E5DEFF' : 'transparent',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          borderColor: milestoneColor || '#9b87f5',
+          maxWidth: '100%',
         }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       />
     );
   }
   
+  // Default state (no milestone or stage)
   return (
-    <div className="h-[4px] w-full border border-dotted border-gray-300 opacity-30 rounded hover:opacity-70 transition-opacity cursor-pointer" />
+    <div 
+      className="h-[4px] w-full border border-dashed border-gray-300 bg-transparent hover:border-gray-400 transition-colors cursor-pointer rounded"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    />
   );
 };
