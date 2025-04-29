@@ -29,7 +29,10 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
           className={`absolute h-[4px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
           style={{
             backgroundColor: milestoneColor || '#E5DEFF',
-            width: '100%',
+            width: '100%', // Ensures the line stays within cell bounds
+            maxWidth: '100%', // Add a maxWidth constraint
+            left: 0,
+            right: 0
           }}
         />
         <div className="relative z-10">
@@ -45,6 +48,7 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
         className={`h-[4px] w-full ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
         style={{
           backgroundColor: milestoneColor || '#E5DEFF',
+          maxWidth: '100%', // Add a maxWidth constraint
         }}
       />
     );
