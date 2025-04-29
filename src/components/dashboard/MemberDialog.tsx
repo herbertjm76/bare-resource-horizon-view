@@ -35,7 +35,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
     }
   });
 
-  const { reset, handleSubmit } = form;
+  const { reset } = form;
 
   useEffect(() => {
     if (member) {
@@ -63,7 +63,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
     }
   }, [member, reset]);
 
-  const onSubmit = (data: MemberFormData) => {
+  const handleFormSubmit = (data: MemberFormData) => {
     // If we're editing a member and it's a pending member, include the isPending flag
     if (member && 'isPending' in member) {
       onSave({
@@ -99,6 +99,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
           onClose={onClose}
           isEditing={!!member}
           isLoading={isLoading}
+          onSubmit={handleFormSubmit}
         />
       </DialogContent>
     </Dialog>

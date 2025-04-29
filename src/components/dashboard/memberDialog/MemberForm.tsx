@@ -14,18 +14,20 @@ interface MemberFormProps {
   onClose: () => void;
   isEditing: boolean;
   isLoading?: boolean;
+  onSubmit: (data: MemberFormData) => void;
 }
 
 const MemberForm: React.FC<MemberFormProps> = ({ 
   form, 
   onClose, 
   isEditing,
-  isLoading = false 
+  isLoading = false,
+  onSubmit
 }) => {
   const { register, handleSubmit, setValue, formState: { errors } } = form;
 
   return (
-    <form onSubmit={handleSubmit(() => {})} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid gap-4">
         <PersonalInfoFields register={register} errors={errors} />
         <ContactInfoFields register={register} errors={errors} />
