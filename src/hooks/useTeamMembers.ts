@@ -18,23 +18,50 @@ export const useTeamMembers = (companyId: string | undefined) => {
       setIsSaving(true);
 
       if (isEditing && memberData.id) {
-        // Update existing member
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            first_name: memberData.first_name,
-            last_name: memberData.last_name,
-            email: memberData.email,
-            role: memberData.role,
-            department: memberData.department,
-            location: memberData.location,
-            job_title: memberData.job_title,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', memberData.id);
+        // Check if this is a pre-registered member (from invites table)
+        const isPending = memberData.isPending === true;
+        
+        if (isPending) {
+          // Update pre-registered member in invites table
+          console.log('Updating pre-registered member in invites table:', memberData);
+          
+          const { error } = await supabase
+            .from('invites')
+            .update({
+              first_name: memberData.first_name,
+              last_name: memberData.last_name,
+              email: memberData.email,
+              role: memberData.role,
+              department: memberData.department,
+              location: memberData.location,
+              job_title: memberData.job_title,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', memberData.id);
 
-        if (error) throw error;
-        toast.success('Team member updated successfully');
+          if (error) throw error;
+          toast.success('Pre-registered member updated successfully');
+        } else {
+          // Update existing active member in profiles table
+          console.log('Updating active member in profiles table:', memberData);
+          
+          const { error } = await supabase
+            .from('profiles')
+            .update({
+              first_name: memberData.first_name,
+              last_name: memberData.last_name,
+              email: memberData.email,
+              role: memberData.role,
+              department: memberData.department,
+              location: memberData.location,
+              job_title: memberData.job_title,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', memberData.id);
+
+          if (error) throw error;
+          toast.success('Team member updated successfully');
+        }
       } else {
         // Create new member through invite system
         const { data: { session } } = await supabase.auth.getSession();

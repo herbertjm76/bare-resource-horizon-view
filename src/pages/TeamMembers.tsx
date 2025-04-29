@@ -86,6 +86,7 @@ const TeamMembersPage = () => {
         table: 'profiles',
         filter: `company_id=eq.${userProfile.company_id}`
       }, () => {
+        console.log('Detected change in profiles table, triggering refetch');
         refetchTeamMembers();
       })
       .on('postgres_changes', {
@@ -94,6 +95,7 @@ const TeamMembersPage = () => {
         table: 'invites',
         filter: `company_id=eq.${userProfile.company_id}`
       }, () => {
+        console.log('Detected change in invites table, triggering refetch');
         refetchTeamMembers();
       })
       .subscribe();

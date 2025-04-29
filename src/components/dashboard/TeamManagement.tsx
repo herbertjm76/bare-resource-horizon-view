@@ -31,7 +31,7 @@ export const TeamManagement = ({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
-  const [currentMember, setCurrentMember] = useState<Profile | null>(null);
+  const [currentMember, setCurrentMember] = useState<Profile | PendingMember | null>(null);
   const [currentInvite, setCurrentInvite] = useState<Invite | null>(null);
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
   const [isPendingMemberToDelete, setIsPendingMemberToDelete] = useState(false);
@@ -78,17 +78,21 @@ export const TeamManagement = ({
   const allMembers: TeamMember[] = [...activeMembers, ...preRegisteredMembers];
 
   const handleSaveMemberWrapper = async (memberData: Partial<Profile>) => {
+    console.log('Saving member data:', memberData, 'Is pending:', 'isPending' in memberData);
+    
     const success = await handleSaveMember(memberData, Boolean(currentMember));
     if (success) {
       setIsAddDialogOpen(false);
       setIsEditDialogOpen(false);
       setCurrentMember(null);
       setRefreshFlag(prev => prev + 1);
+      console.log('Save successful, refreshFlag updated to:', refreshFlag + 1);
     }
   };
 
   const handleEditMember = (member: TeamMember) => {
-    setCurrentMember(member as Profile);
+    console.log('Editing member:', member, 'isPending:', 'isPending' in member);
+    setCurrentMember(member);
     setIsEditDialogOpen(true);
   };
 
