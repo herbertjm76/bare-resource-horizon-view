@@ -13,27 +13,37 @@ export const useTeamMemberHandlers = (
   const handleSaveMemberWrapper = async (memberData: Partial<Profile | PendingMember>, currentMember: TeamMember | null) => {
     console.log('Saving member data:', memberData, 'Is pending:', 'isPending' in memberData);
     
-    const success = await handleSaveMember(memberData, Boolean(currentMember));
-    if (success) {
-      triggerRefresh();
-      console.log('Save successful, refreshed');
-      return true;
+    try {
+      const success = await handleSaveMember(memberData, Boolean(currentMember));
+      if (success) {
+        triggerRefresh();
+        console.log('Save successful, refreshed');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error in handleSaveMemberWrapper:', error);
+      return false;
     }
-    return false;
   };
 
   const handleConfirmDelete = async (memberToDelete: string | null, isPendingMemberToDelete: boolean) => {
     if (!memberToDelete) return false;
     
     console.log('Deleting member:', memberToDelete, 'isPending:', isPendingMemberToDelete);
-    const success = await handleDeleteMember(memberToDelete, isPendingMemberToDelete);
-    
-    if (success) {
-      triggerRefresh();
-      console.log('Delete successful, refreshed');
-      return true;
+    try {
+      const success = await handleDeleteMember(memberToDelete, isPendingMemberToDelete);
+      
+      if (success) {
+        triggerRefresh();
+        console.log('Delete successful, refreshed');
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error in handleConfirmDelete:', error);
+      return false;
     }
-    return false;
   };
 
   const handleBulkDelete = async (selectedMembers: string[], pendingMembers: PendingMember[]) => {

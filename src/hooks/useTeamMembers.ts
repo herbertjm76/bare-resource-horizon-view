@@ -74,6 +74,8 @@ export const useTeamMembers = (companyId: string | undefined) => {
           return false;
         }
         
+        // When creating a new pre-registered member, we use the invites table
+        // and NOT the auth.users table directly (which would cause permission errors)
         const { error } = await supabase
           .from('invites')
           .insert({
