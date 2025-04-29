@@ -38,18 +38,20 @@ export const useTeamMembers = (companyId: string | undefined) => {
           // Update pre-registered member in invites table
           console.log('Updating pre-registered member in invites table:', memberData);
           
-          // Ensure we're only updating the invites table and not trying to access users table
+          // Extract only the fields we need to update
+          const updateData = {
+            first_name: memberData.first_name,
+            last_name: memberData.last_name,
+            email: memberData.email,
+            role: memberData.role as UserRole, // Cast to ensure correct type
+            department: memberData.department,
+            location: memberData.location,
+            job_title: memberData.job_title
+          };
+          
           const { error } = await supabase
             .from('invites')
-            .update({
-              first_name: memberData.first_name,
-              last_name: memberData.last_name,
-              email: memberData.email,
-              role: memberData.role as UserRole, // Cast to ensure correct type
-              department: memberData.department,
-              location: memberData.location,
-              job_title: memberData.job_title
-            })
+            .update(updateData)
             .eq('id', memberData.id);
 
           if (error) {
@@ -61,19 +63,21 @@ export const useTeamMembers = (companyId: string | undefined) => {
           // Update existing active member in profiles table
           console.log('Updating active member in profiles table:', memberData);
           
-          // Ensure we're only updating the profiles table and not trying to access users table
+          // Extract only the fields we need to update
+          const updateData = {
+            first_name: memberData.first_name,
+            last_name: memberData.last_name,
+            email: memberData.email,
+            role: memberData.role as UserRole, // Cast to ensure correct type
+            department: memberData.department,
+            location: memberData.location,
+            job_title: memberData.job_title,
+            updated_at: new Date().toISOString()
+          };
+          
           const { error } = await supabase
             .from('profiles')
-            .update({
-              first_name: memberData.first_name,
-              last_name: memberData.last_name,
-              email: memberData.email,
-              role: memberData.role as UserRole, // Cast to ensure correct type
-              department: memberData.department,
-              location: memberData.location,
-              job_title: memberData.job_title,
-              updated_at: new Date().toISOString()
-            })
+            .update(updateData)
             .eq('id', memberData.id);
 
           if (error) {

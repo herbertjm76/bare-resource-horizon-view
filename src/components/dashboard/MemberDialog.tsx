@@ -39,7 +39,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
 
   // Helper function to determine if a member is pending
   const isPendingMember = (member: TeamMember | null): boolean => {
-    return !!member && 'isPending' in member && member.isPending === true;
+    return Boolean(member && 'isPending' in member && member.isPending === true);
   };
 
   useEffect(() => {
@@ -74,24 +74,22 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
   const handleFormSubmit = (data: MemberFormData) => {
     const memberIsPending = isPendingMember(member);
     
-    // Check if we're editing a member and if it's a pending member, include the isPending flag
+    const formData: Partial<Profile | PendingMember> = {
+      ...data,
+      id: member?.id,
+      role: data.role
+    };
+    
+    // If editing a pending member, ensure the proper flags are set
     if (memberIsPending) {
       console.log('Submitting form for a pending member, preserving isPending flag');
-      onSave({
-        ...data,
-        id: member?.id,
-        isPending: true, // Explicitly set to true for pending members
-        invitation_type: 'pre_registered', // Explicitly set invitation_type for pending members
-        role: data.role
-      });
+      (formData as Partial<PendingMember>).isPending = true;
+      (formData as Partial<PendingMember>).invitation_type = 'pre_registered';
     } else {
       console.log('Submitting form for an active member or new member');
-      onSave({
-        ...data,
-        id: member?.id,
-        role: data.role
-      });
     }
+    
+    onSave(formData);
   };
 
   return (
