@@ -5,6 +5,12 @@ import {
   PopoverContent, 
   PopoverTrigger 
 } from "@/components/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
 import { MilestoneInfo, Continuity } from '../hooks/useWeekMilestones';
 import { MilestoneContinuity } from './milestone/MilestoneContinuity';
 import { MilestonePopoverContent } from './milestone/MilestonePopoverContent';
@@ -32,16 +38,25 @@ export const MilestonePopover: React.FC<MilestonePopoverProps> = ({
 }) => {
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <div className="w-full h-5 cursor-pointer flex justify-center items-center">
-          <MilestoneContinuity 
-            milestone={milestone} 
-            continuity={continuity} 
-            milestoneColor={milestoneColor} 
-            alignment={alignment} 
-          />
-        </div>
-      </PopoverTrigger>
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <PopoverTrigger asChild>
+              <div className="w-full h-5 cursor-pointer flex justify-center items-center">
+                <MilestoneContinuity 
+                  milestone={milestone} 
+                  continuity={continuity} 
+                  milestoneColor={milestoneColor} 
+                  alignment={alignment} 
+                />
+              </div>
+            </PopoverTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-xs">Click to set milestone or stage</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <PopoverContent className="w-64 p-3" align="center">
         <MilestonePopoverContent 
           weekKey={weekKey}

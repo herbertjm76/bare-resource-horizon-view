@@ -35,16 +35,18 @@ export const WeekAllocationCell: React.FC<WeekAllocationCellProps> = ({
     <td className="p-0 border-b text-center font-medium w-8 relative">
       <div className="flex flex-col items-center">
         {/* Milestone/Stage indicator area - clickable */}
-        <MilestonePopover
-          weekKey={weekKey}
-          weekLabel={weekLabel}
-          milestone={milestone}
-          continuity={continuity}
-          milestoneColor={milestoneColor}
-          alignment={alignment}
-          setWeekMilestone={setWeekMilestone}
-          projectStages={projectStages}
-        />
+        <div className="w-full hover:bg-gray-50/60 transition-colors rounded-sm">
+          <MilestonePopover
+            weekKey={weekKey}
+            weekLabel={weekLabel}
+            milestone={milestone}
+            continuity={continuity}
+            milestoneColor={milestoneColor}
+            alignment={alignment}
+            setWeekMilestone={setWeekMilestone}
+            projectStages={projectStages}
+          />
+        </div>
         
         {/* Hours display */}
         <div className="py-[6px] px-0">
