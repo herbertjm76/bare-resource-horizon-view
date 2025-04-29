@@ -1,21 +1,19 @@
 
-import React from 'react';
-import { Circle, Square, Diamond } from 'lucide-react';
 import { MilestoneType } from '../hooks/useWeekMilestones';
 
-// Get milestone icon component
-export const getMilestoneIcon = (type: MilestoneType): React.ReactNode => {
+// Get milestone icon name
+export const getMilestoneIconName = (type: MilestoneType): string => {
   switch (type) {
     case 'milestone':
-      return <Circle className="h-3 w-3" fill="black" />;
+      return 'circle';
     case 'kickoff':
-      return <Square className="h-3 w-3" fill="black" />;
+      return 'square';
     case 'workshop':
-      return <Circle className="h-3 w-3" fill="black" />;
+      return 'circle';
     case 'deadline':
-      return <Diamond className="h-3 w-3" fill="black" />;
+      return 'diamond';
     default:
-      return null;
+      return '';
   }
 };
 

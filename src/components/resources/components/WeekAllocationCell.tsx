@@ -2,7 +2,6 @@
 import React from 'react';
 import { MilestonePopover } from './MilestonePopover';
 import { 
-  getMilestoneIcon, 
   getMilestoneColor, 
   getMilestoneAlignment 
 } from '../utils/milestoneUtils';
@@ -43,7 +42,6 @@ export const WeekAllocationCell: React.FC<WeekAllocationCellProps> = ({
           continuity={continuity}
           milestoneColor={milestoneColor}
           alignment={alignment}
-          getMilestoneIcon={getMilestoneIcon}
           setWeekMilestone={setWeekMilestone}
           projectStages={projectStages}
         />

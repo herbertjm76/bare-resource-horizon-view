@@ -14,6 +14,7 @@ import {
   TooltipTrigger 
 } from "@/components/ui/tooltip";
 import { MilestoneInfo } from '../hooks/useWeekMilestones';
+import { getMilestoneIconName } from '../utils/milestoneUtils';
 
 interface MilestonePopoverProps {
   weekKey: string;
@@ -22,7 +23,6 @@ interface MilestonePopoverProps {
   continuity: any;
   milestoneColor?: string;
   alignment: string;
-  getMilestoneIcon: (type: string) => React.ReactNode;
   setWeekMilestone: (weekKey: string, milestoneInfo: MilestoneInfo) => void;
   projectStages: Array<{id: string; name: string; color?: string}>;
 }
@@ -34,10 +34,25 @@ export const MilestonePopover: React.FC<MilestonePopoverProps> = ({
   continuity,
   milestoneColor,
   alignment,
-  getMilestoneIcon,
   setWeekMilestone,
   projectStages
 }) => {
+  // Function to render the appropriate icon based on milestone type
+  const renderMilestoneIcon = (type: string) => {
+    switch (type) {
+      case 'milestone':
+        return <Circle className="h-3 w-3" fill="black" />;
+      case 'kickoff':
+        return <Square className="h-3 w-3" fill="black" />;
+      case 'workshop':
+        return <Circle className="h-3 w-3" fill="black" />;
+      case 'deadline':
+        return <Diamond className="h-3 w-3" fill="black" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -54,7 +69,7 @@ export const MilestonePopover: React.FC<MilestonePopoverProps> = ({
                 }}
               />
               <div className="relative z-10">
-                {getMilestoneIcon(milestone.type)}
+                {renderMilestoneIcon(milestone.type)}
               </div>
             </div>
           ) : milestone?.stage ? (
