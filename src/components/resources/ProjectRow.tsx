@@ -148,6 +148,20 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     return undefined;
   };
 
+  // Get icon alignment based on milestone type
+  const getMilestoneAlignment = (type: MilestoneType): string => {
+    switch (type) {
+      case 'kickoff':
+        return 'justify-start';
+      case 'workshop':
+        return 'justify-center';
+      case 'deadline':
+        return 'justify-end';
+      default:
+        return 'justify-center';
+    }
+  };
+
   // Check if there's a milestone in the adjacent week
   const hasContinuousStage = (weekIndex: number, currentMilestone: MilestoneInfo | undefined): Continuity => {
     if (!currentMilestone || !currentMilestone.stage) return false;
@@ -208,6 +222,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         const milestone = weekMilestones[weekKey];
         const milestoneColor = milestone ? getMilestoneColor(milestone) : undefined;
         const continuity = milestone?.stage ? hasContinuousStage(weekIndex, milestone) : false;
+        const alignment = milestone?.type ? getMilestoneAlignment(milestone.type) : 'justify-center';
         
         return <td key={weekKey} className="p-0 border-b text-center font-medium w-8 relative">
               <div className="flex flex-col items-center">
@@ -216,9 +231,9 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                   <PopoverTrigger asChild>
                     <div className="w-full h-5 cursor-pointer flex justify-center items-center">
                       {milestone && milestone.type !== 'none' ? (
-                        <div className="relative flex items-center justify-center h-3 w-full">
+                        <div className={`relative flex items-center ${alignment} h-3 w-full`}>
                           <div 
-                            className={`absolute h-2 ${continuity && continuity.left ? 'rounded-r-full' : 'rounded-full'} ${continuity && continuity.right ? 'rounded-l-full' : 'rounded-full'}`}
+                            className={`absolute h-[1.33px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
                             style={{
                               backgroundColor: milestoneColor || '#E5DEFF',
                               width: 'calc(100% - 2px)',
@@ -232,16 +247,16 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
                         </div>
                       ) : milestone?.stage ? (
                         <div 
-                          className={`h-2 ${continuity && continuity.left ? 'rounded-r-full' : 'rounded-l-full'} ${continuity && continuity.right ? 'rounded-l-full' : 'rounded-r-full'}`}
+                          className={`h-[1.33px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'}`}
                           style={{
                             backgroundColor: milestoneColor || '#E5DEFF',
-                            width: continuity ? 'calc(100% + 2px)' : '80%',
+                            width: '100%',
                             marginLeft: continuity && continuity.left ? '-1px' : '0',
                             marginRight: continuity && continuity.right ? '-1px' : '0'
                           }}
                         />
                       ) : (
-                        <div className="h-2 w-4/5 opacity-0 rounded-full" />
+                        <div className="h-[1.33px] w-4/5 border border-dotted border-gray-300 opacity-30 rounded" />
                       )}
                     </div>
                   </PopoverTrigger>
