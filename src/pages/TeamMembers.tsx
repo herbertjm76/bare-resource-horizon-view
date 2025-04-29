@@ -23,6 +23,10 @@ const TeamMembersPage = () => {
         } = await supabase.auth.getSession();
         if (data.session?.user) {
           setUserId(data.session.user.id);
+          console.log('Session found, user ID:', data.session.user.id);
+        } else {
+          console.log('No active session found');
+          toast.error("You must be logged in to access this page");
         }
       } catch (error) {
         console.error("Error getting session:", error);
@@ -34,15 +38,21 @@ const TeamMembersPage = () => {
 
   // Fetch user profile
   const {
-    data: userProfile
+    data: userProfile,
+    isLoading: isProfileLoading
   } = useQuery({
     queryKey: ['userProfile', userId],
     queryFn: async () => {
+      console.log('Fetching user profile for ID:', userId);
       const {
         data,
         error
       } = await supabase.from('profiles').select('*').eq('id', userId).single();
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        throw error;
+      }
+      console.log('User profile fetched:', data);
       return data;
     },
     enabled: !!userId
@@ -57,6 +67,8 @@ const TeamMembersPage = () => {
     queryKey: ['teamMembers', userProfile?.company_id, refreshTrigger],
     queryFn: async () => {
       console.log('Fetching team members, refresh trigger:', refreshTrigger);
+      console.log('Company ID for fetch:', userProfile?.company_id);
+      
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('*')
@@ -64,18 +76,19 @@ const TeamMembersPage = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
+        console.error('Failed to load team members:', error);
         toast.error('Failed to load team members');
         throw error;
       }
 
-      console.log('Fetched profiles:', profiles?.length || 0, profiles);
-      return profiles.map(profile => {
-        return profile as Profile;
-      });
+      console.log('Fetched profiles:', profiles?.length || 0);
+      console.log('Profile data:', profiles);
+      return profiles as Profile[];
     },
     enabled: !!userProfile?.company_id,
     refetchInterval: false, // Disable polling - we'll use manual refresh and realtime
-    staleTime: 0 // Always consider data stale to ensure fresh data on refetch
+    staleTime: 0, // Always consider data stale to ensure fresh data on refetch
+    refetchOnWindowFocus: true, // Refresh when window gets focus
   });
 
   // Manual refresh function that can be called from children
@@ -145,17 +158,21 @@ const TeamMembersPage = () => {
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
               <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
-              {userId ? (
+              {isProfileLoading ? (
+                <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+                  <p className="text-gray-700">Loading user profile...</p>
+                </div>
+              ) : !userProfile ? (
+                <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+                  <p className="text-gray-700">You must be logged in to view team members.</p>
+                </div>
+              ) : (
                 <TeamManagement 
                   teamMembers={teamMembers} 
                   inviteUrl={inviteUrl} 
                   userRole={userProfile?.role || 'member'} 
                   onRefresh={triggerRefresh}
                 />
-              ) : (
-                <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
-                  <p className="text-white">Loading authentication details...</p>
-                </div>
               )}
             </div>
           </div>

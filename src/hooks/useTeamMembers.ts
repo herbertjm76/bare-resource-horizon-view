@@ -35,6 +35,38 @@ export const useTeamMembers = (companyId: string | undefined) => {
       console.log('Is this an edit operation?', isEditing);
       console.log('Member ID:', memberData.id);
 
+      // Get user session to check permissions
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.error('No active session found');
+        toast.error('You must be logged in to manage team members');
+        return false;
+      }
+      
+      console.log('Current user ID:', session.user.id);
+      
+      // Check user permissions
+      const { data: userProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (profileError) {
+        console.error('Error checking user permissions:', profileError);
+        toast.error('Failed to verify your permissions');
+        return false;
+      }
+      
+      console.log('Current user role:', userProfile?.role);
+      
+      // Only owners and admins can manage team members
+      if (!userProfile || (userProfile.role !== 'owner' && userProfile.role !== 'admin')) {
+        console.error('Insufficient permissions, user role:', userProfile?.role);
+        toast.error('You do not have permission to manage team members');
+        return false;
+      }
+
       if (isEditing && memberData.id) {
         if (isPendingMember) {
           // Update pre-registered member in invites table
@@ -56,11 +88,13 @@ export const useTeamMembers = (companyId: string | undefined) => {
             .from('invites')
             .update(updateData)
             .eq('id', memberData.id)
+            .eq('company_id', companyId)  // Add company_id check for security
             .select();
 
           if (error) {
             console.error('Error updating pre-registered member:', error);
-            throw error;
+            toast.error(`Failed to update member: ${error.message}`);
+            return false;
           }
           
           console.log('Successfully updated pre-registered member, response:', data);
@@ -89,11 +123,13 @@ export const useTeamMembers = (companyId: string | undefined) => {
             .from('profiles')
             .update(updateData)
             .eq('id', memberData.id)
+            .eq('company_id', companyId)  // Add company_id check for security
             .select();
 
           if (error) {
             console.error('Error updating active member:', error);
-            throw error;
+            toast.error(`Failed to update member: ${error.message}`);
+            return false;
           }
           
           console.log('Successfully updated active member, response data:', data);
@@ -129,7 +165,8 @@ export const useTeamMembers = (companyId: string | undefined) => {
 
         if (error) {
           console.error('Error creating pre-registered member:', error);
-          throw error;
+          toast.error(`Failed to create member: ${error.message}`);
+          return false;
         }
         
         console.log('Successfully created pre-registered member, response:', data);
@@ -154,17 +191,47 @@ export const useTeamMembers = (companyId: string | undefined) => {
     try {
       setIsDeleting(true);
       
+      // Get user session to check permissions
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.error('No active session found');
+        toast.error('You must be logged in to manage team members');
+        return false;
+      }
+      
+      // Check user permissions
+      const { data: userProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (profileError) {
+        console.error('Error checking user permissions:', profileError);
+        toast.error('Failed to verify your permissions');
+        return false;
+      }
+      
+      // Only owners and admins can delete team members
+      if (!userProfile || (userProfile.role !== 'owner' && userProfile.role !== 'admin')) {
+        console.error('Insufficient permissions, user role:', userProfile?.role);
+        toast.error('You do not have permission to delete team members');
+        return false;
+      }
+      
       if (isPending) {
         console.log('Deleting pending member from invites table:', memberId);
         // Delete from invites table
         const { error } = await supabase
           .from('invites')
           .delete()
-          .eq('id', memberId);
+          .eq('id', memberId)
+          .eq('company_id', companyId); // Add company_id check for security
           
         if (error) {
           console.error('Error deleting from invites:', error);
-          throw error;
+          toast.error(`Failed to delete member: ${error.message}`);
+          return false;
         }
         
         console.log('Successfully deleted from invites table');
@@ -174,11 +241,13 @@ export const useTeamMembers = (companyId: string | undefined) => {
         const { error } = await supabase
           .from('profiles')
           .delete()
-          .eq('id', memberId);
+          .eq('id', memberId)
+          .eq('company_id', companyId); // Add company_id check for security
           
         if (error) {
           console.error('Error deleting from profiles:', error);
-          throw error;
+          toast.error(`Failed to delete member: ${error.message}`);
+          return false;
         }
         
         console.log('Successfully deleted from profiles table');

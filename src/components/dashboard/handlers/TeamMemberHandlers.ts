@@ -39,11 +39,16 @@ export const useTeamMemberHandlers = (
         // Trigger immediate refresh
         triggerRefresh();
         
-        // Also schedule a second refresh after a short delay to ensure data is updated
+        // Also schedule multiple refreshes at intervals to ensure data is updated
         setTimeout(() => {
-          console.log('Triggering delayed refresh after successful save');
+          console.log('Triggering first delayed refresh (500ms) after successful save');
           triggerRefresh();
         }, 500);
+        
+        setTimeout(() => {
+          console.log('Triggering second delayed refresh (1500ms) after successful save');
+          triggerRefresh();
+        }, 1500);
         
         return true;
       }
@@ -67,11 +72,16 @@ export const useTeamMemberHandlers = (
         // Trigger immediate refresh
         triggerRefresh();
         
-        // Also schedule a second refresh after a short delay
+        // Also schedule multiple refreshes at intervals
         setTimeout(() => {
-          console.log('Triggering delayed refresh after successful delete');
+          console.log('Triggering first delayed refresh (500ms) after successful delete');
           triggerRefresh();
         }, 500);
+        
+        setTimeout(() => {
+          console.log('Triggering second delayed refresh (1500ms) after successful delete');
+          triggerRefresh();
+        }, 1500);
         
         toast.success(isPendingMemberToDelete ? 'Pre-registered member deleted successfully' : 'Team member deleted successfully');
         return true;
@@ -98,11 +108,18 @@ export const useTeamMemberHandlers = (
       const results = await Promise.all(deletePromises);
       const successCount = results.filter(Boolean).length;
       
-      // Always trigger refresh after bulk delete
+      // Always trigger multiple refreshes after bulk delete
+      triggerRefresh();
+      
       setTimeout(() => {
-        console.log('Triggering refresh after bulk delete');
+        console.log('Triggering first delayed refresh (500ms) after bulk delete');
         triggerRefresh();
-      }, 200);
+      }, 500);
+      
+      setTimeout(() => {
+        console.log('Triggering second delayed refresh (1500ms) after bulk delete');
+        triggerRefresh();
+      }, 1500);
       
       if (successCount > 0) {
         toast.success(`${successCount} team member${successCount > 1 ? 's' : ''} deleted successfully`);
