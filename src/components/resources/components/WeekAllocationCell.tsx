@@ -1,0 +1,58 @@
+
+import React from 'react';
+import { MilestonePopover } from './MilestonePopover';
+import { 
+  getMilestoneIcon, 
+  getMilestoneColor, 
+  getMilestoneAlignment 
+} from '../utils/milestoneUtils';
+import { MilestoneInfo, Continuity } from '../hooks/useWeekMilestones';
+
+interface WeekAllocationCellProps {
+  weekKey: string;
+  weekLabel: string;
+  projectHours: number;
+  milestone?: MilestoneInfo;
+  continuity: Continuity;
+  stageColorMap: Record<string, string>;
+  setWeekMilestone: (weekKey: string, milestoneInfo: MilestoneInfo) => void;
+  projectStages: Array<{id: string; name: string; color?: string}>;
+}
+
+export const WeekAllocationCell: React.FC<WeekAllocationCellProps> = ({
+  weekKey,
+  weekLabel,
+  projectHours,
+  milestone,
+  continuity,
+  stageColorMap,
+  setWeekMilestone,
+  projectStages
+}) => {
+  const milestoneColor = milestone ? getMilestoneColor(milestone, stageColorMap) : undefined;
+  const alignment = milestone?.type ? getMilestoneAlignment(milestone.type) : 'justify-center';
+  
+  return (
+    <td className="p-0 border-b text-center font-medium w-8 relative">
+      <div className="flex flex-col items-center">
+        {/* Milestone/Stage indicator area - clickable */}
+        <MilestonePopover
+          weekKey={weekKey}
+          weekLabel={weekLabel}
+          milestone={milestone}
+          continuity={continuity}
+          milestoneColor={milestoneColor}
+          alignment={alignment}
+          getMilestoneIcon={getMilestoneIcon}
+          setWeekMilestone={setWeekMilestone}
+          projectStages={projectStages}
+        />
+        
+        {/* Hours display */}
+        <div className="py-[6px] px-0">
+          <span className="text-[15px] font-bold">{projectHours}h</span>
+        </div>
+      </div>
+    </td>
+  );
+};
