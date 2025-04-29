@@ -13,21 +13,23 @@ export const useTeamMemberHandlers = (
   const handleSaveMemberWrapper = async (memberData: Partial<Profile | PendingMember>, currentMember: TeamMember | null) => {
     console.log('Saving member data:', memberData);
     
+    const memberDataCopy = { ...memberData };
+    
     // Ensure we correctly set the isPending flag based on current member
     const isPendingMember = currentMember && 'isPending' in currentMember && currentMember.isPending;
     if (isPendingMember) {
       console.log('Current member is pending, setting isPending flag');
-      // Use type assertion to tell TypeScript we know this is a PendingMember
-      (memberData as Partial<PendingMember>).isPending = true;
+      // Use a type assertion to set isPending for PendingMember type
+      (memberDataCopy as Partial<PendingMember>).isPending = true;
       
       // Also ensure invitation_type is set for pending members
-      if (!('invitation_type' in memberData)) {
-        (memberData as Partial<PendingMember>).invitation_type = 'pre_registered';
+      if (!('invitation_type' in memberDataCopy)) {
+        (memberDataCopy as Partial<PendingMember>).invitation_type = 'pre_registered';
       }
     }
     
     try {
-      const success = await handleSaveMember(memberData, Boolean(currentMember));
+      const success = await handleSaveMember(memberDataCopy, Boolean(currentMember));
       if (success) {
         triggerRefresh();
         console.log('Save successful, refreshed');

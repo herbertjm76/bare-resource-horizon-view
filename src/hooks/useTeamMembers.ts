@@ -38,6 +38,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
           // Update pre-registered member in invites table
           console.log('Updating pre-registered member in invites table:', memberData);
           
+          // Ensure we're only updating the invites table and not trying to access users table
           const { error } = await supabase
             .from('invites')
             .update({
@@ -60,6 +61,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
           // Update existing active member in profiles table
           console.log('Updating active member in profiles table:', memberData);
           
+          // Ensure we're only updating the profiles table and not trying to access users table
           const { error } = await supabase
             .from('profiles')
             .update({
