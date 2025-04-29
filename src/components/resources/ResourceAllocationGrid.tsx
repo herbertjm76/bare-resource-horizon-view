@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { addDays, format, startOfWeek, addWeeks } from 'date-fns';
@@ -80,7 +79,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
           <tr>
             {/* Resources count column */}
             <th className="sticky left-0 bg-muted/50 z-10 p-2 border-b text-center font-medium w-12">
-              #
+              {/* Empty header for the counter column */}
             </th>
             {/* Project/Resource column */}
             <th className="sticky left-12 bg-muted/50 z-10 p-2 border-b text-left font-medium" style={{ minWidth: '250px' }}>
