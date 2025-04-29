@@ -14,7 +14,7 @@ interface TeamManagementProps {
   teamMembers: Profile[];
   inviteUrl: string;
   userRole: string;
-  onRefresh?: () => void; // Add optional callback for parent to refresh data
+  onRefresh?: () => void;
 }
 
 export const TeamManagement = ({
@@ -92,7 +92,6 @@ export const TeamManagement = ({
     const success = await handleConfirmDelete(memberToDelete, isPendingMemberToDelete);
     if (success) {
       closeDeleteDialog();
-      handleRefresh(); // Ensure refresh after delete
     }
   };
 
@@ -100,7 +99,6 @@ export const TeamManagement = ({
     const success = await handleSaveMemberWrapper(memberData, currentMember);
     if (success) {
       closeAddEditDialog();
-      handleRefresh(); // Ensure refresh after save
     }
   };
 
@@ -108,7 +106,6 @@ export const TeamManagement = ({
     handleBulkDelete(selectedMembers, preRegisteredMembers);
     setSelectedMembers([]);
     setEditMode(false);
-    handleRefresh(); // Ensure refresh after bulk delete
   };
 
   // State for invite section edit mode

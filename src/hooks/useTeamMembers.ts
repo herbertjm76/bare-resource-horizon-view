@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile, PendingMember } from '@/components/dashboard/types';
@@ -77,7 +76,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
             first_name: memberData.first_name,
             last_name: memberData.last_name,
             email: memberData.email,
-            role: memberData.role as UserRole, // Cast to ensure correct type
+            role: memberData.role,
             department: memberData.department,
             location: memberData.location,
             job_title: memberData.job_title
@@ -85,7 +84,6 @@ export const useTeamMembers = (companyId: string | undefined) => {
           
           console.log('Update data being sent to invites table:', updateData);
           
-          // IMPORTANT: We're updating the invites table, NOT the auth.users table
           const { error, data } = await supabase
             .from('invites')
             .update(updateData)
@@ -121,7 +119,6 @@ export const useTeamMembers = (companyId: string | undefined) => {
           console.log('Update data being sent to profiles table:', updateData);
           console.log('User ID for update:', memberData.id);
           
-          // IMPORTANT: We're updating the profiles table, NOT the auth.users table
           const { error, data } = await supabase
             .from('profiles')
             .update(updateData)
@@ -162,7 +159,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
             department: memberData.department,
             location: memberData.location,
             job_title: memberData.job_title,
-            role: memberData.role as UserRole // Cast to ensure correct type
+            role: memberData.role
           })
           .select();
 

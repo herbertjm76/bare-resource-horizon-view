@@ -76,8 +76,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
     
     const formData: Partial<Profile | PendingMember> = {
       ...data,
-      id: member?.id,
-      role: data.role
+      id: member?.id
     };
     
     // If editing a pending member, ensure the proper flags are set
