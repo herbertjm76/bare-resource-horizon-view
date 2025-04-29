@@ -1,13 +1,10 @@
 
 import React, { useEffect } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useForm } from 'react-hook-form';
 import { Profile, PendingMember, TeamMember } from './types';
-import { Database } from '@/integrations/supabase/types';
+import MemberForm from './memberDialog/MemberForm';
+import { MemberFormData } from './memberDialog/types';
 
 interface MemberDialogProps {
   isOpen: boolean;
@@ -18,19 +15,6 @@ interface MemberDialogProps {
   isLoading?: boolean;
 }
 
-// Define role type based on the Database enum to ensure consistency
-type UserRole = Database['public']['Enums']['user_role'];
-
-interface MemberFormData {
-  first_name: string;
-  last_name: string;
-  email: string;
-  role: UserRole;
-  department?: string;
-  location?: string;
-  job_title?: string;
-}
-
 const MemberDialog: React.FC<MemberDialogProps> = ({
   isOpen,
   onClose,
@@ -39,29 +23,32 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
   title,
   isLoading = false
 }) => {
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<MemberFormData>({
+  const form = useForm<MemberFormData>({
     defaultValues: {
       first_name: '',
       last_name: '',
       email: '',
-      role: 'member' as UserRole,
+      role: 'member',
       department: '',
       location: '',
       job_title: ''
     }
   });
 
+  const { reset, handleSubmit } = form;
+
   useEffect(() => {
     if (member) {
       // Pre-fill form with member data if editing
-      setValue('first_name', member.first_name || '');
-      setValue('last_name', member.last_name || '');
-      setValue('email', member.email);
-      // Cast the role to ensure it's a valid UserRole type
-      setValue('role', (member.role as UserRole) || 'member');
-      setValue('department', member.department || '');
-      setValue('location', member.location || '');
-      setValue('job_title', member.job_title || '');
+      reset({
+        first_name: member.first_name || '',
+        last_name: member.last_name || '',
+        email: member.email,
+        role: (member.role as MemberFormData['role']) || 'member',
+        department: member.department || '',
+        location: member.location || '',
+        job_title: member.job_title || ''
+      });
     } else {
       // Reset form for new member
       reset({
@@ -74,9 +61,9 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         job_title: ''
       });
     }
-  }, [member, setValue, reset]);
+  }, [member, reset]);
 
-  const onSubmit = (data: MemberFormData) => {
+  const onSubmit = handleSubmit((data: MemberFormData) => {
     // If we're editing a member and it's a pending member, include the isPending flag
     if (member && 'isPending' in member) {
       onSave({
@@ -92,7 +79,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         role: data.role
       });
     }
-  };
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
@@ -107,105 +94,12 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
               : 'Add a new team member to your organization using the form below.'}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid gap-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="first_name">First Name</Label>
-                <Input 
-                  id="first_name"
-                  placeholder="First name"
-                  {...register('first_name', { required: "First name is required" })}
-                />
-                {errors.first_name && (
-                  <p className="text-sm text-red-500">{errors.first_name.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="last_name">Last Name</Label>
-                <Input 
-                  id="last_name"
-                  placeholder="Last name"
-                  {...register('last_name', { required: "Last name is required" })}
-                />
-                {errors.last_name && (
-                  <p className="text-sm text-red-500">{errors.last_name.message}</p>
-                )}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email"
-                type="email"
-                placeholder="Email address"
-                {...register('email', { 
-                  required: "Email is required",
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Invalid email address"
-                  }
-                })}
-              />
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="role">System Role</Label>
-              <Select 
-                defaultValue={member?.role || "member"}
-                onValueChange={(value: UserRole) => setValue('role', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="member">Member</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="owner">Owner</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="department">Department</Label>
-              <Input 
-                id="department"
-                placeholder="Department"
-                {...register('department')}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="job_title">Job Title</Label>
-              <Input 
-                id="job_title"
-                placeholder="Job title"
-                {...register('job_title')}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
-              <Input 
-                id="location"
-                placeholder="Location"
-                {...register('location')}
-              />
-            </div>
-          </div>
-          <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <span className="mr-2">Saving...</span>
-                  <span className="animate-spin">⏳</span>
-                </>
-              ) : member ? 'Save Changes' : 'Add Member'}
-            </Button>
-          </DialogFooter>
-        </form>
+        <MemberForm
+          form={form}
+          onClose={onClose}
+          isEditing={!!member}
+          isLoading={isLoading}
+        />
       </DialogContent>
     </Dialog>
   );
