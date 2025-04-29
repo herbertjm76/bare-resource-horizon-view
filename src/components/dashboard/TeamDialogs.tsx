@@ -2,16 +2,16 @@
 import React from 'react';
 import MemberDialog from './MemberDialog';
 import DeleteMemberDialog from './DeleteMemberDialog';
-import { Profile } from './types';
+import { Profile, PendingMember, TeamMember } from './types';
 
 interface TeamDialogsProps {
   isAddDialogOpen: boolean;
   isEditDialogOpen: boolean;
   isDeleteDialogOpen: boolean;
-  currentMember: Profile | null;
+  currentMember: TeamMember | null;
   onCloseAddEdit: () => void;
   onCloseDelete: () => void;
-  onSaveMember: (data: Partial<Profile>) => void;
+  onSaveMember: (data: Partial<Profile | PendingMember>) => void;
   onConfirmDelete: () => void;
   isSaving: boolean;
   isDeleting: boolean;

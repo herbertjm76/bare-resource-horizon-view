@@ -6,13 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useForm } from 'react-hook-form';
-import { Profile } from './types';
+import { Profile, PendingMember, TeamMember } from './types';
 
 interface MemberDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  member: Profile | null;
-  onSave: (data: Partial<Profile>) => void;
+  member: TeamMember | null;
+  onSave: (data: Partial<Profile | PendingMember>) => void;
   title: string;
   isLoading?: boolean;
 }
@@ -21,7 +21,7 @@ interface MemberFormData {
   first_name: string;
   last_name: string;
   email: string;
-  role: "owner" | "admin" | "member"; // Updated to use the literal union type
+  role: "owner" | "admin" | "member";
   department?: string;
   location?: string;
   job_title?: string;
@@ -72,11 +72,21 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
   }, [member, setValue, reset]);
 
   const onSubmit = (data: MemberFormData) => {
-    onSave({
-      ...data,
-      id: member?.id, // Include the ID if editing an existing member
-      role: data.role // Ensure role is properly typed
-    });
+    // If we're editing a member and it's a pending member, include the isPending flag
+    if (member && 'isPending' in member) {
+      onSave({
+        ...data,
+        id: member.id,
+        isPending: true,
+        role: data.role
+      });
+    } else {
+      onSave({
+        ...data,
+        id: member?.id,
+        role: data.role
+      });
+    }
   };
 
   return (

@@ -1,14 +1,14 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Profile } from '@/components/dashboard/types';
+import { Profile, PendingMember } from '@/components/dashboard/types';
 import { toast } from 'sonner';
 
 export const useTeamMembers = (companyId: string | undefined) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleSaveMember = async (memberData: Partial<Profile>, isEditing: boolean) => {
+  const handleSaveMember = async (memberData: Partial<Profile | PendingMember>, isEditing: boolean) => {
     if (!companyId) {
       toast.error('Company ID is required');
       return false;
@@ -19,7 +19,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
 
       if (isEditing && memberData.id) {
         // Check if this is a pre-registered member (from invites table)
-        const isPending = memberData.isPending === true;
+        const isPending = 'isPending' in memberData && memberData.isPending === true;
         
         if (isPending) {
           // Update pre-registered member in invites table

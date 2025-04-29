@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,7 +40,6 @@ export const TeamManagement = ({
   const { handleSaveMember, handleDeleteMember, isSaving, isDeleting } = useTeamMembers(companyId);
   const { inviteEmail, setInviteEmail, invLoading, handleSendInvite } = useTeamInvites(companyId);
 
-  // Fetch invites whenever refreshFlag changes to ensure UI is updated
   useEffect(() => {
     const fetchInvites = async () => {
       if (userRole === 'owner' || userRole === 'admin') {
@@ -77,7 +75,7 @@ export const TeamManagement = ({
   const emailInvites = invitees.filter(invite => invite.invitation_type === 'email_invite');
   const allMembers: TeamMember[] = [...activeMembers, ...preRegisteredMembers];
 
-  const handleSaveMemberWrapper = async (memberData: Partial<Profile>) => {
+  const handleSaveMemberWrapper = async (memberData: Partial<Profile | PendingMember>) => {
     console.log('Saving member data:', memberData, 'Is pending:', 'isPending' in memberData);
     
     const success = await handleSaveMember(memberData, Boolean(currentMember));
@@ -167,11 +165,8 @@ export const TeamManagement = ({
 
   const handleResendInvite = async (invite: Invite) => {
     try {
-      // Here you would integrate with your email service to resend the invite
-      // For now, we'll just show a toast message
       toast.success(`Invite resent to ${invite.email}`);
       
-      // Optionally update the invite's created_at time in the database
       const { error } = await supabase
         .from('invites')
         .update({ created_at: new Date().toISOString() })
