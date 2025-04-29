@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useForm } from 'react-hook-form';
 import { Profile, PendingMember, TeamMember } from './types';
+import { Database } from '@/integrations/supabase/types';
 
 interface MemberDialogProps {
   isOpen: boolean;
@@ -17,11 +18,14 @@ interface MemberDialogProps {
   isLoading?: boolean;
 }
 
+// Define role type based on the Database enum to ensure consistency
+type UserRole = Database['public']['Enums']['user_role'];
+
 interface MemberFormData {
   first_name: string;
   last_name: string;
   email: string;
-  role: "owner" | "admin" | "member";
+  role: UserRole;
   department?: string;
   location?: string;
   job_title?: string;
@@ -40,7 +44,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
       first_name: '',
       last_name: '',
       email: '',
-      role: 'member' as const,
+      role: 'member' as UserRole,
       department: '',
       location: '',
       job_title: ''
@@ -53,7 +57,8 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
       setValue('first_name', member.first_name || '');
       setValue('last_name', member.last_name || '');
       setValue('email', member.email);
-      setValue('role', member.role);
+      // Cast the role to ensure it's a valid UserRole type
+      setValue('role', (member.role as UserRole) || 'member');
       setValue('department', member.department || '');
       setValue('location', member.location || '');
       setValue('job_title', member.job_title || '');
@@ -150,7 +155,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
               <Label htmlFor="role">System Role</Label>
               <Select 
                 defaultValue={member?.role || "member"}
-                onValueChange={(value: "owner" | "admin" | "member") => setValue('role', value)} // Type cast for onValueChange
+                onValueChange={(value: UserRole) => setValue('role', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select role" />

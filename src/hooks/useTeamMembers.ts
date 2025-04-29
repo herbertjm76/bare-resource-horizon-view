@@ -3,6 +3,10 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Profile, PendingMember } from '@/components/dashboard/types';
 import { toast } from 'sonner';
+import { Database } from '@/integrations/supabase/types';
+
+// Define the user role type based on the database enum
+type UserRole = Database['public']['Enums']['user_role'];
 
 export const useTeamMembers = (companyId: string | undefined) => {
   const [isSaving, setIsSaving] = useState(false);
@@ -31,7 +35,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
               first_name: memberData.first_name,
               last_name: memberData.last_name,
               email: memberData.email,
-              role: memberData.role,
+              role: memberData.role as UserRole, // Cast to ensure correct type
               department: memberData.department,
               location: memberData.location,
               job_title: memberData.job_title,
@@ -51,7 +55,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
               first_name: memberData.first_name,
               last_name: memberData.last_name,
               email: memberData.email,
-              role: memberData.role,
+              role: memberData.role as UserRole, // Cast to ensure correct type
               department: memberData.department,
               location: memberData.location,
               job_title: memberData.job_title,
@@ -83,7 +87,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
             department: memberData.department,
             location: memberData.location,
             job_title: memberData.job_title,
-            role: memberData.role
+            role: memberData.role as UserRole // Cast to ensure correct type
           });
 
         if (error) throw error;
