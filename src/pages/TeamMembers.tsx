@@ -68,19 +68,21 @@ const TeamMembersPage = () => {
         throw error;
       }
 
+      console.log('Fetched profiles:', profiles?.length || 0);
       return profiles.map(profile => {
         return profile as Profile;
       });
     },
     enabled: !!userProfile?.company_id,
-    refetchInterval: 5000, // Add polling to keep data fresh
-    staleTime: 3000 // Consider data stale after 3 seconds
+    refetchInterval: false, // Disable polling - we'll use manual refresh and realtime
+    staleTime: 0 // Always consider data stale to ensure fresh data on refetch
   });
 
   // Manual refresh function that can be called from children
   const triggerRefresh = () => {
     console.log('Manual refresh triggered');
     setRefreshTrigger(prev => prev + 1);
+    // Force immediate refetch
     refetchTeamMembers();
   };
 
@@ -88,32 +90,44 @@ const TeamMembersPage = () => {
   useEffect(() => {
     if (!userProfile?.company_id) return;
     
-    const channel = supabase
-      .channel('team-members-changes')
+    console.log('Setting up realtime subscription for company:', userProfile.company_id);
+    
+    const profilesChannel = supabase
+      .channel('profiles-changes')
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'profiles',
         filter: `company_id=eq.${userProfile.company_id}`
-      }, () => {
-        console.log('Detected change in profiles table, triggering refetch');
-        refetchTeamMembers();
+      }, (payload) => {
+        console.log('Detected change in profiles table:', payload);
+        triggerRefresh();
       })
+      .subscribe((status) => {
+        console.log('Profiles subscription status:', status);
+      });
+      
+    const invitesChannel = supabase
+      .channel('invites-changes')
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'invites',
         filter: `company_id=eq.${userProfile.company_id}`
-      }, () => {
-        console.log('Detected change in invites table, triggering refetch');
-        refetchTeamMembers();
+      }, (payload) => {
+        console.log('Detected change in invites table:', payload);
+        triggerRefresh();
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Invites subscription status:', status);
+      });
       
     return () => {
-      supabase.removeChannel(channel);
+      console.log('Cleaning up realtime subscriptions');
+      supabase.removeChannel(profilesChannel);
+      supabase.removeChannel(invitesChannel);
     };
-  }, [userProfile?.company_id, refetchTeamMembers]);
+  }, [userProfile?.company_id]);
 
   const inviteUrl = userProfile?.company_id ? `${window.location.origin}/join/${userProfile.company_id}` : '';
 

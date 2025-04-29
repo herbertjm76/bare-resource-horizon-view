@@ -49,15 +49,18 @@ export const useTeamMembers = (companyId: string | undefined) => {
             job_title: memberData.job_title
           };
           
-          const { error } = await supabase
+          const { error, data } = await supabase
             .from('invites')
             .update(updateData)
-            .eq('id', memberData.id);
+            .eq('id', memberData.id)
+            .select();
 
           if (error) {
             console.error('Error updating pre-registered member:', error);
             throw error;
           }
+          
+          console.log('Successfully updated pre-registered member, response:', data);
           toast.success('Pre-registered member updated successfully');
         } else {
           // Update existing active member in profiles table
@@ -75,15 +78,18 @@ export const useTeamMembers = (companyId: string | undefined) => {
             updated_at: new Date().toISOString()
           };
           
-          const { error } = await supabase
+          const { error, data } = await supabase
             .from('profiles')
             .update(updateData)
-            .eq('id', memberData.id);
+            .eq('id', memberData.id)
+            .select();
 
           if (error) {
             console.error('Error updating active member:', error);
             throw error;
           }
+          
+          console.log('Successfully updated active member, response:', data);
           toast.success('Team member updated successfully');
         }
       } else {
@@ -96,7 +102,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
         
         // When creating a new pre-registered member, we use the invites table
         console.log('Creating new pre-registered member in invites table');
-        const { error } = await supabase
+        const { error, data } = await supabase
           .from('invites')
           .insert({
             email: memberData.email,
@@ -110,12 +116,15 @@ export const useTeamMembers = (companyId: string | undefined) => {
             location: memberData.location,
             job_title: memberData.job_title,
             role: memberData.role as UserRole // Cast to ensure correct type
-          });
+          })
+          .select();
 
         if (error) {
           console.error('Error creating pre-registered member:', error);
           throw error;
         }
+        
+        console.log('Successfully created pre-registered member, response:', data);
         toast.success('Pre-registered new team member');
       }
 

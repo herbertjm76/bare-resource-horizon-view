@@ -34,9 +34,13 @@ export const useTeamMemberHandlers = (
       console.log('Calling handleSaveMember with data:', memberDataCopy, 'isEditing:', Boolean(currentMember));
       const success = await handleSaveMember(memberDataCopy, Boolean(currentMember));
       if (success) {
-        toast.success(isPendingMember ? 'Pre-registered member updated successfully' : 'Team member updated successfully');
-        triggerRefresh();
-        console.log('Save successful, refreshed');
+        // Ensure refresh happens even if there are other issues
+        setTimeout(() => {
+          console.log('Triggering refresh after successful save');
+          triggerRefresh();
+        }, 200);
+        
+        console.log('Save successful');
         return true;
       }
       return false;
@@ -55,9 +59,14 @@ export const useTeamMemberHandlers = (
       const success = await handleDeleteMember(memberToDelete, isPendingMemberToDelete);
       
       if (success) {
+        // Ensure refresh happens after deletion
+        setTimeout(() => {
+          console.log('Triggering refresh after successful delete');
+          triggerRefresh();
+        }, 200);
+        
         toast.success(isPendingMemberToDelete ? 'Pre-registered member deleted successfully' : 'Team member deleted successfully');
-        triggerRefresh();
-        console.log('Delete successful, refreshed');
+        console.log('Delete successful');
         return true;
       }
       return false;
@@ -82,9 +91,14 @@ export const useTeamMemberHandlers = (
       const results = await Promise.all(deletePromises);
       const successCount = results.filter(Boolean).length;
       
+      // Always trigger refresh after bulk delete
+      setTimeout(() => {
+        console.log('Triggering refresh after bulk delete');
+        triggerRefresh();
+      }, 200);
+      
       if (successCount > 0) {
         toast.success(`${successCount} team member${successCount > 1 ? 's' : ''} deleted successfully`);
-        triggerRefresh();
       } else {
         toast.error("Failed to delete team members");
       }
