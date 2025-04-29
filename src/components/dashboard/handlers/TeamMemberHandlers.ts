@@ -33,14 +33,18 @@ export const useTeamMemberHandlers = (
     try {
       console.log('Calling handleSaveMember with data:', memberDataCopy, 'isEditing:', Boolean(currentMember));
       const success = await handleSaveMember(memberDataCopy, Boolean(currentMember));
+      
       if (success) {
-        // Ensure refresh happens even if there are other issues
-        setTimeout(() => {
-          console.log('Triggering refresh after successful save');
-          triggerRefresh();
-        }, 200);
+        console.log('Save successful, triggering immediate refresh');
+        // Trigger immediate refresh
+        triggerRefresh();
         
-        console.log('Save successful');
+        // Also schedule a second refresh after a short delay to ensure data is updated
+        setTimeout(() => {
+          console.log('Triggering delayed refresh after successful save');
+          triggerRefresh();
+        }, 500);
+        
         return true;
       }
       return false;
@@ -59,14 +63,17 @@ export const useTeamMemberHandlers = (
       const success = await handleDeleteMember(memberToDelete, isPendingMemberToDelete);
       
       if (success) {
-        // Ensure refresh happens after deletion
+        console.log('Delete successful, triggering immediate refresh');
+        // Trigger immediate refresh
+        triggerRefresh();
+        
+        // Also schedule a second refresh after a short delay
         setTimeout(() => {
-          console.log('Triggering refresh after successful delete');
+          console.log('Triggering delayed refresh after successful delete');
           triggerRefresh();
-        }, 200);
+        }, 500);
         
         toast.success(isPendingMemberToDelete ? 'Pre-registered member deleted successfully' : 'Team member deleted successfully');
-        console.log('Delete successful');
         return true;
       }
       return false;

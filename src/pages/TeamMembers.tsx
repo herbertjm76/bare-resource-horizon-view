@@ -68,7 +68,7 @@ const TeamMembersPage = () => {
         throw error;
       }
 
-      console.log('Fetched profiles:', profiles?.length || 0);
+      console.log('Fetched profiles:', profiles?.length || 0, profiles);
       return profiles.map(profile => {
         return profile as Profile;
       });
@@ -92,6 +92,7 @@ const TeamMembersPage = () => {
     
     console.log('Setting up realtime subscription for company:', userProfile.company_id);
     
+    // Separate channel for profiles table
     const profilesChannel = supabase
       .channel('profiles-changes')
       .on('postgres_changes', {
@@ -107,6 +108,7 @@ const TeamMembersPage = () => {
         console.log('Profiles subscription status:', status);
       });
       
+    // Separate channel for invites table  
     const invitesChannel = supabase
       .channel('invites-changes')
       .on('postgres_changes', {

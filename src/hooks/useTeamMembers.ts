@@ -32,6 +32,8 @@ export const useTeamMembers = (companyId: string | undefined) => {
       const isPendingMember = hasPendingFlag || hasInvitationType;
       
       console.log('Is this a pending member?', isPendingMember, 'Member data:', memberData);
+      console.log('Is this an edit operation?', isEditing);
+      console.log('Member ID:', memberData.id);
 
       if (isEditing && memberData.id) {
         if (isPendingMember) {
@@ -49,6 +51,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
             job_title: memberData.job_title
           };
           
+          console.log('Update data being sent to invites table:', updateData);
           const { error, data } = await supabase
             .from('invites')
             .update(updateData)
@@ -62,11 +65,12 @@ export const useTeamMembers = (companyId: string | undefined) => {
           
           console.log('Successfully updated pre-registered member, response:', data);
           toast.success('Pre-registered member updated successfully');
+          return true;
         } else {
           // Update existing active member in profiles table
           console.log('Updating active member in profiles table:', memberData);
           
-          // Extract only the fields we need to update
+          // Extract only the fields we need to update, ensuring we don't include any properties that don't exist in profiles
           const updateData = {
             first_name: memberData.first_name,
             last_name: memberData.last_name,
@@ -77,6 +81,9 @@ export const useTeamMembers = (companyId: string | undefined) => {
             job_title: memberData.job_title,
             updated_at: new Date().toISOString()
           };
+          
+          console.log('Update data being sent to profiles table:', updateData);
+          console.log('User ID for update:', memberData.id);
           
           const { error, data } = await supabase
             .from('profiles')
@@ -89,8 +96,9 @@ export const useTeamMembers = (companyId: string | undefined) => {
             throw error;
           }
           
-          console.log('Successfully updated active member, response:', data);
+          console.log('Successfully updated active member, response data:', data);
           toast.success('Team member updated successfully');
+          return true;
         }
       } else {
         // Create new member through invite system
@@ -126,9 +134,8 @@ export const useTeamMembers = (companyId: string | undefined) => {
         
         console.log('Successfully created pre-registered member, response:', data);
         toast.success('Pre-registered new team member');
+        return true;
       }
-
-      return true;
     } catch (error: any) {
       console.error('Error saving team member:', error);
       toast.error(error.message || 'Failed to save team member');
