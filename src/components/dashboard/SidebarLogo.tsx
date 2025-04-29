@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/button"
 import { ChevronRight, ChevronLeft } from "lucide-react"
-import logoSvg from '@/assets/logo.svg';
 
 interface SidebarLogoProps {
   collapsed: boolean
@@ -19,7 +18,7 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => {
       {collapsed ? (
         <div className="w-full flex items-center justify-center">
           <img 
-            src={logoSvg}
+            src="/lovable-uploads/ed04e6a3-39d3-470c-8f3f-7b02984281bc.png"
             alt="BareResource Logo" 
             className="w-[17.2px] h-[17.2px] opacity-80 hover:opacity-100 transition-opacity" 
           />
@@ -36,7 +35,7 @@ export const SidebarLogo = ({ collapsed, toggleSidebar }: SidebarLogoProps) => {
         <div className="flex items-center w-full">
           <div className="flex items-center flex-grow">
             <img 
-              src={logoSvg}
+              src="/lovable-uploads/ed04e6a3-39d3-470c-8f3f-7b02984281bc.png"
               alt="BareResource Logo" 
               className="w-[20px] h-[20px] opacity-80 hover:opacity-100 transition-opacity" 
             />

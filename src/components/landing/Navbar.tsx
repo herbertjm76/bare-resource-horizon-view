@@ -1,6 +1,5 @@
 
 import { Link } from 'react-router-dom';
-import logoSvg from '@/assets/logo.svg';
 
 const Navbar = () => {
   return (
@@ -10,7 +9,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center">
             <img 
-              src={logoSvg}
+              src="/lovable-uploads/ed04e6a3-39d3-470c-8f3f-7b02984281bc.png"
               alt="BareResource Logo" 
               className="w-[36px] h-[36px] mr-2" 
             />

@@ -1,6 +1,4 @@
 
-import logoSvg from '@/assets/logo.svg';
-
 const Hero = () => {
   return (
     <div className="relative pt-20 bg-hero">
