@@ -50,9 +50,17 @@ export const useTeamMemberHandlers = (
           triggerRefresh();
         }, 1500);
         
+        // Add a third refresh after a longer delay to ensure data is refreshed
+        setTimeout(() => {
+          console.log('Triggering third delayed refresh (3000ms) after successful save');
+          triggerRefresh();
+        }, 3000);
+        
         return true;
+      } else {
+        console.error('Save operation returned false');
+        return false;
       }
-      return false;
     } catch (error) {
       console.error('Error in handleSaveMemberWrapper:', error);
       toast.error(`Failed to save team member: ${error instanceof Error ? error.message : 'Unknown error'}`);

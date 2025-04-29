@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { TeamManagement } from "@/components/dashboard/TeamManagement";
@@ -41,7 +41,7 @@ const TeamMembersPage = () => {
     data: userProfile,
     isLoading: isProfileLoading
   } = useQuery({
-    queryKey: ['userProfile', userId],
+    queryKey: ['userProfile', userId, refreshTrigger],
     queryFn: async () => {
       console.log('Fetching user profile for ID:', userId);
       const {
@@ -58,6 +58,12 @@ const TeamMembersPage = () => {
     enabled: !!userId
   });
 
+  // Force refresh function - useful for debugging
+  const forceRefresh = useCallback(() => {
+    console.log('Force refresh triggered');
+    setRefreshTrigger(prev => prev + 1);
+  }, []);
+
   // Fetch team members with refetch capability
   const {
     data: teamMembers = [],
@@ -69,21 +75,27 @@ const TeamMembersPage = () => {
       console.log('Fetching team members, refresh trigger:', refreshTrigger);
       console.log('Company ID for fetch:', userProfile?.company_id);
       
-      const { data: profiles, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('company_id', userProfile?.company_id)
-        .order('created_at', { ascending: false });
+      try {
+        const { data: profiles, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('company_id', userProfile?.company_id)
+          .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Failed to load team members:', error);
-        toast.error('Failed to load team members');
-        throw error;
+        if (error) {
+          console.error('Failed to load team members:', error);
+          toast.error('Failed to load team members');
+          throw error;
+        }
+
+        console.log('Fetched profiles:', profiles?.length || 0);
+        console.log('Profile data:', profiles);
+        return profiles as Profile[];
+      } catch (fetchError) {
+        console.error('Error in team members fetch function:', fetchError);
+        toast.error('Error loading team members');
+        return [];
       }
-
-      console.log('Fetched profiles:', profiles?.length || 0);
-      console.log('Profile data:', profiles);
-      return profiles as Profile[];
     },
     enabled: !!userProfile?.company_id,
     refetchInterval: false, // Disable polling - we'll use manual refresh and realtime
@@ -92,12 +104,12 @@ const TeamMembersPage = () => {
   });
 
   // Manual refresh function that can be called from children
-  const triggerRefresh = () => {
+  const triggerRefresh = useCallback(() => {
     console.log('Manual refresh triggered');
     setRefreshTrigger(prev => prev + 1);
     // Force immediate refetch
     refetchTeamMembers();
-  };
+  }, [refetchTeamMembers]);
 
   // Listen for realtime changes
   useEffect(() => {
@@ -115,6 +127,12 @@ const TeamMembersPage = () => {
         filter: `company_id=eq.${userProfile.company_id}`
       }, (payload) => {
         console.log('Detected change in profiles table:', payload);
+        
+        // If this is an update operation, log the new data
+        if (payload.eventType === 'UPDATE') {
+          console.log('Profile updated:', payload.new);
+        }
+        
         triggerRefresh();
       })
       .subscribe((status) => {
@@ -131,18 +149,34 @@ const TeamMembersPage = () => {
         filter: `company_id=eq.${userProfile.company_id}`
       }, (payload) => {
         console.log('Detected change in invites table:', payload);
+        
+        // If this is an update operation, log the new data
+        if (payload.eventType === 'UPDATE') {
+          console.log('Invite updated:', payload.new);
+        }
+        
         triggerRefresh();
       })
       .subscribe((status) => {
         console.log('Invites subscription status:', status);
       });
       
+    // Add a debug button to the console for troubleshooting
+    if (typeof window !== 'undefined') {
+      (window as any).forceTeamMembersRefresh = forceRefresh;
+      console.log('Debug function added to window: forceTeamMembersRefresh()');
+    }
+      
     return () => {
       console.log('Cleaning up realtime subscriptions');
       supabase.removeChannel(profilesChannel);
       supabase.removeChannel(invitesChannel);
+      
+      if (typeof window !== 'undefined') {
+        delete (window as any).forceTeamMembersRefresh;
+      }
     };
-  }, [userProfile?.company_id]);
+  }, [userProfile?.company_id, triggerRefresh, forceRefresh]);
 
   const inviteUrl = userProfile?.company_id ? `${window.location.origin}/join/${userProfile.company_id}` : '';
 

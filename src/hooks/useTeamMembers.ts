@@ -84,6 +84,8 @@ export const useTeamMembers = (companyId: string | undefined) => {
           };
           
           console.log('Update data being sent to invites table:', updateData);
+          
+          // IMPORTANT: We're updating the invites table, NOT the auth.users table
           const { error, data } = await supabase
             .from('invites')
             .update(updateData)
@@ -119,6 +121,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
           console.log('Update data being sent to profiles table:', updateData);
           console.log('User ID for update:', memberData.id);
           
+          // IMPORTANT: We're updating the profiles table, NOT the auth.users table
           const { error, data } = await supabase
             .from('profiles')
             .update(updateData)
