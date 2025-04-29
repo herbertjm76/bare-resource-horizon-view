@@ -31,8 +31,10 @@ export const useTeamMemberHandlers = (
     }
     
     try {
+      console.log('Calling handleSaveMember with data:', memberDataCopy, 'isEditing:', Boolean(currentMember));
       const success = await handleSaveMember(memberDataCopy, Boolean(currentMember));
       if (success) {
+        toast.success(isPendingMember ? 'Pre-registered member updated successfully' : 'Team member updated successfully');
         triggerRefresh();
         console.log('Save successful, refreshed');
         return true;
@@ -40,6 +42,7 @@ export const useTeamMemberHandlers = (
       return false;
     } catch (error) {
       console.error('Error in handleSaveMemberWrapper:', error);
+      toast.error(`Failed to save team member: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return false;
     }
   };
@@ -52,6 +55,7 @@ export const useTeamMemberHandlers = (
       const success = await handleDeleteMember(memberToDelete, isPendingMemberToDelete);
       
       if (success) {
+        toast.success(isPendingMemberToDelete ? 'Pre-registered member deleted successfully' : 'Team member deleted successfully');
         triggerRefresh();
         console.log('Delete successful, refreshed');
         return true;
@@ -59,6 +63,7 @@ export const useTeamMemberHandlers = (
       return false;
     } catch (error) {
       console.error('Error in handleConfirmDelete:', error);
+      toast.error(`Failed to delete team member: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return false;
     }
   };
@@ -67,17 +72,25 @@ export const useTeamMemberHandlers = (
     if (!selectedMembers.length) return;
     
     try {
+      console.log('Bulk deleting members:', selectedMembers);
       const deletePromises = selectedMembers.map(memberId => {
         const isPending = pendingMembers.some(m => m.id === memberId);
+        console.log(`Deleting member ${memberId}, isPending: ${isPending}`);
         return handleDeleteMember(memberId, isPending);
       });
       
-      await Promise.all(deletePromises);
-      toast.success(`${selectedMembers.length} team members deleted successfully`);
-      triggerRefresh();
+      const results = await Promise.all(deletePromises);
+      const successCount = results.filter(Boolean).length;
+      
+      if (successCount > 0) {
+        toast.success(`${successCount} team member${successCount > 1 ? 's' : ''} deleted successfully`);
+        triggerRefresh();
+      } else {
+        toast.error("Failed to delete team members");
+      }
     } catch (error) {
-      toast.error("Failed to delete team members");
-      console.error(error);
+      toast.error(`Failed to delete team members: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Error in handleBulkDelete:', error);
     }
   };
 
