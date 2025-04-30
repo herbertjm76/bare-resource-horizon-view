@@ -1,17 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useTeamMembersData } from "@/hooks/useTeamMembersData";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { formatNumber, calculateUtilization, calculateCapacity } from './utils';
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger 
-} from "@/components/ui/tooltip";
-import { Textarea } from "@/components/ui/textarea";
+import { Table, TableBody } from "@/components/ui/table";
+import { WeeklyResourceHeader } from './WeeklyResourceHeader';
+import { MemberTableRow } from './MemberTableRow';
+import { useResourceAllocations } from './useResourceAllocations';
 import './weekly-overview.css';
 
 interface WeeklyResourceTableProps {
@@ -19,18 +14,6 @@ interface WeeklyResourceTableProps {
   filters: {
     office: string;
   };
-}
-
-interface MemberAllocation {
-  id: string;
-  annualLeave: number;
-  publicHoliday: number;
-  vacationLeave: number;
-  medicalLeave: number;
-  others: number;
-  remarks: string;
-  projects: string[];
-  resourcedHours: number;
 }
 
 export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
@@ -50,6 +33,9 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   // Get team members data using the hook
   const { teamMembers, isLoading } = useTeamMembersData(session?.user?.id || null);
 
+  // Get allocations from custom hook
+  const { getMemberAllocation, handleInputChange } = useResourceAllocations(teamMembers);
+
   // Fetch office locations
   const { data: officeLocations = [] } = useQuery({
     queryKey: ['officeLocations'],
@@ -62,44 +48,6 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
       return data;
     }
   });
-
-  // Member allocations state
-  const [memberAllocations, setMemberAllocations] = useState<Record<string, MemberAllocation>>({});
-
-  // Initialize or get member allocation
-  const getMemberAllocation = (memberId: string): MemberAllocation => {
-    if (!memberAllocations[memberId]) {
-      // For demo purposes - in a real app, you'd fetch this data from the backend
-      const resourcedHours = Math.floor(Math.random() * 30);
-      const allocation = {
-        id: memberId,
-        annualLeave: Math.floor(Math.random() * 8),
-        publicHoliday: Math.floor(Math.random() * 8),
-        vacationLeave: 0,
-        medicalLeave: 0,
-        others: 0,
-        remarks: '',
-        projects: new Array(Math.floor(Math.random() * 3) + 1).fill(0).map((_, i) => `Project ${i+1}`),
-        resourcedHours,
-      };
-      setMemberAllocations(prev => ({...prev, [memberId]: allocation}));
-      return allocation;
-    }
-    return memberAllocations[memberId];
-  };
-
-  // Handle input changes for editable fields
-  const handleInputChange = (memberId: string, field: keyof MemberAllocation, value: any) => {
-    const numValue = field !== 'remarks' && field !== 'projects' ? parseFloat(value) || 0 : value;
-    
-    setMemberAllocations(prev => ({
-      ...prev,
-      [memberId]: {
-        ...prev[memberId],
-        [field]: numValue,
-      }
-    }));
-  };
 
   // Group team members by office
   const membersByOffice = teamMembers.reduce((acc, member) => {
@@ -137,39 +85,9 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
 
   return (
     <div className="border rounded-lg overflow-hidden">
-      <div className="overflow-x-auto">
+      <div className="weekly-table-container">
         <Table className="min-w-full text-xs weekly-table">
-          <TableHeader className="bg-muted/50">
-            <TableRow>
-              <TableHead className="py-0 px-2 name-column">Name</TableHead>
-              <TableHead className="py-0 px-2">Office</TableHead>
-              <TableHead className="vertical-text text-center number-column">
-                <div>Projects</div>
-              </TableHead>
-              <TableHead className="vertical-text text-center number-column bg-orange-400 text-white">
-                <div>Capacity</div>
-              </TableHead>
-              <TableHead className="vertical-text text-center number-column">
-                <div>Utilisation</div>
-              </TableHead>
-              <TableHead className="vertical-text text-center number-column bg-yellow-100">
-                <div>Annual Leave</div>
-              </TableHead>
-              <TableHead className="vertical-text text-center number-column">
-                <div>Public Holiday</div>
-              </TableHead>
-              <TableHead className="vertical-text text-center number-column">
-                <div>Vacation Leave</div>
-              </TableHead>
-              <TableHead className="vertical-text text-center number-column">
-                <div>Medical Leave</div>
-              </TableHead>
-              <TableHead className="vertical-text text-center number-column">
-                <div>Others</div>
-              </TableHead>
-              <TableHead className="py-0 px-2 min-w-[100px]">Remarks</TableHead>
-            </TableRow>
-          </TableHeader>
+          <WeeklyResourceHeader />
           <TableBody>
             {filteredOffices.flatMap((office, officeIndex) => {
               const members = membersByOffice[office].sort((a, b) => {
@@ -178,91 +96,17 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
 
               return members.map((member, memberIndex) => {
                 const allocation = getMemberAllocation(member.id);
-                const capacity = calculateCapacity(allocation.resourcedHours);
-                const utilization = calculateUtilization(allocation.resourcedHours, 40);
+                const isEven = memberIndex % 2 === 0;
                 
                 return (
-                  <TableRow key={member.id} className={memberIndex % 2 === 0 ? "bg-muted/10" : ""}>
-                    <TableCell className="py-1 px-2 name-column">
-                      <div className="flex items-center gap-2">
-                        <span>{member.first_name} {member.last_name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1 px-2">{getOfficeDisplay(member.location || 'N/A')}</TableCell>
-                    <TableCell className="py-1 px-0 number-column">
-                      <div className="table-cell">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger className="w-full h-full flex items-center justify-center">
-                              <span className="project-pill">{allocation.projects.length}</span>
-                            </TooltipTrigger>
-                            <TooltipContent side="right" className="w-64">
-                              <div className="p-1">
-                                <strong>Projects:</strong>
-                                <ul className="list-disc ml-4 mt-1">
-                                  {allocation.projects.map((project, idx) => (
-                                    <li key={idx}>{project}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1 px-0 text-center number-column bg-orange-400 text-white font-bold">
-                      <div className="table-cell">{capacity}</div>
-                    </TableCell>
-                    <TableCell className="py-1 px-0 number-column">
-                      <div className="table-cell">{formatNumber(utilization)}%</div>
-                    </TableCell>
-                    <TableCell className="py-1 px-0 bg-yellow-100 number-column">
-                      <div className="table-cell">{allocation.annualLeave}</div>
-                    </TableCell>
-                    <TableCell className="py-1 px-0 number-column">
-                      <div className="table-cell">{allocation.publicHoliday}</div>
-                    </TableCell>
-                    <TableCell className="py-1 px-0 number-column">
-                      <div className="table-cell">
-                        <input
-                          type="number"
-                          min="0"
-                          value={allocation.vacationLeave}
-                          onChange={(e) => handleInputChange(member.id, 'vacationLeave', e.target.value)}
-                          className="editable-cell"
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1 px-0 number-column">
-                      <div className="table-cell">
-                        <input
-                          type="number"
-                          min="0"
-                          value={allocation.medicalLeave}
-                          onChange={(e) => handleInputChange(member.id, 'medicalLeave', e.target.value)}
-                          className="editable-cell"
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1 px-0 number-column">
-                      <div className="table-cell">
-                        <input
-                          type="number"
-                          min="0"
-                          value={allocation.others}
-                          onChange={(e) => handleInputChange(member.id, 'others', e.target.value)}
-                          className="editable-cell"
-                        />
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-1 px-2">
-                      <Textarea 
-                        value={allocation.remarks}
-                        onChange={(e) => handleInputChange(member.id, 'remarks', e.target.value)}
-                        className="min-h-0 h-6 p-1 text-xs resize-none"
-                      />
-                    </TableCell>
-                  </TableRow>
+                  <MemberTableRow
+                    key={member.id}
+                    member={member}
+                    allocation={allocation}
+                    isEven={isEven}
+                    getOfficeDisplay={getOfficeDisplay}
+                    onInputChange={handleInputChange}
+                  />
                 );
               });
             })}
