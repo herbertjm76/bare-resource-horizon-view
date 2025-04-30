@@ -128,4 +128,4 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       </TableCell>
     </TableRow>
   );
-};
+}
