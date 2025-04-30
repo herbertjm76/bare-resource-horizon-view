@@ -9,50 +9,61 @@ export const WeeklyResourceHeader: React.FC = () => {
         <TableHead className="py-2 px-4 name-column">
           <div>Name</div>
         </TableHead>
-        <TableHead className="py-2 px-4">
+        
+        <TableHead className="py-2 px-4 office-column">
           <div>Office</div>
         </TableHead>
-        <TableHead className="vertical-text text-center number-column">
+        
+        {/* Vertical header cells */}
+        <TableHead className="vertical-text-header number-column">
           <div>
             <span className="font-medium">Projects</span>
           </div>
         </TableHead>
-        <TableHead className="vertical-text text-center number-column bg-orange-400 text-white">
+        
+        <TableHead className="vertical-text-header number-column bg-orange-400 text-white">
           <div>
             <span className="font-medium">Capacity</span>
           </div>
         </TableHead>
-        <TableHead className="vertical-text text-center number-column">
+        
+        <TableHead className="vertical-text-header number-column">
           <div>
             <span className="font-medium">Utilisation</span>
           </div>
         </TableHead>
-        <TableHead className="vertical-text text-center number-column bg-yellow-100">
+        
+        <TableHead className="vertical-text-header number-column bg-yellow-100">
           <div>
             <span className="font-medium">Annual Leave</span>
           </div>
         </TableHead>
-        <TableHead className="vertical-text text-center number-column">
+        
+        <TableHead className="vertical-text-header number-column">
           <div>
             <span className="font-medium">Public Holiday</span>
           </div>
         </TableHead>
-        <TableHead className="vertical-text text-center number-column">
+        
+        <TableHead className="vertical-text-header number-column">
           <div>
             <span className="font-medium">Vacation Leave</span>
           </div>
         </TableHead>
-        <TableHead className="vertical-text text-center number-column">
+        
+        <TableHead className="vertical-text-header number-column">
           <div>
             <span className="font-medium">Medical Leave</span>
           </div>
         </TableHead>
-        <TableHead className="vertical-text text-center number-column">
+        
+        <TableHead className="vertical-text-header number-column">
           <div>
             <span className="font-medium">Others</span>
           </div>
         </TableHead>
-        <TableHead className="py-2 px-4 min-w-[100px]">
+        
+        <TableHead className="py-2 px-4 remarks-column">
           <div>Remarks</div>
         </TableHead>
       </TableRow>

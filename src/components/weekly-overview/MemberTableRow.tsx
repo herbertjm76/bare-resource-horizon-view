@@ -52,7 +52,11 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
           <span>{member.first_name} {member.last_name}</span>
         </div>
       </TableCell>
-      <TableCell className="py-1 px-4">{getOfficeDisplay(member.location || 'N/A')}</TableCell>
+      
+      <TableCell className="py-1 px-4 office-column">
+        {getOfficeDisplay(member.location || 'N/A')}
+      </TableCell>
+      
       <TableCell className="py-1 px-2 number-column">
         <div className="table-cell">
           <TooltipProvider>
@@ -74,18 +78,23 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
           </TooltipProvider>
         </div>
       </TableCell>
+      
       <TableCell className="py-1 px-2 text-center number-column bg-orange-400 text-white font-bold">
         <div className="table-cell">{capacity}</div>
       </TableCell>
+      
       <TableCell className="py-1 px-2 number-column">
         <div className="table-cell">{formatNumber(utilization)}%</div>
       </TableCell>
+      
       <TableCell className="py-1 px-2 bg-yellow-100 number-column">
         <div className="table-cell">{allocation.annualLeave}</div>
       </TableCell>
+      
       <TableCell className="py-1 px-2 number-column">
         <div className="table-cell">{allocation.publicHoliday}</div>
       </TableCell>
+      
       <TableCell className="py-1 px-2 number-column">
         <div className="table-cell">
           <input
@@ -97,6 +106,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
           />
         </div>
       </TableCell>
+      
       <TableCell className="py-1 px-2 number-column">
         <div className="table-cell">
           <input
@@ -108,6 +118,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
           />
         </div>
       </TableCell>
+      
       <TableCell className="py-1 px-2 number-column">
         <div className="table-cell">
           <input
@@ -119,7 +130,8 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
           />
         </div>
       </TableCell>
-      <TableCell className="py-1 px-4">
+      
+      <TableCell className="py-1 px-4 remarks-column">
         <Textarea 
           value={allocation.remarks}
           onChange={(e) => onInputChange(member.id, 'remarks', e.target.value)}

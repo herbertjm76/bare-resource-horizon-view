@@ -1,30 +1,33 @@
 
-.vertical-text {
+/* Completely new approach for vertical text columns */
+.vertical-text-header {
   position: relative;
-  height: 120px; /* Reduced height since we're using a better rotation approach */
+  height: 140px; /* Taller header to accommodate rotated text */
+  width: 80px; /* Fixed width for vertical header cells */
   padding: 0;
-  min-width: 70px; /* Ensure minimum width for each vertical column */
+  text-align: center;
 }
 
-.vertical-text > div {
+.vertical-text-header > div {
   position: absolute;
+  top: 0;
   left: 0;
   right: 0;
-  top: 0;
   bottom: 0;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.vertical-text > div > span {
+.vertical-text-header > div > span {
   transform: rotate(-90deg);
   white-space: nowrap;
-  display: inline-block;
-  padding: 5px;
+  display: block;
+  width: 100px; /* Set explicit width for rotated text */
+  text-align: center;
 }
 
+/* Keep existing styles for name column */
 .name-column {
   width: 30%;
   min-width: 200px;
@@ -85,26 +88,21 @@
   height: 100%;
 }
 
-/* Adjust table header for vertical text */
+/* Table header styling */
 .weekly-table thead th {
-  padding-bottom: 0;
   vertical-align: bottom;
-}
-
-/* Add more space between columns */
-.weekly-table td, .weekly-table th {
-  padding-left: 8px;
-  padding-right: 8px;
+  padding: 0; /* Remove padding to avoid spacing issues */
 }
 
 /* Fixed width for number columns */
 .number-column {
-  min-width: 70px;
+  width: 80px;
+  min-width: 80px;
   max-width: 80px;
   text-align: center;
 }
 
-/* Make the table header fixed */
+/* Sticky header setup */
 .weekly-table-container {
   position: relative;
   max-height: calc(100vh - 230px);
@@ -118,7 +116,19 @@
   z-index: 10;
 }
 
-/* Add gap between columns */
-.weekly-table th {
-  margin-right: 2px;
+/* Add space between columns */
+.weekly-table th + th,
+.weekly-table td + td {
+  border-left: 2px solid #f3f4f6;
+}
+
+/* Office column styles */
+.office-column {
+  width: 80px;
+  min-width: 80px;
+}
+
+/* Remarks column style */
+.remarks-column {
+  min-width: 120px;
 }
