@@ -1,30 +1,16 @@
 
-/* Completely new approach for vertical text columns */
-.vertical-text-header {
-  position: relative;
-  height: 140px; /* Taller header to accommodate rotated text */
-  width: 80px; /* Fixed width for vertical header cells */
-  padding: 0;
+/* Remove vertical text styling and replace with horizontal text styles */
+.header-cell {
+  padding: 8px 4px;
   text-align: center;
+  height: auto;
+  width: 80px;
 }
 
-.vertical-text-header > div {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.vertical-text-header > div > span {
-  transform: rotate(-90deg);
-  white-space: nowrap;
-  display: block;
-  width: 100px; /* Set explicit width for rotated text */
-  text-align: center;
+.header-cell > div {
+  font-size: 0.75rem; /* Smaller text to fit in columns */
+  white-space: normal; /* Allow text to wrap */
+  hyphens: auto; /* Enable hyphenation for better word breaks */
 }
 
 /* Keep existing styles for name column */
@@ -90,8 +76,8 @@
 
 /* Table header styling */
 .weekly-table thead th {
-  vertical-align: bottom;
-  padding: 0; /* Remove padding to avoid spacing issues */
+  vertical-align: middle;
+  padding: 8px 4px;
 }
 
 /* Fixed width for number columns */

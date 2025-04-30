@@ -7,64 +7,48 @@ export const WeeklyResourceHeader: React.FC = () => {
     <TableHeader className="bg-muted/50 sticky top-0 z-10">
       <TableRow>
         <TableHead className="py-2 px-4 name-column">
-          <div>Name</div>
+          <div className="font-medium">Name</div>
         </TableHead>
         
         <TableHead className="py-2 px-4 office-column">
-          <div>Office</div>
+          <div className="font-medium">Office</div>
         </TableHead>
         
-        {/* Vertical header cells */}
-        <TableHead className="vertical-text-header number-column">
-          <div>
-            <span className="font-medium">Projects</span>
-          </div>
+        {/* Normal horizontal header cells */}
+        <TableHead className="header-cell number-column">
+          <div className="font-medium">Projects</div>
         </TableHead>
         
-        <TableHead className="vertical-text-header number-column bg-orange-400 text-white">
-          <div>
-            <span className="font-medium">Capacity</span>
-          </div>
+        <TableHead className="header-cell number-column bg-orange-400 text-white">
+          <div className="font-medium">Capacity</div>
         </TableHead>
         
-        <TableHead className="vertical-text-header number-column">
-          <div>
-            <span className="font-medium">Utilisation</span>
-          </div>
+        <TableHead className="header-cell number-column">
+          <div className="font-medium">Utilisation</div>
         </TableHead>
         
-        <TableHead className="vertical-text-header number-column bg-yellow-100">
-          <div>
-            <span className="font-medium">Annual Leave</span>
-          </div>
+        <TableHead className="header-cell number-column bg-yellow-100">
+          <div className="font-medium">Annual Leave</div>
         </TableHead>
         
-        <TableHead className="vertical-text-header number-column">
-          <div>
-            <span className="font-medium">Public Holiday</span>
-          </div>
+        <TableHead className="header-cell number-column">
+          <div className="font-medium">Public Holiday</div>
         </TableHead>
         
-        <TableHead className="vertical-text-header number-column">
-          <div>
-            <span className="font-medium">Vacation Leave</span>
-          </div>
+        <TableHead className="header-cell number-column">
+          <div className="font-medium">Vacation Leave</div>
         </TableHead>
         
-        <TableHead className="vertical-text-header number-column">
-          <div>
-            <span className="font-medium">Medical Leave</span>
-          </div>
+        <TableHead className="header-cell number-column">
+          <div className="font-medium">Medical Leave</div>
         </TableHead>
         
-        <TableHead className="vertical-text-header number-column">
-          <div>
-            <span className="font-medium">Others</span>
-          </div>
+        <TableHead className="header-cell number-column">
+          <div className="font-medium">Others</div>
         </TableHead>
         
         <TableHead className="py-2 px-4 remarks-column">
-          <div>Remarks</div>
+          <div className="font-medium">Remarks</div>
         </TableHead>
       </TableRow>
     </TableHeader>
