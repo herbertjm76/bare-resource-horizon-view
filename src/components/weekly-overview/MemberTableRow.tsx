@@ -54,7 +54,9 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       </TableCell>
       
       <TableCell className="py-1 px-4 office-column">
-        {getOfficeDisplay(member.location || 'N/A')}
+        <div className="flex items-center justify-center">
+          {getOfficeDisplay(member.location || 'N/A')}
+        </div>
       </TableCell>
       
       <TableCell className="py-1 px-1 number-column">

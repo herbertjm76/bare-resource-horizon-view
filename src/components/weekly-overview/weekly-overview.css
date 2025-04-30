@@ -112,6 +112,7 @@
 .office-column {
   width: 80px;
   min-width: 80px;
+  text-align: center;
 }
 
 /* Remarks column style */

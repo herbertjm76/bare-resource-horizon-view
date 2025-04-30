@@ -58,7 +58,7 @@ export const WeeklyResourceHeader: React.FC = () => {
           <TableHead className="header-cell number-column bg-yellow-100">
             <Tooltip>
               <TooltipTrigger className="w-full">
-                <div className="font-medium">ANN</div>
+                <div className="font-medium">AL</div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Annual Leave</p>
@@ -69,7 +69,7 @@ export const WeeklyResourceHeader: React.FC = () => {
           <TableHead className="header-cell number-column">
             <Tooltip>
               <TooltipTrigger className="w-full">
-                <div className="font-medium">PUB</div>
+                <div className="font-medium">PH</div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Public Holiday</p>
@@ -80,7 +80,7 @@ export const WeeklyResourceHeader: React.FC = () => {
           <TableHead className="header-cell number-column">
             <Tooltip>
               <TooltipTrigger className="w-full">
-                <div className="font-medium">VAC</div>
+                <div className="font-medium">VL</div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Vacation Leave</p>
@@ -91,7 +91,7 @@ export const WeeklyResourceHeader: React.FC = () => {
           <TableHead className="header-cell number-column">
             <Tooltip>
               <TooltipTrigger className="w-full">
-                <div className="font-medium">MED</div>
+                <div className="font-medium">ML</div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Medical Leave</p>
@@ -102,7 +102,7 @@ export const WeeklyResourceHeader: React.FC = () => {
           <TableHead className="header-cell number-column">
             <Tooltip>
               <TooltipTrigger className="w-full">
-                <div className="font-medium">OTH</div>
+                <div className="font-medium">OL</div>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Others</p>
