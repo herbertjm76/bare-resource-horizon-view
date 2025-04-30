@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { MilestoneInfo, Continuity } from '../../hooks/useWeekMilestones';
 import { MilestoneIcon } from './MilestoneIcon';
 
@@ -16,15 +16,11 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
   milestoneColor,
   alignment
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  // Default state - empty solid outline
+  // Default state - empty gray line when not selected
   if (!milestone) {
     return (
       <div 
-        className="h-[4px] w-full border border-solid border-gray-300 bg-transparent hover:border-gray-400 transition-colors cursor-pointer rounded"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        className="h-[4px] w-full bg-gray-300 cursor-pointer"
       />
     );
   }
@@ -34,54 +30,40 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
     return (
       <div 
         className={`relative flex items-center ${alignment} h-3 w-full group cursor-pointer`}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Solid outline effect with fill on hover */}
+        {/* Solid color bar with icon */}
         <div 
-          className={`absolute h-[4px] ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'} transition-all group-hover:h-[6px]`}
+          className="absolute h-[4px] w-full"
           style={{
-            backgroundColor: isHovered ? milestoneColor || '#9b87f5' : 'transparent',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-            borderColor: milestoneColor || '#9b87f5',
-            width: '100%',
-            maxWidth: '100%',
+            backgroundColor: milestoneColor || '#9b87f5',
             left: 0,
             right: 0
           }}
         />
-        <div className="relative z-10 transition-transform group-hover:scale-125">
+        <div className="relative z-10">
           <MilestoneIcon type={milestone.type} className="h-3 w-3" />
         </div>
       </div>
     );
   }
   
-  // Stage only (no milestone)
+  // Stage only (no milestone) - solid color rectangle
   if (milestone.stage) {
     return (
       <div 
-        className={`h-[4px] w-full ${continuity && continuity.left ? '' : 'rounded-l'} ${continuity && continuity.right ? '' : 'rounded-r'} cursor-pointer hover:h-[6px] transition-all`}
+        className="h-[4px] w-full cursor-pointer"
         style={{
-          backgroundColor: isHovered ? milestoneColor || '#9b87f5' : 'transparent',
-          borderWidth: '1px',
-          borderStyle: 'solid',
-          borderColor: milestoneColor || '#9b87f5',
+          backgroundColor: milestoneColor || '#9b87f5',
           maxWidth: '100%',
         }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
       />
     );
   }
   
-  // Default state (no milestone or stage)
+  // Default state (no milestone or stage) - gray line
   return (
     <div 
-      className="h-[4px] w-full border border-solid border-gray-300 bg-transparent hover:border-gray-400 transition-colors cursor-pointer rounded"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="h-[4px] w-full bg-gray-300 cursor-pointer"
     />
   );
 };
