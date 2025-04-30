@@ -6,8 +6,8 @@ export const WeeklyResourceHeader: React.FC = () => {
   return (
     <TableHeader className="bg-muted/50 sticky top-0 z-10">
       <TableRow>
-        <TableHead className="py-0 px-2 name-column">Name</TableHead>
-        <TableHead className="py-0 px-2">Office</TableHead>
+        <TableHead className="py-0 px-4 name-column">Name</TableHead>
+        <TableHead className="py-0 px-4">Office</TableHead>
         <TableHead className="vertical-text text-center number-column">
           <div>Projects</div>
         </TableHead>
@@ -32,7 +32,7 @@ export const WeeklyResourceHeader: React.FC = () => {
         <TableHead className="vertical-text text-center number-column">
           <div>Others</div>
         </TableHead>
-        <TableHead className="py-0 px-2 min-w-[100px]">Remarks</TableHead>
+        <TableHead className="py-0 px-4 min-w-[100px]">Remarks</TableHead>
       </TableRow>
     </TableHeader>
   );
