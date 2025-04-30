@@ -18,15 +18,15 @@ export const WeekSelector: React.FC<WeekSelectorProps> = ({
 }) => {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm font-medium text-muted-foreground mr-2">{weekLabel}</span>
+      <span className="text-sm text-muted-foreground mr-1">{weekLabel}</span>
       <div className="flex items-center border rounded-md">
-        <Button variant="ghost" size="icon" onClick={onPreviousWeek}>
+        <Button variant="ghost" size="icon" onClick={onPreviousWeek} className="h-8 w-8 p-0">
           <ChevronLeft className="h-4 w-4" />
         </Button>
         <span className="flex items-center px-2">
           <Calendar className="h-4 w-4" />
         </span>
-        <Button variant="ghost" size="icon" onClick={onNextWeek}>
+        <Button variant="ghost" size="icon" onClick={onNextWeek} className="h-8 w-8 p-0">
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>

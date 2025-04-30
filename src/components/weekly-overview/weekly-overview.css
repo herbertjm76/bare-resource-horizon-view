@@ -1,0 +1,16 @@
+
+.vertical-text {
+  position: relative;
+  height: 140px; /* Adjust based on your needs */
+  padding: 0;
+}
+
+.vertical-text > div {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 140px; /* Adjust based on your needs */
+  transform-origin: bottom left;
+  text-align: left;
+  padding: 4px;
+}

@@ -36,28 +36,28 @@ export const WeeklyResourceFilters: React.FC<WeeklyResourceFiltersProps> = ({
   });
 
   return (
-    <div className="bg-blue-500 p-4 rounded-md mb-6">
-      <h2 className="text-white font-medium mb-4">Filters</h2>
+    <div className="mb-6 border rounded-lg p-6 bg-background">
+      <p className="text-sm text-muted-foreground mb-4">
+        View and manage all your weekly resource allocation. Use the filters below to narrow down the list by office.
+      </p>
+      
       <div className="flex flex-wrap gap-4 items-end">
-        <div>
-          <label className="block text-sm font-medium text-white mb-1">Office</label>
-          <Select
-            value={filters.office}
-            onValueChange={(value) => onFilterChange('office', value)}
-          >
-            <SelectTrigger className="w-[180px] bg-white">
-              <SelectValue placeholder="All Offices" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Offices</SelectItem>
-              {officeLocations.map((office) => (
-                <SelectItem key={office.id} value={office.code}>
-                  {office.code} - {office.city}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select
+          value={filters.office}
+          onValueChange={(value) => onFilterChange('office', value)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="All Offices" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Offices</SelectItem>
+            {officeLocations.map((office) => (
+              <SelectItem key={office.id} value={office.code}>
+                {office.code} - {office.city}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         
         <Input 
           className="w-[240px]" 

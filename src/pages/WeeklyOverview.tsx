@@ -45,10 +45,10 @@ const WeeklyOverview = () => {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background">
+          <div className="flex-1 p-4 sm:p-6 bg-background">
             <div className="max-w-full mx-auto space-y-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
-                <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Weekly Overview</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Weekly Overview</h1>
                 <WeekSelector 
                   selectedWeek={selectedWeek}
                   onPreviousWeek={handlePreviousWeek}

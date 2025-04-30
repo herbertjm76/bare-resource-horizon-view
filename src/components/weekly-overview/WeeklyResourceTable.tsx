@@ -6,6 +6,7 @@ import { useTeamMembersData } from "@/hooks/useTeamMembersData";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatNumber } from './utils';
 import { Eye } from "lucide-react";
+import './weekly-overview.css';
 
 interface WeeklyResourceTableProps {
   selectedWeek: Date;
@@ -81,24 +82,42 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   return (
     <div className="border rounded-lg overflow-hidden">
       <div className="overflow-x-auto">
-        <Table className="min-w-full">
+        <Table className="min-w-full text-xs">
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="w-8 text-center">#</TableHead>
-              <TableHead className="w-8 text-center">View</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Office</TableHead>
-              <TableHead className="text-center">Projects</TableHead>
-              <TableHead className="text-center w-24">Capacity</TableHead>
-              <TableHead className="text-center">Utilisation</TableHead>
-              <TableHead className="text-center">Utilisation (incl. leave)</TableHead>
-              <TableHead className="text-center">Vacation / Holiday</TableHead>
-              <TableHead className="text-center">General Office</TableHead>
-              <TableHead className="text-center">Marketing / BD</TableHead>
-              <TableHead className="text-center">Public Holiday</TableHead>
-              <TableHead className="text-center">Medical Leave / Hospitalisation</TableHead>
-              <TableHead className="text-center">Annual Leave / Birthday Leave / Child Care/Unpaid Leave</TableHead>
-              <TableHead className="text-right">Remarks / Stage Deadline</TableHead>
+              <TableHead className="py-0 px-2 min-w-[120px]">Name</TableHead>
+              <TableHead className="py-0 px-2 min-w-[60px]">Office</TableHead>
+              <TableHead className="vertical-text text-center w-8 h-28">
+                <div className="transform -rotate-90 whitespace-nowrap">Projects</div>
+              </TableHead>
+              <TableHead className="vertical-text text-center w-8 h-28 bg-orange-400 text-white">
+                <div className="transform -rotate-90 whitespace-nowrap">Capacity</div>
+              </TableHead>
+              <TableHead className="vertical-text text-center w-8 h-28">
+                <div className="transform -rotate-90 whitespace-nowrap">Utilisation</div>
+              </TableHead>
+              <TableHead className="vertical-text text-center w-8 h-28">
+                <div className="transform -rotate-90 whitespace-nowrap">Utilisation (incl. leave)</div>
+              </TableHead>
+              <TableHead className="vertical-text text-center w-8 h-28 bg-yellow-100">
+                <div className="transform -rotate-90 whitespace-nowrap">Vacation / Holiday</div>
+              </TableHead>
+              <TableHead className="vertical-text text-center w-8 h-28">
+                <div className="transform -rotate-90 whitespace-nowrap">General Office</div>
+              </TableHead>
+              <TableHead className="vertical-text text-center w-8 h-28">
+                <div className="transform -rotate-90 whitespace-nowrap">Marketing / BD</div>
+              </TableHead>
+              <TableHead className="vertical-text text-center w-8 h-28">
+                <div className="transform -rotate-90 whitespace-nowrap">Public Holiday</div>
+              </TableHead>
+              <TableHead className="vertical-text text-center w-8 h-28">
+                <div className="transform -rotate-90 whitespace-nowrap">Medical Leave / Hospitalisation</div>
+              </TableHead>
+              <TableHead className="vertical-text text-center w-8 h-28">
+                <div className="transform -rotate-90 whitespace-nowrap">Annual Leave / Birthday Leave / Child Care/Unpaid Leave</div>
+              </TableHead>
+              <TableHead className="py-0 px-2 min-w-[100px]">Remarks</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -116,25 +135,24 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
                 
                 return (
                   <TableRow key={member.id} className={memberIndex % 2 === 0 ? "bg-muted/10" : ""}>
-                    <TableCell className="text-center">{officeIndex * 100 + memberIndex + 1}</TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex justify-center">
-                        <Eye className="h-4 w-4 text-blue-500 cursor-pointer" />
+                    <TableCell className="py-1 px-2">
+                      <div className="flex items-center gap-2">
+                        <Eye className="h-3 w-3 text-blue-500 cursor-pointer" />
+                        <span>{member.first_name} {member.last_name}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{member.first_name} {member.last_name}</TableCell>
-                    <TableCell>{getOfficeDisplay(member.location || 'N/A')}</TableCell>
-                    <TableCell className="text-center">{projectCount}</TableCell>
-                    <TableCell className="text-center bg-orange-400 text-white font-bold">{capacity}</TableCell>
-                    <TableCell className="text-center">{formatNumber(utilisation)}%</TableCell>
-                    <TableCell className="text-center">{formatNumber(utilisationWithLeave)}%</TableCell>
-                    <TableCell className="text-center bg-yellow-100">0</TableCell>
-                    <TableCell className="text-center">0</TableCell>
-                    <TableCell className="text-center">0</TableCell>
-                    <TableCell className="text-center">0</TableCell>
-                    <TableCell className="text-center">0</TableCell>
-                    <TableCell className="text-center">0</TableCell>
-                    <TableCell className="text-right"></TableCell>
+                    <TableCell className="py-1 px-2">{getOfficeDisplay(member.location || 'N/A')}</TableCell>
+                    <TableCell className="py-1 px-0 text-center">{projectCount}</TableCell>
+                    <TableCell className="py-1 px-0 text-center bg-orange-400 text-white font-bold">{capacity}</TableCell>
+                    <TableCell className="py-1 px-0 text-center">{formatNumber(utilisation)}%</TableCell>
+                    <TableCell className="py-1 px-0 text-center">{formatNumber(utilisationWithLeave)}%</TableCell>
+                    <TableCell className="py-1 px-0 text-center bg-yellow-100">0</TableCell>
+                    <TableCell className="py-1 px-0 text-center">0</TableCell>
+                    <TableCell className="py-1 px-0 text-center">0</TableCell>
+                    <TableCell className="py-1 px-0 text-center">0</TableCell>
+                    <TableCell className="py-1 px-0 text-center">0</TableCell>
+                    <TableCell className="py-1 px-0 text-center">0</TableCell>
+                    <TableCell className="py-1 px-2"></TableCell>
                   </TableRow>
                 );
               });

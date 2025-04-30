@@ -13,3 +13,5 @@ export const calculateUtilization = (allocated: number, capacity: number): numbe
   if (capacity === 0) return 0;
   return (allocated / capacity) * 100;
 };
+
+// Add any other utility functions here
