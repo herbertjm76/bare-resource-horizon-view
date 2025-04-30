@@ -1,19 +1,22 @@
 
 .vertical-text {
   position: relative;
-  height: 140px; /* Adjust based on your needs */
+  height: 120px; /* Reduced height to be more compact */
   padding: 0;
+  overflow: visible;
 }
 
 .vertical-text > div {
   position: absolute;
   bottom: 0;
   left: 50%;
-  width: 140px; /* Adjust based on your needs */
+  width: 120px; /* Adjusted width */
   transform-origin: bottom left;
   transform: rotate(-90deg) translateX(-50%);
   text-align: center;
   padding: 4px;
+  white-space: nowrap; /* Prevent text wrapping */
+  overflow: visible;
 }
 
 .name-column {
@@ -76,3 +79,20 @@
   height: 100%;
 }
 
+/* Adjust table header to prevent content overlap */
+.weekly-table thead th {
+  padding-bottom: 0;
+  vertical-align: bottom;
+}
+
+/* Add more space between columns */
+.weekly-table td, .weekly-table th {
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+/* Fixed width for number columns */
+.number-column {
+  min-width: 40px;
+  max-width: 60px;
+}
