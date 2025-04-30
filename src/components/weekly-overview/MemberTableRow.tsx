@@ -57,7 +57,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         {getOfficeDisplay(member.location || 'N/A')}
       </TableCell>
       
-      <TableCell className="py-1 px-2 number-column">
+      <TableCell className="py-1 px-1 number-column">
         <div className="table-cell">
           <TooltipProvider>
             <Tooltip>
@@ -79,23 +79,23 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         </div>
       </TableCell>
       
-      <TableCell className="py-1 px-2 text-center number-column bg-orange-400 text-white font-bold">
+      <TableCell className="py-1 px-1 text-center number-column bg-orange-400 text-white font-bold">
         <div className="table-cell">{capacity}</div>
       </TableCell>
       
-      <TableCell className="py-1 px-2 number-column">
+      <TableCell className="py-1 px-1 number-column">
         <div className="table-cell">{formatNumber(utilization)}%</div>
       </TableCell>
       
-      <TableCell className="py-1 px-2 bg-yellow-100 number-column">
+      <TableCell className="py-1 px-1 bg-yellow-100 number-column">
         <div className="table-cell">{allocation.annualLeave}</div>
       </TableCell>
       
-      <TableCell className="py-1 px-2 number-column">
+      <TableCell className="py-1 px-1 number-column">
         <div className="table-cell">{allocation.publicHoliday}</div>
       </TableCell>
       
-      <TableCell className="py-1 px-2 number-column">
+      <TableCell className="py-1 px-1 number-column">
         <div className="table-cell">
           <input
             type="number"
@@ -107,7 +107,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         </div>
       </TableCell>
       
-      <TableCell className="py-1 px-2 number-column">
+      <TableCell className="py-1 px-1 number-column">
         <div className="table-cell">
           <input
             type="number"
@@ -119,7 +119,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         </div>
       </TableCell>
       
-      <TableCell className="py-1 px-2 number-column">
+      <TableCell className="py-1 px-1 number-column">
         <div className="table-cell">
           <input
             type="number"

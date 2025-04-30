@@ -1,16 +1,16 @@
 
-/* Remove vertical text styling and replace with horizontal text styles */
+/* Header cell with acronym styling */
 .header-cell {
-  padding: 8px 4px;
+  padding: 4px 2px;
   text-align: center;
   height: auto;
-  width: 80px;
+  width: 30px; /* Reduced width to 30px */
 }
 
 .header-cell > div {
-  font-size: 0.75rem; /* Smaller text to fit in columns */
-  white-space: normal; /* Allow text to wrap */
-  hyphens: auto; /* Enable hyphenation for better word breaks */
+  font-size: 0.75rem;
+  white-space: normal;
+  hyphens: auto;
 }
 
 /* Keep existing styles for name column */
@@ -77,14 +77,14 @@
 /* Table header styling */
 .weekly-table thead th {
   vertical-align: middle;
-  padding: 8px 4px;
+  padding: 4px 2px;
 }
 
 /* Fixed width for number columns */
 .number-column {
-  width: 80px;
-  min-width: 80px;
-  max-width: 80px;
+  width: 30px;
+  min-width: 30px;
+  max-width: 30px;
   text-align: center;
 }
 
