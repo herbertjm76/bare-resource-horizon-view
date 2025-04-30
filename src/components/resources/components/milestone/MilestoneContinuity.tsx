@@ -20,7 +20,7 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
   if (!milestone) {
     return (
       <div 
-        className="h-[4px] w-full bg-gray-300 cursor-pointer"
+        className="h-[4px] w-full bg-gray-200 cursor-pointer"
       />
     );
   }
@@ -60,10 +60,10 @@ export const MilestoneContinuity: React.FC<MilestoneContinuityProps> = ({
     );
   }
   
-  // Default state (no milestone or stage) - gray line
+  // Default state (no milestone or stage) - lighter gray line
   return (
     <div 
-      className="h-[4px] w-full bg-gray-300 cursor-pointer"
+      className="h-[4px] w-full bg-gray-200 cursor-pointer"
     />
   );
 };
