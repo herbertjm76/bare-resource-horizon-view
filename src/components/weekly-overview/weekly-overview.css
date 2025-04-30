@@ -56,3 +56,23 @@
 .editable-cell:focus {
   background: #f3f4f6;
 }
+
+.project-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #E5DEFF;
+  color: #6941C6;
+  font-weight: 500;
+  border-radius: 16px;
+  padding: 2px 8px;
+  min-width: 24px;
+}
+
+.table-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
