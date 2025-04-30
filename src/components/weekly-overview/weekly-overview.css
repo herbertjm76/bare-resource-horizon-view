@@ -1,23 +1,28 @@
 
 .vertical-text {
   position: relative;
-  height: 180px; /* Further increased height to prevent overlap */
+  height: 120px; /* Reduced height since we're using a better rotation approach */
   padding: 0;
-  overflow: visible;
-  min-width: 60px; /* Ensure minimum width for each vertical column */
+  min-width: 70px; /* Ensure minimum width for each vertical column */
 }
 
 .vertical-text > div {
   position: absolute;
-  bottom: 15px; /* Move text higher from the bottom */
-  left: 50%;
-  width: 180px; /* Increased width for better text display */
-  transform-origin: bottom left;
-  transform: rotate(-90deg) translateX(-50%);
-  text-align: left; /* Changed to left alignment for better readability */
-  padding: 10px; /* Increased padding */
-  white-space: nowrap; /* Prevent text wrapping */
-  overflow: visible;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vertical-text > div > span {
+  transform: rotate(-90deg);
+  white-space: nowrap;
+  display: inline-block;
+  padding: 5px;
 }
 
 .name-column {
@@ -80,11 +85,10 @@
   height: 100%;
 }
 
-/* Adjust table header to prevent content overlap */
+/* Adjust table header for vertical text */
 .weekly-table thead th {
   padding-bottom: 0;
   vertical-align: bottom;
-  height: 180px; /* Increased height to match vertical-text */
 }
 
 /* Add more space between columns */
@@ -95,8 +99,9 @@
 
 /* Fixed width for number columns */
 .number-column {
-  min-width: 60px; /* Further increased min-width for better text accommodation */
-  max-width: 70px;
+  min-width: 70px;
+  max-width: 80px;
+  text-align: center;
 }
 
 /* Make the table header fixed */
@@ -113,8 +118,7 @@
   z-index: 10;
 }
 
-/* Add gap between vertical header texts */
-.weekly-table th.vertical-text {
-  margin-right: 5px;
-  position: relative;
+/* Add gap between columns */
+.weekly-table th {
+  margin-right: 2px;
 }
