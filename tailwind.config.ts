@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -32,7 +31,8 @@ export default {
         "brand-violet": "#6F4BF6",
         "brand-violet-light": "#ECECFB",
         "brand-gray": "#8E9196",
-        "brand-border": "#F0F0F4", 
+        "brand-border": "#F0F0F4",
+        "gray-250": "#e2e2e2", // Added custom gray-250 (slightly darker than gray-200)
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
