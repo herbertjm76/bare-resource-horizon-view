@@ -1,11 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useTeamMembersData } from "@/hooks/useTeamMembersData";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { formatNumber } from './utils';
-import { Eye } from "lucide-react";
+import { formatNumber, calculateUtilization, calculateCapacity } from './utils';
+import { Eye, HelpCircle } from "lucide-react";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger 
+} from "@/components/ui/tooltip";
+import { Textarea } from "@/components/ui/textarea";
 import './weekly-overview.css';
 
 interface WeeklyResourceTableProps {
@@ -13,6 +20,18 @@ interface WeeklyResourceTableProps {
   filters: {
     office: string;
   };
+}
+
+interface MemberAllocation {
+  id: string;
+  annualLeave: number;
+  publicHoliday: number;
+  vacationLeave: number;
+  medicalLeave: number;
+  others: number;
+  remarks: string;
+  projects: string[];
+  resourcedHours: number;
 }
 
 export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
@@ -44,6 +63,44 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
       return data;
     }
   });
+
+  // Member allocations state
+  const [memberAllocations, setMemberAllocations] = useState<Record<string, MemberAllocation>>({});
+
+  // Initialize or get member allocation
+  const getMemberAllocation = (memberId: string): MemberAllocation => {
+    if (!memberAllocations[memberId]) {
+      // For demo purposes - in a real app, you'd fetch this data from the backend
+      const resourcedHours = Math.floor(Math.random() * 30);
+      const allocation = {
+        id: memberId,
+        annualLeave: Math.floor(Math.random() * 8),
+        publicHoliday: Math.floor(Math.random() * 8),
+        vacationLeave: 0,
+        medicalLeave: 0,
+        others: 0,
+        remarks: '',
+        projects: new Array(Math.floor(Math.random() * 3) + 1).fill(0).map((_, i) => `Project ${i+1}`),
+        resourcedHours,
+      };
+      setMemberAllocations(prev => ({...prev, [memberId]: allocation}));
+      return allocation;
+    }
+    return memberAllocations[memberId];
+  };
+
+  // Handle input changes for editable fields
+  const handleInputChange = (memberId: string, field: keyof MemberAllocation, value: any) => {
+    const numValue = field !== 'remarks' && field !== 'projects' ? parseFloat(value) || 0 : value;
+    
+    setMemberAllocations(prev => ({
+      ...prev,
+      [memberId]: {
+        ...prev[memberId],
+        [field]: numValue,
+      }
+    }));
+  };
 
   // Group team members by office
   const membersByOffice = teamMembers.reduce((acc, member) => {
@@ -85,37 +142,31 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
         <Table className="min-w-full text-xs">
           <TableHeader className="bg-muted/50">
             <TableRow>
-              <TableHead className="py-0 px-2 min-w-[120px]">Name</TableHead>
+              <TableHead className="py-0 px-2 name-column">Name</TableHead>
               <TableHead className="py-0 px-2 min-w-[60px]">Office</TableHead>
-              <TableHead className="vertical-text text-center w-8 h-28">
+              <TableHead className="vertical-text text-center w-8">
                 <div className="transform -rotate-90 whitespace-nowrap">Projects</div>
               </TableHead>
-              <TableHead className="vertical-text text-center w-8 h-28 bg-orange-400 text-white">
+              <TableHead className="vertical-text text-center w-8 bg-orange-400 text-white">
                 <div className="transform -rotate-90 whitespace-nowrap">Capacity</div>
               </TableHead>
-              <TableHead className="vertical-text text-center w-8 h-28">
+              <TableHead className="vertical-text text-center w-8">
                 <div className="transform -rotate-90 whitespace-nowrap">Utilisation</div>
               </TableHead>
-              <TableHead className="vertical-text text-center w-8 h-28">
-                <div className="transform -rotate-90 whitespace-nowrap">Utilisation (incl. leave)</div>
+              <TableHead className="vertical-text text-center w-8 bg-yellow-100">
+                <div className="transform -rotate-90 whitespace-nowrap">Annual Leave</div>
               </TableHead>
-              <TableHead className="vertical-text text-center w-8 h-28 bg-yellow-100">
-                <div className="transform -rotate-90 whitespace-nowrap">Vacation / Holiday</div>
-              </TableHead>
-              <TableHead className="vertical-text text-center w-8 h-28">
-                <div className="transform -rotate-90 whitespace-nowrap">General Office</div>
-              </TableHead>
-              <TableHead className="vertical-text text-center w-8 h-28">
-                <div className="transform -rotate-90 whitespace-nowrap">Marketing / BD</div>
-              </TableHead>
-              <TableHead className="vertical-text text-center w-8 h-28">
+              <TableHead className="vertical-text text-center w-8">
                 <div className="transform -rotate-90 whitespace-nowrap">Public Holiday</div>
               </TableHead>
-              <TableHead className="vertical-text text-center w-8 h-28">
-                <div className="transform -rotate-90 whitespace-nowrap">Medical Leave / Hospitalisation</div>
+              <TableHead className="vertical-text text-center w-8">
+                <div className="transform -rotate-90 whitespace-nowrap">Vacation Leave</div>
               </TableHead>
-              <TableHead className="vertical-text text-center w-8 h-28">
-                <div className="transform -rotate-90 whitespace-nowrap">Annual Leave / Birthday Leave / Child Care/Unpaid Leave</div>
+              <TableHead className="vertical-text text-center w-8">
+                <div className="transform -rotate-90 whitespace-nowrap">Medical Leave</div>
+              </TableHead>
+              <TableHead className="vertical-text text-center w-8">
+                <div className="transform -rotate-90 whitespace-nowrap">Others</div>
               </TableHead>
               <TableHead className="py-0 px-2 min-w-[100px]">Remarks</TableHead>
             </TableRow>
@@ -127,32 +178,80 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
               });
 
               return members.map((member, memberIndex) => {
-                // For demonstration, generating some mock data
-                const projectCount = Math.floor(Math.random() * 3);
-                const capacity = 40;
-                const utilisation = Math.random() * 100;
-                const utilisationWithLeave = utilisation - (Math.random() * 20);
+                const allocation = getMemberAllocation(member.id);
+                const capacity = calculateCapacity(allocation.resourcedHours);
+                const utilization = calculateUtilization(allocation.resourcedHours, 40);
                 
                 return (
                   <TableRow key={member.id} className={memberIndex % 2 === 0 ? "bg-muted/10" : ""}>
-                    <TableCell className="py-1 px-2">
+                    <TableCell className="py-1 px-2 name-column">
                       <div className="flex items-center gap-2">
                         <Eye className="h-3 w-3 text-blue-500 cursor-pointer" />
                         <span>{member.first_name} {member.last_name}</span>
                       </div>
                     </TableCell>
                     <TableCell className="py-1 px-2">{getOfficeDisplay(member.location || 'N/A')}</TableCell>
-                    <TableCell className="py-1 px-0 text-center">{projectCount}</TableCell>
+                    <TableCell className="py-1 px-0 text-center">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger className="w-full h-full flex items-center justify-center">
+                            {allocation.projects.length}
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="w-64">
+                            <div className="p-1">
+                              <strong>Projects:</strong>
+                              <ul className="list-disc ml-4 mt-1">
+                                {allocation.projects.map((project, idx) => (
+                                  <li key={idx}>{project}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
                     <TableCell className="py-1 px-0 text-center bg-orange-400 text-white font-bold">{capacity}</TableCell>
-                    <TableCell className="py-1 px-0 text-center">{formatNumber(utilisation)}%</TableCell>
-                    <TableCell className="py-1 px-0 text-center">{formatNumber(utilisationWithLeave)}%</TableCell>
-                    <TableCell className="py-1 px-0 text-center bg-yellow-100">0</TableCell>
-                    <TableCell className="py-1 px-0 text-center">0</TableCell>
-                    <TableCell className="py-1 px-0 text-center">0</TableCell>
-                    <TableCell className="py-1 px-0 text-center">0</TableCell>
-                    <TableCell className="py-1 px-0 text-center">0</TableCell>
-                    <TableCell className="py-1 px-0 text-center">0</TableCell>
-                    <TableCell className="py-1 px-2"></TableCell>
+                    <TableCell className="py-1 px-0 text-center">{formatNumber(utilization)}%</TableCell>
+                    <TableCell className="py-1 px-0 text-center bg-yellow-100">
+                      {allocation.annualLeave}
+                    </TableCell>
+                    <TableCell className="py-1 px-0 text-center">
+                      {allocation.publicHoliday}
+                    </TableCell>
+                    <TableCell className="py-1 px-0 text-center">
+                      <input
+                        type="number"
+                        min="0"
+                        value={allocation.vacationLeave}
+                        onChange={(e) => handleInputChange(member.id, 'vacationLeave', e.target.value)}
+                        className="editable-cell"
+                      />
+                    </TableCell>
+                    <TableCell className="py-1 px-0 text-center">
+                      <input
+                        type="number"
+                        min="0"
+                        value={allocation.medicalLeave}
+                        onChange={(e) => handleInputChange(member.id, 'medicalLeave', e.target.value)}
+                        className="editable-cell"
+                      />
+                    </TableCell>
+                    <TableCell className="py-1 px-0 text-center">
+                      <input
+                        type="number"
+                        min="0"
+                        value={allocation.others}
+                        onChange={(e) => handleInputChange(member.id, 'others', e.target.value)}
+                        className="editable-cell"
+                      />
+                    </TableCell>
+                    <TableCell className="py-1 px-2">
+                      <Textarea 
+                        value={allocation.remarks}
+                        onChange={(e) => handleInputChange(member.id, 'remarks', e.target.value)}
+                        className="min-h-0 h-6 p-1 text-xs resize-none"
+                      />
+                    </TableCell>
                   </TableRow>
                 );
               });

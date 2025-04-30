@@ -11,6 +11,48 @@
   left: 50%;
   width: 140px; /* Adjust based on your needs */
   transform-origin: bottom left;
-  text-align: left;
+  transform: rotate(-90deg) translateX(-50%);
+  text-align: center;
   padding: 4px;
+}
+
+.name-column {
+  width: 30%;
+  min-width: 200px;
+}
+
+.hover-projects {
+  position: relative;
+  cursor: help;
+}
+
+.hover-projects:hover .projects-tooltip {
+  display: block;
+}
+
+.projects-tooltip {
+  display: none;
+  position: absolute;
+  top: -5px;
+  left: 100%;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 8px;
+  width: 200px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+}
+
+.editable-cell {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  outline: none;
+}
+
+.editable-cell:focus {
+  background: #f3f4f6;
 }
