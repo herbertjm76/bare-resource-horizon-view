@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Resource, ProjectAllocations, AddResourceInput } from './types/resourceTypes';
+import { Resource, AllocationsByWeek, ProjectAllocations, AddResourceInput } from './types/resourceTypes';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useResourceManagement = (
@@ -30,7 +30,7 @@ export const useResourceManagement = (
   const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
     setProjectAllocations(prev => {
       // Create a new object to trigger React updates
-      const updated = { ...prev };
+      const updated: ProjectAllocations = { ...prev };
       
       // Initialize resource allocations if they don't exist
       if (!updated[resourceId]) {
