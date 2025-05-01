@@ -51,7 +51,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     const numValue = parseInt(value, 10);
     const hours = isNaN(numValue) ? 0 : numValue;
     
-    // Save to database
+    // Save to database with the specific date
     saveAllocation(weekKey, hours);
     
     // Propagate change to parent for UI updates

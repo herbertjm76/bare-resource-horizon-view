@@ -26,7 +26,10 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   const { office_stages } = useOfficeSettings();
   const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
   
+  // Get Monday of the start date
   const mondayOfStartDate = startOfWeek(startDate, { weekStartsOn: 1 });
+  
+  // Generate array of weeks
   const weeks = Array.from({ length: weeksToShow }, (_, i) => {
     const weekStart = addWeeks(mondayOfStartDate, i);
     return {
@@ -36,6 +39,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     };
   });
   
+  // Filter projects based on criteria
   const filteredProjects = projects.filter(project => {
     if (filters.office !== "all" && project.office?.name !== filters.office) return false;
     if (filters.country !== "all" && project.country !== filters.country) return false;
@@ -43,6 +47,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     return true;
   });
   
+  // Toggle project expansion
   const toggleProjectExpanded = (projectId: string) => {
     setExpandedProjects(prev => 
       prev.includes(projectId) 
