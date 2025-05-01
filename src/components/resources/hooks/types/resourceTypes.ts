@@ -15,3 +15,10 @@ export interface AllocationRecord {
 
 export type ProjectAllocations = Record<string, Record<string, number>>;
 
+// Define the type that AddResourceDialog expects
+export interface AddResourceInput {
+  staffId: string;
+  name: string;
+  role?: string;
+  isPending?: boolean;
+}

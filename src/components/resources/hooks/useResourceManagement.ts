@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Resource, ProjectAllocations } from './types/resourceTypes';
+import { Resource, ProjectAllocations, AddResourceInput } from './types/resourceTypes';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useResourceManagement = (
@@ -78,9 +77,8 @@ export const useResourceManagement = (
     }
   };
   
-  // Add a resource to the project 
-  // Fix: Changed the parameter type to match what AddResourceDialog expects
-  const handleAddResource = (resourceData: { staffId: string, name: string, role?: string, isPending?: boolean }) => {
+  // Add a resource to the project - using the explicit AddResourceInput type
+  const handleAddResource = (resourceData: AddResourceInput) => {
     // Convert from AddResourceDialog format to Resource format
     const resource: Resource = {
       id: resourceData.staffId,

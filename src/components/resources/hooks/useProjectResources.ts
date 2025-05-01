@@ -2,9 +2,9 @@
 import { useState } from 'react';
 import { useFetchResources } from './useFetchResources';
 import { useResourceManagement } from './useResourceManagement';
-import { Resource } from './types/resourceTypes';
+import { Resource, AddResourceInput } from './types/resourceTypes';
 
-export type { Resource } from './types/resourceTypes';
+export type { Resource, AddResourceInput } from './types/resourceTypes';
 
 export const useProjectResources = (projectId: string) => {
   const [showAddResource, setShowAddResource] = useState(false);
