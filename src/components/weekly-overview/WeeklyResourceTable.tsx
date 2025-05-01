@@ -64,11 +64,10 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
       // Transform the pre-registered members to match team member structure
       return data.map(member => ({
         id: member.id,
-        first_name: member.first_name || 'Pending',
-        last_name: member.last_name || 'Member',
+        first_name: member.first_name || '',
+        last_name: member.last_name || '',
         email: member.email || '',
-        location: member.location || null,
-        isPending: true
+        location: member.location || null
       }));
     },
     enabled: !!session?.user?.id
@@ -162,4 +161,4 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
       </div>
     </div>
   );
-};
+}

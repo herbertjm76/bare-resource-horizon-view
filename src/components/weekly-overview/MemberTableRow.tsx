@@ -52,11 +52,6 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         <div className="flex items-center gap-2">
           <span>
             {member.first_name} {member.last_name}
-            {member.isPending && (
-              <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-1 py-0.5 rounded">
-                Pending
-              </span>
-            )}
           </span>
         </div>
       </TableCell>
