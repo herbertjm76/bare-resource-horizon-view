@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
 import { useResourceAllocationsDB } from '@/hooks/allocations';
+import { ResourceUtilizationBadge } from './components/ResourceUtilizationBadge';
 
 interface ResourceRowProps {
   resource: {
@@ -63,6 +64,15 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
   const getWeekKey = (startDate: Date) => {
     return startDate.toISOString().split('T')[0];
   };
+
+  // Calculate total allocated hours across all weeks
+  const totalAllocatedHours = Object.values(allocations).reduce((sum, hours) => sum + hours, 0);
+  // Standard capacity would be 40 hours per week
+  const standardCapacity = 40 * weeks.length;
+  // Calculate utilization percentage
+  const utilizationPercentage = standardCapacity > 0 
+    ? (totalAllocatedHours / standardCapacity) * 100 
+    : 0;
   
   return (
     <tr className={`border-b ${rowBgClass} group`}>
@@ -74,8 +84,9 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="ml-8">
-              <div className="font-medium text-sm">
+              <div className="font-medium text-sm flex items-center gap-2">
                 {resource.name}
+                <ResourceUtilizationBadge utilization={utilizationPercentage} size="sm" />
               </div>
               <div className="text-xs text-muted-foreground">{resource.role}</div>
             </div>
