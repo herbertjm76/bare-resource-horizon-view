@@ -4,7 +4,7 @@ import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
-import { useResourceAllocations } from '@/hooks/resource-allocations';
+import { useResourceAllocationsDB } from '@/hooks/useResourceAllocationsDB';
 
 interface ResourceRowProps {
   resource: {
@@ -33,14 +33,14 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
   onDeleteResource,
   isEven = false
 }) => {
-  // Use the refactored hook
+  // Use the DB hook instead of local state
   const resourceType = resource.isPending ? 'pre_registered' : 'active';
   const { 
     allocations, 
     isLoading, 
     isSaving, 
     saveAllocation 
-  } = useResourceAllocations(projectId, resource.id, resourceType);
+  } = useResourceAllocationsDB(projectId, resource.id, resourceType);
 
   // Base background color for project rows
   const rowBgClass = isEven 

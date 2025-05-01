@@ -10,6 +10,7 @@ import { useWeekMilestones } from './hooks/useWeekMilestones';
 import { useProjectResources } from './hooks/useProjectResources';
 import { useWeeklyProjectHours } from './hooks/useWeeklyProjectHours';
 import { getWeekKey } from './utils/milestoneUtils';
+import { ProjectTotalsRow } from './components/ProjectTotalsRow';
 
 interface ProjectRowProps {
   project: any;
@@ -91,8 +92,6 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           isExpanded={isExpanded}
           onToggleExpand={onToggleExpand}
           headerBgClass={headerBgClass}
-          weeklyProjectHours={weeklyProjectHours}
-          weeks={weeks}
         />
         
         {/* Week allocation cells - always show project totals */}
@@ -104,20 +103,30 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
             ? hasContinuousStage(weekIndex, milestone, weeks, getWeekKey) 
             : false;
           
-          // For project header row, display total hours with different styling
           return (
-            <td 
-              key={weekKey} 
-              className="p-0 text-center font-medium"
-              style={{ backgroundColor: headerBgClass }}
-            >
-              {projectHours > 0 && (
-                <div className="py-2">{projectHours}</div>
-              )}
-            </td>
+            <WeekAllocationCell
+              key={weekKey}
+              weekKey={weekKey}
+              weekLabel={week.label}
+              projectHours={projectHours}
+              milestone={milestone}
+              continuity={continuity}
+              stageColorMap={stageColorMap}
+              setWeekMilestone={setWeekMilestone}
+              projectStages={project.officeStages || []}
+            />
           );
         })}
       </tr>
+      
+      {/* Totals summary row when project is expanded */}
+      {isExpanded && (
+        <ProjectTotalsRow
+          weeklyProjectHours={weeklyProjectHours}
+          weeks={weeks}
+          isEven={isEven}
+        />
+      )}
       
       {/* Resource rows when project is expanded */}
       {isExpanded && resources.map(resource => (
