@@ -9,7 +9,7 @@ export const useResourceManagement = (
   resources: Resource[], 
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>
 ) => {
-  // Store project allocations by resource ID with explicit type
+  // Store project allocations by resource ID with explicit simple type
   const [projectAllocations, setProjectAllocations] = useState<Record<string, AllocationsByWeek>>({});
   
   // Initialize project allocations based on resources
@@ -67,7 +67,7 @@ export const useResourceManagement = (
       
       // Remove this resource's allocations from projectAllocations
       setProjectAllocations(prev => {
-        const updated = { ...prev };
+        const updated: Record<string, AllocationsByWeek> = { ...prev };
         delete updated[resourceId];
         return updated;
       });
@@ -92,10 +92,11 @@ export const useResourceManagement = (
     setResources(prev => [...prev, resource]);
     
     // Initialize empty allocations for this resource
-    setProjectAllocations(prev => ({
-      ...prev,
-      [resource.id]: {}
-    }));
+    setProjectAllocations(prev => {
+      const updated: Record<string, AllocationsByWeek> = { ...prev };
+      updated[resource.id] = {};
+      return updated;
+    });
     
     console.debug(`Added resource ${resource.id} (${resource.name}) to project ${projectId}`);
   };

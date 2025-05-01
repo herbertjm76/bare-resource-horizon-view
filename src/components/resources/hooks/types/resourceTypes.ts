@@ -13,7 +13,7 @@ export interface AllocationRecord {
   hours: number;
 }
 
-// Define allocation types without circular references
+// Simpler definition of allocations by week without circular references
 export type AllocationsByWeek = Record<string, number>;
 
 // Define the type that AddResourceDialog expects
