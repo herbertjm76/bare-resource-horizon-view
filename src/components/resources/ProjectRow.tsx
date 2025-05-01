@@ -55,11 +55,15 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   // Sum up all resource hours for each week
   const weeklyProjectHours = useWeeklyProjectHours(projectAllocations, weeks);
   
+  // Calculate total project hours
+  const totalProjectHours = Object.values(weeklyProjectHours).reduce((sum, hours) => sum + hours, 0);
+  
   // For debugging
   React.useEffect(() => {
     console.log("Project allocations:", projectAllocations);
     console.log("Weekly project hours:", weeklyProjectHours);
-  }, [projectAllocations, weeklyProjectHours]);
+    console.log("Total project hours:", totalProjectHours);
+  }, [projectAllocations, weeklyProjectHours, totalProjectHours]);
 
   // Base background color for project rows
   const rowBgClass = isEven 
@@ -99,6 +103,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           isExpanded={isExpanded}
           onToggleExpand={onToggleExpand}
           headerBgClass={headerBgClass}
+          totalHours={totalProjectHours} // Pass the total hours to the header
         />
         
         {/* Week allocation cells - always show project totals */}
@@ -139,8 +144,8 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         />
       ))}
       
-      {/* Project totals row when expanded */}
-      {isExpanded && resources.length > 0 && (
+      {/* Only show project totals in a separate row if resources exist and the project is expanded */}
+      {isExpanded && resources.length > 0 && false && ( // We've disabled this by setting condition to false
         <ProjectTotalsRow
           weeklyProjectHours={weeklyProjectHours}
           weeks={weeks}

@@ -9,6 +9,7 @@ interface ProjectHeaderProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   headerBgClass: string;
+  totalHours?: number; // Add total hours prop
 }
 
 export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
@@ -16,7 +17,8 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   resourceCount,
   isExpanded,
   onToggleExpand,
-  headerBgClass
+  headerBgClass,
+  totalHours = 0 // Default to 0 if not provided
 }) => {
   return (
     <>
@@ -34,7 +36,12 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             </Button>
             <div>
               <div className="font-medium">{project.name}</div>
-              <div className="text-xs text-muted-foreground">{project.code}</div>
+              <div className="text-xs text-muted-foreground">
+                {project.code}
+                {totalHours > 0 && (
+                  <span className="ml-2 font-medium text-brand-primary">• {totalHours}h total</span>
+                )}
+              </div>
             </div>
           </div>
           
