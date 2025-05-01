@@ -109,7 +109,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
   }, [company]);
   
   const handleAdd = async () => {
-    if (!selectedResource || !company?.id) {
+    if (!selectedResource || !company?.id || !projectId) {
       toast.error('Please select a resource and try again');
       return;
     }
@@ -146,7 +146,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
         
         console.log('Added pending resource:', data);
       } else {
-        // Add active resource
+        // Add active resource - explicitly include company_id
         const { data, error } = await supabase
           .from('project_resources')
           .insert({

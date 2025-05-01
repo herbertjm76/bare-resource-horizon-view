@@ -23,11 +23,15 @@ export const useProjectResources = (projectId: string) => {
 
   // Fetch resources for this project
   const fetchResources = useCallback(async () => {
-    if (!projectId || !company?.id) return;
+    if (!projectId || !company?.id) {
+      console.log('Missing projectId or company.id');
+      setIsLoading(false);
+      return;
+    }
     
     setIsLoading(true);
     try {
-      console.log('Fetching resources for project:', projectId);
+      console.log('Fetching resources for project:', projectId, 'company:', company.id);
       
       // Fetch active members assigned to this project
       const { data: activeMembers, error: activeError } = await supabase

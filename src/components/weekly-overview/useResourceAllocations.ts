@@ -2,6 +2,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, parseISO, startOfWeek } from 'date-fns';
+import { useCompany } from '@/context/CompanyContext';
+import { toast } from 'sonner';
 
 interface TeamMember {
   id: string;
@@ -27,6 +29,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
   const [memberAllocations, setMemberAllocations] = useState<Record<string, MemberAllocation>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const { company } = useCompany();
   
   // Format date for database consistency
   const formatDateKey = (date: Date) => {
@@ -35,7 +38,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
 
   // Fetch allocations for all team members for the selected week
   const fetchAllocations = useCallback(async () => {
-    if (!teamMembers || teamMembers.length === 0) {
+    if (!teamMembers || teamMembers.length === 0 || !company?.id) {
       setIsLoading(false);
       setMemberAllocations({});
       return;
@@ -59,6 +62,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
         `)
         .eq('resource_type', 'active')
         .eq('week_start_date', weekKey)
+        .eq('company_id', company.id)
         .in('resource_id', memberIds);
       
       if (error) {
@@ -104,10 +108,11 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
       setMemberAllocations(initialAllocations);
     } catch (error) {
       console.error('Error fetching allocations:', error);
+      toast.error('Failed to fetch resource allocations');
     } finally {
       setIsLoading(false);
     }
-  }, [teamMembers, selectedWeek]);
+  }, [teamMembers, selectedWeek, company?.id]);
   
   // Fetch allocations when team members or selected week changes
   useEffect(() => {

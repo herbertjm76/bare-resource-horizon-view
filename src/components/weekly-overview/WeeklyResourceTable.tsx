@@ -7,6 +7,7 @@ import { Table, TableBody } from "@/components/ui/table";
 import { WeeklyResourceHeader } from './WeeklyResourceHeader';
 import { MemberTableRow } from './MemberTableRow';
 import { useResourceAllocations } from './useResourceAllocations';
+import { useCompany } from "@/context/CompanyContext";
 import './weekly-overview.css';
 
 interface WeeklyResourceTableProps {
@@ -20,6 +21,9 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   selectedWeek,
   filters
 }) => {
+  // Get company context
+  const { company } = useCompany();
+  
   // Get current user ID
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -35,24 +39,15 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   
   // Get pending team members (pre-registered)
   const { data: preRegisteredMembers = [], isLoading: isLoadingPending } = useQuery({
-    queryKey: ['preRegisteredMembers', session?.user?.id],
+    queryKey: ['preRegisteredMembers', session?.user?.id, company?.id],
     queryFn: async () => {
-      if (!session?.user?.id) return [];
-      
-      // First get the company ID from the user's profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('company_id')
-        .eq('id', session.user.id)
-        .single();
-      
-      if (!profile?.company_id) return [];
+      if (!session?.user?.id || !company?.id) return [];
       
       // Get pre-registered members from invites table
       const { data, error } = await supabase
         .from('invites')
         .select('id, first_name, last_name, email, department, location, job_title, role')
-        .eq('company_id', profile.company_id)
+        .eq('company_id', company.id)
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
         
@@ -70,7 +65,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
         location: member.location || null
       }));
     },
-    enabled: !!session?.user?.id
+    enabled: !!session?.user?.id && !!company?.id
   });
 
   // Get allocations from custom hook - include both active and pre-registered members
@@ -83,15 +78,19 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
 
   // Fetch office locations
   const { data: officeLocations = [] } = useQuery({
-    queryKey: ['officeLocations'],
+    queryKey: ['officeLocations', company?.id],
     queryFn: async () => {
+      if (!company?.id) return [];
+      
       const { data, error } = await supabase
         .from('office_locations')
-        .select('id, code, city, country');
+        .select('id, code, city, country')
+        .eq('company_id', company.id);
       
       if (error) throw error;
       return data;
-    }
+    },
+    enabled: !!company?.id
   });
 
   const isLoading = isLoadingMembers || isLoadingPending || isLoadingAllocations;
