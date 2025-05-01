@@ -1,8 +1,6 @@
-
 const Hero = () => {
-  return (
-    <div className="relative pt-20 bg-hero">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+  return <div className="relative pt-20 bg-hero">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Hero Text */}
           <div className="space-y-6">
@@ -23,19 +21,13 @@ const Hero = () => {
           </div>
           
           {/* Hero Image */}
-          <div className="relative flex justify-center">
+          <div className="relative flex justify-center py-[32px]">
             <div className="bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-2xl">
-              <img 
-                src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
-                alt="Team collaboration illustration"
-                className="w-full rounded-xl"
-              />
+              <img src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" alt="Team collaboration illustration" className="w-full rounded-xl " />
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Hero;
