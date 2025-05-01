@@ -78,7 +78,7 @@ export const useResourceManagement = (
     }
   };
   
-  // Add a resource to the project - using the explicit AddResourceInput type
+  // Add a resource to the project
   const handleAddResource = (resourceData: AddResourceInput) => {
     // Convert from AddResourceDialog format to Resource format
     const resource: Resource = {
