@@ -6,7 +6,6 @@ interface TeamMember {
   first_name: string;
   last_name: string;
   location: string | null;
-  isPending?: boolean;
 }
 
 export interface MemberAllocation {
