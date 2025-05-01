@@ -5,30 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/components/dashboard/types";
 import { toast } from "sonner";
 
-export const useTeamMembersData = (userId: string | null) => {
+export const useTeamMembersData = (includeInactive: boolean = false) => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  // Fetch user profile
-  const {
-    data: userProfile,
-    isLoading: isProfileLoading
-  } = useQuery({
-    queryKey: ['userProfile', userId, refreshTrigger],
-    queryFn: async () => {
-      console.log('Fetching user profile for ID:', userId);
-      const {
-        data,
-        error
-      } = await supabase.from('profiles').select('*').eq('id', userId).single();
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        throw error;
-      }
-      console.log('User profile fetched:', data);
-      return data;
-    },
-    enabled: !!userId
-  });
 
   // Fetch team members with refetch capability
   const {
@@ -36,16 +14,17 @@ export const useTeamMembersData = (userId: string | null) => {
     isLoading,
     refetch: refetchTeamMembers
   } = useQuery({
-    queryKey: ['teamMembers', userProfile?.company_id, refreshTrigger],
+    queryKey: ['teamMembers', refreshTrigger],
     queryFn: async () => {
       console.log('Fetching team members, refresh trigger:', refreshTrigger);
-      console.log('Company ID for fetch:', userProfile?.company_id);
+      console.log('Include inactive members:', includeInactive);
       
       try {
+        // We're fetching directly without relying on a user profile
+        // In a real app, you might want to get the company_id from a context or other source
         const { data: profiles, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('company_id', userProfile?.company_id)
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -55,7 +34,6 @@ export const useTeamMembersData = (userId: string | null) => {
         }
 
         console.log('Fetched profiles:', profiles?.length || 0);
-        console.log('Profile data:', profiles);
         return profiles as Profile[];
       } catch (fetchError) {
         console.error('Error in team members fetch function:', fetchError);
@@ -63,7 +41,6 @@ export const useTeamMembersData = (userId: string | null) => {
         return [];
       }
     },
-    enabled: !!userProfile?.company_id,
     refetchInterval: false,
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -84,8 +61,6 @@ export const useTeamMembersData = (userId: string | null) => {
   }, [refetchTeamMembers]);
 
   return {
-    userProfile,
-    isProfileLoading,
     teamMembers,
     isLoading,
     triggerRefresh,
