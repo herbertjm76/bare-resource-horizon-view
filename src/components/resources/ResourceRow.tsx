@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
-import { useResourceAllocationsDB } from '@/hooks/useResourceAllocationsDB';
+import { useResourceAllocationsDB } from '@/hooks/resource-allocations';
 
 interface ResourceRowProps {
   resource: {
