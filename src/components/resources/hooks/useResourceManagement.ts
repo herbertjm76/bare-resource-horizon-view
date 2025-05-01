@@ -1,48 +1,56 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Resource, AddResourceInput, WeeklyAllocation } from './types/resourceTypes';
+import { Resource, AddResourceInput } from './types/resourceTypes';
 import { supabase } from '@/integrations/supabase/client';
 
-// Define simple types to avoid deep recursion
-type SimpleAllocationMap = {
-  [resourceId: string]: {
-    [weekKey: string]: number
-  }
-}
+// Use a flat map instead of nested objects
+type FlatAllocationMap = Record<string, number>;
+
+// Helper to create composite keys
+const createKey = (resourceId: string, weekKey: string) => `${resourceId}:${weekKey}`;
+
+// Helper to parse composite keys
+const parseKey = (compositeKey: string): { resourceId: string, weekKey: string } => {
+  const [resourceId, weekKey] = compositeKey.split(':');
+  return { resourceId, weekKey };
+};
 
 export const useResourceManagement = (
   projectId: string, 
   resources: Resource[], 
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>
 ) => {
-  // Use a simple object type to store allocations
-  const [projectAllocations, setProjectAllocations] = useState<SimpleAllocationMap>({});
+  // Use a flat structure to store allocations
+  const [allAllocations, setAllAllocations] = useState<FlatAllocationMap>({});
   
-  // Initialize allocations when resources change
-  useEffect(() => {
-    const initialAllocations: SimpleAllocationMap = {};
+  // Derived projectAllocations object (computed property)
+  const projectAllocations = React.useMemo(() => {
+    // Create a new object for returning to components
+    const result: Record<string, Record<string, number>> = {};
     
-    resources.forEach(resource => {
-      initialAllocations[resource.id] = {};
-    });
-    
-    setProjectAllocations(initialAllocations);
-  }, [resources]);
-
-  // Update allocation hours for a resource and week
-  const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
-    setProjectAllocations(prev => {
-      const updated = { ...prev };
+    // Process flat allocations into the expected structure for component consumption
+    Object.entries(allAllocations).forEach(([compositeKey, hours]) => {
+      const { resourceId, weekKey } = parseKey(compositeKey);
       
-      if (!updated[resourceId]) {
-        updated[resourceId] = {};
+      if (!result[resourceId]) {
+        result[resourceId] = {};
       }
       
-      updated[resourceId][weekKey] = hours;
-      
-      return updated;
+      result[resourceId][weekKey] = hours;
     });
+    
+    return result;
+  }, [allAllocations]);
+  
+  // Update allocation hours for a resource and week
+  const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
+    const key = createKey(resourceId, weekKey);
+    
+    setAllAllocations(prev => ({
+      ...prev,
+      [key]: hours
+    }));
   };
 
   // Delete a resource from the project
@@ -60,10 +68,17 @@ export const useResourceManagement = (
       // Update local state
       setResources(prev => prev.filter(r => r.id !== resourceId));
       
-      // Remove allocations
-      setProjectAllocations(prev => {
+      // Remove allocations for this resource
+      setAllAllocations(prev => {
         const updated = { ...prev };
-        delete updated[resourceId];
+        
+        // Find and remove all entries for this resource
+        Object.keys(updated).forEach(key => {
+          if (key.startsWith(`${resourceId}:`)) {
+            delete updated[key];
+          }
+        });
+        
         return updated;
       });
       
@@ -85,13 +100,6 @@ export const useResourceManagement = (
     
     // Update resources list
     setResources(prev => [...prev, resource]);
-    
-    // Initialize empty allocations
-    setProjectAllocations(prev => {
-      const updated = { ...prev };
-      updated[resource.id] = {};
-      return updated;
-    });
   };
 
   return {

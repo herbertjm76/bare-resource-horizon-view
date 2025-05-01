@@ -8,8 +8,10 @@ export interface Resource {
   isPending?: boolean;
 }
 
-// Simple allocation type for tracking hours per week
-export type WeeklyAllocation = {
+// Flat allocation type using composite keys
+export interface ResourceAllocation {
+  key: string; // Format: "resourceId:weekKey"
+  resourceId: string;
   weekKey: string;
   hours: number;
 }
