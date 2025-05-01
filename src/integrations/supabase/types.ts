@@ -562,6 +562,57 @@ export type Database = {
           },
         ]
       }
+      project_resource_allocations: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          hours: number
+          id: string
+          project_id: string
+          resource_id: string
+          resource_type: string
+          updated_at: string
+          week_start_date: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          hours?: number
+          id?: string
+          project_id: string
+          resource_id: string
+          resource_type: string
+          updated_at?: string
+          week_start_date: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          hours?: number
+          id?: string
+          project_id?: string
+          resource_id?: string
+          resource_type?: string
+          updated_at?: string
+          week_start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_resource_allocations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_resource_allocations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_resources: {
         Row: {
           company_id: string | null

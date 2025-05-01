@@ -1,9 +1,10 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
+import { useResourceAllocationsDB } from '@/hooks/useResourceAllocationsDB';
 
 interface ResourceRowProps {
   resource: {
@@ -32,7 +33,14 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
   onDeleteResource,
   isEven = false
 }) => {
-  const [allocations, setAllocations] = useState<Record<string, number>>(resource.allocations || {});
+  // Use the DB hook instead of local state
+  const resourceType = resource.isPending ? 'pre_registered' : 'active';
+  const { 
+    allocations, 
+    isLoading, 
+    isSaving, 
+    saveAllocation 
+  } = useResourceAllocationsDB(projectId, resource.id, resourceType);
 
   // Base background color for project rows
   const rowBgClass = isEven 
@@ -43,13 +51,10 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     const numValue = parseInt(value, 10);
     const hours = isNaN(numValue) ? 0 : numValue;
     
-    // Update local state
-    setAllocations(prev => ({
-      ...prev,
-      [weekKey]: hours
-    }));
+    // Save to database
+    saveAllocation(weekKey, hours);
     
-    // Propagate change to parent
+    // Propagate change to parent for UI updates
     onAllocationChange(resource.id, weekKey, hours);
   };
   
@@ -102,8 +107,9 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
                 max="168"
                 value={hoursValue > 0 ? hoursValue : ''}
                 onChange={(e) => handleAllocationChange(weekKey, e.target.value)}
-                className="w-full h-8 px-1 text-center text-sm border-gray-200 focus:border-brand-violet"
+                className={`w-full h-8 px-1 text-center text-sm border-gray-200 focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''}`}
                 placeholder="0"
+                disabled={isLoading || isSaving}
               />
             </div>
           </td>

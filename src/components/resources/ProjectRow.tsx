@@ -34,11 +34,12 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     resources,
     projectAllocations,
     showAddResource,
+    isLoading,
     setShowAddResource,
     handleAllocationChange,
     handleDeleteResource,
     handleAddResource
-  } = useProjectResources();
+  } = useProjectResources(project.id);
 
   const { 
     weekMilestones, 
@@ -61,6 +62,26 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   const headerBgClass = isEven 
     ? "bg-brand-violet-light/70 hover:bg-brand-violet-light" 
     : "bg-brand-violet-light hover:bg-brand-violet-light/90";
+
+  if (isLoading && isExpanded) {
+    return (
+      <tr className={`border-t border-b border-gray-200 ${headerBgClass}`}>
+        <ProjectHeader
+          project={project}
+          resourceCount={0}
+          isExpanded={isExpanded}
+          onToggleExpand={onToggleExpand}
+          headerBgClass={headerBgClass}
+        />
+        
+        {weeks.map((week) => (
+          <td key={getWeekKey(week.startDate)} className="p-0 text-center">
+            <div className="h-full flex items-center justify-center">-</div>
+          </td>
+        ))}
+      </tr>
+    );
+  }
 
   return <>
       <tr className={`border-t border-b border-gray-200 ${headerBgClass}`}>
