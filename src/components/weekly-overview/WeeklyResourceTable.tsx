@@ -32,9 +32,53 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   
   // Get team members data using the hook
   const { teamMembers, isLoading } = useTeamMembersData(session?.user?.id || null);
+  
+  // Get pending team members (pre-registered)
+  const { data: preRegisteredMembers = [], isLoading: isLoadingPending } = useQuery({
+    queryKey: ['preRegisteredMembers', session?.user?.id],
+    queryFn: async () => {
+      if (!session?.user?.id) return [];
+      
+      // First get the company ID from the user's profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('company_id')
+        .eq('id', session.user.id)
+        .single();
+      
+      if (!profile?.company_id) return [];
+      
+      // Get pre-registered members from invites table
+      const { data, error } = await supabase
+        .from('invites')
+        .select('id, first_name, last_name, email, department, location, job_title, role')
+        .eq('company_id', profile.company_id)
+        .eq('invitation_type', 'pre_registered')
+        .eq('status', 'pending');
+        
+      if (error) {
+        console.error("Error fetching pre-registered members:", error);
+        return [];
+      }
+      
+      // Transform the pre-registered members to match team member structure
+      return data.map(member => ({
+        id: member.id,
+        first_name: member.first_name || 'Pending',
+        last_name: member.last_name || 'Member',
+        email: member.email || '',
+        location: member.location || null,
+        isPending: true
+      }));
+    },
+    enabled: !!session?.user?.id
+  });
 
-  // Get allocations from custom hook
-  const { getMemberAllocation, handleInputChange } = useResourceAllocations(teamMembers);
+  // Get allocations from custom hook - include both active and pre-registered members
+  const { getMemberAllocation, handleInputChange } = useResourceAllocations([
+    ...teamMembers, 
+    ...preRegisteredMembers
+  ]);
 
   // Fetch office locations
   const { data: officeLocations = [] } = useQuery({
@@ -49,15 +93,18 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     }
   });
 
+  // Combine active and pre-registered team members
+  const allMembers = [...teamMembers, ...preRegisteredMembers];
+
   // Group team members by office
-  const membersByOffice = teamMembers.reduce((acc, member) => {
+  const membersByOffice = allMembers.reduce((acc, member) => {
     const location = member.location || 'Unassigned';
     if (!acc[location]) {
       acc[location] = [];
     }
     acc[location].push(member);
     return acc;
-  }, {} as Record<string, typeof teamMembers>);
+  }, {} as Record<string, typeof allMembers>);
 
   // Filter by selected office if needed
   let filteredOffices = Object.keys(membersByOffice);
@@ -68,7 +115,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   // Sort offices alphabetically
   filteredOffices.sort();
 
-  if (isLoading) {
+  if (isLoading || isLoadingPending) {
     return (
       <div className="text-center py-12">
         <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>

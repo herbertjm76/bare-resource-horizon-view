@@ -28,6 +28,7 @@ interface MemberTableRowProps {
     first_name: string;
     last_name: string;
     location: string | null;
+    isPending?: boolean;
   };
   allocation: MemberAllocation;
   isEven: boolean;
@@ -49,7 +50,14 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
     <TableRow className={isEven ? "bg-muted/10" : ""}>
       <TableCell className="py-1 px-4 name-column">
         <div className="flex items-center gap-2">
-          <span>{member.first_name} {member.last_name}</span>
+          <span>
+            {member.first_name} {member.last_name}
+            {member.isPending && (
+              <span className="ml-2 text-xs bg-yellow-100 text-yellow-800 px-1 py-0.5 rounded">
+                Pending
+              </span>
+            )}
+          </span>
         </div>
       </TableCell>
       
@@ -81,7 +89,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         </div>
       </TableCell>
       
-      <TableCell className="py-1 px-1 text-center number-column bg-orange-400 text-white font-bold">
+      <TableCell className="py-1 px-1 text-center number-column font-bold">
         <div className="table-cell">{capacity}</div>
       </TableCell>
       
@@ -90,7 +98,15 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       </TableCell>
       
       <TableCell className="py-1 px-1 bg-yellow-100 number-column">
-        <div className="table-cell">{allocation.annualLeave}</div>
+        <div className="table-cell">
+          <input
+            type="number"
+            min="0"
+            value={allocation.annualLeave}
+            onChange={(e) => onInputChange(member.id, 'annualLeave', e.target.value)}
+            className="editable-cell"
+          />
+        </div>
       </TableCell>
       
       <TableCell className="py-1 px-1 number-column">

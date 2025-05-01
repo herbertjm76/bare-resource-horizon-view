@@ -6,6 +6,7 @@ interface TeamMember {
   first_name: string;
   last_name: string;
   location: string | null;
+  isPending?: boolean;
 }
 
 export interface MemberAllocation {
@@ -28,16 +29,20 @@ export function useResourceAllocations(teamMembers: TeamMember[]) {
   const getMemberAllocation = (memberId: string): MemberAllocation => {
     if (!memberAllocations[memberId]) {
       // For demo purposes - in a real app, you'd fetch this data from the backend
-      const resourcedHours = Math.floor(Math.random() * 30);
+      // Different defaults for pending vs active members
+      const isPending = teamMembers.find(m => m.id === memberId)?.isPending;
+      const resourcedHours = isPending ? 0 : Math.floor(Math.random() * 30);
+      const projectCount = isPending ? 0 : Math.floor(Math.random() * 3) + 1;
+      
       const allocation = {
         id: memberId,
-        annualLeave: Math.floor(Math.random() * 8),
+        annualLeave: 0,
         publicHoliday: Math.floor(Math.random() * 8),
         vacationLeave: 0,
         medicalLeave: 0,
         others: 0,
-        remarks: '',
-        projects: new Array(Math.floor(Math.random() * 3) + 1).fill(0).map((_, i) => `Project ${i+1}`),
+        remarks: isPending ? 'Pending team member' : '',
+        projects: new Array(projectCount).fill(0).map((_, i) => `Project ${i+1}`),
         resourcedHours,
       };
       setMemberAllocations(prev => ({...prev, [memberId]: allocation}));

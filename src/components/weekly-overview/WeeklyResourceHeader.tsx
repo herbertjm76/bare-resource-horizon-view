@@ -17,7 +17,7 @@ export const WeeklyResourceHeader: React.FC = () => {
         </TableHead>
         
         <TableHead className="py-2 px-4 office-column">
-          <div className="font-medium">Office</div>
+          <div className="font-medium text-center">Office</div>
         </TableHead>
         
         {/* Acronym header cells with tooltips */}
@@ -33,7 +33,7 @@ export const WeeklyResourceHeader: React.FC = () => {
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column bg-orange-400 text-white">
+          <TableHead className="header-cell number-column">
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">CAP</div>
