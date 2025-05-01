@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { ResourceRow } from '@/components/resources/ResourceRow';
-import { AddResourceDialog } from '@/components/resources/AddResourceDialog';
+import { AddResourceDialog } from '@/components/resources/dialogs/AddResourceDialog';
 import { useStageColorMap } from '@/components/projects/hooks/useProjectColors';
 import { ProjectHeader } from './components/ProjectHeader';
 import { WeekAllocationCell } from './components/WeekAllocationCell';
