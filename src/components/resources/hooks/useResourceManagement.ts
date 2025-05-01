@@ -9,7 +9,7 @@ export const useResourceManagement = (
   resources: Resource[], 
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>
 ) => {
-  // Store project allocations by resource ID
+  // Store project allocations by resource ID with explicit type
   const [projectAllocations, setProjectAllocations] = useState<Record<string, AllocationsByWeek>>({});
   
   // Initialize project allocations based on resources
@@ -30,7 +30,7 @@ export const useResourceManagement = (
   const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
     setProjectAllocations(prev => {
       // Create a new object to trigger React updates
-      const updated = { ...prev };
+      const updated: Record<string, AllocationsByWeek> = { ...prev };
       
       // Initialize resource allocations if they don't exist
       if (!updated[resourceId]) {
