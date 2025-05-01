@@ -25,8 +25,8 @@ const ProjectResourcing = () => {
   // Get project data
   const { projects, isLoading: isLoadingProjects } = useProjects();
   
-  // Get team members data
-  const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData();
+  // Get team members data - passing true to include inactive members
+  const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData(true);
   
   // Generate week data for utilization summary
   const weeks = Array.from({ length: filters.weeksToShow }, (_, i) => {
