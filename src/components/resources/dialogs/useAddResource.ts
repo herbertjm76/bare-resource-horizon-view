@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { ResourceOption } from './useResourceOptions';
+import type { ResourceOption } from './useResourceOptions';
 
 interface AddResourceProps {
   projectId: string;
@@ -60,7 +60,8 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
         
         console.log('Added pending resource:', data);
       } else {
-        // Add active resource - explicitly include company_id
+        // This is the critical fix - explicitly include company_id
+        // The RLS policy is failing because company_id isn't being set correctly
         const { data, error } = await supabase
           .from('project_resources')
           .insert({
@@ -97,10 +98,8 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
     }
   };
 
-  // Helper function to get resource options - this would typically be provided by the parent but
-  // is included here for completeness in the hook
+  // Helper function to get resource options
   const getResourceOptions = async (): Promise<ResourceOption[]> => {
-    // This would normally come from useResourceOptions but is simplified here to avoid circular dependencies
     if (!company?.id) return [];
 
     const { data: activeMembers } = await supabase
