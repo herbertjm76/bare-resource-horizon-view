@@ -8,15 +8,11 @@ export interface Resource {
   isPending?: boolean;
 }
 
-// Simple definition for allocation records
-export interface AllocationRecord {
-  resourceId: string;
+// Simple allocation type for tracking hours per week
+export type WeeklyAllocation = {
   weekKey: string;
   hours: number;
 }
-
-// Simple map of week key to hours
-export type AllocationsByWeek = Record<string, number>;
 
 // Define the type that AddResourceDialog expects
 export interface AddResourceInput {

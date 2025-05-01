@@ -12,7 +12,7 @@ export const useProjectResources = (projectId: string) => {
   // Get resources data
   const { resources, isLoading, setResources, refreshResources } = useFetchResources(projectId);
   
-  // Get resource management functions with properly typed parameters
+  // Get resource management functions
   const { 
     projectAllocations, 
     handleAllocationChange, 

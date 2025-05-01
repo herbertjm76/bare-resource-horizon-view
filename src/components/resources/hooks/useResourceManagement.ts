@@ -1,46 +1,45 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Resource, AllocationsByWeek, AddResourceInput } from './types/resourceTypes';
+import { Resource, AddResourceInput, WeeklyAllocation } from './types/resourceTypes';
 import { supabase } from '@/integrations/supabase/client';
+
+// Define simple types to avoid deep recursion
+type SimpleAllocationMap = {
+  [resourceId: string]: {
+    [weekKey: string]: number
+  }
+}
 
 export const useResourceManagement = (
   projectId: string, 
   resources: Resource[], 
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>
 ) => {
-  // Use a simple Record type to store allocations
-  const [projectAllocations, setProjectAllocations] = useState<Record<string, AllocationsByWeek>>({});
+  // Use a simple object type to store allocations
+  const [projectAllocations, setProjectAllocations] = useState<SimpleAllocationMap>({});
   
   // Initialize allocations when resources change
   useEffect(() => {
-    const initialAllocations: Record<string, AllocationsByWeek> = {};
+    const initialAllocations: SimpleAllocationMap = {};
     
     resources.forEach(resource => {
-      // Make sure we don't access potentially undefined properties
       initialAllocations[resource.id] = {};
     });
     
     setProjectAllocations(initialAllocations);
-    
   }, [resources]);
 
   // Update allocation hours for a resource and week
   const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
     setProjectAllocations(prev => {
-      // Create a new object to avoid mutation
-      const updated: Record<string, AllocationsByWeek> = { ...prev };
+      const updated = { ...prev };
       
-      // Initialize resource allocations if they don't exist
       if (!updated[resourceId]) {
         updated[resourceId] = {};
       }
       
-      // Update the specific week
-      updated[resourceId] = {
-        ...updated[resourceId],
-        [weekKey]: hours
-      };
+      updated[resourceId][weekKey] = hours;
       
       return updated;
     });
@@ -63,7 +62,7 @@ export const useResourceManagement = (
       
       // Remove allocations
       setProjectAllocations(prev => {
-        const updated: Record<string, AllocationsByWeek> = { ...prev };
+        const updated = { ...prev };
         delete updated[resourceId];
         return updated;
       });
@@ -89,7 +88,7 @@ export const useResourceManagement = (
     
     // Initialize empty allocations
     setProjectAllocations(prev => {
-      const updated: Record<string, AllocationsByWeek> = { ...prev };
+      const updated = { ...prev };
       updated[resource.id] = {};
       return updated;
     });
