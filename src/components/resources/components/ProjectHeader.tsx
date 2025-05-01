@@ -9,6 +9,8 @@ interface ProjectHeaderProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   headerBgClass: string;
+  weeklyProjectHours?: Record<string, number>;
+  weeks?: { startDate: Date; label: string; }[];
 }
 
 export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
@@ -16,7 +18,9 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   resourceCount,
   isExpanded,
   onToggleExpand,
-  headerBgClass
+  headerBgClass,
+  weeklyProjectHours = {},
+  weeks = []
 }) => {
   return (
     <>
