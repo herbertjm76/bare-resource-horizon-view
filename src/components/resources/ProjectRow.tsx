@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/AddResourceDialog';
