@@ -27,6 +27,8 @@ export const useProjectResources = (projectId: string) => {
     
     setIsLoading(true);
     try {
+      console.log('Fetching resources for project:', projectId);
+      
       // Fetch active members assigned to this project
       const { data: activeMembers, error: activeError } = await supabase
         .from('project_resources')
@@ -39,7 +41,12 @@ export const useProjectResources = (projectId: string) => {
         .eq('project_id', projectId)
         .eq('company_id', company.id);
       
-      if (activeError) throw activeError;
+      if (activeError) {
+        console.error('Error fetching active members:', activeError);
+        throw activeError;
+      }
+      
+      console.log('Active members:', activeMembers);
       
       // Fetch pre-registered members assigned to this project
       const { data: preRegisteredMembers, error: pendingError } = await supabase
@@ -53,20 +60,25 @@ export const useProjectResources = (projectId: string) => {
         .eq('project_id', projectId)
         .eq('company_id', company.id);
         
-      if (pendingError) throw pendingError;
+      if (pendingError) {
+        console.error('Error fetching pending members:', pendingError);
+        throw pendingError;
+      }
+      
+      console.log('Pre-registered members:', preRegisteredMembers);
       
       // Format the results to match our Resource interface
-      const activeResources: Resource[] = activeMembers.map(member => ({
+      const activeResources: Resource[] = (activeMembers || []).map(member => ({
         id: member.staff_id,
-        name: `${member.staff.first_name || ''} ${member.staff.last_name || ''}`.trim() || 'Unnamed',
-        role: member.staff.job_title || 'Team Member',
+        name: `${member.staff?.first_name || ''} ${member.staff?.last_name || ''}`.trim() || 'Unnamed',
+        role: member.staff?.job_title || 'Team Member',
         isPending: false,
       }));
       
-      const pendingResources: Resource[] = preRegisteredMembers.map(member => ({
+      const pendingResources: Resource[] = (preRegisteredMembers || []).map(member => ({
         id: member.invite_id,
-        name: `${member.invite.first_name || ''} ${member.invite.last_name || ''}`.trim() || 'Unnamed',
-        role: member.invite.job_title || 'Team Member',
+        name: `${member.invite?.first_name || ''} ${member.invite?.last_name || ''}`.trim() || 'Unnamed',
+        role: member.invite?.job_title || 'Team Member',
         isPending: true,
       }));
       
@@ -104,6 +116,8 @@ export const useProjectResources = (projectId: string) => {
     if (!projectId || !company?.id) return;
     
     try {
+      console.log('Deleting resource:', resourceId);
+      
       const resourceToDelete = resources.find(r => r.id === resourceId);
       
       if (resourceToDelete?.isPending) {
@@ -158,53 +172,19 @@ export const useProjectResources = (projectId: string) => {
 
   // Add a new resource to the project
   const handleAddResource = async (resource: { staffId: string; name: string; role?: string; isPending?: boolean }) => {
-    if (!projectId || !company?.id) return;
+    console.log('Adding resource to state:', resource);
     
-    try {
-      if (resource.isPending) {
-        // Add pre-registered resource
-        const { data, error } = await supabase
-          .from('pending_resources')
-          .insert({
-            invite_id: resource.staffId,
-            project_id: projectId,
-            company_id: company.id,
-            hours: 0
-          })
-          .select();
-          
-        if (error) throw error;
-      } else {
-        // Add active resource
-        const { data, error } = await supabase
-          .from('project_resources')
-          .insert({
-            staff_id: resource.staffId,
-            project_id: projectId,
-            company_id: company.id,
-            hours: 0
-          })
-          .select();
-          
-        if (error) throw error;
-      }
-      
-      // Add the new resource to our local state
-      const newResource = {
-        id: resource.staffId,
-        name: resource.name,
-        role: resource.role || 'Team Member',
-        allocations: {},
-        isPending: resource.isPending
-      };
-      
-      setResources(prev => [...prev, newResource]);
-      setShowAddResource(false);
-      toast.success(`${resource.name} added to project`);
-    } catch (error) {
-      console.error('Error adding resource:', error);
-      toast.error('Failed to add resource to project');
-    }
+    // Add the new resource to our local state immediately for UI feedback
+    const newResource = {
+      id: resource.staffId,
+      name: resource.name,
+      role: resource.role || 'Team Member',
+      allocations: {},
+      isPending: resource.isPending
+    };
+    
+    setResources(prev => [...prev, newResource]);
+    setShowAddResource(false);
   };
 
   return {

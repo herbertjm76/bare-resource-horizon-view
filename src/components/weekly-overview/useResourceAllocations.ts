@@ -35,8 +35,9 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
 
   // Fetch allocations for all team members for the selected week
   const fetchAllocations = useCallback(async () => {
-    if (!teamMembers.length) {
+    if (!teamMembers || teamMembers.length === 0) {
       setIsLoading(false);
+      setMemberAllocations({});
       return;
     }
     
@@ -49,7 +50,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
       const memberIds = teamMembers.map(member => member.id);
       
       // Fetch project allocations for all active members for this week
-      const { data: projectAllocations } = await supabase
+      const { data: projectAllocations, error } = await supabase
         .from('project_resource_allocations')
         .select(`
           resource_id,
@@ -59,6 +60,11 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
         .eq('resource_type', 'active')
         .eq('week_start_date', weekKey)
         .in('resource_id', memberIds);
+      
+      if (error) {
+        console.error('Error fetching project allocations:', error);
+        throw error;
+      }
       
       // Initialize allocations object
       const initialAllocations: Record<string, MemberAllocation> = {};

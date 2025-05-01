@@ -50,7 +50,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
   const { company } = useCompany();
   
   // Fetch team members and pre-registered invites when dialog opens
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchResources = async () => {
       if (!company?.id) return;
       
@@ -109,7 +109,10 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
   }, [company]);
   
   const handleAdd = async () => {
-    if (!selectedResource) return;
+    if (!selectedResource || !company?.id) {
+      toast.error('Please select a resource and try again');
+      return;
+    }
     
     setLoading(true);
     
@@ -117,18 +120,49 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
       const resource = resourceOptions.find(r => r.id === selectedResource);
       if (!resource) throw new Error('Resource not found');
       
+      console.log('Adding resource:', { 
+        resource,
+        projectId,
+        companyId: company.id,
+        type: resource.type 
+      });
+      
       if (resource.type === 'pre-registered') {
         // Handle pre-registered resource (store in pending_resources)
-        if (!company?.id) throw new Error('Company ID is required');
-        
-        await supabase
+        const { data, error } = await supabase
           .from('pending_resources')
           .insert({
             invite_id: resource.id,
             project_id: projectId,
             company_id: company.id,
             hours: 0 // Default hours
-          });
+          })
+          .select();
+          
+        if (error) {
+          console.error('Error adding pending resource:', error);
+          throw error;
+        }
+        
+        console.log('Added pending resource:', data);
+      } else {
+        // Add active resource
+        const { data, error } = await supabase
+          .from('project_resources')
+          .insert({
+            staff_id: resource.id,
+            project_id: projectId,
+            company_id: company.id,
+            hours: 0 // Default hours
+          })
+          .select();
+          
+        if (error) {
+          console.error('Error adding active resource:', error);
+          throw error;
+        }
+        
+        console.log('Added active resource:', data);
       }
       
       // Call the onAdd callback with the resource details
@@ -138,9 +172,12 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
         role: resource.role,
         isPending: resource.type === 'pre-registered'
       });
+      
+      toast.success(`${resource.name} added to project`);
+      onClose();
     } catch (err: any) {
       console.error('Error adding resource:', err);
-      toast.error('Failed to add resource');
+      toast.error('Failed to add resource: ' + (err.message || err.error_description || 'Unknown error'));
     } finally {
       setLoading(false);
     }
