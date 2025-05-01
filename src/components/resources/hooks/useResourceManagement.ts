@@ -9,27 +9,26 @@ export const useResourceManagement = (
   resources: Resource[], 
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>
 ) => {
-  // Store project allocations by resource ID with explicit simple type
+  // Use a simple Record type to store allocations
   const [projectAllocations, setProjectAllocations] = useState<Record<string, AllocationsByWeek>>({});
   
-  // Initialize project allocations based on resources
+  // Initialize allocations when resources change
   useEffect(() => {
-    // Create initial allocation structure
     const initialAllocations: Record<string, AllocationsByWeek> = {};
     
     resources.forEach(resource => {
-      initialAllocations[resource.id] = resource.allocations || {};
+      // Make sure we don't access potentially undefined properties
+      initialAllocations[resource.id] = {};
     });
     
     setProjectAllocations(initialAllocations);
-    console.debug('Initial project allocations set:', initialAllocations);
     
   }, [resources]);
 
-  // Update allocation hours for a specific resource and week
+  // Update allocation hours for a resource and week
   const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
     setProjectAllocations(prev => {
-      // Create a new object to trigger React updates
+      // Create a new object to avoid mutation
       const updated: Record<string, AllocationsByWeek> = { ...prev };
       
       // Initialize resource allocations if they don't exist
@@ -37,14 +36,11 @@ export const useResourceManagement = (
         updated[resourceId] = {};
       }
       
-      // Update the hours for this specific week
+      // Update the specific week
       updated[resourceId] = {
         ...updated[resourceId],
         [weekKey]: hours
       };
-      
-      console.debug(`Updated allocation for resource ${resourceId}, week ${weekKey} to ${hours}h`);
-      console.debug('Updated project allocations:', updated);
       
       return updated;
     });
@@ -53,7 +49,7 @@ export const useResourceManagement = (
   // Delete a resource from the project
   const handleDeleteResource = async (resourceId: string) => {
     try {
-      // Delete the resource from Supabase (use the correct collection name)
+      // Delete from database
       const { error } = await supabase
         .from('project_resources')
         .delete()
@@ -65,7 +61,7 @@ export const useResourceManagement = (
       // Update local state
       setResources(prev => prev.filter(r => r.id !== resourceId));
       
-      // Remove this resource's allocations from projectAllocations
+      // Remove allocations
       setProjectAllocations(prev => {
         const updated: Record<string, AllocationsByWeek> = { ...prev };
         delete updated[resourceId];
@@ -80,7 +76,7 @@ export const useResourceManagement = (
   
   // Add a resource to the project
   const handleAddResource = (resourceData: AddResourceInput) => {
-    // Convert from AddResourceDialog format to Resource format
+    // Convert from AddResourceInput to Resource format
     const resource: Resource = {
       id: resourceData.staffId,
       name: resourceData.name,
@@ -91,14 +87,12 @@ export const useResourceManagement = (
     // Update resources list
     setResources(prev => [...prev, resource]);
     
-    // Initialize empty allocations for this resource
+    // Initialize empty allocations
     setProjectAllocations(prev => {
       const updated: Record<string, AllocationsByWeek> = { ...prev };
       updated[resource.id] = {};
       return updated;
     });
-    
-    console.debug(`Added resource ${resource.id} (${resource.name}) to project ${projectId}`);
   };
 
   return {
