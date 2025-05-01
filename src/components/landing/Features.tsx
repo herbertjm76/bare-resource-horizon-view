@@ -41,11 +41,11 @@ const Features = () => {
     title: "Proactive Alerts",
     description: "Stay ahead with early warnings for project risks and resource conflicts."
   }];
-  return <div className="bg-white py-24" id="features">
+  return <div id="features" className="bg-white py-9">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-[39px] py-0">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-violet-700">Project Management, Elevated</h2>
-          <p className="text-xl text-gray-600 mx-0">Everything you need to run successful projects with intelligent resource planning</p>
+        <div className="text-center mb-3">
+          <h2 className="font-bold mb-0 text-violet-700 text-3xl">Project Management, Elevated</h2>
+          <p className="text-gray-600 mx-0 text-lg">Everything you need to run successful projects with intelligent resource planning</p>
         </div>
         
         <div className="grid md:grid-cols-3 gap-8">
