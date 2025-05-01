@@ -60,10 +60,11 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   
   // For debugging
   React.useEffect(() => {
+    console.log("Project ID:", project.id);
     console.log("Project allocations:", projectAllocations);
     console.log("Weekly project hours:", weeklyProjectHours);
     console.log("Total project hours:", totalProjectHours);
-  }, [projectAllocations, weeklyProjectHours, totalProjectHours]);
+  }, [projectAllocations, weeklyProjectHours, totalProjectHours, project.id]);
 
   // Base background color for project rows
   const rowBgClass = isEven 

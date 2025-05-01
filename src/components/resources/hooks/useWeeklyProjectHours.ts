@@ -25,6 +25,7 @@ export const useWeeklyProjectHours = (
       }
     });
     
+    console.log("Calculated weekly project hours:", weekHours);
     return weekHours;
   }, [projectAllocations, weeks]);
 };
