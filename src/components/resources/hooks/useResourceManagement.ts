@@ -10,9 +10,9 @@ export const useResourceManagement = (
   resources: Resource[], 
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>
 ) => {
-  // We'll use a simpler structure that leverages the existing hooks
-  // and maintains compatibility with the consuming components
-  const [projectAllocations, setProjectAllocations] = useState<Record<string, Record<string, number>>>({});
+  // Using a simpler type definition to avoid the deep instantiation error
+  // This is just a flat two-level object with string keys
+  const [projectAllocations, setProjectAllocations] = useState<{[resourceId: string]: {[weekKey: string]: number}}>({});
   
   // Delete a resource from the project
   const handleDeleteResource = async (resourceId: string) => {
