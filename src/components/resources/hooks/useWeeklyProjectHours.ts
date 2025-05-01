@@ -19,7 +19,7 @@ export const useWeeklyProjectHours = (
     Object.values(projectAllocations).forEach(resourceAlloc => {
       Object.entries(resourceAlloc).forEach(([weekKey, hours]) => {
         if (weekHours[weekKey] !== undefined) {
-          weekHours[weekKey] += hours;
+          weekHours[weekKey] += Number(hours); // Ensure we're adding numbers
         }
       });
     });

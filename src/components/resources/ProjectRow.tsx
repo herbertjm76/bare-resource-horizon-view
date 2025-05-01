@@ -52,6 +52,12 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   
   // Sum up all resource hours for each week
   const weeklyProjectHours = useWeeklyProjectHours(projectAllocations, weeks);
+  
+  // For debugging
+  React.useEffect(() => {
+    console.log("Project allocations:", projectAllocations);
+    console.log("Weekly project hours:", weeklyProjectHours);
+  }, [projectAllocations, weeklyProjectHours]);
 
   // Base background color for project rows
   const rowBgClass = isEven 
