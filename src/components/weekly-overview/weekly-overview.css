@@ -13,10 +13,10 @@
   hyphens: auto;
 }
 
-/* Keep existing styles for name column */
+/* Name column - reduced to half the original width */
 .name-column {
-  width: 30%;
-  min-width: 200px;
+  width: 15%;
+  min-width: 100px;
 }
 
 .hover-projects {
@@ -108,10 +108,10 @@
   border-left: 2px solid #f3f4f6;
 }
 
-/* Office column styles */
+/* Office column styles - reduced by 30% */
 .office-column {
-  width: 80px;
-  min-width: 80px;
+  width: 56px;
+  min-width: 56px;
   text-align: center;
 }
 
