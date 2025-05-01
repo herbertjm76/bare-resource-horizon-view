@@ -1,76 +1,71 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { Resource } from './types/resourceTypes';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
-import { Resource, ProjectAllocations } from './types/resourceTypes';
 
 export const useResourceManagement = (
-  projectId: string,
-  resources: Resource[],
-  setResources: (resources: Resource[]) => void
+  projectId: string, 
+  resources: Resource[], 
+  setResources: React.Dispatch<React.SetStateAction<Resource[]>>
 ) => {
-  const [projectAllocations, setProjectAllocations] = useState<ProjectAllocations>({});
-  const { company } = useCompany();
+  // Store project allocations by resource ID
+  const [projectAllocations, setProjectAllocations] = useState<Record<string, Record<string, number>>>({});
+  
+  // Initialize project allocations based on resources
+  useEffect(() => {
+    // Create initial allocation structure
+    const initialAllocations: Record<string, Record<string, number>> = {};
+    
+    resources.forEach(resource => {
+      initialAllocations[resource.id] = resource.allocations || {};
+    });
+    
+    setProjectAllocations(initialAllocations);
+    console.debug('Initial project allocations set:', initialAllocations);
+    
+  }, [resources]);
 
-  // Handle resource allocation changes (for UI updates)
+  // Update allocation hours for a specific resource and week
   const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
-    setProjectAllocations(prev => ({
-      ...prev,
-      [resourceId]: {
-        ...(prev[resourceId] || {}),
-        [weekKey]: hours
+    setProjectAllocations(prev => {
+      // Create a new object to trigger React updates
+      const updated = { ...prev };
+      
+      // Initialize resource allocations if they don't exist
+      if (!updated[resourceId]) {
+        updated[resourceId] = {};
       }
-    }));
+      
+      // Update the hours for this specific week
+      updated[resourceId] = {
+        ...updated[resourceId],
+        [weekKey]: hours
+      };
+      
+      console.debug(`Updated allocation for resource ${resourceId}, week ${weekKey} to ${hours}h`);
+      console.debug('Updated project allocations:', updated);
+      
+      return updated;
+    });
   };
 
-  // Handle resource deletion
+  // Delete a resource from the project
   const handleDeleteResource = async (resourceId: string) => {
-    if (!projectId || !company?.id) return;
-    
     try {
-      console.log('Deleting resource:', resourceId);
+      // Delete the resource from Supabase (use the correct collection name)
+      const { error } = await supabase
+        .from('project_resources')
+        .delete()
+        .eq('resource_id', resourceId)
+        .eq('project_id', projectId);
       
-      const resourceToDelete = resources.find(r => r.id === resourceId);
+      if (error) throw error;
       
-      if (resourceToDelete?.isPending) {
-        // Delete pre-registered resource
-        await supabase
-          .from('pending_resources')
-          .delete()
-          .eq('project_id', projectId)
-          .eq('invite_id', resourceId)
-          .eq('company_id', company.id);
-          
-        // Also delete any allocations
-        await supabase
-          .from('project_resource_allocations')
-          .delete()
-          .eq('project_id', projectId)
-          .eq('resource_id', resourceId)
-          .eq('resource_type', 'pre_registered')
-          .eq('company_id', company.id);
-      } else {
-        // Delete active resource
-        await supabase
-          .from('project_resources')
-          .delete()
-          .eq('project_id', projectId)
-          .eq('staff_id', resourceId)
-          .eq('company_id', company.id);
-          
-        // Also delete any allocations
-        await supabase
-          .from('project_resource_allocations')
-          .delete()
-          .eq('project_id', projectId)
-          .eq('resource_id', resourceId)
-          .eq('resource_type', 'active')
-          .eq('company_id', company.id);
-      }
+      // Update local state
+      setResources(prev => prev.filter(r => r.id !== resourceId));
       
-      // Update UI state
-      setResources(resources.filter(r => r.id !== resourceId));
+      // Remove this resource's allocations from projectAllocations
       setProjectAllocations(prev => {
         const updated = { ...prev };
         delete updated[resourceId];
@@ -79,29 +74,22 @@ export const useResourceManagement = (
       
     } catch (error) {
       console.error('Error deleting resource:', error);
-      toast.error('Failed to remove resource from project');
+      toast.error('Failed to delete resource');
     }
   };
-
-  // Add a new resource to the project
-  const handleAddResource = (resource: { 
-    staffId: string; 
-    name: string; 
-    role?: string; 
-    isPending?: boolean 
-  }) => {
-    console.log('Adding resource to state:', resource);
+  
+  // Add a resource to the project
+  const handleAddResource = (resource: Resource) => {
+    // Update resources list
+    setResources(prev => [...prev, resource]);
     
-    // Add the new resource to our local state immediately for UI feedback
-    const newResource = {
-      id: resource.staffId,
-      name: resource.name,
-      role: resource.role || 'Team Member',
-      allocations: {},
-      isPending: resource.isPending
-    };
+    // Initialize empty allocations for this resource
+    setProjectAllocations(prev => ({
+      ...prev,
+      [resource.id]: {}
+    }));
     
-    setResources([...resources, newResource]);
+    console.debug(`Added resource ${resource.id} (${resource.name}) to project ${projectId}`);
   };
 
   return {

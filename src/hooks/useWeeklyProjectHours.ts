@@ -46,8 +46,13 @@ export const useWeeklyProjectHours = (
       });
 
       // Sum up hours across all resources
-      Object.values(projectAllocations).forEach(resourceAlloc => {
-        if (!resourceAlloc) return;
+      Object.entries(projectAllocations).forEach(([resourceId, resourceAlloc]) => {
+        if (!resourceAlloc) {
+          console.debug(`No allocations for resource: ${resourceId}`);
+          return;
+        }
+        
+        console.debug(`Processing resource ${resourceId} allocations:`, resourceAlloc);
         
         Object.entries(resourceAlloc).forEach(([weekKey, hours]) => {
           if (weekHours[weekKey] === undefined) {
@@ -61,6 +66,7 @@ export const useWeeklyProjectHours = (
           // Only add valid numbers
           if (!isNaN(numericHours)) {
             weekHours[weekKey] += numericHours;
+            console.debug(`Added ${numericHours} to week ${weekKey}, total now: ${weekHours[weekKey]}`);
           } else {
             console.warn(`Invalid hours value for week ${weekKey}:`, hours);
           }
