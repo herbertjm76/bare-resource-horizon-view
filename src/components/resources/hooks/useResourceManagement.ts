@@ -78,8 +78,17 @@ export const useResourceManagement = (
     }
   };
   
-  // Add a resource to the project
-  const handleAddResource = (resource: Resource) => {
+  // Add a resource to the project 
+  // Fix: Changed the parameter type to match what AddResourceDialog expects
+  const handleAddResource = (resourceData: { staffId: string, name: string, role?: string, isPending?: boolean }) => {
+    // Convert from AddResourceDialog format to Resource format
+    const resource: Resource = {
+      id: resourceData.staffId,
+      name: resourceData.name,
+      role: resourceData.role || 'Team Member',
+      isPending: resourceData.isPending
+    };
+    
     // Update resources list
     setResources(prev => [...prev, resource]);
     
