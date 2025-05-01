@@ -8,7 +8,7 @@ import { WeekAllocationCell } from './components/WeekAllocationCell';
 import { AddResourceRow } from './components/AddResourceRow';
 import { useWeekMilestones } from './hooks/useWeekMilestones';
 import { useProjectResources } from './hooks/useProjectResources';
-import { useWeeklyProjectHours } from '@/hooks/useWeeklyProjectHours';
+import { useWeeklyProjectHours } from './hooks/useWeeklyProjectHours';
 import { getWeekKey } from './utils/milestoneUtils';
 
 interface ProjectRowProps {
@@ -55,11 +55,9 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   
   // For debugging
   React.useEffect(() => {
-    console.log("Project ID:", project.id);
     console.log("Project allocations:", projectAllocations);
     console.log("Weekly project hours:", weeklyProjectHours);
-    console.log("Resources:", resources);
-  }, [project.id, projectAllocations, weeklyProjectHours, resources]);
+  }, [projectAllocations, weeklyProjectHours]);
 
   // Base background color for project rows
   const rowBgClass = isEven 

@@ -2,9 +2,9 @@
 import { useState } from 'react';
 import { useFetchResources } from './useFetchResources';
 import { useResourceManagement } from './useResourceManagement';
-import { Resource, AddResourceInput } from './types/resourceTypes';
+import { Resource } from './types/resourceTypes';
 
-export type { Resource, AddResourceInput } from './types/resourceTypes';
+export type { Resource } from './types/resourceTypes';
 
 export const useProjectResources = (projectId: string) => {
   const [showAddResource, setShowAddResource] = useState(false);
@@ -12,7 +12,7 @@ export const useProjectResources = (projectId: string) => {
   // Get resources data
   const { resources, isLoading, setResources, refreshResources } = useFetchResources(projectId);
   
-  // Get resource management functions with flat allocation structure
+  // Get resource management functions
   const { 
     projectAllocations, 
     handleAllocationChange, 

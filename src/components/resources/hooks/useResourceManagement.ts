@@ -1,77 +1,107 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Resource, AddResourceInput } from './types/resourceTypes';
 import { supabase } from '@/integrations/supabase/client';
-import { useResourceAllocationsDB } from '@/hooks/resource-allocations';
+import { useCompany } from '@/context/CompanyContext';
+import { Resource, ProjectAllocations } from './types/resourceTypes';
 
 export const useResourceManagement = (
-  projectId: string, 
-  resources: Resource[], 
-  setResources: React.Dispatch<React.SetStateAction<Resource[]>>
+  projectId: string,
+  resources: Resource[],
+  setResources: (resources: Resource[]) => void
 ) => {
-  // Using a simpler type definition to avoid the deep instantiation error
-  // This is just a flat two-level object with string keys
-  const [projectAllocations, setProjectAllocations] = useState<{[resourceId: string]: {[weekKey: string]: number}}>({});
-  
-  // Delete a resource from the project
+  const [projectAllocations, setProjectAllocations] = useState<ProjectAllocations>({});
+  const { company } = useCompany();
+
+  // Handle resource allocation changes (for UI updates)
+  const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
+    setProjectAllocations(prev => ({
+      ...prev,
+      [resourceId]: {
+        ...(prev[resourceId] || {}),
+        [weekKey]: hours
+      }
+    }));
+  };
+
+  // Handle resource deletion
   const handleDeleteResource = async (resourceId: string) => {
+    if (!projectId || !company?.id) return;
+    
     try {
-      // Delete from database
-      const { error } = await supabase
-        .from('project_resources')
-        .delete()
-        .eq('resource_id', resourceId)
-        .eq('project_id', projectId);
+      console.log('Deleting resource:', resourceId);
       
-      if (error) throw error;
+      const resourceToDelete = resources.find(r => r.id === resourceId);
       
-      // Update local state
-      setResources(prev => prev.filter(r => r.id !== resourceId));
+      if (resourceToDelete?.isPending) {
+        // Delete pre-registered resource
+        await supabase
+          .from('pending_resources')
+          .delete()
+          .eq('project_id', projectId)
+          .eq('invite_id', resourceId)
+          .eq('company_id', company.id);
+          
+        // Also delete any allocations
+        await supabase
+          .from('project_resource_allocations')
+          .delete()
+          .eq('project_id', projectId)
+          .eq('resource_id', resourceId)
+          .eq('resource_type', 'pre_registered')
+          .eq('company_id', company.id);
+      } else {
+        // Delete active resource
+        await supabase
+          .from('project_resources')
+          .delete()
+          .eq('project_id', projectId)
+          .eq('staff_id', resourceId)
+          .eq('company_id', company.id);
+          
+        // Also delete any allocations
+        await supabase
+          .from('project_resource_allocations')
+          .delete()
+          .eq('project_id', projectId)
+          .eq('resource_id', resourceId)
+          .eq('resource_type', 'active')
+          .eq('company_id', company.id);
+      }
       
-      // Remove allocations for this resource
+      // Update UI state
+      setResources(resources.filter(r => r.id !== resourceId));
       setProjectAllocations(prev => {
         const updated = { ...prev };
-        if (updated[resourceId]) {
-          delete updated[resourceId];
-        }
+        delete updated[resourceId];
         return updated;
       });
       
     } catch (error) {
       console.error('Error deleting resource:', error);
-      toast.error('Failed to delete resource');
+      toast.error('Failed to remove resource from project');
     }
   };
-  
-  // Add a resource to the project
-  const handleAddResource = (resourceData: AddResourceInput) => {
-    // Convert from AddResourceInput to Resource format
-    const resource: Resource = {
-      id: resourceData.staffId,
-      name: resourceData.name,
-      role: resourceData.role || 'Team Member',
-      isPending: resourceData.isPending
+
+  // Add a new resource to the project
+  const handleAddResource = (resource: { 
+    staffId: string; 
+    name: string; 
+    role?: string; 
+    isPending?: boolean 
+  }) => {
+    console.log('Adding resource to state:', resource);
+    
+    // Add the new resource to our local state immediately for UI feedback
+    const newResource = {
+      id: resource.staffId,
+      name: resource.name,
+      role: resource.role || 'Team Member',
+      allocations: {},
+      isPending: resource.isPending
     };
     
-    // Update resources list
-    setResources(prev => [...prev, resource]);
-  };
-  
-  // Update allocation hours for a resource and week
-  // This function now just updates our local state for UI consistency
-  // The actual DB operations are handled by the ResourceRow component
-  const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
-    setProjectAllocations(prev => {
-      const resourceAllocations = prev[resourceId] || {};
-      return {
-        ...prev,
-        [resourceId]: {
-          ...resourceAllocations,
-          [weekKey]: hours
-        }
-      };
-    });
+    setResources([...resources, newResource]);
   };
 
   return {

@@ -4,7 +4,7 @@ import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
-import { useResourceAllocationsDB } from '@/hooks/resource-allocations';
+import { useResourceAllocationsDB } from '@/hooks/useResourceAllocationsDB';
 
 interface ResourceRowProps {
   resource: {
@@ -48,8 +48,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     : "bg-gray-50 hover:bg-gray-100";
 
   const handleAllocationChange = (weekKey: string, value: string) => {
-    // Convert to number explicitly, ensuring we have a valid number
-    const numValue = value === '' ? 0 : parseFloat(value);
+    const numValue = parseInt(value, 10);
     const hours = isNaN(numValue) ? 0 : numValue;
     
     // Save to database with the specific date
@@ -57,9 +56,6 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     
     // Propagate change to parent for UI updates
     onAllocationChange(resource.id, weekKey, hours);
-    
-    // For debugging
-    console.debug(`Resource ${resource.id} allocation for ${weekKey} set to ${hours}`);
   };
   
   const getWeekKey = (startDate: Date) => {
