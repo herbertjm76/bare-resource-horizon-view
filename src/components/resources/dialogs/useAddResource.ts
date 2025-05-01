@@ -48,7 +48,7 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
           .insert({
             invite_id: resource.id,
             project_id: projectId,
-            company_id: company.id,
+            company_id: company.id, // Explicitly include company_id
             hours: 0 // Default hours
           })
           .select();
@@ -60,14 +60,13 @@ export const useAddResource = ({ projectId, onAdd, onClose }: AddResourceProps) 
         
         console.log('Added pending resource:', data);
       } else {
-        // This is the critical fix - explicitly include company_id
-        // The RLS policy is failing because company_id isn't being set correctly
+        // Add active resource with company_id explicitly included
         const { data, error } = await supabase
           .from('project_resources')
           .insert({
             staff_id: resource.id,
             project_id: projectId,
-            company_id: company.id,
+            company_id: company.id, // This is critical for RLS policies
             hours: 0 // Default hours
           })
           .select();
