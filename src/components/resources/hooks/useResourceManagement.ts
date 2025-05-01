@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { Resource, AddResourceInput } from './types/resourceTypes';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,7 +25,7 @@ export const useResourceManagement = (
   const [allAllocations, setAllAllocations] = useState<FlatAllocationMap>({});
   
   // Derived projectAllocations object (computed property)
-  const projectAllocations = React.useMemo(() => {
+  const projectAllocations = useMemo(() => {
     // Create a new object for returning to components
     const result: Record<string, Record<string, number>> = {};
     
