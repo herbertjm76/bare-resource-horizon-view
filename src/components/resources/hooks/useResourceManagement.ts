@@ -30,7 +30,7 @@ export const useResourceManagement = (
   const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
     setProjectAllocations(prev => {
       // Create a new object to trigger React updates
-      const updated: Record<string, AllocationsByWeek> = { ...prev };
+      const updated = { ...prev };
       
       // Initialize resource allocations if they don't exist
       if (!updated[resourceId]) {

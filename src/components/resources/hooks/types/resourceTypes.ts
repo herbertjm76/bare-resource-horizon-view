@@ -15,8 +15,6 @@ export interface AllocationRecord {
 
 // Define allocation types without circular references
 export type AllocationsByWeek = Record<string, number>;
-export type ResourceAllocations = Record<string, AllocationsByWeek>;
-export type ProjectAllocations = Record<string, ResourceAllocations>;
 
 // Define the type that AddResourceDialog expects
 export interface AddResourceInput {
