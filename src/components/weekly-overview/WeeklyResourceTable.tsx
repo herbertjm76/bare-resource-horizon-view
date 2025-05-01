@@ -74,10 +74,8 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   });
 
   // Get allocations from custom hook - include both active and pre-registered members
-  const { getMemberAllocation, handleInputChange } = useResourceAllocations([
-    ...teamMembers, 
-    ...preRegisteredMembers
-  ]);
+  const allMembers = [...teamMembers, ...preRegisteredMembers];
+  const { getMemberAllocation, handleInputChange, isLoading: isLoadingAllocations } = useResourceAllocations(allMembers, selectedWeek);
 
   // Fetch office locations
   const { data: officeLocations = [] } = useQuery({
@@ -91,9 +89,6 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
       return data;
     }
   });
-
-  // Combine active and pre-registered team members
-  const allMembers = [...teamMembers, ...preRegisteredMembers];
 
   // Group team members by office
   const membersByOffice = allMembers.reduce((acc, member) => {
@@ -114,7 +109,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   // Sort offices alphabetically
   filteredOffices.sort();
 
-  if (isLoading || isLoadingPending) {
+  if (isLoading || isLoadingPending || isLoadingAllocations) {
     return (
       <div className="text-center py-12">
         <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>

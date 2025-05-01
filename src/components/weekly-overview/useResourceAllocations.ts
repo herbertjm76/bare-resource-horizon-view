@@ -35,7 +35,10 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
 
   // Fetch allocations for all team members for the selected week
   const fetchAllocations = useCallback(async () => {
-    if (!teamMembers.length) return;
+    if (!teamMembers.length) {
+      setIsLoading(false);
+      return;
+    }
     
     setIsLoading(true);
     
@@ -102,10 +105,8 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
   
   // Fetch allocations when team members or selected week changes
   useEffect(() => {
-    if (teamMembers.length > 0) {
-      fetchAllocations();
-    }
-  }, [teamMembers, selectedWeek, fetchAllocations]);
+    fetchAllocations();
+  }, [fetchAllocations]);
 
   // Initialize or get member allocation
   const getMemberAllocation = (memberId: string): MemberAllocation => {
