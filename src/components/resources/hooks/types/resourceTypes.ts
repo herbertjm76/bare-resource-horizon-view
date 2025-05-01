@@ -14,3 +14,4 @@ export interface AllocationRecord {
 }
 
 export type ProjectAllocations = Record<string, Record<string, number>>;
+

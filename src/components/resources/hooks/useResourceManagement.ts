@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Resource } from './types/resourceTypes';
+import { Resource, ProjectAllocations } from './types/resourceTypes';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useResourceManagement = (
@@ -10,12 +10,12 @@ export const useResourceManagement = (
   setResources: React.Dispatch<React.SetStateAction<Resource[]>>
 ) => {
   // Store project allocations by resource ID
-  const [projectAllocations, setProjectAllocations] = useState<Record<string, Record<string, number>>>({});
+  const [projectAllocations, setProjectAllocations] = useState<ProjectAllocations>({});
   
   // Initialize project allocations based on resources
   useEffect(() => {
     // Create initial allocation structure
-    const initialAllocations: Record<string, Record<string, number>> = {};
+    const initialAllocations: ProjectAllocations = {};
     
     resources.forEach(resource => {
       initialAllocations[resource.id] = resource.allocations || {};
