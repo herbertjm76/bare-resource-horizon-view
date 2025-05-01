@@ -13,4 +13,6 @@ export interface AllocationRecord {
   hours: number;
 }
 
-export type ProjectAllocations = Record<string, Record<string, number>>;
+// Use a flat structure with simple string keys to avoid excessive type nesting
+// The key format will be `${resourceId}:${weekKey}`
+export type ProjectAllocations = Record<string, number>;

@@ -5,6 +5,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { Resource, ProjectAllocations } from './types/resourceTypes';
 
+// Create a utility function to generate allocation keys
+const getAllocationKey = (resourceId: string, weekKey: string): string => {
+  return `${resourceId}:${weekKey}`;
+};
+
+// Utility to parse the composite key
+const parseAllocationKey = (compositeKey: string): { resourceId: string, weekKey: string } => {
+  const [resourceId, weekKey] = compositeKey.split(':');
+  return { resourceId, weekKey };
+};
+
 export const useResourceManagement = (
   projectId: string,
   resources: Resource[],
@@ -15,12 +26,11 @@ export const useResourceManagement = (
 
   // Handle resource allocation changes (for UI updates)
   const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
+    const allocationKey = getAllocationKey(resourceId, weekKey);
+    
     setProjectAllocations(prev => ({
       ...prev,
-      [resourceId]: {
-        ...(prev[resourceId] || {}),
-        [weekKey]: hours
-      }
+      [allocationKey]: hours
     }));
   };
 
@@ -71,9 +81,16 @@ export const useResourceManagement = (
       
       // Update UI state
       setResources(resources.filter(r => r.id !== resourceId));
+      
+      // Remove all allocations for this resource
       setProjectAllocations(prev => {
         const updated = { ...prev };
-        delete updated[resourceId];
+        // Loop through and remove any keys that start with this resourceId
+        Object.keys(updated).forEach(key => {
+          if (key.startsWith(`${resourceId}:`)) {
+            delete updated[key];
+          }
+        });
         return updated;
       });
       
@@ -108,6 +125,7 @@ export const useResourceManagement = (
     projectAllocations,
     handleAllocationChange,
     handleDeleteResource,
-    handleAddResource
+    handleAddResource,
+    getAllocationKey
   };
 };

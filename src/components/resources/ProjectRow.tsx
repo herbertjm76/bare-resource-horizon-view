@@ -10,6 +10,7 @@ import { useWeekMilestones } from './hooks/useWeekMilestones';
 import { useProjectResources } from './hooks/useProjectResources';
 import { useWeeklyProjectHours } from './hooks/useWeeklyProjectHours';
 import { getWeekKey } from './utils/milestoneUtils';
+import { ProjectTotalsRow } from './components/ProjectTotalsRow';
 
 interface ProjectRowProps {
   project: any;
@@ -38,7 +39,8 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     setShowAddResource,
     handleAllocationChange,
     handleDeleteResource,
-    handleAddResource
+    handleAddResource,
+    getAllocationKey
   } = useProjectResources(project.id);
 
   const { 
@@ -136,6 +138,15 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           isEven={isEven}
         />
       ))}
+      
+      {/* Project totals row when expanded */}
+      {isExpanded && resources.length > 0 && (
+        <ProjectTotalsRow
+          weeklyProjectHours={weeklyProjectHours}
+          weeks={weeks}
+          isEven={isEven}
+        />
+      )}
       
       {/* Add resource row when project is expanded */}
       <AddResourceRow

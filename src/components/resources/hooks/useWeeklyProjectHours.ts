@@ -2,7 +2,7 @@
 import React from 'react';
 
 export const useWeeklyProjectHours = (
-  projectAllocations: Record<string, Record<string, number>>, 
+  projectAllocations: Record<string, number>, 
   weeks: { startDate: Date }[]
 ) => {
   // Sum up all resource hours for each week
@@ -15,13 +15,14 @@ export const useWeeklyProjectHours = (
       weekHours[weekKey] = 0;
     });
 
-    // Sum up hours across all resources
-    Object.values(projectAllocations).forEach(resourceAlloc => {
-      Object.entries(resourceAlloc).forEach(([weekKey, hours]) => {
-        if (weekHours[weekKey] !== undefined) {
-          weekHours[weekKey] += Number(hours); // Ensure we're adding numbers
-        }
-      });
+    // Sum up hours across all allocations
+    Object.entries(projectAllocations).forEach(([compositeKey, hours]) => {
+      // Extract the weekKey from the composite key (format: resourceId:weekKey)
+      const weekKey = compositeKey.split(':')[1];
+      
+      if (weekHours[weekKey] !== undefined) {
+        weekHours[weekKey] += Number(hours); // Ensure we're adding numbers
+      }
     });
     
     return weekHours;
