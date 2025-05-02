@@ -5,6 +5,7 @@
   height: 100%;
   overflow: auto;
   position: relative;
+  border-radius: 0.5rem;
 }
 
 /* Ensure the table takes up the full height */
@@ -12,6 +13,7 @@
   border-collapse: separate;
   border-spacing: 0;
   width: 100%;
+  table-layout: fixed;
 }
 
 /* Z-index for sticky headers */
@@ -48,4 +50,29 @@
 /* Hover effect for rows */
 .grid-table-container tbody tr:hover {
   background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Fix for sticky columns with shadows */
+.grid-table-container th.sticky-left-0 {
+  position: sticky;
+  left: 0;
+  z-index: 30;
+}
+
+.grid-table-container th.sticky-left-12 {
+  position: sticky;
+  left: 48px; /* Width of the first column */
+  z-index: 30;
+}
+
+.grid-table-container td.sticky-left-0 {
+  position: sticky;
+  left: 0;
+  z-index: 20;
+}
+
+.grid-table-container td.sticky-left-12 {
+  position: sticky;
+  left: 48px; /* Width of the first column */
+  z-index: 20;
 }

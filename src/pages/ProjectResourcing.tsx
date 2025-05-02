@@ -1,36 +1,30 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { ResourceAllocationGrid } from '@/components/resources/ResourceAllocationGrid';
 import { FilterBar } from '@/components/resources/FilterBar';
-import { format, addDays, addWeeks } from 'date-fns';
+import { format, addWeeks, subWeeks, startOfWeek } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
-import { DateRange } from '@/components/ui/date-range-picker';
+import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 
 const HEADER_HEIGHT = 56;
 
 const ProjectResourcing = () => {
   // Get the start of the current week (Monday)
   const today = new Date();
-  const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday, etc.
-  const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust when day is Sunday
-  const startOfWeek = new Date(today.setDate(diff));
+  const mondayOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 });
+  
+  const [selectedWeek, setSelectedWeek] = useState<Date>(mondayOfCurrentWeek);
   
   const [filters, setFilters] = useState({
     office: "all",
     country: "all",
     manager: "all",
     weeksToShow: 12, // Default is 12 weeks
-  });
-  
-  // Use a date range instead of just a start date
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: startOfWeek,
-    to: addDays(startOfWeek, (filters.weeksToShow * 7) - 1)
   });
   
   // Get project data
@@ -46,33 +40,27 @@ const ProjectResourcing = () => {
     }));
   };
   
-  const handleDateRangeChange = (newRange: DateRange) => {
-    setDateRange(newRange);
-    
-    // Calculate the number of weeks in the range
-    const diffTime = Math.abs(newRange.to.getTime() - newRange.from.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
-    const diffWeeks = Math.ceil(diffDays / 7);
-    
-    // Update weeks to show
-    setFilters(prev => ({
-      ...prev,
-      weeksToShow: diffWeeks
-    }));
-  };
-  
   const handleWeeksChange = (weeks: number) => {
     setFilters(prev => ({
       ...prev,
       weeksToShow: weeks
     }));
-    
-    // Update date range end date based on new weeks
-    setDateRange(prev => ({
-      ...prev,
-      to: addDays(prev.from, (weeks * 7) - 1)
-    }));
   };
+  
+  // Week navigation functions
+  const goToPreviousWeek = useCallback(() => {
+    setSelectedWeek(prevWeek => subWeeks(prevWeek, 1));
+  }, []);
+
+  const goToNextWeek = useCallback(() => {
+    setSelectedWeek(prevWeek => addWeeks(prevWeek, 1));
+  }, []);
+
+  // Format the week label
+  const weekLabel = useCallback((date: Date) => {
+    const endOfWeek = addWeeks(date, 0);
+    return `Week of ${format(date, 'MMM d, yyyy')}`;
+  }, []);
   
   // Extract unique offices, countries, and managers for filters
   const officeOptions = [...new Set(projects.map(p => p.office?.name).filter(Boolean))];
@@ -86,6 +74,15 @@ const ProjectResourcing = () => {
     }
     return acc;
   }, [] as Array<{id: string, name: string}>);
+
+  // Week options for the dropdown (excluding 4 weeks)
+  const weekOptions = [
+    { value: '8', label: '8 Weeks' },
+    { value: '12', label: '12 Weeks' },
+    { value: '16', label: '16 Weeks' },
+    { value: '26', label: '26 Weeks' },
+    { value: '52', label: '52 Weeks' },
+  ];
 
   return (
     <SidebarProvider>
@@ -102,26 +99,34 @@ const ProjectResourcing = () => {
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Project Resourcing</h1>
               </div>
               
-              <FilterBar 
-                filters={{
-                  office: filters.office,
-                  country: filters.country,
-                  manager: filters.manager
-                }}
-                onFilterChange={handleFilterChange}
-                dateRange={dateRange}
-                onDateRangeChange={handleDateRangeChange}
-                weeksToShow={filters.weeksToShow}
-                onWeeksChange={handleWeeksChange}
-                officeOptions={officeOptions}
-                countryOptions={countryOptions}
-                managerOptions={managers}
-              />
+              <div className="flex justify-between items-center gap-4 flex-wrap">
+                <WeekSelector
+                  selectedWeek={selectedWeek}
+                  onPreviousWeek={goToPreviousWeek}
+                  onNextWeek={goToNextWeek}
+                  weekLabel={weekLabel(selectedWeek)}
+                />
+                
+                <FilterBar 
+                  filters={{
+                    office: filters.office,
+                    country: filters.country,
+                    manager: filters.manager
+                  }}
+                  onFilterChange={handleFilterChange}
+                  weeksToShow={filters.weeksToShow}
+                  onWeeksChange={handleWeeksChange}
+                  officeOptions={officeOptions}
+                  countryOptions={countryOptions}
+                  managerOptions={managers}
+                  weekOptions={weekOptions}
+                />
+              </div>
               
               <div className="flex-1 rounded-lg border shadow-sm overflow-hidden" style={{ display: 'flex', flexDirection: 'column' }}>
                 <OfficeSettingsProvider>
                   <ResourceAllocationGrid 
-                    startDate={dateRange.from}
+                    startDate={selectedWeek}
                     weeksToShow={filters.weeksToShow}
                     filters={filters}
                   />

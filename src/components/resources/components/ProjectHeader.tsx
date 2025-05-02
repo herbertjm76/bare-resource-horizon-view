@@ -23,13 +23,13 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   return (
     <>
       {/* Resource count column - frozen */}
-      <td className={`sticky left-0 z-20 p-2 w-12 text-center ${headerBgClass} shadow-[1px_0_0_0_#e5e7eb]`}>
+      <td className={`sticky-left-0 p-2 w-12 text-center ${headerBgClass} shadow-[1px_0_0_0_#e5e7eb]`}>
         {/* Counter moved to the project name cell */}
       </td>
 
       {/* Project name cell with the counter on the right - frozen */}
       <td 
-        className={`sticky left-12 z-20 p-1 cursor-pointer ${headerBgClass} shadow-[1px_0_0_0_#e5e7eb]`} 
+        className={`sticky-left-12 p-1 cursor-pointer ${headerBgClass} shadow-[1px_0_0_0_#e5e7eb]`} 
         onClick={onToggleExpand} 
         style={{ width: '200px', minWidth: '200px' }}
       >
