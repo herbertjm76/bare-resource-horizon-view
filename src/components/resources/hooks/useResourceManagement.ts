@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -22,7 +22,60 @@ export const useResourceManagement = (
   setResources: (resources: Resource[]) => void
 ) => {
   const [projectAllocations, setProjectAllocations] = useState<ProjectAllocations>({});
+  const [isLoadingAllocations, setIsLoadingAllocations] = useState<boolean>(true);
   const { company } = useCompany();
+
+  // Initialize project allocations from database
+  const initializeAllocations = async () => {
+    if (!projectId || !company?.id) return;
+    
+    setIsLoadingAllocations(true);
+    
+    try {
+      console.log('Initializing allocations for project:', projectId);
+      
+      // Fetch all resource allocations for this project from database
+      const { data, error } = await supabase
+        .from('project_resource_allocations')
+        .select('resource_id, week_start_date, hours')
+        .eq('project_id', projectId)
+        .eq('company_id', company.id);
+        
+      if (error) {
+        console.error('Error fetching resource allocations:', error);
+        toast.error('Failed to load resource allocations');
+        return;
+      }
+      
+      console.log('Fetched allocations:', data?.length || 0);
+      
+      // Transform the data into our allocation structure
+      const initialAllocations: ProjectAllocations = {};
+      
+      data?.forEach(allocation => {
+        const weekKey = allocation.week_start_date;
+        const resourceId = allocation.resource_id;
+        const allocationKey = getAllocationKey(resourceId, weekKey);
+        initialAllocations[allocationKey] = allocation.hours;
+      });
+      
+      console.log('Initialized allocations:', initialAllocations);
+      setProjectAllocations(initialAllocations);
+      
+    } catch (err) {
+      console.error('Error in initializeAllocations:', err);
+      toast.error('Failed to load resource allocations');
+    } finally {
+      setIsLoadingAllocations(false);
+    }
+  };
+
+  // Load resource allocations when the component mounts or resources change
+  useEffect(() => {
+    if (projectId && company?.id) {
+      initializeAllocations();
+    }
+  }, [projectId, company?.id]);
 
   // Handle resource allocation changes (for UI updates)
   const handleAllocationChange = (resourceId: string, weekKey: string, hours: number) => {
@@ -126,6 +179,7 @@ export const useResourceManagement = (
     handleAllocationChange,
     handleDeleteResource,
     handleAddResource,
-    getAllocationKey
+    getAllocationKey,
+    isLoadingAllocations
   };
 };

@@ -36,6 +36,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     projectAllocations,
     showAddResource,
     isLoading,
+    isLoadingAllocations,
     setShowAddResource,
     handleAllocationChange,
     handleDeleteResource,
@@ -76,7 +77,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     ? "bg-brand-violet-light/70 hover:bg-brand-violet-light" 
     : "bg-brand-violet-light hover:bg-brand-violet-light/90";
 
-  if (isLoading && isExpanded) {
+  if ((isLoading || isLoadingAllocations) && isExpanded) {
     return (
       <tr className={`border-t border-b border-gray-200 ${headerBgClass}`}>
         <ProjectHeader
