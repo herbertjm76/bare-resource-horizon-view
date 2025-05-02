@@ -1,23 +1,16 @@
 
 import React, { useState } from 'react';
-import { Filter, Check, ChevronDown, X } from 'lucide-react';
-import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { format } from 'date-fns';
+
+import { WeekSelector } from './filters/WeekSelector';
+import { FilterButton } from './filters/FilterButton';
+import { FilterBadges } from './filters/FilterBadges';
+import { AdvancedFilters } from './filters/AdvancedFilters';
 
 interface FilterBarProps {
   filters: {
@@ -63,176 +56,37 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       <div className="flex-1 space-y-3">
         <div className="flex flex-wrap items-center gap-3">
           {/* Weeks to Show */}
-          <Select 
-            value={weeksToShow.toString()}
-            onValueChange={(value) => onWeeksChange(parseInt(value, 10))}
-          >
-            <SelectTrigger 
-              className="w-[140px] bg-white border-slate-200"
-            >
-              <div className="flex items-center">
-                <span className="text-xs mr-2 text-muted-foreground">View:</span>
-                <SelectValue placeholder="Weeks to show" />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              {weekOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <WeekSelector 
+            weeksToShow={weeksToShow}
+            onWeeksChange={onWeeksChange}
+            weekOptions={weekOptions}
+          />
 
           {/* Advanced Filters Button */}
           <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
             <PopoverTrigger asChild>
-              <Button 
-                variant="outline" 
-                className="flex items-center border-slate-200 bg-white hover:bg-slate-100"
-              >
-                <Filter className="w-4 h-4 mr-2 text-brand-primary" />
-                <span>Filters</span>
-                {activeFiltersCount > 0 && (
-                  <Badge 
-                    className="ml-2 bg-brand-primary hover:bg-brand-primary" 
-                    variant="secondary"
-                  >
-                    {activeFiltersCount}
-                  </Badge>
-                )}
-              </Button>
+              <FilterButton activeFiltersCount={activeFiltersCount} />
             </PopoverTrigger>
             <PopoverContent className="w-[400px] p-0" align="start" side="bottom">
-              <div className="px-4 pt-4 pb-2 flex items-center justify-between">
-                <h3 className="font-medium">Advanced Filters</h3>
-                {activeFiltersCount > 0 && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="text-xs h-7 px-2"
-                    onClick={clearFilters}
-                  >
-                    <X className="w-3 h-3 mr-1" />
-                    Clear all filters
-                  </Button>
-                )}
-              </div>
-              <Separator />
-              
-              <div className="p-4 grid gap-4">
-                {/* Office Filter */}
-                <div className="grid gap-1.5">
-                  <label className="text-xs font-medium">Office</label>
-                  <Select 
-                    value={filters.office}
-                    onValueChange={(value) => onFilterChange('office', value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Offices" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Offices</SelectItem>
-                      {officeOptions.map((office) => (
-                        <SelectItem key={office} value={office}>
-                          {office}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {/* Country Filter */}
-                <div className="grid gap-1.5">
-                  <label className="text-xs font-medium">Country</label>
-                  <Select 
-                    value={filters.country}
-                    onValueChange={(value) => onFilterChange('country', value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Countries" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Countries</SelectItem>
-                      {countryOptions.map((country) => (
-                        <SelectItem key={country} value={country}>
-                          {country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {/* Manager Filter */}
-                <div className="grid gap-1.5">
-                  <label className="text-xs font-medium">Project Manager</label>
-                  <Select 
-                    value={filters.manager}
-                    onValueChange={(value) => onFilterChange('manager', value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="All Project Managers" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Project Managers</SelectItem>
-                      {managerOptions.map((manager) => (
-                        <SelectItem key={manager.id} value={manager.id}>
-                          {manager.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <AdvancedFilters 
+                filters={filters}
+                onFilterChange={onFilterChange}
+                officeOptions={officeOptions}
+                countryOptions={countryOptions}
+                managerOptions={managerOptions}
+                clearFilters={clearFilters}
+                activeFiltersCount={activeFiltersCount}
+              />
             </PopoverContent>
           </Popover>
         </div>
 
         {/* Active filters display */}
-        {activeFiltersCount > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {filters.office !== 'all' && (
-              <Badge 
-                variant="outline" 
-                className="bg-slate-50 hover:bg-slate-100 text-xs py-0 h-6"
-              >
-                Office: {filters.office}
-                <button 
-                  className="ml-1 hover:text-destructive"
-                  onClick={() => onFilterChange('office', 'all')}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-            {filters.country !== 'all' && (
-              <Badge 
-                variant="outline" 
-                className="bg-slate-50 hover:bg-slate-100 text-xs py-0 h-6"
-              >
-                Country: {filters.country}
-                <button 
-                  className="ml-1 hover:text-destructive"
-                  onClick={() => onFilterChange('country', 'all')}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-            {filters.manager !== 'all' && (
-              <Badge 
-                variant="outline" 
-                className="bg-slate-50 hover:bg-slate-100 text-xs py-0 h-6"
-              >
-                Manager: {managerOptions.find(m => m.id === filters.manager)?.name || filters.manager}
-                <button 
-                  className="ml-1 hover:text-destructive"
-                  onClick={() => onFilterChange('manager', 'all')}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            )}
-          </div>
-        )}
+        <FilterBadges 
+          filters={filters} 
+          onFilterChange={onFilterChange} 
+          managerOptions={managerOptions} 
+        />
       </div>
     </div>
   );
