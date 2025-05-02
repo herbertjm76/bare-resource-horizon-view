@@ -20,15 +20,11 @@ const ProjectResourcing = () => {
   const diff = today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust when day is Sunday
   const startOfWeek = new Date(today.setDate(diff));
   
-  // End of current week (Sunday)
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6);
-  
   const [filters, setFilters] = useState({
     office: "all",
     country: "all",
     manager: "all",
-    weeksToShow: 12, // Default increased to 12 weeks
+    weeksToShow: 12, // Default is 12 weeks
   });
   
   // Use a date range instead of just a start date
@@ -100,9 +96,9 @@ const ProjectResourcing = () => {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background overflow-hidden">
-            <div className="mx-auto space-y-6">
-              <div className="flex justify-between items-center mb-6">
+          <div className="flex-1 p-4 sm:p-8 bg-background" style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)`, overflow: 'hidden' }}>
+            <div className="mx-auto space-y-6 h-full flex flex-col">
+              <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Project Resourcing</h1>
               </div>
               
@@ -122,7 +118,7 @@ const ProjectResourcing = () => {
                 managerOptions={managers}
               />
               
-              <div className="overflow-x-auto w-full rounded-lg border shadow-sm" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+              <div className="flex-1 rounded-lg border shadow-sm overflow-hidden" style={{ display: 'flex', flexDirection: 'column' }}>
                 <OfficeSettingsProvider>
                   <ResourceAllocationGrid 
                     startDate={dateRange.from}

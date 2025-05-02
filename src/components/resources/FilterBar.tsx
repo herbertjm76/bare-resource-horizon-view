@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { DateRangePicker, DateRange } from "@/components/ui/date-range-picker";
 import { cn } from "@/lib/utils";
+import { addDays, format } from 'date-fns';
 
 interface FilterBarProps {
   filters: {
@@ -64,11 +65,24 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     <div className="flex flex-wrap items-center gap-3 p-4 bg-white border rounded-lg shadow-sm">
       <div className="flex-1 space-y-3">
         <div className="flex flex-wrap items-center gap-3">
-          {/* Date Range Picker */}
-          <DateRangePicker 
-            value={dateRange}
-            onChange={onDateRangeChange}
-          />
+          {/* Week Start Picker */}
+          <Button 
+            variant="outline"
+            className="min-w-[200px] justify-start text-left border-slate-200 bg-white hover:bg-slate-100"
+            onClick={() => {
+              // Handle week selection - this could be enhanced with a specific week picker
+              const newStartDate = dateRange.from;
+              onDateRangeChange({
+                from: newStartDate,
+                to: addDays(newStartDate, (weeksToShow * 7) - 1)
+              });
+            }}
+          >
+            <div className="flex items-center">
+              <span className="text-brand-primary mr-2">Starting:</span>
+              <span>{format(dateRange.from, 'MMM dd, yyyy')}</span>
+            </div>
+          </Button>
 
           {/* Weeks to Show */}
           <Select 
@@ -84,7 +98,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               </div>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="4">4 Weeks</SelectItem>
               <SelectItem value="8">8 Weeks</SelectItem>
               <SelectItem value="12">12 Weeks</SelectItem>
               <SelectItem value="16">16 Weeks</SelectItem>

@@ -1,0 +1,51 @@
+
+/* Resource grid table styles */
+.grid-table-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  position: relative;
+}
+
+/* Ensure the table takes up the full height */
+.grid-table-container table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+/* Z-index for sticky headers */
+.grid-table-container thead th {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: white;
+  box-shadow: 0 1px 0 0 #e5e7eb;
+}
+
+/* Frozen left columns */
+.grid-table-container th.sticky,
+.grid-table-container td.sticky {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background-color: inherit;
+}
+
+/* Shadow for frozen columns */
+.grid-table-container th.sticky:after,
+.grid-table-container td.sticky:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 4px;
+  pointer-events: none;
+  box-shadow: inset -1px 0 0 0 #e5e7eb;
+}
+
+/* Hover effect for rows */
+.grid-table-container tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
