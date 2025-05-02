@@ -76,3 +76,11 @@
   left: 48px; /* Width of the first column */
   z-index: 20;
 }
+
+/* Date column header styles */
+.grid-table-container th span.transform {
+  display: inline-block;
+  width: 80px; /* Give more space for rotated text */
+  transform-origin: center left;
+  margin-left: 15px; /* Adjust spacing */
+}

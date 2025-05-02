@@ -32,7 +32,7 @@ export const WeekAllocationCell: React.FC<WeekAllocationCellProps> = ({
   const alignment = milestone?.type ? getMilestoneAlignment(milestone.type) : 'justify-center';
   
   return (
-    <td className="p-0 border-b text-center font-medium relative" style={{ minWidth: '10px' }}>
+    <td className="p-0 border-b text-center font-medium relative" style={{ minWidth: '35px' }}>
       <div className="flex flex-col items-center">
         {/* Milestone/Stage indicator area - clickable */}
         <div className="w-full transition-colors">
