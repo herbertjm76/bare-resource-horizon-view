@@ -122,7 +122,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               {weeks.map((week, i) => (
                 <th 
                   key={i} 
-                  style={{ width: '10px', minWidth: '10px' }} 
+                  style={{ width: '9px', minWidth: '9px' }} 
                   className="p-0 border-b text-center font-medium"
                 >
                   <div className="flex justify-center items-center h-20">
