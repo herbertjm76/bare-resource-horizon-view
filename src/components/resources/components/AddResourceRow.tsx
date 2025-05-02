@@ -40,8 +40,11 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
       
       {/* Empty cells for week columns */}
       {Array(weeksCount).fill(0).map((_, index) => (
-        <td key={index} className="p-0"></td>
+        <td key={index} className="p-0" style={{ width: '10px', minWidth: '10px' }}></td>
       ))}
+      
+      {/* Add blank flexible cell */}
+      <td className="p-0"></td>
     </tr>
   );
 };

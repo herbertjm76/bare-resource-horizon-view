@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/dialogs/AddResourceDialog';
@@ -93,6 +92,9 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
             <div className="h-full flex items-center justify-center">-</div>
           </td>
         ))}
+        
+        {/* Add blank flexible cell */}
+        <td className="p-0"></td>
       </tr>
     );
   }
@@ -131,6 +133,9 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
             />
           );
         })}
+        
+        {/* Add blank flexible cell */}
+        <td className="p-0"></td>
       </tr>
       
       {/* Resource rows when project is expanded */}

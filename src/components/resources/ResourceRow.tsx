@@ -110,10 +110,9 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
       {weeks.map((week, index) => {
         const weekKey = getWeekKey(week.startDate);
         const hoursValue = allocations[weekKey] || 0;
-        const isLastColumn = index === weeks.length - 1;
         
         return (
-          <td key={weekKey} className="p-0 text-center" style={isLastColumn ? {} : { width: '10px' }}>
+          <td key={weekKey} className="p-0 text-center" style={{ width: '10px', minWidth: '10px' }}>
             <div className="allocation-input-container px-0.5">
               <Input
                 type="number"
@@ -129,6 +128,9 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
           </td>
         );
       })}
+      
+      {/* Add blank flexible cell */}
+      <td className="p-0"></td>
     </tr>
   );
 }

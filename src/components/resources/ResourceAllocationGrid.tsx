@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useProjects } from '@/hooks/useProjects';
-import { addDays, format, startOfWeek, addWeeks } from 'date-fns';
+import { addDays, format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { ProjectRow } from '@/components/resources/ProjectRow';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+
 interface ResourceAllocationGridProps {
   startDate: Date;
   weeksToShow: number;
@@ -14,6 +15,7 @@ interface ResourceAllocationGridProps {
     manager: string;
   };
 }
+
 export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   startDate,
   weeksToShow,
@@ -59,12 +61,14 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   const toggleProjectExpanded = (projectId: string) => {
     setExpandedProjects(prev => prev.includes(projectId) ? prev.filter(id => id !== projectId) : [...prev, projectId]);
   };
+
   if (isLoading) {
     return <div className="text-center py-12">
         <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
         <p className="text-muted-foreground">Loading projects...</p>
       </div>;
   }
+
   if (filteredProjects.length === 0) {
     return <div className="text-center py-12 border rounded-lg">
         <p className="text-muted-foreground mb-2">No projects found matching your filters.</p>
@@ -75,9 +79,9 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
       </div>;
   }
 
-  // Calculate the total width based on number of weeks, adjusting to 10px per column
+  // Calculate the total width needed for data columns
   // Keep the counter at 12px and project name at 33px as before
-  const tableWidth = Math.max(800, weeksToShow * 10 + 45); // 10px per week + 45px for counter and project
+  const dataColumnsWidth = weeksToShow * 10 + 45; // 10px per week + 45px for counter and project
 
   // Enhance projects with office stages data
   const projectsWithStageData = filteredProjects.map(project => {
@@ -86,10 +90,9 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
       officeStages: office_stages || []
     };
   });
+
   return <div className="overflow-x-auto border rounded-lg">
-      <table className="min-w-full border-collapse divide-y divide-gray-200" style={{
-      width: tableWidth + 'px'
-    }}>
+      <table className="min-w-full border-collapse divide-y divide-gray-200">
         <thead className="bg-muted/50 sticky top-0 z-20">
           <tr>
             {/* Resources count column */}
@@ -104,22 +107,23 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               Project / Resource
             </th>
             
-            {/* Date columns - more compact columns */}
-            {weeks.map((week, i) => {
-              // Make the last column flexible by not setting a fixed width
-              const isLastColumn = i === weeks.length - 1;
-              const columnStyle = isLastColumn 
-                ? { minWidth: '10px' } // Last column is flexible
-                : { width: '10px', minWidth: '10px' }; // Fixed width for other columns
-              
-              return (
-                <th key={i} style={columnStyle} className="p-0 border-b text-center font-medium">
-                  <div className="flex justify-center items-center h-20">
-                    <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center">{week.label}</span>
-                  </div>
-                </th>
-              );
-            })}
+            {/* Date columns - fixed width columns */}
+            {weeks.map((week, i) => (
+              <th 
+                key={i} 
+                style={{ width: '10px', minWidth: '10px' }} 
+                className="p-0 border-b text-center font-medium"
+              >
+                <div className="flex justify-center items-center h-20">
+                  <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center">{week.label}</span>
+                </div>
+              </th>
+            ))}
+            
+            {/* Blank flexible column */}
+            <th className="p-0 border-b text-center font-medium">
+              {/* This column is intentionally left blank to provide flexibility */}
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
