@@ -8,6 +8,8 @@ import { WeeklyResourceHeader } from './WeeklyResourceHeader';
 import { MemberTableRow } from './MemberTableRow';
 import { useResourceAllocations } from './useResourceAllocations';
 import { useCompany } from "@/context/CompanyContext";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import './weekly-overview.css';
 
 interface WeeklyResourceTableProps {
@@ -25,7 +27,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   const { company } = useCompany();
   
   // Get current user ID
-  const { data: session } = useQuery({
+  const { data: session, isLoading: isLoadingSession } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
       const { data, error } = await supabase.auth.getSession();
@@ -35,10 +37,10 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   });
   
   // Get team members data using the hook - pass true to include inactive members
-  const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData(true);
+  const { teamMembers, isLoading: isLoadingMembers, error: teamMembersError } = useTeamMembersData(true);
   
   // Get pending team members (pre-registered)
-  const { data: preRegisteredMembers = [], isLoading: isLoadingPending } = useQuery({
+  const { data: preRegisteredMembers = [], isLoading: isLoadingPending, error: pendingError } = useQuery({
     queryKey: ['preRegisteredMembers', session?.user?.id, company?.id],
     queryFn: async () => {
       if (!session?.user?.id || !company?.id) return [];
@@ -68,16 +70,21 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     enabled: !!session?.user?.id && !!company?.id
   });
 
-  // Get allocations from custom hook - include both active and pre-registered members
-  const allMembers = [...(teamMembers || []), ...(preRegisteredMembers || [])];
+  // Get all members combined (active + pre-registered)
+  const allMembers = React.useMemo(() => {
+    return [...(teamMembers || []), ...(preRegisteredMembers || [])];
+  }, [teamMembers, preRegisteredMembers]);
+
+  // Get allocations from custom hook
   const { 
     getMemberAllocation, 
     handleInputChange, 
-    isLoading: isLoadingAllocations 
+    isLoading: isLoadingAllocations,
+    error: allocationsError 
   } = useResourceAllocations(allMembers, selectedWeek);
 
   // Fetch office locations
-  const { data: officeLocations = [] } = useQuery({
+  const { data: officeLocations = [], isLoading: isLoadingOffices, error: officesError } = useQuery({
     queryKey: ['officeLocations', company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
@@ -93,26 +100,41 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     enabled: !!company?.id
   });
 
-  const isLoading = isLoadingMembers || isLoadingPending || isLoadingAllocations;
+  // Determine overall loading state
+  const isLoading = isLoadingSession || isLoadingMembers || isLoadingPending || isLoadingAllocations || isLoadingOffices;
+
+  // Determine if there are any errors
+  const error = teamMembersError || pendingError || allocationsError || officesError;
 
   // Group team members by office
-  const membersByOffice = allMembers.reduce((acc, member) => {
-    const location = member.location || 'Unassigned';
-    if (!acc[location]) {
-      acc[location] = [];
-    }
-    acc[location].push(member);
-    return acc;
-  }, {} as Record<string, typeof allMembers>);
+  const membersByOffice = React.useMemo(() => {
+    return allMembers.reduce((acc, member) => {
+      const location = member.location || 'Unassigned';
+      if (!acc[location]) {
+        acc[location] = [];
+      }
+      acc[location].push(member);
+      return acc;
+    }, {} as Record<string, typeof allMembers>);
+  }, [allMembers]);
 
   // Filter by selected office if needed
-  let filteredOffices = Object.keys(membersByOffice);
-  if (filters.office !== 'all') {
-    filteredOffices = filteredOffices.filter(office => office === filters.office);
-  }
+  const filteredOffices = React.useMemo(() => {
+    let offices = Object.keys(membersByOffice);
+    
+    if (filters.office !== 'all') {
+      offices = offices.filter(office => office === filters.office);
+    }
+    
+    // Sort offices alphabetically
+    return offices.sort();
+  }, [membersByOffice, filters.office]);
 
-  // Sort offices alphabetically
-  filteredOffices.sort();
+  // Helper function to get office code display name
+  const getOfficeDisplay = React.useCallback((locationCode: string) => {
+    const office = officeLocations.find(o => o.code === locationCode);
+    return office ? `${office.code}` : locationCode;
+  }, [officeLocations]);
 
   if (isLoading) {
     return (
@@ -123,11 +145,24 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     );
   }
 
-  // Helper function to get office code display name
-  const getOfficeDisplay = (locationCode: string) => {
-    const office = officeLocations.find(o => o.code === locationCode);
-    return office ? `${office.code}` : locationCode;
-  };
+  if (error) {
+    return (
+      <Alert variant="destructive" className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          {typeof error === 'string' ? error : 'An error occurred while loading data. Please try again later.'}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (!allMembers.length) {
+    return (
+      <div className="text-center py-12 border rounded-lg">
+        <p className="text-muted-foreground mb-2">No team members found. Add team members to see the weekly overview.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="border rounded-lg overflow-hidden">

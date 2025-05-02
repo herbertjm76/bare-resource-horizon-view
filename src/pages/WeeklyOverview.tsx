@@ -8,8 +8,21 @@ import { WeeklyResourceFilters } from '@/components/weekly-overview/WeeklyResour
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
 
 const HEADER_HEIGHT = 56;
+
+// Create a client for React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 30000,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const WeeklyOverview = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
@@ -37,42 +50,45 @@ const WeeklyOverview = () => {
   const weekLabel = `Week of ${format(weekStart, 'MMMM d, yyyy')}`;
 
   return (
-    <SidebarProvider>
-      <div className="w-full min-h-screen flex flex-row">
-        <div className="flex-shrink-0">
-          <DashboardSidebar />
-        </div>
-        <div className="flex-1 flex flex-col">
-          <AppHeader />
-          <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-6 bg-background">
-            <div className="max-w-full mx-auto space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
-                <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Weekly Overview</h1>
-                <WeekSelector 
-                  selectedWeek={selectedWeek}
-                  onPreviousWeek={handlePreviousWeek}
-                  onNextWeek={handleNextWeek}
-                  weekLabel={weekLabel}
-                />
-              </div>
-              
-              <WeeklyResourceFilters 
-                filters={filters}
-                onFilterChange={handleFilterChange}
-              />
-              
-              <OfficeSettingsProvider>
-                <WeeklyResourceTable 
-                  selectedWeek={selectedWeek} 
+    <QueryClientProvider client={queryClient}>
+      <SidebarProvider>
+        <div className="w-full min-h-screen flex flex-row">
+          <div className="flex-shrink-0">
+            <DashboardSidebar />
+          </div>
+          <div className="flex-1 flex flex-col">
+            <AppHeader />
+            <div style={{ height: HEADER_HEIGHT }} />
+            <div className="flex-1 p-4 sm:p-6 bg-background">
+              <div className="max-w-full mx-auto space-y-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+                  <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Weekly Overview</h1>
+                  <WeekSelector 
+                    selectedWeek={selectedWeek}
+                    onPreviousWeek={handlePreviousWeek}
+                    onNextWeek={handleNextWeek}
+                    weekLabel={weekLabel}
+                  />
+                </div>
+                
+                <WeeklyResourceFilters 
                   filters={filters}
+                  onFilterChange={handleFilterChange}
                 />
-              </OfficeSettingsProvider>
+                
+                <OfficeSettingsProvider>
+                  <WeeklyResourceTable 
+                    selectedWeek={selectedWeek} 
+                    filters={filters}
+                  />
+                </OfficeSettingsProvider>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </SidebarProvider>
+        <Toaster position="top-right" />
+      </SidebarProvider>
+    </QueryClientProvider>
   );
 };
 

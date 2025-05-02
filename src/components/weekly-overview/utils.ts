@@ -1,32 +1,27 @@
 
 /**
- * Formats a number to have 0 decimal places
+ * Format a number to show only one decimal place when needed
  */
-export const formatNumber = (num: number): string => {
-  return num.toFixed(0);
+export const formatNumber = (value: number): string => {
+  if (Number.isInteger(value)) {
+    return value.toString();
+  }
+  return value.toFixed(1);
 };
 
 /**
- * Calculates the utilization percentage
+ * Calculate utilization percentage based on hours and capacity
  */
-export const calculateUtilization = (allocated: number, capacity: number): number => {
+export const calculateUtilization = (hours: number, capacity: number = 40): number => {
   if (capacity === 0) return 0;
-  return (allocated / capacity) * 100;
+  return Math.min(100, (hours / capacity) * 100);
 };
 
 /**
- * Calculate capacity based on resourced hours
+ * Calculate resource capacity based on project hours
+ * Normally would be standard 40, but can be adjusted based on other factors
  */
-export const calculateCapacity = (resourcedHours: number): number => {
-  return Math.max(0, 40 - resourcedHours);
+export const calculateCapacity = (projectHours: number): number => {
+  // For now, just return 40 as standard work week
+  return 40;
 };
-
-/**
- * Convert an array of project names to a displayable string
- */
-export const formatProjects = (projects: string[]): string => {
-  if (!projects || projects.length === 0) return "None";
-  return projects.join(", ");
-};
-
-// Add any other utility functions here

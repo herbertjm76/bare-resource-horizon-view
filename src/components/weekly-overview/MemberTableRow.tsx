@@ -43,6 +43,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   getOfficeDisplay,
   onInputChange
 }) => {
+  // Calculate capacity and utilization
   const capacity = calculateCapacity(allocation.resourcedHours);
   const utilization = calculateUtilization(allocation.resourcedHours, 40);
   
@@ -52,6 +53,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         <div className="flex items-center gap-2">
           <span>
             {member.first_name} {member.last_name}
+            {member.isPending && <span className="text-muted-foreground text-xs ml-1">(pending)</span>}
           </span>
         </div>
       </TableCell>
@@ -72,11 +74,15 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
               <TooltipContent side="right" className="w-64">
                 <div className="p-1">
                   <strong>Projects:</strong>
-                  <ul className="list-disc ml-4 mt-1">
-                    {allocation.projects.map((project, idx) => (
-                      <li key={idx}>{project}</li>
-                    ))}
-                  </ul>
+                  {allocation.projects.length > 0 ? (
+                    <ul className="list-disc ml-4 mt-1">
+                      {allocation.projects.map((project, idx) => (
+                        <li key={idx}>{project}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="mt-1 text-muted-foreground">No projects assigned</p>
+                  )}
                 </div>
               </TooltipContent>
             </Tooltip>

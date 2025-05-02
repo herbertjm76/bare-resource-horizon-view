@@ -1,5 +1,8 @@
 
 import React from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { useCompany } from "@/context/CompanyContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
   SelectContent,
@@ -7,9 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 interface WeeklyResourceFiltersProps {
   filters: {
@@ -22,47 +22,48 @@ export const WeeklyResourceFilters: React.FC<WeeklyResourceFiltersProps> = ({
   filters,
   onFilterChange
 }) => {
-  // Fetch offices from the database
-  const { data: officeLocations = [] } = useQuery({
-    queryKey: ['officeLocations'],
+  const { company } = useCompany();
+  
+  // Fetch office locations for filter
+  const { data: officeLocations = [], isLoading } = useQuery({
+    queryKey: ['office-locations', company?.id],
     queryFn: async () => {
+      if (!company?.id) return [];
+      
       const { data, error } = await supabase
         .from('office_locations')
-        .select('id, code, city, country');
+        .select('id, code, city, country')
+        .eq('company_id', company.id);
       
       if (error) throw error;
       return data;
-    }
+    },
+    enabled: !!company?.id
   });
-
+  
   return (
-    <div className="mb-6 border rounded-lg p-6 bg-background">
-      <p className="text-sm text-muted-foreground mb-4">
-        View and manage all your weekly resource allocation. Use the filters below to narrow down the list by office.
-      </p>
-      
-      <div className="flex flex-wrap gap-4 items-end">
-        <Select
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="space-y-1">
+        <label htmlFor="office-filter" className="text-sm font-medium text-muted-foreground">
+          Office
+        </label>
+        <Select 
           value={filters.office}
-          onValueChange={(value) => onFilterChange('office', value)}
+          onValueChange={value => onFilterChange('office', value)}
+          disabled={isLoading}
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="All Offices" />
+          <SelectTrigger id="office-filter" className="w-full">
+            <SelectValue placeholder="Select office" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Offices</SelectItem>
-            {officeLocations.map((office) => (
+            {officeLocations.map(office => (
               <SelectItem key={office.id} value={office.code}>
-                {office.code} - {office.city}
+                {office.code} - {office.city}, {office.country}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        
-        <Input 
-          className="w-[240px]" 
-          placeholder="Search team members..." 
-        />
       </div>
     </div>
   );
