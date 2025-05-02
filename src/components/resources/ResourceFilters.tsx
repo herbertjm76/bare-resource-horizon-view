@@ -7,9 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
-import { addWeeks, subWeeks } from 'date-fns';
 import { useProjects } from '@/hooks/useProjects';
 
 interface ResourceFiltersProps {
@@ -44,20 +41,12 @@ export const ResourceFilters: React.FC<ResourceFiltersProps> = ({
     return acc;
   }, [] as Array<{id: string, name: string}>);
   
-  const handlePreviousWeek = () => {
-    onFilterChange({ startDate: subWeeks(filters.startDate, 1) });
-  };
-  
-  const handleNextWeek = () => {
-    onFilterChange({ startDate: addWeeks(filters.startDate, 1) });
-  };
-  
   const handleWeeksToShow = (value: string) => {
     onFilterChange({ weeksToShow: parseInt(value, 10) });
   };
 
   return (
-    <div className="flex flex-wrap gap-4 mb-6">
+    <div className="flex flex-wrap gap-4">
       <Select 
         onValueChange={(value) => onFilterChange({ office: value })}
         value={filters.office}
@@ -109,36 +98,22 @@ export const ResourceFilters: React.FC<ResourceFiltersProps> = ({
         </SelectContent>
       </Select>
       
-      <div className="flex items-center ml-auto space-x-2">
-        <Select 
-          onValueChange={handleWeeksToShow}
-          value={filters.weeksToShow.toString()}
-        >
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Weeks to show" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="4">4 Weeks</SelectItem>
-            <SelectItem value="8">8 Weeks</SelectItem>
-            <SelectItem value="12">12 Weeks</SelectItem>
-            <SelectItem value="16">16 Weeks</SelectItem>
-            <SelectItem value="26">26 Weeks (6 Months)</SelectItem>
-            <SelectItem value="52">52 Weeks (1 Year)</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        <div className="flex items-center border rounded-md">
-          <Button variant="ghost" size="icon" onClick={handlePreviousWeek}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="flex items-center px-2">
-            <Calendar className="h-4 w-4 mr-2" />
-          </span>
-          <Button variant="ghost" size="icon" onClick={handleNextWeek}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <Select 
+        onValueChange={handleWeeksToShow}
+        value={filters.weeksToShow.toString()}
+      >
+        <SelectTrigger className="w-[140px]">
+          <SelectValue placeholder="Weeks to show" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="4">4 Weeks</SelectItem>
+          <SelectItem value="8">8 Weeks</SelectItem>
+          <SelectItem value="12">12 Weeks</SelectItem>
+          <SelectItem value="16">16 Weeks</SelectItem>
+          <SelectItem value="26">26 Weeks (6 Months)</SelectItem>
+          <SelectItem value="52">52 Weeks (1 Year)</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 };

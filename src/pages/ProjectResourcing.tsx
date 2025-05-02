@@ -5,10 +5,12 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { ResourceAllocationGrid } from '@/components/resources/ResourceAllocationGrid';
 import { ResourceFilters } from '@/components/resources/ResourceFilters';
-import { format } from 'date-fns';
+import { format, addWeeks, subWeeks } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
+import { Button } from "@/components/ui/button";
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 
 const HEADER_HEIGHT = 56;
 
@@ -34,6 +36,14 @@ const ProjectResourcing = () => {
     }));
   };
 
+  const handlePreviousWeek = () => {
+    handleFilterChange({ startDate: subWeeks(filters.startDate, 1) });
+  };
+  
+  const handleNextWeek = () => {
+    handleFilterChange({ startDate: addWeeks(filters.startDate, 1) });
+  };
+
   return (
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
@@ -47,12 +57,26 @@ const ProjectResourcing = () => {
             <div className="mx-auto space-y-8">
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Project Resourcing</h1>
-                <div className="text-sm text-muted-foreground">
-                  Week of {format(filters.startDate, 'MMM d, yyyy')}
-                </div>
               </div>
               
-              <div>
+              <div className="flex flex-wrap items-center gap-4">
+                {/* Week Selector - Moved to the left */}
+                <div className="flex items-center border rounded-md">
+                  <Button variant="ghost" size="icon" onClick={handlePreviousWeek}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <span className="flex items-center px-3">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    <span className="text-sm font-medium">
+                      Week of {format(filters.startDate, 'MMM d, yyyy')}
+                    </span>
+                  </span>
+                  <Button variant="ghost" size="icon" onClick={handleNextWeek}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Resource Filters - Now to the right of the week selector */}
                 <ResourceFilters filters={filters} onFilterChange={handleFilterChange} />
               </div>
               

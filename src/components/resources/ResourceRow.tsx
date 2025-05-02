@@ -86,7 +86,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
             <div className="ml-5">
               <div className="font-medium text-xs truncate flex items-center gap-1">
                 {resource.name}
-                <ResourceUtilizationBadge utilization={utilizationPercentage} size="xs" />
+                <ResourceUtilizationBadge utilization={utilizationPercentage} size="sm" />
               </div>
               <div className="text-xs text-muted-foreground truncate">{resource.role}</div>
             </div>
