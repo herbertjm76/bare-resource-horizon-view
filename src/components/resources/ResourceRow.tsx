@@ -45,8 +45,8 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
 
   // Base background color for project rows
   const rowBgClass = isEven 
-    ? "bg-white hover:bg-gray-50" 
-    : "bg-gray-50 hover:bg-gray-100";
+    ? "bg-white" 
+    : "bg-gray-50";
 
   const handleAllocationChange = (weekKey: string, value: string) => {
     const numValue = parseInt(value, 10);
@@ -75,13 +75,13 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     : 0;
   
   return (
-    <tr className={`border-b ${rowBgClass} group`}>
+    <tr className={`border-b ${rowBgClass} group hover:bg-gray-50`}>
       {/* Fixed counter column */}
-      <td className={`sticky left-0 z-10 p-2 w-12 ${rowBgClass}`}></td>
+      <td className={`sticky-left-0 ${rowBgClass} z-10 p-2 w-12 group-hover:bg-gray-50`}></td>
       
       {/* Resource info column */}
       <td 
-        className={`sticky left-12 z-10 p-1 ${rowBgClass}`} 
+        className={`sticky-left-12 ${rowBgClass} z-10 p-1 group-hover:bg-gray-50`} 
         style={{ width: '200px', minWidth: '200px' }}
       >
         <div className="flex items-center justify-between">

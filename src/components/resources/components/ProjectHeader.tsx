@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { ChevronRight, ChevronDown } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
+import { ResourceUtilizationBadge } from './ResourceUtilizationBadge';
 
 interface ProjectHeaderProps {
   project: any;
@@ -9,7 +10,7 @@ interface ProjectHeaderProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   headerBgClass: string;
-  totalHours?: number;
+  totalHours?: number; // Optional total hours
 }
 
 export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
@@ -22,35 +23,38 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
 }) => {
   return (
     <>
-      {/* Resource count column - frozen */}
-      <td className={`sticky-left-0 p-2 w-12 text-center ${headerBgClass} shadow-[1px_0_0_0_#e5e7eb]`}>
-        {/* Counter moved to the project name cell */}
+      {/* Fixed counter column */}
+      <td className={`sticky-left-0 ${headerBgClass} z-10 p-2 w-12 text-center`}>
+        <button 
+          onClick={onToggleExpand} 
+          className="rounded-full p-1 hover:bg-white/30 transition-colors"
+        >
+          {isExpanded ? (
+            <ChevronDown className="h-4 w-4 text-foreground/80" />
+          ) : (
+            <ChevronRight className="h-4 w-4 text-foreground/80" />
+          )}
+        </button>
       </td>
-
-      {/* Project name cell with the counter on the right - frozen */}
+      
+      {/* Fixed project name column */}
       <td 
-        className={`sticky-left-12 p-1 cursor-pointer ${headerBgClass} shadow-[1px_0_0_0_#e5e7eb]`} 
-        onClick={onToggleExpand} 
+        className={`sticky-left-12 ${headerBgClass} z-10 p-2 font-medium`}
         style={{ width: '200px', minWidth: '200px' }}
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <Button variant="ghost" size="icon" className="h-5 w-5 p-0 mr-1">
-              {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-            </Button>
-            <div className="truncate">
-              <div className="font-medium text-xs truncate">{project.name}</div>
-              <div className="text-xs text-muted-foreground truncate">
-                {project.code}
-                {totalHours > 0 && (
-                  <span className="ml-1 font-medium text-brand-primary text-xs">• {totalHours}h</span>
-                )}
-              </div>
+        <div className="flex flex-col">
+          <div className="text-sm font-medium line-clamp-1">{project.name || 'Untitled Project'}</div>
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-muted-foreground">
+              {resourceCount} resource{resourceCount !== 1 ? 's' : ''}
             </div>
-          </div>
-          
-          <div className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-brand-violet text-white text-xs font-medium">
-            {resourceCount}
+            {totalHours > 0 && (
+              <div className="flex items-center">
+                <span className="mx-1 text-muted-foreground">•</span>
+                <ResourceUtilizationBadge utilization={75} size="sm" />
+                <span className="ml-1 text-xs text-muted-foreground">{totalHours}h</span>
+              </div>
+            )}
           </div>
         </div>
       </td>

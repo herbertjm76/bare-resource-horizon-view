@@ -8,11 +8,12 @@
   border-radius: 0.5rem;
 }
 
-/* Ensure the table takes up the full height */
+/* Ensure the table takes up the full width */
 .grid-table-container table {
   border-collapse: separate;
   border-spacing: 0;
-  width: 100%;
+  width: max-content; /* Allow table to expand beyond container */
+  min-width: 100%; /* Ensure it's at least 100% of container width */
   table-layout: fixed;
 }
 
@@ -27,25 +28,37 @@
 }
 
 /* Frozen left columns */
-.grid-table-container th.sticky,
-.grid-table-container td.sticky {
+.grid-table-container .sticky-left-0 {
   position: sticky;
   left: 0;
-  z-index: 10;
-  background-color: inherit;
+  z-index: 20;
 }
 
-/* Shadow for frozen columns */
-.grid-table-container th.sticky:after,
-.grid-table-container td.sticky:after {
+.grid-table-container .sticky-left-12 {
+  position: sticky;
+  left: 48px; /* Width of the first column */
+  z-index: 20;
+}
+
+/* Header cells need higher z-index to stay on top */
+.grid-table-container thead .sticky-left-0 {
+  z-index: 30;
+}
+
+.grid-table-container thead .sticky-left-12 {
+  z-index: 30;
+}
+
+/* Add shadow for frozen columns to create visual separation */
+.grid-table-container .sticky-left-12::after {
   content: '';
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 4px;
+  width: 6px;
   pointer-events: none;
-  box-shadow: inset -1px 0 0 0 #e5e7eb;
+  box-shadow: inset -3px 0 5px -3px rgba(0, 0, 0, 0.1);
 }
 
 /* Hover effect for rows */
@@ -53,29 +66,12 @@
   background-color: rgba(0, 0, 0, 0.02);
 }
 
-/* Fix for sticky columns with shadows */
-.grid-table-container th.sticky-left-0 {
-  position: sticky;
-  left: 0;
-  z-index: 30;
-}
-
-.grid-table-container th.sticky-left-12 {
-  position: sticky;
-  left: 48px; /* Width of the first column */
-  z-index: 30;
-}
-
-.grid-table-container td.sticky-left-0 {
-  position: sticky;
-  left: 0;
-  z-index: 20;
-}
-
-.grid-table-container td.sticky-left-12 {
-  position: sticky;
-  left: 48px; /* Width of the first column */
-  z-index: 20;
+/* Ensure background color persists while scrolling */
+.grid-table-container tr td.sticky-left-0,
+.grid-table-container tr th.sticky-left-0,
+.grid-table-container tr td.sticky-left-12, 
+.grid-table-container tr th.sticky-left-12 {
+  background-color: inherit;
 }
 
 /* Date column header styles */
