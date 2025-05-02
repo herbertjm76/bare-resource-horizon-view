@@ -28,7 +28,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
       </td>
 
       {/* Project name cell with the counter on the right */}
-      <td className={`sticky left-12 z-10 p-1 cursor-pointer ${headerBgClass}`} onClick={onToggleExpand} style={{ width: '45px', minWidth: '45px' }}>
+      <td className={`sticky left-12 z-10 p-1 cursor-pointer ${headerBgClass}`} onClick={onToggleExpand} style={{ width: '60px', minWidth: '60px' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Button variant="ghost" size="icon" className="h-5 w-5 p-0 mr-1">

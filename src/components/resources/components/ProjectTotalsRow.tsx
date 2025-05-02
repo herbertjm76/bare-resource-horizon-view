@@ -31,7 +31,7 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
       <td className={`sticky left-0 z-10 p-2 w-12 ${rowBgClass}`}></td>
       
       {/* Project totals label */}
-      <td className={`sticky left-12 z-10 p-2 ${rowBgClass}`} style={{ width: '45px', minWidth: '45px' }}>
+      <td className={`sticky left-12 z-10 p-2 ${rowBgClass}`} style={{ width: '60px', minWidth: '60px' }}>
         <div className="flex items-center">
           <div className="ml-8">
             <div className="font-medium text-sm">
