@@ -12,6 +12,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
   const {
     data: teamMembers = [],
     isLoading,
+    error,
     refetch: refetchTeamMembers
   } = useQuery({
     queryKey: ['teamMembers', refreshTrigger],
@@ -63,6 +64,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
   return {
     teamMembers,
     isLoading,
+    error, // Now we're properly exposing the error from the useQuery hook
     triggerRefresh,
     forceRefresh,
   };
