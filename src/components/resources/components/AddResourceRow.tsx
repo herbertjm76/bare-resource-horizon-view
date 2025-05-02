@@ -24,7 +24,7 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
       <td className={`sticky left-0 z-10 p-2 w-12 ${rowBgClass}`}></td>
       
       {/* Add resource button column */}
-      <td className={`sticky left-12 z-10 p-1 ${rowBgClass}`}>
+      <td className={`sticky left-12 z-10 p-1 ${rowBgClass}`} style={{ width: '45px', minWidth: '45px' }}>
         <div className="flex items-center">
           <Button 
             variant="ghost" 
