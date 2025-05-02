@@ -115,7 +115,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               minWidth: `${weekColumnWidth}px`
             }} className="p-0 border-b text-center font-medium">
                   <div className="flex justify-center items-end h-16">
-                    <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center translate-y-2">{week.label}</span>
+                    <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center translate-y-4">{week.label}</span>
                   </div>
                 </th>)}
               
