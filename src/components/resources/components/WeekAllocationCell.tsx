@@ -50,7 +50,7 @@ export const WeekAllocationCell: React.FC<WeekAllocationCellProps> = ({
         
         {/* Hours display */}
         <div className="py-[4px] px-0">
-          <span className={`text-xs font-bold ${projectHours > 0 ? 'text-black' : 'text-brand-gray'}`}>
+          <span className={`text-xs font-bold ${projectHours > 0 ? 'text-black' : 'text-gray-250'}`}>
             {projectHours > 0 ? `${projectHours}h` : '0h'}
           </span>
         </div>

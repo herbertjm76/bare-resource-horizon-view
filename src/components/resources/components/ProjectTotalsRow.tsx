@@ -40,7 +40,7 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
             <div className="font-medium text-sm">
               Project Totals
             </div>
-            <div className={`text-xs ${totalHours > 0 ? 'text-muted-foreground' : 'text-brand-gray'}`}>
+            <div className={`text-xs ${totalHours > 0 ? 'text-muted-foreground' : 'text-gray-250'}`}>
               Total Hours: {totalHours}
             </div>
           </div>
@@ -55,7 +55,7 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
         return (
           <td key={weekKey} className="p-0 text-center" style={{ width: '10px', minWidth: '10px' }}>
             <div className="py-2 px-0">
-              <span className={`text-xs font-bold ${totalHoursForWeek > 0 ? 'text-black' : 'text-brand-gray'}`}>
+              <span className={`text-xs font-bold ${totalHoursForWeek > 0 ? 'text-black' : 'text-gray-250'}`}>
                 {totalHoursForWeek}h
               </span>
             </div>
