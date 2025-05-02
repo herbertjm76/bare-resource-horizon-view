@@ -75,8 +75,9 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
       </div>;
   }
 
-  // Calculate the total width based on number of weeks, adjusting to 33px as requested
-  const tableWidth = Math.max(800, weeksToShow * 40 + 45); // 40px per week + 45px for counter and project (33+12)
+  // Calculate the total width based on number of weeks, adjusting to 10px per column
+  // Keep the counter at 12px and project name at 33px as before
+  const tableWidth = Math.max(800, weeksToShow * 10 + 45); // 10px per week + 45px for counter and project
 
   // Enhance projects with office stages data
   const projectsWithStageData = filteredProjects.map(project => {
@@ -104,14 +105,21 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
             </th>
             
             {/* Date columns - more compact columns */}
-            {weeks.map((week, i) => <th key={i} style={{
-            width: '40px',
-            minWidth: '40px'
-          }} className="p-0 border-b text-center font-medium">
-                <div className="flex justify-center items-center h-20">
-                  <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center">{week.label}</span>
-                </div>
-              </th>)}
+            {weeks.map((week, i) => {
+              // Make the last column flexible by not setting a fixed width
+              const isLastColumn = i === weeks.length - 1;
+              const columnStyle = isLastColumn 
+                ? { minWidth: '10px' } // Last column is flexible
+                : { width: '10px', minWidth: '10px' }; // Fixed width for other columns
+              
+              return (
+                <th key={i} style={columnStyle} className="p-0 border-b text-center font-medium">
+                  <div className="flex justify-center items-center h-20">
+                    <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center">{week.label}</span>
+                  </div>
+                </th>
+              );
+            })}
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">

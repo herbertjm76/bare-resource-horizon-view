@@ -107,12 +107,13 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
       </td>
       
       {/* Allocation input cells */}
-      {weeks.map(week => {
+      {weeks.map((week, index) => {
         const weekKey = getWeekKey(week.startDate);
         const hoursValue = allocations[weekKey] || 0;
+        const isLastColumn = index === weeks.length - 1;
         
         return (
-          <td key={weekKey} className="p-0 text-center w-8">
+          <td key={weekKey} className="p-0 text-center" style={isLastColumn ? {} : { width: '10px' }}>
             <div className="allocation-input-container px-0.5">
               <Input
                 type="number"
@@ -120,7 +121,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
                 max="168"
                 value={hoursValue > 0 ? hoursValue : ''}
                 onChange={(e) => handleAllocationChange(weekKey, e.target.value)}
-                className={`w-full h-8 px-1 text-center text-xs border-gray-200 focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''}`}
+                className={`w-full h-6 px-0 text-center text-xs border-gray-200 focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''}`}
                 placeholder="0"
                 disabled={isLoading || isSaving}
               />

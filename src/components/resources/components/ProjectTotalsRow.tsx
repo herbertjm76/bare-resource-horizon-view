@@ -43,14 +43,15 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
       </td>
       
       {/* Weekly total hours cells */}
-      {weeks.map(week => {
+      {weeks.map((week, index) => {
         const weekKey = getWeekKey(week.startDate);
         const totalHoursForWeek = weeklyProjectHours[weekKey] || 0;
+        const isLastColumn = index === weeks.length - 1;
         
         return (
-          <td key={weekKey} className="p-0 text-center w-8">
-            <div className="py-3 px-0">
-              <span className="text-[15px] font-bold">{totalHoursForWeek}h</span>
+          <td key={weekKey} className="p-0 text-center" style={isLastColumn ? {} : { width: '10px' }}>
+            <div className="py-2 px-0">
+              <span className="text-xs font-bold">{totalHoursForWeek}h</span>
             </div>
           </td>
         );
