@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
 import { ResourceUtilizationBadge } from './ResourceUtilizationBadge';
 
 interface ProjectHeaderProps {
