@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { addDays, format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
@@ -80,8 +81,9 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   }
 
   // Calculate the total width needed for data columns
-  // Keep the counter at 12px and project name at 120px as requested
-  const dataColumnsWidth = weeksToShow * 10 + 132; // 10px per week + 132px for counter (12px) and project resource (120px)
+  // Counter column at 12px and project name at 200px (increased width)
+  const projectColumnWidth = 200;
+  const dataColumnsWidth = weeksToShow * 10 + 12 + projectColumnWidth;
 
   // Enhance projects with office stages data
   const projectsWithStageData = filteredProjects.map(project => {
@@ -100,10 +102,13 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               {/* Empty header for the counter column */}
             </th>
             {/* Project/Resource column */}
-            <th className="sticky left-12 bg-muted/50 z-20 p-2 border-b text-left font-medium" style={{
-            width: '120px',
-            minWidth: '120px'
-          }}>
+            <th 
+              className="sticky left-12 bg-muted/50 z-20 p-2 border-b text-left font-medium" 
+              style={{
+                width: `${projectColumnWidth}px`,
+                minWidth: `${projectColumnWidth}px`
+              }}
+            >
               Project / Resource
             </th>
             

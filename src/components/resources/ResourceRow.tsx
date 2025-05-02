@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -79,7 +80,10 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
       <td className={`sticky left-0 z-10 p-2 w-12 ${rowBgClass}`}></td>
       
       {/* Resource info column */}
-      <td className={`sticky left-12 z-10 p-1 ${rowBgClass}`} style={{ width: '120px', minWidth: '120px' }}>
+      <td 
+        className={`sticky left-12 z-10 p-1 ${rowBgClass}`} 
+        style={{ width: '200px', minWidth: '200px' }}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="ml-5">
