@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
@@ -7,6 +7,8 @@ import { useUserSession } from '@/hooks/useUserSession';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersRealtime } from '@/hooks/useTeamMembersRealtime';
 import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 const HEADER_HEIGHT = 56;
 
@@ -14,14 +16,39 @@ const TeamMembersPage = () => {
   // Get user session
   const userId = useUserSession();
   
-  // Fetch team members data
+  // Fetch team members data - passing false since we don't need inactive members here
   const {
-    userProfile,
-    isProfileLoading,
     teamMembers,
     triggerRefresh,
     forceRefresh
-  } = useTeamMembersData(userId);
+  } = useTeamMembersData(false);
+
+  // Fetch user profile separately since it's no longer part of useTeamMembersData
+  const {
+    data: userProfile,
+    isLoading: isProfileLoading
+  } = useQuery({
+    queryKey: ['userProfile', userId],
+    queryFn: async () => {
+      if (!userId) return null;
+      console.log('Fetching user profile for ID:', userId);
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        throw error;
+      }
+      
+      console.log('User profile fetched:', data);
+      return data;
+    },
+    enabled: !!userId
+  });
 
   // Set up realtime subscriptions
   useTeamMembersRealtime(

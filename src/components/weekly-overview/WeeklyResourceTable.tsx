@@ -34,8 +34,8 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     }
   });
   
-  // Get team members data using the hook
-  const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData(session?.user?.id || null);
+  // Get team members data using the hook - pass true to include inactive members
+  const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData(true);
   
   // Get pending team members (pre-registered)
   const { data: preRegisteredMembers = [], isLoading: isLoadingPending } = useQuery({

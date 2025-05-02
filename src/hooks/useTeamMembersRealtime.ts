@@ -1,75 +1,64 @@
 
 import { useEffect } from 'react';
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 export const useTeamMembersRealtime = (
   companyId: string | undefined,
-  triggerRefresh: () => void,
-  forceRefresh: () => void
+  onRefresh: () => void,
+  onForceRefresh: () => void
 ) => {
   useEffect(() => {
     if (!companyId) return;
     
-    console.log('Setting up realtime subscription for company:', companyId);
+    console.log('Setting up realtime subscriptions for company:', companyId);
     
-    // Separate channel for profiles table
-    const profilesChannel = supabase
-      .channel('profiles-changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'profiles',
-        filter: `company_id=eq.${companyId}`
-      }, (payload) => {
-        console.log('Detected change in profiles table:', payload);
-        
-        // If this is an update operation, log the new data
-        if (payload.eventType === 'UPDATE') {
-          console.log('Profile updated:', payload.new);
+    // Subscribe to changes on profiles table for this company
+    const profilesSubscription = supabase
+      .channel('team-members-profiles')
+      .on(
+        'postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'profiles',
+          filter: `company_id=eq.${companyId}` 
+        }, 
+        (payload) => {
+          console.log('Profiles change detected:', payload);
+          onRefresh();
         }
-        
-        triggerRefresh();
-      })
+      )
       .subscribe((status) => {
         console.log('Profiles subscription status:', status);
       });
       
-    // Separate channel for invites table  
-    const invitesChannel = supabase
-      .channel('invites-changes')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'invites',
-        filter: `company_id=eq.${companyId}`
-      }, (payload) => {
-        console.log('Detected change in invites table:', payload);
-        
-        // If this is an update operation, log the new data
-        if (payload.eventType === 'UPDATE') {
-          console.log('Invite updated:', payload.new);
+    // Subscribe to changes on invites table for this company  
+    const invitesSubscription = supabase
+      .channel('team-members-invites')
+      .on(
+        'postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'invites',
+          filter: `company_id=eq.${companyId}` 
+        }, 
+        (payload) => {
+          console.log('Invites change detected:', payload);
+          onRefresh();
         }
-        
-        triggerRefresh();
-      })
+      )
       .subscribe((status) => {
         console.log('Invites subscription status:', status);
       });
-      
-    // Add a debug button to the console for troubleshooting
-    if (typeof window !== 'undefined') {
-      (window as any).forceTeamMembersRefresh = forceRefresh;
-      console.log('Debug function added to window: forceTeamMembersRefresh()');
-    }
-      
+
+    // Cleanup
     return () => {
-      console.log('Cleaning up realtime subscriptions');
-      supabase.removeChannel(profilesChannel);
-      supabase.removeChannel(invitesChannel);
-      
-      if (typeof window !== 'undefined') {
-        delete (window as any).forceTeamMembersRefresh;
-      }
+      console.log('Removing realtime subscriptions');
+      supabase.removeChannel(profilesSubscription);
+      supabase.removeChannel(invitesSubscription);
     };
-  }, [companyId, triggerRefresh, forceRefresh]);
+  }, [companyId, onRefresh]);
+
+  return null;
 };
