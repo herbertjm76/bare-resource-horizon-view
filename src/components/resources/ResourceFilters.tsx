@@ -14,8 +14,6 @@ interface ResourceFiltersProps {
     office: string;
     country: string;
     manager: string;
-    startDate: Date;
-    weeksToShow: number;
   };
   onFilterChange: (filters: Partial<ResourceFiltersProps['filters']>) => void;
 }
@@ -40,10 +38,6 @@ export const ResourceFilters: React.FC<ResourceFiltersProps> = ({
     }
     return acc;
   }, [] as Array<{id: string, name: string}>);
-  
-  const handleWeeksToShow = (value: string) => {
-    onFilterChange({ weeksToShow: parseInt(value, 10) });
-  };
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -95,23 +89,6 @@ export const ResourceFilters: React.FC<ResourceFiltersProps> = ({
               {manager.name}
             </SelectItem>
           ))}
-        </SelectContent>
-      </Select>
-      
-      <Select 
-        onValueChange={handleWeeksToShow}
-        value={filters.weeksToShow.toString()}
-      >
-        <SelectTrigger className="w-[140px]">
-          <SelectValue placeholder="Weeks to show" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="4">4 Weeks</SelectItem>
-          <SelectItem value="8">8 Weeks</SelectItem>
-          <SelectItem value="12">12 Weeks</SelectItem>
-          <SelectItem value="16">16 Weeks</SelectItem>
-          <SelectItem value="26">26 Weeks (6 Months)</SelectItem>
-          <SelectItem value="52">52 Weeks (1 Year)</SelectItem>
         </SelectContent>
       </Select>
     </div>
