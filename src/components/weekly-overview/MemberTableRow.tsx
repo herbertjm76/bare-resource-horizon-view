@@ -91,7 +91,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       </TableCell>
       
       <TableCell className="py-1 px-1 text-center number-column font-bold">
-        <div className="table-cell">{capacity}</div>
+        <div className="table-cell">{formatNumber(allocation.resourcedHours || 0)}</div>
       </TableCell>
       
       <TableCell className="py-1 px-1 number-column">

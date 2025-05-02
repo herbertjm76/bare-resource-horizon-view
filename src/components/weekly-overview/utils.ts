@@ -25,3 +25,16 @@ export const calculateCapacity = (projectHours: number): number => {
   // For now, just return 40 as standard work week
   return 40;
 };
+
+/**
+ * Format a date as a week key (YYYY-MM-DD) for database lookups
+ * Always returns the Monday of the week
+ */
+export const formatWeekKey = (date: Date): string => {
+  const dayOfWeek = date.getDay();
+  const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust for Sunday
+  const monday = new Date(date);
+  monday.setDate(diff);
+  return monday.toISOString().split('T')[0];
+};
+

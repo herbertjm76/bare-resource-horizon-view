@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { format, parseISO, startOfWeek } from 'date-fns';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
+import { formatWeekKey } from './utils';
 
 interface TeamMember {
   id: string;
@@ -31,11 +32,6 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
   const [error, setError] = useState<string | null>(null);
   const { company } = useCompany();
   
-  // Format date for database consistency
-  const formatDateKey = (date: Date) => {
-    return format(startOfWeek(date, { weekStartsOn: 1 }), 'yyyy-MM-dd');
-  };
-
   // Fetch allocations for all team members for the selected week
   const fetchAllocations = useCallback(async () => {
     if (!teamMembers || teamMembers.length === 0) {
@@ -48,12 +44,12 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
     setError(null);
     
     try {
-      const weekKey = formatDateKey(selectedWeek);
+      const weekKey = formatWeekKey(selectedWeek);
       
       // Get all member IDs
       const memberIds = teamMembers.map(member => member.id);
       
-      // First, try to fetch real project allocation data
+      // First, fetch project allocations with project details for the selected week
       let projectAllocations = [];
       if (company?.id) {
         const { data, error } = await supabase
@@ -72,6 +68,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
           setError('Failed to fetch resource allocations');
         } else {
           projectAllocations = data || [];
+          console.log('Fetched project allocations:', projectAllocations);
         }
       }
       
