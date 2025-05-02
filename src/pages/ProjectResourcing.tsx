@@ -123,7 +123,7 @@ const ProjectResourcing = () => {
                 />
               </div>
               
-              <div className="flex-1 rounded-lg border shadow-sm overflow-hidden" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className="flex-1 rounded-lg border shadow-sm" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 <OfficeSettingsProvider>
                   <ResourceAllocationGrid 
                     startDate={selectedWeek}
