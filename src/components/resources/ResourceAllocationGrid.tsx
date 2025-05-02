@@ -77,8 +77,8 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     );
   }
 
-  // Calculate the total width based on number of weeks, but make columns tighter
-  const tableWidth = Math.max(800, weeksToShow * 40 + 262); // 40px per week + 262px for left columns (250 + 12)
+  // Calculate the total width based on number of weeks, adjusting to 33px as requested
+  const tableWidth = Math.max(800, weeksToShow * 40 + 45); // 40px per week + 45px for counter and project (33+12)
 
   // Enhance projects with office stages data
   const projectsWithStageData = filteredProjects.map(project => {
@@ -98,7 +98,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               {/* Empty header for the counter column */}
             </th>
             {/* Project/Resource column */}
-            <th className="sticky left-12 bg-muted/50 z-20 p-2 border-b text-left font-medium" style={{ minWidth: '250px' }}>
+            <th className="sticky left-12 bg-muted/50 z-20 p-2 border-b text-left font-medium" style={{ width: '33px', minWidth: '33px' }}>
               Project / Resource
             </th>
             

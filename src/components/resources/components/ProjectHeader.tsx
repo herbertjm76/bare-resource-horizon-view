@@ -9,7 +9,7 @@ interface ProjectHeaderProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   headerBgClass: string;
-  totalHours?: number; // Add total hours prop
+  totalHours?: number;
 }
 
 export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
@@ -18,7 +18,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   isExpanded,
   onToggleExpand,
   headerBgClass,
-  totalHours = 0 // Default to 0 if not provided
+  totalHours = 0
 }) => {
   return (
     <>
@@ -28,25 +28,24 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
       </td>
 
       {/* Project name cell with the counter on the right */}
-      <td className={`sticky left-12 z-10 p-2 cursor-pointer ${headerBgClass}`} onClick={onToggleExpand}>
+      <td className={`sticky left-12 z-10 p-1 cursor-pointer ${headerBgClass}`} onClick={onToggleExpand}>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Button variant="ghost" size="icon" className="h-6 w-6 p-0 mr-2">
-              {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            <Button variant="ghost" size="icon" className="h-5 w-5 p-0 mr-1">
+              {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
             </Button>
-            <div>
-              <div className="font-medium">{project.name}</div>
-              <div className="text-xs text-muted-foreground">
+            <div className="truncate">
+              <div className="font-medium text-xs truncate">{project.name}</div>
+              <div className="text-xs text-muted-foreground truncate">
                 {project.code}
                 {totalHours > 0 && (
-                  <span className="ml-2 font-medium text-brand-primary">• {totalHours}h total</span>
+                  <span className="ml-1 font-medium text-brand-primary text-xs">• {totalHours}h</span>
                 )}
               </div>
             </div>
           </div>
           
-          {/* Always show resource counter */}
-          <div className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-brand-violet text-white text-xs font-medium">
+          <div className="inline-flex items-center justify-center h-5 w-5 rounded-full bg-brand-violet text-white text-xs font-medium">
             {resourceCount}
           </div>
         </div>

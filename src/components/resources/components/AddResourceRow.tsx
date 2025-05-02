@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { UserPlus } from 'lucide-react';
+import { PlusCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 interface AddResourceRowProps {
@@ -19,16 +19,29 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
   if (!isExpanded) return null;
   
   return (
-    <tr className={`border-b ${rowBgClass}`}>
-      <td className={`sticky left-0 z-10 w-12 ${rowBgClass}`}></td>
-      <td className={`sticky left-12 z-10 p-2 ${rowBgClass}`}>
-        <Button variant="ghost" size="sm" className="ml-8 text-muted-foreground" onClick={onAddResource}>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Add Resource
-        </Button>
+    <tr className={rowBgClass}>
+      {/* Fixed counter column */}
+      <td className={`sticky left-0 z-10 p-2 w-12 ${rowBgClass}`}></td>
+      
+      {/* Add resource button column */}
+      <td className={`sticky left-12 z-10 p-1 ${rowBgClass}`}>
+        <div className="flex items-center">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 px-2 ml-5 text-brand-violet hover:bg-brand-violet/10"
+            onClick={onAddResource}
+          >
+            <PlusCircle className="h-4 w-4 mr-1" />
+            <span className="text-xs">Add Resource</span>
+          </Button>
+        </div>
       </td>
       
-      {Array.from({ length: weeksCount }).map((_, i) => <td key={i} className="p-0 w-8"></td>)}
+      {/* Empty cells for week columns */}
+      {Array(weeksCount).fill(0).map((_, index) => (
+        <td key={index} className="p-0"></td>
+      ))}
     </tr>
   );
 };
