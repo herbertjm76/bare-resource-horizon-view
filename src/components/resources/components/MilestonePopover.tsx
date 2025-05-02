@@ -42,7 +42,7 @@ export const MilestonePopover: React.FC<MilestonePopoverProps> = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <PopoverTrigger asChild>
-              <div className="w-full h-5 cursor-pointer flex justify-center items-center">
+              <div className="w-full h-[18px] cursor-pointer flex items-center justify-center">
                 <MilestoneContinuity 
                   milestone={milestone} 
                   continuity={continuity} 

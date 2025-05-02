@@ -115,7 +115,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
         const hoursValue = allocations[weekKey] || 0;
         
         return (
-          <td key={weekKey} className="p-0 text-center" style={{ width: '10px', minWidth: '10px' }}>
+          <td key={weekKey} className="p-0 text-center" style={{ width: '35px', minWidth: '35px' }}>
             <div className="allocation-input-container px-0.5">
               <Input
                 type="number"

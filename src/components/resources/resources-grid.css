@@ -23,6 +23,7 @@
   z-index: 20;
   background-color: white;
   box-shadow: 0 1px 0 0 #e5e7eb;
+  padding: 0; /* Remove default padding */
 }
 
 /* Frozen left columns */
@@ -83,4 +84,20 @@
   width: 80px; /* Give more space for rotated text */
   transform-origin: center left;
   margin-left: 15px; /* Adjust spacing */
+}
+
+/* Remove bottom margin from column headers to eliminate extra space */
+.grid-table-container thead tr th > div {
+  margin-bottom: 0;
+}
+
+/* Ensure project row header has no extra bottom padding */
+.grid-table-container tbody tr:first-child td {
+  border-top: none;
+}
+
+/* Consistent vertical alignment for all cells */
+.grid-table-container th,
+.grid-table-container td {
+  vertical-align: middle;
 }
