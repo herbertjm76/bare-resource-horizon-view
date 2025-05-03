@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
@@ -34,7 +34,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
   onDeleteResource,
   isEven = false
 }) => {
-  // Use the DB hook instead of local state
+  // Use the DB hook
   const resourceType = resource.isPending ? 'pre_registered' : 'active';
   const { 
     allocations, 
@@ -43,12 +43,35 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     saveAllocation 
   } = useResourceAllocationsDB(projectId, resource.id, resourceType);
 
+  // Local state for input values to prevent losing focus
+  const [inputValues, setInputValues] = useState<Record<string, string>>({});
+
+  // Initialize input values from allocations
+  useEffect(() => {
+    const initialValues: Record<string, string> = {};
+    
+    Object.entries(allocations).forEach(([weekKey, hours]) => {
+      initialValues[weekKey] = hours > 0 ? hours.toString() : '';
+    });
+    
+    setInputValues(initialValues);
+  }, [allocations]);
+
   // Base background color for project rows
   const rowBgClass = isEven 
     ? "bg-white" 
     : "bg-gray-50";
 
-  const handleAllocationChange = (weekKey: string, value: string) => {
+  // Handle input change locally without saving to DB immediately
+  const handleInputChange = (weekKey: string, value: string) => {
+    setInputValues(prev => ({
+      ...prev,
+      [weekKey]: value
+    }));
+  };
+  
+  // Save allocation when user is done typing (on blur)
+  const handleInputBlur = (weekKey: string, value: string) => {
     const numValue = parseInt(value, 10);
     const hours = isNaN(numValue) ? 0 : numValue;
     
@@ -112,7 +135,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
       {/* Allocation input cells */}
       {weeks.map((week, index) => {
         const weekKey = getWeekKey(week.startDate);
-        const hoursValue = allocations[weekKey] || 0;
+        const inputValue = inputValues[weekKey] || '';
         
         return (
           <td key={weekKey} className="p-0 text-center" style={{ width: '35px', minWidth: '35px' }}>
@@ -121,8 +144,9 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
                 type="number"
                 min="0"
                 max="168"
-                value={hoursValue > 0 ? hoursValue : ''}
-                onChange={(e) => handleAllocationChange(weekKey, e.target.value)}
+                value={inputValue}
+                onChange={(e) => handleInputChange(weekKey, e.target.value)}
+                onBlur={(e) => handleInputBlur(weekKey, e.target.value)}
                 className={`w-full h-6 px-0 text-center text-xs border-gray-200 focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''}`}
                 placeholder="0"
                 disabled={isLoading || isSaving}
