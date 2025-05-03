@@ -48,7 +48,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
       // Get pre-registered members from invites table
       const { data, error } = await supabase
         .from('invites')
-        .select('id, first_name, last_name, email, department, location, job_title, role')
+        .select('id, first_name, last_name, email, department, location, job_title, role, weekly_capacity')
         .eq('company_id', company.id)
         .eq('invitation_type', 'pre_registered')
         .eq('status', 'pending');
@@ -64,7 +64,8 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
         first_name: member.first_name || '',
         last_name: member.last_name || '',
         email: member.email || '',
-        location: member.location || null
+        location: member.location || null,
+        weekly_capacity: member.weekly_capacity || 40
       }));
     },
     enabled: !!session?.user?.id && !!company?.id

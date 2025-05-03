@@ -29,6 +29,7 @@ interface MemberTableRowProps {
     last_name: string;
     location: string | null;
     isPending?: boolean;
+    weekly_capacity?: number;
   };
   allocation: MemberAllocation;
   isEven: boolean;
@@ -43,9 +44,11 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   getOfficeDisplay,
   onInputChange
 }) => {
-  // Calculate capacity and utilization
-  const capacity = calculateCapacity(allocation.resourcedHours);
-  const utilization = calculateUtilization(allocation.resourcedHours, 40);
+  // Get member's weekly capacity (default to 40 if not set)
+  const weeklyCapacity = member.weekly_capacity || 40;
+  
+  // Calculate utilization based on member's specific capacity
+  const utilization = calculateUtilization(allocation.resourcedHours, weeklyCapacity);
   
   return (
     <TableRow className={isEven ? "bg-muted/10" : ""}>

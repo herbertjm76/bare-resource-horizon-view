@@ -11,6 +11,7 @@ interface TeamMember {
   first_name: string;
   last_name: string;
   location: string | null;
+  weekly_capacity?: number;
 }
 
 export interface MemberAllocation {

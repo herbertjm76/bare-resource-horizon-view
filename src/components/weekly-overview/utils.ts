@@ -1,40 +1,37 @@
 
+import { format, startOfWeek } from 'date-fns';
+
 /**
- * Format a number to show only one decimal place when needed
+ * Format a number for display
  */
-export const formatNumber = (value: number): string => {
-  if (Number.isInteger(value)) {
-    return value.toString();
-  }
-  return value.toFixed(1);
+export const formatNumber = (num: number): string | number => {
+  // Return empty string for 0 values
+  if (num === 0) return '0';
+  // Return formatted number for other values
+  return num;
 };
 
 /**
- * Calculate utilization percentage based on hours and capacity
+ * Calculate utilization percentage
  */
 export const calculateUtilization = (hours: number, capacity: number = 40): number => {
-  if (capacity === 0) return 0;
-  return Math.min(100, (hours / capacity) * 100);
+  if (capacity <= 0) return 0;
+  const percentage = (hours / capacity) * 100;
+  return Math.round(percentage);
 };
 
 /**
- * Calculate resource capacity based on project hours
- * Normally would be standard 40, but can be adjusted based on other factors
+ * Calculate capacity value
  */
-export const calculateCapacity = (projectHours: number): number => {
-  // For now, just return 40 as standard work week
-  return 40;
+export const calculateCapacity = (hours: number): number => {
+  // For now, just return the hours as capacity
+  return hours;
 };
 
 /**
- * Format a date as a week key (YYYY-MM-DD) for database lookups
- * Always returns the Monday of the week
+ * Format a date as a week key (YYYY-MM-DD of Monday)
  */
 export const formatWeekKey = (date: Date): string => {
-  const dayOfWeek = date.getDay();
-  const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1); // Adjust for Sunday
-  const monday = new Date(date);
-  monday.setDate(diff);
-  return monday.toISOString().split('T')[0];
+  const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+  return format(weekStart, 'yyyy-MM-dd');
 };
-
