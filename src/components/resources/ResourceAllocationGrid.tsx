@@ -15,6 +15,7 @@ interface ResourceAllocationGridProps {
     office: string;
     country: string;
     manager: string;
+    searchTerm?: string;
   };
 }
 
@@ -51,11 +52,21 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     };
   });
 
-  // Filter projects based on criteria
+  // Filter projects based on criteria including search term
   const filteredProjects = projects.filter(project => {
     if (filters.office !== "all" && project.office?.name !== filters.office) return false;
     if (filters.country !== "all" && project.country !== filters.country) return false;
     if (filters.manager !== "all" && project.project_manager?.id !== filters.manager) return false;
+    
+    // Filter by search term if present
+    if (filters.searchTerm && filters.searchTerm.trim() !== '') {
+      const searchLower = filters.searchTerm.toLowerCase().trim();
+      const projectNameMatch = project.name?.toLowerCase().includes(searchLower);
+      const projectCodeMatch = project.code?.toLowerCase().includes(searchLower);
+      
+      if (!projectNameMatch && !projectCodeMatch) return false;
+    }
+    
     return true;
   });
 

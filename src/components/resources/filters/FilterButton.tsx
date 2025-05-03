@@ -13,15 +13,15 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
 }) => {
   return (
     <Button 
-      variant="outline" 
-      className="flex items-center border-slate-200 bg-white hover:bg-slate-100"
+      variant="default" 
+      className="flex items-center"
     >
-      <Filter className="w-4 h-4 mr-2 text-brand-primary" />
+      <Filter className="w-4 h-4 mr-2" />
       <span>Filters</span>
       {activeFiltersCount > 0 && (
         <Badge 
-          className="ml-2 bg-brand-primary hover:bg-brand-primary" 
-          variant="secondary"
+          className="ml-2 bg-white text-brand-primary hover:bg-white" 
+          variant="outline"
         >
           {activeFiltersCount}
         </Badge>

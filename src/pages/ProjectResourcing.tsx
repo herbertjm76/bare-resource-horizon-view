@@ -19,6 +19,7 @@ const ProjectResourcing = () => {
   const mondayOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 });
   
   const [selectedWeek, setSelectedWeek] = useState<Date>(mondayOfCurrentWeek);
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [filters, setFilters] = useState({
     office: "all",
@@ -45,6 +46,10 @@ const ProjectResourcing = () => {
       ...prev,
       weeksToShow: weeks
     }));
+  };
+  
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
   };
   
   // Week navigation functions
@@ -99,7 +104,7 @@ const ProjectResourcing = () => {
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Project Resourcing</h1>
               </div>
               
-              <div className="flex justify-between items-center gap-4 flex-wrap">
+              <div className="flex justify-between items-start gap-4 flex-wrap">
                 <WeekSelector
                   selectedWeek={selectedWeek}
                   onPreviousWeek={goToPreviousWeek}
@@ -116,6 +121,8 @@ const ProjectResourcing = () => {
                   onFilterChange={handleFilterChange}
                   weeksToShow={filters.weeksToShow}
                   onWeeksChange={handleWeeksChange}
+                  searchTerm={searchTerm}
+                  onSearchChange={handleSearchChange}
                   officeOptions={officeOptions}
                   countryOptions={countryOptions}
                   managerOptions={managers}
@@ -128,7 +135,10 @@ const ProjectResourcing = () => {
                   <ResourceAllocationGrid 
                     startDate={selectedWeek}
                     weeksToShow={filters.weeksToShow}
-                    filters={filters}
+                    filters={{
+                      ...filters,
+                      searchTerm
+                    }}
                   />
                 </OfficeSettingsProvider>
               </div>
