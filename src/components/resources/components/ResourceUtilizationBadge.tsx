@@ -18,6 +18,9 @@ export const ResourceUtilizationBadge: React.FC<ResourceUtilizationBadgeProps> =
   utilization, 
   size = 'md' 
 }) => {
+  // Round up the utilization percentage for display
+  const displayUtilization = Math.ceil(utilization);
+  
   // Get status based on utilization percentage (now yellow is optimal, green is high)
   const getUtilizationStatus = (percentage: number): UtilizationStatus => {
     if (percentage <= 30) return 'low';
@@ -54,7 +57,7 @@ export const ResourceUtilizationBadge: React.FC<ResourceUtilizationBadgeProps> =
     }
   };
 
-  const status = getUtilizationStatus(utilization);
+  const status = getUtilizationStatus(displayUtilization);
   const colors = getColorScheme(status);
   const message = getTooltipMessage(status);
   
@@ -67,7 +70,7 @@ export const ResourceUtilizationBadge: React.FC<ResourceUtilizationBadgeProps> =
       <Tooltip>
         <TooltipTrigger asChild>
           <span className={`inline-flex items-center justify-center rounded-full ${colors.background} ${colors.text} font-medium ${sizeClasses}`}>
-            {utilization}%
+            {displayUtilization}%
           </span>
         </TooltipTrigger>
         <TooltipContent side="top">

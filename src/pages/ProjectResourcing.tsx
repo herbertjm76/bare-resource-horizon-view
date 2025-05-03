@@ -10,6 +10,7 @@ import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
+import { SearchInput } from '@/components/resources/filters/SearchInput';
 
 const HEADER_HEIGHT = 56;
 
@@ -104,33 +105,61 @@ const ProjectResourcing = () => {
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Project Resourcing</h1>
               </div>
               
-              <div className="flex justify-between items-start gap-4 flex-wrap">
-                <WeekSelector
-                  selectedWeek={selectedWeek}
-                  onPreviousWeek={goToPreviousWeek}
-                  onNextWeek={goToNextWeek}
-                  weekLabel={weekLabel(selectedWeek)}
-                />
+              <div className="flex flex-wrap gap-4">
+                {/* Week selector in a bordered box */}
+                <div className="flex border rounded-md p-2 items-center">
+                  <WeekSelector
+                    selectedWeek={selectedWeek}
+                    onPreviousWeek={goToPreviousWeek}
+                    onNextWeek={goToNextWeek}
+                    weekLabel={weekLabel(selectedWeek)}
+                  />
+                  
+                  {/* Weeks dropdown */}
+                  <div className="ml-4">
+                    <select
+                      className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      value={filters.weeksToShow.toString()}
+                      onChange={(e) => handleWeeksChange(Number(e.target.value))}
+                    >
+                      {weekOptions.map(option => (
+                        <option key={option.value} value={option.value}>{option.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
                 
-                <FilterBar 
-                  filters={{
-                    office: filters.office,
-                    country: filters.country,
-                    manager: filters.manager
-                  }}
-                  onFilterChange={handleFilterChange}
-                  weeksToShow={filters.weeksToShow}
-                  onWeeksChange={handleWeeksChange}
-                  searchTerm={searchTerm}
-                  onSearchChange={handleSearchChange}
-                  officeOptions={officeOptions}
-                  countryOptions={countryOptions}
-                  managerOptions={managers}
-                  weekOptions={weekOptions}
-                />
+                {/* Search and filter in a bordered box */}
+                <div className="flex items-center border rounded-md p-2 gap-2 flex-1 max-w-md">
+                  <div className="flex-1">
+                    <SearchInput 
+                      value={searchTerm}
+                      onChange={handleSearchChange}
+                      placeholder="Search projects..."
+                    />
+                  </div>
+                  
+                  <FilterBar 
+                    filters={{
+                      office: filters.office,
+                      country: filters.country,
+                      manager: filters.manager
+                    }}
+                    onFilterChange={handleFilterChange}
+                    weeksToShow={filters.weeksToShow}
+                    onWeeksChange={handleWeeksChange}
+                    searchTerm={searchTerm}
+                    onSearchChange={handleSearchChange}
+                    officeOptions={officeOptions}
+                    countryOptions={countryOptions}
+                    managerOptions={managers}
+                    weekOptions={weekOptions}
+                    hideSearchAndWeeksSelector={true} /* Hide these as we've moved them */
+                  />
+                </div>
               </div>
               
-              <div className="flex-1 rounded-lg border shadow-sm" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className="flex-1 rounded-lg border shadow-sm flex flex-col">
                 <OfficeSettingsProvider>
                   <ResourceAllocationGrid 
                     startDate={selectedWeek}

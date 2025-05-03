@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { addDays, format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
@@ -112,9 +111,12 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     };
   });
   
+  // Calculate height to fill available space with some padding
+  const calculatedHeight = 'calc(100% - 20px)'; // Reduced from original to use more space
+  
   return (
-    <div className="border rounded-lg overflow-hidden h-[calc(100vh-300px)]">
-      <div className="grid-table-container">
+    <div className="border rounded-lg overflow-hidden h-full flex-grow flex flex-col">
+      <div className="grid-table-container flex-grow">
         <table style={{ width: tableWidth }} className="min-w-full divide-y divide-gray-200">
           <thead className="bg-muted/50">
             <tr>

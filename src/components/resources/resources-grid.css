@@ -9,6 +9,8 @@
   border-radius: 0.5rem;
   scrollbar-width: thin; /* For Firefox */
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* For Firefox */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Scrollbar styling for WebKit browsers */
@@ -120,4 +122,14 @@
 .grid-table-container th,
 .grid-table-container td {
   vertical-align: middle;
+}
+
+/* Ensure the table takes up all available space */
+.grid-table-container > div {
+  flex-grow: 1;
+}
+
+/* Make sure table fills the available height */
+.grid-table-container table {
+  height: 100%;
 }

@@ -1,16 +1,8 @@
 
 import React, { useState } from 'react';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-
-import { WeekSelector } from './filters/WeekSelector';
 import { FilterButton } from './filters/FilterButton';
-import { FilterBadges } from './filters/FilterBadges';
 import { AdvancedFilters } from './filters/AdvancedFilters';
+import { FilterBadges } from './filters/FilterBadges';
 import { SearchInput } from './filters/SearchInput';
 
 interface FilterBarProps {
@@ -26,8 +18,9 @@ interface FilterBarProps {
   onSearchChange: (value: string) => void;
   officeOptions: string[];
   countryOptions: string[];
-  managerOptions: {id: string, name: string}[];
-  weekOptions: {value: string, label: string}[];
+  managerOptions: Array<{ id: string; name: string }>;
+  weekOptions: Array<{ value: string; label: string }>;
+  hideSearchAndWeeksSelector?: boolean;
 }
 
 export const FilterBar: React.FC<FilterBarProps> = ({
@@ -40,77 +33,74 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   officeOptions,
   countryOptions,
   managerOptions,
-  weekOptions
+  weekOptions,
+  hideSearchAndWeeksSelector = false
 }) => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   
-  // Count active filters
-  const activeFiltersCount = 
-    (filters.office !== 'all' ? 1 : 0) + 
-    (filters.country !== 'all' ? 1 : 0) + 
-    (filters.manager !== 'all' ? 1 : 0);
-
-  const clearFilters = () => {
-    onFilterChange('office', 'all');
-    onFilterChange('country', 'all');
-    onFilterChange('manager', 'all');
+  // Calculate active filters count
+  const activeFiltersCount = Object.entries(filters).reduce((count, [key, value]) => {
+    if (value !== 'all') count++;
+    return count;
+  }, 0);
+  
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-stretch gap-4">
-        {/* Week selector group */}
-        <div className="flex-1 md:flex-none p-4 bg-white border rounded-lg shadow-sm min-w-[220px]">
-          <div className="font-medium text-sm text-muted-foreground mb-2">Time Period</div>
-          <WeekSelector 
-            weeksToShow={weeksToShow}
-            onWeeksChange={onWeeksChange}
-            weekOptions={weekOptions}
+    <div className="flex flex-col w-auto">
+      <div className="flex items-center gap-2">
+        {!hideSearchAndWeeksSelector && (
+          <div className="flex-1">
+            <SearchInput 
+              value={searchTerm}
+              onChange={onSearchChange}
+              placeholder="Search projects..."
+            />
+          </div>
+        )}
+        
+        <div>
+          <FilterButton 
+            activeFiltersCount={activeFiltersCount} 
           />
         </div>
         
-        {/* Search and filter group */}
-        <div className="flex-1 p-4 bg-white border rounded-lg shadow-sm">
-          <div className="font-medium text-sm text-muted-foreground mb-2">Find Projects</div>
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex-1 min-w-[200px]">
-              <SearchInput 
-                value={searchTerm}
-                onChange={onSearchChange}
-                placeholder="Search project name..."
-              />
-            </div>
-            
-            <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-              <PopoverTrigger asChild>
-                <div>
-                  <FilterButton activeFiltersCount={activeFiltersCount} />
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-0" align="start" side="bottom">
-                <AdvancedFilters 
-                  filters={filters}
-                  onFilterChange={onFilterChange}
-                  officeOptions={officeOptions}
-                  countryOptions={countryOptions}
-                  managerOptions={managerOptions}
-                  clearFilters={clearFilters}
-                  activeFiltersCount={activeFiltersCount}
-                />
-              </PopoverContent>
-            </Popover>
+        {!hideSearchAndWeeksSelector && (
+          <div className="ml-auto">
+            <select
+              className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              value={weeksToShow.toString()}
+              onChange={(e) => onWeeksChange(Number(e.target.value))}
+            >
+              {weekOptions.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
           </div>
-        </div>
+        )}
       </div>
       
-      {/* Active filters display */}
-      {activeFiltersCount > 0 && (
-        <FilterBadges 
-          filters={filters} 
-          onFilterChange={onFilterChange} 
-          managerOptions={managerOptions} 
-        />
-      )}
+      {/* Filter badges */}
+      <FilterBadges 
+        filters={filters}
+        onFilterChange={onFilterChange}
+        officeOptions={officeOptions}
+        countryOptions={countryOptions}
+        managerOptions={managerOptions}
+      />
+      
+      {/* Advanced Filters */}
+      <AdvancedFilters
+        show={showFilters}
+        filters={filters}
+        onFilterChange={onFilterChange}
+        officeOptions={officeOptions}
+        countryOptions={countryOptions}
+        managerOptions={managerOptions}
+        onClose={() => setShowFilters(false)}
+      />
     </div>
   );
 };

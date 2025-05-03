@@ -48,22 +48,26 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
         className={`sticky-left-12 ${headerBgClass} z-10 p-2 font-medium`}
         style={{ width: '200px', minWidth: '200px' }}
       >
-        <div className="flex flex-col">
-          <div className="text-sm font-medium line-clamp-1">{project.name || 'Untitled Project'}</div>
-          <div className="flex items-center gap-2">
-            <div className="text-xs text-muted-foreground">
-              {resourceCount} resource{resourceCount !== 1 ? 's' : ''}
-            </div>
+        <div className="flex items-center">
+          <div className="text-sm font-medium line-clamp-1 mr-2">{project.name || 'Untitled Project'}</div>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <span>{resourceCount} resource{resourceCount !== 1 ? 's' : ''}</span>
+            
             {totalHours > 0 && (
-              <div className="flex items-center">
-                <span className="mx-1 text-muted-foreground">•</span>
+              <>
+                <span className="mx-0.5 text-muted-foreground">•</span>
                 {hasFeesSet ? (
-                  <ResourceUtilizationBadge utilization={projectUtilization} size="sm" />
+                  <div className="flex items-center gap-1">
+                    <ResourceUtilizationBadge utilization={projectUtilization} size="sm" />
+                    <span>{totalHours}h</span>
+                  </div>
                 ) : (
-                  <NoFeeBadge hours={totalHours} size="sm" />
+                  <div className="flex items-center gap-1">
+                    <NoFeeBadge hours={totalHours} size="sm" />
+                    <span>{totalHours}h</span>
+                  </div>
                 )}
-                <span className="ml-1 text-xs text-muted-foreground">{totalHours}h</span>
-              </div>
+              </>
             )}
           </div>
         </div>

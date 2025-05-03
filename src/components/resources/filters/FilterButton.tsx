@@ -14,7 +14,7 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
   return (
     <Button 
       variant="default" 
-      className="flex items-center"
+      className="flex items-center bg-brand-primary hover:bg-brand-primary/90"
     >
       <Filter className="w-4 h-4 mr-2" />
       <span>Filters</span>
