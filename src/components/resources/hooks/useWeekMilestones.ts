@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -33,13 +34,13 @@ export const useWeekMilestones = () => {
         [weekKey]: milestoneInfo
       }));
       
-      // Show toast message
-      if (milestoneInfo.type === 'none') {
-        toast.info("Milestone removed");
-      } else if (milestoneInfo.stage) {
+      // Show toast message - Check for stage first, then milestone type
+      if (milestoneInfo.stage) {
         toast.success(`Stage ${milestoneInfo.stage} set for week of ${weekKey}`);
-      } else {
+      } else if (milestoneInfo.type !== 'none') {
         toast.success(`${milestoneInfo.type} set for week of ${weekKey}`);
+      } else {
+        toast.info("Milestone removed");
       }
     }
   };
