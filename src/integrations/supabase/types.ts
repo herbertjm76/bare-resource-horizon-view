@@ -78,6 +78,7 @@ export type Database = {
           location: string | null
           role: string | null
           status: string
+          weekly_capacity: number | null
         }
         Insert: {
           accepted_at?: string | null
@@ -96,6 +97,7 @@ export type Database = {
           location?: string | null
           role?: string | null
           status?: string
+          weekly_capacity?: number | null
         }
         Update: {
           accepted_at?: string | null
@@ -114,6 +116,7 @@ export type Database = {
           location?: string | null
           role?: string | null
           status?: string
+          weekly_capacity?: number | null
         }
         Relationships: [
           {
@@ -418,6 +421,7 @@ export type Database = {
           location: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
+          weekly_capacity: number
         }
         Insert: {
           avatar_url?: string | null
@@ -432,6 +436,7 @@ export type Database = {
           location?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
+          weekly_capacity?: number
         }
         Update: {
           avatar_url?: string | null
@@ -446,6 +451,7 @@ export type Database = {
           location?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
+          weekly_capacity?: number
         }
         Relationships: [
           {

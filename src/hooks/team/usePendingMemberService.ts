@@ -38,7 +38,8 @@ export const usePendingMemberService = (companyId: string | undefined) => {
         role: memberData.role,
         department: memberData.department,
         location: memberData.location,
-        job_title: memberData.job_title
+        job_title: memberData.job_title,
+        weekly_capacity: memberData.weekly_capacity
       };
       
       console.log('Update data being sent to invites table:', updateData);
@@ -105,7 +106,8 @@ export const usePendingMemberService = (companyId: string | undefined) => {
           department: memberData.department,
           location: memberData.location,
           job_title: memberData.job_title,
-          role: memberData.role
+          role: memberData.role,
+          weekly_capacity: memberData.weekly_capacity || 40
         });
 
       if (error) {

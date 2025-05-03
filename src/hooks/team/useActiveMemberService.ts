@@ -41,6 +41,7 @@ export const useActiveMemberService = (companyId: string | undefined) => {
         department: memberData.department,
         location: memberData.location,
         job_title: memberData.job_title,
+        weekly_capacity: memberData.weekly_capacity,
         role: memberData.role as UserRole, // Cast to ensure correct type
         updated_at: new Date().toISOString()
       };

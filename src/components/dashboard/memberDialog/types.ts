@@ -12,4 +12,5 @@ export interface MemberFormData {
   department?: string;
   location?: string;
   job_title?: string;
+  weekly_capacity?: number;
 }

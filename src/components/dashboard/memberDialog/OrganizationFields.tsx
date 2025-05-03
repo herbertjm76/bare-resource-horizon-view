@@ -36,6 +36,20 @@ const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register }) => 
           {...register('location')}
         />
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="weekly_capacity">Weekly Capacity (hours)</Label>
+        <Input 
+          id="weekly_capacity"
+          type="number"
+          min="1"
+          max="168"
+          placeholder="40"
+          {...register('weekly_capacity', { 
+            valueAsNumber: true,
+            validate: value => !value || value > 0 || "Capacity must be greater than 0"
+          })}
+        />
+      </div>
     </>
   );
 };

@@ -31,7 +31,8 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
       role: 'member',
       department: '',
       location: '',
-      job_title: ''
+      job_title: '',
+      weekly_capacity: 40
     }
   });
 
@@ -55,7 +56,8 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         role: (member.role as MemberFormData['role']) || 'member',
         department: member.department || '',
         location: member.location || '',
-        job_title: member.job_title || ''
+        job_title: member.job_title || '',
+        weekly_capacity: member.weekly_capacity || 40
       });
     } else {
       // Reset form for new member
@@ -66,7 +68,8 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         role: 'member',
         department: '',
         location: '',
-        job_title: ''
+        job_title: '',
+        weekly_capacity: 40
       });
     }
   }, [member, reset]);
