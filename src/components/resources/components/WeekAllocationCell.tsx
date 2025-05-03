@@ -32,10 +32,10 @@ export const WeekAllocationCell: React.FC<WeekAllocationCellProps> = ({
   const alignment = milestone?.type ? getMilestoneAlignment(milestone.type) : 'justify-center';
   
   return (
-    <td className="p-0 border-b text-center font-medium relative" style={{ minWidth: '35px' }}>
-      <div className="flex flex-col items-center">
-        {/* Milestone/Stage indicator area - clickable */}
-        <div className="w-full transition-colors">
+    <td className="border-b text-center font-medium relative week-allocation-cell" style={{ minWidth: '35px', maxWidth: '35px', padding: 0 }}>
+      <div className="week-allocation-cell-content">
+        {/* Milestone/Stage indicator area */}
+        <div className="w-full">
           <MilestonePopover
             weekKey={weekKey}
             weekLabel={weekLabel}
@@ -49,7 +49,7 @@ export const WeekAllocationCell: React.FC<WeekAllocationCellProps> = ({
         </div>
         
         {/* Hours display */}
-        <div className="py-[4px] px-0">
+        <div className="hours-display">
           <span className={`text-xs font-bold ${projectHours > 0 ? 'text-black' : 'text-gray-250'}`}>
             {projectHours > 0 ? `${projectHours}h` : '0h'}
           </span>

@@ -13,6 +13,7 @@ import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { SearchInput } from '@/components/resources/filters/SearchInput';
 
 const HEADER_HEIGHT = 56;
+const FILTERS_HEIGHT = 126; // Height of filters section including margins
 
 const ProjectResourcing = () => {
   // Get the start of the current week (Monday)
@@ -99,13 +100,13 @@ const ProjectResourcing = () => {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background" style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
-            <div className="mx-auto space-y-6 h-full flex flex-col">
-              <div className="flex justify-between items-center">
+          <div className="flex-1 p-4 sm:p-8 bg-background flex flex-col" style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
+            <div className="flex-grow flex flex-col max-w-full h-full">
+              <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Project Resourcing</h1>
               </div>
               
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4 mb-4">
                 {/* Week selector in a bordered box */}
                 <div className="flex border rounded-md p-2 items-center">
                   <WeekSelector
