@@ -11,6 +11,9 @@ interface FilterBadgesProps {
   };
   onFilterChange: (key: string, value: string) => void;
   managerOptions: {id: string, name: string}[];
+  // These props exist in FilterBar.tsx but were missing from this interface
+  officeOptions?: string[];
+  countryOptions?: string[];
 }
 
 export const FilterBadges: React.FC<FilterBadgesProps> = ({

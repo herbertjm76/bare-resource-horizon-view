@@ -21,8 +21,9 @@ interface AdvancedFiltersProps {
   officeOptions: string[];
   countryOptions: string[];
   managerOptions: {id: string, name: string}[];
-  clearFilters: () => void;
-  activeFiltersCount: number;
+  onClose: () => void;
+  // Add the missing property that was causing the error
+  show: boolean;
 }
 
 export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
@@ -31,9 +32,24 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   officeOptions,
   countryOptions,
   managerOptions,
-  clearFilters,
-  activeFiltersCount
+  onClose,
+  show
 }) => {
+  // Calculate active filters count 
+  const activeFiltersCount = Object.entries(filters).reduce((count, [key, value]) => {
+    if (value !== 'all') count++;
+    return count;
+  }, 0);
+
+  // Define clearFilters function to handle clearing all filters
+  const clearFilters = () => {
+    onFilterChange('office', 'all');
+    onFilterChange('country', 'all');
+    onFilterChange('manager', 'all');
+  };
+
+  if (!show) return null;
+
   return (
     <>
       <div className="px-4 pt-4 pb-2 flex items-center justify-between">

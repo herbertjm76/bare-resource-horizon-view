@@ -63,7 +63,8 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         
         <div>
           <FilterButton 
-            activeFiltersCount={activeFiltersCount} 
+            activeFiltersCount={activeFiltersCount}
+            onClick={toggleFilters}
           />
         </div>
         
@@ -86,8 +87,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       <FilterBadges 
         filters={filters}
         onFilterChange={onFilterChange}
-        officeOptions={officeOptions}
-        countryOptions={countryOptions}
         managerOptions={managerOptions}
       />
       
