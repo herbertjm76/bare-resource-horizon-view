@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Users, Clock, DollarSign } from 'lucide-react';
 import { ResourceUtilizationBadge } from './ResourceUtilizationBadge';
 import { NoFeeBadge } from './NoFeeBadge';
 
@@ -23,14 +23,11 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
 }) => {
   // Check if the project has fees set
   const hasFeesSet = project.fee > 0 || (project.stage_fees && project.stage_fees.length > 0);
-  
-  // Placeholder utilization calculation (this would ideally come from a hook or calculation)
-  const projectUtilization = 75; // This would be calculated based on project budget vs hours
 
   return (
     <>
       {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${headerBgClass} z-10 p-2 w-12 text-center`}>
+      <td className={`sticky-left-0 ${headerBgClass} z-10 p-1 w-12 text-center`}>
         <button 
           onClick={onToggleExpand} 
           className="rounded-full p-1 hover:bg-white/30 transition-colors"
@@ -45,29 +42,31 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
       
       {/* Fixed project name column */}
       <td 
-        className={`sticky-left-12 ${headerBgClass} z-10 p-2 font-medium`}
+        className={`sticky-left-12 ${headerBgClass} z-10 p-1 font-medium`}
         style={{ width: '200px', minWidth: '200px' }}
       >
-        <div className="flex items-center">
-          <div className="text-sm font-medium line-clamp-1 mr-2">{project.name || 'Untitled Project'}</div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span>{resourceCount} resource{resourceCount !== 1 ? 's' : ''}</span>
+        <div className="flex flex-col">
+          <div className="text-sm font-medium line-clamp-1 mb-0.5">{project.name || 'Untitled Project'}</div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-0.5">
+              <Users className="h-3 w-3" />
+              <span>{resourceCount}</span>
+            </div>
             
             {totalHours > 0 && (
-              <>
-                <span className="mx-0.5 text-muted-foreground">•</span>
-                {hasFeesSet ? (
-                  <div className="flex items-center gap-1">
-                    <ResourceUtilizationBadge utilization={projectUtilization} size="sm" />
-                    <span>{totalHours}h</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-1">
-                    <NoFeeBadge hours={totalHours} size="sm" />
-                    <span>{totalHours}h</span>
-                  </div>
-                )}
-              </>
+              <div className="flex items-center gap-0.5">
+                <Clock className="h-3 w-3" />
+                <span>{totalHours}h</span>
+              </div>
+            )}
+            
+            {hasFeesSet ? (
+              <ResourceUtilizationBadge utilization={75} size="xs" />
+            ) : (
+              <div className="flex items-center gap-0.5">
+                <DollarSign className="h-3 w-3" />
+                <span className="text-[10px]">Not set</span>
+              </div>
             )}
           </div>
         </div>
@@ -75,3 +74,4 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
     </>
   );
 };
+

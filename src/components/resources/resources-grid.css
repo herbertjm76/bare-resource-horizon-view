@@ -15,7 +15,7 @@
 
 /* Scrollbar styling for WebKit browsers */
 .grid-table-container::-webkit-scrollbar {
-  height: 8px;
+  height: 8px;  /* Make sure horizontal scrollbar is visible */
   width: 8px;
 }
 
@@ -127,9 +127,29 @@
 /* Ensure the table takes up all available space */
 .grid-table-container > div {
   flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: auto;
 }
 
 /* Make sure table fills the available height */
 .grid-table-container table {
   height: 100%;
+}
+
+/* Ensure the scrollbar is visible at the bottom */
+.grid-table-container:after {
+  content: '';
+  height: 8px; /* Matches scrollbar height */
+  display: block;
+  width: 100%;
+}
+
+/* Make all rows more compact */
+.grid-table-container tr {
+  min-height: 28px; /* Set a minimum height for all rows */
+}
+
+/* Make allocation input more compact */
+.allocation-input-container input {
+  padding: 0;
 }

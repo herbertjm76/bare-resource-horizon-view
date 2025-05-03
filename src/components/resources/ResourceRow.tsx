@@ -98,13 +98,13 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     : 0;
   
   return (
-    <tr className={`border-b ${rowBgClass} group hover:bg-gray-50`}>
+    <tr className={`border-b ${rowBgClass} group hover:bg-gray-50 h-7`}>
       {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${rowBgClass} z-10 p-2 w-12 group-hover:bg-gray-50`}></td>
+      <td className={`sticky-left-0 ${rowBgClass} z-10 p-0.5 w-12 group-hover:bg-gray-50`}></td>
       
       {/* Resource info column */}
       <td 
-        className={`sticky-left-12 ${rowBgClass} z-10 p-1 group-hover:bg-gray-50`} 
+        className={`sticky-left-12 ${rowBgClass} z-10 p-0.5 group-hover:bg-gray-50`} 
         style={{ width: '200px', minWidth: '200px' }}
       >
         <div className="flex items-center justify-between">
@@ -112,15 +112,15 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
             <div className="ml-5">
               <div className="font-medium text-xs truncate flex items-center gap-1">
                 {resource.name}
-                <ResourceUtilizationBadge utilization={utilizationPercentage} size="sm" />
+                <ResourceUtilizationBadge utilization={utilizationPercentage} size="xs" />
               </div>
-              <div className="text-xs text-muted-foreground truncate">{resource.role}</div>
+              <div className="text-[10px] text-muted-foreground truncate">{resource.role}</div>
             </div>
           </div>
           <Button 
             variant="ghost" 
             size="sm" 
-            className="h-5 w-5 p-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-muted-foreground hover:text-destructive"
+            className="h-4 w-4 p-0 opacity-0 group-hover:opacity-100 hover:opacity-100 text-muted-foreground hover:text-destructive"
             onClick={() => {
               onDeleteResource(resource.id);
               toast.info(`${resource.name} removed from project`);
@@ -147,7 +147,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
                 value={inputValue}
                 onChange={(e) => handleInputChange(weekKey, e.target.value)}
                 onBlur={(e) => handleInputBlur(weekKey, e.target.value)}
-                className={`w-full h-6 px-0 text-center text-xs border-gray-200 focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''}`}
+                className={`w-full h-5 px-0 text-center text-xs border-gray-200 focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''}`}
                 placeholder="0"
                 disabled={isLoading || isSaving}
               />

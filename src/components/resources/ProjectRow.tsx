@@ -79,7 +79,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
 
   if ((isLoading || isLoadingAllocations) && isExpanded) {
     return (
-      <tr className={`border-t border-b border-gray-200 ${headerBgClass}`}>
+      <tr className={`border-t border-b border-gray-200 ${headerBgClass} h-8`}>
         <ProjectHeader
           project={project}
           resourceCount={0}
@@ -101,7 +101,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   }
 
   return <>
-      <tr className={`border-t border-b border-gray-200 ${headerBgClass}`}>
+      <tr className={`border-t border-b border-gray-200 ${headerBgClass} h-10`}>
         <ProjectHeader
           project={project}
           resourceCount={resources.length}
@@ -151,15 +151,6 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           isEven={isEven}
         />
       ))}
-      
-      {/* Only show project totals in a separate row if resources exist and the project is expanded */}
-      {isExpanded && resources.length > 0 && false && ( // We've disabled this by setting condition to false
-        <ProjectTotalsRow
-          weeklyProjectHours={weeklyProjectHours}
-          weeks={weeks}
-          isEven={isEven}
-        />
-      )}
       
       {/* Add resource row when project is expanded */}
       <AddResourceRow

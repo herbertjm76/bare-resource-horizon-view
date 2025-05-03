@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { addDays, format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
@@ -111,68 +112,67 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     };
   });
   
-  // Calculate height to fill available space with some padding
-  const calculatedHeight = 'calc(100% - 20px)'; // Reduced from original to use more space
-  
   return (
     <div className="border rounded-lg overflow-hidden h-full flex-grow flex flex-col">
       <div className="grid-table-container flex-grow">
-        <table style={{ width: tableWidth }} className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-muted/50">
-            <tr>
-              {/* Resources count column - frozen */}
-              <th className="sticky-left-0 bg-muted/50 z-30 p-2 border-b text-center font-medium w-12 shadow-[1px_0_0_0_#e5e7eb]" style={{
-                width: '48px',
-                minWidth: '48px'
-              }}>
-                {/* Empty header for the counter column */}
-              </th>
-              
-              {/* Project/Resource column - frozen */}
-              <th className="sticky-left-12 bg-muted/50 z-30 p-2 border-b text-left font-medium shadow-[1px_0_0_0_#e5e7eb]" style={{
-                width: '200px',
-                minWidth: '200px'
-              }}>
-                Project / Resource
-              </th>
-              
-              {/* Date columns - fixed width columns */}
-              {weeks.map((week, i) => (
-                <th 
-                  key={i} 
-                  style={{
-                    width: '35px',
-                    minWidth: '35px'
-                  }} 
-                  className="p-0 border-b text-center font-medium"
-                >
-                  <div className="flex justify-center items-end h-16">
-                    <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center translate-y-0">
-                      {week.label}
-                    </span>
-                  </div>
+        <div className="overflow-x-auto overflow-y-auto h-full">
+          <table style={{ width: tableWidth }} className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-muted/50">
+              <tr className="h-16">
+                {/* Resources count column - frozen */}
+                <th className="sticky-left-0 bg-muted/50 z-30 p-1 border-b text-center font-medium w-12 shadow-[1px_0_0_0_#e5e7eb]" style={{
+                  width: '48px',
+                  minWidth: '48px'
+                }}>
+                  {/* Empty header for the counter column */}
                 </th>
+                
+                {/* Project/Resource column - frozen */}
+                <th className="sticky-left-12 bg-muted/50 z-30 p-1 border-b text-left font-medium shadow-[1px_0_0_0_#e5e7eb]" style={{
+                  width: '200px',
+                  minWidth: '200px'
+                }}>
+                  Project / Resource
+                </th>
+                
+                {/* Date columns - fixed width columns */}
+                {weeks.map((week, i) => (
+                  <th 
+                    key={i} 
+                    style={{
+                      width: '35px',
+                      minWidth: '35px'
+                    }} 
+                    className="p-0 border-b text-center font-medium"
+                  >
+                    <div className="flex justify-center items-end h-16">
+                      <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center translate-y-0">
+                        {week.label}
+                      </span>
+                    </div>
+                  </th>
+                ))}
+                
+                {/* Blank flexible column */}
+                <th className="p-0 border-b text-center font-medium">
+                  {/* This column is intentionally left blank to provide flexibility */}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {projectsWithStageData.map((project, index) => (
+                <ProjectRow 
+                  key={project.id} 
+                  project={project} 
+                  weeks={weeks} 
+                  isExpanded={expandedProjects.includes(project.id)} 
+                  onToggleExpand={() => toggleProjectExpanded(project.id)} 
+                  isEven={index % 2 === 0} 
+                />
               ))}
-              
-              {/* Blank flexible column */}
-              <th className="p-0 border-b text-center font-medium">
-                {/* This column is intentionally left blank to provide flexibility */}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {projectsWithStageData.map((project, index) => (
-              <ProjectRow 
-                key={project.id} 
-                project={project} 
-                weeks={weeks} 
-                isExpanded={expandedProjects.includes(project.id)} 
-                onToggleExpand={() => toggleProjectExpanded(project.id)} 
-                isEven={index % 2 === 0} 
-              />
-            ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

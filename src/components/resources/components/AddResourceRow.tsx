@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { PlusCircle } from 'lucide-react';
-import { Button } from "@/components/ui/button";
 
 interface AddResourceRowProps {
   isExpanded: boolean;
@@ -19,31 +18,27 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
   if (!isExpanded) return null;
   
   return (
-    <tr className={rowBgClass}>
+    <tr className={`border-b ${rowBgClass} h-6`}>
       {/* Fixed counter column */}
-      <td className={`sticky left-0 z-10 p-2 w-12 ${rowBgClass}`}></td>
+      <td className={`sticky-left-0 ${rowBgClass} z-10 p-0 w-12`}></td>
       
-      {/* Add resource button column */}
+      {/* Resource info column */}
       <td 
-        className={`sticky left-12 z-10 p-1 ${rowBgClass}`} 
+        className={`sticky-left-12 ${rowBgClass} z-10 px-1 py-0`} 
         style={{ width: '200px', minWidth: '200px' }}
       >
-        <div className="flex items-center">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="h-8 px-2 ml-5 text-brand-violet hover:bg-brand-violet/10"
-            onClick={onAddResource}
-          >
-            <PlusCircle className="h-4 w-4 mr-1" />
-            <span className="text-xs">Add Resource</span>
-          </Button>
-        </div>
+        <button 
+          className="flex items-center text-xs text-muted-foreground hover:text-foreground ml-5"
+          onClick={onAddResource}
+        >
+          <PlusCircle className="h-3 w-3 mr-1" />
+          <span>Add resource</span>
+        </button>
       </td>
       
       {/* Empty cells for week columns */}
       {Array(weeksCount).fill(0).map((_, index) => (
-        <td key={index} className="p-0" style={{ width: '10px', minWidth: '10px' }}></td>
+        <td key={index} className="p-0"></td>
       ))}
       
       {/* Add blank flexible cell */}

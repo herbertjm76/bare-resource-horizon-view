@@ -1,82 +1,54 @@
 
 import React from 'react';
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { Badge } from "@/components/ui/badge";
 
-type UtilizationStatus = 'low' | 'optimal' | 'high' | 'over';
-
-interface UtilizationColorScheme {
-  background: string;
-  text: string;
-}
+// Helper function to get color based on utilization percentage
+const getUtilizationColor = (utilization: number) => {
+  if (utilization < 70) return { bg: '#EDFAE5', text: '#25701B' }; // Green - under utilized
+  if (utilization <= 100) return { bg: '#FEF7CD', text: '#856404' }; // Yellow - good utilization
+  return { bg: '#FFDEE2', text: '#C0392B' }; // Red - over utilized
+};
 
 interface ResourceUtilizationBadgeProps {
   utilization: number;
-  size?: 'sm' | 'md';
+  size?: 'xs' | 'sm' | 'md';
 }
 
 export const ResourceUtilizationBadge: React.FC<ResourceUtilizationBadgeProps> = ({ 
-  utilization, 
-  size = 'md' 
+  utilization,
+  size = 'md'
 }) => {
-  // Round up the utilization percentage for display
-  const displayUtilization = Math.ceil(utilization);
+  // Round utilization to nearest integer
+  const roundedUtilization = Math.round(utilization);
   
-  // Get status based on utilization percentage (now yellow is optimal, green is high)
-  const getUtilizationStatus = (percentage: number): UtilizationStatus => {
-    if (percentage <= 30) return 'low';
-    if (percentage <= 80) return 'optimal';
-    if (percentage <= 100) return 'high';
-    return 'over';
-  };
-
-  // Get color scheme based on status
-  const getColorScheme = (status: UtilizationStatus): UtilizationColorScheme => {
-    switch (status) {
-      case 'low':
-        return { background: 'bg-gray-200', text: 'text-gray-600' };
-      case 'optimal':
-        return { background: 'bg-yellow-100', text: 'text-yellow-800' }; // Changed to yellow
-      case 'high':
-        return { background: 'bg-green-100', text: 'text-green-800' }; // Changed to green
-      case 'over':
-        return { background: 'bg-red-100', text: 'text-red-800' };
-    }
-  };
-
-  // Get tooltip message based on status
-  const getTooltipMessage = (status: UtilizationStatus): string => {
-    switch (status) {
-      case 'low':
-        return 'Low utilization (≤30%)';
-      case 'optimal':
-        return 'Optimal utilization (31-80%)';
-      case 'high':
-        return 'High utilization (81-100%)';
-      case 'over':
-        return 'Over-allocated (>100%)';
-    }
-  };
-
-  const status = getUtilizationStatus(displayUtilization);
-  const colors = getColorScheme(status);
-  const message = getTooltipMessage(status);
+  const colors = getUtilizationColor(roundedUtilization);
   
-  const sizeClasses = size === 'sm' 
-    ? 'h-4 text-xs px-1.5' 
-    : 'h-5 text-xs px-2';
-
+  // Determine text size and padding based on size prop
+  let sizeClasses = '';
+  
+  switch(size) {
+    case 'xs':
+      sizeClasses = 'text-[10px] py-0 px-1 h-4';
+      break;
+    case 'sm':
+      sizeClasses = 'text-xs py-0 px-1 h-4';
+      break;
+    case 'md':
+    default:
+      sizeClasses = 'text-xs py-0.5 px-2 h-5';
+      break;
+  }
+  
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className={`inline-flex items-center justify-center rounded-full ${colors.background} ${colors.text} font-medium ${sizeClasses}`}>
-            {displayUtilization}%
-          </span>
-        </TooltipTrigger>
-        <TooltipContent side="top">
-          <p>{message}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Badge
+      variant="outline"
+      className={`${sizeClasses} font-medium`}
+      style={{
+        backgroundColor: colors.bg,
+        color: colors.text
+      }}
+    >
+      {roundedUtilization}%
+    </Badge>
   );
 };
