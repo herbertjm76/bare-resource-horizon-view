@@ -93,7 +93,7 @@ const ProjectResourcing = () => {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background" style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)`, overflow: 'hidden' }}>
+          <div className="flex-1 p-4 sm:p-8 bg-background" style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
             <div className="mx-auto space-y-6 h-full flex flex-col">
               <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Project Resourcing</h1>
@@ -123,7 +123,7 @@ const ProjectResourcing = () => {
                 />
               </div>
               
-              <div className="flex-1 rounded-lg border shadow-sm" style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <div className="flex-1 rounded-lg border shadow-sm" style={{ display: 'flex', flexDirection: 'column' }}>
                 <OfficeSettingsProvider>
                   <ResourceAllocationGrid 
                     startDate={selectedWeek}

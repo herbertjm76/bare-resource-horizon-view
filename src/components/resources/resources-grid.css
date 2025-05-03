@@ -7,6 +7,23 @@
   overflow-y: auto; /* Enable vertical scrolling */
   position: relative;
   border-radius: 0.5rem;
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* For Firefox */
+}
+
+/* Scrollbar styling for WebKit browsers */
+.grid-table-container::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.grid-table-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.grid-table-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
 }
 
 /* Ensure the table takes up the full width */
