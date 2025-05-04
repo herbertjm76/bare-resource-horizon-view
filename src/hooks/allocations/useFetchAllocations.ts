@@ -1,7 +1,7 @@
 
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { formatWeekKey, getWeekStartDate } from '@/components/weekly-overview/utils';
+import { formatWeekKey, getWeekStartDate, getWeekDateRange } from '@/components/weekly-overview/utils';
 import { MemberAllocation } from '@/components/weekly-overview/types';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
@@ -38,26 +38,30 @@ export function useFetchAllocations() {
     setError(null);
     
     try {
-      // Get formatted week key for consistent querying
+      // Get the date range for the selected week
+      const { startDateString, endDateString } = getWeekDateRange(selectedWeek);
       const weekKey = formatWeekKey(selectedWeek);
-      console.log('Fetching allocations for week key:', weekKey);
+      
+      console.log('Fetching allocations for date range:', startDateString, 'to', endDateString);
+      console.log('Week key:', weekKey);
       console.log('Selected week JS date:', selectedWeek);
       console.log('Monday of selected week:', getWeekStartDate(selectedWeek));
       
       // Get all member IDs
       const memberIds = teamMembers.map(member => member.id);
-      console.log('Fetching allocations for members:', memberIds);
-      console.log('Member count:', memberIds.length);
+      console.log('Fetching allocations for members:', memberIds.length);
       
       // Fetch project allocations with project details for the selected week
       let projectAllocations = [];
       if (company?.id) {
+        // First try exact date match
         const { data, error } = await supabase
           .from('project_resource_allocations')
           .select(`
             id,
             resource_id,
             hours,
+            week_start_date,
             project:projects(id, name, code)
           `)
           .eq('week_start_date', weekKey)
@@ -69,20 +73,14 @@ export function useFetchAllocations() {
           setError('Failed to fetch resource allocations');
         } else {
           projectAllocations = data || [];
-          console.log('Fetched project allocations for week:', weekKey, projectAllocations);
+          console.log('Fetched project allocations for week key:', weekKey);
           console.log('Allocation count:', projectAllocations.length);
           
-          // Debug: Check if we got any results
+          // If no allocations found with exact date match, try a range query
           if (projectAllocations.length === 0) {
-            console.log('No allocations found. Trying an alternative date format...');
+            console.log('No allocations found with exact date. Trying date range query...');
             
-            // Attempt to query a range of dates around the week start
-            const mondayDate = getWeekStartDate(selectedWeek);
-            const mondayStr = mondayDate.toISOString().split('T')[0];
-            
-            console.log(`Trying alternative query with date: ${mondayStr}`);
-            
-            const { data: alternativeData, error: altError } = await supabase
+            const { data: rangeData, error: rangeError } = await supabase
               .from('project_resource_allocations')
               .select(`
                 id,
@@ -91,21 +89,64 @@ export function useFetchAllocations() {
                 week_start_date,
                 project:projects(id, name, code)
               `)
+              .gte('week_start_date', startDateString)
+              .lte('week_start_date', endDateString)
               .eq('company_id', company.id)
-              .in('resource_id', memberIds)
+              .in('resource_id', memberIds);
+              
+            if (rangeError) {
+              console.error('Error in date range query:', rangeError);
+            } else {
+              projectAllocations = rangeData || [];
+              console.log('Found allocations with date range query:', projectAllocations.length);
+            }
+          }
+          
+          // If still no allocations, get the latest few weeks' data to help debug
+          if (projectAllocations.length === 0) {
+            console.log('No allocations found. Showing latest allocation dates for debugging...');
+            
+            const { data: dateData } = await supabase
+              .from('project_resource_allocations')
+              .select('week_start_date')
+              .eq('company_id', company.id)
               .order('week_start_date', { ascending: false })
               .limit(20);
               
-            if (altError) {
-              console.error('Error in alternative query:', altError);
-            } else {
-              console.log('Latest allocation dates in DB:', 
-                alternativeData?.map(a => a.week_start_date).filter((v, i, a) => a.indexOf(v) === i)
-              );
+            // Get unique dates
+            const uniqueDates = [...new Set(dateData?.map(item => item.week_start_date))];
+            console.log('Latest allocation dates in DB:', uniqueDates);
+            
+            // Try to fetch again using the most recent date
+            if (uniqueDates && uniqueDates.length > 0) {
+              const latestDate = uniqueDates[0];
+              console.log(`Trying to fetch with latest date: ${latestDate}`);
+              
+              const { data: latestData, error: latestError } = await supabase
+                .from('project_resource_allocations')
+                .select(`
+                  id,
+                  resource_id,
+                  hours,
+                  week_start_date,
+                  project:projects(id, name, code)
+                `)
+                .eq('week_start_date', latestDate)
+                .eq('company_id', company.id)
+                .in('resource_id', memberIds);
+                
+              if (latestError) {
+                console.error('Error fetching with latest date:', latestError);
+              } else {
+                projectAllocations = latestData || [];
+                console.log(`Found ${projectAllocations.length} allocations using latest date: ${latestDate}`);
+              }
             }
           }
         }
       }
+      
+      console.log('Project allocations before processing:', projectAllocations);
       
       // Initialize allocations object
       const initialAllocations: Record<string, MemberAllocation> = {};

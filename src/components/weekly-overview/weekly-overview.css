@@ -148,3 +148,22 @@
 .leave-input:hover:after {
   opacity: 1;
 }
+
+/* Office header styling */
+.office-header {
+  background-color: #f0f0f0;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Totals row styling */
+tfoot tr {
+  border-top: 2px solid #e0e0e0 !important;
+  background-color: #f7f7f7;
+}
+
+tfoot td {
+  font-weight: 500;
+}

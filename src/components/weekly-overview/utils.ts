@@ -1,5 +1,5 @@
 
-import { format, startOfWeek } from 'date-fns';
+import { format, startOfWeek, endOfWeek, parseISO, isValid } from 'date-fns';
 
 /**
  * Format a number to 1 decimal place
@@ -38,8 +38,50 @@ export const formatWeekKey = (date: Date): string => {
 };
 
 /**
+ * Format date string to YYYY-MM-DD format
+ * 
+ * @param dateStr Date string to format
+ * @returns Formatted date string
+ */
+export const formatDateString = (dateStr: string): string => {
+  try {
+    if (!dateStr) return '';
+    const date = parseISO(dateStr);
+    if (!isValid(date)) return dateStr;
+    return format(date, 'yyyy-MM-dd');
+  } catch (e) {
+    console.error('Error formatting date string:', dateStr, e);
+    return dateStr;
+  }
+};
+
+/**
  * Get the week start date (Monday) from a given date
  */
 export const getWeekStartDate = (date: Date): Date => {
   return startOfWeek(date, { weekStartsOn: 1 });
+};
+
+/**
+ * Get the week end date (Sunday) from a given date
+ */
+export const getWeekEndDate = (date: Date): Date => {
+  return endOfWeek(date, { weekStartsOn: 1 });
+};
+
+/**
+ * Get a date range for a week (start and end dates)
+ * 
+ * @param date Any date in the week
+ * @returns Object with startDate and endDate
+ */
+export const getWeekDateRange = (date: Date) => {
+  const startDate = getWeekStartDate(date);
+  const endDate = getWeekEndDate(date);
+  return { 
+    startDate, 
+    endDate,
+    startDateString: format(startDate, 'yyyy-MM-dd'),
+    endDateString: format(endDate, 'yyyy-MM-dd')
+  };
 };

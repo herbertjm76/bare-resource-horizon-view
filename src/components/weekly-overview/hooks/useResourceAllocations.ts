@@ -55,7 +55,23 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
       setIsLoading,
       setError
     );
-  }, [fetchAllocations, teamMembers, selectedWeek]);
+  }, [fetchAllocations, teamMembers, selectedWeek, setMemberAllocations, setIsLoading, setError]);
+
+  // Calculate totals for each project
+  const projectTotals = useCallback(() => {
+    const totals: Record<string, number> = {};
+    
+    Object.values(memberAllocations).forEach(allocation => {
+      allocation.projectAllocations.forEach(project => {
+        if (!totals[project.projectId]) {
+          totals[project.projectId] = 0;
+        }
+        totals[project.projectId] += project.hours;
+      });
+    });
+    
+    return totals;
+  }, [memberAllocations]);
 
   return {
     memberAllocations,
@@ -63,6 +79,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
     handleInputChange,
     isLoading,
     error,
-    refreshAllocations
+    refreshAllocations,
+    projectTotals
   };
 }

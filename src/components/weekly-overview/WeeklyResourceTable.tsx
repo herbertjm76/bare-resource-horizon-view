@@ -3,7 +3,7 @@ import React from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useTeamMembersData } from "@/hooks/useTeamMembersData";
-import { Table, TableBody } from "@/components/ui/table";
+import { Table, TableBody, TableFooter } from "@/components/ui/table";
 import { WeeklyResourceHeader } from './WeeklyResourceHeader';
 import { useResourceAllocations } from './hooks/useResourceAllocations';
 import { useCompany } from "@/context/CompanyContext";
@@ -11,6 +11,7 @@ import { ResourceTableLoadingState } from './components/ResourceTableLoadingStat
 import { ResourceTableErrorState } from './components/ResourceTableErrorState';
 import { EmptyResourceState } from './components/EmptyResourceState';
 import { TeamMemberRows } from './components/TeamMemberRows';
+import { ProjectTotalsRow } from './components/ProjectTotalsRow';
 import { useOfficeMembers } from './hooks/useOfficeMembers';
 import { useOfficeDisplay } from './hooks/useOfficeDisplay';
 import './weekly-overview.css';
@@ -112,7 +113,8 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     handleInputChange, 
     isLoading: isLoadingAllocations,
     error: allocationsError,
-    refreshAllocations
+    refreshAllocations,
+    projectTotals
   } = useResourceAllocations(allMembers, selectedWeek);
   
   // Refresh allocations when week changes
@@ -163,6 +165,12 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
               projects={projects}
             />
           </TableBody>
+          <TableFooter>
+            <ProjectTotalsRow 
+              projects={projects}
+              projectTotals={projectTotals()}
+            />
+          </TableFooter>
         </Table>
       </div>
     </div>
