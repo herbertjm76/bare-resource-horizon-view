@@ -122,11 +122,11 @@ export const exportToPDF = async (selectedWeek: Date, weekLabel: string): Promis
         margin: { top: 30 },
         didDrawPage: (data) => {
           // Add footer with page number
-          const pageNumber = pdf.internal.getNumberOfPages();
-          const totalPages = pageNumber;
+          const pageCount = pdf.internal.pages.length - 1;
+          const pageNumber = pageCount;
           pdf.setFontSize(8);
           pdf.text(
-            `Page ${pageNumber} of ${totalPages}`,
+            `Page ${pageNumber} of ${pageCount}`,
             pdf.internal.pageSize.width - 20,
             pdf.internal.pageSize.height - 10
           );
