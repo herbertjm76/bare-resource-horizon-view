@@ -11,7 +11,9 @@ interface TeamMember {
   id: string;
   name: string;
   role: string;
+  office?: string;
   isPending?: boolean;
+  allocations?: Record<string, number | { projectId: string, hours: number }>;
 }
 
 interface WeeklyResourceTableProps {
@@ -77,7 +79,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     // Count unique projects
     const projectSet = new Set<string>();
     Object.entries(member.allocations).forEach(([_, allocationData]) => {
-      if (typeof allocationData === 'object' && allocationData.projectId) {
+      if (typeof allocationData === 'object' && 'projectId' in allocationData) {
         projectSet.add(allocationData.projectId);
       }
     });
