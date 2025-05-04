@@ -38,23 +38,32 @@ export function useFetchAllocations() {
     setError(null);
     
     try {
-      // Get the date range for the selected week
-      const { startDateString, endDateString } = getWeekDateRange(selectedWeek);
-      const weekKey = formatWeekKey(selectedWeek);
+      // Get the Monday of the selected week
+      const monday = getWeekStartDate(selectedWeek);
       
-      console.log('Fetching allocations for date range:', startDateString, 'to', endDateString);
-      console.log('Week key:', weekKey);
+      // Get the Sunday of the selected week (this is the key change - we need to look for 
+      // allocations that might have been entered with Sunday as the start date)
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() - 1);
+      
+      // Format both dates for database queries
+      const mondayKey = formatWeekKey(selectedWeek); // This returns Monday in YYYY-MM-DD format
+      const sundayKey = sunday.toISOString().split('T')[0]; // Get Sunday in YYYY-MM-DD format
+      
+      console.log('Looking for allocations with Monday date:', mondayKey);
+      console.log('Or Sunday date:', sundayKey);
       console.log('Selected week JS date:', selectedWeek);
-      console.log('Monday of selected week:', getWeekStartDate(selectedWeek));
+      console.log('Monday of selected week:', monday);
       
       // Get all member IDs
       const memberIds = teamMembers.map(member => member.id);
       console.log('Fetching allocations for members:', memberIds.length);
       
       // Fetch project allocations with project details for the selected week
+      // We'll look for allocations with EITHER Monday OR Sunday as the start date
       let projectAllocations = [];
       if (company?.id) {
-        // First try with exact week_start_date match
+        // Query for allocations with either Monday OR Sunday as the week_start_date
         let { data, error } = await supabase
           .from('project_resource_allocations')
           .select(`
@@ -64,7 +73,7 @@ export function useFetchAllocations() {
             week_start_date,
             project:projects(id, name, code)
           `)
-          .eq('week_start_date', weekKey)
+          .or(`week_start_date.eq.${mondayKey},week_start_date.eq.${sundayKey}`)
           .eq('company_id', company.id)
           .in('resource_id', memberIds);
         
@@ -73,15 +82,16 @@ export function useFetchAllocations() {
           setError('Failed to fetch resource allocations');
         } else {
           projectAllocations = data || [];
-          console.log('Fetched project allocations for week key:', weekKey);
+          console.log('Fetched allocations for query:', `week_start_date.eq.${mondayKey} OR week_start_date.eq.${sundayKey}`);
           console.log('Allocation count:', projectAllocations.length);
           
           // If no allocations found with exact date match, try a range query
-          // or try with slightly different date formats that might be stored
           if (projectAllocations.length === 0) {
-            console.log('No allocations found with exact date. Trying alternative queries...');
+            console.log('No exact match allocations found. Trying a date range query...');
             
-            // Try a date range query
+            // Get the range for the entire week
+            const { startDateString, endDateString } = getWeekDateRange(selectedWeek);
+            
             const { data: rangeData, error: rangeError } = await supabase
               .from('project_resource_allocations')
               .select(`

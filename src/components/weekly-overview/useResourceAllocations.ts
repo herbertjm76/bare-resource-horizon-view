@@ -1,10 +1,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { format, parseISO, startOfWeek } from 'date-fns';
+import { formatWeekKey, getWeekStartDate } from './utils';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
-import { formatWeekKey } from './utils';
+import { MemberAllocation } from './types';
 
 interface TeamMember {
   id: string;
@@ -14,24 +14,9 @@ interface TeamMember {
   weekly_capacity?: number;
 }
 
-export interface MemberAllocation {
-  id: string;
-  annualLeave: number;
-  publicHoliday: number;
-  vacationLeave: number;
-  medicalLeave: number;
-  others: number;
-  remarks: string;
-  projects: string[];
-  resourcedHours: number;
-  projectAllocations: Array<{
-    projectName: string;
-    projectId: string;
-    hours: number;
-    projectCode: string;
-  }>;
-}
-
+/**
+ * Main hook that manages resource allocations for the weekly overview
+ */
 export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: Date) {
   // Member allocations state
   const [memberAllocations, setMemberAllocations] = useState<Record<string, MemberAllocation>>({});
@@ -51,7 +36,18 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
     setError(null);
     
     try {
-      const weekKey = formatWeekKey(selectedWeek);
+      // Get the Monday of the selected week
+      const monday = getWeekStartDate(selectedWeek);
+      
+      // Get the Sunday of the selected week for databases that start weeks on Sunday
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() - 1);
+      
+      // Format both dates for database queries
+      const mondayKey = formatWeekKey(selectedWeek);
+      const sundayKey = sunday.toISOString().split('T')[0];
+      
+      console.log('Looking for allocations with dates:', mondayKey, 'or', sundayKey);
       
       // Get all member IDs
       const memberIds = teamMembers.map(member => member.id);
@@ -59,14 +55,16 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
       // Fetch project allocations with project details for the selected week
       let projectAllocations = [];
       if (company?.id) {
+        // Query for allocations with either Monday OR Sunday as the week_start_date
         const { data, error } = await supabase
           .from('project_resource_allocations')
           .select(`
             resource_id,
             hours,
+            week_start_date,
             project:projects(id, name, code)
           `)
-          .eq('week_start_date', weekKey)
+          .or(`week_start_date.eq.${mondayKey},week_start_date.eq.${sundayKey}`)
           .eq('company_id', company.id)
           .in('resource_id', memberIds);
         
@@ -75,7 +73,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
           setError('Failed to fetch resource allocations');
         } else {
           projectAllocations = data || [];
-          console.log('Fetched project allocations for week:', weekKey, projectAllocations);
+          console.log('Fetched project allocations for dates:', mondayKey, 'or', sundayKey, projectAllocations);
         }
       }
       
@@ -88,6 +86,8 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
         const memberProjects = projectAllocations.filter(alloc => 
           alloc.resource_id === member.id
         ) || [];
+        
+        console.log(`Member ${member.first_name} ${member.last_name} allocations:`, memberProjects);
         
         // Calculate total resourced hours
         const resourcedHours = memberProjects.reduce(
@@ -125,6 +125,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
         };
       }
       
+      console.log('Final processed allocations:', initialAllocations);
       setMemberAllocations(initialAllocations);
     } catch (err) {
       console.error('Error fetching allocations:', err);
@@ -179,12 +180,29 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
     // For now we're just updating the local state
   };
 
+  // Calculate totals for each project
+  const projectTotals = useCallback(() => {
+    const totals: Record<string, number> = {};
+    
+    Object.values(memberAllocations).forEach(allocation => {
+      allocation.projectAllocations.forEach(project => {
+        if (!totals[project.projectId]) {
+          totals[project.projectId] = 0;
+        }
+        totals[project.projectId] += project.hours;
+      });
+    });
+    
+    return totals;
+  }, [memberAllocations]);
+
   return {
     memberAllocations,
     getMemberAllocation,
     handleInputChange,
     isLoading,
     error,
-    refreshAllocations: fetchAllocations
+    refreshAllocations: fetchAllocations,
+    projectTotals
   };
 }

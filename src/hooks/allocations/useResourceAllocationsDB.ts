@@ -33,6 +33,7 @@ export function useResourceAllocationsDB(
         company.id
       );
       
+      console.log('Fetched allocations:', allocationMap);
       setAllocations(allocationMap);
     } finally {
       setIsLoading(false);
@@ -45,6 +46,7 @@ export function useResourceAllocationsDB(
     
     setIsSaving(true);
     try {
+      console.log(`Saving allocation: week=${weekKey}, hours=${hours}`);
       const success = await saveResourceAllocation(
         projectId,
         resourceId,
@@ -113,6 +115,7 @@ export function useResourceAllocationsDB(
           const newData = payload.new as ResourceAllocation;
           const weekKey = formatDateKey(newData.week_start_date);
           
+          console.log('Realtime update received:', newData);
           setAllocations(prev => ({
             ...prev,
             [weekKey]: newData.hours
