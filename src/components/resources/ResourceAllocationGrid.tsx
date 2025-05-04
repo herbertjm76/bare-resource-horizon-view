@@ -75,16 +75,14 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     setExpandedProjects(prev => prev.includes(projectId) ? prev.filter(id => id !== projectId) : [...prev, projectId]);
   };
   
-  // Calculate the total width needed for the table
+  // Calculate the total width needed for the table - improved calculation
   const tableWidth = useMemo(() => {
     // Fixed columns: counter (48px) + project name (200px)
     const fixedColumnsWidth = 48 + 200;
-    // Week columns: 35px per week
+    // Week columns: 35px per day (fixed width)
     const weekColumnsWidth = weeks.length * 35;
-    // Add some padding for good measure
-    const extraSpace = 100;
-    
-    return `${fixedColumnsWidth + weekColumnsWidth + extraSpace}px`;
+    // Add padding to ensure we have enough space
+    return fixedColumnsWidth + weekColumnsWidth + 50;
   }, [weeks.length]);
 
   if (isLoading) {
@@ -113,13 +111,16 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   });
   
   return (
-    <div className="grid-table-outer-container h-full flex-grow">
+    <div className="grid-table-outer-container">
       <div className="grid-table-container">
-        <table style={{ width: tableWidth, minWidth: '100%' }} className="resource-allocation-table">
-          <thead className="bg-muted/50">
-            <tr className="h-10">
+        <table 
+          className="resource-allocation-table" 
+          style={{ width: `${tableWidth}px`, minWidth: '100%' }}
+        >
+          <thead>
+            <tr>
               {/* Resources count column - frozen */}
-              <th className="sticky-left-0 bg-muted/50 z-30 p-1 border-b text-center font-medium w-12 shadow-[1px_0_0_0_#e5e7eb]" style={{
+              <th className="sticky-left-0 bg-muted/50 z-30 border-b text-center font-medium w-12 shadow-[1px_0_0_0_#e5e7eb]" style={{
                 width: '48px',
                 minWidth: '48px'
               }}>
@@ -127,7 +128,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               </th>
               
               {/* Project/Resource column - frozen */}
-              <th className="sticky-left-12 bg-muted/50 z-30 p-1 border-b text-left font-medium shadow-[1px_0_0_0_#e5e7eb]" style={{
+              <th className="sticky-left-12 bg-muted/50 z-30 border-b text-left font-medium shadow-[1px_0_0_0_#e5e7eb]" style={{
                 width: '200px',
                 minWidth: '200px'
               }}>
@@ -142,23 +143,21 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
                     width: '35px',
                     minWidth: '35px'
                   }} 
-                  className="p-0 border-b text-center font-medium"
+                  className="border-b text-center font-medium"
                 >
-                  <div className="flex justify-center items-end h-10">
-                    <span className="text-xs whitespace-nowrap transform -rotate-90 origin-center translate-y-0">
-                      {week.label}
-                    </span>
+                  <div className="date-label">
+                    <span>{week.label}</span>
                   </div>
                 </th>
               ))}
               
               {/* Blank flexible column */}
-              <th className="p-0 border-b text-center font-medium">
-                {/* This column is intentionally left blank to provide flexibility */}
+              <th className="border-b text-center font-medium">
+                {/* Empty space to allow horizontal scrolling */}
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody>
             {projectsWithStageData.map((project, index) => (
               <ProjectRow 
                 key={project.id} 
