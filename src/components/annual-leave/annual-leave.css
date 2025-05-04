@@ -16,14 +16,14 @@
 }
 
 /* Sticky header and first column */
-.sticky-header {
+.annual-leave-calendar .sticky-header {
   position: sticky;
   top: 0;
   z-index: 10;
   background-color: white;
 }
 
-.sticky-column {
+.annual-leave-calendar .sticky-column {
   position: sticky;
   left: 0;
   z-index: 5;
@@ -31,6 +31,32 @@
 }
 
 /* Add hover effect on cells */
-.leave-cell:hover {
+.annual-leave-calendar .leave-cell:hover {
   background-color: rgba(0, 0, 0, 0.025);
+}
+
+/* Better styling for the table */
+.annual-leave-calendar table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.annual-leave-calendar th,
+.annual-leave-calendar td {
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.annual-leave-calendar tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.annual-leave-calendar tbody td:focus-within {
+  background-color: rgba(111, 75, 246, 0.05);
+}
+
+.annual-leave-calendar input:focus {
+  box-shadow: none;
+  outline: 2px solid rgba(111, 75, 246, 0.5);
+  border-radius: 3px;
 }

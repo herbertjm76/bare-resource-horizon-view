@@ -42,29 +42,54 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
     return `${member.first_name || ''} ${member.last_name || ''}${isPending ? ' (pending)' : ''}`.trim();
   };
   
+  // Custom day formatter for minimal day representation
+  const getMinimalDayLabel = (day: Date): string => {
+    const dayOfWeek = day.getDay();
+    switch(dayOfWeek) {
+      case 0: return 'S';
+      case 1: return 'M';
+      case 2: return 'T';
+      case 3: return 'W';
+      case 4: return 'Th';
+      case 5: return 'F';
+      case 6: return 'S';
+      default: return '';
+    }
+  };
+  
   return (
     <div className="overflow-x-auto annual-leave-calendar">
       <Table>
         <TableHeader className="sticky top-0 bg-background z-10">
           <TableRow>
-            <TableHead className="sticky left-0 bg-background z-10 min-w-[180px]">Member</TableHead>
-            {daysInMonth.map(day => (
-              <TableHead 
-                key={day.toString()} 
-                className={`p-0 text-center w-8 ${day.getDay() === 0 || day.getDay() === 6 ? 'bg-muted/30' : ''}`}
-              >
-                <div className="flex flex-col items-center text-xs">
-                  <span>{format(day, 'EEE')}</span>
-                  <span className="font-medium">{format(day, 'd')}</span>
-                </div>
-              </TableHead>
-            ))}
+            <TableHead className="sticky left-0 bg-background z-10 min-w-[180px] border-r">Member</TableHead>
+            {daysInMonth.map(day => {
+              const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+              const dayNumber = format(day, 'd');
+              const dayLabel = getMinimalDayLabel(day);
+              
+              return (
+                <TableHead 
+                  key={day.toString()} 
+                  className={`p-0 text-center w-8 ${isWeekend ? 'bg-muted/30' : ''} ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''}`}
+                  aria-label={format(day, 'EEEE')}
+                >
+                  <div className="flex flex-col items-center text-xs py-1 px-2">
+                    <span className="text-muted-foreground">{dayLabel}</span>
+                    <span className="font-medium">{dayNumber}</span>
+                  </div>
+                </TableHead>
+              );
+            })}
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedMembers.map(member => (
-            <TableRow key={member.id}>
-              <TableCell className="whitespace-nowrap font-medium sticky left-0 bg-background z-10 p-1">
+          {sortedMembers.map((member, rowIndex) => (
+            <TableRow 
+              key={member.id}
+              className={rowIndex % 2 === 0 ? 'bg-muted/5' : ''}
+            >
+              <TableCell className="whitespace-nowrap font-medium sticky left-0 bg-background z-10 p-1.5 border-r">
                 {getMemberName(member)}
               </TableCell>
               {daysInMonth.map(day => {
@@ -73,7 +98,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 return (
                   <TableCell 
                     key={`${member.id}-${dateKey}`} 
-                    className={`p-0 text-center ${isWeekend ? 'bg-muted/30' : ''}`}
+                    className={`p-0 text-center ${isWeekend ? 'bg-muted/30' : ''} ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''}`}
                   >
                     <Input 
                       type="number" 
@@ -82,7 +107,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                       value={leaveData[member.id]?.[dateKey] || ''} 
                       onChange={e => handleInputChange(member.id, dateKey, e.target.value)} 
                       placeholder="0" 
-                      className="h-6 w-6 p-0 text-center border-0 hover:border hover:border-input focus:border focus:border-input" 
+                      className="h-7 w-7 p-0 text-center border-0 hover:border hover:border-input focus:border focus:border-input rounded-sm" 
                     />
                   </TableCell>
                 );

@@ -10,13 +10,22 @@ import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
 import { useAnnualLeave } from '@/hooks/useAnnualLeave';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FilterButton } from '@/components/resources/filters/FilterButton';
+import { Button } from '@/components/ui/button';
+import { Users, Office, X } from 'lucide-react';
 import '@/components/annual-leave/annual-leave.css';
 
 const HEADER_HEIGHT = 56;
 
+type FilterType = 'all' | 'department' | 'office';
+
 const TeamAnnualLeave = () => {
   // State for selected month
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  
+  // State for active filters
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [filterValue, setFilterValue] = useState<string>('');
   
   // Fetch team members data
   const { teamMembers, isLoading: isLoadingTeamMembers } = useTeamMembersData(true);
@@ -43,6 +52,23 @@ const TeamAnnualLeave = () => {
     updateLeaveHours(memberId, date, hours);
   };
   
+  // Calculate active filters count for filter button
+  const activeFiltersCount = activeFilter === 'all' ? 0 : 1;
+  
+  // Handle filter changes
+  const handleFilterChange = (type: FilterType) => {
+    setActiveFilter(type === activeFilter ? 'all' : type);
+    if (type === 'all') {
+      setFilterValue('');
+    }
+  };
+  
+  // Clear all filters
+  const clearFilters = () => {
+    setActiveFilter('all');
+    setFilterValue('');
+  };
+  
   const isLoading = isLoadingTeamMembers || isLoadingLeave;
 
   return (
@@ -56,7 +82,7 @@ const TeamAnnualLeave = () => {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="mx-auto space-y-6">
-              <div className="flex flex-row justify-between items-center gap-4">
+              <div className="flex flex-row justify-between items-center gap-4 flex-wrap">
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Annual Leave</h1>
                 
                 <div className="flex items-center gap-2">
@@ -64,8 +90,51 @@ const TeamAnnualLeave = () => {
                     selectedMonth={selectedMonth} 
                     onMonthChange={handleMonthChange} 
                   />
+                  
+                  <FilterButton 
+                    activeFiltersCount={activeFiltersCount}
+                    onClick={() => {}} // Empty function as we're using inline filters
+                  />
                 </div>
               </div>
+              
+              {activeFiltersCount > 0 && (
+                <div className="bg-muted/20 p-2 rounded-md flex items-center gap-2 flex-wrap">
+                  <div className="text-sm font-medium">Filters:</div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      variant={activeFilter === 'office' ? 'default' : 'outline'}
+                      size="sm"
+                      className="h-8 gap-1.5"
+                      onClick={() => handleFilterChange('office')}
+                    >
+                      <Office className="h-3.5 w-3.5" />
+                      Office
+                    </Button>
+                    
+                    <Button
+                      variant={activeFilter === 'department' ? 'default' : 'outline'}
+                      size="sm"
+                      className="h-8 gap-1.5"
+                      onClick={() => handleFilterChange('department')}
+                    >
+                      <Users className="h-3.5 w-3.5" />
+                      Department
+                    </Button>
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 ml-auto"
+                    onClick={clearFilters}
+                  >
+                    <X className="h-3.5 w-3.5 mr-1" />
+                    Clear
+                  </Button>
+                </div>
+              )}
               
               <div className="border rounded-lg bg-card shadow-sm">
                 {isLoading ? (
