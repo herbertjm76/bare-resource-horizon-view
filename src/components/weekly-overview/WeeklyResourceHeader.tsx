@@ -7,8 +7,35 @@ import {
   TooltipProvider,
   TooltipTrigger 
 } from "@/components/ui/tooltip";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useCompany } from "@/context/CompanyContext";
 
 export const WeeklyResourceHeader: React.FC = () => {
+  const { company } = useCompany();
+  
+  // Fetch all projects for the company
+  const { data: projects = [] } = useQuery({
+    queryKey: ['company-projects', company?.id],
+    queryFn: async () => {
+      if (!company?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, code, name')
+        .eq('company_id', company.id)
+        .order('code');
+      
+      if (error) {
+        console.error("Error fetching projects:", error);
+        return [];
+      }
+      
+      return data || [];
+    },
+    enabled: !!company?.id
+  });
+
   return (
     <TableHeader className="bg-muted/50 sticky top-0 z-10">
       <TableRow>
@@ -115,9 +142,26 @@ export const WeeklyResourceHeader: React.FC = () => {
           <div className="font-medium">Remarks</div>
         </TableHead>
         
-        <TableHead className="py-2 px-4 projects-column">
-          <div className="font-medium">Project Allocations</div>
-        </TableHead>
+        {/* Project columns - each project in the company gets its own column */}
+        {projects.map(project => (
+          <TableHead 
+            key={project.id} 
+            className="project-code-column relative"
+          >
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="w-full h-full">
+                  <div className="project-code-header">
+                    {project.code}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p>{project.name}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </TableHead>
+        ))}
       </TableRow>
     </TableHeader>
   );

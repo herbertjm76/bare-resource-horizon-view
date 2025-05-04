@@ -36,6 +36,28 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     }
   });
   
+  // Fetch all projects for the company
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
+    queryKey: ['company-projects', company?.id],
+    queryFn: async () => {
+      if (!company?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, code, name')
+        .eq('company_id', company.id)
+        .order('code');
+      
+      if (error) {
+        console.error("Error fetching projects:", error);
+        return [];
+      }
+      
+      return data || [];
+    },
+    enabled: !!company?.id
+  });
+  
   // Get team members data using the hook - pass true to include inactive members
   const { teamMembers, isLoading: isLoadingMembers, error: teamMembersError } = useTeamMembersData(true);
   
@@ -102,7 +124,8 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   });
 
   // Determine overall loading state
-  const isLoading = isLoadingSession || isLoadingMembers || isLoadingPending || isLoadingAllocations || isLoadingOffices;
+  const isLoading = isLoadingSession || isLoadingMembers || isLoadingPending || 
+                    isLoadingAllocations || isLoadingOffices || isLoadingProjects;
 
   // Determine if there are any errors
   const error = teamMembersError || pendingError || allocationsError || officesError;
@@ -188,6 +211,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
                     isEven={isEven}
                     getOfficeDisplay={getOfficeDisplay}
                     onInputChange={handleInputChange}
+                    projects={projects}
                   />
                 );
               });

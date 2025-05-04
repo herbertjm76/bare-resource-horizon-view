@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger 
 } from "@/components/ui/tooltip";
-import { formatNumber, calculateUtilization, calculateCapacity } from './utils';
+import { formatNumber, calculateUtilization } from './utils';
 
 interface MemberAllocation {
   id: string;
@@ -22,8 +22,15 @@ interface MemberAllocation {
   resourcedHours: number;
   projectAllocations?: Array<{
     projectName: string;
+    projectId: string;
     hours: number;
   }>;
+}
+
+interface Project {
+  id: string;
+  code: string;
+  name: string;
 }
 
 interface MemberTableRowProps {
@@ -39,6 +46,7 @@ interface MemberTableRowProps {
   isEven: boolean;
   getOfficeDisplay: (locationCode: string) => string;
   onInputChange: (memberId: string, field: keyof MemberAllocation, value: any) => void;
+  projects: Project[];
 }
 
 export const MemberTableRow: React.FC<MemberTableRowProps> = ({
@@ -46,7 +54,8 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   allocation,
   isEven,
   getOfficeDisplay,
-  onInputChange
+  onInputChange,
+  projects
 }) => {
   // Get member's weekly capacity (default to 40 if not set)
   const weeklyCapacity = member.weekly_capacity || 40;
@@ -54,12 +63,11 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   // Calculate utilization based on member's specific capacity
   const utilization = calculateUtilization(allocation.resourcedHours, weeklyCapacity);
   
-  // Default project allocations if not provided
-  const projectAllocations = allocation.projectAllocations || 
-    allocation.projects.map((name, index) => ({
-      projectName: name,
-      hours: Math.round((allocation.resourcedHours / allocation.projects.length) * 10) / 10
-    }));
+  // Project allocations map for quick lookup
+  const projectAllocationsMap = (allocation.projectAllocations || []).reduce((acc, curr) => {
+    acc[curr.projectId] = curr.hours;
+    return acc;
+  }, {} as Record<string, number>);
   
   return (
     <TableRow className={isEven ? "bg-muted/10" : ""}>
@@ -172,24 +180,14 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         />
       </TableCell>
       
-      <TableCell className="py-1 px-4 projects-column">
-        <div className="flex flex-col gap-1 text-xs">
-          {projectAllocations.length > 0 ? (
-            projectAllocations.map((project, idx) => (
-              <div key={idx} className="flex justify-between items-center py-0.5">
-                <span className="font-medium truncate max-w-[120px]" title={project.projectName}>
-                  {project.projectName}
-                </span>
-                <span className="ml-2 bg-muted/60 px-2 py-0.5 rounded font-mono">
-                  {formatNumber(project.hours)}h
-                </span>
-              </div>
-            ))
-          ) : (
-            <span className="text-muted-foreground italic">No projects assigned</span>
-          )}
-        </div>
-      </TableCell>
+      {/* Project allocation cells */}
+      {projects.map(project => (
+        <TableCell key={project.id} className="py-1 px-1 project-hours-column">
+          <div className="table-cell">
+            {projectAllocationsMap[project.id] ? formatNumber(projectAllocationsMap[project.id]) : ''}
+          </div>
+        </TableCell>
+      ))}
     </TableRow>
   );
 }

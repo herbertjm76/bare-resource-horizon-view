@@ -63,7 +63,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
           .select(`
             resource_id,
             hours,
-            project:projects(id, name)
+            project:projects(id, name, code)
           `)
           .eq('week_start_date', weekKey)
           .eq('company_id', company.id)
@@ -101,7 +101,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
           
         // Create detailed project allocations array
         const detailedProjectAllocations = memberProjects
-          .filter(p => p.project?.name)
+          .filter(p => p.project?.id && p.project?.name)
           .map(p => ({
             projectName: p.project.name,
             projectId: p.project.id,
