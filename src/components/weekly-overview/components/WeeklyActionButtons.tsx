@@ -1,10 +1,15 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Save, Printer } from "lucide-react";
+import { FileText, Printer, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { exportToPDF } from "../utils/exportToPDF";
-import { exportToExcel } from "../utils/exportToExcel";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 
 interface WeeklyActionButtonsProps {
   selectedWeek: Date;
@@ -36,46 +41,31 @@ export const WeeklyActionButtons: React.FC<WeeklyActionButtonsProps> = ({
     }
   };
 
-  const handleExportExcel = async () => {
-    try {
-      toast.info("Generating Excel file...");
-      await exportToExcel(selectedWeek, weekLabel);
-      toast.success("Excel file exported successfully!");
-    } catch (error) {
-      console.error("Excel export failed:", error);
-      toast.error("Failed to export Excel file. Please try again.");
-    }
-  };
-
   return (
     <div className="flex items-center gap-2 print:hidden">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleExportPDF}
-        className="flex items-center gap-1"
-      >
-        <Save className="h-4 w-4" />
-        <span className="hidden sm:inline">PDF</span>
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleExportExcel}
-        className="flex items-center gap-1"
-      >
-        <Save className="h-4 w-4" />
-        <span className="hidden sm:inline">Excel</span>
-      </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handlePrint}
-        className="flex items-center gap-1"
-      >
-        <Printer className="h-4 w-4" />
-        <span className="hidden sm:inline">Print</span>
-      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1"
+          >
+            <FileText className="h-4 w-4" />
+            <span className="hidden sm:inline">Export</span>
+            <ChevronDown className="h-3 w-3 opacity-50" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={handleExportPDF}>
+            <FileText className="mr-2 h-4 w-4" />
+            <span>PDF</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handlePrint}>
+            <Printer className="mr-2 h-4 w-4" />
+            <span>Print</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
