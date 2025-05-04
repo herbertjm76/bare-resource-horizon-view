@@ -138,9 +138,10 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     <div className="border rounded-lg overflow-hidden">
       <div className="weekly-table-container">
         <Table className="min-w-full text-xs weekly-table">
-          <WeeklyResourceHeader />
+          <WeeklyResourceHeader selectedWeek={selectedWeek} />
           <TableBody>
             <TeamMemberRows 
+              selectedWeek={selectedWeek}
               filteredOffices={filteredOffices}
               membersByOffice={membersByOffice}
               getMemberAllocation={getMemberAllocation}

@@ -25,7 +25,9 @@ const queryClient = new QueryClient({
 });
 
 const WeeklyOverview = () => {
-  const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
+  // Default to the week of April 28, 2025 as shown in the example
+  const defaultDate = new Date(2025, 3, 28); // April 28, 2025
+  const [selectedWeek, setSelectedWeek] = useState<Date>(defaultDate);
   const [filters, setFilters] = useState({
     office: "all",
   });
