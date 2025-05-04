@@ -103,7 +103,7 @@ export function useFetchAllocations() {
         initialAllocations[member.id] = {
           id: member.id,
           annualLeave: 0,
-          publicHoliday: 0, // No longer using random values
+          publicHoliday: Math.floor(Math.random() * 2) * 8, // Either 0 or 8 hours
           vacationLeave: 0,
           medicalLeave: 0,
           others: 0,

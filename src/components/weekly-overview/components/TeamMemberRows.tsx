@@ -10,7 +10,6 @@ interface TeamMemberRowsProps {
   getOfficeDisplay: (locationCode: string) => string;
   handleInputChange: (memberId: string, field: string, value: any) => void;
   projects: Project[];
-  selectedWeek: Date;
 }
 
 export const TeamMemberRows: React.FC<TeamMemberRowsProps> = ({
@@ -19,8 +18,7 @@ export const TeamMemberRows: React.FC<TeamMemberRowsProps> = ({
   getMemberAllocation,
   getOfficeDisplay,
   handleInputChange,
-  projects,
-  selectedWeek
+  projects
 }) => {
   return (
     <>
@@ -42,7 +40,6 @@ export const TeamMemberRows: React.FC<TeamMemberRowsProps> = ({
               getOfficeDisplay={getOfficeDisplay}
               onInputChange={handleInputChange}
               projects={projects}
-              selectedWeek={selectedWeek}
             />
           );
         });

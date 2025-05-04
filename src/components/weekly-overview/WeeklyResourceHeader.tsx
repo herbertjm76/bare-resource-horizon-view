@@ -10,13 +10,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/context/CompanyContext";
-import { format, addDays } from 'date-fns';
 
-interface WeeklyResourceHeaderProps {
-  selectedWeek: Date;
-}
-
-export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ selectedWeek }) => {
+export const WeeklyResourceHeader: React.FC = () => {
   const { company } = useCompany();
   
   // Fetch all projects for the company
@@ -52,11 +47,106 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ sele
           <div className="font-medium text-center">Office</div>
         </TableHead>
         
+        {/* Acronym header cells with tooltips */}
+        <TooltipProvider>
+          <TableHead className="header-cell number-column">
+            <Tooltip>
+              <TooltipTrigger className="w-full">
+                <div className="font-medium">PRJ</div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Projects</p>
+              </TooltipContent>
+            </Tooltip>
+          </TableHead>
+          
+          <TableHead className="header-cell number-column">
+            <Tooltip>
+              <TooltipTrigger className="w-full">
+                <div className="font-medium">CAP</div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Capacity</p>
+              </TooltipContent>
+            </Tooltip>
+          </TableHead>
+          
+          <TableHead className="header-cell number-column">
+            <Tooltip>
+              <TooltipTrigger className="w-full">
+                <div className="font-medium">UTL</div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Utilisation</p>
+              </TooltipContent>
+            </Tooltip>
+          </TableHead>
+          
+          <TableHead className="header-cell number-column bg-yellow-100">
+            <Tooltip>
+              <TooltipTrigger className="w-full">
+                <div className="font-medium">AL</div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Annual Leave</p>
+              </TooltipContent>
+            </Tooltip>
+          </TableHead>
+          
+          <TableHead className="header-cell number-column">
+            <Tooltip>
+              <TooltipTrigger className="w-full">
+                <div className="font-medium">PH</div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Public Holiday</p>
+              </TooltipContent>
+            </Tooltip>
+          </TableHead>
+          
+          <TableHead className="header-cell number-column">
+            <Tooltip>
+              <TooltipTrigger className="w-full">
+                <div className="font-medium">VL</div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Vacation Leave</p>
+              </TooltipContent>
+            </Tooltip>
+          </TableHead>
+          
+          <TableHead className="header-cell number-column">
+            <Tooltip>
+              <TooltipTrigger className="w-full">
+                <div className="font-medium">ML</div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Medical Leave</p>
+              </TooltipContent>
+            </Tooltip>
+          </TableHead>
+          
+          <TableHead className="header-cell number-column">
+            <Tooltip>
+              <TooltipTrigger className="w-full">
+                <div className="font-medium">OL</div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Others</p>
+              </TooltipContent>
+            </Tooltip>
+          </TableHead>
+        </TooltipProvider>
+        
+        <TableHead className="py-2 px-4 remarks-column">
+          <div className="font-medium">Remarks</div>
+        </TableHead>
+        
         {/* Project columns - each project in the company gets its own column */}
         {projects.map(project => (
           <TableHead 
             key={project.id} 
-            className="project-code-column relative week-highlighted"
+            className="project-code-column relative"
           >
             <TooltipProvider>
               <Tooltip>
@@ -72,31 +162,6 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ sele
             </TooltipProvider>
           </TableHead>
         ))}
-        
-        {/* Weekly total and utilization columns */}
-        <TooltipProvider>
-          <TableHead className="header-cell number-column week-highlighted">
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <div className="font-medium">Total</div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Weekly Total Hours</p>
-              </TooltipContent>
-            </Tooltip>
-          </TableHead>
-          
-          <TableHead className="header-cell number-column week-highlighted">
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <div className="font-medium">UTL</div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Utilisation</p>
-              </TooltipContent>
-            </Tooltip>
-          </TableHead>
-        </TooltipProvider>
       </TableRow>
     </TableHeader>
   );
