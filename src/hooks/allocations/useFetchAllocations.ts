@@ -1,10 +1,14 @@
 
 import { useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { formatWeekKey, getWeekStartDate, getWeekDateRange } from '@/components/weekly-overview/utils';
-import { MemberAllocation } from '@/components/weekly-overview/types';
 import { useCompany } from '@/context/CompanyContext';
+import { MemberAllocation } from '@/components/weekly-overview/types';
 import { toast } from 'sonner';
+import {
+  fetchPreciseDateAllocations,
+  fetchDateRangeAllocations,
+  fetchRecentAllocations
+} from './utils/fetchUtils';
+import { processMemberAllocations } from './utils/processingUtils';
 
 interface TeamMember {
   id: string;
@@ -38,177 +42,32 @@ export function useFetchAllocations() {
     setError(null);
     
     try {
-      // Get the Monday of the selected week
-      const monday = getWeekStartDate(selectedWeek);
-      
-      // Get the Sunday of the selected week (this is the key change - we need to look for 
-      // allocations that might have been entered with Sunday as the start date)
-      const sunday = new Date(monday);
-      sunday.setDate(monday.getDate() - 1);
-      
-      // Format both dates for database queries
-      const mondayKey = formatWeekKey(selectedWeek); // This returns Monday in YYYY-MM-DD format
-      const sundayKey = sunday.toISOString().split('T')[0]; // Get Sunday in YYYY-MM-DD format
-      
-      console.log('Looking for allocations with Monday date:', mondayKey);
-      console.log('Or Sunday date:', sundayKey);
       console.log('Selected week JS date:', selectedWeek);
-      console.log('Monday of selected week:', monday);
       
       // Get all member IDs
       const memberIds = teamMembers.map(member => member.id);
       console.log('Fetching allocations for members:', memberIds.length);
       
-      // Fetch project allocations with project details for the selected week
-      // We'll look for allocations with EITHER Monday OR Sunday as the start date
+      // Try different fetching strategies in sequence until we get data
       let projectAllocations = [];
-      if (company?.id) {
-        // Query for allocations with either Monday OR Sunday as the week_start_date
-        let { data, error } = await supabase
-          .from('project_resource_allocations')
-          .select(`
-            id,
-            resource_id,
-            hours,
-            week_start_date,
-            project:projects(id, name, code)
-          `)
-          .or(`week_start_date.eq.${mondayKey},week_start_date.eq.${sundayKey}`)
-          .eq('company_id', company.id)
-          .in('resource_id', memberIds);
-        
-        if (error) {
-          console.error('Error fetching project allocations:', error);
-          setError('Failed to fetch resource allocations');
-        } else {
-          projectAllocations = data || [];
-          console.log('Fetched allocations for query:', `week_start_date.eq.${mondayKey} OR week_start_date.eq.${sundayKey}`);
-          console.log('Allocation count:', projectAllocations.length);
-          
-          // If no allocations found with exact date match, try a range query
-          if (projectAllocations.length === 0) {
-            console.log('No exact match allocations found. Trying a date range query...');
-            
-            // Get the range for the entire week
-            const { startDateString, endDateString } = getWeekDateRange(selectedWeek);
-            
-            const { data: rangeData, error: rangeError } = await supabase
-              .from('project_resource_allocations')
-              .select(`
-                id,
-                resource_id,
-                hours,
-                week_start_date,
-                project:projects(id, name, code)
-              `)
-              .gte('week_start_date', startDateString)
-              .lte('week_start_date', endDateString)
-              .eq('company_id', company.id)
-              .in('resource_id', memberIds);
-              
-            if (rangeError) {
-              console.error('Error in date range query:', rangeError);
-            } else if (rangeData && rangeData.length > 0) {
-              projectAllocations = rangeData;
-              console.log('Found allocations with date range query:', projectAllocations.length);
-            } else {
-              // Try to fetch any recent allocation dates to help debug
-              console.log('No allocations found with range query. Checking for recent allocations...');
-              
-              const { data: dateData } = await supabase
-                .from('project_resource_allocations')
-                .select('week_start_date')
-                .eq('company_id', company.id)
-                .order('week_start_date', { ascending: false })
-                .limit(10);
-                
-              if (dateData && dateData.length > 0) {
-                // Get unique dates for debugging
-                const uniqueDates = [...new Set(dateData.map(item => item.week_start_date))];
-                console.log('Recent allocation dates in DB:', uniqueDates);
-                
-                // Try fetching with the most recent date
-                const latestDate = uniqueDates[0];
-                console.log(`Trying to fetch with most recent date: ${latestDate}`);
-                
-                const { data: latestData } = await supabase
-                  .from('project_resource_allocations')
-                  .select(`
-                    id,
-                    resource_id,
-                    hours,
-                    week_start_date,
-                    project:projects(id, name, code)
-                  `)
-                  .eq('week_start_date', latestDate)
-                  .eq('company_id', company.id)
-                  .in('resource_id', memberIds);
-                  
-                if (latestData && latestData.length > 0) {
-                  projectAllocations = latestData;
-                  console.log(`Found ${projectAllocations.length} allocations using latest date: ${latestDate}`);
-                }
-              }
-            }
-          }
-        }
+      
+      // 1. First try precise date matching (Monday or Sunday)
+      projectAllocations = await fetchPreciseDateAllocations(memberIds, selectedWeek, company?.id);
+      
+      // 2. If no allocations found with exact match, try a date range query
+      if (projectAllocations.length === 0) {
+        projectAllocations = await fetchDateRangeAllocations(memberIds, selectedWeek, company?.id);
+      }
+      
+      // 3. As a last resort, try to fetch any recent allocations to help debug
+      if (projectAllocations.length === 0) {
+        projectAllocations = await fetchRecentAllocations(memberIds, company?.id);
       }
       
       console.log('Project allocations before processing:', projectAllocations);
       
-      // Initialize allocations object
-      const initialAllocations: Record<string, MemberAllocation> = {};
-      
-      // Process each team member
-      for (const member of teamMembers) {
-        // Get this member's project allocations
-        const memberProjects = projectAllocations.filter(alloc => 
-          alloc.resource_id === member.id
-        ) || [];
-        
-        console.log(`Member ${member.id} (${member.first_name} ${member.last_name}) allocations:`, memberProjects);
-        
-        // Calculate total resourced hours
-        const resourcedHours = memberProjects.reduce(
-          (sum, project) => sum + (Number(project.hours) || 0), 
-          0
-        );
-        
-        // Get project names and detailed allocations
-        const projectNames = memberProjects
-          .filter(p => p.project?.name)
-          .map(p => p.project.name);
-          
-        // Create detailed project allocations array
-        const detailedProjectAllocations = memberProjects
-          .filter(p => p.project?.id && p.project?.name && p.project?.code)
-          .map(p => ({
-            projectName: p.project.name,
-            projectId: p.project.id,
-            projectCode: p.project.code,
-            hours: Number(p.hours) || 0
-          }))
-          .sort((a, b) => b.hours - a.hours); // Sort by hours descending
-        
-        // For demonstration, create some leave data - in real app this would come from a leave table
-        const annualLeave = Math.floor(Math.random() * 8);
-        const vacationLeave = Math.floor(Math.random() * 8);
-        const medicalLeave = Math.floor(Math.random() * 4);
-        const others = Math.floor(Math.random() * 2);
-        
-        initialAllocations[member.id] = {
-          id: member.id,
-          annualLeave,
-          publicHoliday: Math.floor(Math.random() * 2) * 8, // Either 0 or 8 hours
-          vacationLeave,
-          medicalLeave,
-          others,
-          remarks: '',
-          projects: [...new Set(projectNames)], // Remove duplicates
-          projectAllocations: detailedProjectAllocations,
-          resourcedHours,
-        };
-      }
+      // Process the allocations into the expected format
+      const initialAllocations = processMemberAllocations(teamMembers, projectAllocations);
       
       console.log('Processed allocations:', initialAllocations);
       setMemberAllocations(initialAllocations);
