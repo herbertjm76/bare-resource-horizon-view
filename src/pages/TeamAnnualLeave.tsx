@@ -12,7 +12,7 @@ import { useAnnualLeave } from '@/hooks/useAnnualLeave';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FilterButton } from '@/components/resources/filters/FilterButton';
 import { Button } from '@/components/ui/button';
-import { Users, Office, X } from 'lucide-react';
+import { Users, Building, X } from 'lucide-react';
 import '@/components/annual-leave/annual-leave.css';
 
 const HEADER_HEIGHT = 56;
@@ -109,7 +109,7 @@ const TeamAnnualLeave = () => {
                       className="h-8 gap-1.5"
                       onClick={() => handleFilterChange('office')}
                     >
-                      <Office className="h-3.5 w-3.5" />
+                      <Building className="h-3.5 w-3.5" />
                       Office
                     </Button>
                     
