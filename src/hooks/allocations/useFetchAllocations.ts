@@ -50,6 +50,7 @@ export function useFetchAllocations() {
         const { data, error } = await supabase
           .from('project_resource_allocations')
           .select(`
+            id,
             resource_id,
             hours,
             project:projects(id, name, code)
