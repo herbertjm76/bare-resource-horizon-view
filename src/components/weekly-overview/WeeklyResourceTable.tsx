@@ -1,281 +1,198 @@
 
-import React from 'react';
-import { ScrollArea } from "@/components/ui/scroll-area";
+import React, { useState } from 'react';
+import { format, isSameMonth } from 'date-fns';
 import { useWeeklyResourceData } from './hooks/useWeeklyResourceData';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Textarea } from "@/components/ui/textarea";
-import { formatNumber, calculateUtilization } from './utils';
-import "./weekly-resource-table.css";
+import './weekly-resource-table.css';
+import { toast } from 'sonner';
+import { Card } from '../ui/card';
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  isPending?: boolean;
+}
 
 interface WeeklyResourceTableProps {
   selectedWeek: Date;
   filters: {
     office: string;
+    [key: string]: string;
   };
 }
 
 export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   selectedWeek,
-  filters
+  filters,
 }) => {
-  const {
-    allMembers,
-    filteredOffices,
-    membersByOffice,
-    getMemberAllocation,
-    handleInputChange,
-    getOfficeDisplay,
-    isLoading,
-    error
-  } = useWeeklyResourceData(selectedWeek, filters);
+  const { isLoading, error, teamMembers, weekDays, updateAllocation } = useWeeklyResourceData(selectedWeek, filters);
+  const { office_stages } = useOfficeSettings();
+  const [editingCell, setEditingCell] = useState<string | null>(null);
+  const [tempValue, setTempValue] = useState<string>('');
 
-  // Loading state
+  // Handle cell click to begin editing
+  const handleCellClick = (memberId: string, date: string) => {
+    const editKey = `${memberId}-${date}`;
+    setEditingCell(editKey);
+    const currentValue = teamMembers.find(m => m.id === memberId)?.allocations?.[date] || '';
+    setTempValue(currentValue.toString());
+  };
+
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTempValue(e.target.value);
+  };
+
+  // Handle input blur to save changes
+  const handleInputBlur = async (memberId: string, date: string) => {
+    setEditingCell(null);
+    const newValue = parseInt(tempValue, 10);
+    
+    if (isNaN(newValue)) return;
+    
+    try {
+      await updateAllocation(memberId, date, newValue);
+      toast.success('Allocation updated');
+    } catch (error) {
+      toast.error('Failed to update allocation');
+      console.error(error);
+    }
+  };
+
+  // Handle keyboard events in input
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, memberId: string, date: string) => {
+    if (e.key === 'Enter') {
+      handleInputBlur(memberId, date);
+    } else if (e.key === 'Escape') {
+      setEditingCell(null);
+    }
+  };
+
+  // Get project count for each team member
+  const getProjectCount = (memberId: string) => {
+    const member = teamMembers.find(m => m.id === memberId);
+    if (!member || !member.allocations) return 0;
+    
+    // Count unique projects
+    const projectSet = new Set<string>();
+    Object.entries(member.allocations).forEach(([_, allocationData]) => {
+      if (typeof allocationData === 'object' && allocationData.projectId) {
+        projectSet.add(allocationData.projectId);
+      }
+    });
+    
+    return projectSet.size;
+  };
+
   if (isLoading) {
     return (
       <div className="resource-table-loading">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
-        <p className="text-muted-foreground">Loading resources...</p>
+        <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mb-2"></div>
+        <p className="text-muted-foreground">Loading team resources...</p>
       </div>
     );
   }
 
-  // Error state
   if (error) {
     return (
-      <div className="resource-table-error bg-destructive/10 text-destructive p-4 rounded-lg">
-        <p className="font-semibold">Error loading data</p>
-        <p className="text-sm">{typeof error === 'string' ? error : 'An error occurred while loading data. Please try again later.'}</p>
+      <div className="resource-table-error">
+        <p className="text-destructive mb-2">Failed to load resource data</p>
+        <p className="text-muted-foreground text-sm">{error.message}</p>
       </div>
     );
   }
 
-  // Empty state
-  if (!allMembers.length) {
+  if (!teamMembers.length) {
     return (
-      <div className="resource-table-empty border rounded-lg">
-        <p className="text-muted-foreground mb-2">No team members found. Add team members to see the weekly overview.</p>
+      <div className="resource-table-empty">
+        <p className="text-muted-foreground">No team members found matching the selected filters.</p>
       </div>
     );
   }
 
   return (
-    <div className="resource-table-container border rounded-lg">
-      <ScrollArea className="resource-table-scroll h-[calc(100vh-320px)]">
+    <Card className="resource-table-container shadow-sm border">
+      <div className="resource-table-scroll h-[calc(100vh-240px)]">
         <table className="resource-table">
-          <TableHeader />
-          <TableBody 
-            filteredOffices={filteredOffices} 
-            membersByOffice={membersByOffice} 
-            getMemberAllocation={getMemberAllocation}
-            handleInputChange={handleInputChange}
-            getOfficeDisplay={getOfficeDisplay}
-          />
+          <thead>
+            <tr>
+              <th className="column-name">Team Member</th>
+              <th className="column-office">Office</th>
+              
+              {weekDays.map((day) => (
+                <th 
+                  key={day.date} 
+                  className={`column-numeric ${day.isAnnualLeave ? 'column-annual-leave' : ''}`}
+                >
+                  {format(new Date(day.date), 'EEE')}<br/>
+                  <span className="text-xs font-normal">
+                    {format(new Date(day.date), 'd')}
+                  </span>
+                </th>
+              ))}
+              
+              <th className="column-remarks">Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            {teamMembers.map((member) => (
+              <tr 
+                key={member.id} 
+                className={member.isPending ? 'member-pending' : ''}
+              >
+                <td className="column-name">
+                  <div>
+                    <div className="font-medium flex items-center gap-2">
+                      {member.name}
+                      {getProjectCount(member.id) > 0 && (
+                        <span className="project-count">{getProjectCount(member.id)}</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground">{member.role}</div>
+                  </div>
+                </td>
+                <td className="column-office">
+                  {member.office || '—'}
+                </td>
+                
+                {weekDays.map((day) => {
+                  const allocation = member.allocations?.[day.date];
+                  const editKey = `${member.id}-${day.date}`;
+                  const isEditing = editingCell === editKey;
+                  
+                  return (
+                    <td 
+                      key={`${member.id}-${day.date}`} 
+                      className={`column-numeric ${day.isAnnualLeave ? 'column-annual-leave' : ''}`}
+                      onClick={() => !isEditing && handleCellClick(member.id, day.date)}
+                    >
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={tempValue}
+                          onChange={handleInputChange}
+                          onBlur={() => handleInputBlur(member.id, day.date)}
+                          onKeyDown={(e) => handleInputKeyDown(e, member.id, day.date)}
+                          autoFocus
+                        />
+                      ) : (
+                        (allocation && typeof allocation === 'object' && 'hours' in allocation) 
+                          ? allocation.hours 
+                          : allocation || ''
+                      )}
+                    </td>
+                  );
+                })}
+                
+                <td className="column-remarks">
+                  {/* Placeholder for remarks */}
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
-      </ScrollArea>
-    </div>
+      </div>
+    </Card>
   );
 };
-
-// Table Header Component
-const TableHeader = () => (
-  <thead>
-    <tr>
-      <th className="column-name">
-        <span className="font-medium">Name</span>
-      </th>
-      
-      <th className="column-office">
-        <span className="font-medium">Office</span>
-      </th>
-      
-      <TooltipProvider>
-        <AbbreviatedHeader abbreviation="PRJ" fullName="Projects" />
-        <AbbreviatedHeader abbreviation="CAP" fullName="Capacity" />
-        <AbbreviatedHeader abbreviation="UTL" fullName="Utilisation" />
-        <AbbreviatedHeader 
-          abbreviation="AL" 
-          fullName="Annual Leave" 
-          className="column-annual-leave"
-        />
-        <AbbreviatedHeader abbreviation="PH" fullName="Public Holiday" />
-        <AbbreviatedHeader abbreviation="VL" fullName="Vacation Leave" />
-        <AbbreviatedHeader abbreviation="ML" fullName="Medical Leave" />
-        <AbbreviatedHeader abbreviation="OL" fullName="Others" />
-      </TooltipProvider>
-      
-      <th className="column-remarks">
-        <span className="font-medium">Remarks</span>
-      </th>
-    </tr>
-  </thead>
-);
-
-// Abbreviated header cell with tooltip
-const AbbreviatedHeader = ({ 
-  abbreviation, 
-  fullName,
-  className = ""
-}: { 
-  abbreviation: string;
-  fullName: string;
-  className?: string;
-}) => (
-  <th className={`column-numeric ${className}`}>
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span className="font-medium cursor-help">{abbreviation}</span>
-      </TooltipTrigger>
-      <TooltipContent side="top">
-        <p>{fullName}</p>
-      </TooltipContent>
-    </Tooltip>
-  </th>
-);
-
-// Table Body Component
-const TableBody = ({ 
-  filteredOffices, 
-  membersByOffice, 
-  getMemberAllocation,
-  handleInputChange,
-  getOfficeDisplay
-}: any) => (
-  <tbody>
-    {filteredOffices.flatMap((office: string) => {
-      const members = membersByOffice[office].sort((a: any, b: any) => {
-        return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
-      });
-
-      return members.map((member: any, memberIndex: number) => (
-        <ResourceRow
-          key={member.id}
-          member={member}
-          allocation={getMemberAllocation(member.id)}
-          isEven={memberIndex % 2 === 0}
-          handleInputChange={handleInputChange}
-          getOfficeDisplay={getOfficeDisplay}
-        />
-      ));
-    })}
-  </tbody>
-);
-
-// Resource Row Component
-const ResourceRow = ({ 
-  member, 
-  allocation, 
-  isEven,
-  handleInputChange,
-  getOfficeDisplay
-}: any) => {
-  const weeklyCapacity = member.weekly_capacity || 40;
-  const utilization = calculateUtilization(allocation.resourcedHours, weeklyCapacity);
-  
-  return (
-    <tr>
-      <td className="column-name">
-        <div className="flex items-center gap-2">
-          <span className={member.isPending ? 'member-pending' : ''}>
-            {member.first_name} {member.last_name}
-            {member.isPending && <span className="text-muted-foreground text-xs ml-1">(pending)</span>}
-          </span>
-        </div>
-      </td>
-      
-      <td className="column-office">
-        {getOfficeDisplay(member.location || 'N/A')}
-      </td>
-      
-      <td className="column-numeric">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="project-count">{allocation.projects.length}</span>
-            </TooltipTrigger>
-            <TooltipContent side="right" className="w-64">
-              <div className="p-1">
-                <strong>Projects:</strong>
-                {allocation.projects.length > 0 ? (
-                  <ul className="list-disc ml-4 mt-1">
-                    {allocation.projects.map((project: string, idx: number) => (
-                      <li key={idx}>{project}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="mt-1 text-muted-foreground">No projects assigned</p>
-                )}
-              </div>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </td>
-      
-      <td className="column-numeric font-bold">
-        {formatNumber(allocation.resourcedHours || 0)}
-      </td>
-      
-      <td className="column-numeric">
-        {formatNumber(utilization)}%
-      </td>
-      
-      <td className="column-numeric column-annual-leave">
-        <EditableNumericField
-          value={allocation.annualLeave}
-          onChange={(value) => handleInputChange(member.id, 'annualLeave', value)}
-        />
-      </td>
-      
-      <td className="column-numeric">
-        {allocation.publicHoliday}
-      </td>
-      
-      <td className="column-numeric">
-        <EditableNumericField
-          value={allocation.vacationLeave}
-          onChange={(value) => handleInputChange(member.id, 'vacationLeave', value)}
-        />
-      </td>
-      
-      <td className="column-numeric">
-        <EditableNumericField
-          value={allocation.medicalLeave}
-          onChange={(value) => handleInputChange(member.id, 'medicalLeave', value)}
-        />
-      </td>
-      
-      <td className="column-numeric">
-        <EditableNumericField
-          value={allocation.others}
-          onChange={(value) => handleInputChange(member.id, 'others', value)}
-        />
-      </td>
-      
-      <td className="column-remarks">
-        <Textarea 
-          value={allocation.remarks}
-          onChange={(e) => handleInputChange(member.id, 'remarks', e.target.value)}
-          className="min-h-0 h-6 p-1 text-xs resize-none"
-        />
-      </td>
-    </tr>
-  );
-};
-
-// Editable Numeric Field Component
-const EditableNumericField = ({ 
-  value, 
-  onChange 
-}: { 
-  value: number;
-  onChange: (value: number) => void;
-}) => (
-  <input
-    type="number"
-    min="0"
-    value={value}
-    onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
-    className="w-full h-6 p-0 text-center"
-  />
-);
-
-export default WeeklyResourceTable;

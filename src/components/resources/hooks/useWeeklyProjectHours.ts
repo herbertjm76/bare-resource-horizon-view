@@ -1,31 +1,41 @@
 
-import React from 'react';
+import { useMemo } from 'react';
+import { ProjectAllocations } from './types/resourceTypes';
 
+/**
+ * Calculate total project hours for each week from all resource allocations
+ * @param projectAllocations - All resource allocations for the project
+ * @param weeks - Array of week data
+ * @returns Record of week keys to total hours
+ */
 export const useWeeklyProjectHours = (
-  projectAllocations: Record<string, number>, 
-  weeks: { startDate: Date }[]
+  projectAllocations: ProjectAllocations,
+  weeks: {
+    startDate: Date;
+    label: string;
+    days: Date[];
+  }[]
 ) => {
-  // Sum up all resource hours for each week
-  return React.useMemo(() => {
-    const weekHours: Record<string, number> = {};
-
+  return useMemo(() => {
+    // Create an object to hold weekly totals
+    const weeklyHours: Record<string, number> = {};
+    
     // Initialize all weeks with 0 hours
     weeks.forEach(week => {
       const weekKey = week.startDate.toISOString().split('T')[0];
-      weekHours[weekKey] = 0;
+      weeklyHours[weekKey] = 0;
     });
-
-    // Sum up hours across all allocations
-    Object.entries(projectAllocations).forEach(([compositeKey, hours]) => {
-      // Extract the weekKey from the composite key (format: resourceId:weekKey)
-      const weekKey = compositeKey.split(':')[1];
+    
+    // Sum up hours for each week
+    Object.entries(projectAllocations).forEach(([key, hours]) => {
+      // Parse the composite key (format: resourceId:weekKey)
+      const [_, weekKey] = key.split(':');
       
-      if (weekHours[weekKey] !== undefined) {
-        weekHours[weekKey] += Number(hours); // Ensure we're adding numbers
+      if (weekKey && weeklyHours.hasOwnProperty(weekKey)) {
+        weeklyHours[weekKey] += hours;
       }
     });
     
-    console.log("Calculated weekly project hours:", weekHours);
-    return weekHours;
+    return weeklyHours;
   }, [projectAllocations, weeks]);
 };
