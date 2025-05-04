@@ -33,6 +33,9 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
   
   // Fetch allocations when team members or selected week changes
   useEffect(() => {
+    console.log('useResourceAllocations effect triggered with week:', selectedWeek);
+    console.log('Team members count:', teamMembers.length);
+    
     fetchAllocations(
       teamMembers,
       selectedWeek,
@@ -44,6 +47,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
 
   // Function to manually refresh allocations
   const refreshAllocations = useCallback(() => {
+    console.log('Manual refresh of allocations triggered');
     fetchAllocations(
       teamMembers,
       selectedWeek,

@@ -112,7 +112,7 @@
 }
 
 .leave-input:hover {
-  border-color: #d1d5db;
+  border-color: hsl(var(--primary) / 0.5);
   background-color: #fff;
 }
 
@@ -125,4 +125,26 @@
 
 .weekly-table .table-cell {
   font-size: 0.75rem;
+}
+
+/* Highlight the editable fields with a subtle indicator */
+.leave-input {
+  position: relative;
+}
+
+.leave-input:after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  background-color: hsl(var(--primary) / 0.6);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.leave-input:hover:after {
+  opacity: 1;
 }

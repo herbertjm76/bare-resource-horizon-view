@@ -1,7 +1,7 @@
 
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { formatWeekKey } from '@/components/weekly-overview/utils';
+import { formatWeekKey, getWeekStartDate } from '@/components/weekly-overview/utils';
 import { MemberAllocation } from '@/components/weekly-overview/types';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
@@ -41,10 +41,13 @@ export function useFetchAllocations() {
       // Get formatted week key for consistent querying
       const weekKey = formatWeekKey(selectedWeek);
       console.log('Fetching allocations for week key:', weekKey);
+      console.log('Selected week JS date:', selectedWeek);
+      console.log('Monday of selected week:', getWeekStartDate(selectedWeek));
       
       // Get all member IDs
       const memberIds = teamMembers.map(member => member.id);
       console.log('Fetching allocations for members:', memberIds);
+      console.log('Member count:', memberIds.length);
       
       // Fetch project allocations with project details for the selected week
       let projectAllocations = [];
@@ -67,6 +70,40 @@ export function useFetchAllocations() {
         } else {
           projectAllocations = data || [];
           console.log('Fetched project allocations for week:', weekKey, projectAllocations);
+          console.log('Allocation count:', projectAllocations.length);
+          
+          // Debug: Check if we got any results
+          if (projectAllocations.length === 0) {
+            console.log('No allocations found. Trying an alternative date format...');
+            
+            // Attempt to query a range of dates around the week start
+            const mondayDate = getWeekStartDate(selectedWeek);
+            const mondayStr = mondayDate.toISOString().split('T')[0];
+            
+            console.log(`Trying alternative query with date: ${mondayStr}`);
+            
+            const { data: alternativeData, error: altError } = await supabase
+              .from('project_resource_allocations')
+              .select(`
+                id,
+                resource_id,
+                hours,
+                week_start_date,
+                project:projects(id, name, code)
+              `)
+              .eq('company_id', company.id)
+              .in('resource_id', memberIds)
+              .order('week_start_date', { ascending: false })
+              .limit(20);
+              
+            if (altError) {
+              console.error('Error in alternative query:', altError);
+            } else {
+              console.log('Latest allocation dates in DB:', 
+                alternativeData?.map(a => a.week_start_date).filter((v, i, a) => a.indexOf(v) === i)
+              );
+            }
+          }
         }
       }
       

@@ -32,5 +32,14 @@ export const formatWeekKey = (date: Date): string => {
   // Explicitly set to start on Monday (1)
   const monday = startOfWeek(date, { weekStartsOn: 1 });
   // Format to YYYY-MM-DD for consistent database queries
-  return format(monday, 'yyyy-MM-dd');
+  const formattedDate = format(monday, 'yyyy-MM-dd');
+  console.log(`formatWeekKey: Input date ${date.toISOString()}, Monday date: ${monday.toISOString()}, formatted: ${formattedDate}`);
+  return formattedDate;
+};
+
+/**
+ * Get the week start date (Monday) from a given date
+ */
+export const getWeekStartDate = (date: Date): Date => {
+  return startOfWeek(date, { weekStartsOn: 1 });
 };
