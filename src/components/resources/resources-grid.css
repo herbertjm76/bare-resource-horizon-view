@@ -1,4 +1,3 @@
-
 /* Resource grid table styles */
 .grid-table-outer-container {
   width: 100%;
@@ -49,6 +48,7 @@
   table-layout: fixed;
 }
 
+/* Removed width: 100% as it forces table to fit without overflow */
 .resource-allocation-table table-fixed {
   width: 100%;
 }

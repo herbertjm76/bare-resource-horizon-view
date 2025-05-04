@@ -80,10 +80,10 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     // Fixed columns: counter (48px) + project name (200px)
     const fixedColumnsWidth = 48 + 200;
     // Week columns: 35px per day (fixed width)
-    const weekColumnsWidth = weeks.length * 35;
+    const weekColumnsWidth = weeksToShow * 35;
     // Add padding to ensure we have enough space
     return fixedColumnsWidth + weekColumnsWidth + 50;
-  }, [weeks.length]);
+  }, [weeksToShow]);
 
   if (isLoading) {
     return <div className="text-center py-12">
