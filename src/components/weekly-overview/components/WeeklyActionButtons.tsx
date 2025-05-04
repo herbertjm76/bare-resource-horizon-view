@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Save, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { exportToPDF } from "../utils/exportToPDF";
+import { exportToExcel } from "../utils/exportToExcel";
 
 interface WeeklyActionButtonsProps {
   selectedWeek: Date;
@@ -35,6 +36,17 @@ export const WeeklyActionButtons: React.FC<WeeklyActionButtonsProps> = ({
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      toast.info("Generating Excel file...");
+      await exportToExcel(selectedWeek, weekLabel);
+      toast.success("Excel file exported successfully!");
+    } catch (error) {
+      console.error("Excel export failed:", error);
+      toast.error("Failed to export Excel file. Please try again.");
+    }
+  };
+
   return (
     <div className="flex items-center gap-2 print:hidden">
       <Button
@@ -44,7 +56,16 @@ export const WeeklyActionButtons: React.FC<WeeklyActionButtonsProps> = ({
         className="flex items-center gap-1"
       >
         <Save className="h-4 w-4" />
-        <span className="hidden sm:inline">Export PDF</span>
+        <span className="hidden sm:inline">PDF</span>
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleExportExcel}
+        className="flex items-center gap-1"
+      >
+        <Save className="h-4 w-4" />
+        <span className="hidden sm:inline">Excel</span>
       </Button>
       <Button
         variant="outline"
