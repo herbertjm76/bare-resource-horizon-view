@@ -6,10 +6,12 @@ import { AppHeader } from '@/components/AppHeader';
 import { WeeklyResourceTable } from '@/components/weekly-overview/WeeklyResourceTable';
 import { WeeklyResourceFilters } from '@/components/weekly-overview/WeeklyResourceFilters';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
-import { format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
+import { WeeklyActionButtons } from '@/components/weekly-overview/components/WeeklyActionButtons';
+import { format, startOfWeek, addWeeks, subWeeks, addDays } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import '@/components/weekly-overview/weekly-overview-print.css';
 
 const HEADER_HEIGHT = 56;
 
@@ -47,34 +49,53 @@ const WeeklyOverview = () => {
 
   // Get Monday of the current week
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  // Get Sunday (end of week)
+  const weekEnd = addDays(weekStart, 6);
+  // Format the week label
   const weekLabel = `Week of ${format(weekStart, 'MMMM d, yyyy')}`;
 
   return (
     <QueryClientProvider client={queryClient}>
       <SidebarProvider>
         <div className="w-full min-h-screen flex flex-row">
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 print:hidden">
             <DashboardSidebar />
           </div>
           <div className="flex-1 flex flex-col">
-            <AppHeader />
-            <div style={{ height: HEADER_HEIGHT }} />
+            <div className="print:hidden">
+              <AppHeader />
+            </div>
+            <div style={{ height: HEADER_HEIGHT }} className="print:hidden" />
             <div className="flex-1 p-4 sm:p-6 bg-background">
+              {/* Print only title - hidden in normal view */}
+              <div className="hidden print:block">
+                <h1 className="print-title">Weekly Resource Overview</h1>
+                <p className="print-subtitle">{weekLabel}</p>
+              </div>
+              
               <div className="max-w-full mx-auto space-y-4">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2 print:hidden">
                   <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Weekly Overview</h1>
-                  <WeekSelector 
-                    selectedWeek={selectedWeek}
-                    onPreviousWeek={handlePreviousWeek}
-                    onNextWeek={handleNextWeek}
-                    weekLabel={weekLabel}
-                  />
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <WeeklyActionButtons 
+                      selectedWeek={selectedWeek}
+                      weekLabel={weekLabel}
+                    />
+                    <WeekSelector 
+                      selectedWeek={selectedWeek}
+                      onPreviousWeek={handlePreviousWeek}
+                      onNextWeek={handleNextWeek}
+                      weekLabel={weekLabel}
+                    />
+                  </div>
                 </div>
                 
-                <WeeklyResourceFilters 
-                  filters={filters}
-                  onFilterChange={handleFilterChange}
-                />
+                <div className="filters-container print:hidden">
+                  <WeeklyResourceFilters 
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                  />
+                </div>
                 
                 <OfficeSettingsProvider>
                   <WeeklyResourceTable 

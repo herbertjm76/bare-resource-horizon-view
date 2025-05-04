@@ -26,23 +26,36 @@ export const TeamMemberRows: React.FC<TeamMemberRowsProps> = ({
         const members = membersByOffice[office].sort((a, b) => {
           return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
         });
-
-        return members.map((member, memberIndex) => {
-          const allocation = getMemberAllocation(member.id);
-          const isEven = memberIndex % 2 === 0;
+        
+        // Add office header row for print layout
+        const officeDisplay = getOfficeDisplay(office);
+        
+        return [
+          // Office header for print view only
+          <tr key={`office-header-${office}`} className="hidden print:table-row print:font-bold print:bg-gray-200">
+            <td colSpan={9 + projects.length} className="py-2 px-4 text-left">
+              Office: {officeDisplay}
+            </td>
+          </tr>,
           
-          return (
-            <MemberTableRow
-              key={member.id}
-              member={member}
-              allocation={allocation}
-              isEven={isEven}
-              getOfficeDisplay={getOfficeDisplay}
-              onInputChange={handleInputChange}
-              projects={projects}
-            />
-          );
-        });
+          // Regular member rows
+          ...members.map((member, memberIndex) => {
+            const allocation = getMemberAllocation(member.id);
+            const isEven = memberIndex % 2 === 0;
+            
+            return (
+              <MemberTableRow
+                key={member.id}
+                member={member}
+                allocation={allocation}
+                isEven={isEven}
+                getOfficeDisplay={getOfficeDisplay}
+                onInputChange={handleInputChange}
+                projects={projects}
+              />
+            );
+          })
+        ];
       })}
     </>
   );
