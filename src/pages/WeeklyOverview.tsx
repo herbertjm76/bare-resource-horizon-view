@@ -10,6 +10,7 @@ import { format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import { Card, CardContent } from '@/components/ui/card';
 
 const HEADER_HEIGHT = 56;
 
@@ -25,7 +26,11 @@ const queryClient = new QueryClient({
 });
 
 const WeeklyOverview = () => {
-  const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
+  // Get Monday of the current week
+  const today = new Date();
+  const mondayOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 });
+  
+  const [selectedWeek, setSelectedWeek] = useState<Date>(mondayOfCurrentWeek);
   const [filters, setFilters] = useState({
     office: "all",
   });
@@ -45,9 +50,8 @@ const WeeklyOverview = () => {
     }));
   };
 
-  // Get Monday of the current week
-  const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
-  const weekLabel = `Week of ${format(weekStart, 'MMMM d, yyyy')}`;
+  // Format the week label
+  const weekLabel = `Week of ${format(selectedWeek, 'MMMM d, yyyy')}`;
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -76,12 +80,16 @@ const WeeklyOverview = () => {
                   onFilterChange={handleFilterChange}
                 />
                 
-                <OfficeSettingsProvider>
-                  <WeeklyResourceTable 
-                    selectedWeek={selectedWeek} 
-                    filters={filters}
-                  />
-                </OfficeSettingsProvider>
+                <Card className="shadow-sm">
+                  <CardContent className="p-0">
+                    <OfficeSettingsProvider>
+                      <WeeklyResourceTable 
+                        selectedWeek={selectedWeek} 
+                        filters={filters}
+                      />
+                    </OfficeSettingsProvider>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>

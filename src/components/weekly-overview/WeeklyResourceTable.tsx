@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useWeeklyResourceData } from './hooks/useWeeklyResourceData';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatNumber, calculateUtilization } from './utils';
 import "./weekly-resource-table.css";
 
@@ -29,52 +29,60 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     error
   } = useWeeklyResourceData(selectedWeek, filters);
 
-  // Loading state
   if (isLoading) {
-    return (
-      <div className="resource-table-loading">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
-        <p className="text-muted-foreground">Loading resources...</p>
-      </div>
-    );
+    return <TableLoadingState />;
   }
 
-  // Error state
   if (error) {
-    return (
-      <div className="resource-table-error bg-destructive/10 text-destructive p-4 rounded-lg">
-        <p className="font-semibold">Error loading data</p>
-        <p className="text-sm">{typeof error === 'string' ? error : 'An error occurred while loading data. Please try again later.'}</p>
-      </div>
-    );
+    return <TableErrorState error={error} />;
   }
 
-  // Empty state
   if (!allMembers.length) {
-    return (
-      <div className="resource-table-empty border rounded-lg">
-        <p className="text-muted-foreground mb-2">No team members found. Add team members to see the weekly overview.</p>
-      </div>
-    );
+    return <TableEmptyState />;
   }
 
   return (
     <div className="resource-table-container border rounded-lg">
       <ScrollArea className="resource-table-scroll h-[calc(100vh-320px)]">
-        <table className="resource-table">
-          <TableHeader />
-          <TableBody 
-            filteredOffices={filteredOffices} 
-            membersByOffice={membersByOffice} 
-            getMemberAllocation={getMemberAllocation}
-            handleInputChange={handleInputChange}
-            getOfficeDisplay={getOfficeDisplay}
-          />
-        </table>
+        <div className="min-w-max"> {/* Ensures table can expand horizontally */}
+          <table className="resource-table">
+            <TableHeader />
+            <TableBody 
+              filteredOffices={filteredOffices} 
+              membersByOffice={membersByOffice} 
+              getMemberAllocation={getMemberAllocation}
+              handleInputChange={handleInputChange}
+              getOfficeDisplay={getOfficeDisplay}
+            />
+          </table>
+        </div>
       </ScrollArea>
     </div>
   );
 };
+
+// Table Loading State Component
+const TableLoadingState = () => (
+  <div className="resource-table-loading">
+    <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mb-4"></div>
+    <p className="text-muted-foreground">Loading resources...</p>
+  </div>
+);
+
+// Table Error State Component
+const TableErrorState = ({ error }: { error: any }) => (
+  <div className="resource-table-error bg-destructive/10 text-destructive p-4 rounded-lg">
+    <p className="font-semibold">Error loading data</p>
+    <p className="text-sm">{typeof error === 'string' ? error : 'An error occurred while loading data. Please try again later.'}</p>
+  </div>
+);
+
+// Table Empty State Component
+const TableEmptyState = () => (
+  <div className="resource-table-empty border rounded-lg">
+    <p className="text-muted-foreground mb-2">No team members found. Add team members to see the weekly overview.</p>
+  </div>
+);
 
 // Table Header Component
 const TableHeader = () => (
@@ -91,7 +99,7 @@ const TableHeader = () => (
       <TooltipProvider>
         <AbbreviatedHeader abbreviation="PRJ" fullName="Projects" />
         <AbbreviatedHeader abbreviation="CAP" fullName="Capacity" />
-        <AbbreviatedHeader abbreviation="UTL" fullName="Utilisation" />
+        <AbbreviatedHeader abbreviation="UTL" fullName="Utilization" />
         <AbbreviatedHeader 
           abbreviation="AL" 
           fullName="Annual Leave" 
@@ -151,7 +159,6 @@ const TableBody = ({
           key={member.id}
           member={member}
           allocation={getMemberAllocation(member.id)}
-          isEven={memberIndex % 2 === 0}
           handleInputChange={handleInputChange}
           getOfficeDisplay={getOfficeDisplay}
         />
@@ -164,7 +171,6 @@ const TableBody = ({
 const ResourceRow = ({ 
   member, 
   allocation, 
-  isEven,
   handleInputChange,
   getOfficeDisplay
 }: any) => {

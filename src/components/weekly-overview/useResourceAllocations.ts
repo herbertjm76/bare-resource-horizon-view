@@ -12,7 +12,7 @@ interface TeamMember {
   last_name: string;
   location: string | null;
   weekly_capacity?: number;
-  isPending?: boolean; // Add isPending property
+  isPending: boolean; // Ensure isPending is required
 }
 
 export interface MemberAllocation {
@@ -52,7 +52,8 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
       const memberIds = teamMembers.map(member => member.id);
       
       // First, fetch project allocations with project details for the selected week
-      let projectAllocations = [];
+      let projectAllocations: any[] = [];
+      
       if (company?.id) {
         const { data, error } = await supabase
           .from('project_resource_allocations')
@@ -92,8 +93,8 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
         
         // Get project names
         const projectNames = memberProjects
-          .filter(p => p.project?.name)
-          .map(p => p.project.name);
+          .filter((p: any) => p.project?.name)
+          .map((p: any) => p.project.name);
         
         // For demo purposes - generate some random data for non-project time
         initialAllocations[member.id] = {
