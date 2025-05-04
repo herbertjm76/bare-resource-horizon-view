@@ -18,9 +18,6 @@ export const ResourceSelectOption: React.FC<ResourceSelectOptionProps> = ({ memb
   return (
     <div className="flex items-center justify-between w-full">
       <span>{member.name}</span>
-      {member.type === 'pre-registered' && (
-        <Badge variant="outline" className="ml-2 text-xs">Pending</Badge>
-      )}
     </div>
   );
 };

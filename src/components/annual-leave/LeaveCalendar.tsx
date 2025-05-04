@@ -38,8 +38,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
 
   // Helper to get the name for a member
   const getMemberName = (member: TeamMember) => {
-    const isPending = 'isPending' in member && member.isPending;
-    return `${member.first_name || ''} ${member.last_name || ''}${isPending ? ' (pending)' : ''}`.trim();
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
   
   // Custom day formatter for minimal day representation

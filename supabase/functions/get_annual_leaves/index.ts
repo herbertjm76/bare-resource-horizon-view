@@ -21,13 +21,23 @@ serve(async (req) => {
 
     // Parse the request body
     const { company_id_param, month_param } = await req.json();
+    
+    // Extract year and month from the month_param (format: "YYYY-MM%")
+    const [year, month] = month_param.split('-');
+    
+    // Create date range for the given month
+    const startDate = `${year}-${month}-01`;
+    const endDate = month === '12' 
+      ? `${parseInt(year) + 1}-01-01` 
+      : `${year}-${(parseInt(month) + 1).toString().padStart(2, '0')}-01`;
 
     // Query annual leaves
     const { data, error } = await supabase
       .from('annual_leaves')
       .select('id, member_id, date, hours')
       .eq('company_id', company_id_param)
-      .like('date', month_param);
+      .gte('date', startDate)
+      .lt('date', endDate);
 
     if (error) {
       throw error;
