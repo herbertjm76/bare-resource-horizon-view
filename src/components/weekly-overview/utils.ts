@@ -1,39 +1,34 @@
+
 import { format, startOfWeek } from 'date-fns';
 
 /**
- * Format a number for display
+ * Format a number to 1 decimal place
  */
-export const formatNumber = (num: number): string | number => {
-  // Return empty string for 0 values
-  if (num === 0) return '0';
-  // Return formatted number for other values
-  return num;
+export const formatNumber = (num: number): string => {
+  if (isNaN(num)) return '0';
+  return Number(num.toFixed(1)).toString();
 };
 
 /**
- * Calculate utilization percentage
+ * Calculate utilization percentage based on hours used and capacity
+ * 
+ * @param hoursUsed Number of hours used by the resource
+ * @param weeklyCapacity Weekly capacity of the resource (default: 40)
+ * @returns Utilization percentage
  */
-export const calculateUtilization = (hours: number, capacity: number = 40): number => {
-  if (capacity <= 0) return 0;
-  const percentage = (hours / capacity) * 100;
-  return Math.round(percentage);
+export const calculateUtilization = (hoursUsed: number, weeklyCapacity: number = 40): number => {
+  if (weeklyCapacity === 0) return 0;
+  const percentage = (hoursUsed / weeklyCapacity) * 100;
+  return Math.min(parseFloat(percentage.toFixed(1)), 100); // Cap at 100% and format to 1 decimal place
 };
 
 /**
- * Calculate capacity value
- */
-export const calculateCapacity = (hours: number): number => {
-  // For now, just return the hours as capacity
-  return hours;
-};
-
-/**
- * Format a date into a standard week key format (YYYY-MM-DD)
- * Always returns the Monday of the week
+ * Format a date to a week key (YYYY-MM-DD format of Monday)
+ * 
+ * @param date Date to format
+ * @returns Week key in YYYY-MM-DD format
  */
 export const formatWeekKey = (date: Date): string => {
-  // Get Monday of the current week
-  const mondayDate = startOfWeek(date, { weekStartsOn: 1 });
-  // Format as YYYY-MM-DD
-  return format(mondayDate, 'yyyy-MM-dd');
+  const monday = startOfWeek(date, { weekStartsOn: 1 });
+  return format(monday, 'yyyy-MM-dd');
 };

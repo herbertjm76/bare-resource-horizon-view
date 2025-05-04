@@ -43,11 +43,6 @@ export const WeeklyResourceHeader: React.FC = () => {
           <div className="font-medium">Name</div>
         </TableHead>
         
-        <TableHead className="py-2 px-4 office-column">
-          <div className="font-medium text-center">Office</div>
-        </TableHead>
-        
-        {/* Acronym header cells with tooltips */}
         <TooltipProvider>
           <TableHead className="header-cell number-column">
             <Tooltip>
@@ -60,7 +55,7 @@ export const WeeklyResourceHeader: React.FC = () => {
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column">
+          <TableHead className="header-cell capacity-column">
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">CAP</div>
@@ -82,7 +77,7 @@ export const WeeklyResourceHeader: React.FC = () => {
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column bg-yellow-100">
+          <TableHead className="header-cell number-column leave-column">
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">AL</div>
@@ -104,7 +99,7 @@ export const WeeklyResourceHeader: React.FC = () => {
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column">
+          <TableHead className="header-cell number-column leave-column">
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">VL</div>
@@ -115,7 +110,7 @@ export const WeeklyResourceHeader: React.FC = () => {
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column">
+          <TableHead className="header-cell number-column leave-column">
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">ML</div>
@@ -126,7 +121,7 @@ export const WeeklyResourceHeader: React.FC = () => {
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column">
+          <TableHead className="header-cell number-column leave-column">
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">OL</div>

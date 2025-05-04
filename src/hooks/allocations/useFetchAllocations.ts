@@ -1,11 +1,10 @@
 
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { format, parseISO } from 'date-fns';
-import { useCompany } from '@/context/CompanyContext';
-import { toast } from 'sonner';
 import { formatWeekKey } from '@/components/weekly-overview/utils';
 import { MemberAllocation } from '@/components/weekly-overview/types';
+import { useCompany } from '@/context/CompanyContext';
+import { toast } from 'sonner';
 
 interface TeamMember {
   id: string;
@@ -100,13 +99,19 @@ export function useFetchAllocations() {
           }))
           .sort((a, b) => b.hours - a.hours); // Sort by hours descending
         
+        // For demonstration, create some leave data - in real app this would come from a leave table
+        const annualLeave = Math.floor(Math.random() * 8);
+        const vacationLeave = Math.floor(Math.random() * 8);
+        const medicalLeave = Math.floor(Math.random() * 4);
+        const others = Math.floor(Math.random() * 2);
+        
         initialAllocations[member.id] = {
           id: member.id,
-          annualLeave: 0,
+          annualLeave,
           publicHoliday: Math.floor(Math.random() * 2) * 8, // Either 0 or 8 hours
-          vacationLeave: 0,
-          medicalLeave: 0,
-          others: 0,
+          vacationLeave,
+          medicalLeave,
+          others,
           remarks: '',
           projects: [...new Set(projectNames)], // Remove duplicates
           projectAllocations: detailedProjectAllocations,

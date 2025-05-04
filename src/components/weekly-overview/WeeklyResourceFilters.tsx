@@ -42,29 +42,25 @@ export const WeeklyResourceFilters: React.FC<WeeklyResourceFiltersProps> = ({
   });
   
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      <div className="space-y-1">
-        <label htmlFor="office-filter" className="text-sm font-medium text-muted-foreground">
-          Office
-        </label>
-        <Select 
-          value={filters.office}
-          onValueChange={value => onFilterChange('office', value)}
-          disabled={isLoading}
-        >
-          <SelectTrigger id="office-filter" className="w-full">
-            <SelectValue placeholder="Select office" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Offices</SelectItem>
-            {officeLocations.map(office => (
-              <SelectItem key={office.id} value={office.code}>
-                {office.code} - {office.city}, {office.country}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <div>
+      <Select 
+        value={filters.office}
+        onValueChange={value => onFilterChange('office', value)}
+        disabled={isLoading}
+      >
+        <SelectTrigger className="w-full text-sm">
+          <span className="text-xs mr-2 text-muted-foreground">Office:</span>
+          <SelectValue placeholder="All Offices" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Offices</SelectItem>
+          {officeLocations.map(office => (
+            <SelectItem key={office.id} value={office.code}>
+              {office.code} - {office.city}, {office.country}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 };

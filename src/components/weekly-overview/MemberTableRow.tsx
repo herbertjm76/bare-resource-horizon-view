@@ -41,6 +41,16 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   // Calculate utilization based on member's specific capacity
   const utilization = calculateUtilization(allocation.resourcedHours, weeklyCapacity);
   
+  // Get utilization color
+  const getUtilizationColor = (util: number): string => {
+    if (util < 50) return 'bg-red-100 text-red-800';
+    if (util < 75) return 'bg-yellow-100 text-yellow-800';
+    if (util < 90) return 'bg-blue-100 text-blue-800';
+    return 'bg-green-100 text-green-800';
+  };
+
+  const utilizationColorClass = getUtilizationColor(utilization);
+  
   // Project allocations map for quick lookup
   const projectAllocationsMap = (allocation.projectAllocations || []).reduce((acc, curr) => {
     acc[curr.projectId] = curr.hours;
@@ -49,18 +59,12 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   
   return (
     <TableRow className={isEven ? "bg-muted/10" : ""}>
-      <TableCell className="py-1 px-4 name-column">
+      <TableCell className="py-2 px-4 name-column">
         <div className="flex items-center gap-2">
           <span>
             {member.first_name} {member.last_name}
             {member.isPending && <span className="text-muted-foreground text-xs ml-1">(pending)</span>}
           </span>
-        </div>
-      </TableCell>
-      
-      <TableCell className="py-1 px-4 office-column">
-        <div className="flex items-center justify-center">
-          {getOfficeDisplay(member.location || 'N/A')}
         </div>
       </TableCell>
       
@@ -90,22 +94,26 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         </div>
       </TableCell>
       
-      <TableCell className="py-1 px-1 text-center number-column font-bold">
-        <div className="table-cell">{formatNumber(allocation.resourcedHours || 0)}</div>
+      <TableCell className="py-1 px-1 capacity-column">
+        <div className="capacity-display">
+          {formatNumber(allocation.resourcedHours || 0)}h
+        </div>
       </TableCell>
       
       <TableCell className="py-1 px-1 number-column">
-        <div className="table-cell">{formatNumber(utilization)}%</div>
+        <div className={`utilization-pill ${utilizationColorClass}`}>
+          {formatNumber(utilization)}%
+        </div>
       </TableCell>
       
-      <TableCell className="py-1 px-1 bg-yellow-100 number-column">
+      <TableCell className="py-1 px-1 number-column leave-column">
         <div className="table-cell">
           <input
             type="number"
             min="0"
             value={allocation.annualLeave}
             onChange={(e) => onInputChange(member.id, 'annualLeave', e.target.value)}
-            className="editable-cell"
+            className="leave-input"
           />
         </div>
       </TableCell>
@@ -114,38 +122,38 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         <div className="table-cell">{allocation.publicHoliday}</div>
       </TableCell>
       
-      <TableCell className="py-1 px-1 number-column">
+      <TableCell className="py-1 px-1 number-column leave-column">
         <div className="table-cell">
           <input
             type="number"
             min="0"
             value={allocation.vacationLeave}
             onChange={(e) => onInputChange(member.id, 'vacationLeave', e.target.value)}
-            className="editable-cell"
+            className="leave-input"
           />
         </div>
       </TableCell>
       
-      <TableCell className="py-1 px-1 number-column">
+      <TableCell className="py-1 px-1 number-column leave-column">
         <div className="table-cell">
           <input
             type="number"
             min="0"
             value={allocation.medicalLeave}
             onChange={(e) => onInputChange(member.id, 'medicalLeave', e.target.value)}
-            className="editable-cell"
+            className="leave-input"
           />
         </div>
       </TableCell>
       
-      <TableCell className="py-1 px-1 number-column">
+      <TableCell className="py-1 px-1 number-column leave-column">
         <div className="table-cell">
           <input
             type="number"
             min="0"
             value={allocation.others}
             onChange={(e) => onInputChange(member.id, 'others', e.target.value)}
-            className="editable-cell"
+            className="leave-input"
           />
         </div>
       </TableCell>
@@ -162,7 +170,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       {projects.map(project => (
         <TableCell key={project.id} className="py-1 px-1 project-hours-column">
           <div className="table-cell">
-            {projectAllocationsMap[project.id] ? formatNumber(projectAllocationsMap[project.id]) : ''}
+            {projectAllocationsMap[project.id] ? `${formatNumber(projectAllocationsMap[project.id])}h` : ''}
           </div>
         </TableCell>
       ))}

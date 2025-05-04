@@ -76,11 +76,12 @@ const WeeklyOverview = () => {
               <div className="max-w-full mx-auto space-y-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2 print:hidden">
                   <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Weekly Overview</h1>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                    <WeeklyActionButtons 
-                      selectedWeek={selectedWeek}
-                      weekLabel={weekLabel}
-                    />
+                </div>
+                
+                {/* New aligned control bar with filters */}
+                <div className="flex flex-wrap gap-4 mb-4 print:hidden">
+                  {/* Week selector in a bordered box */}
+                  <div className="flex border rounded-md p-2 items-center">
                     <WeekSelector 
                       selectedWeek={selectedWeek}
                       onPreviousWeek={handlePreviousWeek}
@@ -88,13 +89,22 @@ const WeeklyOverview = () => {
                       weekLabel={weekLabel}
                     />
                   </div>
-                </div>
-                
-                <div className="filters-container print:hidden">
-                  <WeeklyResourceFilters 
-                    filters={filters}
-                    onFilterChange={handleFilterChange}
-                  />
+                  
+                  {/* Filters in a bordered box */}
+                  <div className="flex-1 max-w-xs border rounded-md p-2">
+                    <WeeklyResourceFilters 
+                      filters={filters}
+                      onFilterChange={handleFilterChange}
+                    />
+                  </div>
+                  
+                  {/* Export button */}
+                  <div className="flex items-center">
+                    <WeeklyActionButtons 
+                      selectedWeek={selectedWeek}
+                      weekLabel={weekLabel}
+                    />
+                  </div>
                 </div>
                 
                 <OfficeSettingsProvider>

@@ -38,6 +38,13 @@ export const TeamMemberRows: React.FC<TeamMemberRowsProps> = ({
             </td>
           </tr>,
           
+          // Office header visible in regular view
+          <tr key={`office-visible-header-${office}`} className="bg-muted/30 print:hidden">
+            <td colSpan={9 + projects.length} className="py-1 px-4 text-left">
+              <div className="text-sm font-semibold">{officeDisplay}</div>
+            </td>
+          </tr>,
+          
           // Regular member rows
           ...members.map((member, memberIndex) => {
             const allocation = getMemberAllocation(member.id);
