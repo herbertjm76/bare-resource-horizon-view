@@ -5,11 +5,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTeamMembersData } from "@/hooks/useTeamMembersData";
 import { Table, TableBody } from "@/components/ui/table";
 import { WeeklyResourceHeader } from './WeeklyResourceHeader';
-import { MemberTableRow } from './MemberTableRow';
 import { useResourceAllocations } from './useResourceAllocations';
 import { useCompany } from "@/context/CompanyContext";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ResourceTableLoadingState } from './components/ResourceTableLoadingState';
+import { ResourceTableErrorState } from './components/ResourceTableErrorState';
+import { EmptyResourceState } from './components/EmptyResourceState';
+import { TeamMemberRows } from './components/TeamMemberRows';
+import { useOfficeMembers } from './hooks/useOfficeMembers';
+import { useOfficeDisplay } from './hooks/useOfficeDisplay';
 import './weekly-overview.css';
 
 interface WeeklyResourceTableProps {
@@ -105,87 +108,30 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     isLoading: isLoadingAllocations,
     error: allocationsError 
   } = useResourceAllocations(allMembers, selectedWeek);
-
-  // Fetch office locations
-  const { data: officeLocations = [], isLoading: isLoadingOffices, error: officesError } = useQuery({
-    queryKey: ['officeLocations', company?.id],
-    queryFn: async () => {
-      if (!company?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('office_locations')
-        .select('id, code, city, country')
-        .eq('company_id', company.id);
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!company?.id
-  });
+  
+  // Get office display helper
+  const { getOfficeDisplay } = useOfficeDisplay();
+  
+  // Get members organized by office
+  const { membersByOffice, filteredOffices } = useOfficeMembers(allMembers, filters);
 
   // Determine overall loading state
   const isLoading = isLoadingSession || isLoadingMembers || isLoadingPending || 
-                    isLoadingAllocations || isLoadingOffices || isLoadingProjects;
+                    isLoadingAllocations || isLoadingProjects;
 
   // Determine if there are any errors
-  const error = teamMembersError || pendingError || allocationsError || officesError;
-
-  // Group team members by office
-  const membersByOffice = React.useMemo(() => {
-    return allMembers.reduce((acc, member) => {
-      const location = member.location || 'Unassigned';
-      if (!acc[location]) {
-        acc[location] = [];
-      }
-      acc[location].push(member);
-      return acc;
-    }, {} as Record<string, typeof allMembers>);
-  }, [allMembers]);
-
-  // Filter by selected office if needed
-  const filteredOffices = React.useMemo(() => {
-    let offices = Object.keys(membersByOffice);
-    
-    if (filters.office !== 'all') {
-      offices = offices.filter(office => office === filters.office);
-    }
-    
-    // Sort offices alphabetically
-    return offices.sort();
-  }, [membersByOffice, filters.office]);
-
-  // Helper function to get office code display name
-  const getOfficeDisplay = React.useCallback((locationCode: string) => {
-    const office = officeLocations.find(o => o.code === locationCode);
-    return office ? `${office.code}` : locationCode;
-  }, [officeLocations]);
+  const error = teamMembersError || pendingError || allocationsError;
 
   if (isLoading) {
-    return (
-      <div className="text-center py-12">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Loading resources...</p>
-      </div>
-    );
+    return <ResourceTableLoadingState />;
   }
 
   if (error) {
-    return (
-      <Alert variant="destructive" className="mb-6">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          {typeof error === 'string' ? error : 'An error occurred while loading data. Please try again later.'}
-        </AlertDescription>
-      </Alert>
-    );
+    return <ResourceTableErrorState error={error} />;
   }
 
   if (!allMembers.length) {
-    return (
-      <div className="text-center py-12 border rounded-lg">
-        <p className="text-muted-foreground mb-2">No team members found. Add team members to see the weekly overview.</p>
-      </div>
-    );
+    return <EmptyResourceState />;
   }
 
   return (
@@ -194,31 +140,17 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
         <Table className="min-w-full text-xs weekly-table">
           <WeeklyResourceHeader />
           <TableBody>
-            {filteredOffices.flatMap((office, officeIndex) => {
-              const members = membersByOffice[office].sort((a, b) => {
-                return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
-              });
-
-              return members.map((member, memberIndex) => {
-                const allocation = getMemberAllocation(member.id);
-                const isEven = memberIndex % 2 === 0;
-                
-                return (
-                  <MemberTableRow
-                    key={member.id}
-                    member={member}
-                    allocation={allocation}
-                    isEven={isEven}
-                    getOfficeDisplay={getOfficeDisplay}
-                    onInputChange={handleInputChange}
-                    projects={projects}
-                  />
-                );
-              });
-            })}
+            <TeamMemberRows 
+              filteredOffices={filteredOffices}
+              membersByOffice={membersByOffice}
+              getMemberAllocation={getMemberAllocation}
+              getOfficeDisplay={getOfficeDisplay}
+              handleInputChange={handleInputChange}
+              projects={projects}
+            />
           </TableBody>
         </Table>
       </div>
     </div>
   );
-}
+};
