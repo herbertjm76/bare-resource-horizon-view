@@ -54,8 +54,8 @@ export function useFetchAllocations() {
       // Fetch project allocations with project details for the selected week
       let projectAllocations = [];
       if (company?.id) {
-        // First try exact date match
-        const { data, error } = await supabase
+        // First try with exact week_start_date match
+        let { data, error } = await supabase
           .from('project_resource_allocations')
           .select(`
             id,
@@ -77,9 +77,11 @@ export function useFetchAllocations() {
           console.log('Allocation count:', projectAllocations.length);
           
           // If no allocations found with exact date match, try a range query
+          // or try with slightly different date formats that might be stored
           if (projectAllocations.length === 0) {
-            console.log('No allocations found with exact date. Trying date range query...');
+            console.log('No allocations found with exact date. Trying alternative queries...');
             
+            // Try a date range query
             const { data: rangeData, error: rangeError } = await supabase
               .from('project_resource_allocations')
               .select(`
@@ -96,50 +98,46 @@ export function useFetchAllocations() {
               
             if (rangeError) {
               console.error('Error in date range query:', rangeError);
-            } else {
-              projectAllocations = rangeData || [];
+            } else if (rangeData && rangeData.length > 0) {
+              projectAllocations = rangeData;
               console.log('Found allocations with date range query:', projectAllocations.length);
-            }
-          }
-          
-          // If still no allocations, get the latest few weeks' data to help debug
-          if (projectAllocations.length === 0) {
-            console.log('No allocations found. Showing latest allocation dates for debugging...');
-            
-            const { data: dateData } = await supabase
-              .from('project_resource_allocations')
-              .select('week_start_date')
-              .eq('company_id', company.id)
-              .order('week_start_date', { ascending: false })
-              .limit(20);
+            } else {
+              // Try to fetch any recent allocation dates to help debug
+              console.log('No allocations found with range query. Checking for recent allocations...');
               
-            // Get unique dates
-            const uniqueDates = [...new Set(dateData?.map(item => item.week_start_date))];
-            console.log('Latest allocation dates in DB:', uniqueDates);
-            
-            // Try to fetch again using the most recent date
-            if (uniqueDates && uniqueDates.length > 0) {
-              const latestDate = uniqueDates[0];
-              console.log(`Trying to fetch with latest date: ${latestDate}`);
-              
-              const { data: latestData, error: latestError } = await supabase
+              const { data: dateData } = await supabase
                 .from('project_resource_allocations')
-                .select(`
-                  id,
-                  resource_id,
-                  hours,
-                  week_start_date,
-                  project:projects(id, name, code)
-                `)
-                .eq('week_start_date', latestDate)
+                .select('week_start_date')
                 .eq('company_id', company.id)
-                .in('resource_id', memberIds);
+                .order('week_start_date', { ascending: false })
+                .limit(10);
                 
-              if (latestError) {
-                console.error('Error fetching with latest date:', latestError);
-              } else {
-                projectAllocations = latestData || [];
-                console.log(`Found ${projectAllocations.length} allocations using latest date: ${latestDate}`);
+              if (dateData && dateData.length > 0) {
+                // Get unique dates for debugging
+                const uniqueDates = [...new Set(dateData.map(item => item.week_start_date))];
+                console.log('Recent allocation dates in DB:', uniqueDates);
+                
+                // Try fetching with the most recent date
+                const latestDate = uniqueDates[0];
+                console.log(`Trying to fetch with most recent date: ${latestDate}`);
+                
+                const { data: latestData } = await supabase
+                  .from('project_resource_allocations')
+                  .select(`
+                    id,
+                    resource_id,
+                    hours,
+                    week_start_date,
+                    project:projects(id, name, code)
+                  `)
+                  .eq('week_start_date', latestDate)
+                  .eq('company_id', company.id)
+                  .in('resource_id', memberIds);
+                  
+                if (latestData && latestData.length > 0) {
+                  projectAllocations = latestData;
+                  console.log(`Found ${projectAllocations.length} allocations using latest date: ${latestDate}`);
+                }
               }
             }
           }
