@@ -1,0 +1,36 @@
+
+/* Annual Leave Calendar Styles */
+.annual-leave-calendar input::-webkit-outer-spin-button,
+.annual-leave-calendar input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.annual-leave-calendar input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Highlight weekend cells */
+.weekend-cell {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Sticky header and first column */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+}
+
+.sticky-column {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background-color: white;
+}
+
+/* Add hover effect on cells */
+.leave-cell:hover {
+  background-color: rgba(0, 0, 0, 0.025);
+}
