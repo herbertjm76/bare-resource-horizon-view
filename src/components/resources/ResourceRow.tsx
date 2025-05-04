@@ -98,16 +98,16 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     : 0;
   
   return (
-    <tr className={`border-b ${rowBgClass} group hover:bg-gray-50 h-7`}>
+    <tr className={`border-b ${rowBgClass} group hover:bg-gray-50 h-6`}>
       {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${rowBgClass} z-10 p-0.5 w-12 group-hover:bg-gray-50`}></td>
+      <td className={`sticky-left-0 ${rowBgClass} z-10 p-0 w-12 group-hover:bg-gray-50`}></td>
       
       {/* Resource info column */}
       <td 
-        className={`sticky-left-12 ${rowBgClass} z-10 p-0.5 group-hover:bg-gray-50`} 
+        className={`sticky-left-12 ${rowBgClass} z-10 p-0 group-hover:bg-gray-50`} 
         style={{ width: '200px', minWidth: '200px' }}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between h-6">
           <div className="flex items-center">
             <div className="ml-5">
               <div className="font-medium text-xs truncate flex items-center gap-1">

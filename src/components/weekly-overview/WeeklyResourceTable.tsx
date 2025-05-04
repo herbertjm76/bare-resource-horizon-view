@@ -151,7 +151,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
       <Alert variant="destructive" className="mb-6">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          {typeof error === 'string' ? error : 'An error occurred while loading data. Please try again later.'}
+          {error instanceof Error ? error.message : 'An error occurred while loading data. Please try again later.'}
         </AlertDescription>
       </Alert>
     );

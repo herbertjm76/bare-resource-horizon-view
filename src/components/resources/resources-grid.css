@@ -52,7 +52,7 @@
   z-index: 20;
   background-color: white;
   box-shadow: 0 1px 0 0 #e5e7eb;
-  height: 48px; /* Increased height for header row */
+  height: 40px; /* Reduced height for header row */
   padding: 0;
 }
 
@@ -130,11 +130,11 @@
 
 /* Make all rows more compact */
 .grid-table-container tr {
-  height: 24px; /* Reduced height for more compact rows */
+  height: 24px; /* Standard compact row height for both collapsed and expanded rows */
 }
 
 .grid-table-container thead tr {
-  height: 48px; /* Increased height for header row to fit rotated text */
+  height: 40px; /* Reduced header row height to match other rows better */
 }
 
 /* Make allocation input more compact */
@@ -166,12 +166,12 @@
   line-height: 1;
 }
 
-/* Fix for project header row height */
+/* Fix for project header row height - make it match the normal row height */
 .project-header-row {
-  height: 28px;
+  height: 24px; /* Match standard row height */
 }
 
 /* Fix for add resource row height */
 .add-resource-row {
-  height: 24px;
+  height: 24px; /* Match standard row height */
 }

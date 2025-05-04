@@ -33,7 +33,7 @@ export const WeekAllocationCell: React.FC<WeekAllocationCellProps> = ({
   
   return (
     <td className="border-b text-center font-medium relative week-allocation-cell" style={{ minWidth: '35px', maxWidth: '35px', padding: 0 }}>
-      <div className="week-allocation-cell-content">
+      <div className="week-allocation-cell-content h-6">
         {/* Milestone/Stage indicator area */}
         <div className="w-full">
           <MilestonePopover
