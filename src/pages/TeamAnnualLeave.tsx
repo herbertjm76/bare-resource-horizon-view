@@ -10,6 +10,7 @@ import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
 import { useAnnualLeave } from '@/hooks/useAnnualLeave';
 import { Skeleton } from '@/components/ui/skeleton';
+import '@/components/annual-leave/annual-leave.css';
 
 const HEADER_HEIGHT = 56;
 
@@ -20,11 +21,11 @@ const TeamAnnualLeave = () => {
   // Fetch team members data
   const { teamMembers, isLoading: isLoadingTeamMembers } = useTeamMembersData(true);
   
-  // Get company context and user role (assuming owner or admin has full access)
-  const { company, userProfile } = useCompany();
+  // Get company context
+  const { company } = useCompany();
   
   // Fetch pre-registered members
-  const { preRegisteredMembers } = useTeamMembersState(company?.id, userProfile?.role);
+  const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
   
   // Fetch annual leave data
   const { leaveData, isLoading: isLoadingLeave, updateLeaveHours } = useAnnualLeave(selectedMonth);

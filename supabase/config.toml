@@ -1,1 +1,48 @@
+
 project_id = "gxebsznewbwtktzqeilg"
+
+[api]
+enabled = true
+port = 54321
+types = "typescript"
+[api.cors]
+enabled = true
+origins = ["*"]
+
+# Add function configurations
+[functions]
+[functions.get_annual_leaves]
+verify_jwt = true
+
+[functions.check_annual_leave_entry]
+verify_jwt = true
+
+[functions.delete_annual_leave]
+verify_jwt = true
+
+[functions.update_annual_leave]
+verify_jwt = true
+
+[functions.create_annual_leave]
+verify_jwt = true
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+port = 54323
+
+[storage]
+file_size_limit = "50MiB"
+
+[auth]
+enabled = true
+port = 54324
+
+[realtime]
+enabled = true
+
+[inbucket]
+enabled = true

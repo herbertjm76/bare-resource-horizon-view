@@ -29,11 +29,12 @@ export const useAnnualLeave = (month: Date) => {
       const monthStr = format(month, 'yyyy-MM');
 
       // Fetch all leaves for the month
+      // We use a raw query since the types don't know about the annual_leaves table yet
       const { data, error } = await supabase
-        .from('annual_leaves')
-        .select('*')
-        .eq('company_id', company.id)
-        .like('date', `${monthStr}%`);
+        .rpc('get_annual_leaves', { 
+          company_id_param: company.id,
+          month_param: monthStr + '%'
+        });
 
       if (error) {
         console.error('Error fetching leave data:', error);
@@ -44,12 +45,14 @@ export const useAnnualLeave = (month: Date) => {
       // Transform data into nested structure by member_id and date
       const formattedData: Record<string, Record<string, number>> = {};
       
-      data?.forEach((leave: LeaveEntry) => {
-        if (!formattedData[leave.member_id]) {
-          formattedData[leave.member_id] = {};
-        }
-        formattedData[leave.member_id][leave.date] = leave.hours;
-      });
+      if (data) {
+        data.forEach((leave: any) => {
+          if (!formattedData[leave.member_id]) {
+            formattedData[leave.member_id] = {};
+          }
+          formattedData[leave.member_id][leave.date] = leave.hours;
+        });
+      }
 
       setLeaveData(formattedData);
     } catch (error) {
@@ -90,37 +93,41 @@ export const useAnnualLeave = (month: Date) => {
         return updated;
       });
 
-      // Check if entry exists
-      const { data: existingData } = await supabase
-        .from('annual_leaves')
-        .select('id')
-        .eq('member_id', memberId)
-        .eq('date', date)
-        .eq('company_id', company.id)
-        .single();
+      // Use a raw query to check if entry exists
+      const { data: existingData, error: checkError } = await supabase
+        .rpc('check_annual_leave_entry', {
+          member_id_param: memberId,
+          date_param: date,
+          company_id_param: company.id
+        });
+
+      if (checkError) {
+        console.error('Error checking leave entry:', checkError);
+        throw checkError;
+      }
 
       if (hours === 0 && existingData?.id) {
         // Delete entry if hours is zero and entry exists
         await supabase
-          .from('annual_leaves')
-          .delete()
-          .eq('id', existingData.id);
+          .rpc('delete_annual_leave', {
+            leave_id_param: existingData.id
+          });
       } else if (hours > 0) {
         if (existingData?.id) {
           // Update existing entry
           await supabase
-            .from('annual_leaves')
-            .update({ hours })
-            .eq('id', existingData.id);
+            .rpc('update_annual_leave', {
+              leave_id_param: existingData.id,
+              hours_param: hours
+            });
         } else {
           // Create new entry
           await supabase
-            .from('annual_leaves')
-            .insert({
-              member_id: memberId,
-              date,
-              hours,
-              company_id: company.id
+            .rpc('create_annual_leave', {
+              member_id_param: memberId,
+              date_param: date,
+              hours_param: hours,
+              company_id_param: company.id
             });
         }
       }
