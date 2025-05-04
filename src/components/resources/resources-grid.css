@@ -20,8 +20,8 @@
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
-.grid-table-container inline-block {
-  min-w-full;
+.grid-table-container .inline-block {
+  min-width: 100%;
 }
 
 /* Scrollbar styling for WebKit browsers */
