@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { addDays, format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
@@ -87,7 +88,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     // Fixed columns: counter (48px) + project name (200px)
     const fixedColumnsWidth = 48 + 200;
     // Week columns: 35px per day (fixed width)
-    const weekColumnsWidth = weeksToShow * 35;
+    const weekColumnsWidth = weeksToShow * 7 * 35; // 7 days per week
     // Add padding to ensure we have enough space
     return fixedColumnsWidth + weekColumnsWidth + 50;
   }, [weeksToShow]);
@@ -110,66 +111,64 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   }
   
   return (
-    <div className="grid-table-outer-container" overflow-x-auto w-full max-w-full>
-      <div className="grid-table-container w-max">
-        <table 
-          className="resource-allocation-table table-fixed w-max"
-          style={{ width: '2600px' }}
-        >
-          <thead>
-            <tr>
-              {/* Resources count column - frozen */}
-              <th className="sticky-left-0 bg-muted/50 z-30 border-b text-center font-medium w-12 shadow-[1px_0_0_0_#e5e7eb]" style={{
-                width: '48px',
-                minWidth: '48px'
-              }}>
-                {/* Empty header for the counter column */}
+    <div className="overflow-x-auto w-full max-w-full">
+      <table 
+        className="resource-allocation-table table-fixed"
+        style={{ width: `${tableWidth}px`, minWidth: '100%' }}
+      >
+        <thead>
+          <tr>
+            {/* Resources count column - frozen */}
+            <th className="sticky-left-0 bg-muted/50 z-30 border-b text-center font-medium w-12 shadow-[1px_0_0_0_#e5e7eb]" style={{
+              width: '48px',
+              minWidth: '48px'
+            }}>
+              {/* Empty header for the counter column */}
+            </th>
+            
+            {/* Project/Resource column - frozen */}
+            <th className="sticky-left-12 bg-muted/50 z-30 border-b text-left font-medium shadow-[1px_0_0_0_#e5e7eb]" style={{
+              width: '200px',
+              minWidth: '200px'
+            }}>
+              Project / Resource
+            </th>
+            
+            {/* Date columns - fixed width columns */}
+            {weeks.map((week, i) => (
+              <th 
+                key={i} 
+                style={{
+                  width: '35px',
+                  minWidth: '35px'
+                }} 
+                className="border-b text-center font-medium"
+              >
+                <div className="date-label">
+                  <span>{week.label}</span>
+                </div>
               </th>
-              
-              {/* Project/Resource column - frozen */}
-              <th className="sticky-left-12 bg-muted/50 z-30 border-b text-left font-medium shadow-[1px_0_0_0_#e5e7eb]" style={{
-                width: '200px',
-                minWidth: '200px'
-              }}>
-                Project / Resource
-              </th>
-              
-              {/* Date columns - fixed width columns */}
-              {weeks.map((week, i) => (
-                <th 
-                  key={i} 
-                  style={{
-                    width: '35px',
-                    minWidth: '35px'
-                  }} 
-                  className="border-b text-center font-medium"
-                >
-                  <div className="date-label">
-                    <span>{week.label}</span>
-                  </div>
-                </th>
-              ))}
-              
-              {/* Blank flexible column */}
-              <th className="border-b text-center font-medium">
-                {/* Empty space to allow horizontal scrolling */}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {projectsWithStageData.map((project, index) => (
-              <ProjectRow 
-                key={project.id} 
-                project={project} 
-                weeks={weeks} 
-                isExpanded={expandedProjects.includes(project.id)} 
-                onToggleExpand={() => toggleProjectExpanded(project.id)} 
-                isEven={index % 2 === 0} 
-              />
             ))}
-          </tbody>
-        </table>
-      </div>
+            
+            {/* Blank flexible column */}
+            <th className="border-b text-center font-medium">
+              {/* Empty space to allow horizontal scrolling */}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {projectsWithStageData.map((project, index) => (
+            <ProjectRow 
+              key={project.id} 
+              project={project} 
+              weeks={weeks} 
+              isExpanded={expandedProjects.includes(project.id)} 
+              onToggleExpand={() => toggleProjectExpanded(project.id)} 
+              isEven={index % 2 === 0} 
+            />
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

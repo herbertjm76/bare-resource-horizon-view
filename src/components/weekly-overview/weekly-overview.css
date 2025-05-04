@@ -1,15 +1,7 @@
 
-/* Weekly overview table styles */
+/* Weekly overview table styles - simplified */
 
-.weekly-table-container {
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-.weekly-table {
-  table-layout: fixed;
-}
-
+/* Column width settings */
 .name-column {
   width: 200px;
   min-width: 200px;
@@ -29,6 +21,12 @@
   text-align: center;
 }
 
+.remarks-column {
+  width: 150px;
+  min-width: 150px;
+}
+
+/* Table cell styling */
 .table-cell {
   display: flex;
   align-items: center;
@@ -43,11 +41,7 @@
   vertical-align: middle;
 }
 
-.remarks-column {
-  width: 150px;
-  min-width: 150px;
-}
-
+/* Project pill styling */
 .project-pill {
   display: inline-flex;
   align-items: center;
@@ -62,6 +56,7 @@
   font-weight: 500;
 }
 
+/* Editable cell styling */
 .editable-cell {
   width: 100%;
   height: 1.5rem;
@@ -77,4 +72,10 @@
 .editable-cell:focus {
   border-color: #e5e7eb;
   background-color: #f9fafb;
+}
+
+/* Table styling */
+.weekly-table {
+  table-layout: fixed;
+  min-width: 100%;
 }

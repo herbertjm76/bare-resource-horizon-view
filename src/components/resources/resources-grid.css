@@ -1,52 +1,8 @@
 
 /* Resource grid table styles - simplified */
-.grid-table-outer-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  border-radius: 0.5rem;
-  display: flex;
-  flex-direction: column;
-}
 
-/* Supply width helpers */
-.grid-table-container {
-  width: 100%;
-  height: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
-  position: relative;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
-}
-
-/* Scrollbar styling for WebKit browsers */
-.grid-table-container::-webkit-scrollbar {
-  height: 8px;
-  width: 8px;
-  display: block;
-}
-
-.grid-table-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.grid-table-container::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 20px;
-}
-
-/* Table structure */
-.resource-allocation-table {
-  border-collapse: separate;
-  border-spacing: 0;
-  width: max-content;
-  min-width: 100%;
-  table-layout: fixed;
-}
-
-/* Z-index for sticky headers */
-.grid-table-container thead th {
+/* Header cells need higher z-index to stay on top */
+thead th {
   position: sticky;
   top: 0;
   z-index: 40;
@@ -57,14 +13,14 @@
 }
 
 /* Frozen left columns */
-.grid-table-container .sticky-left-0 {
+.sticky-left-0 {
   position: sticky;
   left: 0;
   z-index: 30;
   background-color: inherit;
 }
 
-.grid-table-container .sticky-left-12 {
+.sticky-left-12 {
   position: sticky;
   left: 48px;
   z-index: 30;
@@ -72,18 +28,18 @@
 }
 
 /* Header cells need higher z-index to stay on top */
-.grid-table-container thead .sticky-left-0 {
+thead .sticky-left-0 {
   z-index: 50;
   background-color: white;
 }
 
-.grid-table-container thead .sticky-left-12 {
+thead .sticky-left-12 {
   z-index: 50;
   background-color: white;
 }
 
 /* Add shadow for frozen columns to create visual separation */
-.grid-table-container .sticky-left-12::after {
+.sticky-left-12::after {
   content: '';
   position: absolute;
   top: 0;
@@ -95,20 +51,20 @@
 }
 
 /* Hover effect for rows */
-.grid-table-container tbody tr:hover {
+tbody tr:hover {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
 /* Ensure background color persists while scrolling */
-.grid-table-container tr td.sticky-left-0,
-.grid-table-container tr th.sticky-left-0,
-.grid-table-container tr td.sticky-left-12, 
-.grid-table-container tr th.sticky-left-12 {
+tr td.sticky-left-0,
+tr th.sticky-left-0,
+tr td.sticky-left-12, 
+tr th.sticky-left-12 {
   background-color: inherit;
 }
 
 /* Date column header styles - fixed rotation */
-.grid-table-container th .date-label {
+th .date-label {
   width: 100%;
   height: 100%;
   display: flex;
@@ -117,7 +73,7 @@
   padding-bottom: 8px;
 }
 
-.grid-table-container th .date-label span {
+th .date-label span {
   transform: rotate(-90deg);
   transform-origin: center;
   white-space: nowrap;
@@ -127,17 +83,17 @@
 }
 
 /* Consistent vertical alignment for all cells */
-.grid-table-container th,
-.grid-table-container td {
+th,
+td {
   vertical-align: middle;
 }
 
 /* Make all rows more compact */
-.grid-table-container tr {
+tr {
   height: 24px;
 }
 
-.grid-table-container thead tr {
+thead tr {
   height: 48px;
 }
 
@@ -148,26 +104,9 @@
 }
 
 /* Compact cell padding */
-.grid-table-container td,
-.grid-table-container th {
+td,
+th {
   padding: 0;
-}
-
-/* Fix gaps in date bars */
-.week-allocation-cell {
-  padding: 0;
-  height: 100%;
-}
-
-.week-allocation-cell-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.hours-display {
-  padding: 2px 0;
-  line-height: 1;
 }
 
 /* Fix for project header row height */

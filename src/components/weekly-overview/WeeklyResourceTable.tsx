@@ -13,5 +13,9 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   selectedWeek,
   filters
 }) => {
-  return <WeeklyResourceTableContent selectedWeek={selectedWeek} filters={filters} />;
+  return (
+    <div className="border rounded-lg overflow-hidden">
+      <WeeklyResourceTableContent selectedWeek={selectedWeek} filters={filters} />
+    </div>
+  );
 };
