@@ -1,19 +1,20 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { ResourceAllocationGrid } from '@/components/resources/ResourceAllocationGrid';
-import { FilterBar } from '@/components/resources/FilterBar';
 import { format, addWeeks, subWeeks, startOfWeek } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { SearchInput } from '@/components/resources/filters/SearchInput';
+import { FilterPopover } from '@/components/filters/FilterPopover';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FilterBadges } from '@/components/resources/filters/FilterBadges';
 
 const HEADER_HEIGHT = 56;
-const FILTERS_HEIGHT = 126; // Height of filters section including margins
 
 const ProjectResourcing = () => {
   // Get the start of the current week (Monday)
@@ -65,22 +66,29 @@ const ProjectResourcing = () => {
 
   // Format the week label
   const weekLabel = useCallback((date: Date) => {
-    const endOfWeek = addWeeks(date, 0);
     return `Week of ${format(date, 'MMM d, yyyy')}`;
   }, []);
   
   // Extract unique offices, countries, and managers for filters
-  const officeOptions = [...new Set(projects.map(p => p.office?.name).filter(Boolean))];
-  const countryOptions = [...new Set(projects.map(p => p.country).filter(Boolean))];
-  const managers = projects.reduce((acc, project) => {
-    if (project.project_manager && !acc.some(m => m.id === project.project_manager.id)) {
-      acc.push({
-        id: project.project_manager.id,
-        name: `${project.project_manager.first_name || ''} ${project.project_manager.last_name || ''}`.trim()
-      });
-    }
-    return acc;
-  }, [] as Array<{id: string, name: string}>);
+  const officeOptions = useMemo(() => {
+    return [...new Set(projects.map(p => p.office?.name).filter(Boolean))];
+  }, [projects]);
+  
+  const countryOptions = useMemo(() => {
+    return [...new Set(projects.map(p => p.country).filter(Boolean))];
+  }, [projects]);
+  
+  const managers = useMemo(() => {
+    return projects.reduce((acc, project) => {
+      if (project.project_manager && !acc.some(m => m.id === project.project_manager.id)) {
+        acc.push({
+          id: project.project_manager.id,
+          name: `${project.project_manager.first_name || ''} ${project.project_manager.last_name || ''}`.trim()
+        });
+      }
+      return acc;
+    }, [] as Array<{id: string, name: string}>);
+  }, [projects]);
 
   // Week options for the dropdown (excluding 4 weeks)
   const weekOptions = [
@@ -90,6 +98,138 @@ const ProjectResourcing = () => {
     { value: '26', label: '26 Weeks' },
     { value: '52', label: '52 Weeks' },
   ];
+
+  // Calculate active filters count
+  const activeFiltersCount = 
+    (filters.office !== 'all' ? 1 : 0) + 
+    (filters.country !== 'all' ? 1 : 0) + 
+    (filters.manager !== 'all' ? 1 : 0) +
+    (searchTerm ? 1 : 0);
+  
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({
+      office: "all",
+      country: "all",
+      manager: "all",
+      weeksToShow: filters.weeksToShow // Keep the weeks setting
+    });
+    setSearchTerm('');
+  };
+
+  // Render filter content
+  const renderFilterContent = () => {
+    return (
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Office</label>
+          <Select 
+            value={filters.office}
+            onValueChange={(value) => handleFilterChange('office', value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="All Offices" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Offices</SelectItem>
+              {officeOptions.map((office) => (
+                <SelectItem key={office} value={office}>
+                  {office}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Country</label>
+          <Select 
+            value={filters.country}
+            onValueChange={(value) => handleFilterChange('country', value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="All Countries" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Countries</SelectItem>
+              {countryOptions.map((country) => (
+                <SelectItem key={country} value={country}>
+                  {country}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Project Manager</label>
+          <Select 
+            value={filters.manager}
+            onValueChange={(value) => handleFilterChange('manager', value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="All Project Managers" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Project Managers</SelectItem>
+              {managers.map((manager) => (
+                <SelectItem key={manager.id} value={manager.id}>
+                  {manager.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Search</label>
+          <SearchInput 
+            value={searchTerm}
+            onChange={handleSearchChange}
+            placeholder="Search projects..."
+          />
+        </div>
+        
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Weeks to Show</label>
+          <Select
+            value={filters.weeksToShow.toString()}
+            onValueChange={(value) => handleWeeksChange(Number(value))}
+          >
+            {weekOptions.map(option => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
+        
+        {/* Active filter badges */}
+        {activeFiltersCount > 0 && (
+          <div className="mt-4 pt-4 border-t">
+            <FilterBadges 
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              managerOptions={managers}
+              officeOptions={officeOptions}
+              countryOptions={countryOptions}
+            />
+            {searchTerm && (
+              <div className="mt-2 inline-flex items-center bg-muted/40 rounded-full text-xs py-1 pl-3 pr-1.5">
+                <span className="mr-1">Search: {searchTerm}</span>
+                <button 
+                  className="h-5 w-5 p-0 rounded-full inline-flex items-center justify-center hover:bg-muted/60"
+                  onClick={() => setSearchTerm('')}
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <SidebarProvider>
@@ -115,19 +255,6 @@ const ProjectResourcing = () => {
                     onNextWeek={goToNextWeek}
                     weekLabel={weekLabel(selectedWeek)}
                   />
-                  
-                  {/* Weeks dropdown */}
-                  <div className="ml-4">
-                    <select
-                      className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                      value={filters.weeksToShow.toString()}
-                      onChange={(e) => handleWeeksChange(Number(e.target.value))}
-                    >
-                      {weekOptions.map(option => (
-                        <option key={option.value} value={option.value}>{option.label}</option>
-                      ))}
-                    </select>
-                  </div>
                 </div>
                 
                 {/* Search and filter in a bordered box */}
@@ -140,23 +267,12 @@ const ProjectResourcing = () => {
                     />
                   </div>
                   
-                  <FilterBar 
-                    filters={{
-                      office: filters.office,
-                      country: filters.country,
-                      manager: filters.manager
-                    }}
-                    onFilterChange={handleFilterChange}
-                    weeksToShow={filters.weeksToShow}
-                    onWeeksChange={handleWeeksChange}
-                    searchTerm={searchTerm}
-                    onSearchChange={handleSearchChange}
-                    officeOptions={officeOptions}
-                    countryOptions={countryOptions}
-                    managerOptions={managers}
-                    weekOptions={weekOptions}
-                    hideSearchAndWeeksSelector={true} /* Hide these as we've moved them */
-                  />
+                  <FilterPopover
+                    activeFiltersCount={activeFiltersCount}
+                    onClearFilters={clearFilters}
+                  >
+                    {renderFilterContent()}
+                  </FilterPopover>
                 </div>
               </div>
               

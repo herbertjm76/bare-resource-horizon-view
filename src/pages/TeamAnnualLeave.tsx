@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Users, Building, X, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FilterPopover } from '@/components/filters/FilterPopover';
 import '@/components/annual-leave/annual-leave.css';
 
 const HEADER_HEIGHT = 56;
@@ -122,12 +123,132 @@ const TeamAnnualLeave = () => {
   
   const isLoading = isLoadingTeamMembers || isLoadingLeave;
 
-  // State to toggle filter visibility
-  const [showFilters, setShowFilters] = useState<boolean>(false);
+  // Render filter content for the popover
+  const renderFilterContent = () => {
+    return (
+      <>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Filter Type</label>
+            <div className="flex gap-2">
+              <Button
+                variant={activeFilter === 'location' ? 'default' : 'outline'}
+                size="sm"
+                className="h-8 gap-1.5"
+                onClick={() => handleFilterTypeChange('location')}
+              >
+                <Building className="h-3.5 w-3.5" />
+                Location
+              </Button>
+              
+              <Button
+                variant={activeFilter === 'department' ? 'default' : 'outline'}
+                size="sm"
+                className="h-8 gap-1.5"
+                onClick={() => handleFilterTypeChange('department')}
+              >
+                <Users className="h-3.5 w-3.5" />
+                Department
+              </Button>
+            </div>
+          </div>
 
-  // Toggle filter visibility
-  const toggleFilters = () => {
-    setShowFilters(!showFilters);
+          {activeFilter === 'department' && departments.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Department</label>
+              <Select 
+                value={filterValue} 
+                onValueChange={handleFilterValueChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select department" />
+                </SelectTrigger>
+                <SelectContent>
+                  {departments.map(dept => (
+                    <SelectItem key={dept} value={dept}>
+                      {dept}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          
+          {activeFilter === 'location' && locations.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Location</label>
+              <Select 
+                value={filterValue} 
+                onValueChange={handleFilterValueChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  {locations.map(location => (
+                    <SelectItem key={location} value={location}>
+                      {location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Search Members</label>
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name..."
+                className="pl-9 w-full"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+        
+        {/* Active filter badges */}
+        {activeFiltersCount > 0 && (
+          <div className="mt-4 pt-4 border-t flex flex-wrap gap-2">
+            {activeFilter !== 'all' && (
+              <div className="inline-flex items-center bg-muted/40 rounded-full text-xs py-1 pl-3 pr-1.5">
+                <span className="mr-1">
+                  {activeFilter === 'department' ? 'Department: ' : 'Location: '}
+                  {filterValue}
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-5 w-5 p-0 rounded-full"
+                  onClick={() => {
+                    setActiveFilter('all');
+                    setFilterValue('');
+                  }}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+            
+            {searchQuery && (
+              <div className="inline-flex items-center bg-muted/40 rounded-full text-xs py-1 pl-3 pr-1.5">
+                <span className="mr-1">Search: {searchQuery}</span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-5 w-5 p-0 rounded-full"
+                  onClick={() => setSearchQuery('')}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </>
+    );
   };
 
   return (
@@ -154,10 +275,12 @@ const TeamAnnualLeave = () => {
                     onMonthChange={handleMonthChange} 
                   />
                   
-                  <FilterButton 
-                    activeFiltersCount={activeFiltersCount}
-                    onClick={toggleFilters} 
-                  />
+                  <FilterPopover 
+                    activeFiltersCount={activeFiltersCount} 
+                    onClearFilters={clearFilters}
+                  >
+                    {renderFilterContent()}
+                  </FilterPopover>
                 </div>
                 
                 <div className="relative">
@@ -170,80 +293,6 @@ const TeamAnnualLeave = () => {
                   />
                 </div>
               </div>
-              
-              {(activeFiltersCount > 0 || showFilters) && (
-                <div className="bg-muted/20 p-2 rounded-md flex items-center gap-2 flex-wrap">
-                  <div className="text-sm font-medium">Filters:</div>
-                  
-                  <div className="flex gap-2">
-                    <Button
-                      variant={activeFilter === 'location' ? 'default' : 'outline'}
-                      size="sm"
-                      className="h-8 gap-1.5"
-                      onClick={() => handleFilterTypeChange('location')}
-                    >
-                      <Building className="h-3.5 w-3.5" />
-                      Location
-                    </Button>
-                    
-                    <Button
-                      variant={activeFilter === 'department' ? 'default' : 'outline'}
-                      size="sm"
-                      className="h-8 gap-1.5"
-                      onClick={() => handleFilterTypeChange('department')}
-                    >
-                      <Users className="h-3.5 w-3.5" />
-                      Department
-                    </Button>
-                  </div>
-                  
-                  {activeFilter === 'department' && departments.length > 0 && (
-                    <Select 
-                      value={filterValue} 
-                      onValueChange={handleFilterValueChange}
-                    >
-                      <SelectTrigger className="h-8 min-w-[180px]">
-                        <SelectValue placeholder="Select department" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map(dept => (
-                          <SelectItem key={dept} value={dept}>
-                            {dept}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  
-                  {activeFilter === 'location' && locations.length > 0 && (
-                    <Select 
-                      value={filterValue} 
-                      onValueChange={handleFilterValueChange}
-                    >
-                      <SelectTrigger className="h-8 min-w-[180px]">
-                        <SelectValue placeholder="Select location" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {locations.map(location => (
-                          <SelectItem key={location} value={location}>
-                            {location}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                  
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 ml-auto"
-                    onClick={clearFilters}
-                  >
-                    <X className="h-3.5 w-3.5 mr-1" />
-                    Clear
-                  </Button>
-                </div>
-              )}
               
               <div className="border rounded-lg bg-card shadow-sm">
                 {isLoading ? (
