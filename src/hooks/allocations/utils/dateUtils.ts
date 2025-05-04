@@ -5,7 +5,7 @@ import { format, startOfWeek } from 'date-fns';
  * Gets the Monday of the selected week
  */
 export function getWeekStartDate(date: Date): Date {
-  return startOfWeek(date, { weekStartsOn: 1 });
+  return startOfWeek(date, { weekStartsOn: 1 }); // 1 = Monday
 }
 
 /**

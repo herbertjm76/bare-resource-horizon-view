@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
 import { useResourceAllocationsDB } from '@/hooks/allocations';
 import { ResourceUtilizationBadge } from './components/ResourceUtilizationBadge';
+import { getWeekStartDate } from '@/hooks/allocations/utils/dateUtils';
+import { format } from 'date-fns';
 
 interface ResourceRowProps {
   resource: {
@@ -85,7 +87,9 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
   };
   
   const getWeekKey = (startDate: Date) => {
-    return startDate.toISOString().split('T')[0];
+    // Ensure we're using Monday as the week start date
+    const mondayDate = getWeekStartDate(startDate);
+    return format(mondayDate, 'yyyy-MM-dd');
   };
 
   // Calculate total allocated hours across all weeks
