@@ -14,7 +14,7 @@ interface TeamMember {
   email: string;
   location: string | null;
   weekly_capacity?: number;
-  isPending: boolean; // Ensure isPending is required
+  isPending?: boolean; // Add the isPending property
 }
 
 export function useWeeklyResourceData(selectedWeek: Date, filters: { office: string }) {
@@ -68,7 +68,7 @@ export function useWeeklyResourceData(selectedWeek: Date, filters: { office: str
   });
 
   // Get all members combined (active + pre-registered)
-  const allMembers: TeamMember[] = useMemo(() => {
+  const allMembers = useMemo(() => {
     // Make sure to add isPending=false to regular team members
     const activeMembers = (teamMembers || []).map(member => ({
       ...member,
@@ -117,7 +117,7 @@ export function useWeeklyResourceData(selectedWeek: Date, filters: { office: str
       }
       acc[location].push(member);
       return acc;
-    }, {} as Record<string, TeamMember[]>);
+    }, {} as Record<string, typeof allMembers>);
   }, [allMembers]);
 
   // Filter by selected office if needed

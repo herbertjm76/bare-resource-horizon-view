@@ -1,23 +1,19 @@
 
 /* Weekly Resource Table Styles */
 .resource-table-container {
-  display: flex;
-  flex-direction: column;
   border-radius: 0.5rem;
   overflow: hidden;
   height: 100%;
-  width: 100%;
 }
 
 .resource-table-scroll {
-  width: 100%;
   overflow: auto;
 }
 
 .resource-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
 /* Header styling */
@@ -33,13 +29,11 @@
   text-align: left;
   font-weight: 600;
   color: hsl(var(--muted-foreground));
-  white-space: nowrap;
 }
 
 .resource-table td {
   padding: 0.5rem 1rem;
   vertical-align: middle;
-  border-bottom: 1px solid hsl(var(--border) / 0.3);
 }
 
 /* Frozen columns */
@@ -57,7 +51,7 @@
   left: 200px; /* Width of the first column */
   z-index: 5;
   background-color: inherit;
-  width: 80px;
+  width: 60px;
   text-align: center;
 }
 
@@ -66,12 +60,6 @@ thead .column-name,
 thead .column-office {
   z-index: 15;
   background-color: hsl(var(--muted) / 0.5);
-  box-shadow: 1px 0 0 0 hsl(var(--border) / 0.3);
-}
-
-tbody .column-name,
-tbody .column-office {
-  background-color: hsl(var(--background));
 }
 
 /* Alternating row colors */
@@ -79,16 +67,10 @@ tbody .column-office {
   background-color: hsl(var(--muted) / 0.1);
 }
 
-.resource-table tbody tr:nth-child(even) .column-name,
-.resource-table tbody tr:nth-child(even) .column-office {
-  background-color: hsl(var(--muted) / 0.1);
-}
-
 /* Fixed width columns */
 .column-numeric {
-  width: 60px;
+  width: 50px;
   text-align: center;
-  white-space: nowrap;
 }
 
 .column-numeric input {
