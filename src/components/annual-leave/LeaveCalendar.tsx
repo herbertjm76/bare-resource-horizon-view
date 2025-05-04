@@ -41,17 +41,17 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
     return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
   
-  // Custom day formatter for minimal day representation
+  // Custom day formatter for minimal day representation with unique identifiers
   const getMinimalDayLabel = (day: Date): string => {
     const dayOfWeek = day.getDay();
     switch(dayOfWeek) {
-      case 0: return 'S';
+      case 0: return 'Su'; // Changed from 'S' to 'Su' for Sunday
       case 1: return 'M';
-      case 2: return 'T';
+      case 2: return 'Tu'; // Changed from 'T' to 'Tu' for Tuesday
       case 3: return 'W';
       case 4: return 'Th';
       case 5: return 'F';
-      case 6: return 'S';
+      case 6: return 'Sa'; // Changed from 'S' to 'Sa' for Saturday
       default: return '';
     }
   };
@@ -61,6 +61,11 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
     if (!hours) return '';
     if (hours > 0) return 'bg-brand-violet-light font-medium';
     return '';
+  };
+  
+  // Helper to check if the cell should have a thick border (Sunday-Monday separator)
+  const isSundayBorder = (day: Date): boolean => {
+    return day.getDay() === 0; // Sunday
   };
   
   return (
@@ -73,11 +78,12 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
               const isWeekend = day.getDay() === 0 || day.getDay() === 6;
               const dayNumber = format(day, 'd');
               const dayLabel = getMinimalDayLabel(day);
+              const isSundayCol = isSundayBorder(day);
               
               return (
                 <TableHead 
                   key={day.toString()} 
-                  className={`p-0 text-center w-8 ${isWeekend ? 'bg-muted/60' : ''} ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''}`}
+                  className={`p-0 text-center w-8 ${isWeekend ? 'bg-muted/60' : ''} ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''} ${isSundayCol ? 'sunday-border' : ''}`}
                   aria-label={format(day, 'EEEE')}
                 >
                   <div className="flex flex-col items-center text-xs py-1 px-2">
@@ -93,22 +99,23 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
           {sortedMembers.map((member, rowIndex) => (
             <TableRow 
               key={member.id}
-              className={rowIndex % 2 === 0 ? 'bg-muted/20' : ''}
             >
               <TableCell className="whitespace-nowrap font-medium sticky left-0 z-10 p-1.5 border-r" 
-                style={{ backgroundColor: rowIndex % 2 === 0 ? 'rgba(0,0,0,0.07)' : 'var(--background)' }}>
+                style={{ backgroundColor: rowIndex % 2 === 0 ? 'white' : 'rgba(0,0,0,0.07)' }}>
                 {getMemberName(member)}
               </TableCell>
               {daysInMonth.map(day => {
                 const dateKey = format(day, 'yyyy-MM-dd');
                 const isWeekend = day.getDay() === 0 || day.getDay() === 6;
                 const hours = leaveData[member.id]?.[dateKey];
+                const isSundayCol = isSundayBorder(day);
                 
                 return (
                   <TableCell 
                     key={`${member.id}-${dateKey}`} 
                     className={`p-0 text-center leave-cell ${isWeekend ? 'bg-muted/60' : ''} 
                       ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''} 
+                      ${isSundayCol ? 'sunday-border' : ''}
                       ${getCellStyle(hours)}`}
                   >
                     <Input 

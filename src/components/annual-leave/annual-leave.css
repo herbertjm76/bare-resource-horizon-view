@@ -47,6 +47,12 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+/* Sunday-Monday separator (thick border) */
+.annual-leave-calendar th.sunday-border,
+.annual-leave-calendar td.sunday-border {
+  border-right: 2px solid rgba(0, 0, 0, 0.2);
+}
+
 /* Row hover effect */
 .annual-leave-calendar tbody tr:hover {
   background-color: rgba(111, 75, 246, 0.05) !important;
@@ -74,7 +80,7 @@
 }
 
 /* Alternating row colors that work with sticky column - IMPROVED CONTRAST */
-.annual-leave-calendar tr:nth-child(even) td:not(.sticky) {
+.annual-leave-calendar tr:nth-child(even) {
   background-color: rgba(0, 0, 0, 0.07);
 }
 
@@ -82,4 +88,3 @@
 .annual-leave-calendar input {
   transition: color 0.2s ease, background-color 0.2s ease;
 }
-

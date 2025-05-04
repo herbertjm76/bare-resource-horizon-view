@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
@@ -12,7 +12,9 @@ import { useAnnualLeave } from '@/hooks/useAnnualLeave';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FilterButton } from '@/components/resources/filters/FilterButton';
 import { Button } from '@/components/ui/button';
-import { Users, Building, X } from 'lucide-react';
+import { Users, Building, X, Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import '@/components/annual-leave/annual-leave.css';
 
 const HEADER_HEIGHT = 56;
@@ -26,6 +28,7 @@ const TeamAnnualLeave = () => {
   // State for active filters
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [filterValue, setFilterValue] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   
   // Fetch team members data
   const { teamMembers, isLoading: isLoadingTeamMembers } = useTeamMembersData(true);
@@ -42,6 +45,45 @@ const TeamAnnualLeave = () => {
   // Combine active and pre-registered members
   const allMembers = [...teamMembers, ...preRegisteredMembers];
   
+  // Get unique departments and offices for filters
+  const departments = useMemo(() => {
+    const depts = new Set<string>();
+    allMembers.forEach(member => {
+      if (member.department) depts.add(member.department);
+    });
+    return Array.from(depts).sort();
+  }, [allMembers]);
+  
+  const offices = useMemo(() => {
+    const offs = new Set<string>();
+    allMembers.forEach(member => {
+      if (member.office) offs.add(member.office);
+    });
+    return Array.from(offs).sort();
+  }, [allMembers]);
+  
+  // Filter members based on active filters and search query
+  const filteredMembers = useMemo(() => {
+    return allMembers.filter(member => {
+      // Filter by search query
+      if (searchQuery) {
+        const memberName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
+        if (!memberName.includes(searchQuery.toLowerCase())) {
+          return false;
+        }
+      }
+      
+      // Apply department/office filter if active
+      if (activeFilter === 'department' && filterValue) {
+        return member.department === filterValue;
+      } else if (activeFilter === 'office' && filterValue) {
+        return member.office === filterValue;
+      }
+      
+      return true;
+    });
+  }, [allMembers, activeFilter, filterValue, searchQuery]);
+  
   // Handle month change
   const handleMonthChange = (newMonth: Date) => {
     setSelectedMonth(newMonth);
@@ -53,20 +95,29 @@ const TeamAnnualLeave = () => {
   };
   
   // Calculate active filters count for filter button
-  const activeFiltersCount = activeFilter === 'all' ? 0 : 1;
+  const activeFiltersCount = (activeFilter === 'all' ? 0 : 1) + (searchQuery ? 1 : 0);
   
   // Handle filter changes
-  const handleFilterChange = (type: FilterType) => {
-    setActiveFilter(type === activeFilter ? 'all' : type);
-    if (type === 'all') {
+  const handleFilterTypeChange = (type: FilterType) => {
+    if (type === activeFilter) {
+      setActiveFilter('all');
       setFilterValue('');
+    } else {
+      setActiveFilter(type);
+      setFilterValue(''); // Reset filter value when changing type
     }
+  };
+  
+  // Handle filter value change
+  const handleFilterValueChange = (value: string) => {
+    setFilterValue(value);
   };
   
   // Clear all filters
   const clearFilters = () => {
     setActiveFilter('all');
     setFilterValue('');
+    setSearchQuery('');
   };
   
   const isLoading = isLoadingTeamMembers || isLoadingLeave;
@@ -88,7 +139,7 @@ const TeamAnnualLeave = () => {
                 <p>Enter the number of leave hours for each day. Empty cells count as 0 hours.</p>
               </div>
               
-              <div className="flex flex-row justify-between items-center gap-4">
+              <div className="flex flex-row justify-between items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
                   <MonthSelector 
                     selectedMonth={selectedMonth} 
@@ -98,6 +149,16 @@ const TeamAnnualLeave = () => {
                   <FilterButton 
                     activeFiltersCount={activeFiltersCount}
                     onClick={() => {}} // Empty function as we're using inline filters
+                  />
+                </div>
+                
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search members..."
+                    className="pl-9 w-full md:w-[200px]"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
               </div>
@@ -111,7 +172,7 @@ const TeamAnnualLeave = () => {
                       variant={activeFilter === 'office' ? 'default' : 'outline'}
                       size="sm"
                       className="h-8 gap-1.5"
-                      onClick={() => handleFilterChange('office')}
+                      onClick={() => handleFilterTypeChange('office')}
                     >
                       <Building className="h-3.5 w-3.5" />
                       Office
@@ -121,12 +182,48 @@ const TeamAnnualLeave = () => {
                       variant={activeFilter === 'department' ? 'default' : 'outline'}
                       size="sm"
                       className="h-8 gap-1.5"
-                      onClick={() => handleFilterChange('department')}
+                      onClick={() => handleFilterTypeChange('department')}
                     >
                       <Users className="h-3.5 w-3.5" />
                       Department
                     </Button>
                   </div>
+                  
+                  {activeFilter === 'department' && departments.length > 0 && (
+                    <Select 
+                      value={filterValue} 
+                      onValueChange={handleFilterValueChange}
+                    >
+                      <SelectTrigger className="h-8 min-w-[180px]">
+                        <SelectValue placeholder="Select department" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {departments.map(dept => (
+                          <SelectItem key={dept} value={dept}>
+                            {dept}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  
+                  {activeFilter === 'office' && offices.length > 0 && (
+                    <Select 
+                      value={filterValue} 
+                      onValueChange={handleFilterValueChange}
+                    >
+                      <SelectTrigger className="h-8 min-w-[180px]">
+                        <SelectValue placeholder="Select office" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {offices.map(office => (
+                          <SelectItem key={office} value={office}>
+                            {office}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                   
                   <Button
                     variant="outline"
@@ -150,7 +247,7 @@ const TeamAnnualLeave = () => {
                   </div>
                 ) : (
                   <LeaveCalendar 
-                    members={allMembers}
+                    members={filteredMembers}
                     selectedMonth={selectedMonth}
                     leaveData={leaveData}
                     onLeaveChange={handleLeaveChange}
