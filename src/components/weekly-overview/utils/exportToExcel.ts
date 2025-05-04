@@ -1,7 +1,7 @@
 
 import { utils, write } from 'xlsx';
 import { formatWeekKey } from '../utils';
-import { saveAs } from 'file-saver';
+import FileSaver from 'file-saver';
 
 /**
  * Get all team members and their allocations from the table
@@ -94,16 +94,11 @@ export const exportToExcel = async (selectedWeek: Date, weekLabel: string): Prom
       const fileName = `Weekly_Overview_${weekStart}.xlsx`;
       
       // Generate binary string and create Blob
-      const wbout = write(wb, { bookType: 'xlsx', type: 'binary' });
-      const buf = new ArrayBuffer(wbout.length);
-      const view = new Uint8Array(buf);
-      for (let i = 0; i < wbout.length; i++) {
-        view[i] = wbout.charCodeAt(i) & 0xFF;
-      }
+      const wbout = write(wb, { bookType: 'xlsx', type: 'array' });
       
       // Create Blob and save file
-      const blob = new Blob([buf], { type: 'application/octet-stream' });
-      saveAs(blob, fileName);
+      const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      FileSaver.saveAs(blob, fileName);
       
       resolve();
     } catch (error) {
