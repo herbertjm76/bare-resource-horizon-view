@@ -56,13 +56,15 @@ const TeamAnnualLeave = () => {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="mx-auto space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex flex-row justify-between items-center gap-4">
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Annual Leave</h1>
                 
-                <MonthSelector 
-                  selectedMonth={selectedMonth} 
-                  onMonthChange={handleMonthChange} 
-                />
+                <div className="flex items-center gap-2">
+                  <MonthSelector 
+                    selectedMonth={selectedMonth} 
+                    onMonthChange={handleMonthChange} 
+                  />
+                </div>
               </div>
               
               <div className="border rounded-lg bg-card shadow-sm">

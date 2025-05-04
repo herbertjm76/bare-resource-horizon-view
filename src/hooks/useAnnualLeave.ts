@@ -28,13 +28,13 @@ export const useAnnualLeave = (month: Date) => {
       // Format month for query: YYYY-MM
       const monthStr = format(month, 'yyyy-MM');
 
-      // Fetch all leaves for the month
-      // We use a raw query since the types don't know about the annual_leaves table yet
-      const { data, error } = await supabase
-        .rpc('get_annual_leaves', { 
+      // Fetch all leaves for the month using the edge function
+      const { data, error } = await supabase.functions.invoke('get_annual_leaves', {
+        body: { 
           company_id_param: company.id,
           month_param: monthStr + '%'
-        });
+        }
+      });
 
       if (error) {
         console.error('Error fetching leave data:', error);
@@ -93,13 +93,14 @@ export const useAnnualLeave = (month: Date) => {
         return updated;
       });
 
-      // Use a raw query to check if entry exists
-      const { data: existingData, error: checkError } = await supabase
-        .rpc('check_annual_leave_entry', {
+      // Use the edge function to check if entry exists
+      const { data: existingData, error: checkError } = await supabase.functions.invoke('check_annual_leave_entry', {
+        body: {
           member_id_param: memberId,
           date_param: date,
           company_id_param: company.id
-        });
+        }
+      });
 
       if (checkError) {
         console.error('Error checking leave entry:', checkError);
@@ -108,27 +109,30 @@ export const useAnnualLeave = (month: Date) => {
 
       if (hours === 0 && existingData?.id) {
         // Delete entry if hours is zero and entry exists
-        await supabase
-          .rpc('delete_annual_leave', {
+        await supabase.functions.invoke('delete_annual_leave', {
+          body: {
             leave_id_param: existingData.id
-          });
+          }
+        });
       } else if (hours > 0) {
         if (existingData?.id) {
           // Update existing entry
-          await supabase
-            .rpc('update_annual_leave', {
+          await supabase.functions.invoke('update_annual_leave', {
+            body: {
               leave_id_param: existingData.id,
               hours_param: hours
-            });
+            }
+          });
         } else {
           // Create new entry
-          await supabase
-            .rpc('create_annual_leave', {
+          await supabase.functions.invoke('create_annual_leave', {
+            body: {
               member_id_param: memberId,
               date_param: date,
               hours_param: hours,
               company_id_param: company.id
-            });
+            }
+          });
         }
       }
     } catch (error) {
