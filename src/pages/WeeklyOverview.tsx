@@ -3,11 +3,9 @@ import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
-import { WeeklyResourceTable } from '@/components/weekly-overview/WeeklyResourceTable';
 import { WeeklyResourceFilters } from '@/components/weekly-overview/WeeklyResourceFilters';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
-import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
@@ -81,13 +79,10 @@ const WeeklyOverview = () => {
                 />
                 
                 <Card className="shadow-sm">
-                  <CardContent className="p-0">
-                    <OfficeSettingsProvider>
-                      <WeeklyResourceTable 
-                        selectedWeek={selectedWeek} 
-                        filters={filters}
-                      />
-                    </OfficeSettingsProvider>
+                  <CardContent className="p-6">
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">Resource table has been removed and will be reimplemented.</p>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
