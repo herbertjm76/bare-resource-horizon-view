@@ -24,6 +24,11 @@ export interface MemberAllocation {
   remarks: string;
   projects: string[];
   resourcedHours: number;
+  projectAllocations?: Array<{
+    projectName: string;
+    projectId: string;
+    hours: number;
+  }>;
 }
 
 export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: Date) {
@@ -89,10 +94,20 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
           0
         );
         
-        // Get project names
+        // Get project names and detailed allocations
         const projectNames = memberProjects
           .filter(p => p.project?.name)
           .map(p => p.project.name);
+          
+        // Create detailed project allocations array
+        const detailedProjectAllocations = memberProjects
+          .filter(p => p.project?.name)
+          .map(p => ({
+            projectName: p.project.name,
+            projectId: p.project.id,
+            hours: Number(p.hours) || 0
+          }))
+          .sort((a, b) => b.hours - a.hours); // Sort by hours descending
         
         // For demo purposes - generate some random data for non-project time
         initialAllocations[member.id] = {
@@ -104,6 +119,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
           others: 0,
           remarks: '',
           projects: [...new Set(projectNames)], // Remove duplicates
+          projectAllocations: detailedProjectAllocations,
           resourcedHours,
         };
       }
@@ -136,6 +152,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
         others: 0,
         remarks: '',
         projects: [],
+        projectAllocations: [],
         resourcedHours: 0,
       };
     }
@@ -144,7 +161,9 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
 
   // Handle input changes for editable fields
   const handleInputChange = (memberId: string, field: keyof MemberAllocation, value: any) => {
-    const numValue = field !== 'remarks' && field !== 'projects' ? parseFloat(value) || 0 : value;
+    const numValue = field !== 'remarks' && field !== 'projects' && field !== 'projectAllocations' 
+      ? parseFloat(value) || 0 
+      : value;
     
     // Update local state for immediate UI feedback
     setMemberAllocations(prev => ({

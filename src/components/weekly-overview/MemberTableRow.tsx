@@ -20,6 +20,10 @@ interface MemberAllocation {
   remarks: string;
   projects: string[];
   resourcedHours: number;
+  projectAllocations?: Array<{
+    projectName: string;
+    hours: number;
+  }>;
 }
 
 interface MemberTableRowProps {
@@ -49,6 +53,13 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   
   // Calculate utilization based on member's specific capacity
   const utilization = calculateUtilization(allocation.resourcedHours, weeklyCapacity);
+  
+  // Default project allocations if not provided
+  const projectAllocations = allocation.projectAllocations || 
+    allocation.projects.map((name, index) => ({
+      projectName: name,
+      hours: Math.round((allocation.resourcedHours / allocation.projects.length) * 10) / 10
+    }));
   
   return (
     <TableRow className={isEven ? "bg-muted/10" : ""}>
@@ -159,6 +170,25 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
           onChange={(e) => onInputChange(member.id, 'remarks', e.target.value)}
           className="min-h-0 h-6 p-1 text-xs resize-none"
         />
+      </TableCell>
+      
+      <TableCell className="py-1 px-4 projects-column">
+        <div className="flex flex-col gap-1 text-xs">
+          {projectAllocations.length > 0 ? (
+            projectAllocations.map((project, idx) => (
+              <div key={idx} className="flex justify-between items-center py-0.5">
+                <span className="font-medium truncate max-w-[120px]" title={project.projectName}>
+                  {project.projectName}
+                </span>
+                <span className="ml-2 bg-muted/60 px-2 py-0.5 rounded font-mono">
+                  {formatNumber(project.hours)}h
+                </span>
+              </div>
+            ))
+          ) : (
+            <span className="text-muted-foreground italic">No projects assigned</span>
+          )}
+        </div>
       </TableCell>
     </TableRow>
   );

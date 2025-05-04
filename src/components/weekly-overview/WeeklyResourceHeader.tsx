@@ -114,6 +114,10 @@ export const WeeklyResourceHeader: React.FC = () => {
         <TableHead className="py-2 px-4 remarks-column">
           <div className="font-medium">Remarks</div>
         </TableHead>
+        
+        <TableHead className="py-2 px-4 projects-column">
+          <div className="font-medium">Project Allocations</div>
+        </TableHead>
       </TableRow>
     </TableHeader>
   );
