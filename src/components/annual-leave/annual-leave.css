@@ -47,10 +47,12 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+/* Row hover effect */
 .annual-leave-calendar tbody tr:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: rgba(111, 75, 246, 0.05) !important;
 }
 
+/* Focus and hover effects */
 .annual-leave-calendar tbody td:focus-within {
   background-color: rgba(111, 75, 246, 0.05);
 }
@@ -59,4 +61,24 @@
   box-shadow: none;
   outline: 2px solid rgba(111, 75, 246, 0.5);
   border-radius: 3px;
+}
+
+/* Cell with hours styling */
+.annual-leave-calendar td.bg-brand-violet-light {
+  transition: background-color 0.2s ease;
+}
+
+/* Improved header styling */
+.annual-leave-calendar thead th {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Alternating row colors that work with sticky column */
+.annual-leave-calendar tr:nth-child(even) td:not(.sticky) {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Transition effect when adding hours */
+.annual-leave-calendar input {
+  transition: color 0.2s ease, background-color 0.2s ease;
 }

@@ -55,6 +55,13 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
       default: return '';
     }
   };
+
+  // Helper to determine cell styling based on hours value
+  const getCellStyle = (hours: number | undefined) => {
+    if (!hours) return '';
+    if (hours > 0) return 'bg-brand-violet-light font-medium';
+    return '';
+  };
   
   return (
     <div className="overflow-x-auto annual-leave-calendar">
@@ -70,12 +77,12 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
               return (
                 <TableHead 
                   key={day.toString()} 
-                  className={`p-0 text-center w-8 ${isWeekend ? 'bg-muted/30' : ''} ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''}`}
+                  className={`p-0 text-center w-8 ${isWeekend ? 'bg-muted/50' : ''} ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''}`}
                   aria-label={format(day, 'EEEE')}
                 >
                   <div className="flex flex-col items-center text-xs py-1 px-2">
-                    <span className="text-muted-foreground">{dayLabel}</span>
-                    <span className="font-medium">{dayNumber}</span>
+                    <span className={`text-muted-foreground ${isWeekend ? 'font-medium' : ''}`}>{dayLabel}</span>
+                    <span className={`${isWeekend ? 'font-bold' : 'font-medium'}`}>{dayNumber}</span>
                   </div>
                 </TableHead>
               );
@@ -86,27 +93,34 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
           {sortedMembers.map((member, rowIndex) => (
             <TableRow 
               key={member.id}
-              className={rowIndex % 2 === 0 ? 'bg-muted/5' : ''}
+              className={rowIndex % 2 === 0 ? 'bg-muted/10' : ''}
             >
-              <TableCell className="whitespace-nowrap font-medium sticky left-0 bg-background z-10 p-1.5 border-r">
+              <TableCell className="whitespace-nowrap font-medium sticky left-0 z-10 p-1.5 border-r" 
+                style={{ backgroundColor: rowIndex % 2 === 0 ? 'rgba(0,0,0,0.03)' : 'var(--background)' }}>
                 {getMemberName(member)}
               </TableCell>
               {daysInMonth.map(day => {
                 const dateKey = format(day, 'yyyy-MM-dd');
                 const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+                const hours = leaveData[member.id]?.[dateKey];
+                
                 return (
                   <TableCell 
                     key={`${member.id}-${dateKey}`} 
-                    className={`p-0 text-center ${isWeekend ? 'bg-muted/30' : ''} ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''}`}
+                    className={`p-0 text-center leave-cell ${isWeekend ? 'bg-muted/50' : ''} 
+                      ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''} 
+                      ${getCellStyle(hours)}`}
                   >
                     <Input 
                       type="number" 
                       min="0" 
                       max="24" 
-                      value={leaveData[member.id]?.[dateKey] || ''} 
+                      value={hours || ''} 
                       onChange={e => handleInputChange(member.id, dateKey, e.target.value)} 
                       placeholder="0" 
-                      className="h-7 w-7 p-0 text-center border-0 hover:border hover:border-input focus:border focus:border-input rounded-sm" 
+                      className={`h-7 w-7 p-0 text-center border-0 hover:border hover:border-input 
+                        focus:border focus:border-input rounded-sm 
+                        ${hours > 0 ? 'font-medium text-brand-primary' : 'text-gray-250'}`} 
                     />
                   </TableCell>
                 );
