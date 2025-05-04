@@ -27,7 +27,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   return (
     <>
       {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${headerBgClass} z-10 p-0 w-12 text-center`}>
+      <td className={`sticky-left-0 ${headerBgClass} z-10 p-1 w-12 text-center`}>
         <button 
           onClick={onToggleExpand} 
           className="rounded-full p-1 hover:bg-white/30 transition-colors"
@@ -42,37 +42,36 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
       
       {/* Fixed project name column */}
       <td 
-        className={`sticky-left-12 ${headerBgClass} z-10 p-0 font-medium`}
+        className={`sticky-left-12 ${headerBgClass} z-10 p-1 font-medium`}
         style={{ width: '200px', minWidth: '200px' }}
       >
-        <div className="flex items-center h-6">
-          <div className="truncate">
-            <div className="text-xs font-medium truncate">{project.name || 'Untitled Project'}</div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <div className="flex items-center">
-                <Users className="h-3 w-3 mr-0.5" />
-                <span>{resourceCount}</span>
-              </div>
-              
-              {totalHours > 0 && (
-                <div className="flex items-center ml-1">
-                  <Clock className="h-3 w-3 mr-0.5" />
-                  <span>{totalHours}h</span>
-                </div>
-              )}
-              
-              {hasFeesSet ? (
-                <ResourceUtilizationBadge utilization={75} size="xs" />
-              ) : (
-                <div className="flex items-center ml-1">
-                  <DollarSign className="h-3 w-3 mr-0.5" />
-                  <span className="text-[10px]">Not set</span>
-                </div>
-              )}
+        <div className="flex flex-col">
+          <div className="text-sm font-medium line-clamp-1 mb-0.5">{project.name || 'Untitled Project'}</div>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-0.5">
+              <Users className="h-3 w-3" />
+              <span>{resourceCount}</span>
             </div>
+            
+            {totalHours > 0 && (
+              <div className="flex items-center gap-0.5">
+                <Clock className="h-3 w-3" />
+                <span>{totalHours}h</span>
+              </div>
+            )}
+            
+            {hasFeesSet ? (
+              <ResourceUtilizationBadge utilization={75} size="xs" />
+            ) : (
+              <div className="flex items-center gap-0.5">
+                <DollarSign className="h-3 w-3" />
+                <span className="text-[10px]">Not set</span>
+              </div>
+            )}
           </div>
         </div>
       </td>
     </>
   );
 };
+

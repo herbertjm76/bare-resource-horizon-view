@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/dialogs/AddResourceDialog';
@@ -78,7 +79,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
 
   if ((isLoading || isLoadingAllocations) && isExpanded) {
     return (
-      <tr className={`border-t border-b border-gray-200 ${headerBgClass} h-6`}>
+      <tr className={`border-t border-b border-gray-200 ${headerBgClass} h-8`}>
         <ProjectHeader
           project={project}
           resourceCount={0}
@@ -100,7 +101,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   }
 
   return <>
-      <tr className={`border-t border-b border-gray-200 ${headerBgClass} h-6`}>
+      <tr className={`border-t border-b border-gray-200 ${headerBgClass} h-10`}>
         <ProjectHeader
           project={project}
           resourceCount={resources.length}
@@ -152,14 +153,12 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
       ))}
       
       {/* Add resource row when project is expanded */}
-      {isExpanded && (
-        <AddResourceRow
-          isExpanded={isExpanded}
-          rowBgClass={rowBgClass}
-          weeksCount={weeks.length}
-          onAddResource={() => setShowAddResource(true)}
-        />
-      )}
+      <AddResourceRow
+        isExpanded={isExpanded}
+        rowBgClass={rowBgClass}
+        weeksCount={weeks.length}
+        onAddResource={() => setShowAddResource(true)}
+      />
       
       {showAddResource && (
         <AddResourceDialog 

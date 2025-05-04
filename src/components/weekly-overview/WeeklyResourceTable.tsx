@@ -1,200 +1,200 @@
 
-import React from 'react';
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useTeamMembersData } from "@/hooks/useTeamMembersData";
-import { Table, TableBody } from "@/components/ui/table";
-import { WeeklyResourceHeader } from './WeeklyResourceHeader';
-import { MemberTableRow } from './MemberTableRow';
-import { useResourceAllocations } from './useResourceAllocations';
-import { useCompany } from "@/context/CompanyContext";
-import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import './weekly-overview.css';
+import React, { useState } from 'react';
+import { format, isSameMonth } from 'date-fns';
+import { useWeeklyResourceData } from './hooks/useWeeklyResourceData';
+import './weekly-resource-table.css';
+import { toast } from 'sonner';
+import { Card } from '../ui/card';
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  office?: string;
+  isPending?: boolean;
+  allocations?: Record<string, number | { projectId: string, hours: number }>;
+}
 
 interface WeeklyResourceTableProps {
   selectedWeek: Date;
   filters: {
     office: string;
+    [key: string]: string;
   };
 }
 
 export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   selectedWeek,
-  filters
+  filters,
 }) => {
-  // Get company context
-  const { company } = useCompany();
-  
-  // Get current user ID
-  const { data: session, isLoading: isLoadingSession } = useQuery({
-    queryKey: ['session'],
-    queryFn: async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      return data.session;
-    }
-  });
-  
-  // Get team members data using the hook - pass true to include inactive members
-  const { teamMembers, isLoading: isLoadingMembers, error: teamMembersError } = useTeamMembersData(true);
-  
-  // Get pending team members (pre-registered)
-  const { data: preRegisteredMembers = [], isLoading: isLoadingPending, error: pendingError } = useQuery({
-    queryKey: ['preRegisteredMembers', session?.user?.id, company?.id],
-    queryFn: async () => {
-      if (!session?.user?.id || !company?.id) return [];
-      
-      // Get pre-registered members from invites table
-      const { data, error } = await supabase
-        .from('invites')
-        .select('id, first_name, last_name, email, department, location, job_title, role, weekly_capacity')
-        .eq('company_id', company.id)
-        .eq('invitation_type', 'pre_registered')
-        .eq('status', 'pending');
-        
-      if (error) {
-        console.error("Error fetching pre-registered members:", error);
-        return [];
-      }
-      
-      // Transform the pre-registered members to match team member structure
-      return data.map(member => ({
-        id: member.id,
-        first_name: member.first_name || '',
-        last_name: member.last_name || '',
-        email: member.email || '',
-        location: member.location || null,
-        weekly_capacity: member.weekly_capacity || 40
-      }));
-    },
-    enabled: !!session?.user?.id && !!company?.id
-  });
+  const { isLoading, error, teamMembers, weekDays, updateAllocation } = useWeeklyResourceData(selectedWeek, filters);
+  const { office_stages } = useOfficeSettings();
+  const [editingCell, setEditingCell] = useState<string | null>(null);
+  const [tempValue, setTempValue] = useState<string>('');
 
-  // Get all members combined (active + pre-registered)
-  const allMembers = React.useMemo(() => {
-    return [...(teamMembers || []), ...(preRegisteredMembers || [])];
-  }, [teamMembers, preRegisteredMembers]);
+  // Handle cell click to begin editing
+  const handleCellClick = (memberId: string, date: string) => {
+    const editKey = `${memberId}-${date}`;
+    setEditingCell(editKey);
+    const currentValue = teamMembers.find(m => m.id === memberId)?.allocations?.[date] || '';
+    setTempValue(currentValue.toString());
+  };
 
-  // Get allocations from custom hook
-  const { 
-    getMemberAllocation, 
-    handleInputChange, 
-    isLoading: isLoadingAllocations,
-    error: allocationsError 
-  } = useResourceAllocations(allMembers, selectedWeek);
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTempValue(e.target.value);
+  };
 
-  // Fetch office locations
-  const { data: officeLocations = [], isLoading: isLoadingOffices, error: officesError } = useQuery({
-    queryKey: ['officeLocations', company?.id],
-    queryFn: async () => {
-      if (!company?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('office_locations')
-        .select('id, code, city, country')
-        .eq('company_id', company.id);
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!company?.id
-  });
-
-  // Determine overall loading state
-  const isLoading = isLoadingSession || isLoadingMembers || isLoadingPending || isLoadingAllocations || isLoadingOffices;
-
-  // Determine if there are any errors
-  const error = teamMembersError || pendingError || allocationsError || officesError;
-
-  // Group team members by office
-  const membersByOffice = React.useMemo(() => {
-    return allMembers.reduce((acc, member) => {
-      const location = member.location || 'Unassigned';
-      if (!acc[location]) {
-        acc[location] = [];
-      }
-      acc[location].push(member);
-      return acc;
-    }, {} as Record<string, typeof allMembers>);
-  }, [allMembers]);
-
-  // Filter by selected office if needed
-  const filteredOffices = React.useMemo(() => {
-    let offices = Object.keys(membersByOffice);
+  // Handle input blur to save changes
+  const handleInputBlur = async (memberId: string, date: string) => {
+    setEditingCell(null);
+    const newValue = parseInt(tempValue, 10);
     
-    if (filters.office !== 'all') {
-      offices = offices.filter(office => office === filters.office);
-    }
+    if (isNaN(newValue)) return;
     
-    // Sort offices alphabetically
-    return offices.sort();
-  }, [membersByOffice, filters.office]);
+    try {
+      await updateAllocation(memberId, date, newValue);
+      toast.success('Allocation updated');
+    } catch (error) {
+      toast.error('Failed to update allocation');
+      console.error(error);
+    }
+  };
 
-  // Helper function to get office code display name
-  const getOfficeDisplay = React.useCallback((locationCode: string) => {
-    const office = officeLocations.find(o => o.code === locationCode);
-    return office ? `${office.code}` : locationCode;
-  }, [officeLocations]);
+  // Handle keyboard events in input
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, memberId: string, date: string) => {
+    if (e.key === 'Enter') {
+      handleInputBlur(memberId, date);
+    } else if (e.key === 'Escape') {
+      setEditingCell(null);
+    }
+  };
+
+  // Get project count for each team member
+  const getProjectCount = (memberId: string) => {
+    const member = teamMembers.find(m => m.id === memberId);
+    if (!member || !member.allocations) return 0;
+    
+    // Count unique projects
+    const projectSet = new Set<string>();
+    Object.entries(member.allocations).forEach(([_, allocationData]) => {
+      if (typeof allocationData === 'object' && 'projectId' in allocationData) {
+        projectSet.add(allocationData.projectId);
+      }
+    });
+    
+    return projectSet.size;
+  };
 
   if (isLoading) {
     return (
-      <div className="text-center py-12">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Loading resources...</p>
+      <div className="resource-table-loading">
+        <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full mb-2"></div>
+        <p className="text-muted-foreground">Loading team resources...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <Alert variant="destructive" className="mb-6">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          {error instanceof Error ? error.message : 'An error occurred while loading data. Please try again later.'}
-        </AlertDescription>
-      </Alert>
+      <div className="resource-table-error">
+        <p className="text-destructive mb-2">Failed to load resource data</p>
+        <p className="text-muted-foreground text-sm">{error.message}</p>
+      </div>
     );
   }
 
-  if (!allMembers.length) {
+  if (!teamMembers.length) {
     return (
-      <div className="text-center py-12 border rounded-lg">
-        <p className="text-muted-foreground mb-2">No team members found. Add team members to see the weekly overview.</p>
+      <div className="resource-table-empty">
+        <p className="text-muted-foreground">No team members found matching the selected filters.</p>
       </div>
     );
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="weekly-table-container">
-        <Table className="min-w-full text-xs weekly-table">
-          <WeeklyResourceHeader />
-          <TableBody>
-            {filteredOffices.flatMap((office, officeIndex) => {
-              const members = membersByOffice[office].sort((a, b) => {
-                return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
-              });
-
-              return members.map((member, memberIndex) => {
-                const allocation = getMemberAllocation(member.id);
-                const isEven = memberIndex % 2 === 0;
+    <Card className="resource-table-container shadow-sm border">
+      <div className="resource-table-scroll h-[calc(100vh-240px)]">
+        <table className="resource-table">
+          <thead>
+            <tr>
+              <th className="column-name">Team Member</th>
+              <th className="column-office">Office</th>
+              
+              {weekDays.map((day) => (
+                <th 
+                  key={day.date} 
+                  className={`column-numeric ${day.isAnnualLeave ? 'column-annual-leave' : ''}`}
+                >
+                  {format(new Date(day.date), 'EEE')}<br/>
+                  <span className="text-xs font-normal">
+                    {format(new Date(day.date), 'd')}
+                  </span>
+                </th>
+              ))}
+              
+              <th className="column-remarks">Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            {teamMembers.map((member) => (
+              <tr 
+                key={member.id} 
+                className={member.isPending ? 'member-pending' : ''}
+              >
+                <td className="column-name">
+                  <div>
+                    <div className="font-medium flex items-center gap-2">
+                      {member.name}
+                      {getProjectCount(member.id) > 0 && (
+                        <span className="project-count">{getProjectCount(member.id)}</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground">{member.role}</div>
+                  </div>
+                </td>
+                <td className="column-office">
+                  {member.office || '—'}
+                </td>
                 
-                return (
-                  <MemberTableRow
-                    key={member.id}
-                    member={member}
-                    allocation={allocation}
-                    isEven={isEven}
-                    getOfficeDisplay={getOfficeDisplay}
-                    onInputChange={handleInputChange}
-                  />
-                );
-              });
-            })}
-          </TableBody>
-        </Table>
+                {weekDays.map((day) => {
+                  const allocation = member.allocations?.[day.date];
+                  const editKey = `${member.id}-${day.date}`;
+                  const isEditing = editingCell === editKey;
+                  
+                  return (
+                    <td 
+                      key={`${member.id}-${day.date}`} 
+                      className={`column-numeric ${day.isAnnualLeave ? 'column-annual-leave' : ''}`}
+                      onClick={() => !isEditing && handleCellClick(member.id, day.date)}
+                    >
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={tempValue}
+                          onChange={handleInputChange}
+                          onBlur={() => handleInputBlur(member.id, day.date)}
+                          onKeyDown={(e) => handleInputKeyDown(e, member.id, day.date)}
+                          autoFocus
+                        />
+                      ) : (
+                        (allocation && typeof allocation === 'object' && 'hours' in allocation) 
+                          ? allocation.hours 
+                          : allocation || ''
+                      )}
+                    </td>
+                  );
+                })}
+                
+                <td className="column-remarks">
+                  {/* Placeholder for remarks */}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-    </div>
+    </Card>
   );
-}
+};
