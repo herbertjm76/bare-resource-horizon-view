@@ -19,7 +19,7 @@ import '@/components/annual-leave/annual-leave.css';
 
 const HEADER_HEIGHT = 56;
 
-type FilterType = 'all' | 'department' | 'office';
+type FilterType = 'all' | 'department' | 'location';
 
 const TeamAnnualLeave = () => {
   // State for selected month
@@ -45,7 +45,7 @@ const TeamAnnualLeave = () => {
   // Combine active and pre-registered members
   const allMembers = [...teamMembers, ...preRegisteredMembers];
   
-  // Get unique departments and offices for filters
+  // Get unique departments and locations for filters
   const departments = useMemo(() => {
     const depts = new Set<string>();
     allMembers.forEach(member => {
@@ -54,12 +54,12 @@ const TeamAnnualLeave = () => {
     return Array.from(depts).sort();
   }, [allMembers]);
   
-  const offices = useMemo(() => {
-    const offs = new Set<string>();
+  const locations = useMemo(() => {
+    const locs = new Set<string>();
     allMembers.forEach(member => {
-      if (member.office) offs.add(member.office);
+      if (member.location) locs.add(member.location);
     });
-    return Array.from(offs).sort();
+    return Array.from(locs).sort();
   }, [allMembers]);
   
   // Filter members based on active filters and search query
@@ -73,11 +73,11 @@ const TeamAnnualLeave = () => {
         }
       }
       
-      // Apply department/office filter if active
+      // Apply department/location filter if active
       if (activeFilter === 'department' && filterValue) {
         return member.department === filterValue;
-      } else if (activeFilter === 'office' && filterValue) {
-        return member.office === filterValue;
+      } else if (activeFilter === 'location' && filterValue) {
+        return member.location === filterValue;
       }
       
       return true;
@@ -122,6 +122,14 @@ const TeamAnnualLeave = () => {
   
   const isLoading = isLoadingTeamMembers || isLoadingLeave;
 
+  // State to toggle filter visibility
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+
+  // Toggle filter visibility
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
   return (
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
@@ -148,7 +156,7 @@ const TeamAnnualLeave = () => {
                   
                   <FilterButton 
                     activeFiltersCount={activeFiltersCount}
-                    onClick={() => {}} // Empty function as we're using inline filters
+                    onClick={toggleFilters} 
                   />
                 </div>
                 
@@ -163,19 +171,19 @@ const TeamAnnualLeave = () => {
                 </div>
               </div>
               
-              {activeFiltersCount > 0 && (
+              {(activeFiltersCount > 0 || showFilters) && (
                 <div className="bg-muted/20 p-2 rounded-md flex items-center gap-2 flex-wrap">
                   <div className="text-sm font-medium">Filters:</div>
                   
                   <div className="flex gap-2">
                     <Button
-                      variant={activeFilter === 'office' ? 'default' : 'outline'}
+                      variant={activeFilter === 'location' ? 'default' : 'outline'}
                       size="sm"
                       className="h-8 gap-1.5"
-                      onClick={() => handleFilterTypeChange('office')}
+                      onClick={() => handleFilterTypeChange('location')}
                     >
                       <Building className="h-3.5 w-3.5" />
-                      Office
+                      Location
                     </Button>
                     
                     <Button
@@ -207,18 +215,18 @@ const TeamAnnualLeave = () => {
                     </Select>
                   )}
                   
-                  {activeFilter === 'office' && offices.length > 0 && (
+                  {activeFilter === 'location' && locations.length > 0 && (
                     <Select 
                       value={filterValue} 
                       onValueChange={handleFilterValueChange}
                     >
                       <SelectTrigger className="h-8 min-w-[180px]">
-                        <SelectValue placeholder="Select office" />
+                        <SelectValue placeholder="Select location" />
                       </SelectTrigger>
                       <SelectContent>
-                        {offices.map(office => (
-                          <SelectItem key={office} value={office}>
-                            {office}
+                        {locations.map(location => (
+                          <SelectItem key={location} value={location}>
+                            {location}
                           </SelectItem>
                         ))}
                       </SelectContent>
