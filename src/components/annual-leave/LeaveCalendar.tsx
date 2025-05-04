@@ -77,7 +77,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
               return (
                 <TableHead 
                   key={day.toString()} 
-                  className={`p-0 text-center w-8 ${isWeekend ? 'bg-muted/50' : ''} ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''}`}
+                  className={`p-0 text-center w-8 ${isWeekend ? 'bg-muted/60' : ''} ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''}`}
                   aria-label={format(day, 'EEEE')}
                 >
                   <div className="flex flex-col items-center text-xs py-1 px-2">
@@ -93,10 +93,10 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
           {sortedMembers.map((member, rowIndex) => (
             <TableRow 
               key={member.id}
-              className={rowIndex % 2 === 0 ? 'bg-muted/10' : ''}
+              className={rowIndex % 2 === 0 ? 'bg-muted/20' : ''}
             >
               <TableCell className="whitespace-nowrap font-medium sticky left-0 z-10 p-1.5 border-r" 
-                style={{ backgroundColor: rowIndex % 2 === 0 ? 'rgba(0,0,0,0.03)' : 'var(--background)' }}>
+                style={{ backgroundColor: rowIndex % 2 === 0 ? 'rgba(0,0,0,0.07)' : 'var(--background)' }}>
                 {getMemberName(member)}
               </TableCell>
               {daysInMonth.map(day => {
@@ -107,7 +107,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 return (
                   <TableCell 
                     key={`${member.id}-${dateKey}`} 
-                    className={`p-0 text-center leave-cell ${isWeekend ? 'bg-muted/50' : ''} 
+                    className={`p-0 text-center leave-cell ${isWeekend ? 'bg-muted/60' : ''} 
                       ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''} 
                       ${getCellStyle(hours)}`}
                   >

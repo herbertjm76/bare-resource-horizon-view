@@ -73,12 +73,13 @@
   border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
-/* Alternating row colors that work with sticky column */
+/* Alternating row colors that work with sticky column - IMPROVED CONTRAST */
 .annual-leave-calendar tr:nth-child(even) td:not(.sticky) {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: rgba(0, 0, 0, 0.07);
 }
 
 /* Transition effect when adding hours */
 .annual-leave-calendar input {
   transition: color 0.2s ease, background-color 0.2s ease;
 }
+
