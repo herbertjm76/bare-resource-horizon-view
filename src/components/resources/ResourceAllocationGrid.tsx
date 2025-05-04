@@ -1,12 +1,12 @@
 
 import React, { useState, useMemo } from 'react';
 import { useProjects } from '@/hooks/useProjects';
-import { addDays, format, startOfWeek, addWeeks } from 'date-fns';
+import { addDays, format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
 import { ProjectRow } from '@/components/resources/ProjectRow';
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from 'lucide-react';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import './resources-grid.css';
 
 interface ResourceAllocationGridProps {
   startDate: Date;
@@ -75,6 +75,33 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     setExpandedProjects(prev => prev.includes(projectId) ? prev.filter(id => id !== projectId) : [...prev, projectId]);
   };
   
+  // Calculate the total width needed for the table - improved calculation
+  const tableWidth = useMemo(() => {
+    // Fixed columns: counter (48px) + project name (200px)
+    const fixedColumnsWidth = 48 + 200;
+    // Week columns: 35px per day (fixed width)
+    const weekColumnsWidth = weeks.length * 35;
+    // Add padding to ensure we have enough space
+    return fixedColumnsWidth + weekColumnsWidth + 50;
+  }, [weeks.length]);
+
+  if (isLoading) {
+    return <div className="text-center py-12">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Loading projects...</p>
+      </div>;
+  }
+  
+  if (filteredProjects.length === 0) {
+    return <div className="text-center py-12 border rounded-lg">
+        <p className="text-muted-foreground mb-2">No projects found matching your filters.</p>
+        <Button variant="outline" onClick={() => window.location.href = '/projects'}>
+          <PlusCircle className="h-4 w-4 mr-2" />
+          Create a New Project
+        </Button>
+      </div>;
+  }
+
   // Enhance projects with office stages data
   const projectsWithStageData = filteredProjects.map(project => {
     return {
@@ -83,56 +110,28 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     };
   });
   
-  // Calculate the total width needed for the table
-  const tableWidth = useMemo(() => {
-    // Fixed columns: counter (48px) + project name (200px)
-    const fixedColumnsWidth = 48 + 200;
-    // Week columns: 35px per day (fixed width)
-    const weekColumnsWidth = weeksToShow * 7 * 35; // 7 days per week
-    // Add padding
-    return fixedColumnsWidth + weekColumnsWidth + 20;
-  }, [weeksToShow]);
-
-  if (isLoading) {
-    return (
-      <div className="text-center py-12">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Loading projects...</p>
-      </div>
-    );
-  }
-  
-  if (filteredProjects.length === 0) {
-    return (
-      <div className="text-center py-12 border rounded-lg">
-        <p className="text-muted-foreground mb-2">No projects found matching your filters.</p>
-        <Button variant="outline" onClick={() => window.location.href = '/projects'}>
-          <PlusCircle className="h-4 w-4 mr-2" />
-          Create a New Project
-        </Button>
-      </div>
-    );
-  }
-  
   return (
-    <ScrollArea className="h-[calc(100vh-240px)]">
-      <div style={{ width: `${tableWidth}px`, minWidth: '100%' }}>
-        <table className="border-collapse w-full">
+    <div className="grid-table-outer-container">
+      <div className="grid-table-container">
+        <table 
+          className="resource-allocation-table" 
+          style={{ width: `${tableWidth}px`, minWidth: '100%' }}
+        >
           <thead>
             <tr>
               {/* Resources count column - frozen */}
-              <th 
-                className="sticky top-0 left-0 z-50 bg-white border-b text-center font-medium shadow-[1px_0_0_0_#e5e7eb]" 
-                style={{ width: '48px', minWidth: '48px' }}
-              >
+              <th className="sticky-left-0 bg-muted/50 z-30 border-b text-center font-medium w-12 shadow-[1px_0_0_0_#e5e7eb]" style={{
+                width: '48px',
+                minWidth: '48px'
+              }}>
                 {/* Empty header for the counter column */}
               </th>
               
               {/* Project/Resource column - frozen */}
-              <th 
-                className="sticky top-0 left-[48px] z-50 bg-white border-b text-left font-medium shadow-[1px_0_0_0_#e5e7eb]" 
-                style={{ width: '200px', minWidth: '200px' }}
-              >
+              <th className="sticky-left-12 bg-muted/50 z-30 border-b text-left font-medium shadow-[1px_0_0_0_#e5e7eb]" style={{
+                width: '200px',
+                minWidth: '200px'
+              }}>
                 Project / Resource
               </th>
               
@@ -140,19 +139,20 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               {weeks.map((week, i) => (
                 <th 
                   key={i} 
-                  style={{ width: '35px', minWidth: '35px' }} 
-                  className="sticky top-0 z-40 bg-white border-b text-center font-medium"
+                  style={{
+                    width: '35px',
+                    minWidth: '35px'
+                  }} 
+                  className="border-b text-center font-medium"
                 >
-                  <div className="h-full flex items-end justify-center pb-2">
-                    <span className="transform -rotate-90 origin-center whitespace-nowrap text-xs">
-                      {week.label}
-                    </span>
+                  <div className="date-label">
+                    <span>{week.label}</span>
                   </div>
                 </th>
               ))}
               
               {/* Blank flexible column */}
-              <th className="sticky top-0 z-40 bg-white border-b">
+              <th className="border-b text-center font-medium">
                 {/* Empty space to allow horizontal scrolling */}
               </th>
             </tr>
@@ -171,6 +171,6 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
           </tbody>
         </table>
       </div>
-    </ScrollArea>
+    </div>
   );
 };
