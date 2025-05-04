@@ -38,10 +38,13 @@ export function useFetchAllocations() {
     setError(null);
     
     try {
+      // Get formatted week key for consistent querying
       const weekKey = formatWeekKey(selectedWeek);
+      console.log('Fetching allocations for week key:', weekKey);
       
       // Get all member IDs
       const memberIds = teamMembers.map(member => member.id);
+      console.log('Fetching allocations for members:', memberIds);
       
       // Fetch project allocations with project details for the selected week
       let projectAllocations = [];
@@ -76,6 +79,8 @@ export function useFetchAllocations() {
         const memberProjects = projectAllocations.filter(alloc => 
           alloc.resource_id === member.id
         ) || [];
+        
+        console.log(`Member ${member.id} (${member.first_name} ${member.last_name}) allocations:`, memberProjects);
         
         // Calculate total resourced hours
         const resourcedHours = memberProjects.reduce(
@@ -119,6 +124,7 @@ export function useFetchAllocations() {
         };
       }
       
+      console.log('Processed allocations:', initialAllocations);
       setMemberAllocations(initialAllocations);
     } catch (err) {
       console.error('Error fetching allocations:', err);

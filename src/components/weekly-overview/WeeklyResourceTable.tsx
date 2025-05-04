@@ -56,6 +56,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
         return [];
       }
       
+      console.log("Fetched projects:", data);
       return data || [];
     },
     enabled: !!company?.id
@@ -83,6 +84,8 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
         return [];
       }
       
+      console.log("Fetched pre-registered members:", data);
+      
       // Transform the pre-registered members to match team member structure
       return data.map(member => ({
         id: member.id,
@@ -98,7 +101,9 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
 
   // Get all members combined (active + pre-registered)
   const allMembers = React.useMemo(() => {
-    return [...(teamMembers || []), ...(preRegisteredMembers || [])];
+    const combined = [...(teamMembers || []), ...(preRegisteredMembers || [])];
+    console.log("All members for resource table:", combined);
+    return combined;
   }, [teamMembers, preRegisteredMembers]);
 
   // Get allocations from custom hook
@@ -106,8 +111,17 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     getMemberAllocation, 
     handleInputChange, 
     isLoading: isLoadingAllocations,
-    error: allocationsError 
+    error: allocationsError,
+    refreshAllocations
   } = useResourceAllocations(allMembers, selectedWeek);
+  
+  // Refresh allocations when week changes
+  React.useEffect(() => {
+    if (refreshAllocations) {
+      console.log("Refreshing allocations for week:", selectedWeek);
+      refreshAllocations();
+    }
+  }, [selectedWeek, refreshAllocations]);
   
   // Get office display helper
   const { getOfficeDisplay } = useOfficeDisplay();
@@ -138,7 +152,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     <div className="border rounded-lg overflow-hidden">
       <div className="weekly-table-container">
         <Table className="min-w-full text-xs weekly-table">
-          <WeeklyResourceHeader />
+          <WeeklyResourceHeader projects={projects} />
           <TableBody>
             <TeamMemberRows 
               filteredOffices={filteredOffices}

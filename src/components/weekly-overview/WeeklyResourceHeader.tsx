@@ -7,35 +7,13 @@ import {
   TooltipProvider,
   TooltipTrigger 
 } from "@/components/ui/tooltip";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useCompany } from "@/context/CompanyContext";
+import { Project } from './types';
 
-export const WeeklyResourceHeader: React.FC = () => {
-  const { company } = useCompany();
-  
-  // Fetch all projects for the company
-  const { data: projects = [] } = useQuery({
-    queryKey: ['company-projects', company?.id],
-    queryFn: async () => {
-      if (!company?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('projects')
-        .select('id, code, name')
-        .eq('company_id', company.id)
-        .order('code');
-      
-      if (error) {
-        console.error("Error fetching projects:", error);
-        return [];
-      }
-      
-      return data || [];
-    },
-    enabled: !!company?.id
-  });
+interface WeeklyResourceHeaderProps {
+  projects: Project[];
+}
 
+export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ projects }) => {
   return (
     <TableHeader className="bg-muted/50 sticky top-0 z-10">
       <TableRow>

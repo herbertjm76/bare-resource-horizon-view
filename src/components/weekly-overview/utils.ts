@@ -29,6 +29,8 @@ export const calculateUtilization = (hoursUsed: number, weeklyCapacity: number =
  * @returns Week key in YYYY-MM-DD format
  */
 export const formatWeekKey = (date: Date): string => {
+  // Explicitly set to start on Monday (1)
   const monday = startOfWeek(date, { weekStartsOn: 1 });
+  // Format to YYYY-MM-DD for consistent database queries
   return format(monday, 'yyyy-MM-dd');
 };

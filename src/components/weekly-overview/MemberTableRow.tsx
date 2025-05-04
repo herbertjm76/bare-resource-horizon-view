@@ -62,6 +62,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       <TableCell className="py-2 px-4 name-column">
         <div className="flex items-center gap-2">
           <span>
+            {/* Display only name without location */}
             {member.first_name} {member.last_name}
             {member.isPending && <span className="text-muted-foreground text-xs ml-1">(pending)</span>}
           </span>
