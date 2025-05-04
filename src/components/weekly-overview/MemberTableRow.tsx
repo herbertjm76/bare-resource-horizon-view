@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,12 +61,14 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       <TableCell className="py-2 px-4 name-column">
         <div className="flex items-center gap-2">
           <span className="font-medium">
-            {/* Display name only without location */}
+            {/* Display only first and last name without location */}
             {member.first_name} {member.last_name}
             {member.isPending && <span className="text-muted-foreground text-xs ml-1">(pending)</span>}
           </span>
         </div>
       </TableCell>
+      
+      
       
       <TableCell className="py-1 px-1 number-column">
         <div className="table-cell">
