@@ -28,7 +28,7 @@ export const useProjectTableRow = (project: Project, refetch: () => void) => {
 
     office_stages.forEach(stage => {
       const fee = getStageFee(stage.id);
-      row[stage.id] = fee;
+      row[stage.id] = fee; // Add this line to assign the fee to the row object
     });
 
     return row;
