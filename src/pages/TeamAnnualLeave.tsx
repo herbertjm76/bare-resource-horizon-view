@@ -82,9 +82,13 @@ const TeamAnnualLeave = () => {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="mx-auto space-y-6">
-              <div className="flex flex-row justify-between items-center gap-4 flex-wrap">
-                <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Annual Leave</h1>
-                
+              <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Annual Leave</h1>
+              
+              <div className="text-sm text-muted-foreground">
+                <p>Enter the number of leave hours for each day. Empty cells count as 0 hours.</p>
+              </div>
+              
+              <div className="flex flex-row justify-between items-center gap-4">
                 <div className="flex items-center gap-2">
                   <MonthSelector 
                     selectedMonth={selectedMonth} 
@@ -152,10 +156,6 @@ const TeamAnnualLeave = () => {
                     onLeaveChange={handleLeaveChange}
                   />
                 )}
-              </div>
-              
-              <div className="text-sm text-muted-foreground">
-                <p>Enter the number of leave hours for each day. Empty cells count as 0 hours.</p>
               </div>
             </div>
           </div>
