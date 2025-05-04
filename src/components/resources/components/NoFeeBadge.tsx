@@ -1,12 +1,42 @@
 
 import React from 'react';
-import { DollarSign } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
 
-export const NoFeeBadge: React.FC = () => {
+interface NoFeeBadgeProps {
+  hours: number;
+  size?: 'xs' | 'sm' | 'md';
+}
+
+export const NoFeeBadge: React.FC<NoFeeBadgeProps> = ({ 
+  hours,
+  size = 'md'
+}) => {
+  // Determine text size and padding based on size prop
+  let sizeClasses = '';
+  
+  switch(size) {
+    case 'xs':
+      sizeClasses = 'text-[10px] py-0 px-1 h-4';
+      break;
+    case 'sm':
+      sizeClasses = 'text-xs py-0 px-1 h-4';
+      break;
+    case 'md':
+    default:
+      sizeClasses = 'text-xs py-0.5 px-2 h-5';
+      break;
+  }
+  
   return (
-    <div className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-gray-100 text-gray-700 text-xs">
-      <DollarSign className="h-3 w-3" />
-      <span>Not set</span>
-    </div>
+    <Badge
+      variant="outline"
+      className={`${sizeClasses} font-medium`}
+      style={{
+        backgroundColor: '#F1F0FB',
+        color: '#6E59A5'
+      }}
+    >
+      No fee
+    </Badge>
   );
 };

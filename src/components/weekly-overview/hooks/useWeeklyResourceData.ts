@@ -1,139 +1,134 @@
 
-import { useState, useEffect, useMemo } from 'react';
-import { format, addDays } from 'date-fns';
-import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
+import { useCallback, useMemo } from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useTeamMembersData } from "@/hooks/useTeamMembersData";
+import { useCompany } from "@/context/CompanyContext";
+import { useResourceAllocations } from '../useResourceAllocations';
 
-interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-  office?: string;
-  isPending?: boolean;
-  allocations?: Record<string, number | { projectId: string, hours: number }>;
-}
-
-// Function to update allocation for a team member
-const updateAllocationInDB = async (
-  memberId: string, 
-  date: string, 
-  hours: number
-): Promise<boolean> => {
-  try {
-    // In a real app, this would update the database
-    console.log(`Updating allocation for member ${memberId} on ${date}: ${hours} hours`);
-    
-    // Simulate successful update
-    return true;
-  } catch (error) {
-    console.error('Failed to update allocation:', error);
-    return false;
-  }
-};
-
-export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: string }) => {
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+export function useWeeklyResourceData(selectedWeek: Date, filters: { office: string }) {
+  // Get company context
   const { company } = useCompany();
   
-  // Generate week days for the selected week
-  const weekDays = useMemo(() => {
-    const weekStart = new Date(selectedWeek);
-    // Adjust to Monday
-    const monday = new Date(weekStart);
-    monday.setDate(monday.getDate() - monday.getDay() + 1);
-    
-    return Array.from({ length: 5 }, (_, i) => {
-      const date = addDays(monday, i);
-      return {
-        date: format(date, 'yyyy-MM-dd'),
-        dayName: format(date, 'EEE'),
-        isAnnualLeave: false // Placeholder, would be determined by API call
-      };
-    });
-  }, [selectedWeek]);
+  // Get current user ID
+  const { data: session, isLoading: isLoadingSession } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return data.session;
+    }
+  });
   
-  // Fetch team members and their allocations
-  useEffect(() => {
-    const fetchTeamData = async () => {
-      try {
-        setIsLoading(true);
+  // Get team members data using the hook - pass true to include inactive members
+  const { teamMembers, isLoading: isLoadingMembers, error: teamMembersError } = useTeamMembersData(true);
+  
+  // Get pending team members (pre-registered)
+  const { data: preRegisteredMembers = [], isLoading: isLoadingPending, error: pendingError } = useQuery({
+    queryKey: ['preRegisteredMembers', session?.user?.id, company?.id],
+    queryFn: async () => {
+      if (!session?.user?.id || !company?.id) return [];
+      
+      // Get pre-registered members from invites table
+      const { data, error } = await supabase
+        .from('invites')
+        .select('id, first_name, last_name, email, department, location, job_title, role, weekly_capacity')
+        .eq('company_id', company.id)
+        .eq('invitation_type', 'pre_registered')
+        .eq('status', 'pending');
         
-        if (!company?.id) {
-          throw new Error('Company ID not available');
-        }
-        
-        // Fetch all profiles for the company
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, first_name, last_name, job_title, location')
-          .eq('company_id', company.id);
-          
-        if (profilesError) {
-          throw profilesError;
-        }
-        
-        // Format profiles as team members
-        const formattedMembers: TeamMember[] = profiles.map(profile => ({
-          id: profile.id,
-          name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
-          role: profile.job_title || 'Team Member',
-          office: profile.location,
-          allocations: {} // Will be populated with allocations data
-        }));
-        
-        // Filter by office if specified
-        const filteredMembers = filters.office === 'all' 
-          ? formattedMembers
-          : formattedMembers.filter(member => member.office === filters.office);
-        
-        setTeamMembers(filteredMembers);
-        setError(null);
-      } catch (err) {
-        console.error('Error loading team data:', err);
-        setError(err instanceof Error ? err : new Error('Failed to load team data'));
-        toast.error('Failed to load team data');
-      } finally {
-        setIsLoading(false);
+      if (error) {
+        console.error("Error fetching pre-registered members:", error);
+        return [];
       }
-    };
+      
+      // Transform the pre-registered members to match team member structure
+      return data.map(member => ({
+        id: member.id,
+        first_name: member.first_name || '',
+        last_name: member.last_name || '',
+        email: member.email || '',
+        location: member.location || null,
+        weekly_capacity: member.weekly_capacity || 40
+      }));
+    },
+    enabled: !!session?.user?.id && !!company?.id
+  });
+
+  // Get all members combined (active + pre-registered)
+  const allMembers = useMemo(() => {
+    return [...(teamMembers || []), ...(preRegisteredMembers || [])];
+  }, [teamMembers, preRegisteredMembers]);
+
+  // Get allocations from custom hook
+  const { 
+    getMemberAllocation, 
+    handleInputChange, 
+    isLoading: isLoadingAllocations,
+    error: allocationsError 
+  } = useResourceAllocations(allMembers, selectedWeek);
+
+  // Fetch office locations
+  const { data: officeLocations = [], isLoading: isLoadingOffices, error: officesError } = useQuery({
+    queryKey: ['officeLocations', company?.id],
+    queryFn: async () => {
+      if (!company?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('office_locations')
+        .select('id, code, city, country')
+        .eq('company_id', company.id);
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!company?.id
+  });
+
+  // Determine overall loading state
+  const isLoading = isLoadingSession || isLoadingMembers || isLoadingPending || isLoadingAllocations || isLoadingOffices;
+
+  // Determine if there are any errors
+  const error = teamMembersError || pendingError || allocationsError || officesError;
+
+  // Group team members by office
+  const membersByOffice = useMemo(() => {
+    return allMembers.reduce((acc, member) => {
+      const location = member.location || 'Unassigned';
+      if (!acc[location]) {
+        acc[location] = [];
+      }
+      acc[location].push(member);
+      return acc;
+    }, {} as Record<string, typeof allMembers>);
+  }, [allMembers]);
+
+  // Filter by selected office if needed
+  const filteredOffices = useMemo(() => {
+    let offices = Object.keys(membersByOffice);
     
-    fetchTeamData();
-  }, [company?.id, selectedWeek, filters.office]);
-  
-  // Function to update allocation in the UI and database
-  const updateAllocation = async (memberId: string, date: string, hours: number): Promise<boolean> => {
-    // Update allocation in the database
-    const success = await updateAllocationInDB(memberId, date, hours);
-    
-    if (success) {
-      // Update the local state
-      setTeamMembers(prev => 
-        prev.map(member => {
-          if (member.id === memberId) {
-            return {
-              ...member,
-              allocations: {
-                ...(member.allocations || {}),
-                [date]: hours
-              }
-            };
-          }
-          return member;
-        })
-      );
+    if (filters.office !== 'all') {
+      offices = offices.filter(office => office === filters.office);
     }
     
-    return success;
-  };
-  
+    // Sort offices alphabetically
+    return offices.sort();
+  }, [membersByOffice, filters.office]);
+
+  // Helper function to get office code display name
+  const getOfficeDisplay = useCallback((locationCode: string) => {
+    const office = officeLocations.find(o => o.code === locationCode);
+    return office ? `${office.code}` : locationCode;
+  }, [officeLocations]);
+
   return {
+    allMembers,
+    membersByOffice,
+    filteredOffices,
+    getMemberAllocation,
+    handleInputChange,
+    getOfficeDisplay,
     isLoading,
-    error,
-    teamMembers,
-    weekDays,
-    updateAllocation
+    error
   };
-};
+}

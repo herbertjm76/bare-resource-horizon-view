@@ -63,6 +63,31 @@ tr th.sticky-left-12 {
   background-color: inherit;
 }
 
+/* Date column header styles - fixed rotation */
+th .date-label {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px;
+}
+
+th .date-label span {
+  transform: rotate(-90deg);
+  transform-origin: center;
+  white-space: nowrap;
+  display: inline-block;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+/* Consistent vertical alignment for all cells */
+th,
+td {
+  vertical-align: middle;
+}
+
 /* Make all rows more compact */
 tr {
   height: 24px;
@@ -72,9 +97,30 @@ thead tr {
   height: 48px;
 }
 
+/* Make allocation input more compact */
+.allocation-input-container input {
+  padding: 0;
+  height: 20px;
+}
+
 /* Compact cell padding */
 td,
 th {
   padding: 0;
-  vertical-align: middle;
+}
+
+/* Fix for project header row height */
+.project-header-row {
+  height: 28px;
+}
+
+/* Fix for add resource row height */
+.add-resource-row {
+  height: 24px;
+}
+
+/* Table structure for proper scrolling */
+.resource-allocation-table {
+  border-collapse: collapse;
+  width: 100%;
 }

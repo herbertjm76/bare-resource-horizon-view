@@ -1,42 +1,54 @@
 
 import React from 'react';
+import { Badge } from "@/components/ui/badge";
 
-type BadgeSize = 'xs' | 'sm' | 'md';
+// Helper function to get color based on utilization percentage
+const getUtilizationColor = (utilization: number) => {
+  if (utilization < 70) return { bg: '#EDFAE5', text: '#25701B' }; // Green - under utilized
+  if (utilization <= 100) return { bg: '#FEF7CD', text: '#856404' }; // Yellow - good utilization
+  return { bg: '#FFDEE2', text: '#C0392B' }; // Red - over utilized
+};
 
 interface ResourceUtilizationBadgeProps {
   utilization: number;
-  size?: BadgeSize;
+  size?: 'xs' | 'sm' | 'md';
 }
 
-export const ResourceUtilizationBadge: React.FC<ResourceUtilizationBadgeProps> = ({
+export const ResourceUtilizationBadge: React.FC<ResourceUtilizationBadgeProps> = ({ 
   utilization,
   size = 'md'
 }) => {
-  // Determine color based on utilization percentage
-  const getColor = (): { bg: string; text: string } => {
-    if (utilization >= 90) {
-      return { bg: 'bg-red-100', text: 'text-red-700' }; // Over-allocated
-    } else if (utilization >= 75) {
-      return { bg: 'bg-green-100', text: 'text-green-700' }; // Good utilization
-    } else if (utilization >= 50) {
-      return { bg: 'bg-yellow-100', text: 'text-yellow-700' }; // Moderate utilization
-    } else {
-      return { bg: 'bg-gray-100', text: 'text-gray-700' }; // Under-utilized
-    }
-  };
+  // Round utilization to nearest integer
+  const roundedUtilization = Math.round(utilization);
   
-  const { bg, text } = getColor();
+  const colors = getUtilizationColor(roundedUtilization);
   
-  // Determine size classes
-  const sizeClasses = {
-    xs: 'text-[10px] px-1 py-0',
-    sm: 'text-xs px-1.5 py-0.5',
-    md: 'text-sm px-2 py-1'
-  };
+  // Determine text size and padding based on size prop
+  let sizeClasses = '';
+  
+  switch(size) {
+    case 'xs':
+      sizeClasses = 'text-[10px] py-0 px-1 h-4';
+      break;
+    case 'sm':
+      sizeClasses = 'text-xs py-0 px-1 h-4';
+      break;
+    case 'md':
+    default:
+      sizeClasses = 'text-xs py-0.5 px-2 h-5';
+      break;
+  }
   
   return (
-    <div className={`inline-flex items-center rounded-full ${bg} ${text} ${sizeClasses[size]}`}>
-      {Math.round(utilization)}%
-    </div>
+    <Badge
+      variant="outline"
+      className={`${sizeClasses} font-medium`}
+      style={{
+        backgroundColor: colors.bg,
+        color: colors.text
+      }}
+    >
+      {roundedUtilization}%
+    </Badge>
   );
 };
