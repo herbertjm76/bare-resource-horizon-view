@@ -1,4 +1,3 @@
-
 import { format, startOfWeek } from 'date-fns';
 
 /**
@@ -29,9 +28,12 @@ export const calculateCapacity = (hours: number): number => {
 };
 
 /**
- * Format a date as a week key (YYYY-MM-DD of Monday)
+ * Format a date into a standard week key format (YYYY-MM-DD)
+ * Always returns the Monday of the week
  */
 export const formatWeekKey = (date: Date): string => {
-  const weekStart = startOfWeek(date, { weekStartsOn: 1 });
-  return format(weekStart, 'yyyy-MM-dd');
+  // Get Monday of the current week
+  const mondayDate = startOfWeek(date, { weekStartsOn: 1 });
+  // Format as YYYY-MM-DD
+  return format(mondayDate, 'yyyy-MM-dd');
 };

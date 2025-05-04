@@ -24,10 +24,11 @@ export interface MemberAllocation {
   remarks: string;
   projects: string[];
   resourcedHours: number;
-  projectAllocations?: Array<{
+  projectAllocations: Array<{
     projectName: string;
     projectId: string;
     hours: number;
+    projectCode: string;
   }>;
 }
 
@@ -55,7 +56,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
       // Get all member IDs
       const memberIds = teamMembers.map(member => member.id);
       
-      // First, fetch project allocations with project details for the selected week
+      // Fetch project allocations with project details for the selected week
       let projectAllocations = [];
       if (company?.id) {
         const { data, error } = await supabase
@@ -74,7 +75,7 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
           setError('Failed to fetch resource allocations');
         } else {
           projectAllocations = data || [];
-          console.log('Fetched project allocations:', projectAllocations);
+          console.log('Fetched project allocations for week:', weekKey, projectAllocations);
         }
       }
       
@@ -101,15 +102,15 @@ export function useResourceAllocations(teamMembers: TeamMember[], selectedWeek: 
           
         // Create detailed project allocations array
         const detailedProjectAllocations = memberProjects
-          .filter(p => p.project?.id && p.project?.name)
+          .filter(p => p.project?.id && p.project?.name && p.project?.code)
           .map(p => ({
             projectName: p.project.name,
             projectId: p.project.id,
+            projectCode: p.project.code,
             hours: Number(p.hours) || 0
           }))
           .sort((a, b) => b.hours - a.hours); // Sort by hours descending
         
-        // For demo purposes - generate some random data for non-project time
         initialAllocations[member.id] = {
           id: member.id,
           annualLeave: 0,

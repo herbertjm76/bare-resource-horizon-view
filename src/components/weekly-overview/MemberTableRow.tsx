@@ -20,10 +20,11 @@ interface MemberAllocation {
   remarks: string;
   projects: string[];
   resourcedHours: number;
-  projectAllocations?: Array<{
+  projectAllocations: Array<{
     projectName: string;
     projectId: string;
     hours: number;
+    projectCode: string;
   }>;
 }
 
