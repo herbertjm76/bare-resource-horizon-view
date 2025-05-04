@@ -12,6 +12,7 @@ interface TeamMember {
   last_name: string;
   location: string | null;
   weekly_capacity?: number;
+  isPending?: boolean; // Add isPending property
 }
 
 export interface MemberAllocation {

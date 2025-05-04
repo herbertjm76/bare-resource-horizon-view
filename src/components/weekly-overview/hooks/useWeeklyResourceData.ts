@@ -6,6 +6,17 @@ import { useTeamMembersData } from "@/hooks/useTeamMembersData";
 import { useCompany } from "@/context/CompanyContext";
 import { useResourceAllocations } from '../useResourceAllocations';
 
+// Define the TeamMember interface that includes the isPending property
+interface TeamMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  location: string | null;
+  weekly_capacity?: number;
+  isPending?: boolean; // Add the isPending property
+}
+
 export function useWeeklyResourceData(selectedWeek: Date, filters: { office: string }) {
   // Get company context
   const { company } = useCompany();
@@ -49,7 +60,8 @@ export function useWeeklyResourceData(selectedWeek: Date, filters: { office: str
         last_name: member.last_name || '',
         email: member.email || '',
         location: member.location || null,
-        weekly_capacity: member.weekly_capacity || 40
+        weekly_capacity: member.weekly_capacity || 40,
+        isPending: true // Set isPending flag to true for pre-registered members
       }));
     },
     enabled: !!session?.user?.id && !!company?.id
@@ -57,7 +69,12 @@ export function useWeeklyResourceData(selectedWeek: Date, filters: { office: str
 
   // Get all members combined (active + pre-registered)
   const allMembers = useMemo(() => {
-    return [...(teamMembers || []), ...(preRegisteredMembers || [])];
+    // Make sure to add isPending=false to regular team members
+    const activeMembers = (teamMembers || []).map(member => ({
+      ...member,
+      isPending: false // Set isPending flag to false for active team members
+    }));
+    return [...activeMembers, ...(preRegisteredMembers || [])];
   }, [teamMembers, preRegisteredMembers]);
 
   // Get allocations from custom hook
