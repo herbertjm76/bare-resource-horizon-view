@@ -174,3 +174,4 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
     </div>
   );
 };
+
