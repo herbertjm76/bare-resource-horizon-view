@@ -11,9 +11,9 @@ import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { SearchInput } from '@/components/resources/filters/SearchInput';
+import { Card, CardContent } from '@/components/ui/card';
 
 const HEADER_HEIGHT = 56;
-const FILTERS_HEIGHT = 126; // Height of filters section including margins
 
 const ProjectResourcing = () => {
   // Get the start of the current week (Monday)
@@ -65,7 +65,6 @@ const ProjectResourcing = () => {
 
   // Format the week label
   const weekLabel = useCallback((date: Date) => {
-    const endOfWeek = addWeeks(date, 0);
     return `Week of ${format(date, 'MMM d, yyyy')}`;
   }, []);
   
@@ -160,18 +159,20 @@ const ProjectResourcing = () => {
                 </div>
               </div>
               
-              <div className="flex-1 rounded-lg border shadow-sm flex flex-col overflow-hidden">
-                <OfficeSettingsProvider>
-                  <ResourceAllocationGrid 
-                    startDate={selectedWeek}
-                    weeksToShow={filters.weeksToShow}
-                    filters={{
-                      ...filters,
-                      searchTerm
-                    }}
-                  />
-                </OfficeSettingsProvider>
-              </div>
+              <Card className="flex-1 shadow-sm">
+                <CardContent className="p-0 h-full">
+                  <OfficeSettingsProvider>
+                    <ResourceAllocationGrid 
+                      startDate={selectedWeek}
+                      weeksToShow={filters.weeksToShow}
+                      filters={{
+                        ...filters,
+                        searchTerm
+                      }}
+                    />
+                  </OfficeSettingsProvider>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

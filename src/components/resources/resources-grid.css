@@ -118,3 +118,9 @@ th {
 .add-resource-row {
   height: 24px;
 }
+
+/* Table structure for proper scrolling */
+.resource-allocation-table {
+  border-collapse: collapse;
+  width: 100%;
+}

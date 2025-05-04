@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { WeeklyResourceTableContent } from './components/WeeklyResourceTableContent';
 
 interface WeeklyResourceTableProps {
@@ -15,7 +16,9 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
 }) => {
   return (
     <div className="border rounded-lg overflow-hidden">
-      <WeeklyResourceTableContent selectedWeek={selectedWeek} filters={filters} />
+      <ScrollArea className="h-[calc(100vh-320px)]">
+        <WeeklyResourceTableContent selectedWeek={selectedWeek} filters={filters} />
+      </ScrollArea>
     </div>
   );
 };
