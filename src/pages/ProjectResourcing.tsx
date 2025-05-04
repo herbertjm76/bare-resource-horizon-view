@@ -11,7 +11,6 @@ import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { SearchInput } from '@/components/resources/filters/SearchInput';
-import { Card, CardContent } from '@/components/ui/card';
 
 const HEADER_HEIGHT = 56;
 
@@ -65,6 +64,7 @@ const ProjectResourcing = () => {
 
   // Format the week label
   const weekLabel = useCallback((date: Date) => {
+    const endOfWeek = addWeeks(date, 0);
     return `Week of ${format(date, 'MMM d, yyyy')}`;
   }, []);
   
@@ -99,13 +99,13 @@ const ProjectResourcing = () => {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background flex flex-col" style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
-            <div className="flex-grow flex flex-col max-w-full h-full">
-              <div className="flex justify-between items-center mb-6">
+          <div className="flex-1 p-4 sm:p-8 bg-background" style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)` }}>
+            <div className="mx-auto space-y-6 h-full flex flex-col">
+              <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Project Resourcing</h1>
               </div>
               
-              <div className="flex flex-wrap gap-4 mb-4">
+              <div className="flex flex-wrap gap-4">
                 {/* Week selector in a bordered box */}
                 <div className="flex border rounded-md p-2 items-center">
                   <WeekSelector
@@ -159,20 +159,18 @@ const ProjectResourcing = () => {
                 </div>
               </div>
               
-              <Card className="flex-1 shadow-sm">
-                <CardContent className="p-0 h-full">
-                  <OfficeSettingsProvider>
-                    <ResourceAllocationGrid 
-                      startDate={selectedWeek}
-                      weeksToShow={filters.weeksToShow}
-                      filters={{
-                        ...filters,
-                        searchTerm
-                      }}
-                    />
-                  </OfficeSettingsProvider>
-                </CardContent>
-              </Card>
+              <div className="flex-1 rounded-lg border shadow-sm flex flex-col overflow-hidden">
+                <OfficeSettingsProvider>
+                  <ResourceAllocationGrid 
+                    startDate={selectedWeek}
+                    weeksToShow={filters.weeksToShow}
+                    filters={{
+                      ...filters,
+                      searchTerm
+                    }}
+                  />
+                </OfficeSettingsProvider>
+              </div>
             </div>
           </div>
         </div>

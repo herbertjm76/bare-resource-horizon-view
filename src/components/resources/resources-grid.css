@@ -1,49 +1,87 @@
 
-/* Resource grid table styles - simplified */
+/* Resource grid table styles */
+.grid-table-outer-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
 
-/* Header cells need higher z-index to stay on top */
-thead th {
+.grid-table-container {
+  width: 100%;
+  height: 100%;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+  position: relative;
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* For Firefox */
+}
+
+/* Scrollbar styling for WebKit browsers */
+.grid-table-container::-webkit-scrollbar {
+  height: 8px;  /* Make sure horizontal scrollbar is visible */
+  width: 8px;
+}
+
+.grid-table-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.grid-table-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+}
+
+/* Ensure the table takes up the full width */
+.resource-allocation-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: max-content; /* Allow table to expand beyond container */
+  min-width: 100%; /* Ensure it's at least 100% of container width */
+  table-layout: fixed;
+}
+
+/* Z-index for sticky headers */
+.grid-table-container thead th {
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 20;
   background-color: white;
   box-shadow: 0 1px 0 0 #e5e7eb;
-  height: 48px;
-  padding: 0;
+  padding: 0; /* Remove default padding */
 }
 
 /* Frozen left columns */
-.sticky-left-0 {
+.grid-table-container .sticky-left-0 {
   position: sticky;
   left: 0;
-  z-index: 30;
-  background-color: inherit;
+  z-index: 20;
 }
 
-.sticky-left-12 {
+.grid-table-container .sticky-left-12 {
   position: sticky;
-  left: 48px;
-  z-index: 30;
-  background-color: inherit;
+  left: 48px; /* Width of the first column */
+  z-index: 20;
 }
 
 /* Header cells need higher z-index to stay on top */
-thead .sticky-left-0 {
-  z-index: 50;
-  background-color: white;
+.grid-table-container thead .sticky-left-0 {
+  z-index: 30;
 }
 
-thead .sticky-left-12 {
-  z-index: 50;
-  background-color: white;
+.grid-table-container thead .sticky-left-12 {
+  z-index: 30;
 }
 
 /* Add shadow for frozen columns to create visual separation */
-.sticky-left-12::after {
+.grid-table-container .sticky-left-12::after {
   content: '';
   position: absolute;
   top: 0;
-  right: -6px;
+  right: -6px;  /* Position shadow outside of the element */
   bottom: 0;
   width: 6px;
   pointer-events: none;
@@ -51,76 +89,58 @@ thead .sticky-left-12 {
 }
 
 /* Hover effect for rows */
-tbody tr:hover {
+.grid-table-container tbody tr:hover {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
 /* Ensure background color persists while scrolling */
-tr td.sticky-left-0,
-tr th.sticky-left-0,
-tr td.sticky-left-12, 
-tr th.sticky-left-12 {
+.grid-table-container tr td.sticky-left-0,
+.grid-table-container tr th.sticky-left-0,
+.grid-table-container tr td.sticky-left-12, 
+.grid-table-container tr th.sticky-left-12 {
   background-color: inherit;
 }
 
-/* Date column header styles - fixed rotation */
-th .date-label {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 8px;
+/* Date column header styles */
+.grid-table-container th span.transform {
+  display: inline-block;
+  width: 80px; /* Give more space for rotated text */
+  transform-origin: center left;
+  margin-left: 15px; /* Adjust spacing */
 }
 
-th .date-label span {
-  transform: rotate(-90deg);
-  transform-origin: center;
-  white-space: nowrap;
-  display: inline-block;
-  font-size: 0.75rem;
-  line-height: 1rem;
+/* Remove bottom margin from column headers to eliminate extra space */
+.grid-table-container thead tr th > div {
+  margin-bottom: 0;
+}
+
+/* Ensure project row header has no extra bottom padding */
+.grid-table-container tbody tr:first-child td {
+  border-top: none;
 }
 
 /* Consistent vertical alignment for all cells */
-th,
-td {
+.grid-table-container th,
+.grid-table-container td {
   vertical-align: middle;
 }
 
 /* Make all rows more compact */
-tr {
-  height: 24px;
+.grid-table-container tr {
+  height: 28px; /* Set a fixed height for all rows */
 }
 
-thead tr {
-  height: 48px;
+.grid-table-container thead tr {
+  height: 32px; /* Slightly taller header row */
 }
 
 /* Make allocation input more compact */
 .allocation-input-container input {
   padding: 0;
-  height: 20px;
 }
 
 /* Compact cell padding */
-td,
-th {
-  padding: 0;
-}
-
-/* Fix for project header row height */
-.project-header-row {
-  height: 28px;
-}
-
-/* Fix for add resource row height */
-.add-resource-row {
-  height: 24px;
-}
-
-/* Table structure for proper scrolling */
-.resource-allocation-table {
-  border-collapse: collapse;
-  width: 100%;
+.grid-table-container td,
+.grid-table-container th {
+  padding: 0.25rem;
 }
