@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTeamMembersData } from "@/hooks/useTeamMembersData";
 import { Table, TableBody } from "@/components/ui/table";
 import { WeeklyResourceHeader } from './WeeklyResourceHeader';
-import { useResourceAllocations } from './useResourceAllocations';
+import { useResourceAllocations } from './hooks/useResourceAllocations';
 import { useCompany } from "@/context/CompanyContext";
 import { ResourceTableLoadingState } from './components/ResourceTableLoadingState';
 import { ResourceTableErrorState } from './components/ResourceTableErrorState';
