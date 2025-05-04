@@ -110,11 +110,10 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   }
   
   return (
-    <div className="grid-table-outer-container">
-      <div className="grid-table-container">
+    <div className="grid-table-outer-container" overflow-x-auto w-full max-w-full>
+      <div className="grid-table-container w-max">
         <table 
-          className="resource-allocation-table" 
-          style={{ width: `${tableWidth}px`, minWidth: '100%' }}
+          className="resource-allocation-table table-fixed w-max"
         >
           <thead>
             <tr>
