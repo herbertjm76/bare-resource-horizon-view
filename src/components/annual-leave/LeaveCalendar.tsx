@@ -122,12 +122,12 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 const hours = leaveData[member.id]?.[dateKey];
                 const isSundayCol = isSundayBorder(day);
                 
-                // Determine the style for the input based on the value
+                // Updated style logic: Always make font bold (medium), but color differently based on value
                 const inputValueStyle = hours === 0 
-                  ? 'text-gray-250' // Light grey for zero
+                  ? 'font-medium text-gray-250' // Light grey for zero
                   : hours > 0 
                     ? 'font-medium text-brand-primary' // Bold purple for other digits
-                    : 'text-gray-250'; // Light grey for empty/null
+                    : 'font-medium text-gray-250'; // Light grey for empty/null
                 
                 return (
                   <TableCell 
