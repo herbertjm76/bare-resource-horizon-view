@@ -31,9 +31,21 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
     return nameA.localeCompare(nameB);
   });
   
+  // Modified input change handler to restrict input to a single digit (0-9)
   const handleInputChange = (memberId: string, date: string, value: string) => {
-    const hours = parseFloat(value) || 0;
-    onLeaveChange(memberId, date, hours);
+    // If the value is empty, treat it as 0
+    if (value === '') {
+      onLeaveChange(memberId, date, 0);
+      return;
+    }
+    
+    // Only allow digits 0-9
+    const digit = parseInt(value.slice(-1), 10);
+    
+    // Check if it's a valid number
+    if (!isNaN(digit) && digit >= 0 && digit <= 9) {
+      onLeaveChange(memberId, date, digit);
+    }
   };
 
   // Helper to get the name for a member
@@ -110,6 +122,13 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 const hours = leaveData[member.id]?.[dateKey];
                 const isSundayCol = isSundayBorder(day);
                 
+                // Determine the style for the input based on the value
+                const inputValueStyle = hours === 0 
+                  ? 'text-gray-250' // Light grey for zero
+                  : hours > 0 
+                    ? 'font-medium text-brand-primary' // Bold purple for other digits
+                    : 'text-gray-250'; // Light grey for empty/null
+                
                 return (
                   <TableCell 
                     key={`${member.id}-${dateKey}`} 
@@ -119,15 +138,13 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                       ${getCellStyle(hours)}`}
                   >
                     <Input 
-                      type="number" 
-                      min="0" 
-                      max="24" 
-                      value={hours || ''} 
+                      type="text" 
+                      maxLength={1}
+                      value={hours !== undefined ? hours : ''} 
                       onChange={e => handleInputChange(member.id, dateKey, e.target.value)} 
                       placeholder="0" 
                       className={`h-7 w-7 p-0 text-center border-0 hover:border hover:border-input 
-                        focus:border focus:border-input rounded-sm 
-                        ${hours > 0 ? 'font-medium text-brand-primary' : 'text-gray-250'}`} 
+                        focus:border focus:border-input rounded-sm ${inputValueStyle}`}
                     />
                   </TableCell>
                 );
