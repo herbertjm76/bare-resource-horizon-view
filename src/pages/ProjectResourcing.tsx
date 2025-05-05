@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -13,6 +12,7 @@ import { SearchInput } from '@/components/resources/filters/SearchInput';
 import { FilterPopover } from '@/components/filters/FilterPopover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FilterBadges } from '@/components/resources/filters/FilterBadges';
+import { X } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
