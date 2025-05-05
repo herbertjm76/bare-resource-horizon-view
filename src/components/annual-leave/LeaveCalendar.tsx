@@ -122,12 +122,16 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 const hours = leaveData[member.id]?.[dateKey];
                 const isSundayCol = isSundayBorder(day);
                 
-                // Updated style logic: Always make font bold (medium), but color differently based on value
+                // Enhanced styling for input values
+                // Default zero with 50% opacity, non-zero values with purple background and black text
                 const inputValueStyle = hours === 0 
-                  ? 'font-medium text-gray-250' // Light grey for zero
+                  ? 'font-medium text-gray-250 opacity-50' // Light grey with 50% opacity for zero
                   : hours > 0 
-                    ? 'font-medium text-brand-primary' // Bold purple for other digits
-                    : 'font-medium text-gray-250'; // Light grey for empty/null
+                    ? 'font-medium text-black' // Black text for other digits
+                    : 'font-medium text-gray-250 opacity-50'; // Light grey with 50% opacity for empty/null
+                
+                // Determine if the cell has a value for background styling
+                const cellHasValue = hours !== undefined && hours > 0;
                 
                 return (
                   <TableCell 
@@ -135,7 +139,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                     className={`p-0 text-center leave-cell ${isWeekend ? 'bg-muted/60' : ''} 
                       ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''} 
                       ${isSundayCol ? 'sunday-border' : ''}
-                      ${getCellStyle(hours)}`}
+                      ${cellHasValue ? 'leave-cell-filled' : ''}`}
                   >
                     <Input 
                       type="text" 
@@ -144,7 +148,10 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                       onChange={e => handleInputChange(member.id, dateKey, e.target.value)} 
                       placeholder="0" 
                       className={`h-7 w-7 p-0 text-center border-0 hover:border hover:border-input 
-                        focus:border focus:border-input rounded-sm ${inputValueStyle}`}
+                        focus:border focus:border-input rounded-sm
+                        transition-all duration-200
+                        ${inputValueStyle}
+                        ${cellHasValue ? 'bg-brand-violet-light' : 'bg-transparent'}`}
                     />
                   </TableCell>
                 );
