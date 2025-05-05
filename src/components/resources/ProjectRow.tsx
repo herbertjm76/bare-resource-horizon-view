@@ -152,15 +152,6 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         />
       ))}
       
-      {/* Project totals row - show when project is expanded */}
-      {isExpanded && (
-        <ProjectTotalsRow
-          weeklyProjectHours={weeklyProjectHours}
-          weeks={weeks}
-          isEven={isEven}
-        />
-      )}
-      
       {/* Add resource row when project is expanded */}
       <AddResourceRow
         isExpanded={isExpanded}
