@@ -6,9 +6,12 @@ import { useCompany } from "@/context/CompanyContext";
 import { useResourceAllocations } from './useResourceAllocations';
 import { useOfficeMembers } from './useOfficeMembers';
 import { useOfficeDisplay } from './useOfficeDisplay';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: string }) => {
+  // Track loading state explicitly
+  const [isInitializing, setIsInitializing] = useState(true);
+  
   // Get company context
   const { company } = useCompany();
   
@@ -98,17 +101,34 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
     projectTotals
   } = useResourceAllocations(allMembers, selectedWeek);
   
-  // Refresh allocations when week changes
-  
   // Get office display helper
   const { getOfficeDisplay } = useOfficeDisplay();
   
   // Get members organized by office
   const { membersByOffice, filteredOffices } = useOfficeMembers(allMembers, filters);
 
+  // Clear initialization state when data is loaded
+  useEffect(() => {
+    if (!isLoadingSession && !isLoadingMembers && !isLoadingPending && !isLoadingProjects) {
+      // Add a small delay to ensure allocations have loaded too
+      const timer = setTimeout(() => setIsInitializing(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoadingSession, isLoadingMembers, isLoadingPending, isLoadingProjects]);
+
   // Determine overall loading state
-  const isLoading = isLoadingSession || isLoadingMembers || isLoadingPending || 
-                    isLoadingAllocations || isLoadingProjects;
+  const isLoading = isInitializing || isLoadingSession || isLoadingMembers || 
+                    isLoadingPending || isLoadingAllocations || isLoadingProjects;
+
+  // More detailed loading debug info
+  console.log("Loading states:", {
+    isInitializing,
+    isLoadingSession,
+    isLoadingMembers,
+    isLoadingPending, 
+    isLoadingAllocations,
+    isLoadingProjects
+  });
 
   // Determine if there are any errors
   const error = teamMembersError || pendingError || allocationsError;

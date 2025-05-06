@@ -43,6 +43,14 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     }
   }, [selectedWeek, refreshAllocations]);
 
+  // Debug to help identify loading state issues
+  console.log("WeeklyResourceTable - Loading state:", isLoading);
+  console.log("WeeklyResourceTable - Projects:", projects);
+  console.log("WeeklyResourceTable - Members count:", allMembers?.length);
+  
+  // Added safety check for members array
+  const hasMembers = Array.isArray(allMembers) && allMembers.length > 0;
+
   if (isLoading) {
     return <ResourceTableLoadingState />;
   }
@@ -51,7 +59,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
     return <ResourceTableErrorState error={error} />;
   }
 
-  if (!allMembers.length) {
+  if (!hasMembers) {
     return <EmptyResourceState />;
   }
 
