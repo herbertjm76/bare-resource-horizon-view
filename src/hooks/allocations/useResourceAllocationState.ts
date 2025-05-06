@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { MemberAllocation } from '@/components/weekly-overview/types';
 
 /**
@@ -12,6 +12,19 @@ export function useResourceAllocationState() {
   // State for tracking loading and error states
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Force loading state to clear after a maximum time to prevent getting stuck
+  useEffect(() => {
+    // If loading takes more than 15 seconds, force it to complete
+    const safetyTimer = setTimeout(() => {
+      if (isLoading) {
+        console.log('Allocation state loading safety timeout reached, forcing completion');
+        setIsLoading(false);
+      }
+    }, 15000);
+    
+    return () => clearTimeout(safetyTimer);
+  }, [isLoading]);
   
   // Function to get allocation for a specific member
   const getMemberAllocation = useCallback((memberId: string) => {
