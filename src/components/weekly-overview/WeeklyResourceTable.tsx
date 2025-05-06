@@ -24,6 +24,7 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
 }) => {
   // Track how long we've been loading
   const [loadingDuration, setLoadingDuration] = useState(0);
+  const [forceRender, setForceRender] = useState(false);
   
   const {
     projects,
@@ -48,25 +49,31 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
       interval = setInterval(() => {
         setLoadingDuration(prev => {
           const newDuration = prev + 1;
-          // If loading for more than 12 seconds, show toast
-          if (newDuration === 12) {
-            toast.info("Still loading resources...", {
-              description: "This is taking longer than expected.",
-              duration: 4000
+          
+          // If loading for more than 15 seconds, force render
+          if (newDuration === 15 && !forceRender) {
+            setForceRender(true);
+            toast.info("Forcing data display", {
+              description: "Some data may still be loading in the background.",
+              duration: 5000
             });
           }
+          
           return newDuration;
         });
       }, 1000);
     } else {
       // Reset counter when loading completes
       setLoadingDuration(0);
+      if (forceRender) {
+        setForceRender(false);
+      }
     }
     
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isLoading]);
+  }, [isLoading, forceRender]);
   
   // Refresh allocations when week changes
   useEffect(() => {
@@ -81,15 +88,8 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   const hasProjects = Array.isArray(projects) && projects.length > 0;
 
   // Render loading state with additional checks to prevent getting stuck
-  if (isLoading || !hasProjects) {
-    // If loading takes too long, force render the table even if not all data is available
-    if (loadingDuration > 15 && hasMembers && hasProjects) {
-      console.log("Force rendering table after extended loading time");
-      toast.info("Some data may still be loading", { duration: 3000 });
-      // Continue to table rendering below
-    } else {
-      return <ResourceTableLoadingState />;
-    }
+  if ((isLoading || !hasProjects) && !forceRender) {
+    return <ResourceTableLoadingState />;
   }
 
   // Render error state

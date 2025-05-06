@@ -1,6 +1,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { MemberAllocation } from '@/components/weekly-overview/types';
+import { toast } from 'sonner';
 
 /**
  * Hook to manage the state of resource allocations
@@ -15,13 +16,14 @@ export function useResourceAllocationState() {
   
   // Force loading state to clear after a maximum time to prevent getting stuck
   useEffect(() => {
-    // If loading takes more than 15 seconds, force it to complete
+    // If loading takes more than 12 seconds, force it to complete
     const safetyTimer = setTimeout(() => {
       if (isLoading) {
         console.log('Allocation state loading safety timeout reached, forcing completion');
+        toast.info("Some data may still be loading", { duration: 3000 });
         setIsLoading(false);
       }
-    }, 15000);
+    }, 12000); // Reduced from 15s to 12s for quicker feedback
     
     return () => clearTimeout(safetyTimer);
   }, [isLoading]);

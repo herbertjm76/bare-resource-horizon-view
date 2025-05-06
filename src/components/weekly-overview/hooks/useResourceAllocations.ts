@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useResourceAllocationState } from '@/hooks/allocations/useResourceAllocationState';
 import { useFetchAllocations } from '@/hooks/allocations/useFetchAllocations';
+import { toast } from 'sonner';
 
 /**
  * Main hook that combines allocation state management and data fetching
@@ -19,11 +20,14 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
     setMemberAllocations,
     getMemberAllocation,
     handleInputChange,
-    isLoading, 
-    setIsLoading,
+    isLoading: allocationsStateLoading, 
+    setIsLoading: setAllocationsStateLoading,
     error,
     setError
   } = useResourceAllocationState();
+  
+  // Local loading state to prevent rapid changes
+  const [isLoading, setIsLoading] = useState(true);
   
   // Get allocation data fetching function
   const { fetchAllocations } = useFetchAllocations();
@@ -38,20 +42,44 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
     // Set a new timer that will force loading state to false after 10 seconds
     const timer = setTimeout(() => {
       console.log('Loading state was potentially stuck, forcing it to false');
+      setAllocationsStateLoading(false);
       setIsLoading(false);
       setIsInitialLoad(false);
-    }, 10000); // 10 second safety timeout
+      toast.info("Data loaded with default values", { duration: 3000 });
+    }, 8000); // Reduced from 10s to 8s
     
     setLoadingStuckTimer(timer);
-  }, [loadingStuckTimer, setIsLoading]);
+  }, [loadingStuckTimer, setAllocationsStateLoading]);
+  
+  // Update isLoading based on allocationsStateLoading with a slight delay to prevent flickering
+  useEffect(() => {
+    // If allocationsStateLoading is false, add a slight delay before updating isLoading
+    if (!allocationsStateLoading && isLoading) {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else if (allocationsStateLoading && !isLoading) {
+      // If allocationsStateLoading is true, update isLoading immediately
+      setIsLoading(true);
+    }
+  }, [allocationsStateLoading, isLoading]);
   
   // Fetch allocations when team members or selected week changes
   useEffect(() => {
     console.log('useResourceAllocations effect triggered with week:', selectedWeek);
     console.log('Team members count:', teamMembers.length);
     
+    if (teamMembers.length === 0) {
+      setIsLoading(false);
+      setAllocationsStateLoading(false);
+      setIsInitialLoad(false);
+      return;
+    }
+    
     // Set loading state and start safety timer
     setIsLoading(true);
+    setAllocationsStateLoading(true);
     ensureLoadingEnds();
     
     const loadData = async () => {
@@ -60,7 +88,7 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
           teamMembers,
           selectedWeek,
           setMemberAllocations,
-          setIsLoading,
+          setAllocationsStateLoading,
           setError
         );
         
@@ -74,8 +102,10 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
       } catch (err) {
         console.error('Failed to load allocations:', err);
         setError('Failed to load allocations');
+        setAllocationsStateLoading(false);
         setIsLoading(false);
         setIsInitialLoad(false);
+        toast.error('Failed to load allocations');
       }
     };
     
@@ -87,22 +117,23 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
         clearTimeout(loadingStuckTimer);
       }
     };
-  }, [fetchAllocations, teamMembers, selectedWeek, ensureLoadingEnds]);
+  }, [fetchAllocations, teamMembers, selectedWeek, ensureLoadingEnds, setMemberAllocations, setAllocationsStateLoading, setError, loadingStuckTimer]);
 
   // Function to manually refresh allocations
   const refreshAllocations = useCallback(() => {
     console.log('Manual refresh of allocations triggered');
     setIsLoading(true);
+    setAllocationsStateLoading(true);
     ensureLoadingEnds();
     
     fetchAllocations(
       teamMembers,
       selectedWeek,
       setMemberAllocations,
-      setIsLoading,
+      setAllocationsStateLoading,
       setError
     );
-  }, [fetchAllocations, teamMembers, selectedWeek, setMemberAllocations, setIsLoading, setError, ensureLoadingEnds]);
+  }, [fetchAllocations, teamMembers, selectedWeek, setMemberAllocations, setAllocationsStateLoading, setError, ensureLoadingEnds]);
 
   // Calculate totals for each project
   const projectTotals = useCallback(() => {

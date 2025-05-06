@@ -2,14 +2,26 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { RefreshCcw } from "lucide-react";
+import { toast } from 'sonner';
 
 export const ResourceTableLoadingState: React.FC = () => {
   const [loadingTime, setLoadingTime] = useState<number>(0);
   const [showRetry, setShowRetry] = useState<boolean>(false);
 
   useEffect(() => {
+    // Start a timer to track loading time
     const timer = setInterval(() => {
-      setLoadingTime(prev => prev + 1);
+      setLoadingTime(prev => {
+        const newTime = prev + 1;
+        // Show notification when loading is taking too long
+        if (newTime === 10) {
+          toast.info("Still loading resources...", {
+            description: "This is taking longer than expected.",
+            duration: 4000
+          });
+        }
+        return newTime;
+      });
     }, 1000);
 
     // After 8 seconds, show retry button
@@ -24,6 +36,7 @@ export const ResourceTableLoadingState: React.FC = () => {
   }, []);
 
   const handleRetry = () => {
+    toast.info("Reloading page...");
     // Force reload the current page
     window.location.reload();
   };
