@@ -13,20 +13,20 @@ export const useMemberPermissions = () => {
   const checkUserPermissions = async () => {
     try {
       // Get user session to check permissions
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      const { data } = await supabase.auth.getUser();
+      if (!data || !data.user) {
         console.error('No active session found');
         toast.error('You must be logged in to manage team members');
         return false;
       }
       
-      console.log('Current user ID:', session.user.id);
+      console.log('Current user ID:', data.user.id);
       
       // Check user permissions
       const { data: userProfile, error: profileError } = await supabase
         .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
+        .select('role, company_id')
+        .eq('id', data.user.id)
         .single();
         
       if (profileError) {
@@ -36,6 +36,7 @@ export const useMemberPermissions = () => {
       }
       
       console.log('Current user role:', userProfile?.role);
+      console.log('Current user company ID:', userProfile?.company_id);
       
       // Only owners and admins can manage team members
       if (!userProfile || (userProfile.role !== 'owner' && userProfile.role !== 'admin')) {

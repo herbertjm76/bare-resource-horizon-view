@@ -9,6 +9,7 @@ import { useTeamMembersRealtime } from '@/hooks/useTeamMembersRealtime';
 import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 const HEADER_HEIGHT = 56;
 
@@ -20,34 +21,44 @@ const TeamMembersPage = () => {
   const {
     teamMembers,
     triggerRefresh,
-    forceRefresh
+    forceRefresh,
+    isLoading: isTeamMembersLoading,
+    error: teamMembersError
   } = useTeamMembersData(false);
 
   // Fetch user profile separately since it's no longer part of useTeamMembersData
   const {
     data: userProfile,
-    isLoading: isProfileLoading
+    isLoading: isProfileLoading,
+    error: profileError
   } = useQuery({
     queryKey: ['userProfile', userId],
     queryFn: async () => {
       if (!userId) return null;
       console.log('Fetching user profile for ID:', userId);
       
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+          
+        if (error) {
+          console.error('Error fetching user profile:', error);
+          toast.error('Failed to load your profile');
+          throw error;
+        }
         
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        throw error;
+        console.log('User profile fetched:', data);
+        return data;
+      } catch (error) {
+        console.error('Error in profile fetch:', error);
+        return null;
       }
-      
-      console.log('User profile fetched:', data);
-      return data;
     },
-    enabled: !!userId
+    enabled: !!userId,
+    retry: 3
   });
 
   // Set up realtime subscriptions
@@ -56,6 +67,17 @@ const TeamMembersPage = () => {
     triggerRefresh,
     forceRefresh
   );
+  
+  // Show error message if there's an issue
+  useEffect(() => {
+    if (teamMembersError) {
+      toast.error('Failed to load team members data');
+    }
+    
+    if (profileError) {
+      toast.error('Failed to load your profile');
+    }
+  }, [teamMembersError, profileError]);
 
   return (
     <SidebarProvider>

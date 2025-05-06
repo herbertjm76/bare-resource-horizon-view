@@ -893,11 +893,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_role: {
+        Args: { user_id: string }
+        Returns: string
+      }
       is_company_role: {
-        Args: {
-          company_uuid: string
-          requested_role: Database["public"]["Enums"]["user_role"]
-        }
+        Args:
+          | Record<PropertyKey, never>
+          | {
+              company_uuid: string
+              requested_role: Database["public"]["Enums"]["user_role"]
+            }
         Returns: boolean
       }
     }

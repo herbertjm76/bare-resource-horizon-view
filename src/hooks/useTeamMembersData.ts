@@ -21,11 +21,34 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
       console.log('Include inactive members:', includeInactive);
       
       try {
-        // We're fetching directly without relying on a user profile
-        // In a real app, you might want to get the company_id from a context or other source
+        // First, get the current user's company_id
+        const { data: currentUserProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('company_id, role')
+          .eq('id', await supabase.auth.getUser().then(res => res.data.user?.id))
+          .single();
+          
+        if (profileError) {
+          console.error('Failed to get user profile:', profileError);
+          toast.error('Failed to get user profile');
+          throw profileError;
+        }
+        
+        if (!currentUserProfile?.company_id) {
+          console.error('User has no company associated');
+          toast.error('No company associated with your account');
+          return [];
+        }
+        
+        console.log('User company ID:', currentUserProfile.company_id);
+        console.log('User role:', currentUserProfile.role);
+        
+        // Now fetch all profiles from the same company
+        // The RLS policies will handle access restrictions
         const { data: profiles, error } = await supabase
           .from('profiles')
           .select('*')
+          .eq('company_id', currentUserProfile.company_id)
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -64,7 +87,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
   return {
     teamMembers,
     isLoading,
-    error, // Now we're properly exposing the error from the useQuery hook
+    error,
     triggerRefresh,
     forceRefresh,
   };
