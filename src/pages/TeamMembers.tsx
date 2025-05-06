@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
@@ -10,12 +10,14 @@ import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useCompany } from '@/context/CompanyContext';
 
 const HEADER_HEIGHT = 56;
 
 const TeamMembersPage = () => {
   // Get user session
   const userId = useUserSession();
+  const { company, loading: companyLoading } = useCompany();
   
   // Fetch team members data - passing false since we don't need inactive members here
   const {
@@ -65,13 +67,13 @@ const TeamMembersPage = () => {
 
   // Set up realtime subscriptions
   useTeamMembersRealtime(
-    userProfile?.company_id,
+    userProfile?.company_id || company?.id,
     triggerRefresh,
     forceRefresh
   );
   
   // Show error message if there's an issue
-  useEffect(() => {
+  React.useEffect(() => {
     if (teamMembersError) {
       console.error('Team members error:', teamMembersError);
       toast.error('Failed to load team members data');
@@ -82,6 +84,8 @@ const TeamMembersPage = () => {
       toast.error('Failed to load your profile');
     }
   }, [teamMembersError, profileError]);
+
+  const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading;
 
   return (
     <SidebarProvider>
@@ -95,7 +99,7 @@ const TeamMembersPage = () => {
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <TeamMemberContent
               userProfile={userProfile}
-              isProfileLoading={isProfileLoading}
+              isProfileLoading={isLoading}
               teamMembers={teamMembers}
               onRefresh={triggerRefresh}
             />

@@ -4,9 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/components/dashboard/types";
 import { toast } from "sonner";
+import { useCompany } from '@/context/CompanyContext';
 
 export const useTeamMembersData = (includeInactive: boolean = false) => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { company, loading: companyLoading } = useCompany();
 
   // Fetch team members with refetch capability
   const {
@@ -15,48 +17,69 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
     error,
     refetch: refetchTeamMembers
   } = useQuery({
-    queryKey: ['teamMembers', refreshTrigger, includeInactive],
+    queryKey: ['teamMembers', refreshTrigger, includeInactive, company?.id],
     queryFn: async () => {
       console.log('Fetching team members, refresh trigger:', refreshTrigger);
       console.log('Include inactive members:', includeInactive);
+      console.log('Company ID from context:', company?.id);
       
       try {
-        // First, get the current user's company_id
-        const { data: currentUserProfile, error: profileError } = await supabase
-          .from('profiles')
-          .select('company_id, role')
-          .eq('id', await supabase.auth.getUser().then(res => res.data.user?.id))
-          .single();
+        if (!company?.id) {
+          console.log('No company ID available, using current user company');
           
-        if (profileError) {
-          console.error('Failed to get user profile:', profileError);
-          toast.error('Failed to get user profile');
-          throw profileError;
+          // First, get the current user's company_id
+          const { data: currentUserProfile, error: profileError } = await supabase
+            .from('profiles')
+            .select('company_id, role')
+            .eq('id', await supabase.auth.getUser().then(res => res.data.user?.id))
+            .single();
+            
+          if (profileError) {
+            console.error('Failed to get user profile:', profileError);
+            toast.error('Failed to get user profile');
+            throw profileError;
+          }
+          
+          if (!currentUserProfile?.company_id) {
+            console.error('User has no company associated');
+            toast.error('No company associated with your account');
+            return [];
+          }
+          
+          console.log('User company ID:', currentUserProfile.company_id);
+          console.log('User role:', currentUserProfile.role);
+          
+          // Now fetch all profiles from the same company
+          const { data: profiles, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('company_id', currentUserProfile.company_id);
+  
+          if (error) {
+            console.error('Failed to load team members:', error);
+            toast.error('Failed to load team members');
+            throw error;
+          }
+  
+          console.log('Fetched profiles:', profiles?.length || 0);
+          return profiles as Profile[];
         }
         
-        if (!currentUserProfile?.company_id) {
-          console.error('User has no company associated');
-          toast.error('No company associated with your account');
-          return [];
-        }
+        // If we have company ID from context, use that
+        console.log('Using company ID from context:', company.id);
         
-        console.log('User company ID:', currentUserProfile.company_id);
-        console.log('User role:', currentUserProfile.role);
-        
-        // Now fetch all profiles from the same company
-        // The updated RLS policies will handle access restrictions
         const { data: profiles, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('company_id', currentUserProfile.company_id);
+          .eq('company_id', company.id);
 
         if (error) {
-          console.error('Failed to load team members:', error);
+          console.error('Failed to load team members with context company ID:', error);
           toast.error('Failed to load team members');
           throw error;
         }
 
-        console.log('Fetched profiles:', profiles?.length || 0);
+        console.log('Fetched profiles with context company ID:', profiles?.length || 0);
         return profiles as Profile[];
       } catch (fetchError) {
         console.error('Error in team members fetch function:', fetchError);
@@ -64,6 +87,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
         return [];
       }
     },
+    enabled: !companyLoading,
     refetchInterval: false,
     staleTime: 0,
     refetchOnWindowFocus: true,
@@ -85,7 +109,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
 
   return {
     teamMembers,
-    isLoading,
+    isLoading: isLoading || companyLoading,
     error,
     triggerRefresh,
     forceRefresh,

@@ -9,6 +9,7 @@ export const useTeamMembersRealtime = (
 ) => {
   useEffect(() => {
     if (!companyId) {
+      console.log('No company ID provided for realtime subscription');
       // If no companyId is provided, try to get it from the current user's profile
       const fetchCompanyId = async () => {
         try {
