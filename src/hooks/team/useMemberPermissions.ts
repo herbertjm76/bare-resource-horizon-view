@@ -35,12 +35,18 @@ export const useMemberPermissions = () => {
         return false;
       }
       
-      console.log('Current user role:', userProfile?.role);
-      console.log('Current user company ID:', userProfile?.company_id);
+      if (!userProfile) {
+        console.error('User profile not found');
+        toast.error('User profile not found');
+        return false;
+      }
+      
+      console.log('Current user role:', userProfile.role);
+      console.log('Current user company ID:', userProfile.company_id);
       
       // Only owners and admins can manage team members
-      if (!userProfile || (userProfile.role !== 'owner' && userProfile.role !== 'admin')) {
-        console.error('Insufficient permissions, user role:', userProfile?.role);
+      if (userProfile.role !== 'owner' && userProfile.role !== 'admin') {
+        console.error('Insufficient permissions, user role:', userProfile.role);
         toast.error('You do not have permission to manage team members');
         return false;
       }

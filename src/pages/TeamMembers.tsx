@@ -50,7 +50,8 @@ const TeamMembersPage = () => {
           throw error;
         }
         
-        console.log('User profile fetched:', data);
+        console.log('User profile fetched successfully');
+        console.log('Profile data:', data);
         return data;
       } catch (error) {
         console.error('Error in profile fetch:', error);
@@ -58,7 +59,8 @@ const TeamMembersPage = () => {
       }
     },
     enabled: !!userId,
-    retry: 3
+    retry: 3,
+    refetchOnWindowFocus: false
   });
 
   // Set up realtime subscriptions
@@ -71,10 +73,12 @@ const TeamMembersPage = () => {
   // Show error message if there's an issue
   useEffect(() => {
     if (teamMembersError) {
+      console.error('Team members error:', teamMembersError);
       toast.error('Failed to load team members data');
     }
     
     if (profileError) {
+      console.error('Profile error:', profileError);
       toast.error('Failed to load your profile');
     }
   }, [teamMembersError, profileError]);

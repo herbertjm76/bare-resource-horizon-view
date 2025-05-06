@@ -11,18 +11,32 @@ export const useTeamMembersRealtime = (
     if (!companyId) {
       // If no companyId is provided, try to get it from the current user's profile
       const fetchCompanyId = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('company_id')
-          .eq('id', user.id)
-          .single();
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) {
+            console.error('No authenticated user found for realtime subscriptions');
+            return;
+          }
           
-        if (profile?.company_id) {
-          console.log('Setting up realtime subscriptions for company from profile:', profile.company_id);
-          setupSubscriptions(profile.company_id);
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('company_id')
+            .eq('id', user.id)
+            .single();
+            
+          if (error) {
+            console.error('Error fetching user profile for realtime:', error);
+            return;
+          }
+            
+          if (profile?.company_id) {
+            console.log('Setting up realtime subscriptions for company from profile:', profile.company_id);
+            setupSubscriptions(profile.company_id);
+          } else {
+            console.error('User has no company ID for realtime subscriptions');
+          }
+        } catch (error) {
+          console.error('Error in fetchCompanyId for realtime:', error);
         }
       };
       
@@ -31,7 +45,7 @@ export const useTeamMembersRealtime = (
     }
     
     console.log('Setting up realtime subscriptions for company:', companyId);
-    setupSubscriptions(companyId);
+    return setupSubscriptions(companyId);
     
     function setupSubscriptions(companyId: string) {
       // Subscribe to changes on profiles table for this company
@@ -82,7 +96,6 @@ export const useTeamMembersRealtime = (
       };
     }
     
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId, onRefresh]);
 
   return null;

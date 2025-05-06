@@ -15,7 +15,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
     error,
     refetch: refetchTeamMembers
   } = useQuery({
-    queryKey: ['teamMembers', refreshTrigger],
+    queryKey: ['teamMembers', refreshTrigger, includeInactive],
     queryFn: async () => {
       console.log('Fetching team members, refresh trigger:', refreshTrigger);
       console.log('Include inactive members:', includeInactive);
@@ -44,12 +44,11 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
         console.log('User role:', currentUserProfile.role);
         
         // Now fetch all profiles from the same company
-        // The RLS policies will handle access restrictions
+        // The updated RLS policies will handle access restrictions
         const { data: profiles, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('company_id', currentUserProfile.company_id)
-          .order('created_at', { ascending: false });
+          .eq('company_id', currentUserProfile.company_id);
 
         if (error) {
           console.error('Failed to load team members:', error);
