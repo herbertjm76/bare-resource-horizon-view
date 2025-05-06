@@ -7,6 +7,9 @@ import { useFetchAllocations } from '@/hooks/allocations/useFetchAllocations';
  * Main hook that combines allocation state management and data fetching
  */
 export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
+  // Track if this is the initial load
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  
   // Get allocation state management functions
   const {
     memberAllocations,
@@ -27,13 +30,20 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
     console.log('useResourceAllocations effect triggered with week:', selectedWeek);
     console.log('Team members count:', teamMembers.length);
     
-    fetchAllocations(
-      teamMembers,
-      selectedWeek,
-      setMemberAllocations,
-      setIsLoading,
-      setError
-    );
+    const loadData = async () => {
+      await fetchAllocations(
+        teamMembers,
+        selectedWeek,
+        setMemberAllocations,
+        setIsLoading,
+        setError
+      );
+      
+      // Mark that initial load is complete
+      setIsInitialLoad(false);
+    };
+    
+    loadData();
   }, [fetchAllocations, teamMembers, selectedWeek]);
 
   // Function to manually refresh allocations
@@ -68,7 +78,7 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
     memberAllocations,
     getMemberAllocation,
     handleInputChange,
-    isLoading,
+    isLoading: isLoading || isInitialLoad,
     error,
     refreshAllocations,
     projectTotals

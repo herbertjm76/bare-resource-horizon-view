@@ -6,11 +6,12 @@ import { useCompany } from "@/context/CompanyContext";
 import { useResourceAllocations } from './useResourceAllocations';
 import { useOfficeMembers } from './useOfficeMembers';
 import { useOfficeDisplay } from './useOfficeDisplay';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: string }) => {
-  // Track loading state explicitly
+  // Track loading state explicitly with a stabilized ref to prevent flickering
   const [isInitializing, setIsInitializing] = useState(true);
+  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Get company context
   const { company } = useCompany();
@@ -93,6 +94,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
 
   // Get allocations from custom hook
   const { 
+    memberAllocations,
     getMemberAllocation, 
     handleInputChange, 
     isLoading: isLoadingAllocations,
@@ -109,26 +111,44 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
 
   // Clear initialization state when data is loaded
   useEffect(() => {
-    if (!isLoadingSession && !isLoadingMembers && !isLoadingPending && !isLoadingProjects) {
-      // Add a small delay to ensure allocations have loaded too
-      const timer = setTimeout(() => setIsInitializing(false), 500);
-      return () => clearTimeout(timer);
+    // Cancel any existing timer to prevent race conditions
+    if (loadingTimerRef.current) {
+      clearTimeout(loadingTimerRef.current);
     }
-  }, [isLoadingSession, isLoadingMembers, isLoadingPending, isLoadingProjects]);
-
-  // Determine overall loading state
-  const isLoading = isInitializing || isLoadingSession || isLoadingMembers || 
-                    isLoadingPending || isLoadingAllocations || isLoadingProjects;
-
-  // More detailed loading debug info
-  console.log("Loading states:", {
-    isInitializing,
-    isLoadingSession,
-    isLoadingMembers,
+    
+    const dataIsReady = !isLoadingSession && !isLoadingMembers && 
+                         !isLoadingPending && !isLoadingProjects && 
+                         !isLoadingAllocations && Array.isArray(allMembers);
+                         
+    if (dataIsReady) {
+      // Use a short delay to ensure all data is properly initialized
+      loadingTimerRef.current = setTimeout(() => {
+        setIsInitializing(false);
+      }, 300);
+    } else {
+      // If any data is still loading, make sure we're in loading state
+      setIsInitializing(true);
+    }
+    
+    // Cleanup timer on unmount
+    return () => {
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+      }
+    };
+  }, [
+    isLoadingSession, 
+    isLoadingMembers, 
     isLoadingPending, 
-    isLoadingAllocations,
-    isLoadingProjects
-  });
+    isLoadingProjects, 
+    isLoadingAllocations, 
+    allMembers
+  ]);
+
+  // Determine overall loading state with proper dependency on allocation loading
+  const isLoading = isInitializing || isLoadingSession || isLoadingMembers || 
+                    isLoadingPending || isLoadingAllocations || isLoadingProjects ||
+                    !Array.isArray(memberAllocations);
 
   // Determine if there are any errors
   const error = teamMembersError || pendingError || allocationsError;

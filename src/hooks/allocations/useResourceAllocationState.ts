@@ -1,22 +1,40 @@
 
 import { useState, useCallback } from 'react';
 import { MemberAllocation } from '@/components/weekly-overview/types';
-import { toast } from 'sonner';
 
 /**
- * Hook for managing member allocation state
+ * Hook to manage the state of resource allocations
  */
 export function useResourceAllocationState() {
-  // Member allocations state
+  // State for storing member allocations
   const [memberAllocations, setMemberAllocations] = useState<Record<string, MemberAllocation>>({});
-  const [isLoading, setIsLoading] = useState(true);
+  
+  // State for tracking loading and error states
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Initialize or get member allocation
-  const getMemberAllocation = (memberId: string): MemberAllocation => {
-    if (!memberAllocations[memberId]) {
-      // Use default values if allocation not found
-      return {
+  // Function to get allocation for a specific member
+  const getMemberAllocation = useCallback((memberId: string) => {
+    return memberAllocations[memberId] || {
+      id: memberId,
+      annualLeave: 0,
+      publicHoliday: 0,
+      vacationLeave: 0,
+      medicalLeave: 0,
+      others: 0,
+      remarks: '',
+      projects: [],
+      projectAllocations: [],
+      resourcedHours: 0
+    };
+  }, [memberAllocations]);
+  
+  // Function to handle input changes (e.g., hours, remarks)
+  const handleInputChange = useCallback((memberId: string, field: string, value: any) => {
+    console.log(`Updating ${field} for member ${memberId} to:`, value);
+    
+    setMemberAllocations(prev => {
+      const allocation = prev[memberId] || {
         id: memberId,
         annualLeave: 0,
         publicHoliday: 0,
@@ -26,30 +44,18 @@ export function useResourceAllocationState() {
         remarks: '',
         projects: [],
         projectAllocations: [],
-        resourcedHours: 0,
+        resourcedHours: 0
       };
-    }
-    return memberAllocations[memberId];
-  };
-
-  // Handle input changes for editable fields
-  const handleInputChange = (memberId: string, field: keyof MemberAllocation, value: any) => {
-    const numValue = field !== 'remarks' && field !== 'projects' && field !== 'projectAllocations' 
-      ? parseFloat(value) || 0 
-      : value;
-    
-    // Update local state for immediate UI feedback
-    setMemberAllocations(prev => ({
-      ...prev,
-      [memberId]: {
-        ...prev[memberId],
-        [field]: numValue,
-      }
-    }));
-    
-    // Here we would save changes to the database
-    // For now we're just updating the local state
-  };
+      
+      return {
+        ...prev,
+        [memberId]: {
+          ...allocation,
+          [field]: value
+        }
+      };
+    });
+  }, []);
   
   return {
     memberAllocations,
