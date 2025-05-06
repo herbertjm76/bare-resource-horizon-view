@@ -893,6 +893,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_profile_by_id: {
+        Args: { user_id: string }
+        Returns: {
+          id: string
+          company_id: string
+          role: string
+          email: string
+          first_name: string
+          last_name: string
+          job_title: string
+          department: string
+          location: string
+          created_at: string
+          updated_at: string
+        }[]
+      }
       get_user_role: {
         Args: { user_id: string }
         Returns: string

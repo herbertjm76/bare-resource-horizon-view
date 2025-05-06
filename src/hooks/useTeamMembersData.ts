@@ -27,11 +27,15 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
         if (!company?.id) {
           console.log('No company ID available, using current user company');
           
-          // First, get the current user's company_id
+          // First, get the current user's profile using the security definer function
+          const { data: authData } = await supabase.auth.getUser();
+          if (!authData.user) {
+            console.error('No authenticated user found');
+            return [];
+          }
+          
           const { data: currentUserProfile, error: profileError } = await supabase
-            .from('profiles')
-            .select('company_id, role')
-            .eq('id', await supabase.auth.getUser().then(res => res.data.user?.id))
+            .rpc('get_user_profile_by_id', { user_id: authData.user.id })
             .single();
             
           if (profileError) {

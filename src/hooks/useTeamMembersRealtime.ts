@@ -19,10 +19,9 @@ export const useTeamMembersRealtime = (
             return;
           }
           
+          // Use the RPC function to fetch the profile safely
           const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('company_id')
-            .eq('id', user.id)
+            .rpc('get_user_profile_by_id', { user_id: user.id })
             .single();
             
           if (error) {

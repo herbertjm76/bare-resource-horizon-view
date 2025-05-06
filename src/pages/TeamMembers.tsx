@@ -28,7 +28,7 @@ const TeamMembersPage = () => {
     error: teamMembersError
   } = useTeamMembersData(false);
 
-  // Fetch user profile separately since it's no longer part of useTeamMembersData
+  // Fetch user profile using the secure RPC function
   const {
     data: userProfile,
     isLoading: isProfileLoading,
@@ -40,10 +40,9 @@ const TeamMembersPage = () => {
       console.log('Fetching user profile for ID:', userId);
       
       try {
+        // Use the RPC function which is secure against RLS recursion
         const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', userId)
+          .rpc('get_user_profile_by_id', { user_id: userId })
           .single();
           
         if (error) {
