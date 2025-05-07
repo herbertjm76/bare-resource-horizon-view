@@ -1,26 +1,49 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Profile, PendingMember } from '@/components/dashboard/types';
 import { toast } from 'sonner';
 import { useActiveMemberService } from './team/useActiveMemberService';
 import { usePendingMemberService } from './team/usePendingMemberService';
+import { useCompany } from '@/context/CompanyContext';
 
 /**
  * Hook for managing team members (both active and pending)
  */
-export const useTeamMembers = (companyId: string | undefined) => {
+export const useTeamMembers = (initialCompanyId: string | undefined) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { company } = useCompany();
+  
+  // Use company context as fallback if initialCompanyId is not provided
+  const effectiveCompanyId = initialCompanyId || company?.id;
+  
+  // Log company ID source for debugging 
+  useEffect(() => {
+    console.log('useTeamMembers - Company ID sources:', {
+      initialCompanyId,
+      contextCompanyId: company?.id,
+      effectiveCompanyId
+    });
+    
+    if (!effectiveCompanyId) {
+      console.warn('useTeamMembers - No company ID available');
+    }
+  }, [initialCompanyId, company?.id, effectiveCompanyId]);
   
   // Import services for active and pending members
-  const { updateActiveMember, deleteActiveMember } = useActiveMemberService(companyId);
-  const { updatePendingMember, createPendingMember, deletePendingMember } = usePendingMemberService(companyId);
+  const { updateActiveMember, deleteActiveMember } = useActiveMemberService(effectiveCompanyId);
+  const { updatePendingMember, createPendingMember, deletePendingMember } = usePendingMemberService(effectiveCompanyId);
 
   /**
    * Save (create or update) a team member
    */
   const handleSaveMember = async (memberData: Partial<Profile | PendingMember>, isEditing: boolean) => {
-    if (!companyId) {
+    if (!effectiveCompanyId) {
+      console.error('Company ID is required to save members', {
+        initialCompanyId,
+        contextCompanyId: company?.id,
+        memberData
+      });
       toast.error('Company ID is required');
       return false;
     }
@@ -28,6 +51,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
     try {
       setIsSaving(true);
       console.log('Starting to save member with data:', memberData);
+      console.log('Using company ID:', effectiveCompanyId);
       
       // Enhanced detection of pending members - debugging output
       const hasPendingFlag = 'isPending' in memberData && memberData.isPending === true;
@@ -71,7 +95,8 @@ export const useTeamMembers = (companyId: string | undefined) => {
    * Delete a team member
    */
   const handleDeleteMember = async (memberId: string, isPending: boolean = false) => {
-    if (!companyId) {
+    if (!effectiveCompanyId) {
+      console.error('Company ID is required to delete members');
       toast.error('Company ID is required');
       return false;
     }
@@ -107,6 +132,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
     handleSaveMember,
     handleDeleteMember,
     isSaving,
-    isDeleting
+    isDeleting,
+    companyId: effectiveCompanyId
   };
 };

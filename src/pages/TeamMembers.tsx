@@ -16,7 +16,6 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, Shield, AlertCircle, RefreshCw } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import AuthGuard from '@/components/AuthGuard';
 
 const HEADER_HEIGHT = 56;
 
@@ -35,7 +34,17 @@ const TeamMembersContent = () => {
   
   // Get user session
   const userId = useUserSession();
-  const { company, loading: companyLoading, refreshCompany } = useCompany();
+  const { company, loading: companyLoading, refreshCompany, error: companyError } = useCompany();
+  
+  // Log available company data for debugging
+  useEffect(() => {
+    console.log('TeamMembersPage - Company data:', {
+      hasCompany: !!company,
+      companyId: company?.id,
+      companyLoading,
+      companyError
+    });
+  }, [company, companyLoading, companyError]);
   
   // Check permissions when component mounts
   useEffect(() => {
@@ -78,6 +87,7 @@ const TeamMembersContent = () => {
   // Ensure company data is loaded
   useEffect(() => {
     if (!company && userId) {
+      console.log('No company data loaded, refreshing company data');
       refreshCompany();
     }
   }, [company, userId, refreshCompany]);
@@ -131,7 +141,7 @@ const TeamMembersContent = () => {
         }
         
         // As a fallback, try to fetch the profile
-        // Using .select('id, role, company_id, first_name, last_name, email') to minimize data
+        console.log('Fetching user profile from database');
         const { data, error } = await supabase
           .from('profiles')
           .select('id, role, company_id, first_name, last_name, email')
@@ -190,7 +200,11 @@ const TeamMembersContent = () => {
     if (profileError) {
       toast.error('Failed to load your profile');
     }
-  }, [teamMembersError, profileError]);
+
+    if (companyError) {
+      toast.error('Failed to load company data');
+    }
+  }, [teamMembersError, profileError, companyError]);
 
   const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || isChecking;
 
@@ -206,6 +220,7 @@ const TeamMembersContent = () => {
       if (result.hasPermission) {
         refetchProfile();
         triggerRefresh();
+        refreshCompany();
       } else {
         // Increment attempts counter
         setPermissionCheckAttempts(prev => prev + 1);
@@ -215,6 +230,15 @@ const TeamMembersContent = () => {
       toast.error('Could not refresh your session');
     }
   };
+
+  // Verify if company ID is available (explicit log for debugging)
+  const effectiveCompanyId = userProfile?.company_id || company?.id;
+  useEffect(() => {
+    console.log('TeamMembersContent - Effective company ID:', effectiveCompanyId);
+    if (!effectiveCompanyId && !isLoading) {
+      console.warn('No company ID available for team members page');
+    }
+  }, [effectiveCompanyId, isLoading]);
 
   // Show loading state
   if (isLoading && !useFallbackPermission) {
@@ -258,6 +282,28 @@ const TeamMembersContent = () => {
               }}
             >
               Use Development Mode
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show company error state
+  if (!company && companyError && !useFallbackPermission) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Company Not Found</AlertTitle>
+            <AlertDescription>
+              {companyError || 'Could not find your company data'}
+            </AlertDescription>
+          </Alert>
+          <div className="flex justify-center">
+            <Button onClick={refreshCompany}>
+              Retry
             </Button>
           </div>
         </div>

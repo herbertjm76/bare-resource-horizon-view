@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Profile, TeamMember } from './types';
 import TeamMemberSection from './TeamMemberSection';
@@ -18,15 +17,27 @@ interface TeamManagementProps {
   inviteUrl: string;
   userRole: string;
   onRefresh?: () => void;
+  companyId?: string; // Add explicit company ID prop
 }
 
 export const TeamManagement = ({
   teamMembers: activeMembers,
   inviteUrl,
   userRole,
-  onRefresh
+  onRefresh,
+  companyId: explicitCompanyId // Receive explicit company ID
 }: TeamManagementProps) => {
-  const companyId = activeMembers[0]?.company_id;
+  // Use explicitly provided companyId if available, otherwise use from first team member
+  const companyId = explicitCompanyId || activeMembers[0]?.company_id;
+  
+  // Log company ID source for debugging
+  useEffect(() => {
+    console.log('TeamManagement - Company ID source:', {
+      explicitCompanyId,
+      memberCompanyId: activeMembers[0]?.company_id,
+      effectiveCompanyId: companyId
+    });
+  }, [explicitCompanyId, activeMembers, companyId]);
   
   // Custom hooks for state management
   const {
@@ -124,6 +135,19 @@ export const TeamManagement = ({
   // State for invite section edit mode
   const [inviteEditMode, setInviteEditMode] = React.useState(false);
   const toggleInviteEditMode = () => setInviteEditMode(!inviteEditMode);
+
+  // Handle the case where company ID is missing
+  if (!companyId) {
+    return (
+      <Card className="p-6">
+        <CardContent className="text-center flex flex-col items-center py-12">
+          <p className="text-red-500 font-medium mb-2">Company ID is required to manage team members</p>
+          <p className="text-sm text-gray-500 mb-4">Please contact your administrator or refresh the page</p>
+          <Button onClick={handleRefresh} variant="outline">Refresh</Button>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Handle the case when there are no team members and user is admin/owner
   if (allMembers.length === 0 && isAdminOrOwner) {

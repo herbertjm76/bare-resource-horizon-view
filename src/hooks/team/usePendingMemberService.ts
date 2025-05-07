@@ -1,22 +1,40 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { PendingMember } from '@/components/dashboard/types';
 import { toast } from 'sonner';
 import { useMemberPermissions } from './useMemberPermissions';
+import { useCompany } from '@/context/CompanyContext';
 
 /**
  * Service for managing pending team members in the invites table
  */
-export const usePendingMemberService = (companyId: string | undefined) => {
+export const usePendingMemberService = (initialCompanyId: string | undefined) => {
   const [isLoading, setIsLoading] = useState(false);
   const { checkUserPermissions } = useMemberPermissions();
+  // Use the company context to get the company ID as a fallback
+  const { company } = useCompany();
+  const [companyId, setCompanyId] = useState<string | undefined>(initialCompanyId);
+  
+  // If initialCompanyId is not provided, try to get it from the company context
+  useEffect(() => {
+    if (!initialCompanyId && company?.id) {
+      console.log('Using company ID from context:', company.id);
+      setCompanyId(company.id);
+    }
+  }, [initialCompanyId, company]);
 
   /**
    * Update a pending member (pre-registered)
    */
   const updatePendingMember = async (memberData: Partial<PendingMember>) => {
-    if (!companyId) {
+    const effectiveCompanyId = companyId || company?.id;
+    
+    if (!effectiveCompanyId) {
+      console.error('Company ID missing for updatePendingMember', {
+        providedCompanyId: companyId,
+        contextCompanyId: company?.id,
+      });
       toast.error('Company ID is required');
       return false;
     }
@@ -25,10 +43,14 @@ export const usePendingMemberService = (companyId: string | undefined) => {
       setIsLoading(true);
       
       // Check user permissions
-      const hasPermission = await checkUserPermissions();
-      if (!hasPermission) return false;
+      const permissionCheck = await checkUserPermissions();
+      if (!permissionCheck.hasPermission) {
+        toast.error('You do not have permission to update team members');
+        return false;
+      }
 
       console.log('Updating pre-registered member in invites table:', memberData);
+      console.log('Using company ID:', effectiveCompanyId);
       
       // Extract only the fields we need to update
       const updateData = {
@@ -48,7 +70,7 @@ export const usePendingMemberService = (companyId: string | undefined) => {
         .from('invites')
         .update(updateData)
         .eq('id', memberData.id)
-        .eq('company_id', companyId);  // Add company_id check for security
+        .eq('company_id', effectiveCompanyId);  // Add company_id check for security
 
       if (error) {
         console.error('Error updating pre-registered member:', error);
@@ -72,7 +94,14 @@ export const usePendingMemberService = (companyId: string | undefined) => {
    * Create a new pending member (pre-registered)
    */
   const createPendingMember = async (memberData: Partial<PendingMember>) => {
-    if (!companyId) {
+    const effectiveCompanyId = companyId || company?.id;
+    
+    if (!effectiveCompanyId) {
+      console.error('Company ID missing for createPendingMember', {
+        providedCompanyId: companyId,
+        contextCompanyId: company?.id,
+        memberData,
+      });
       toast.error('Company ID is required');
       return false;
     }
@@ -81,8 +110,11 @@ export const usePendingMemberService = (companyId: string | undefined) => {
       setIsLoading(true);
       
       // Check user permissions
-      const hasPermission = await checkUserPermissions();
-      if (!hasPermission) return false;
+      const permissionCheck = await checkUserPermissions();
+      if (!permissionCheck.hasPermission) {
+        toast.error('You do not have permission to add team members');
+        return false;
+      }
 
       // Get current user's session
       const { data: { session } } = await supabase.auth.getSession();
@@ -91,13 +123,14 @@ export const usePendingMemberService = (companyId: string | undefined) => {
         return false;
       }
       
+      console.log('Creating new pre-registered member in invites table with company ID:', effectiveCompanyId);
+      
       // Create new pre-registered member in invites table
-      console.log('Creating new pre-registered member in invites table');
       const { error } = await supabase
         .from('invites')
         .insert({
           email: memberData.email,
-          company_id: companyId,
+          company_id: effectiveCompanyId,
           code: Math.random().toString(36).substring(2, 10).toUpperCase(),
           created_by: session.user.id,
           invitation_type: 'pre_registered',
@@ -132,7 +165,10 @@ export const usePendingMemberService = (companyId: string | undefined) => {
    * Delete a pending member
    */
   const deletePendingMember = async (memberId: string) => {
-    if (!companyId) {
+    const effectiveCompanyId = companyId || company?.id;
+    
+    if (!effectiveCompanyId) {
+      console.error('Company ID missing for deletePendingMember');
       toast.error('Company ID is required');
       return false;
     }
@@ -141,16 +177,21 @@ export const usePendingMemberService = (companyId: string | undefined) => {
       setIsLoading(true);
       
       // Check user permissions
-      const hasPermission = await checkUserPermissions();
-      if (!hasPermission) return false;
+      const permissionCheck = await checkUserPermissions();
+      if (!permissionCheck.hasPermission) {
+        toast.error('You do not have permission to delete team members');
+        return false;
+      }
       
       console.log('Deleting pending member from invites table:', memberId);
+      console.log('Using company ID:', effectiveCompanyId);
+      
       // Delete from invites table
       const { error } = await supabase
         .from('invites')
         .delete()
         .eq('id', memberId)
-        .eq('company_id', companyId); // Add company_id check for security
+        .eq('company_id', effectiveCompanyId); // Add company_id check for security
         
       if (error) {
         console.error('Error deleting from invites:', error);
@@ -173,6 +214,7 @@ export const usePendingMemberService = (companyId: string | undefined) => {
     updatePendingMember,
     createPendingMember,
     deletePendingMember,
-    isLoading
+    isLoading,
+    companyId: effectiveCompanyId
   };
 };
