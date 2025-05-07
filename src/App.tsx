@@ -19,9 +19,15 @@ import WeeklyOverview from "./pages/WeeklyOverview";
 import ProjectResourcing from "./pages/ProjectResourcing";
 import Help from "./pages/Help";
 import { CompanyProvider, useCompany } from "./context/CompanyContext";
-import { useEffect } from "react";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Component to handle routing based on subdomain status
 const AppRoutes = () => {
@@ -58,7 +64,7 @@ const AppRoutes = () => {
       <Route path="/projects" element={<Projects />} />
       <Route path="/profile" element={<Profile />} />
       
-      {/* Admin/Owner only routes */}
+      {/* Admin/Owner routes - permissions checked within each component */}
       <Route path="/team-members" element={<TeamMembers />} />
       <Route path="/team-workload" element={<TeamWorkload />} />
       <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />

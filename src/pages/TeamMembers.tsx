@@ -21,48 +21,56 @@ const TeamMembersPage = () => {
   const navigate = useNavigate();
   const { checkUserPermissions } = useMemberPermissions();
   const [isCheckingPermissions, setIsCheckingPermissions] = useState(true);
+  const [permissionChecked, setPermissionChecked] = useState(false);
   
   // Get user session
   const userId = useUserSession();
   const { company, loading: companyLoading, refreshCompany } = useCompany();
   
-  // Check permissions separately and early
+  // Check permissions only once to prevent multiple checks
   useEffect(() => {
     const verifyAccess = async () => {
-      if (!userId) {
-        setIsCheckingPermissions(false);
+      if (!userId || permissionChecked) {
         return;
       }
       
       try {
         setIsCheckingPermissions(true);
+        console.log('Verifying access with userId:', userId);
         const hasPermission = await checkUserPermissions();
         
         if (!hasPermission) {
-          console.log('User does not have permission to access team members page');
+          console.log('Permission check failed, redirecting to dashboard');
+          toast.error('You do not have permission to access this page');
           navigate('/dashboard');
+          return;
         }
         
-        setIsCheckingPermissions(false);
+        setPermissionChecked(true);
       } catch (error) {
         console.error('Error verifying permissions:', error);
-        setIsCheckingPermissions(false);
+        toast.error('Failed to verify your permissions');
         navigate('/dashboard');
+      } finally {
+        setIsCheckingPermissions(false);
       }
     };
     
-    verifyAccess();
-  }, [userId, navigate, checkUserPermissions]);
+    if (userId) {
+      verifyAccess();
+    } else {
+      setIsCheckingPermissions(false);
+    }
+  }, [userId, navigate, checkUserPermissions, permissionChecked]);
   
   // Ensure company data is loaded
   useEffect(() => {
     if (!company && userId) {
-      console.log('Company data missing, refreshing...');
       refreshCompany();
     }
   }, [company, userId, refreshCompany]);
   
-  // Fetch team members data - passing false since we don't need inactive members here
+  // Fetch team members data - passing false since we don't need inactive members
   const {
     teamMembers,
     triggerRefresh,
@@ -71,7 +79,7 @@ const TeamMembersPage = () => {
     error: teamMembersError
   } = useTeamMembersData(false);
 
-  // Fetch user profile - direct query with no RPC
+  // Fetch user profile - simplified query to reduce potential errors
   const {
     data: userProfile,
     isLoading: isProfileLoading,
@@ -80,41 +88,27 @@ const TeamMembersPage = () => {
     queryKey: ['userProfile', userId],
     queryFn: async () => {
       if (!userId) return null;
-      console.log('Fetching user profile for ID:', userId);
       
       try {
-        // Direct query to get user profile
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', userId)
           .single();
           
-        if (error) {
-          console.error('Error fetching user profile:', error);
-          toast.error('Failed to load your profile');
-          throw error;
-        }
-        
-        if (!data) {
-          console.warn('No profile found for user');
-          return null;
-        }
-        
-        console.log('User profile fetched successfully');
+        if (error) throw error;
         return data;
       } catch (error) {
-        console.error('Error in profile fetch:', error);
+        console.error('Error fetching user profile:', error);
         return null;
       }
     },
-    enabled: !!userId && !isCheckingPermissions,
-    retry: 3,
+    enabled: !!userId && permissionChecked,
+    retry: 1,
     refetchOnWindowFocus: false,
-    refetchOnMount: true, // Always refetch when the component mounts
   });
 
-  // Set up realtime subscriptions
+  // Set up realtime subscriptions only after permissions are confirmed
   useTeamMembersRealtime(
     userProfile?.company_id || company?.id,
     triggerRefresh,
@@ -124,27 +118,17 @@ const TeamMembersPage = () => {
   // Show error message if there's an issue
   useEffect(() => {
     if (teamMembersError) {
-      console.error('Team members error:', teamMembersError);
       toast.error('Failed to load team members data');
     }
     
     if (profileError) {
-      console.error('Profile error:', profileError);
       toast.error('Failed to load your profile');
     }
   }, [teamMembersError, profileError]);
 
-  // Log important state for debugging
-  useEffect(() => {
-    console.log('TeamMembers page - User ID:', userId);
-    console.log('TeamMembers page - User profile:', userProfile);
-    console.log('TeamMembers page - Company from context:', company);
-    console.log('TeamMembers page - Team members count:', teamMembers?.length || 0);
-  }, [userId, userProfile, company, teamMembers]);
-
   const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || isCheckingPermissions;
 
-  // If still checking permissions, show a loading state
+  // Show loading state
   if (isCheckingPermissions) {
     return (
       <div className="w-full h-screen flex items-center justify-center">
@@ -154,6 +138,11 @@ const TeamMembersPage = () => {
         </div>
       </div>
     );
+  }
+
+  // If not authenticated, the useUserSession hook will handle redirection
+  if (!userId) {
+    return null;
   }
 
   return (
