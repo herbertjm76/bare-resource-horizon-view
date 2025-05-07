@@ -64,7 +64,7 @@ const AppRoutes = () => {
       <Route path="/projects" element={<Projects />} />
       <Route path="/profile" element={<Profile />} />
       
-      {/* Admin/Owner routes - permissions checked within each component */}
+      {/* Team management routes - permission checks handled inside components */}
       <Route path="/team-members" element={<TeamMembers />} />
       <Route path="/team-workload" element={<TeamWorkload />} />
       <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
