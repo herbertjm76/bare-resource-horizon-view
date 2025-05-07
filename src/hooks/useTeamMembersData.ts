@@ -63,7 +63,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
         
-        // Use direct query to get company members instead of RPC
+        // Use direct query to get company members
         const { data: profiles, error } = await supabase
           .from('profiles')
           .select('*')

@@ -43,7 +43,7 @@ const TeamMembersPage = () => {
     error: teamMembersError
   } = useTeamMembersData(false);
 
-  // Fetch user profile using the secure RPC function
+  // Fetch user profile - direct query with no RPC
   const {
     data: userProfile,
     isLoading: isProfileLoading,
@@ -55,9 +55,12 @@ const TeamMembersPage = () => {
       console.log('Fetching user profile for ID:', userId);
       
       try {
-        // Use the RPC function which is secure against RLS recursion
+        // Direct query to get user profile
         const { data, error } = await supabase
-          .rpc('get_user_profile_by_id', { user_id: userId });
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
           
         if (error) {
           console.error('Error fetching user profile:', error);
@@ -65,17 +68,14 @@ const TeamMembersPage = () => {
           throw error;
         }
         
-        if (!data || data.length === 0) {
+        if (!data) {
           console.warn('No profile found for user');
           return null;
         }
         
-        // Since the RPC returns an array, access the first element
-        const profile = Array.isArray(data) ? data[0] : data;
-        
         console.log('User profile fetched successfully');
-        console.log('Profile data:', profile);
-        return profile;
+        console.log('Profile data:', data);
+        return data;
       } catch (error) {
         console.error('Error in profile fetch:', error);
         return null;

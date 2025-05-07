@@ -51,12 +51,12 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         if (requiredRole) {
           console.log("AuthGuard: Checking role requirement:", requiredRole);
           
-          // Get user profile to check role
+          // Get user profile to check role - direct query instead of RPC
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', user.id)
-            .maybeSingle();
+            .single();
 
           if (profileError) {
             console.error("AuthGuard: Error fetching user profile for role check:", profileError);

@@ -22,8 +22,7 @@ export const useMemberPermissions = () => {
       
       console.log('Current user ID:', data.user.id);
       
-      // Since we can't use the RPC function directly due to TypeScript issues,
-      // query the profiles table to check if user is admin or owner
+      // Query the profiles table to check if user is admin or owner
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('role')
