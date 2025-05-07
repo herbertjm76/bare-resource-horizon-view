@@ -16,11 +16,15 @@ const IndustryField: React.FC<IndustryFieldProps> = ({ value, onChange }) => (
         id="companyIndustry" 
         className="w-full rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
       >
-        <SelectValue placeholder="Select industry..." />
+        <SelectValue placeholder="Select industry..." className="text-white/80" />
       </SelectTrigger>
       <SelectContent className="bg-white/90 backdrop-blur-sm border border-white/30">
         {industryOptions.map(opt => (
-          <SelectItem key={opt} value={opt} className="text-gray-800 hover:bg-white/80 focus:bg-white/80">
+          <SelectItem 
+            key={opt} 
+            value={opt} 
+            className="text-gray-800 hover:bg-white/80 focus:bg-white/80"
+          >
             {opt}
           </SelectItem>
         ))}

@@ -34,13 +34,19 @@ const SizeField: React.FC<SizeFieldProps> = ({ register, errors }) => {
           defaultValue=""
         >
           <FormControl>
-            <SelectTrigger className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-              <SelectValue placeholder="Select size..." />
+            <SelectTrigger className="w-full rounded-md border border-white/30 bg-white/20 text-white px-3 py-2 text-sm">
+              <SelectValue placeholder="Select size..." className="text-white/80" />
             </SelectTrigger>
           </FormControl>
-          <SelectContent>
+          <SelectContent className="bg-white/90 backdrop-blur-sm border border-white/30">
             {companySizes.map(opt => (
-              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              <SelectItem 
+                key={opt.value} 
+                value={opt.value}
+                className="text-gray-800 hover:bg-white/80 focus:bg-white/80"
+              >
+                {opt.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
