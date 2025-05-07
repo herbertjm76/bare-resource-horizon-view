@@ -35,7 +35,13 @@ export const useMemberPermissions = () => {
         return false;
       }
       
-      const canManage = profileData?.role === 'admin' || profileData?.role === 'owner';
+      if (!profileData) {
+        console.error('No profile found');
+        toast.error('User profile not found');
+        return false;
+      }
+      
+      const canManage = profileData.role === 'admin' || profileData.role === 'owner';
       
       if (!canManage) {
         console.error('Insufficient permissions');
@@ -53,9 +59,7 @@ export const useMemberPermissions = () => {
       if (profileDataError) {
         console.error('Error fetching user profile:', profileDataError);
         // Don't return false here since we already verified permissions
-      }
-      
-      if (userProfile) {
+      } else if (userProfile) {
         console.log('Current user role:', userProfile.role);
         console.log('Current user company ID:', userProfile.company_id);
       }

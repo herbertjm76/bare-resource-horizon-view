@@ -11,20 +11,33 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
-import { useAuthorization } from '@/hooks/useAuthorization';
+import { useMemberPermissions } from '@/hooks/team/useMemberPermissions';
+import { useNavigate } from 'react-router-dom';
 
 const HEADER_HEIGHT = 56;
 
 const TeamMembersPage = () => {
-  // Check user authorization explicitly
-  const { isAuthorized, loading: authLoading, userRole } = useAuthorization({
-    requiredRole: ['admin', 'owner'],
-    autoRedirect: true
-  });
+  const navigate = useNavigate();
+  const { checkUserPermissions } = useMemberPermissions();
   
   // Get user session
   const userId = useUserSession();
   const { company, loading: companyLoading, refreshCompany } = useCompany();
+  
+  // Check permissions separately and early
+  useEffect(() => {
+    const verifyAccess = async () => {
+      if (!userId) return;
+      
+      const hasPermission = await checkUserPermissions();
+      if (!hasPermission) {
+        console.log('User does not have permission to access team members page');
+        navigate('/dashboard');
+      }
+    };
+    
+    verifyAccess();
+  }, [userId, navigate]);
   
   // Ensure company data is loaded
   useEffect(() => {
@@ -115,7 +128,7 @@ const TeamMembersPage = () => {
     console.log('TeamMembers page - Team members count:', teamMembers?.length || 0);
   }, [userId, userProfile, company, teamMembers]);
 
-  const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || authLoading;
+  const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading;
 
   return (
     <SidebarProvider>

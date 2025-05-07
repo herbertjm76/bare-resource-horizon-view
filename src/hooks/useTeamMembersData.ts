@@ -75,7 +75,12 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           throw error;
         }
 
-        console.log('Fetched profiles:', profiles?.length || 0);
+        if (!profiles) {
+          console.warn('No team members found');
+          return [];
+        }
+
+        console.log('Fetched profiles:', profiles.length || 0);
         return profiles as Profile[];
       } catch (fetchError) {
         console.error('Error in team members fetch function:', fetchError);
