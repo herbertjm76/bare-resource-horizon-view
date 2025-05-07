@@ -106,7 +106,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         }
       });
       
-      // 1. Create company first
+      // 1. Create company first 
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
@@ -158,38 +158,6 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         console.error('No user returned from signup');
         await supabase.from('companies').delete().eq('id', companyData.id);
         throw new Error('Failed to create user account');
-      }
-
-      console.log('User created successfully with ID:', authData.user.id);
-
-      // 3. Create profile record manually for extra reliability
-      const profileCreated = await ensureUserProfile(authData.user.id, {
-        email: ownerEmail,
-        firstName: ownerFirstName,
-        lastName: ownerLastName,
-        companyId: companyData.id,
-        role: userRole
-      });
-
-      if (!profileCreated) {
-        console.warn('Warning: Could not ensure profile creation through helper function');
-        // Try one more direct approach
-        const { error: directProfileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: ownerEmail,
-            first_name: ownerFirstName,
-            last_name: ownerLastName,
-            company_id: companyData.id,
-            role: userRole
-          });
-        
-        if (directProfileError) {
-          console.error('Direct profile creation failed:', directProfileError);
-        } else {
-          console.log('Direct profile creation succeeded');
-        }
       }
 
       // Show success message and confirmation info
