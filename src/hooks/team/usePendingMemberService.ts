@@ -24,12 +24,13 @@ export const usePendingMemberService = (initialCompanyId: string | undefined) =>
     }
   }, [initialCompanyId, company]);
 
+  // Calculate effective company ID for use throughout this hook
+  const effectiveCompanyId = companyId || company?.id;
+
   /**
    * Update a pending member (pre-registered)
    */
   const updatePendingMember = async (memberData: Partial<PendingMember>) => {
-    const effectiveCompanyId = companyId || company?.id;
-    
     if (!effectiveCompanyId) {
       console.error('Company ID missing for updatePendingMember', {
         providedCompanyId: companyId,
@@ -93,9 +94,7 @@ export const usePendingMemberService = (initialCompanyId: string | undefined) =>
   /**
    * Create a new pending member (pre-registered)
    */
-  const createPendingMember = async (memberData: Partial<PendingMember>) => {
-    const effectiveCompanyId = companyId || company?.id;
-    
+  const createPendingMember = async (memberData: Partial<PendingMember>) => {    
     if (!effectiveCompanyId) {
       console.error('Company ID missing for createPendingMember', {
         providedCompanyId: companyId,
@@ -165,8 +164,6 @@ export const usePendingMemberService = (initialCompanyId: string | undefined) =>
    * Delete a pending member
    */
   const deletePendingMember = async (memberId: string) => {
-    const effectiveCompanyId = companyId || company?.id;
-    
     if (!effectiveCompanyId) {
       console.error('Company ID missing for deletePendingMember');
       toast.error('Company ID is required');
