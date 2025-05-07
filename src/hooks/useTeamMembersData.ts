@@ -40,18 +40,21 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
         let companyId = company?.id;
         
         if (!companyId) {
-          // Use the RPC function to get the company safely
-          const { data: companyIdData, error: companyIdError } = await supabase
-            .rpc('get_user_company_id', { user_id: authData.user.id });
+          // Since we can't use the RPC function directly, query the profiles table
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('company_id')
+            .eq('id', authData.user.id)
+            .single();
             
-          if (companyIdError) {
-            console.error('Failed to get user company ID:', companyIdError);
+          if (profileError) {
+            console.error('Failed to get user company ID:', profileError);
             toast.error('Failed to get company information');
-            throw companyIdError;
+            throw profileError;
           }
           
-          companyId = companyIdData;
-          console.log('User company ID from RPC:', companyId);
+          companyId = profileData?.company_id;
+          console.log('User company ID from query:', companyId);
         }
         
         if (!companyId) {
@@ -60,9 +63,11 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
         
-        // Use company_members function to securely get all profiles in the company
+        // Use direct query to get company members instead of RPC
         const { data: profiles, error } = await supabase
-          .rpc('get_company_members', { company_id_input: companyId });
+          .from('profiles')
+          .select('*')
+          .eq('company_id', companyId);
 
         if (error) {
           console.error('Failed to load team members:', error);

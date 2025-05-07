@@ -22,15 +22,21 @@ export const useMemberPermissions = () => {
       
       console.log('Current user ID:', data.user.id);
       
-      // Use secure RPC functions to check if user can manage company members
-      const { data: canManage, error: managementError } = await supabase
-        .rpc('user_can_manage_company', { user_id: data.user.id });
+      // Since we can't use the RPC function directly due to TypeScript issues,
+      // query the profiles table to check if user is admin or owner
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
         
-      if (managementError) {
-        console.error('Error checking user permissions:', managementError);
+      if (profileError) {
+        console.error('Error checking user permissions:', profileError);
         toast.error('Failed to verify your permissions');
         return false;
       }
+      
+      const canManage = profileData?.role === 'admin' || profileData?.role === 'owner';
       
       if (!canManage) {
         console.error('Insufficient permissions');
@@ -39,18 +45,20 @@ export const useMemberPermissions = () => {
       }
       
       // Get user profile for logging purposes
-      const { data: userProfile, error: profileError } = await supabase
-        .rpc('get_user_profile_by_id', { user_id: data.user.id });
+      const { data: userProfile, error: profileDataError } = await supabase
+        .from('profiles')
+        .select('role, company_id')
+        .eq('id', data.user.id)
+        .single();
         
-      if (profileError) {
-        console.error('Error fetching user profile:', profileError);
-        // Don't return false here since we already verified permissions with the RPC
+      if (profileDataError) {
+        console.error('Error fetching user profile:', profileDataError);
+        // Don't return false here since we already verified permissions
       }
       
-      if (userProfile && userProfile.length > 0) {
-        const profile = Array.isArray(userProfile) ? userProfile[0] : userProfile;
-        console.log('Current user role:', profile.role);
-        console.log('Current user company ID:', profile.company_id);
+      if (userProfile) {
+        console.log('Current user role:', userProfile.role);
+        console.log('Current user company ID:', userProfile.company_id);
       }
 
       return true;
