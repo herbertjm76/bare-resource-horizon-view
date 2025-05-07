@@ -64,7 +64,8 @@ export const useSignupForm = (onSwitchToLogin: () => void) => {
       
       updateFormState({ subdomainCheck: { isChecking: false, error: '' } });
       return count === 0;
-    } catch {
+    } catch (error: any) {
+      console.error('Error checking subdomain availability:', error);
       updateFormState({ 
         subdomainCheck: { isChecking: false, error: 'Could not check subdomain.' } 
       });
@@ -118,6 +119,8 @@ export const useSignupForm = (onSwitchToLogin: () => void) => {
         return;
       }
       
+      console.log('Creating company with data:', company);
+      
       // 1. Create company first 
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
@@ -145,6 +148,7 @@ export const useSignupForm = (onSwitchToLogin: () => void) => {
       const userRole: UserRole = 'owner';
 
       // 2. Sign up user with Supabase Auth
+      console.log('Signing up user with email:', ownerEmail);
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: ownerEmail,
         password: ownerPassword,
