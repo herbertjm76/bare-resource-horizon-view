@@ -11,10 +11,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
+import { useAuthorization } from '@/hooks/useAuthorization';
 
 const HEADER_HEIGHT = 56;
 
 const TeamMembersPage = () => {
+  // Check user authorization explicitly
+  const { isAuthorized, loading: authLoading, userRole } = useAuthorization({
+    requiredRole: ['admin', 'owner'],
+    autoRedirect: true
+  });
+  
   // Get user session
   const userId = useUserSession();
   const { company, loading: companyLoading, refreshCompany } = useCompany();
@@ -108,7 +115,7 @@ const TeamMembersPage = () => {
     console.log('TeamMembers page - Team members count:', teamMembers?.length || 0);
   }, [userId, userProfile, company, teamMembers]);
 
-  const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading;
+  const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || authLoading;
 
   return (
     <SidebarProvider>

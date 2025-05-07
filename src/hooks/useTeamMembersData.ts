@@ -60,11 +60,9 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
         
-        // Fetch profiles directly with the new RPC function that's more secure
+        // Use company_members function to securely get all profiles in the company
         const { data: profiles, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('company_id', companyId);
+          .rpc('get_company_members', { company_id_input: companyId });
 
         if (error) {
           console.error('Failed to load team members:', error);

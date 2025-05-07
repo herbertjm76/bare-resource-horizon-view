@@ -20,6 +20,7 @@ import ProjectResourcing from "./pages/ProjectResourcing";
 import Help from "./pages/Help";
 import { CompanyProvider, useCompany } from "./context/CompanyContext";
 import { useEffect } from "react";
+import AuthGuard from "@/components/AuthGuard";
 
 const queryClient = new QueryClient();
 
@@ -51,17 +52,35 @@ const AppRoutes = () => {
           : <Index />
       } />
       
-      {/* Company-specific routes */}
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/weekly-overview" element={<WeeklyOverview />} />
-      <Route path="/project-resourcing" element={<ProjectResourcing />} />
-      <Route path="/projects" element={<Projects />} />
-      <Route path="/team-members" element={<TeamMembers />} />
-      <Route path="/team-workload" element={<TeamWorkload />} />
-      <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
-      <Route path="/office-settings" element={<OfficeSettings />} />
-      <Route path="/help" element={<Help />} />
-      <Route path="/profile" element={<Profile />} />
+      {/* Protected routes requiring authentication */}
+      <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
+      <Route path="/weekly-overview" element={<AuthGuard><WeeklyOverview /></AuthGuard>} />
+      <Route path="/project-resourcing" element={<AuthGuard><ProjectResourcing /></AuthGuard>} />
+      <Route path="/projects" element={<AuthGuard><Projects /></AuthGuard>} />
+      <Route path="/profile" element={<AuthGuard><Profile /></AuthGuard>} />
+      
+      {/* Admin/Owner only routes */}
+      <Route path="/team-members" element={
+        <AuthGuard requiredRole={['admin', 'owner']}>
+          <TeamMembers />
+        </AuthGuard>
+      } />
+      <Route path="/team-workload" element={
+        <AuthGuard requiredRole={['admin', 'owner']}>
+          <TeamWorkload />
+        </AuthGuard>
+      } />
+      <Route path="/team-annual-leave" element={
+        <AuthGuard requiredRole={['admin', 'owner']}>
+          <TeamAnnualLeave />
+        </AuthGuard>
+      } />
+      <Route path="/office-settings" element={
+        <AuthGuard requiredRole={['admin', 'owner']}>
+          <OfficeSettings />
+        </AuthGuard>
+      } />
+      <Route path="/help" element={<AuthGuard><Help /></AuthGuard>} />
       
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />

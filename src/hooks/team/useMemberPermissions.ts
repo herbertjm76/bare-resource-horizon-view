@@ -22,33 +22,35 @@ export const useMemberPermissions = () => {
       
       console.log('Current user ID:', data.user.id);
       
-      // Get user profile using the RPC function
-      const { data: userProfile, error: profileError } = await supabase
-        .rpc('get_user_profile_by_id', { user_id: data.user.id });
+      // Use secure RPC functions to check if user can manage company members
+      const { data: canManage, error: managementError } = await supabase
+        .rpc('user_can_manage_company', { user_id: data.user.id });
         
-      if (profileError) {
-        console.error('Error checking user permissions:', profileError);
+      if (managementError) {
+        console.error('Error checking user permissions:', managementError);
         toast.error('Failed to verify your permissions');
         return false;
       }
       
-      if (!userProfile || userProfile.length === 0) {
-        console.error('User profile not found');
-        toast.error('User profile not found');
+      if (!canManage) {
+        console.error('Insufficient permissions');
+        toast.error('You do not have permission to manage team members');
         return false;
       }
       
-      // Since the RPC returns an array, we need to access the first element
-      const profile = Array.isArray(userProfile) ? userProfile[0] : userProfile;
+      // Get user profile for logging purposes
+      const { data: userProfile, error: profileError } = await supabase
+        .rpc('get_user_profile_by_id', { user_id: data.user.id });
+        
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError);
+        // Don't return false here since we already verified permissions with the RPC
+      }
       
-      console.log('Current user role:', profile.role);
-      console.log('Current user company ID:', profile.company_id);
-      
-      // Only owners and admins can manage team members
-      if (profile.role !== 'owner' && profile.role !== 'admin') {
-        console.error('Insufficient permissions, user role:', profile.role);
-        toast.error('You do not have permission to manage team members');
-        return false;
+      if (userProfile && userProfile.length > 0) {
+        const profile = Array.isArray(userProfile) ? userProfile[0] : userProfile;
+        console.log('Current user role:', profile.role);
+        console.log('Current user company ID:', profile.company_id);
       }
 
       return true;
