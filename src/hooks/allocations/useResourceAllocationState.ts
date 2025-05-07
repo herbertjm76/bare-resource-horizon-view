@@ -1,55 +1,22 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { MemberAllocation } from '@/components/weekly-overview/types';
 import { toast } from 'sonner';
 
 /**
- * Hook to manage the state of resource allocations
+ * Hook for managing member allocation state
  */
 export function useResourceAllocationState() {
-  // State for storing member allocations
+  // Member allocations state
   const [memberAllocations, setMemberAllocations] = useState<Record<string, MemberAllocation>>({});
-  
-  // State for tracking loading and error states
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Force loading state to clear after a maximum time to prevent getting stuck
-  useEffect(() => {
-    // If loading takes more than 12 seconds, force it to complete
-    const safetyTimer = setTimeout(() => {
-      if (isLoading) {
-        console.log('Allocation state loading safety timeout reached, forcing completion');
-        toast.info("Some data may still be loading", { duration: 3000 });
-        setIsLoading(false);
-      }
-    }, 12000); // Reduced from 15s to 12s for quicker feedback
-    
-    return () => clearTimeout(safetyTimer);
-  }, [isLoading]);
-  
-  // Function to get allocation for a specific member
-  const getMemberAllocation = useCallback((memberId: string) => {
-    return memberAllocations[memberId] || {
-      id: memberId,
-      annualLeave: 0,
-      publicHoliday: 0,
-      vacationLeave: 0,
-      medicalLeave: 0,
-      others: 0,
-      remarks: '',
-      projects: [],
-      projectAllocations: [],
-      resourcedHours: 0
-    };
-  }, [memberAllocations]);
-  
-  // Function to handle input changes (e.g., hours, remarks)
-  const handleInputChange = useCallback((memberId: string, field: string, value: any) => {
-    console.log(`Updating ${field} for member ${memberId} to:`, value);
-    
-    setMemberAllocations(prev => {
-      const allocation = prev[memberId] || {
+  // Initialize or get member allocation
+  const getMemberAllocation = (memberId: string): MemberAllocation => {
+    if (!memberAllocations[memberId]) {
+      // Use default values if allocation not found
+      return {
         id: memberId,
         annualLeave: 0,
         publicHoliday: 0,
@@ -59,18 +26,30 @@ export function useResourceAllocationState() {
         remarks: '',
         projects: [],
         projectAllocations: [],
-        resourcedHours: 0
+        resourcedHours: 0,
       };
-      
-      return {
-        ...prev,
-        [memberId]: {
-          ...allocation,
-          [field]: value
-        }
-      };
-    });
-  }, []);
+    }
+    return memberAllocations[memberId];
+  };
+
+  // Handle input changes for editable fields
+  const handleInputChange = (memberId: string, field: keyof MemberAllocation, value: any) => {
+    const numValue = field !== 'remarks' && field !== 'projects' && field !== 'projectAllocations' 
+      ? parseFloat(value) || 0 
+      : value;
+    
+    // Update local state for immediate UI feedback
+    setMemberAllocations(prev => ({
+      ...prev,
+      [memberId]: {
+        ...prev[memberId],
+        [field]: numValue,
+      }
+    }));
+    
+    // Here we would save changes to the database
+    // For now we're just updating the local state
+  };
   
   return {
     memberAllocations,

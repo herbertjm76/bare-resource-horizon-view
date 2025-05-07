@@ -7,20 +7,17 @@ import { Badge } from "@/components/ui/badge";
 interface FilterButtonProps {
   activeFiltersCount: number;
   onClick?: () => void;
-  className?: string;
 }
 
 export const FilterButton: React.FC<FilterButtonProps> = ({
   activeFiltersCount,
-  onClick,
-  className
+  onClick
 }) => {
   return (
     <Button 
       variant="default" 
-      className={`flex items-center bg-brand-primary hover:bg-brand-primary/90 ${className || ''}`}
+      className="flex items-center bg-brand-primary hover:bg-brand-primary/90"
       onClick={onClick}
-      type="button"
     >
       <Filter className="w-4 h-4 mr-2" />
       <span>Filters</span>

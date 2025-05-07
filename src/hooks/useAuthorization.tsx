@@ -47,7 +47,7 @@ export const useAuthorization = ({
       }, 8000);
       
       // Check if user is authenticated
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
         console.error("useAuthorization: Session error", sessionError);
@@ -60,7 +60,7 @@ export const useAuthorization = ({
         return;
       }
       
-      if (!sessionData.session) {
+      if (!session) {
         console.log("useAuthorization: No active session");
         setError("No active session");
         setIsAuthorized(false);
@@ -71,14 +71,14 @@ export const useAuthorization = ({
         return;
       }
 
-      console.log("useAuthorization: Session found for user", sessionData.session.user.id);
+      console.log("useAuthorization: Session found for user", session.user.id);
 
-      // Get user profile directly with a single query instead of using RPC
+      // Get user profile to check role
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role, company_id')
-        .eq('id', sessionData.session.user.id)
-        .single();
+        .eq('id', session.user.id)
+        .maybeSingle();
 
       if (profileError) {
         console.error("useAuthorization: Profile error", profileError);

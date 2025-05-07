@@ -19,16 +19,9 @@ import WeeklyOverview from "./pages/WeeklyOverview";
 import ProjectResourcing from "./pages/ProjectResourcing";
 import Help from "./pages/Help";
 import { CompanyProvider, useCompany } from "./context/CompanyContext";
+import { useEffect } from "react";
 
-// Create a new QueryClient instance with default options
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 // Component to handle routing based on subdomain status
 const AppRoutes = () => {
@@ -58,19 +51,17 @@ const AppRoutes = () => {
           : <Index />
       } />
       
-      {/* Protected routes requiring authentication */}
+      {/* Company-specific routes */}
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/weekly-overview" element={<WeeklyOverview />} />
       <Route path="/project-resourcing" element={<ProjectResourcing />} />
       <Route path="/projects" element={<Projects />} />
-      <Route path="/profile" element={<Profile />} />
-      
-      {/* Team management routes - removed AuthGuard dependency */}
       <Route path="/team-members" element={<TeamMembers />} />
       <Route path="/team-workload" element={<TeamWorkload />} />
       <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
       <Route path="/office-settings" element={<OfficeSettings />} />
       <Route path="/help" element={<Help />} />
+      <Route path="/profile" element={<Profile />} />
       
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />

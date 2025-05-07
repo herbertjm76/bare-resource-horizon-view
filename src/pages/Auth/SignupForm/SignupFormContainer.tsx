@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -105,29 +106,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         }
       });
       
-      // Create auth user first
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: ownerEmail,
-        password: ownerPassword,
-        options: {
-          data: {
-            first_name: ownerFirstName,
-            last_name: ownerLastName,
-            role: 'owner'
-          },
-          emailRedirectTo: window.location.origin + '/auth'
-        }
-      });
-
-      if (signUpError) {
-        throw signUpError;
-      }
-
-      if (!authData.user) {
-        throw new Error('Failed to create user account');
-      }
-
-      // Then create company after user is created
+      // 1. Create company first
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
@@ -150,29 +129,51 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
 
       console.log('Company created successfully with ID:', companyData.id);
 
-      // Update the user's profile with company_id
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          company_id: companyData.id,
-          role: 'owner'
-        })
-        .eq('id', authData.user.id);
+      // Define the role explicitly as a valid UserRole enum value
+      const userRole: UserRole = 'owner';
 
-      if (updateError) {
-        console.warn('Could not update profile with company ID:', updateError);
-        // Fallback: try direct creation/update
-        const profileCreated = await ensureUserProfile(authData.user.id, {
-          email: ownerEmail,
-          firstName: ownerFirstName,
-          lastName: ownerLastName,
-          companyId: companyData.id,
-          role: 'owner'
-        });
-
-        if (!profileCreated) {
-          console.warn('Warning: Could not ensure profile creation through helper function');
+      // 2. Sign up user with Supabase Auth
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: ownerEmail,
+        password: ownerPassword,
+        options: {
+          data: {
+            first_name: ownerFirstName,
+            last_name: ownerLastName,
+            company_id: companyData.id,
+            role: userRole
+          },
+          emailRedirectTo: window.location.origin + '/auth'
         }
+      });
+
+      if (signUpError) {
+        // If auth fails, clean up by deleting the company
+        console.error('Signup error:', signUpError);
+        await supabase.from('companies').delete().eq('id', companyData.id);
+        throw signUpError;
+      }
+
+      if (!authData.user) {
+        console.error('No user returned from signup');
+        await supabase.from('companies').delete().eq('id', companyData.id);
+        throw new Error('Failed to create user account');
+      }
+
+      console.log('User created successfully with ID:', authData.user.id);
+
+      // 3. Create profile record manually since the trigger might be failing
+      const profileCreated = await ensureUserProfile(authData.user.id, {
+        email: ownerEmail,
+        firstName: ownerFirstName,
+        lastName: ownerLastName,
+        companyId: companyData.id,
+        role: userRole
+      });
+
+      if (!profileCreated) {
+        console.warn('Warning: Could not ensure profile creation through helper function');
+        // We'll continue anyway since the database trigger should handle this
       }
 
       // Show success message and confirmation info

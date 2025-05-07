@@ -2,7 +2,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 interface FilterBadgesProps {
   filters: {
@@ -12,6 +11,7 @@ interface FilterBadgesProps {
   };
   onFilterChange: (key: string, value: string) => void;
   managerOptions: {id: string, name: string}[];
+  // These props exist in FilterBar.tsx but were missing from this interface
   officeOptions?: string[];
   countryOptions?: string[];
 }
@@ -19,9 +19,7 @@ interface FilterBadgesProps {
 export const FilterBadges: React.FC<FilterBadgesProps> = ({
   filters,
   onFilterChange,
-  managerOptions,
-  officeOptions,
-  countryOptions
+  managerOptions
 }) => {
   // Count active filters
   const activeFiltersCount = 
@@ -39,14 +37,12 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
           className="bg-slate-50 hover:bg-slate-100 text-xs py-0 h-6"
         >
           Office: {filters.office}
-          <Button 
-            variant="ghost"
-            size="sm"
-            className="ml-1 p-0 h-auto hover:bg-transparent hover:text-destructive"
+          <button 
+            className="ml-1 hover:text-destructive"
             onClick={() => onFilterChange('office', 'all')}
           >
             <X className="h-3 w-3" />
-          </Button>
+          </button>
         </Badge>
       )}
       {filters.country !== 'all' && (
@@ -55,14 +51,12 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
           className="bg-slate-50 hover:bg-slate-100 text-xs py-0 h-6"
         >
           Country: {filters.country}
-          <Button 
-            variant="ghost"
-            size="sm"
-            className="ml-1 p-0 h-auto hover:bg-transparent hover:text-destructive"
+          <button 
+            className="ml-1 hover:text-destructive"
             onClick={() => onFilterChange('country', 'all')}
           >
             <X className="h-3 w-3" />
-          </Button>
+          </button>
         </Badge>
       )}
       {filters.manager !== 'all' && (
@@ -71,14 +65,12 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
           className="bg-slate-50 hover:bg-slate-100 text-xs py-0 h-6"
         >
           Manager: {managerOptions.find(m => m.id === filters.manager)?.name || filters.manager}
-          <Button 
-            variant="ghost"
-            size="sm"
-            className="ml-1 p-0 h-auto hover:bg-transparent hover:text-destructive"
+          <button 
+            className="ml-1 hover:text-destructive"
             onClick={() => onFilterChange('manager', 'all')}
           >
             <X className="h-3 w-3" />
-          </Button>
+          </button>
         </Badge>
       )}
     </div>

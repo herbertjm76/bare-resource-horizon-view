@@ -1,14 +1,19 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useTeamMembersData } from "@/hooks/useTeamMembersData";
 import { Table, TableBody, TableFooter } from "@/components/ui/table";
 import { WeeklyResourceHeader } from './WeeklyResourceHeader';
+import { useResourceAllocations } from './hooks/useResourceAllocations';
+import { useCompany } from "@/context/CompanyContext";
 import { ResourceTableLoadingState } from './components/ResourceTableLoadingState';
 import { ResourceTableErrorState } from './components/ResourceTableErrorState';
 import { EmptyResourceState } from './components/EmptyResourceState';
 import { TeamMemberRows } from './components/TeamMemberRows';
 import { ProjectTotalsRow } from './components/ProjectTotalsRow';
-import { useWeeklyResourceData } from './hooks/useWeeklyResourceData';
-import { toast } from 'sonner';
+import { useOfficeMembers } from './hooks/useOfficeMembers';
+import { useOfficeDisplay } from './hooks/useOfficeDisplay';
 import './weekly-overview.css';
 
 interface WeeklyResourceTableProps {
@@ -22,83 +27,126 @@ export const WeeklyResourceTable: React.FC<WeeklyResourceTableProps> = ({
   selectedWeek,
   filters
 }) => {
-  // Track how long we've been loading
-  const [loadingDuration, setLoadingDuration] = useState(0);
-  const [forceRender, setForceRender] = useState(false);
+  // Get company context
+  const { company } = useCompany();
   
-  const {
-    projects,
-    allMembers,
-    membersByOffice,
-    filteredOffices,
-    getMemberAllocation,
-    handleInputChange,
-    getOfficeDisplay,
-    projectTotals,
-    refreshAllocations,
-    isLoading,
-    error
-  } = useWeeklyResourceData(selectedWeek, filters);
-  
-  // Track loading time and display toast if it takes too long
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    
-    if (isLoading) {
-      // Start counting loading time
-      interval = setInterval(() => {
-        setLoadingDuration(prev => {
-          const newDuration = prev + 1;
-          
-          // If loading for more than 15 seconds, force render
-          if (newDuration === 15 && !forceRender) {
-            setForceRender(true);
-            toast.info("Forcing data display", {
-              description: "Some data may still be loading in the background.",
-              duration: 5000
-            });
-          }
-          
-          return newDuration;
-        });
-      }, 1000);
-    } else {
-      // Reset counter when loading completes
-      setLoadingDuration(0);
-      if (forceRender) {
-        setForceRender(false);
-      }
+  // Get current user ID
+  const { data: session, isLoading: isLoadingSession } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return data.session;
     }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isLoading, forceRender]);
+  });
+  
+  // Fetch all projects for the company
+  const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
+    queryKey: ['company-projects', company?.id],
+    queryFn: async () => {
+      if (!company?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, code, name')
+        .eq('company_id', company.id)
+        .order('code');
+      
+      if (error) {
+        console.error("Error fetching projects:", error);
+        return [];
+      }
+      
+      console.log("Fetched projects:", data);
+      return data || [];
+    },
+    enabled: !!company?.id
+  });
+  
+  // Get team members data using the hook - pass true to include inactive members
+  const { teamMembers, isLoading: isLoadingMembers, error: teamMembersError } = useTeamMembersData(true);
+  
+  // Get pending team members (pre-registered)
+  const { data: preRegisteredMembers = [], isLoading: isLoadingPending, error: pendingError } = useQuery({
+    queryKey: ['preRegisteredMembers', session?.user?.id, company?.id],
+    queryFn: async () => {
+      if (!session?.user?.id || !company?.id) return [];
+      
+      // Get pre-registered members from invites table
+      const { data, error } = await supabase
+        .from('invites')
+        .select('id, first_name, last_name, email, department, location, job_title, role, weekly_capacity')
+        .eq('company_id', company.id)
+        .eq('invitation_type', 'pre_registered')
+        .eq('status', 'pending');
+        
+      if (error) {
+        console.error("Error fetching pre-registered members:", error);
+        return [];
+      }
+      
+      console.log("Fetched pre-registered members:", data);
+      
+      // Transform the pre-registered members to match team member structure
+      return data.map(member => ({
+        id: member.id,
+        first_name: member.first_name || '',
+        last_name: member.last_name || '',
+        email: member.email || '',
+        location: member.location || null,
+        weekly_capacity: member.weekly_capacity || 40
+      }));
+    },
+    enabled: !!session?.user?.id && !!company?.id
+  });
+
+  // Get all members combined (active + pre-registered)
+  const allMembers = React.useMemo(() => {
+    const combined = [...(teamMembers || []), ...(preRegisteredMembers || [])];
+    console.log("All members for resource table:", combined);
+    return combined;
+  }, [teamMembers, preRegisteredMembers]);
+
+  // Get allocations from custom hook
+  const { 
+    getMemberAllocation, 
+    handleInputChange, 
+    isLoading: isLoadingAllocations,
+    error: allocationsError,
+    refreshAllocations,
+    projectTotals
+  } = useResourceAllocations(allMembers, selectedWeek);
   
   // Refresh allocations when week changes
-  useEffect(() => {
+  React.useEffect(() => {
     if (refreshAllocations) {
       console.log("Refreshing allocations for week:", selectedWeek);
       refreshAllocations();
     }
   }, [selectedWeek, refreshAllocations]);
   
-  // Added safety check for data
-  const hasMembers = Array.isArray(allMembers) && allMembers.length > 0;
-  const hasProjects = Array.isArray(projects) && projects.length > 0;
+  // Get office display helper
+  const { getOfficeDisplay } = useOfficeDisplay();
+  
+  // Get members organized by office
+  const { membersByOffice, filteredOffices } = useOfficeMembers(allMembers, filters);
 
-  // Render loading state with additional checks to prevent getting stuck
-  if ((isLoading || !hasProjects) && !forceRender) {
+  // Determine overall loading state
+  const isLoading = isLoadingSession || isLoadingMembers || isLoadingPending || 
+                    isLoadingAllocations || isLoadingProjects;
+
+  // Determine if there are any errors
+  const error = teamMembersError || pendingError || allocationsError;
+
+  if (isLoading) {
     return <ResourceTableLoadingState />;
   }
 
-  // Render error state
   if (error) {
     return <ResourceTableErrorState error={error} />;
   }
 
-  // Render empty state
-  if (!hasMembers) {
+  if (!allMembers.length) {
     return <EmptyResourceState />;
   }
 

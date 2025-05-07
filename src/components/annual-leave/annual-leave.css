@@ -70,10 +70,8 @@
 }
 
 /* Cell with hours styling */
-.annual-leave-calendar td.leave-cell-filled input {
-  background-color: #ECECFB; /* Light purple background for filled cells */
-  color: black;
-  font-weight: 500;
+.annual-leave-calendar td.bg-brand-violet-light {
+  transition: background-color 0.2s ease;
 }
 
 /* Improved header styling */
@@ -88,21 +86,5 @@
 
 /* Transition effect when adding hours */
 .annual-leave-calendar input {
-  transition: all 0.2s ease;
-}
-
-/* Enhanced input appearance */
-.annual-leave-calendar input::placeholder {
-  color: rgba(0, 0, 0, 0.3);
-}
-
-/* Pulse animation for newly entered values */
-@keyframes pulse-highlight {
-  0% { box-shadow: 0 0 0 0 rgba(111, 75, 246, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(111, 75, 246, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(111, 75, 246, 0); }
-}
-
-.annual-leave-calendar .leave-cell-filled input:focus {
-  animation: pulse-highlight 1.5s;
+  transition: color 0.2s ease, background-color 0.2s ease;
 }

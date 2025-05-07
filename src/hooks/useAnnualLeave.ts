@@ -25,14 +25,14 @@ export const useAnnualLeave = (month: Date) => {
     setIsLoading(true);
 
     try {
-      // Format month for query: YYYY-MM (removed the % character)
+      // Format month for query: YYYY-MM
       const monthStr = format(month, 'yyyy-MM');
 
       // Fetch all leaves for the month using the edge function
       const { data, error } = await supabase.functions.invoke('get_annual_leaves', {
         body: { 
           company_id_param: company.id,
-          month_param: monthStr  // Removed the '%' that was causing the issue
+          month_param: monthStr + '%'
         }
       });
 

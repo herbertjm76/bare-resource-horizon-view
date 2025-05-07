@@ -31,21 +31,9 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
     return nameA.localeCompare(nameB);
   });
   
-  // Modified input change handler to restrict input to a single digit (0-9)
   const handleInputChange = (memberId: string, date: string, value: string) => {
-    // If the value is empty, treat it as 0
-    if (value === '') {
-      onLeaveChange(memberId, date, 0);
-      return;
-    }
-    
-    // Only allow digits 0-9
-    const digit = parseInt(value.slice(-1), 10);
-    
-    // Check if it's a valid number
-    if (!isNaN(digit) && digit >= 0 && digit <= 9) {
-      onLeaveChange(memberId, date, digit);
-    }
+    const hours = parseFloat(value) || 0;
+    onLeaveChange(memberId, date, hours);
   };
 
   // Helper to get the name for a member
@@ -122,36 +110,24 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 const hours = leaveData[member.id]?.[dateKey];
                 const isSundayCol = isSundayBorder(day);
                 
-                // Enhanced styling for input values
-                // Default zero with 50% opacity, non-zero values with purple background and black text
-                const inputValueStyle = hours === 0 
-                  ? 'font-medium text-gray-250 opacity-50' // Light grey with 50% opacity for zero
-                  : hours > 0 
-                    ? 'font-medium text-black' // Black text for other digits
-                    : 'font-medium text-gray-250 opacity-50'; // Light grey with 50% opacity for empty/null
-                
-                // Determine if the cell has a value for background styling
-                const cellHasValue = hours !== undefined && hours > 0;
-                
                 return (
                   <TableCell 
                     key={`${member.id}-${dateKey}`} 
                     className={`p-0 text-center leave-cell ${isWeekend ? 'bg-muted/60' : ''} 
                       ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''} 
                       ${isSundayCol ? 'sunday-border' : ''}
-                      ${cellHasValue ? 'leave-cell-filled' : ''}`}
+                      ${getCellStyle(hours)}`}
                   >
                     <Input 
-                      type="text" 
-                      maxLength={1}
-                      value={hours !== undefined ? hours : ''} 
+                      type="number" 
+                      min="0" 
+                      max="24" 
+                      value={hours || ''} 
                       onChange={e => handleInputChange(member.id, dateKey, e.target.value)} 
                       placeholder="0" 
                       className={`h-7 w-7 p-0 text-center border-0 hover:border hover:border-input 
-                        focus:border focus:border-input rounded-sm
-                        transition-all duration-200
-                        ${inputValueStyle}
-                        ${cellHasValue ? 'bg-brand-violet-light' : 'bg-transparent'}`}
+                        focus:border focus:border-input rounded-sm 
+                        ${hours > 0 ? 'font-medium text-brand-primary' : 'text-gray-250'}`} 
                     />
                   </TableCell>
                 );

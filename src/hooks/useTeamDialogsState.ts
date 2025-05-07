@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { TeamMember, Invite } from '@/components/dashboard/types';
+import { Profile, PendingMember, Invite, TeamMember } from '@/components/dashboard/types';
 
 export const useTeamDialogsState = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -12,31 +12,26 @@ export const useTeamDialogsState = () => {
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
   const [isPendingMemberToDelete, setIsPendingMemberToDelete] = useState(false);
 
-  // Dialog open handlers
   const openAddDialog = () => {
-    setCurrentMember(null);
     setIsAddDialogOpen(true);
-    setIsEditDialogOpen(false);
   };
 
   const openEditDialog = (member: TeamMember) => {
+    console.log('Editing member:', member, 'isPending:', 'isPending' in member);
     setCurrentMember(member);
     setIsEditDialogOpen(true);
-    setIsAddDialogOpen(false);
   };
 
-  const openDeleteDialog = (memberId: string, isPending: boolean = false) => {
+  const openDeleteDialog = (memberId: string, isPending: boolean) => {
     setMemberToDelete(memberId);
     setIsPendingMemberToDelete(isPending);
     setIsDeleteDialogOpen(true);
   };
 
-  const openInviteDialog = (invite: Invite | null = null) => {
-    setCurrentInvite(invite);
+  const openInviteDialog = () => {
     setIsInviteDialogOpen(true);
   };
 
-  // Dialog close handlers
   const closeAddEditDialog = () => {
     setIsAddDialogOpen(false);
     setIsEditDialogOpen(false);

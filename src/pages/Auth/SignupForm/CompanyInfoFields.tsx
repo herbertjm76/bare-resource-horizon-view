@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { CompanyFormData, industryOptions } from "../companyHelpers";
@@ -5,7 +6,6 @@ import AddressAutocomplete from "@/components/ui/AddressAutocomplete";
 import CountryField from "@/components/CompanyRegistrationForm/CountryField";
 import IndustryField from "./IndustryField";
 import { UseFormWatch } from "react-hook-form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface CompanyInfoFieldsProps {
   company: CompanyFormData;
@@ -112,20 +112,19 @@ const CompanyInfoFields: React.FC<CompanyInfoFieldsProps> = ({
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label htmlFor="companySize" className="block text-white font-medium mb-1">Size</label>
-          <Select value={company.size} onValueChange={value => handleCompanyChange('size', value)}>
-            <SelectTrigger 
-              id="companySize" 
-              className="w-full rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
-            >
-              <SelectValue placeholder="Select size..." />
-            </SelectTrigger>
-            <SelectContent className="bg-white/90 backdrop-blur-sm border border-white/30">
-              <SelectItem value="1-5" className="text-gray-800 hover:bg-white/80 focus:bg-white/80">1-5</SelectItem>
-              <SelectItem value="5-25" className="text-gray-800 hover:bg-white/80 focus:bg-white/80">5-25</SelectItem>
-              <SelectItem value="26-50" className="text-gray-800 hover:bg-white/80 focus:bg-white/80">26-50</SelectItem>
-              <SelectItem value="51-100" className="text-gray-800 hover:bg-white/80 focus:bg-white/80">51-100</SelectItem>
-            </SelectContent>
-          </Select>
+          <select
+            id="companySize"
+            value={company.size}
+            onChange={e => handleCompanyChange('size', e.target.value)}
+            className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
+            required
+          >
+            <option value="">Select size...</option>
+            <option value="1-5">1-5</option>
+            <option value="5-25">5-25</option>
+            <option value="26-50">26-50</option>
+            <option value="51-100">51-100</option>
+          </select>
         </div>
         <IndustryField value={company.industry || ""} onChange={v => handleCompanyChange('industry', v)} />
       </div>

@@ -1,104 +1,41 @@
 
-import React, { useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { UserPlus, RefreshCw } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { useCompany } from '@/context/CompanyContext';
-import { TeamManagement } from './TeamManagement';
-import { toast } from 'sonner';
+import React from 'react';
+import { TeamManagement } from "@/components/dashboard/TeamManagement";
+import { Profile } from "@/components/dashboard/types";
 
 interface TeamMemberContentProps {
   userProfile: any;
-  isProfileLoading?: boolean;
-  teamMembers: any[];
-  onRefresh?: () => void;
+  isProfileLoading: boolean;
+  teamMembers: Profile[];
+  onRefresh: () => void;
 }
 
-export const TeamMemberContent = ({ 
-  userProfile, 
-  isProfileLoading = false,
-  teamMembers = [],
-  onRefresh 
-}: TeamMemberContentProps) => {
-  const { company, loading: companyLoading, error: companyError } = useCompany();
-
-  // Use companyId from userProfile if available, otherwise from company context
-  const companyId = userProfile?.company_id || company?.id;
-  
-  // Generate invite URL
-  const baseUrl = window.location.origin;
-  const inviteUrl = `${baseUrl}/join`;
-
-  // Log the available company data for debugging
-  useEffect(() => {
-    console.log('TeamMemberContent - Company data:', {
-      userProfileCompanyId: userProfile?.company_id,
-      contextCompanyId: company?.id,
-      effectiveCompanyId: companyId,
-      companyLoading,
-      companyError
-    });
-  }, [userProfile, company, companyId, companyLoading, companyError]);
-
-  // Display warning if company ID is missing
-  useEffect(() => {
-    if (!isProfileLoading && !companyLoading && !companyId) {
-      console.error('No company ID available in TeamMemberContent');
-      toast.error('Missing company ID. Please try refreshing the page or contact support.');
-    }
-  }, [companyId, isProfileLoading, companyLoading]);
-
-  if (isProfileLoading || companyLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <RefreshCw className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  // Handle error state when no company is found
-  if (!company && companyError) {
-    return (
-      <Card className="p-8 flex flex-col items-center justify-center">
-        <p className="mb-4 text-center text-red-500">
-          {companyError || 'Could not load company data'}
-        </p>
-        <Button onClick={onRefresh}>Retry</Button>
-      </Card>
-    );
-  }
+export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
+  userProfile,
+  isProfileLoading,
+  teamMembers,
+  onRefresh
+}) => {
+  const inviteUrl = userProfile?.company_id ? `${window.location.origin}/join/${userProfile.company_id}` : '';
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold">Team Members</h2>
-        <div className="flex space-x-2">
-          {onRefresh && (
-            <Button variant="outline" onClick={onRefresh} className="flex items-center gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Refresh
-            </Button>
-          )}
+    <div className="max-w-6xl mx-auto space-y-8">
+      <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
+      {isProfileLoading ? (
+        <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+          <p className="text-gray-700">Loading user profile...</p>
         </div>
-      </div>
-      
-      {companyId ? (
+      ) : !userProfile ? (
+        <div className="bg-white/10 backdrop-blur-md p-6 rounded-xl">
+          <p className="text-gray-700">You must be logged in to view team members.</p>
+        </div>
+      ) : (
         <TeamManagement 
           teamMembers={teamMembers} 
-          inviteUrl={inviteUrl}
-          userRole={userProfile?.role || 'member'}
+          inviteUrl={inviteUrl} 
+          userRole={userProfile?.role || 'member'} 
           onRefresh={onRefresh}
-          companyId={companyId}
         />
-      ) : (
-        <Card className="p-8 text-center">
-          <p className="text-red-500 font-medium">Company ID is missing. Cannot load team members.</p>
-          <p className="mt-2">This is required to associate new team members with your company.</p>
-          <Button onClick={onRefresh} className="mt-4">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-        </Card>
       )}
     </div>
   );
