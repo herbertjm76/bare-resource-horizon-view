@@ -8,16 +8,18 @@ interface CompanyAddressFieldProps {
   country: string;
   onChange: (field: keyof CompanyFormData, value: string) => void;
   onSelectSuggestion: (address: string, city: string) => void;
+  error?: string;
 }
 
 const CompanyAddressField: React.FC<CompanyAddressFieldProps> = ({ 
   address, 
   country, 
   onChange, 
-  onSelectSuggestion 
+  onSelectSuggestion,
+  error
 }) => (
   <div>
-    <label htmlFor="companyAddress" className="block text-white font-medium mb-1">Address</label>
+    <label htmlFor="companyAddress" className="block text-white font-medium mb-1">Company Address</label>
     <AddressAutocomplete
       value={address}
       country={country}
@@ -25,8 +27,9 @@ const CompanyAddressField: React.FC<CompanyAddressFieldProps> = ({
       onSelectSuggestion={(address, city) => onSelectSuggestion(address, city)}
       placeholder="Enter company address"
       disabled={false}
-      className="w-full rounded-lg bg-white/20 border border-white/30 text-white"
+      className={`w-full rounded-lg bg-white/20 border ${error ? 'border-red-400' : 'border-white/30'} text-white`}
     />
+    {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
   </div>
 );
 
