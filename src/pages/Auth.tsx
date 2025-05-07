@@ -48,7 +48,7 @@ const Auth: React.FC = () => {
         
         // First set up auth state change listener to catch immediate events
         const { data } = supabase.auth.onAuthStateChange((event, session) => {
-          console.log('Auth page: Auth state changed:', event);
+          console.log('Auth page: Auth state changed:', event, session?.user?.id);
           
           if (!mounted) return;
           
