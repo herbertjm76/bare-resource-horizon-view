@@ -13,20 +13,28 @@ export const useMemberPermissions = () => {
   const checkUserPermissions = async () => {
     try {
       // Get user session to check permissions
-      const { data } = await supabase.auth.getUser();
-      if (!data || !data.user) {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        toast.error('Authentication error. Please try logging in again.');
+        return false;
+      }
+      
+      if (!sessionData?.session?.user) {
         console.error('No active session found');
         toast.error('You must be logged in to manage team members');
         return false;
       }
       
-      console.log('Current user ID:', data.user.id);
+      const userId = sessionData.session.user.id;
+      console.log('Current user ID:', userId);
       
       // Query the profiles table to check if user is admin or owner
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
+        .select('role, company_id')
+        .eq('id', userId)
         .single();
         
       if (profileError) {
@@ -41,29 +49,15 @@ export const useMemberPermissions = () => {
         return false;
       }
       
+      console.log('User profile data:', profileData);
       const canManage = profileData.role === 'admin' || profileData.role === 'owner';
       
       if (!canManage) {
-        console.error('Insufficient permissions');
+        console.warn('Insufficient permissions, role:', profileData.role);
         toast.error('You do not have permission to manage team members');
         return false;
       }
       
-      // Get user profile for logging purposes
-      const { data: userProfile, error: profileDataError } = await supabase
-        .from('profiles')
-        .select('role, company_id')
-        .eq('id', data.user.id)
-        .single();
-        
-      if (profileDataError) {
-        console.error('Error fetching user profile:', profileDataError);
-        // Don't return false here since we already verified permissions
-      } else if (userProfile) {
-        console.log('Current user role:', userProfile.role);
-        console.log('Current user company ID:', userProfile.company_id);
-      }
-
       return true;
     } catch (error: any) {
       console.error('Error checking permissions:', error);

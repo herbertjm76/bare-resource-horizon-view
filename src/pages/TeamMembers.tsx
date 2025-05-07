@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
@@ -13,12 +13,14 @@ import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
 import { useMemberPermissions } from '@/hooks/team/useMemberPermissions';
 import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
 const TeamMembersPage = () => {
   const navigate = useNavigate();
   const { checkUserPermissions } = useMemberPermissions();
+  const [isCheckingPermissions, setIsCheckingPermissions] = useState(true);
   
   // Get user session
   const userId = useUserSession();
@@ -27,17 +29,30 @@ const TeamMembersPage = () => {
   // Check permissions separately and early
   useEffect(() => {
     const verifyAccess = async () => {
-      if (!userId) return;
+      if (!userId) {
+        setIsCheckingPermissions(false);
+        return;
+      }
       
-      const hasPermission = await checkUserPermissions();
-      if (!hasPermission) {
-        console.log('User does not have permission to access team members page');
+      try {
+        setIsCheckingPermissions(true);
+        const hasPermission = await checkUserPermissions();
+        
+        if (!hasPermission) {
+          console.log('User does not have permission to access team members page');
+          navigate('/dashboard');
+        }
+        
+        setIsCheckingPermissions(false);
+      } catch (error) {
+        console.error('Error verifying permissions:', error);
+        setIsCheckingPermissions(false);
         navigate('/dashboard');
       }
     };
     
     verifyAccess();
-  }, [userId, navigate]);
+  }, [userId, navigate, checkUserPermissions]);
   
   // Ensure company data is loaded
   useEffect(() => {
@@ -87,14 +102,13 @@ const TeamMembersPage = () => {
         }
         
         console.log('User profile fetched successfully');
-        console.log('Profile data:', data);
         return data;
       } catch (error) {
         console.error('Error in profile fetch:', error);
         return null;
       }
     },
-    enabled: !!userId,
+    enabled: !!userId && !isCheckingPermissions,
     retry: 3,
     refetchOnWindowFocus: false,
     refetchOnMount: true, // Always refetch when the component mounts
@@ -128,7 +142,19 @@ const TeamMembersPage = () => {
     console.log('TeamMembers page - Team members count:', teamMembers?.length || 0);
   }, [userId, userProfile, company, teamMembers]);
 
-  const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading;
+  const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || isCheckingPermissions;
+
+  // If still checking permissions, show a loading state
+  if (isCheckingPermissions) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Verifying permissions...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
