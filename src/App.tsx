@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
@@ -19,9 +19,62 @@ import WeeklyOverview from "./pages/WeeklyOverview";
 import ProjectResourcing from "./pages/ProjectResourcing";
 import Help from "./pages/Help";
 import { CompanyProvider, useCompany } from "./context/CompanyContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "./integrations/supabase/client";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+// Component to check authentication and redirect if needed
+const AuthGuard = ({ children }: { children: React.ReactNode }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        setIsAuthenticated(!!data.session);
+      } catch (error) {
+        console.error('Auth check error:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    checkAuth();
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+    
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
 
 // Component to handle routing based on subdomain status
 const AppRoutes = () => {
@@ -51,17 +104,57 @@ const AppRoutes = () => {
           : <Index />
       } />
       
-      {/* Company-specific routes */}
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/weekly-overview" element={<WeeklyOverview />} />
-      <Route path="/project-resourcing" element={<ProjectResourcing />} />
-      <Route path="/projects" element={<Projects />} />
-      <Route path="/team-members" element={<TeamMembers />} />
-      <Route path="/team-workload" element={<TeamWorkload />} />
-      <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
-      <Route path="/office-settings" element={<OfficeSettings />} />
-      <Route path="/help" element={<Help />} />
-      <Route path="/profile" element={<Profile />} />
+      {/* Protected company-specific routes */}
+      <Route path="/dashboard" element={
+        <AuthGuard>
+          <Dashboard />
+        </AuthGuard>
+      } />
+      <Route path="/weekly-overview" element={
+        <AuthGuard>
+          <WeeklyOverview />
+        </AuthGuard>
+      } />
+      <Route path="/project-resourcing" element={
+        <AuthGuard>
+          <ProjectResourcing />
+        </AuthGuard>
+      } />
+      <Route path="/projects" element={
+        <AuthGuard>
+          <Projects />
+        </AuthGuard>
+      } />
+      <Route path="/team-members" element={
+        <AuthGuard>
+          <TeamMembers />
+        </AuthGuard>
+      } />
+      <Route path="/team-workload" element={
+        <AuthGuard>
+          <TeamWorkload />
+        </AuthGuard>
+      } />
+      <Route path="/team-annual-leave" element={
+        <AuthGuard>
+          <TeamAnnualLeave />
+        </AuthGuard>
+      } />
+      <Route path="/office-settings" element={
+        <AuthGuard>
+          <OfficeSettings />
+        </AuthGuard>
+      } />
+      <Route path="/help" element={
+        <AuthGuard>
+          <Help />
+        </AuthGuard>
+      } />
+      <Route path="/profile" element={
+        <AuthGuard>
+          <Profile />
+        </AuthGuard>
+      } />
       
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />

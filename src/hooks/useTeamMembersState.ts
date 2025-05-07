@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Profile, PendingMember, Invite, TeamMember } from '@/components/dashboard/types';
+import { useCompany } from '@/context/CompanyContext';
 
 export const useTeamMembersState = (companyId: string | undefined, userRole: string) => {
   const [preRegisteredMembers, setPreRegisteredMembers] = useState<PendingMember[]>([]);
@@ -10,19 +11,24 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
   const [refreshFlag, setRefreshFlag] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const { company } = useCompany();
+
+  // Use company context as fallback if companyId is undefined
+  const effectiveCompanyId = companyId || company?.id;
 
   // Fetch invites effect
   useEffect(() => {
     const fetchInvites = async () => {
-      if (!companyId || !(userRole === 'owner' || userRole === 'admin')) {
+      if (!effectiveCompanyId || !(userRole === 'owner' || userRole === 'admin')) {
+        console.log('Cannot fetch invites: missing company ID or insufficient privileges');
         return;
       }
       
-      console.log('Fetching invites - refresh flag:', refreshFlag);
+      console.log('Fetching invites - refresh flag:', refreshFlag, 'company ID:', effectiveCompanyId);
       const { data: invites, error } = await supabase
         .from('invites')
         .select('*')
-        .eq('company_id', companyId)
+        .eq('company_id', effectiveCompanyId)
         .eq('status', 'pending')
         .order('created_at', { ascending: false });
         
@@ -44,10 +50,10 @@ export const useTeamMembersState = (companyId: string | undefined, userRole: str
       setEmailInvites((invites || []).filter(invite => invite.invitation_type === 'email_invite'));
     };
     
-    if (companyId) {
+    if (effectiveCompanyId) {
       fetchInvites();
     }
-  }, [companyId, userRole, refreshFlag]);
+  }, [effectiveCompanyId, userRole, refreshFlag]);
 
   const triggerRefresh = () => setRefreshFlag(prev => prev + 1);
 
