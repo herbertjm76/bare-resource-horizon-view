@@ -1,3 +1,6 @@
+
+import { Link } from 'react-router-dom';
+
 const Hero = () => {
   return <div className="relative pt-20 bg-hero">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0">
@@ -11,9 +14,9 @@ const Hero = () => {
               Make smarter project decisions with powerful resource insights
             </p>
             <div className="flex gap-4">
-              <button className="bg-white text-purple-600 px-8 py-3 rounded-lg font-medium hover:bg-purple-50 transition-colors">
+              <Link to="/auth?signup=true" className="bg-white text-purple-600 px-8 py-3 rounded-lg font-medium hover:bg-purple-50 transition-colors">
                 Get Started
-              </button>
+              </Link>
               <button className="bg-white/10 backdrop-blur-sm text-white px-8 py-3 rounded-lg border border-white/20 hover:bg-white/20 transition-colors">
                 Watch Demo
               </button>

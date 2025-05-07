@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 const Navbar = () => {
   return <nav className="fixed w-full bg-white shadow-md z-50">
@@ -20,10 +21,15 @@ const Navbar = () => {
             <Link to="#pricing" className="hover:text-purple-600 transition-colors">Pricing</Link>
           </div>
           
-          {/* CTA Button */}
-          <Link to="/auth" className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg text-sm sm:text-base">
-            Get Started
-          </Link>
+          {/* Auth Buttons */}
+          <div className="flex items-center gap-3">
+            <Link to="/auth" className="text-gray-700 hover:text-purple-600 transition-colors font-medium">
+              Sign In
+            </Link>
+            <Link to="/auth?signup=true" className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg text-sm sm:text-base">
+              Sign Up
+            </Link>
+          </div>
         </div>
       </div>
     </nav>;

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import LoginForm from './Auth/LoginForm';
@@ -9,7 +9,9 @@ import { AlertCircle, Link2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const Auth: React.FC = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [searchParams] = useSearchParams();
+  const showSignup = searchParams.get('signup') === 'true';
+  const [isLogin, setIsLogin] = useState(!showSignup);
   const [error, setError] = useState<string | null>(null);
   const [showConfigHelp, setShowConfigHelp] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
