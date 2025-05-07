@@ -20,6 +20,7 @@ import ProjectResourcing from "./pages/ProjectResourcing";
 import Help from "./pages/Help";
 import { CompanyProvider, useCompany } from "./context/CompanyContext";
 
+// Create a new QueryClient instance with default options
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -64,7 +65,7 @@ const AppRoutes = () => {
       <Route path="/projects" element={<Projects />} />
       <Route path="/profile" element={<Profile />} />
       
-      {/* Team management routes - permission checks handled inside components */}
+      {/* Team management routes */}
       <Route path="/team-members" element={<TeamMembers />} />
       <Route path="/team-workload" element={<TeamWorkload />} />
       <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />

@@ -37,15 +37,23 @@ const TeamMembersContent = () => {
         return;
       }
       
-      console.log('Verifying access for user:', userId);
-      const result = await checkUserPermissions();
-      
-      console.log('Permission check result:', result);
-      setPermissionChecked(true);
-      
-      if (!result.hasPermission) {
-        toast.error('You do not have permission to access this page');
-      }
+      // Add a small delay to ensure any session changes are propagated
+      setTimeout(async () => {
+        console.log('Verifying access for user:', userId);
+        try {
+          const result = await checkUserPermissions();
+          console.log('Permission check complete with result:', result);
+          setPermissionChecked(true);
+          
+          if (!result.hasPermission) {
+            console.error('Permission denied:', result.error);
+            toast.error('Permission check failed: ' + (result.error || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Error during permission check:', error);
+          setPermissionChecked(true);
+        }
+      }, 500);
     };
     
     if (userId && !permissionChecked) {
@@ -99,7 +107,7 @@ const TeamMembersContent = () => {
         return null;
       }
     },
-    enabled: !!userId && hasPermission,
+    enabled: !!userId,
     retry: 1,
     refetchOnWindowFocus: false,
   });
@@ -122,7 +130,7 @@ const TeamMembersContent = () => {
     }
   }, [teamMembersError, profileError]);
 
-  const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || isChecking;
+  const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || (isChecking && !permissionChecked);
 
   // Handle retry for permission errors
   const handleRetryPermission = async () => {
@@ -133,6 +141,20 @@ const TeamMembersContent = () => {
       refetchProfile();
     }
   };
+
+  // Check for errors in session
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      console.log("Current session:", data?.session ? "Active" : "None");
+      if (data?.session?.user) {
+        console.log("Session user:", data.session.user.id);
+        console.log("User metadata:", data.session.user.user_metadata);
+      }
+    };
+    
+    checkSession();
+  }, []);
 
   // Show loading state
   if (isChecking && !permissionChecked) {
@@ -155,7 +177,7 @@ const TeamMembersContent = () => {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Access Denied</AlertTitle>
             <AlertDescription>
-              You do not have permission to access this page
+              {permissionError || 'You do not have permission to access this page'}
             </AlertDescription>
           </Alert>
           <div className="flex gap-4 justify-center">
