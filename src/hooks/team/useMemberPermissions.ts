@@ -14,8 +14,13 @@ export const useMemberPermissions = () => {
     try {
       console.log('Checking user permissions...');
       
-      // Get user session to check permissions - use simpler session check
-      const { data: sessionData } = await supabase.auth.getSession();
+      // Get user session to check permissions
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Error fetching session:', sessionError.message);
+        return false;
+      }
       
       if (!sessionData?.session?.user) {
         console.error('No active session found');
@@ -25,34 +30,39 @@ export const useMemberPermissions = () => {
       const userId = sessionData.session.user.id;
       console.log('Current user ID:', userId);
       
-      // Query the profiles table directly with better error handling
+      // Query the profiles table directly to get the user's role
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, first_name, last_name')
         .eq('id', userId)
         .single();
         
       if (profileError) {
-        console.error('Error checking user permissions:', profileError);
+        console.error('Error checking user profile:', profileError.message);
         return false;
       }
       
       if (!profileData) {
-        console.error('No profile found');
+        console.error('No profile found for user');
         return false;
       }
       
-      console.log('User profile data:', profileData);
-      const canManage = profileData.role === 'admin' || profileData.role === 'owner';
+      console.log('User profile found:', profileData);
+      
+      // Check if the user is an admin or owner
+      const role = profileData.role;
+      console.log('User role:', role);
+      
+      const canManage = role === 'admin' || role === 'owner';
+      console.log('Can user manage team members?', canManage);
       
       if (!canManage) {
-        console.warn('Insufficient permissions, role:', profileData.role);
-        return false;
+        console.warn('User does not have sufficient permissions');
       }
       
-      return true;
+      return canManage;
     } catch (error: any) {
-      console.error('Error checking permissions:', error);
+      console.error('Error checking permissions:', error.message);
       return false;
     }
   };

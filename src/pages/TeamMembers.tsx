@@ -13,7 +13,9 @@ import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
 import { useMemberPermissions } from '@/hooks/team/useMemberPermissions';
 import { useNavigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Shield, AlertCircle } from 'lucide-react';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 const HEADER_HEIGHT = 56;
 
@@ -21,36 +23,39 @@ const TeamMembersPage = () => {
   const navigate = useNavigate();
   const { checkUserPermissions } = useMemberPermissions();
   const [isCheckingPermissions, setIsCheckingPermissions] = useState(true);
-  const [permissionChecked, setPermissionChecked] = useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
   
   // Get user session
   const userId = useUserSession();
   const { company, loading: companyLoading, refreshCompany } = useCompany();
   
-  // Check permissions only once to prevent multiple checks
+  // Check permissions only once
   useEffect(() => {
     const verifyAccess = async () => {
-      if (!userId || permissionChecked) {
+      if (!userId) {
+        console.log('No user ID available, cannot check permissions');
+        setIsCheckingPermissions(false);
         return;
       }
       
       try {
         setIsCheckingPermissions(true);
-        console.log('Verifying access with userId:', userId);
-        const hasPermission = await checkUserPermissions();
+        console.log('Verifying access for user:', userId);
         
-        if (!hasPermission) {
-          console.log('Permission check failed, redirecting to dashboard');
+        const hasAccess = await checkUserPermissions();
+        console.log('Permission check result:', hasAccess);
+        
+        setHasPermission(hasAccess);
+        
+        if (!hasAccess) {
+          setPermissionError('You do not have permission to access this page');
           toast.error('You do not have permission to access this page');
-          navigate('/dashboard');
-          return;
         }
-        
-        setPermissionChecked(true);
       } catch (error) {
         console.error('Error verifying permissions:', error);
-        toast.error('Failed to verify your permissions');
-        navigate('/dashboard');
+        setPermissionError('Failed to verify your permissions');
+        toast.error('Error checking permissions');
       } finally {
         setIsCheckingPermissions(false);
       }
@@ -61,7 +66,7 @@ const TeamMembersPage = () => {
     } else {
       setIsCheckingPermissions(false);
     }
-  }, [userId, navigate, checkUserPermissions, permissionChecked]);
+  }, [userId, checkUserPermissions]);
   
   // Ensure company data is loaded
   useEffect(() => {
@@ -79,7 +84,7 @@ const TeamMembersPage = () => {
     error: teamMembersError
   } = useTeamMembersData(false);
 
-  // Fetch user profile - simplified query to reduce potential errors
+  // Fetch user profile
   const {
     data: userProfile,
     isLoading: isProfileLoading,
@@ -96,14 +101,17 @@ const TeamMembersPage = () => {
           .eq('id', userId)
           .single();
           
-        if (error) throw error;
+        if (error) {
+          console.error('Profile fetch error:', error);
+          throw error;
+        }
         return data;
       } catch (error) {
         console.error('Error fetching user profile:', error);
         return null;
       }
     },
-    enabled: !!userId && permissionChecked,
+    enabled: !!userId && hasPermission,
     retry: 1,
     refetchOnWindowFocus: false,
   });
@@ -128,6 +136,26 @@ const TeamMembersPage = () => {
 
   const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || isCheckingPermissions;
 
+  // Handle retry for permission errors
+  const handleRetryPermission = async () => {
+    setPermissionError(null);
+    setIsCheckingPermissions(true);
+    
+    try {
+      const hasAccess = await checkUserPermissions();
+      setHasPermission(hasAccess);
+      
+      if (!hasAccess) {
+        setPermissionError('You do not have permission to access this page');
+        toast.error('You do not have permission to access this page');
+      }
+    } catch (error) {
+      setPermissionError('Failed to verify your permissions');
+    } finally {
+      setIsCheckingPermissions(false);
+    }
+  };
+
   // Show loading state
   if (isCheckingPermissions) {
     return (
@@ -135,6 +163,31 @@ const TeamMembersPage = () => {
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <p className="text-sm text-muted-foreground">Verifying permissions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show permission error state
+  if (!hasPermission && permissionError) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Access Denied</AlertTitle>
+            <AlertDescription>
+              {permissionError}
+            </AlertDescription>
+          </Alert>
+          <div className="flex gap-4 justify-center">
+            <Button onClick={() => navigate('/dashboard')} variant="outline">
+              Back to Dashboard
+            </Button>
+            <Button onClick={handleRetryPermission}>
+              Retry
+            </Button>
+          </div>
         </div>
       </div>
     );
