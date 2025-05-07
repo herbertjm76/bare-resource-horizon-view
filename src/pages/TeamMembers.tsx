@@ -58,14 +58,17 @@ const TeamMembersPage = () => {
           throw error;
         }
         
-        if (!data) {
+        if (!data || data.length === 0) {
           console.warn('No profile found for user');
           return null;
         }
         
+        // Since the RPC returns an array, access the first element
+        const profile = Array.isArray(data) ? data[0] : data;
+        
         console.log('User profile fetched successfully');
-        console.log('Profile data:', data);
-        return data;
+        console.log('Profile data:', profile);
+        return profile;
       } catch (error) {
         console.error('Error in profile fetch:', error);
         return null;

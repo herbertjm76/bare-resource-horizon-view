@@ -32,18 +32,21 @@ export const useMemberPermissions = () => {
         return false;
       }
       
-      if (!userProfile) {
+      if (!userProfile || userProfile.length === 0) {
         console.error('User profile not found');
         toast.error('User profile not found');
         return false;
       }
       
-      console.log('Current user role:', userProfile.role);
-      console.log('Current user company ID:', userProfile.company_id);
+      // Since the RPC returns an array, we need to access the first element
+      const profile = Array.isArray(userProfile) ? userProfile[0] : userProfile;
+      
+      console.log('Current user role:', profile.role);
+      console.log('Current user company ID:', profile.company_id);
       
       // Only owners and admins can manage team members
-      if (userProfile.role !== 'owner' && userProfile.role !== 'admin') {
-        console.error('Insufficient permissions, user role:', userProfile.role);
+      if (profile.role !== 'owner' && profile.role !== 'admin') {
+        console.error('Insufficient permissions, user role:', profile.role);
         toast.error('You do not have permission to manage team members');
         return false;
       }
