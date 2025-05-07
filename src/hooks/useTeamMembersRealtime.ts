@@ -11,7 +11,8 @@ export const useTeamMembersRealtime = (
   useEffect(() => {
     if (!companyId) {
       console.log('No company ID provided for realtime subscription');
-      // If no companyId is provided, try to get it from the current user's profile
+      
+      // If no companyId is provided, try to get it from the current user's profile using the RPC
       const fetchCompanyId = async () => {
         try {
           const { data: { user } } = await supabase.auth.getUser();
@@ -20,19 +21,18 @@ export const useTeamMembersRealtime = (
             return;
           }
           
-          // Use the RPC function to fetch the profile safely
-          const { data: profile, error } = await supabase
-            .rpc('get_user_profile_by_id', { user_id: user.id })
-            .single();
+          // Use the RPC function to get the company safely
+          const { data: companyIdData, error: companyIdError } = await supabase
+            .rpc('get_user_company_id', { user_id: user.id });
             
-          if (error) {
-            console.error('Error fetching user profile for realtime:', error);
+          if (companyIdError) {
+            console.error('Error fetching user company ID for realtime:', companyIdError);
             return;
           }
-            
-          if (profile?.company_id) {
-            console.log('Setting up realtime subscriptions for company from profile:', profile.company_id);
-            setupSubscriptions(profile.company_id);
+          
+          if (companyIdData) {
+            console.log('Setting up realtime subscriptions for company from RPC:', companyIdData);
+            setupSubscriptions(companyIdData);
           } else {
             console.error('User has no company ID for realtime subscriptions');
           }

@@ -22,10 +22,9 @@ export const useMemberPermissions = () => {
       
       console.log('Current user ID:', data.user.id);
       
-      // Check user permissions using the RPC function to avoid RLS recursion
+      // Get user profile using the RPC function
       const { data: userProfile, error: profileError } = await supabase
-        .rpc('get_user_profile_by_id', { user_id: data.user.id })
-        .single();
+        .rpc('get_user_profile_by_id', { user_id: data.user.id });
         
       if (profileError) {
         console.error('Error checking user permissions:', profileError);

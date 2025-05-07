@@ -17,7 +17,15 @@ const HEADER_HEIGHT = 56;
 const TeamMembersPage = () => {
   // Get user session
   const userId = useUserSession();
-  const { company, loading: companyLoading } = useCompany();
+  const { company, loading: companyLoading, refreshCompany } = useCompany();
+  
+  // Ensure company data is loaded
+  useEffect(() => {
+    if (!company && userId) {
+      console.log('Company data missing, refreshing...');
+      refreshCompany();
+    }
+  }, [company, userId, refreshCompany]);
   
   // Fetch team members data - passing false since we don't need inactive members here
   const {
@@ -42,13 +50,17 @@ const TeamMembersPage = () => {
       try {
         // Use the RPC function which is secure against RLS recursion
         const { data, error } = await supabase
-          .rpc('get_user_profile_by_id', { user_id: userId })
-          .single();
+          .rpc('get_user_profile_by_id', { user_id: userId });
           
         if (error) {
           console.error('Error fetching user profile:', error);
           toast.error('Failed to load your profile');
           throw error;
+        }
+        
+        if (!data) {
+          console.warn('No profile found for user');
+          return null;
         }
         
         console.log('User profile fetched successfully');
@@ -108,7 +120,7 @@ const TeamMembersPage = () => {
             <TeamMemberContent
               userProfile={userProfile}
               isProfileLoading={isLoading}
-              teamMembers={teamMembers}
+              teamMembers={teamMembers || []}
               onRefresh={triggerRefresh}
             />
           </div>

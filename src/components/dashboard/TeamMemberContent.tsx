@@ -3,7 +3,7 @@ import React from 'react';
 import { TeamManagement } from "@/components/dashboard/TeamManagement";
 import { Profile } from "@/components/dashboard/types";
 import { Card, CardContent } from '@/components/ui/card';
-import { AlertCircle, Loader2, UserX } from 'lucide-react';
+import { AlertCircle, Loader2, UserX, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface TeamMemberContentProps {
@@ -56,6 +56,7 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
             <p className="text-gray-700">You must be logged in to view team members.</p>
             <div className="mt-4">
               <Button onClick={handleRetry}>
+                <RefreshCw className="h-4 w-4 mr-2" />
                 Try Again
               </Button>
             </div>
@@ -65,8 +66,15 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
     );
   }
   
+  // Debug output to help diagnose issues
+  console.log('TeamMemberContent rendering with profile:', userProfile);
+  console.log('TeamMemberContent has team members:', teamMembers?.length || 0);
+  
+  // Ensure teamMembers is always an array
+  const safeTeamMembers = Array.isArray(teamMembers) ? teamMembers : [];
+  
   // Handle the case where we have user profile but no team members
-  if (teamMembers.length === 0) {
+  if (safeTeamMembers.length === 0) {
     const isAdminOrOwner = userProfile?.role === 'owner' || userProfile?.role === 'admin';
     
     return (
@@ -85,6 +93,7 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
             </p>
             <div className="mt-4">
               <Button onClick={handleRetry}>
+                <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
               </Button>
             </div>
@@ -93,7 +102,7 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
         
         {/* Even with empty team members array, pass it to TeamManagement so it can handle the empty state */}
         <TeamManagement 
-          teamMembers={teamMembers} 
+          teamMembers={safeTeamMembers} 
           inviteUrl={inviteUrl} 
           userRole={userProfile?.role || 'member'} 
           onRefresh={onRefresh}
@@ -106,7 +115,7 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
     <div className="max-w-6xl mx-auto space-y-8">
       <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
       <TeamManagement 
-        teamMembers={teamMembers} 
+        teamMembers={safeTeamMembers} 
         inviteUrl={inviteUrl} 
         userRole={userProfile?.role || 'member'} 
         onRefresh={onRefresh}

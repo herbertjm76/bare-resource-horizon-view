@@ -1,3 +1,4 @@
+
 import { useCallback, useState, useEffect } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,30 +36,22 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
         
-        // Get the user's company ID - if available from context, use it
-        // otherwise fetch it from the profile
+        // Get the user's company ID - first try from context
         let companyId = company?.id;
         
         if (!companyId) {
-          // Get the user's profile using the secure RPC function
-          const { data: currentUserProfile, error: profileError } = await supabase
-            .rpc('get_user_profile_by_id', { user_id: authData.user.id })
-            .single();
+          // Use the RPC function to get the company safely
+          const { data: companyIdData, error: companyIdError } = await supabase
+            .rpc('get_user_company_id', { user_id: authData.user.id });
             
-          if (profileError) {
-            console.error('Failed to get user profile:', profileError);
-            toast.error('Failed to get user profile');
-            throw profileError;
+          if (companyIdError) {
+            console.error('Failed to get user company ID:', companyIdError);
+            toast.error('Failed to get company information');
+            throw companyIdError;
           }
           
-          if (!currentUserProfile?.company_id) {
-            console.error('User has no company associated');
-            toast.error('No company associated with your account');
-            return [];
-          }
-          
-          companyId = currentUserProfile.company_id;
-          console.log('User company ID from profile:', companyId);
+          companyId = companyIdData;
+          console.log('User company ID from RPC:', companyId);
         }
         
         if (!companyId) {
@@ -67,7 +60,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
         
-        // Now fetch all profiles from the same company
+        // Fetch profiles directly with the new RPC function that's more secure
         const { data: profiles, error } = await supabase
           .from('profiles')
           .select('*')
@@ -84,7 +77,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
       } catch (fetchError) {
         console.error('Error in team members fetch function:', fetchError);
         toast.error('Error loading team members');
-        return [];
+        throw fetchError;
       }
     },
     enabled: !companyLoading,
@@ -108,7 +101,7 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
   }, [refetchTeamMembers]);
 
   return {
-    teamMembers,
+    teamMembers: teamMembers || [],
     isLoading: isLoading || companyLoading,
     error,
     triggerRefresh,
