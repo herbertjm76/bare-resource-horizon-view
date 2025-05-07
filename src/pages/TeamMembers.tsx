@@ -61,7 +61,8 @@ const TeamMembersPage = () => {
     },
     enabled: !!userId,
     retry: 3,
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: false,
+    refetchOnMount: true, // Always refetch when the component mounts
   });
 
   // Set up realtime subscriptions
@@ -83,6 +84,14 @@ const TeamMembersPage = () => {
       toast.error('Failed to load your profile');
     }
   }, [teamMembersError, profileError]);
+
+  // Log important state for debugging
+  useEffect(() => {
+    console.log('TeamMembers page - User ID:', userId);
+    console.log('TeamMembers page - User profile:', userProfile);
+    console.log('TeamMembers page - Company from context:', company);
+    console.log('TeamMembers page - Team members count:', teamMembers?.length || 0);
+  }, [userId, userProfile, company, teamMembers]);
 
   const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading;
 

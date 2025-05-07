@@ -1,5 +1,4 @@
-
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/components/dashboard/types";
@@ -9,6 +8,11 @@ import { useCompany } from '@/context/CompanyContext';
 export const useTeamMembersData = (includeInactive: boolean = false) => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const { company, loading: companyLoading } = useCompany();
+
+  // Add more detailed logging
+  useEffect(() => {
+    console.log('useTeamMembersData - Company context:', company);
+  }, [company]);
 
   // Fetch team members with refetch capability
   const {
@@ -31,31 +35,43 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
         
-        // Get the user's profile using the secure RPC function
-        const { data: currentUserProfile, error: profileError } = await supabase
-          .rpc('get_user_profile_by_id', { user_id: authData.user.id })
-          .single();
+        // Get the user's company ID - if available from context, use it
+        // otherwise fetch it from the profile
+        let companyId = company?.id;
+        
+        if (!companyId) {
+          // Get the user's profile using the secure RPC function
+          const { data: currentUserProfile, error: profileError } = await supabase
+            .rpc('get_user_profile_by_id', { user_id: authData.user.id })
+            .single();
+            
+          if (profileError) {
+            console.error('Failed to get user profile:', profileError);
+            toast.error('Failed to get user profile');
+            throw profileError;
+          }
           
-        if (profileError) {
-          console.error('Failed to get user profile:', profileError);
-          toast.error('Failed to get user profile');
-          throw profileError;
+          if (!currentUserProfile?.company_id) {
+            console.error('User has no company associated');
+            toast.error('No company associated with your account');
+            return [];
+          }
+          
+          companyId = currentUserProfile.company_id;
+          console.log('User company ID from profile:', companyId);
         }
         
-        if (!currentUserProfile?.company_id) {
-          console.error('User has no company associated');
-          toast.error('No company associated with your account');
+        if (!companyId) {
+          console.error('Cannot fetch team members: No company ID available');
+          toast.error('Company information not available');
           return [];
         }
-        
-        console.log('User company ID:', currentUserProfile.company_id);
-        console.log('User role:', currentUserProfile.role);
         
         // Now fetch all profiles from the same company
         const { data: profiles, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('company_id', currentUserProfile.company_id);
+          .eq('company_id', companyId);
 
         if (error) {
           console.error('Failed to load team members:', error);

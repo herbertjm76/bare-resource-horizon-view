@@ -68,6 +68,12 @@ export const useTeamMembersRealtime = (
           )
           .subscribe((status) => {
             console.log('Profiles subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('Successfully subscribed to profiles changes');
+            } else if (status === 'TIMED_OUT' || status === 'CHANNEL_ERROR') {
+              console.error('Error subscribing to profiles changes:', status);
+              toast.error('Failed to subscribe to team member updates');
+            }
           });
           
         // Subscribe to changes on invites table for this company  
@@ -88,6 +94,12 @@ export const useTeamMembersRealtime = (
           )
           .subscribe((status) => {
             console.log('Invites subscription status:', status);
+            if (status === 'SUBSCRIBED') {
+              console.log('Successfully subscribed to invites changes');
+            } else if (status === 'TIMED_OUT' || status === 'CHANNEL_ERROR') {
+              console.error('Error subscribing to invites changes:', status);
+              toast.error('Failed to subscribe to invite updates');
+            }
           });
     
         // Cleanup

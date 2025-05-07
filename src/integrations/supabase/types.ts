@@ -893,6 +893,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_company_id: {
+        Args: { user_id: string }
+        Returns: string
+      }
       get_user_profile_by_id: {
         Args: { user_id: string }
         Returns: {
@@ -920,6 +924,10 @@ export type Database = {
               company_uuid: string
               requested_role: Database["public"]["Enums"]["user_role"]
             }
+        Returns: boolean
+      }
+      users_are_in_same_company: {
+        Args: { user_id_1: string; user_id_2: string }
         Returns: boolean
       }
     }
