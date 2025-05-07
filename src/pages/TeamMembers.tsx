@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
@@ -72,7 +72,7 @@ const TeamMembersPage = () => {
   );
   
   // Show error message if there's an issue
-  React.useEffect(() => {
+  useEffect(() => {
     if (teamMembersError) {
       console.error('Team members error:', teamMembersError);
       toast.error('Failed to load team members data');

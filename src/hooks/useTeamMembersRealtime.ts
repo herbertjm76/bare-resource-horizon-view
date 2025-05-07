@@ -1,6 +1,7 @@
 
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export const useTeamMembersRealtime = (
   companyId: string | undefined,
@@ -48,52 +49,58 @@ export const useTeamMembersRealtime = (
     return setupSubscriptions(companyId);
     
     function setupSubscriptions(companyId: string) {
-      // Subscribe to changes on profiles table for this company
-      const profilesSubscription = supabase
-        .channel('team-members-profiles')
-        .on(
-          'postgres_changes', 
-          { 
-            event: '*', 
-            schema: 'public', 
-            table: 'profiles',
-            filter: `company_id=eq.${companyId}` 
-          }, 
-          (payload) => {
-            console.log('Profiles change detected:', payload);
-            onRefresh();
-          }
-        )
-        .subscribe((status) => {
-          console.log('Profiles subscription status:', status);
-        });
-        
-      // Subscribe to changes on invites table for this company  
-      const invitesSubscription = supabase
-        .channel('team-members-invites')
-        .on(
-          'postgres_changes', 
-          { 
-            event: '*', 
-            schema: 'public', 
-            table: 'invites',
-            filter: `company_id=eq.${companyId}` 
-          }, 
-          (payload) => {
-            console.log('Invites change detected:', payload);
-            onRefresh();
-          }
-        )
-        .subscribe((status) => {
-          console.log('Invites subscription status:', status);
-        });
-  
-      // Cleanup
-      return () => {
-        console.log('Removing realtime subscriptions');
-        supabase.removeChannel(profilesSubscription);
-        supabase.removeChannel(invitesSubscription);
-      };
+      try {
+        // Subscribe to changes on profiles table for this company
+        const profilesSubscription = supabase
+          .channel('team-members-profiles')
+          .on(
+            'postgres_changes', 
+            { 
+              event: '*', 
+              schema: 'public', 
+              table: 'profiles',
+              filter: `company_id=eq.${companyId}` 
+            }, 
+            (payload) => {
+              console.log('Profiles change detected:', payload);
+              onRefresh();
+            }
+          )
+          .subscribe((status) => {
+            console.log('Profiles subscription status:', status);
+          });
+          
+        // Subscribe to changes on invites table for this company  
+        const invitesSubscription = supabase
+          .channel('team-members-invites')
+          .on(
+            'postgres_changes', 
+            { 
+              event: '*', 
+              schema: 'public', 
+              table: 'invites',
+              filter: `company_id=eq.${companyId}` 
+            }, 
+            (payload) => {
+              console.log('Invites change detected:', payload);
+              onRefresh();
+            }
+          )
+          .subscribe((status) => {
+            console.log('Invites subscription status:', status);
+          });
+    
+        // Cleanup
+        return () => {
+          console.log('Removing realtime subscriptions');
+          supabase.removeChannel(profilesSubscription);
+          supabase.removeChannel(invitesSubscription);
+        };
+      } catch (error) {
+        console.error('Error setting up realtime subscriptions:', error);
+        toast.error('Failed to set up realtime updates');
+        return () => {}; // Return empty cleanup function
+      }
     }
     
   }, [companyId, onRefresh]);
