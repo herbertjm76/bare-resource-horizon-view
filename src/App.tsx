@@ -65,7 +65,7 @@ const AppRoutes = () => {
       <Route path="/projects" element={<Projects />} />
       <Route path="/profile" element={<Profile />} />
       
-      {/* Team management routes */}
+      {/* Team management routes - removed AuthGuard dependency */}
       <Route path="/team-members" element={<TeamMembers />} />
       <Route path="/team-workload" element={<TeamWorkload />} />
       <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
