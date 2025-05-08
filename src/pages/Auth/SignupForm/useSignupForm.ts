@@ -76,13 +76,15 @@ export const useSignupForm = (onSwitchToLogin: () => void) => {
   const validateForm = (): boolean => {
     const { ownerFirstName, ownerLastName, ownerEmail, ownerPassword, company } = formState;
     
-    if (
-      !ownerFirstName || !ownerLastName || !ownerEmail || !ownerPassword ||
-      !company.name || !company.subdomain || !company.address || !company.country || 
-      !company.city || !company.size || !company.industry
-    ) {
-      updateFormState({ signupError: 'Please fill in all required fields.' });
-      toast.error('Please fill in all required fields.');
+    if (!ownerFirstName || !ownerLastName || !ownerEmail || !ownerPassword) {
+      updateFormState({ signupError: 'Please fill in all required owner fields.' });
+      toast.error('Please fill in all required owner fields.');
+      return false;
+    }
+    
+    if (!company.name || !company.subdomain) {
+      updateFormState({ signupError: 'Company name and subdomain are required.' });
+      toast.error('Company name and subdomain are required.');
       return false;
     }
 
@@ -119,7 +121,11 @@ export const useSignupForm = (onSwitchToLogin: () => void) => {
         return;
       }
       
-      console.log('Creating company with data:', company);
+      console.log('Creating company with data:', {
+        name: company.name,
+        subdomain: company.subdomain.toLowerCase(),
+        website: company.website || null,
+      });
       
       // 1. Create company first 
       const { data: companyData, error: companyError } = await supabase
@@ -128,11 +134,12 @@ export const useSignupForm = (onSwitchToLogin: () => void) => {
           name: company.name,
           subdomain: company.subdomain.toLowerCase(),
           website: company.website || null,
-          address: company.address,
-          size: company.size,
-          city: company.city,
-          country: company.country,
-          industry: company.industry
+          // Only include these if they're provided
+          ...(company.address ? { address: company.address } : {}),
+          ...(company.city ? { city: company.city } : {}),
+          ...(company.country ? { country: company.country } : {}),
+          ...(company.size ? { size: company.size } : {}),
+          ...(company.industry ? { industry: company.industry } : {})
         })
         .select()
         .single();
@@ -174,6 +181,33 @@ export const useSignupForm = (onSwitchToLogin: () => void) => {
         console.error('No user returned from signup');
         await supabase.from('companies').delete().eq('id', companyData.id);
         throw new Error('Failed to create user account');
+      }
+
+      console.log('Auth signup successful, user created:', authData.user.id);
+      
+      // Manually ensure profile exists by inserting directly
+      // This is a fallback in case the trigger fails
+      try {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email: ownerEmail,
+            first_name: ownerFirstName,
+            last_name: ownerLastName,
+            company_id: companyData.id,
+            role: userRole
+          });
+          
+        if (profileError) {
+          console.warn('Manual profile creation failed:', profileError);
+          // We don't throw here as the auth trigger might have created the profile
+        } else {
+          console.log('Manual profile creation successful');
+        }
+      } catch (profileErr) {
+        console.warn('Error in manual profile creation:', profileErr);
+        // Don't fail the signup if this fails
       }
 
       // Show success message and confirmation info

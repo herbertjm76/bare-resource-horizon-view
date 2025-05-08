@@ -38,6 +38,9 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
     }
 
     try {
+      console.log(`Join form: ${isSignup ? 'Signup' : 'Login'} attempt for company:`, companyName);
+      console.log('Company ID:', company?.id);
+      
       if (isSignup) {
         if (!firstName || !lastName || !email || !password) {
           toast.error('Please fill in all required fields');
@@ -45,9 +48,14 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
           return;
         }
 
-        // The invitation code would typically be checked server-side; for now, assume it's valid if present
-        // Optionally: fetch company info here using inviteCodeInput
+        if (password.length < 6) {
+          toast.error('Password must be at least 6 characters long');
+          setLoading(false);
+          return;
+        }
 
+        console.log('Signing up new user as company member...');
+        
         // Register new user as a member of existing company
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -56,15 +64,19 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
             data: {
               first_name: firstName,
               last_name: lastName,
-              company_id: company?.id, // This should ideally re-fetch company using invite code if not already present
+              company_id: company?.id,
               role: 'member'
-            }
+            },
+            emailRedirectTo: window.location.origin + '/auth'
           }
         });
 
         if (error) throw error;
 
+        console.log('Signup successful, user ID:', data.user?.id);
+
         if (data.user) {
+          // Manual profile creation as a fallback
           await ensureUserProfile(data.user.id, {
             email,
             firstName,
@@ -78,6 +90,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
         }
       } else {
         // Login existing user
+        console.log('Signing in existing user...');
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -85,6 +98,8 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
 
         if (error) throw error;
 
+        console.log('Login successful, verifying company membership...');
+        
         // Verify user belongs to this company
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
@@ -92,13 +107,22 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
           .eq('id', data.user.id)
           .maybeSingle();
 
-        if (profileError || !profile) {
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          await ensureUserProfile(data.user.id, {
+            email,
+            companyId: company?.id,
+            role: 'member'
+          });
+        } else if (!profile) {
+          console.log('No profile found, creating one...');
           await ensureUserProfile(data.user.id, {
             email,
             companyId: company?.id,
             role: 'member'
           });
         } else if (profile.company_id !== company?.id) {
+          console.error('User belongs to a different company');
           await supabase.auth.signOut();
           throw new Error('You are not a member of this company.');
         }

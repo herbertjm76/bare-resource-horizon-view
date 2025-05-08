@@ -39,46 +39,42 @@ const Auth: React.FC = () => {
 
   // Check if user is already logged in
   useEffect(() => {
+    console.log('Auth page: Checking session status');
     let mounted = true;
-    let authSubscription: { unsubscribe: () => void } | null = null;
     
+    // First set up auth state change listener to catch immediate events
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id);
+      
+      if (!mounted) return;
+      
+      if (event === 'SIGNED_IN' && session) {
+        console.log('User signed in, redirecting to dashboard');
+        toast.success('Successfully signed in!');
+        navigate('/dashboard');
+      }
+    });
+    
+    // Then check for existing session
     const checkSession = async () => {
       try {
-        console.log('Auth page: Checking session');
-        
-        // First set up auth state change listener to catch immediate events
-        const { data } = supabase.auth.onAuthStateChange((event, session) => {
-          console.log('Auth page: Auth state changed:', event, session?.user?.id);
-          
-          if (!mounted) return;
-          
-          if (event === 'SIGNED_IN' && session) {
-            console.log('Auth page: User signed in, redirecting to dashboard');
-            toast.success('Successfully signed in!');
-            navigate('/dashboard');
-          }
-        });
-        
-        authSubscription = data.subscription;
-        
-        // Check for existing session
         const { data: sessionData, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('Auth page: Session check error:', error);
+          console.error('Session check error:', error);
           if (mounted) setIsCheckingSession(false);
           return;
         }
         
         if (sessionData.session) {
-          console.log('Auth page: User already logged in, redirecting to dashboard');
+          console.log('User already logged in, redirecting to dashboard');
           navigate('/dashboard');
         } else {
-          console.log('Auth page: No active session found');
+          console.log('No active session found');
           if (mounted) setIsCheckingSession(false);
         }
       } catch (err) {
-        console.error('Auth page: Error checking session:', err);
+        console.error('Error checking session:', err);
         if (mounted) setIsCheckingSession(false);
       }
     };
@@ -86,9 +82,8 @@ const Auth: React.FC = () => {
     checkSession();
     
     return () => {
-      console.log('Auth page: Cleaning up');
       mounted = false;
-      if (authSubscription) authSubscription.unsubscribe();
+      authListener.subscription.unsubscribe();
     };
   }, [navigate]);
 
