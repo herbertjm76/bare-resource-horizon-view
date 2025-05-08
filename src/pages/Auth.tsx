@@ -24,6 +24,12 @@ const Auth: React.FC = () => {
     const errorCode = params.get('error');
     const errorDescription = params.get('error_description');
     
+    console.log('Auth page: URL parameters:', {
+      errorCode,
+      errorDescription,
+      search: location.search
+    });
+    
     if (errorCode === 'email_not_confirmed') {
       setError('Please confirm your email address before logging in. Check your inbox for a confirmation link.');
     } else if (errorCode === 'invalid_request') {
@@ -101,6 +107,7 @@ const Auth: React.FC = () => {
       toast.success('Confirmation email resent. Please check your inbox.');
       setError(null);
     } catch (err: any) {
+      console.error('Error resending confirmation email:', err);
       toast.error(err.message || 'Failed to resend confirmation email.');
     }
   };
@@ -148,6 +155,7 @@ const Auth: React.FC = () => {
             <AlertDescription className="mt-2">
               <p>This error often occurs when the Supabase Site URL and Redirect URL are not properly configured.</p>
               <p className="mt-2">For administrators: Please ensure that your Supabase project has the correct Site URL and Redirect URLs configured in the Authentication settings.</p>
+              <p className="mt-2">Current URL: {window.location.origin}</p>
             </AlertDescription>
           </Alert>
         )}

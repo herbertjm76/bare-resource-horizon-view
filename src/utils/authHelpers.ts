@@ -5,10 +5,19 @@ import { Database } from '@/integrations/supabase/types';
 // Define user role type to match the database enum
 type UserRole = Database['public']['Enums']['user_role'];
 
+interface ProfileData {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  companyId?: string;
+  role?: string;
+  [key: string]: any; // Allow additional properties
+}
+
 /**
  * Ensures a user profile exists or creates one if it doesn't
  */
-export const ensureUserProfile = async (userId: string, userData?: any) => {
+export const ensureUserProfile = async (userId: string, userData?: ProfileData): Promise<boolean> => {
   if (!userId) {
     console.error('Cannot ensure profile: No user ID provided');
     return false;
@@ -20,7 +29,7 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
     // Check if profile exists
     const { data: existingProfile, error: checkError } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, email, first_name, last_name, company_id, role')
       .eq('id', userId)
       .maybeSingle();
     
@@ -60,34 +69,43 @@ export const ensureUserProfile = async (userId: string, userData?: any) => {
     
     const profileData = {
       id: userId,
-      email: userData?.email || user?.email,
-      first_name: userData?.firstName || metaData.first_name,
-      last_name: userData?.lastName || metaData.last_name,
-      company_id: userData?.companyId || metaData.company_id,
+      email: userData?.email || user?.email || '',
+      first_name: userData?.firstName || metaData.first_name || '',
+      last_name: userData?.lastName || metaData.last_name || '',
+      company_id: userData?.companyId || metaData.company_id || null,
       role: userRole
     };
     
     console.log('Creating profile with data:', profileData);
     
     // Try insert operation first
-    const { error: insertError } = await supabase
+    const { data: insertData, error: insertError } = await supabase
       .from('profiles')
-      .insert(profileData);
+      .insert(profileData)
+      .select()
+      .single();
     
     // If insert fails, try upsert as fallback
     if (insertError) {
-      console.log('Profile insert failed, trying upsert:', insertError);
-      const { error: upsertError } = await supabase
+      console.log('Profile insert failed:', insertError);
+      console.log('Trying upsert as fallback...');
+      
+      const { data: upsertData, error: upsertError } = await supabase
         .from('profiles')
-        .upsert(profileData);
+        .upsert(profileData)
+        .select()
+        .single();
       
       if (upsertError) {
         console.error('Profile upsert error:', upsertError);
         return false;
       }
+      
+      console.log('Profile upsert successful:', upsertData);
+      return true;
     }
     
-    console.log('Profile created successfully for user:', userId);
+    console.log('Profile insert successful:', insertData);
     return true;
   } catch (error) {
     console.error('Unexpected error in ensureUserProfile:', error);

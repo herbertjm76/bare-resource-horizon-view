@@ -22,16 +22,19 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
   const [lastName, setLastName] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignup, setIsSignup] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     const effectiveInviteCode = inviteCode ?? inviteCodeInput;
 
     // Validate invite code if needed
     if (!inviteCode && !inviteCodeInput) {
+      setError('Please enter an invite code.');
       toast.error('Please enter an invite code.');
       setLoading(false);
       return;
@@ -43,12 +46,14 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
       
       if (isSignup) {
         if (!firstName || !lastName || !email || !password) {
+          setError('Please fill in all required fields');
           toast.error('Please fill in all required fields');
           setLoading(false);
           return;
         }
 
         if (password.length < 6) {
+          setError('Password must be at least 6 characters long');
           toast.error('Password must be at least 6 characters long');
           setLoading(false);
           return;
@@ -57,7 +62,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
         console.log('Signing up new user as company member...');
         
         // Register new user as a member of existing company
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error: signupError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -71,32 +76,58 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
           }
         });
 
-        if (error) throw error;
+        if (signupError) {
+          console.error('Signup error:', signupError);
+          setError(signupError.message);
+          toast.error(signupError.message || 'Sign up failed');
+          setLoading(false);
+          return;
+        }
 
         console.log('Signup successful, user ID:', data.user?.id);
 
         if (data.user) {
-          // Manual profile creation as a fallback
-          await ensureUserProfile(data.user.id, {
-            email,
-            firstName,
-            lastName,
-            companyId: company?.id,
-            role: 'member'
-          });
-          
-          toast.success('Account created successfully! Please check your email for verification.');
-          navigate('/dashboard');
+          try {
+            // Manual profile creation as a fallback
+            const profileResult = await ensureUserProfile(data.user.id, {
+              email,
+              firstName,
+              lastName,
+              companyId: company?.id,
+              role: 'member'
+            });
+            
+            console.log('Profile creation result:', profileResult);
+            
+            toast.success('Account created successfully! Please check your email for verification.');
+            navigate('/dashboard');
+          } catch (profileError: any) {
+            console.error('Error ensuring user profile:', profileError);
+            setError(`Account created but profile setup failed: ${profileError.message}`);
+            toast.error('Account created but profile setup failed');
+            setLoading(false);
+          }
+        } else {
+          // This should rarely happen, but handle it just in case
+          setError('Sign up response missing user data');
+          toast.error('Sign up response missing user data');
+          setLoading(false);
         }
       } else {
         // Login existing user
         console.log('Signing in existing user...');
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error: loginError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
-        if (error) throw error;
+        if (loginError) {
+          console.error('Login error:', loginError);
+          setError(loginError.message);
+          toast.error(loginError.message || 'Login failed');
+          setLoading(false);
+          return;
+        }
 
         console.log('Login successful, verifying company membership...');
         
@@ -109,22 +140,33 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
 
         if (profileError) {
           console.error('Error fetching profile:', profileError);
-          await ensureUserProfile(data.user.id, {
-            email,
-            companyId: company?.id,
-            role: 'member'
-          });
+          try {
+            await ensureUserProfile(data.user.id, {
+              email,
+              companyId: company?.id,
+              role: 'member'
+            });
+          } catch (ensureError) {
+            console.error('Profile creation failed:', ensureError);
+          }
         } else if (!profile) {
           console.log('No profile found, creating one...');
-          await ensureUserProfile(data.user.id, {
-            email,
-            companyId: company?.id,
-            role: 'member'
-          });
+          try {
+            await ensureUserProfile(data.user.id, {
+              email,
+              companyId: company?.id,
+              role: 'member'
+            });
+          } catch (createError) {
+            console.error('Profile creation failed:', createError);
+          }
         } else if (profile.company_id !== company?.id) {
           console.error('User belongs to a different company');
           await supabase.auth.signOut();
-          throw new Error('You are not a member of this company.');
+          setError('You are not a member of this company.');
+          toast.error('You are not a member of this company.');
+          setLoading(false);
+          return;
         }
 
         toast.success('Login successful!');
@@ -132,6 +174,7 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
+      setError(error.message || 'Authentication failed. Please try again.');
       toast.error(error.message || 'Authentication failed. Please try again.');
     } finally {
       setLoading(false);
@@ -140,6 +183,12 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
 
   return (
     <form onSubmit={handleAuth} className="space-y-4">
+      {error && (
+        <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-md text-white text-sm">
+          {error}
+        </div>
+      )}
+      
       {/* Only show invite code field if inviteCode is NOT present */}
       {!inviteCode && (
         <div>
