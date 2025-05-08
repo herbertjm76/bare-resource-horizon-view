@@ -66,47 +66,75 @@ export const ensureUserProfile = async (userId: string, userData?: ProfileData):
     if (providedRole && validRoles.includes(providedRole as UserRole)) {
       userRole = providedRole as UserRole;
     }
+
+    // Try multiple approaches to create the profile with retries
+    let profileCreated = false;
+    let attempts = 0;
+    const maxAttempts = 3;
     
-    const profileData = {
-      id: userId,
-      email: userData?.email || user?.email || '',
-      first_name: userData?.firstName || metaData.first_name || '',
-      last_name: userData?.lastName || metaData.last_name || '',
-      company_id: userData?.companyId || metaData.company_id || null,
-      role: userRole
-    };
-    
-    console.log('Creating profile with data:', profileData);
-    
-    // Try insert operation first
-    const { data: insertData, error: insertError } = await supabase
-      .from('profiles')
-      .insert(profileData)
-      .select()
-      .single();
-    
-    // If insert fails, try upsert as fallback
-    if (insertError) {
-      console.log('Profile insert failed:', insertError);
-      console.log('Trying upsert as fallback...');
+    while (!profileCreated && attempts < maxAttempts) {
+      attempts++;
+      console.log(`Profile creation attempt ${attempts}/${maxAttempts}`);
       
-      const { data: upsertData, error: upsertError } = await supabase
-        .from('profiles')
-        .upsert(profileData)
-        .select()
-        .single();
-      
-      if (upsertError) {
-        console.error('Profile upsert error:', upsertError);
-        return false;
+      try {
+        // Try insert operation
+        const { data: insertData, error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            email: userData?.email || user?.email || '',
+            first_name: userData?.firstName || metaData.first_name || '',
+            last_name: userData?.lastName || metaData.last_name || '',
+            company_id: userData?.companyId || metaData.company_id || null,
+            role: userRole
+          })
+          .select()
+          .single();
+        
+        if (!insertError) {
+          console.log('Profile insert successful on attempt', attempts, insertData);
+          profileCreated = true;
+          break;
+        }
+        
+        console.log('Profile insert failed:', insertError);
+        
+        // If first attempt fails, try upsert on subsequent attempts
+        if (attempts > 1) {
+          console.log('Trying upsert as fallback...');
+          
+          const { data: upsertData, error: upsertError } = await supabase
+            .from('profiles')
+            .upsert({
+              id: userId,
+              email: userData?.email || user?.email || '',
+              first_name: userData?.firstName || metaData.first_name || '',
+              last_name: userData?.lastName || metaData.last_name || '',
+              company_id: userData?.companyId || metaData.company_id || null,
+              role: userRole
+            })
+            .select()
+            .single();
+          
+          if (!upsertError) {
+            console.log('Profile upsert successful:', upsertData);
+            profileCreated = true;
+            break;
+          }
+          
+          console.error('Profile upsert error:', upsertError);
+        }
+        
+        // Small delay between attempts
+        if (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      } catch (error) {
+        console.error('Unexpected error in profile creation attempt', attempts, error);
       }
-      
-      console.log('Profile upsert successful:', upsertData);
-      return true;
     }
     
-    console.log('Profile insert successful:', insertData);
-    return true;
+    return profileCreated;
   } catch (error) {
     console.error('Unexpected error in ensureUserProfile:', error);
     return false;

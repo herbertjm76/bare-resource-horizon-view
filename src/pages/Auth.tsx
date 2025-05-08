@@ -43,12 +43,12 @@ const Auth: React.FC = () => {
     }
   }, [location]);
 
-  // Check if user is already logged in
+  // Check if user is already logged in - improved implementation
   useEffect(() => {
     console.log('Auth page: Checking session status');
     let mounted = true;
     
-    // First set up auth state change listener to catch immediate events
+    // Set up auth state change listener first to catch immediate events
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
       
@@ -56,8 +56,15 @@ const Auth: React.FC = () => {
       
       if (event === 'SIGNED_IN' && session) {
         console.log('User signed in, redirecting to dashboard');
-        toast.success('Successfully signed in!');
-        navigate('/dashboard');
+        
+        // We're now waiting a small delay before redirecting
+        // This helps ensure any DB operations (like profile creation) complete
+        setTimeout(() => {
+          if (mounted) {
+            toast.success('Successfully signed in!');
+            navigate('/dashboard');
+          }
+        }, 300);
       }
     });
     
@@ -74,7 +81,10 @@ const Auth: React.FC = () => {
         
         if (sessionData.session) {
           console.log('User already logged in, redirecting to dashboard');
-          navigate('/dashboard');
+          // Small delay before redirect to ensure profile exists
+          setTimeout(() => {
+            if (mounted) navigate('/dashboard');
+          }, 300);
         } else {
           console.log('No active session found');
           if (mounted) setIsCheckingSession(false);

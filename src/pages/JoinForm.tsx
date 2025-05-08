@@ -87,26 +87,29 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
         console.log('Signup successful, user ID:', data.user?.id);
 
         if (data.user) {
-          try {
-            // Manual profile creation as a fallback
-            const profileResult = await ensureUserProfile(data.user.id, {
-              email,
-              firstName,
-              lastName,
-              companyId: company?.id,
-              role: 'member'
-            });
-            
-            console.log('Profile creation result:', profileResult);
-            
-            toast.success('Account created successfully! Please check your email for verification.');
-            navigate('/dashboard');
-          } catch (profileError: any) {
-            console.error('Error ensuring user profile:', profileError);
-            setError(`Account created but profile setup failed: ${profileError.message}`);
-            toast.error('Account created but profile setup failed');
-            setLoading(false);
-          }
+          // Give a small delay for the auth system to stabilize
+          setTimeout(async () => {
+            try {
+              // Manual profile creation as a fallback
+              const profileResult = await ensureUserProfile(data.user!.id, {
+                email,
+                firstName,
+                lastName,
+                companyId: company?.id,
+                role: 'member'
+              });
+              
+              console.log('Profile creation result:', profileResult);
+              
+              toast.success('Account created successfully! Please check your email for verification.');
+              navigate('/dashboard');
+            } catch (profileError: any) {
+              console.error('Error ensuring user profile:', profileError);
+              setError(`Account created but profile setup failed: ${profileError.message}`);
+              toast.error('Account created but profile setup failed');
+              setLoading(false);
+            }
+          }, 300);
         } else {
           // This should rarely happen, but handle it just in case
           setError('Sign up response missing user data');
@@ -131,52 +134,59 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
 
         console.log('Login successful, verifying company membership...');
         
-        // Verify user belongs to this company
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('company_id')
-          .eq('id', data.user.id)
-          .maybeSingle();
-
-        if (profileError) {
-          console.error('Error fetching profile:', profileError);
+        // Small delay before verifying company membership
+        setTimeout(async () => {
           try {
-            await ensureUserProfile(data.user.id, {
-              email,
-              companyId: company?.id,
-              role: 'member'
-            });
-          } catch (ensureError) {
-            console.error('Profile creation failed:', ensureError);
+            // Verify user belongs to this company
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .select('company_id')
+              .eq('id', data.user.id)
+              .maybeSingle();
+    
+            if (profileError) {
+              console.error('Error fetching profile:', profileError);
+              try {
+                await ensureUserProfile(data.user.id, {
+                  email,
+                  companyId: company?.id,
+                  role: 'member'
+                });
+              } catch (ensureError) {
+                console.error('Profile creation failed:', ensureError);
+              }
+            } else if (!profile) {
+              console.log('No profile found, creating one...');
+              try {
+                await ensureUserProfile(data.user.id, {
+                  email,
+                  companyId: company?.id,
+                  role: 'member'
+                });
+              } catch (createError) {
+                console.error('Profile creation failed:', createError);
+              }
+            } else if (profile.company_id !== company?.id) {
+              console.error('User belongs to a different company');
+              await supabase.auth.signOut();
+              setError('You are not a member of this company.');
+              toast.error('You are not a member of this company.');
+              setLoading(false);
+              return;
+            }
+    
+            toast.success('Login successful!');
+            navigate('/dashboard');
+          } catch (verifyError) {
+            console.error('Error verifying company membership:', verifyError);
+            setLoading(false);
           }
-        } else if (!profile) {
-          console.log('No profile found, creating one...');
-          try {
-            await ensureUserProfile(data.user.id, {
-              email,
-              companyId: company?.id,
-              role: 'member'
-            });
-          } catch (createError) {
-            console.error('Profile creation failed:', createError);
-          }
-        } else if (profile.company_id !== company?.id) {
-          console.error('User belongs to a different company');
-          await supabase.auth.signOut();
-          setError('You are not a member of this company.');
-          toast.error('You are not a member of this company.');
-          setLoading(false);
-          return;
-        }
-
-        toast.success('Login successful!');
-        navigate('/dashboard');
+        }, 300);
       }
     } catch (error: any) {
       console.error('Authentication error:', error);
       setError(error.message || 'Authentication failed. Please try again.');
       toast.error(error.message || 'Authentication failed. Please try again.');
-    } finally {
       setLoading(false);
     }
   };
