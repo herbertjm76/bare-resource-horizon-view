@@ -1,5 +1,5 @@
 
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf'; // Updated import statement to use named import
 import 'jspdf-autotable';
 import { addDays, format } from 'date-fns';
 import { formatWeekKey } from '../utils';
