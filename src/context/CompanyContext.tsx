@@ -1,7 +1,7 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface Company {
   id: string;
@@ -35,6 +35,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [isSubdomainMode, setIsSubdomainMode] = useState(false);
+  const navigate = useNavigate();
 
   const fetchCompanyData = async () => {
     try {
@@ -60,81 +61,120 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         if (subdomain) {
           setIsSubdomainMode(true);
           
-          // Look up company by subdomain
-          const { data: companyData, error: subdomainError } = await supabase
-            .from('companies')
-            .select('*')
-            .eq('subdomain', subdomain)
-            .single();
-            
-          if (subdomainError) {
-            if (subdomainError.code !== 'PGRST116') { // Not found
+          try {
+            // Look up company by subdomain
+            const { data: companyData, error: subdomainError } = await supabase
+              .from('companies')
+              .select('*')
+              .eq('subdomain', subdomain)
+              .maybeSingle();
+              
+            if (subdomainError) {
               console.error('Error fetching company by subdomain:', subdomainError);
+            } else if (companyData) {
+              console.log('Found company by subdomain:', companyData.name);
+              setCompany(companyData);
+              setLoading(false);
+              return;
+            } else {
+              console.error('No company found for subdomain:', subdomain);
+              // Don't navigate here, let the Not Found component handle this case
             }
-          } else if (companyData) {
-            console.log('Found company by subdomain:', companyData.name);
-            setCompany(companyData);
-            setLoading(false);
-            return;
+          } catch (err) {
+            console.error('Error in subdomain lookup:', err);
           }
         }
       }
       
-      // If not subdomain mode or subdomain not found, try to get company from user profile
+      // Get session to check if user is logged in
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
         console.log('No session found');
         setLoading(false);
+        // If on a specific page that needs company data like /join, keep the loading state
+        // Otherwise just show the login page without company data
+        if (window.location.pathname.startsWith('/join')) {
+          const companyIdParam = new URLSearchParams(window.location.search).get('companyId');
+          if (companyIdParam) {
+            await fetchCompanyById(companyIdParam);
+          }
+        }
         return;
       }
       
       console.log('Getting user profile for ID:', session.user.id);
       
-      // Get user profile to find company ID
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('company_id')
-        .eq('id', session.user.id)
-        .single();
-        
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
-        if (profileError.code !== 'PGRST116') { // Not found error
-          throw profileError;
+      try {
+        // Get user profile to find company ID
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('company_id')
+          .eq('id', session.user.id)
+          .maybeSingle();
+          
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+          // Don't throw here, try to create profile as fallback
+          const { error } = await supabase.from('profiles')
+            .insert({ id: session.user.id, email: session.user.email })
+            .select();
+          
+          if (error) console.error('Error creating profile:', error);
+          setLoading(false);
+          return;
         }
+        
+        if (!profile?.company_id) {
+          console.log('No company ID found in user profile');
+          setLoading(false);
+          return;
+        }
+        
+        companyId = profile.company_id;
+        console.log('Found company ID in profile:', companyId);
+        
+        await fetchCompanyById(companyId);
+      } catch (err) {
+        console.error('Error fetching user profile:', err);
         setLoading(false);
-        return;
       }
-      
-      if (!profile?.company_id) {
-        console.log('No company ID found in user profile');
-        setLoading(false);
-        return;
-      }
-      
-      companyId = profile.company_id;
-      console.log('Found company ID in profile:', companyId);
-      
+    } catch (fetchError) {
+      console.error('Error in company context:', fetchError);
+      setError(fetchError instanceof Error ? fetchError : new Error(String(fetchError)));
+      toast.error('Failed to load company data');
+      setLoading(false);
+    }
+  };
+
+  const fetchCompanyById = async (companyId: string) => {
+    try {
       // Get company details
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .select('*')
         .eq('id', companyId)
-        .single();
+        .maybeSingle();
         
       if (companyError) {
         console.error('Error fetching company details:', companyError);
         throw companyError;
       }
       
-      console.log('Company data loaded:', companyData.name);
-      setCompany(companyData);
-      
-    } catch (fetchError) {
-      console.error('Error in company context:', fetchError);
-      setError(fetchError instanceof Error ? fetchError : new Error(String(fetchError)));
-      toast.error('Failed to load company data');
+      if (companyData) {
+        console.log('Company data loaded:', companyData.name);
+        setCompany(companyData);
+      } else {
+        console.error('No company found with ID:', companyId);
+        // Handle "company not found" case
+        const currentPath = window.location.pathname;
+        if (!currentPath.startsWith('/auth') && currentPath !== '/') {
+          toast.error('Company not found. Please contact support.');
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching company by ID:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       setLoading(false);
     }
@@ -145,9 +185,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     fetchCompanyData();
     
     // Listen for auth state changes to refresh company data
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
-      console.log('Auth state changed, refreshing company data');
-      fetchCompanyData();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        // Small delay to ensure database is updated
+        setTimeout(() => fetchCompanyData(), 300);
+      } else if (event === 'SIGNED_OUT') {
+        setCompany(null);
+      }
     });
     
     return () => {

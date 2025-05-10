@@ -10,9 +10,13 @@ import SignupFormMessages from './SignupFormMessages';
 
 interface SignupFormContainerProps {
   onSwitchToLogin: () => void;
+  ensureProfile: (userId: string, userData?: any) => Promise<boolean>;
 }
 
-const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLogin }) => {
+const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ 
+  onSwitchToLogin,
+  ensureProfile 
+}) => {
   const { 
     formState: { 
       ownerFirstName, ownerLastName, ownerEmail, ownerPassword,
@@ -21,7 +25,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
     handleOwnerChange,
     handleCompanyChange,
     handleSignUp
-  } = useSignupForm(onSwitchToLogin);
+  } = useSignupForm(onSwitchToLogin, ensureProfile);
 
   const form = useForm<CompanyFormData>({ defaultValues: emptyCompany });
   const { watch, setValue, formState: { errors } } = form;

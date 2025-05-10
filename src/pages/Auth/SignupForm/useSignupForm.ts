@@ -25,7 +25,10 @@ export interface SignupFormState {
   subdomainCheck: SubdomainCheckState;
 }
 
-export const useSignupForm = (onSwitchToLogin: () => void) => {
+export const useSignupForm = (
+  onSwitchToLogin: () => void, 
+  ensureProfile: (userId: string, userData?: any) => Promise<boolean>
+) => {
   const [formState, setFormState] = useState<SignupFormState>({
     ownerFirstName: '',
     ownerLastName: '',
@@ -62,12 +65,20 @@ export const useSignupForm = (onSwitchToLogin: () => void) => {
       
       if (error) throw error;
       
+      const isAvailable = count === 0;
       updateFormState({ subdomainCheck: { isChecking: false, error: '' } });
-      return count === 0;
+      
+      if (!isAvailable) {
+        updateFormState({ 
+          subdomainCheck: { isChecking: false, error: 'This subdomain is already taken. Please choose another one.' } 
+        });
+      }
+      
+      return isAvailable;
     } catch (error: any) {
       console.error('Error checking subdomain availability:', error);
       updateFormState({ 
-        subdomainCheck: { isChecking: false, error: 'Could not check subdomain.' } 
+        subdomainCheck: { isChecking: false, error: 'Could not check subdomain. Please try again.' } 
       });
       return false;
     }
@@ -185,25 +196,21 @@ export const useSignupForm = (onSwitchToLogin: () => void) => {
 
       console.log('Auth signup successful, user created:', authData.user.id);
       
-      // Manually ensure profile exists by inserting directly
-      // This is a fallback in case the trigger fails
+      // Manually ensure profile exists through our reliable function
       try {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: ownerEmail,
-            first_name: ownerFirstName,
-            last_name: ownerLastName,
-            company_id: companyData.id,
-            role: userRole
-          });
-          
-        if (profileError) {
-          console.warn('Manual profile creation failed:', profileError);
-          // We don't throw here as the auth trigger might have created the profile
+        console.log('Ensuring profile exists...');
+        const profileCreated = await ensureProfile(authData.user.id, {
+          email: ownerEmail,
+          firstName: ownerFirstName,
+          lastName: ownerLastName,
+          companyId: companyData.id,
+          role: userRole
+        });
+        
+        if (profileCreated) {
+          console.log('Profile creation successful');
         } else {
-          console.log('Manual profile creation successful');
+          console.warn('Profile creation may have failed - check for duplicates');
         }
       } catch (profileErr) {
         console.warn('Error in manual profile creation:', profileErr);

@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { toast } from 'sonner';
 
 // Define user role type to match the database enum
 type UserRole = Database['public']['Enums']['user_role'];
@@ -35,6 +36,10 @@ export const ensureUserProfile = async (userId: string, userData?: ProfileData):
     
     if (checkError) {
       console.error('Error checking profile existence:', checkError);
+      if (checkError.code === 'PGRST301') {
+        // This is an RLS error - could be policy issue
+        console.error('This appears to be an RLS permission error. Check policies.');
+      }
       return false;
     }
     
@@ -77,17 +82,22 @@ export const ensureUserProfile = async (userId: string, userData?: ProfileData):
       console.log(`Profile creation attempt ${attempts}/${maxAttempts}`);
       
       try {
+        // Prepare profile data
+        const profileData = {
+          id: userId,
+          email: userData?.email || user?.email || '',
+          first_name: userData?.firstName || metaData.first_name || '',
+          last_name: userData?.lastName || metaData.last_name || '',
+          company_id: userData?.companyId || metaData.company_id || null,
+          role: userRole
+        };
+        
+        console.log('Attempting to create profile with data:', JSON.stringify(profileData));
+        
         // Try insert operation
         const { data: insertData, error: insertError } = await supabase
           .from('profiles')
-          .insert({
-            id: userId,
-            email: userData?.email || user?.email || '',
-            first_name: userData?.firstName || metaData.first_name || '',
-            last_name: userData?.lastName || metaData.last_name || '',
-            company_id: userData?.companyId || metaData.company_id || null,
-            role: userRole
-          })
+          .insert(profileData)
           .select()
           .single();
         
@@ -99,20 +109,19 @@ export const ensureUserProfile = async (userId: string, userData?: ProfileData):
         
         console.log('Profile insert failed:', insertError);
         
+        if (insertError.code === 'PGRST301') {
+          console.error('RLS policy blocking profile creation. This may be a permissions issue.');
+          // Try again after a small delay, maybe auth state is still propagating
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
         // If first attempt fails, try upsert on subsequent attempts
         if (attempts > 1) {
           console.log('Trying upsert as fallback...');
           
           const { data: upsertData, error: upsertError } = await supabase
             .from('profiles')
-            .upsert({
-              id: userId,
-              email: userData?.email || user?.email || '',
-              first_name: userData?.firstName || metaData.first_name || '',
-              last_name: userData?.lastName || metaData.last_name || '',
-              company_id: userData?.companyId || metaData.company_id || null,
-              role: userRole
-            })
+            .upsert(profileData)
             .select()
             .single();
           
@@ -137,6 +146,50 @@ export const ensureUserProfile = async (userId: string, userData?: ProfileData):
     return profileCreated;
   } catch (error) {
     console.error('Unexpected error in ensureUserProfile:', error);
+    return false;
+  }
+};
+
+/**
+ * Check if the user has a valid session and profile
+ * @returns Promise<boolean> True if user has valid session and profile
+ */
+export const checkUserSessionAndProfile = async (): Promise<boolean> => {
+  try {
+    // First check session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      console.error('Session check error:', sessionError);
+      return false;
+    }
+    
+    if (!session) {
+      console.log('No active session');
+      return false;
+    }
+    
+    // Then check profile
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', session.user.id)
+      .maybeSingle();
+      
+    if (profileError) {
+      console.error('Profile check error:', profileError);
+      // Try to create profile if it doesn't exist
+      return await ensureUserProfile(session.user.id);
+    }
+    
+    if (!profile) {
+      console.log('No profile found, creating one');
+      return await ensureUserProfile(session.user.id);
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error checking user session and profile:', error);
     return false;
   }
 };

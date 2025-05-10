@@ -5,8 +5,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import LoginForm from './Auth/LoginForm';
 import SignupForm from './Auth/SignupForm';
-import { AlertCircle, Link2 } from 'lucide-react';
+import { AlertCircle, Link2, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { checkUserSessionAndProfile } from '@/utils/authHelpers';
 
 const Auth: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -15,6 +17,7 @@ const Auth: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showConfigHelp, setShowConfigHelp] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -55,16 +58,35 @@ const Auth: React.FC = () => {
       if (!mounted) return;
       
       if (event === 'SIGNED_IN' && session) {
-        console.log('User signed in, redirecting to dashboard');
+        console.log('User signed in, ensuring profile exists');
         
-        // We're now waiting a small delay before redirecting
-        // This helps ensure any DB operations (like profile creation) complete
-        setTimeout(() => {
-          if (mounted) {
-            toast.success('Successfully signed in!');
-            navigate('/dashboard');
+        // Don't redirect immediately, ensure profile exists first
+        setIsProcessing(true);
+        
+        // Use setTimeout to avoid potential deadlocks
+        setTimeout(async () => {
+          if (!mounted) return;
+          
+          try {
+            // Ensure profile exists
+            const profileExists = await checkUserSessionAndProfile();
+            
+            if (profileExists) {
+              console.log('Profile confirmed, redirecting to dashboard');
+              toast.success('Successfully signed in!');
+              navigate('/dashboard');
+            } else {
+              console.error('Failed to ensure user profile exists');
+              setError('Your account was created but there was an issue setting up your profile. Please try again or contact support.');
+              setIsCheckingSession(false);
+              setIsProcessing(false);
+            }
+          } catch (err) {
+            console.error('Error in profile check:', err);
+            setIsCheckingSession(false);
+            setIsProcessing(false);
           }
-        }, 300);
+        }, 500);
       }
     });
     
@@ -80,11 +102,32 @@ const Auth: React.FC = () => {
         }
         
         if (sessionData.session) {
-          console.log('User already logged in, redirecting to dashboard');
-          // Small delay before redirect to ensure profile exists
-          setTimeout(() => {
-            if (mounted) navigate('/dashboard');
-          }, 300);
+          console.log('User already logged in, ensuring profile exists');
+          setIsProcessing(true);
+          
+          // Small delay to ensure database is updated
+          setTimeout(async () => {
+            if (!mounted) return;
+            
+            try {
+              // Check if profile exists and create if needed
+              const profileExists = await checkUserSessionAndProfile();
+              
+              if (profileExists) {
+                console.log('Profile confirmed, redirecting to dashboard');
+                navigate('/dashboard');
+              } else {
+                console.error('Failed to ensure user profile exists');
+                setError('There was an issue accessing your profile. Please try signing in again or contact support.');
+                setIsCheckingSession(false);
+                setIsProcessing(false);
+              }
+            } catch (err) {
+              console.error('Error in profile check:', err);
+              setIsCheckingSession(false);
+              setIsProcessing(false);
+            }
+          }, 500);
         } else {
           console.log('No active session found');
           if (mounted) setIsCheckingSession(false);
@@ -108,6 +151,7 @@ const Auth: React.FC = () => {
     if (!email) return;
     
     try {
+      setIsProcessing(true);
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email,
@@ -119,7 +163,16 @@ const Auth: React.FC = () => {
     } catch (err: any) {
       console.error('Error resending confirmation email:', err);
       toast.error(err.message || 'Failed to resend confirmation email.');
+    } finally {
+      setIsProcessing(false);
     }
+  };
+
+  const handleRetry = () => {
+    setIsCheckingSession(true);
+    setError(null);
+    setShowConfigHelp(false);
+    window.location.reload();
   };
 
   if (isCheckingSession) {
@@ -149,11 +202,22 @@ const Auth: React.FC = () => {
               {(error.includes('confirm your email') || error.includes('verification link') || error.includes('invalid')) && (
                 <button 
                   onClick={resendConfirmationEmail}
+                  disabled={isProcessing}
                   className="block mt-2 text-blue-300 underline hover:text-blue-200 transition-colors"
                 >
-                  Resend confirmation email
+                  {isProcessing ? 'Processing...' : 'Resend confirmation email'}
                 </button>
               )}
+              
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={handleRetry}
+                className="mt-3 bg-white/10 border-white/30 text-white hover:bg-white/20"
+              >
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                Retry
+              </Button>
             </AlertDescription>
           </Alert>
         )}
