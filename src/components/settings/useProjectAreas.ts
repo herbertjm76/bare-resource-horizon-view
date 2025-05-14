@@ -54,16 +54,11 @@ export default function useProjectAreas() {
       
       const newArea = await createProjectArea(company.id, values);
       setAreas(old => [...old, newArea]);
-      toast({
-        description: "Area added successfully."
-      });
+      toast.success("Area added successfully.");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(errorMessage);
-      toast({
-        variant: "destructive",
-        description: errorMessage
-      });
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -92,16 +87,11 @@ export default function useProjectAreas() {
             : area
         )
       );
-      toast({
-        description: "Area updated successfully."
-      });
+      toast.success("Area updated successfully.");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(errorMessage);
-      toast({
-        variant: "destructive",
-        description: errorMessage
-      });
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -113,16 +103,11 @@ export default function useProjectAreas() {
     try {
       await deleteProjectAreas(ids);
       setAreas(areas => areas.filter(a => !ids.includes(a.id)));
-      toast({
-        description: `${ids.length} area(s) deleted successfully.`
-      });
+      toast.success(`${ids.length} area(s) deleted successfully.`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(errorMessage);
-      toast({
-        variant: "destructive",
-        description: errorMessage
-      });
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

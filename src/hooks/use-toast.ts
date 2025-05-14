@@ -20,12 +20,6 @@ export interface Toast {
 
 // Constants
 const TOAST_LIMIT = 5;
-const ACTION_TYPES = {
-  ADD_TOAST: "ADD_TOAST",
-  UPDATE_TOAST: "UPDATE_TOAST",
-  DISMISS_TOAST: "DISMISS_TOAST",
-  REMOVE_TOAST: "REMOVE_TOAST",
-} as const;
 
 // ID generator
 let count = 0;
@@ -34,40 +28,39 @@ function genId() {
   return count.toString();
 }
 
-// State and action types
-type ActionType = typeof ACTION_TYPES;
+// Define the state type explicitly with the correct typing
 type State = {
-  toasts: Array<Required<Pick<Toast, "id" | "open">> & Toast>;
+  toasts: Array<Toast & { id: string; open: boolean }>;
 };
 
+// Initialize memory state
+const memoryState: State = { toasts: [] };
+const listeners: Array<(state: State) => void> = [];
+
+// Action types
 type Action =
-  | {
-      type: ActionType["ADD_TOAST"];
-      toast: Toast;
-    }
-  | {
-      type: ActionType["UPDATE_TOAST"];
-      toast: Partial<Toast>;
-    }
-  | {
-      type: ActionType["DISMISS_TOAST"];
-      toastId?: string;
-    }
-  | {
-      type: ActionType["REMOVE_TOAST"];
-      toastId?: string;
-    };
+  | { type: "ADD_TOAST"; toast: Toast }
+  | { type: "UPDATE_TOAST"; toast: Partial<Toast> }
+  | { type: "DISMISS_TOAST"; toastId?: string }
+  | { type: "REMOVE_TOAST"; toastId?: string };
 
 // Reducer function
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case ACTION_TYPES.ADD_TOAST:
-      return {
-        ...state,
-        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
+    case "ADD_TOAST":
+      // Ensure the toast has id and open properties
+      const newToast = {
+        ...action.toast,
+        id: action.toast.id || genId(),
+        open: action.toast.open ?? true,
       };
 
-    case ACTION_TYPES.UPDATE_TOAST:
+      return {
+        ...state,
+        toasts: [newToast, ...state.toasts].slice(0, TOAST_LIMIT),
+      };
+
+    case "UPDATE_TOAST":
       return {
         ...state,
         toasts: state.toasts.map((t) =>
@@ -75,7 +68,7 @@ const reducer = (state: State, action: Action): State => {
         ),
       };
 
-    case ACTION_TYPES.DISMISS_TOAST: {
+    case "DISMISS_TOAST": {
       const { toastId } = action;
 
       // If no toast id, dismiss all
@@ -102,7 +95,7 @@ const reducer = (state: State, action: Action): State => {
         ),
       };
     }
-    case ACTION_TYPES.REMOVE_TOAST: {
+    case "REMOVE_TOAST": {
       const { toastId } = action;
 
       // If no toast id, remove all
@@ -121,10 +114,6 @@ const reducer = (state: State, action: Action): State => {
     }
   }
 };
-
-// Initialize listeners and memory state
-const listeners: Array<(state: State) => void> = [];
-let memoryState: State = { toasts: [] };
 
 // Dispatch function
 function dispatch(action: Action) {
@@ -165,8 +154,8 @@ function toast(props: Toast) {
   };
 }
 
-// Simplified Sonner helpers - use the same parameters as our toast
-const simplifiedSonnerMethods = {
+// Simplified Sonner helpers
+const sonnerMethods = {
   error: (description: string) => sonnerToast.error(description),
   success: (description: string) => sonnerToast.success(description),
   info: (description: string) => sonnerToast.info(description),
@@ -174,7 +163,7 @@ const simplifiedSonnerMethods = {
 };
 
 // Extend the toast object with sonner methods
-Object.assign(toast, simplifiedSonnerMethods);
+Object.assign(toast, sonnerMethods);
 
 // Hook for using toast
 function useToast() {
@@ -188,7 +177,7 @@ function useToast() {
         listeners.splice(index, 1);
       }
     };
-  }, [state]);
+  }, []);
 
   return {
     ...state,
@@ -198,4 +187,4 @@ function useToast() {
 }
 
 // Export everything needed
-export { useToast, toast, type State as ToastState };
+export { useToast, toast };
