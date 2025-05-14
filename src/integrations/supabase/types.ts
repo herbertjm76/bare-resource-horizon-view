@@ -926,6 +926,14 @@ export type Database = {
             }
         Returns: boolean
       }
+      user_has_admin_role: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+      user_has_owner_role: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       users_are_in_same_company: {
         Args: { user_id_1: string; user_id_2: string }
         Returns: boolean
