@@ -130,10 +130,13 @@ function dispatch(action: Action) {
   });
 }
 
-type Toast = Omit<ToasterToast, "id">;
+export type Toast = Partial<Omit<ToasterToast, "id">> & {
+  id?: string;
+  open?: boolean;
+};
 
-function toast({ ...props }: Toast) {
-  const id = genId();
+function toast(props: Toast) {
+  const id = props.id || genId();
 
   const update = (props: ToasterToast) =>
     dispatch({
