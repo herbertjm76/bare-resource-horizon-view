@@ -37,7 +37,7 @@ export const SidebarNavigation = ({
     <>
       {items.map((section) => (
         <div key={section.label} className="mb-2">
-          <SidebarGroupLabel className="text-white/70 px-2 pt-4 pb-2">
+          <SidebarGroupLabel className="text-white/70 px-4 pt-6 pb-2">
             {collapsed ? "" : section.label}
           </SidebarGroupLabel>
           <SidebarContent>
@@ -46,32 +46,36 @@ export const SidebarNavigation = ({
                 const isActive = currentPath === item.url;
                 return (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
+                    <SidebarMenuButton asChild
                       className={`
+                        relative
                         text-white 
                         hover:text-white 
-                        hover:bg-[#7d8086]
+                        hover:bg-[#7d8086]/30
                         rounded-none
-                        px-2
+                        px-4
                         py-2
                         flex
                         items-center
-                        gap-3
+                        gap-4
                         transition-all
                         text-sm
-                        ${isActive ? "bg-[#6E59A5] text-white" : ""}
+                        ${isActive ? "before:absolute before:left-0 before:top-0 before:h-full before:w-0.5 before:bg-brand-primary" : ""}
                       `}
                       isActive={isActive}
                       tooltip={collapsed ? item.title : undefined}
                     >
                       <Link 
                         to={item.url} 
-                        className="flex items-center gap-3 w-full"
+                        className="flex items-center gap-4 w-full"
                         onClick={onItemClick}
                       >
-                        <item.icon className="h-5 w-5 min-w-5" />
-                        {!collapsed && <span className="font-medium">{item.title}</span>}
+                        <item.icon className={`h-[22px] w-[22px] min-w-[22px] ${isActive ? "text-brand-primary" : ""}`} />
+                        {!collapsed && (
+                          <span className={`font-medium ${isActive ? "text-brand-primary" : ""}`}>
+                            {item.title}
+                          </span>
+                        )}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -84,4 +88,3 @@ export const SidebarNavigation = ({
     </>
   );
 };
-

@@ -1,0 +1,169 @@
+
+/* Existing weekly table CSS */
+.weekly-table-container {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.weekly-table {
+  table-layout: fixed;
+}
+
+.weekly-table .header-cell {
+  text-align: center;
+  padding: 0.5rem 0.25rem;
+  vertical-align: middle;
+  font-size: 0.75rem;
+}
+
+.weekly-table .name-column {
+  min-width: 160px;
+  width: 160px;
+}
+
+.weekly-table .number-column {
+  min-width: 50px;
+  width: 50px;
+  padding: 0.25rem;
+  text-align: center;
+}
+
+.weekly-table .capacity-column {
+  min-width: 60px;
+  width: 60px;
+  padding: 0.25rem;
+  text-align: center;
+}
+
+.weekly-table .remarks-column {
+  min-width: 120px;
+  width: 120px;
+}
+
+.weekly-table .project-code-column {
+  min-width: 50px;
+  width: 50px;
+}
+
+.weekly-table .project-hours-column {
+  min-width: 50px;
+  width: 50px;
+  text-align: center;
+}
+
+.weekly-table .project-code-header {
+  transform: rotate(-90deg);
+  white-space: nowrap;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.project-pill {
+  padding: 0.125rem 0.375rem;
+  background-color: hsl(var(--primary) / 0.8);
+  color: white;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+/* Updated styles for capacity */
+.capacity-display {
+  background-color: #f3f3f3;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-weight: 600;
+  color: #333;
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Utilization pill */
+.utilization-pill {
+  border-radius: 9999px;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 40px;
+  display: inline-block;
+}
+
+/* Leave inputs styling - Enhanced for better UX */
+.leave-column {
+  background-color: #f9f9f9;
+}
+
+.leave-input {
+  width: 100%;
+  min-width: 30px;
+  max-width: 50px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  font-size: 0.75rem;
+  padding: 0.125rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.leave-input:hover {
+  border-color: hsl(var(--primary) / 0.5);
+  background-color: #fff;
+}
+
+.leave-input:focus {
+  outline: 2px solid hsl(var(--primary) / 0.5);
+  background-color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.weekly-table .table-cell {
+  font-size: 0.75rem;
+}
+
+/* Highlight the editable fields with a subtle indicator */
+.leave-input {
+  position: relative;
+}
+
+.leave-input:after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 6px;
+  height: 6px;
+  background-color: hsl(var(--primary) / 0.6);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.leave-input:hover:after {
+  opacity: 1;
+}
+
+/* Office header styling */
+.office-header {
+  background-color: #f0f0f0;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Totals row styling */
+tfoot tr {
+  border-top: 2px solid #e0e0e0 !important;
+  background-color: #f7f7f7;
+}
+
+tfoot td {
+  font-weight: 500;
+}

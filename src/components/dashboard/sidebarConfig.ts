@@ -1,14 +1,14 @@
+
 import { 
   LayoutDashboard,
-  CalendarDays,
-  CalendarRange,
-  Users,
-  Clock,
-  ScrollText,
-  FolderKanban,
+  LayoutList,
   GanttChartSquare,
+  FolderKanban,
   UserSquare2,
-  Flag
+  Briefcase,
+  Calendar,
+  Flag,
+  HelpCircle
 } from "lucide-react"
 
 export const navigationItems = [
@@ -21,29 +21,24 @@ export const navigationItems = [
         icon: LayoutDashboard,
       },
       {
-        title: "Calendar",
-        url: "/calendar",
-        icon: CalendarDays,
+        title: "Weekly Overview",
+        url: "/weekly-overview",
+        icon: LayoutList,
       },
     ],
   },
   {
-    label: "RESOURCE PLANNING",
+    label: "PROJECT MANAGEMENT",
     items: [
       {
-        title: "Weekly Planning",
-        url: "/weekly-planning",
-        icon: CalendarRange,
+        title: "Project Resourcing",
+        url: "/project-resourcing",
+        icon: GanttChartSquare,
       },
       {
-        title: "Resource Allocation",
-        url: "/resource-allocation",
-        icon: Users,
-      },
-      {
-        title: "Capacity Planning",
-        url: "/capacity-planning",
-        icon: Clock,
+        title: "All Projects",
+        url: "/projects",
+        icon: FolderKanban,
       },
     ],
   },
@@ -56,34 +51,29 @@ export const navigationItems = [
         icon: UserSquare2,
       },
       {
-        title: "Skills & Roles",
-        url: "/skills-roles",
-        icon: ScrollText,
+        title: "Team Workload",
+        url: "/team-workload",
+        icon: Briefcase,
+      },
+      {
+        title: "Team Annual Leave",
+        url: "/team-annual-leave",
+        icon: Calendar,
       },
     ],
   },
   {
-    label: "PROJECTS",
-    items: [
-      {
-        title: "All Projects",
-        url: "/projects",
-        icon: FolderKanban,
-      },
-      {
-        title: "Project Resourcing",
-        url: "/project-resourcing",
-        icon: GanttChartSquare,
-      },
-    ],
-  },
-  {
-    label: "SYSTEM",
+    label: "SETTINGS",
     items: [
       {
         title: "Office Settings",
         url: "/office-settings",
         icon: Flag,
+      },
+      {
+        title: "Help",
+        url: "/help",
+        icon: HelpCircle,
       },
     ],
   },

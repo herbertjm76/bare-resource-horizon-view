@@ -1,56 +1,101 @@
 
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { ClipboardCopy } from "lucide-react";
-import { Invite } from "./TeamManagement";
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Invite } from './types';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Send, Trash2 } from 'lucide-react';
+import { getStatusStyle } from './utils/statusColors';
 
 interface TeamInvitesTableProps {
   invitees: Invite[];
   copyInviteCode: (code: string) => void;
+  editMode?: boolean;
+  onResendInvite?: (invite: Invite) => void;
+  onDeleteInvite?: (inviteId: string) => void;
 }
 
-const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
-  invitees,
+const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({ 
+  invitees, 
   copyInviteCode,
+  editMode = false,
+  onResendInvite,
+  onDeleteInvite
 }) => {
-  if (invitees.length === 0) return null;
+  // Only show email invites
+  const emailInvites = invitees.filter(invite => invite.invitation_type === 'email_invite');
+  
+  if (!emailInvites.length) {
+    return null;
+  }
+
   return (
-    <div className="mb-8">
-      <h3 className="text-lg font-medium text-white mb-2">Pending Invites</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-white/10">
-              <th className="py-2 px-4 text-left text-white/80">Email</th>
-              <th className="py-2 px-4 text-left text-white/80">Invite Code</th>
-              <th className="py-2 px-4 text-left text-white/80">Status</th>
-              <th className="py-2 px-4 text-left text-white/80">Created</th>
-              <th className="py-2 px-4 text-left text-white/80">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invitees.map(invite => (
-              <tr key={invite.id} className="border-b border-white/10 hover:bg-white/5">
-                <td className="py-2 px-4 text-white">{invite.email || <span className="italic text-white/50">Not set</span>}</td>
-                <td className="py-2 px-4 text-white">{invite.code}</td>
-                <td className="py-2 px-4 text-white">{invite.status}</td>
-                <td className="py-2 px-4 text-white">{new Date(invite.created_at).toLocaleString()}</td>
-                <td className="py-2 px-4">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="inline-flex gap-1 text-white"
-                    onClick={() => copyInviteCode(invite.code)}
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[30%]">Email</TableHead>
+            <TableHead className="w-[20%]">Status</TableHead>
+            <TableHead className="w-[20%]">Sent</TableHead>
+            <TableHead className="w-[30%]"></TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {emailInvites.map((invite) => {
+            const statusStyle = 
+              invite.status?.toLowerCase() === 'active' 
+                ? getStatusStyle('active')
+                : getStatusStyle('invited');
+              
+            return (
+              <TableRow key={invite.id}>
+                <TableCell className="w-[30%]">{invite.email}</TableCell>
+                <TableCell className="w-[20%]">
+                  <Badge 
+                    variant={statusStyle.variant}
+                    className={statusStyle.className}
                   >
-                    <ClipboardCopy className="h-4 w-4" />
-                    Copy Link
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    {invite.status || 'Invited'}
+                  </Badge>
+                </TableCell>
+                <TableCell className="w-[20%]">{new Date(invite.created_at).toLocaleDateString()}</TableCell>
+                <TableCell className="w-[30%]">
+                  {editMode ? (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onResendInvite && onResendInvite(invite)}
+                      >
+                        <Send className="h-4 w-4 mr-1" />
+                        Resend
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                        onClick={() => onDeleteInvite && onDeleteInvite(invite.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="h-9"></div> // Empty space holder to maintain layout
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 };

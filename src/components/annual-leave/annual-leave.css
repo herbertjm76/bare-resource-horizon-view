@@ -1,0 +1,108 @@
+
+/* Annual Leave Calendar Styles */
+.annual-leave-calendar input::-webkit-outer-spin-button,
+.annual-leave-calendar input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.annual-leave-calendar input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Highlight weekend cells */
+.weekend-cell {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Sticky header and first column */
+.annual-leave-calendar .sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+}
+
+.annual-leave-calendar .sticky-column {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background-color: white;
+}
+
+/* Add hover effect on cells */
+.annual-leave-calendar .leave-cell:hover {
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+/* Better styling for the table */
+.annual-leave-calendar table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.annual-leave-calendar th,
+.annual-leave-calendar td {
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Sunday-Monday separator (thick border) */
+.annual-leave-calendar th.sunday-border,
+.annual-leave-calendar td.sunday-border {
+  border-right: 2px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Row hover effect */
+.annual-leave-calendar tbody tr:hover {
+  background-color: rgba(111, 75, 246, 0.05) !important;
+}
+
+/* Focus and hover effects */
+.annual-leave-calendar tbody td:focus-within {
+  background-color: rgba(111, 75, 246, 0.05);
+}
+
+.annual-leave-calendar input:focus {
+  box-shadow: none;
+  outline: 2px solid rgba(111, 75, 246, 0.5);
+  border-radius: 3px;
+}
+
+/* Cell with hours styling */
+.annual-leave-calendar td.leave-cell-filled input {
+  background-color: #ECECFB; /* Light purple background for filled cells */
+  color: black;
+  font-weight: 500;
+}
+
+/* Improved header styling */
+.annual-leave-calendar thead th {
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Alternating row colors that work with sticky column - IMPROVED CONTRAST */
+.annual-leave-calendar tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+/* Transition effect when adding hours */
+.annual-leave-calendar input {
+  transition: all 0.2s ease;
+}
+
+/* Enhanced input appearance */
+.annual-leave-calendar input::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* Pulse animation for newly entered values */
+@keyframes pulse-highlight {
+  0% { box-shadow: 0 0 0 0 rgba(111, 75, 246, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(111, 75, 246, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(111, 75, 246, 0); }
+}
+
+.annual-leave-calendar .leave-cell-filled input:focus {
+  animation: pulse-highlight 1.5s;
+}

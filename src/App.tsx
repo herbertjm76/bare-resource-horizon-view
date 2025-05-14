@@ -12,10 +12,23 @@ import OfficeSettings from "./pages/OfficeSettings";
 import Auth from "./pages/Auth";
 import Join from "./pages/Join";
 import Profile from "./pages/Profile";
+import TeamMembers from "./pages/TeamMembers";
+import TeamWorkload from "./pages/TeamWorkload";
+import TeamAnnualLeave from "./pages/TeamAnnualLeave";
+import WeeklyOverview from "./pages/WeeklyOverview";
+import ProjectResourcing from "./pages/ProjectResourcing";
+import Help from "./pages/Help";
 import { CompanyProvider, useCompany } from "./context/CompanyContext";
-import { useEffect } from "react";
 
-const queryClient = new QueryClient();
+// Create a new QueryClient instance with default options
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 // Component to handle routing based on subdomain status
 const AppRoutes = () => {
@@ -45,11 +58,19 @@ const AppRoutes = () => {
           : <Index />
       } />
       
-      {/* Company-specific routes */}
+      {/* Protected routes requiring authentication */}
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/weekly-overview" element={<WeeklyOverview />} />
+      <Route path="/project-resourcing" element={<ProjectResourcing />} />
       <Route path="/projects" element={<Projects />} />
-      <Route path="/office-settings" element={<OfficeSettings />} />
       <Route path="/profile" element={<Profile />} />
+      
+      {/* Team management routes */}
+      <Route path="/team-members" element={<TeamMembers />} />
+      <Route path="/team-workload" element={<TeamWorkload />} />
+      <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
+      <Route path="/office-settings" element={<OfficeSettings />} />
+      <Route path="/help" element={<Help />} />
       
       {/* Catch-all route */}
       <Route path="*" element={<NotFound />} />

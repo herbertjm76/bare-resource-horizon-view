@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Command, CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -36,25 +37,46 @@ interface CurrencyPickerProps {
 
 export const CurrencyPicker = ({ value, onValueChange }: CurrencyPickerProps) => {
   const selectedCurrency = currencies.find(c => c.code === value) || currencies[0];
+  const [open, setOpen] = React.useState(false);
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full justify-start">
+        <Button 
+          variant="outline" 
+          className="w-full justify-start h-8 text-left font-normal"
+          type="button"
+        >
           <span>{selectedCurrency.symbol} ({selectedCurrency.code})</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="p-0" align="start">
-        <Command>
-          <CommandInput placeholder="Search currency..." />
-          <CommandList>
+      <PopoverContent 
+        className="p-0" 
+        align="start"
+        sideOffset={4}
+        style={{ zIndex: 999 }}
+        avoidCollisions={true}
+        collisionPadding={16}
+      >
+        <Command className="bg-popover">
+          <CommandInput 
+            placeholder="Search currency..."
+            className="h-9"
+          />
+          <CommandList className="pointer-events-auto">
             <CommandEmpty>No currency found.</CommandEmpty>
             <CommandGroup>
               {currencies.map((currency) => (
                 <CommandItem
                   key={currency.code}
                   value={currency.code}
-                  onSelect={() => onValueChange(currency.code)}
+                  onSelect={(value) => {
+                    onValueChange(value);
+                    setOpen(false);
+                  }}
+                  className="cursor-pointer"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <Check
                     className={cn(

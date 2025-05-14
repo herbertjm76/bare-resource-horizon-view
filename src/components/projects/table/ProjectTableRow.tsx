@@ -6,7 +6,6 @@ import { Edit, Trash2 } from "lucide-react";
 import { EditableProjectField } from '../components/EditableProjectField';
 import { useProjectTableRow } from './hooks/useProjectTableRow';
 import type { ProjectStatus } from '../utils/projectMappings';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { EditProjectDialog } from '../EditProjectDialog';
 
 interface ProjectTableRowProps {
@@ -40,10 +39,16 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     getStatusColor,
     locations,
     editableFields,
-    getAreaByCountry
+    getAreaByCountry,
+    getStageFee,
+    buildProjectRow
   } = useProjectTableRow(project, refetch);
 
   const projectArea = getAreaByCountry(project.country);
+  const row = buildProjectRow();
+  
+  console.log(`ProjectTableRow - Project ${project.id} row data:`, row);
+  console.log(`ProjectTableRow - Office stages:`, office_stages);
 
   return (
     <>
@@ -107,20 +112,25 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         </TableCell>
         
         {office_stages.map((stage) => {
-          const isCurrentStage = project.current_stage === stage.name;
+          const fee = row[stage.id];
+          console.log(`Stage ${stage.name} (${stage.id}): Fee = ${fee}`);
           return (
             <TableCell 
               key={`${project.id}-${stage.id}`} 
               className="text-center"
             >
-              {isCurrentStage ? (
-                <div 
-                  className="h-3 w-3 rounded-full mx-auto"
-                  style={{
-                    backgroundColor: "#212172"
-                  }}
-                />
-              ) : null}
+              {fee !== undefined && fee !== null ? (
+                <span className="text-xs">
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                  }).format(fee)}
+                </span>
+              ) : (
+                "-"
+              )}
             </TableCell>
           );
         })}
@@ -151,7 +161,6 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         )}
       </TableRow>
 
-      {/* Add the EditProjectDialog component */}
       {showEditDialog && (
         <EditProjectDialog
           project={project}

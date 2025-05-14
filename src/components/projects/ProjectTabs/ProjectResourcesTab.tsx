@@ -2,12 +2,12 @@
 import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ProjectForm } from "../NewProjectDialog";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Trash2 } from "lucide-react";
+import type { FormState } from "../hooks/types/projectTypes";
 
 interface ProjectResourcesTabProps {
-  form: ProjectForm;
+  form: FormState;
   roles: Array<{ id: string; name: string; code: string }>;
 }
 
