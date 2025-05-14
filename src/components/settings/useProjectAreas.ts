@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import type { ProjectAreaFormValues, ProjectArea } from "./projectAreaTypes";
 import { useProjectAreasState } from './hooks/useProjectAreasState';
 import { 
@@ -14,7 +14,6 @@ import {
 export { getAutoRegion } from './projectAreaUtils';
 
 export default function useProjectAreas() {
-  const { toast } = useToast();
   const { company, loading: companyLoading } = useCompany();
   const { 
     areas, 

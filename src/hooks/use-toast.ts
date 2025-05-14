@@ -1,47 +1,53 @@
 
-import React from "react";
+import * as React from "react";
 import { toast as sonnerToast, type ToasterProps } from "sonner";
 
-const TOAST_LIMIT = 5;
+// Type for the toast action element
 export type ToastActionElement = React.ReactElement<
   unknown,
   string | React.JSXElementConstructor<any>
 >;
 
-type ToasterToast = {
-  id: string;
-  title?: React.ReactNode;
+// Type for our toast
+export interface Toast {
+  id?: string;
   description?: React.ReactNode;
   action?: ToastActionElement;
-  open: boolean;
-  onOpenChange?: (open: boolean) => void;
   variant?: "default" | "destructive";
-};
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
 
-const actionTypes = {
+// Constants
+const TOAST_LIMIT = 5;
+const ACTION_TYPES = {
   ADD_TOAST: "ADD_TOAST",
   UPDATE_TOAST: "UPDATE_TOAST",
   DISMISS_TOAST: "DISMISS_TOAST",
   REMOVE_TOAST: "REMOVE_TOAST",
 } as const;
 
+// ID generator
 let count = 0;
-
 function genId() {
   count = (count + 1) % Number.MAX_VALUE;
   return count.toString();
 }
 
-type ActionType = typeof actionTypes;
+// State and action types
+type ActionType = typeof ACTION_TYPES;
+type State = {
+  toasts: Array<Required<Pick<Toast, "id" | "open">> & Toast>;
+};
 
 type Action =
   | {
       type: ActionType["ADD_TOAST"];
-      toast: ToasterToast;
+      toast: Toast;
     }
   | {
       type: ActionType["UPDATE_TOAST"];
-      toast: Partial<ToasterToast>;
+      toast: Partial<Toast>;
     }
   | {
       type: ActionType["DISMISS_TOAST"];
@@ -52,19 +58,16 @@ type Action =
       toastId?: string;
     };
 
-interface State {
-  toasts: ToasterToast[];
-}
-
-export const reducer = (state: State, action: Action): State => {
+// Reducer function
+const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "ADD_TOAST":
+    case ACTION_TYPES.ADD_TOAST:
       return {
         ...state,
         toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
       };
 
-    case "UPDATE_TOAST":
+    case ACTION_TYPES.UPDATE_TOAST:
       return {
         ...state,
         toasts: state.toasts.map((t) =>
@@ -72,7 +75,7 @@ export const reducer = (state: State, action: Action): State => {
         ),
       };
 
-    case "DISMISS_TOAST": {
+    case ACTION_TYPES.DISMISS_TOAST: {
       const { toastId } = action;
 
       // If no toast id, dismiss all
@@ -99,7 +102,7 @@ export const reducer = (state: State, action: Action): State => {
         ),
       };
     }
-    case "REMOVE_TOAST": {
+    case ACTION_TYPES.REMOVE_TOAST: {
       const { toastId } = action;
 
       // If no toast id, remove all
@@ -119,10 +122,11 @@ export const reducer = (state: State, action: Action): State => {
   }
 };
 
+// Initialize listeners and memory state
 const listeners: Array<(state: State) => void> = [];
-
 let memoryState: State = { toasts: [] };
 
+// Dispatch function
 function dispatch(action: Action) {
   memoryState = reducer(memoryState, action);
   listeners.forEach((listener) => {
@@ -130,19 +134,16 @@ function dispatch(action: Action) {
   });
 }
 
-export type Toast = Partial<Omit<ToasterToast, "id">> & {
-  id?: string;
-  open?: boolean;
-};
-
+// Our main toast function
 function toast(props: Toast) {
   const id = props.id || genId();
 
-  const update = (props: ToasterToast) =>
+  const update = (props: Toast) =>
     dispatch({
       type: "UPDATE_TOAST",
       toast: { ...props, id },
     });
+    
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
 
   dispatch({
@@ -164,6 +165,18 @@ function toast(props: Toast) {
   };
 }
 
+// Simplified Sonner helpers - use the same parameters as our toast
+const simplifiedSonnerMethods = {
+  error: (description: string) => sonnerToast.error(description),
+  success: (description: string) => sonnerToast.success(description),
+  info: (description: string) => sonnerToast.info(description),
+  warning: (description: string) => sonnerToast.warning(description),
+};
+
+// Extend the toast object with sonner methods
+Object.assign(toast, simplifiedSonnerMethods);
+
+// Hook for using toast
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState);
 
@@ -184,15 +197,5 @@ function useToast() {
   };
 }
 
-// Additional implementation to forward to sonner toast
-const forwardToast = {
-  error: (message: string) => sonnerToast.error(message),
-  success: (message: string) => sonnerToast.success(message),
-  info: (message: string) => sonnerToast.info(message),
-  warning: (message: string) => sonnerToast.warning(message),
-};
-
-// Extend the toast object with sonner methods
-Object.assign(toast, forwardToast);
-
-export { useToast, toast };
+// Export everything needed
+export { useToast, toast, type State as ToastState };
