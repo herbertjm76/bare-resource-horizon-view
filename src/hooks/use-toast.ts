@@ -1,6 +1,6 @@
 
 import React from "react";
-import { toast as sonnerToast, Toast, ToastProps } from "sonner";
+import { toast as sonnerToast, type ToasterProps } from "sonner";
 
 const TOAST_LIMIT = 5;
 export type ToastActionElement = React.ReactElement<
@@ -8,7 +8,15 @@ export type ToastActionElement = React.ReactElement<
   string | React.JSXElementConstructor<any>
 >;
 
-type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>;
+type ToasterToast = {
+  id: string;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: ToastActionElement;
+  open: boolean;
+  onOpenChange?: (open: boolean) => void;
+  variant?: "default" | "destructive";
+};
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
@@ -171,14 +179,6 @@ function useToast() {
     toast,
     dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
   };
-}
-
-export interface ToasterToast extends Partial<ToastProps> {
-  id: string;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  description?: React.ReactNode;
-  action?: ToastActionElement;
 }
 
 // Additional implementation to forward to sonner toast

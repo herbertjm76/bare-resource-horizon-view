@@ -55,14 +55,15 @@ export default function useProjectAreas() {
       
       const newArea = await createProjectArea(company.id, values);
       setAreas(old => [...old, newArea]);
-      toast({ title: "Success", description: "Area added successfully." });
+      toast({
+        description: "Area added successfully."
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(errorMessage);
-      toast({ 
-        title: "Error", 
-        description: errorMessage, 
-        variant: "destructive" 
+      toast({
+        variant: "destructive",
+        description: errorMessage
       });
     } finally {
       setLoading(false);
@@ -92,14 +93,15 @@ export default function useProjectAreas() {
             : area
         )
       );
-      toast({ title: "Success", description: "Area updated successfully." });
+      toast({
+        description: "Area updated successfully."
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(errorMessage);
-      toast({ 
-        title: "Error", 
-        description: errorMessage, 
-        variant: "destructive" 
+      toast({
+        variant: "destructive",
+        description: errorMessage
       });
     } finally {
       setLoading(false);
@@ -113,16 +115,14 @@ export default function useProjectAreas() {
       await deleteProjectAreas(ids);
       setAreas(areas => areas.filter(a => !ids.includes(a.id)));
       toast({
-        title: "Success",
-        description: `${ids.length} area(s) deleted successfully.`,
+        description: `${ids.length} area(s) deleted successfully.`
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(errorMessage);
       toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
+        variant: "destructive",
+        description: errorMessage
       });
     } finally {
       setLoading(false);
