@@ -170,13 +170,13 @@ export function useToast(): {
 }
 
 // Export toast as a standalone function
-export const toast: ToastFunction = (props: ToastProps) => {
+export const toast: ToastFunction = ((props: ToastProps) => {
   return sonnerToast(props.title as string, {
     description: props.description,
     duration: props.duration || 5000,
     id: props.id,
   });
-} as ToastFunction;
+}) as ToastFunction;
 
 // Add helper methods to toast function
 toast.success = (props: ToastProps | string) => {
