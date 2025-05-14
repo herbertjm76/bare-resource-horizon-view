@@ -18,16 +18,21 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
   ensureProfile 
 }) => {
   const { 
-    formState: { 
-      ownerFirstName, ownerLastName, ownerEmail, ownerPassword,
-      company, subdomainCheck, loading, showConfirmationInfo, signupError
-    },
+    formState,
     handleOwnerChange,
     handleCompanyChange,
     handleSignUp
   } = useSignupForm(onSwitchToLogin, ensureProfile);
 
-  const form = useForm<CompanyFormData>({ defaultValues: emptyCompany });
+  const { 
+    ownerFirstName, ownerLastName, ownerEmail, ownerPassword,
+    company, subdomainCheck, loading, showConfirmationInfo, signupError
+  } = formState;
+
+  const form = useForm<CompanyFormData>({ 
+    defaultValues: emptyCompany 
+  });
+  
   const { watch, setValue, formState: { errors } } = form;
 
   // Keep form values in sync with company state
@@ -38,7 +43,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({
   }, [company, setValue]);
 
   return (
-    <form className="space-y-4" onSubmit={handleSignUp} autoComplete="off">
+    <form className="space-y-4" onSubmit={(e) => handleSignUp(e)} autoComplete="off">
       <h2 className="text-2xl font-extrabold text-white mb-1 text-center">Sign Up & Register Company</h2>
       <p className="text-white/70 text-center mb-6">Complete your details to create your account and register your company in one step.</p>
 

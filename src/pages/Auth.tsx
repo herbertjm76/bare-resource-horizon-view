@@ -23,26 +23,30 @@ const Auth: React.FC = () => {
 
   // Check for error parameters in URL
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const errorCode = params.get('error');
-    const errorDescription = params.get('error_description');
-    
-    console.log('Auth page: URL parameters:', {
-      errorCode,
-      errorDescription,
-      search: location.search
-    });
-    
-    if (errorCode === 'email_not_confirmed') {
-      setError('Please confirm your email address before logging in. Check your inbox for a confirmation link.');
-    } else if (errorCode === 'invalid_request') {
-      setError('The verification link is invalid or has expired. If you\'re trying to verify your email, please try requesting a new confirmation email.');
-      setShowConfigHelp(true);
-    } else if (errorCode && errorDescription) {
-      setError(`${errorDescription}`);
-      if (errorDescription.includes('invalid') || errorDescription.includes('expired')) {
+    try {
+      const params = new URLSearchParams(location.search);
+      const errorCode = params.get('error');
+      const errorDescription = params.get('error_description');
+      
+      console.log('Auth page: URL parameters:', {
+        errorCode,
+        errorDescription,
+        search: location.search
+      });
+      
+      if (errorCode === 'email_not_confirmed') {
+        setError('Please confirm your email address before logging in. Check your inbox for a confirmation link.');
+      } else if (errorCode === 'invalid_request') {
+        setError('The verification link is invalid or has expired. If you\'re trying to verify your email, please try requesting a new confirmation email.');
         setShowConfigHelp(true);
+      } else if (errorCode && errorDescription) {
+        setError(`${errorDescription}`);
+        if (errorDescription.includes('invalid') || errorDescription.includes('expired')) {
+          setShowConfigHelp(true);
+        }
       }
+    } catch (err) {
+      console.error('Error parsing URL parameters:', err);
     }
   }, [location]);
 
