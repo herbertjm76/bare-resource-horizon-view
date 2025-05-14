@@ -30,11 +30,11 @@ function genId() {
 
 // Define the state type explicitly with the correct typing
 type State = {
-  toasts: Array<Toast & { id: string; open: boolean }>;
+  toasts: Array<Required<Pick<Toast, "id" | "open">> & Toast>;
 };
 
 // Initialize memory state
-const memoryState: State = { toasts: [] };
+let memoryState: State = { toasts: [] };
 const listeners: Array<(state: State) => void> = [];
 
 // Action types
@@ -123,8 +123,21 @@ function dispatch(action: Action) {
   });
 }
 
+// Define the type for our toast function with success/error methods
+interface ToastFunction {
+  (props: Toast): {
+    id: string;
+    dismiss: () => void;
+    update: (props: Toast) => void;
+  };
+  success: (description: string) => void;
+  error: (description: string) => void;
+  info: (description: string) => void;
+  warning: (description: string) => void;
+}
+
 // Our main toast function
-function toast(props: Toast) {
+const toast = ((props: Toast) => {
   const id = props.id || genId();
 
   const update = (props: Toast) =>
@@ -152,18 +165,13 @@ function toast(props: Toast) {
     dismiss,
     update,
   };
-}
+}) as ToastFunction;
 
-// Simplified Sonner helpers
-const sonnerMethods = {
-  error: (description: string) => sonnerToast.error(description),
-  success: (description: string) => sonnerToast.success(description),
-  info: (description: string) => sonnerToast.info(description),
-  warning: (description: string) => sonnerToast.warning(description),
-};
-
-// Extend the toast object with sonner methods
-Object.assign(toast, sonnerMethods);
+// Add Sonner helper methods to our toast function
+toast.success = (description: string) => sonnerToast.success(description);
+toast.error = (description: string) => sonnerToast.error(description);
+toast.info = (description: string) => sonnerToast.info(description);
+toast.warning = (description: string) => sonnerToast.warning(description);
 
 // Hook for using toast
 function useToast() {
