@@ -1,247 +1,224 @@
 
-import { Toast, ToastActionElement, ToastProps } from "@/components/ui/toast";
-import * as React from "react";
+import React, { createContext, useContext, useState } from "react";
 import { toast as sonnerToast } from "sonner";
 
-const TOAST_LIMIT = 20;
-const TOAST_REMOVE_DELAY = 1000;
-
-type ToasterToast = Toast & {
-  id: string;
+// Define our types for Toast
+export interface ToastProps {
+  id?: string;
   title?: React.ReactNode;
   description?: React.ReactNode;
-  action?: ToastActionElement;
-  open: boolean;
+  action?: React.ReactNode;
+  open?: boolean;
+  variant?: "default" | "destructive";
+  duration?: number;
+}
+
+// Enhanced toast function interface
+export interface ToastFunction {
+  (props: ToastProps): {
+    id: string;
+    dismiss: () => void;
+    update: (props: ToastProps) => void;
+  };
+  success: (props: ToastProps | string) => void;
+  error: (props: ToastProps | string) => void;
+  info: (props: ToastProps | string) => void;
+  warning: (props: ToastProps | string) => void;
+}
+
+// Type for toast state
+type State = {
+  toasts: Required<Pick<ToastProps, "id" | "open">> & ToastProps[];
 };
 
-const actionTypes = {
-  ADD_TOAST: "ADD_TOAST",
-  UPDATE_TOAST: "UPDATE_TOAST",
-  DISMISS_TOAST: "DISMISS_TOAST",
-  REMOVE_TOAST: "REMOVE_TOAST",
-} as const;
-
-let count = 0;
-
-function genId() {
-  count = (count + 1) % Number.MAX_SAFE_INTEGER;
-  return count.toString();
-}
-
-type ActionType = typeof actionTypes;
-
-type Action =
-  | {
-      type: ActionType["ADD_TOAST"];
-      toast: ToasterToast;
-    }
-  | {
-      type: ActionType["UPDATE_TOAST"];
-      toast: Partial<ToasterToast>;
-    }
-  | {
-      type: ActionType["DISMISS_TOAST"];
-      toastId?: ToasterToast["id"];
-    }
-  | {
-      type: ActionType["REMOVE_TOAST"];
-      toastId?: ToasterToast["id"];
-    };
-
-interface State {
-  toasts: ToasterToast[];
-}
-
-const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
-
+// Create initial state
 const initialState: State = {
   toasts: [],
 };
 
-function reducer(state: State, action: Action): State {
-  switch (action.type) {
-    case actionTypes.ADD_TOAST:
-      return {
-        ...state,
-        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
-      };
+// Generate a unique ID
+const generateId = () => {
+  return Math.random().toString(36).substring(2, 9);
+};
 
-    case actionTypes.UPDATE_TOAST:
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t
-        ),
-      };
+// Create a context
+export const ToastContext = createContext<{
+  state: State;
+  toast: ToastFunction;
+}>({
+  state: initialState,
+  toast: (() => {
+    throw new Error("Toast context not initialized");
+  }) as ToastFunction,
+});
 
-    case actionTypes.DISMISS_TOAST: {
-      const { toastId } = action;
+// Define the provider
+export function ToastProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.JSX.Element {
+  const [state, setState] = useState<State>(initialState);
 
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
-      if (toastId) {
-        const timeout = toastTimeouts.get(toastId);
-        if (timeout) clearTimeout(timeout);
+  // Create a new toast
+  const toast = ((props: ToastProps) => {
+    const id = props.id || generateId();
+    const newToast = { ...props, id, open: true };
 
-        const dismissTimeout = setTimeout(() => {
-          dispatch({
-            type: actionTypes.REMOVE_TOAST,
-            toastId: toastId,
-          });
-        }, TOAST_REMOVE_DELAY);
+    setState((prev) => ({
+      ...prev,
+      toasts: [...prev.toasts, newToast as Required<Pick<ToastProps, "id" | "open">> & ToastProps],
+    }));
 
-        toastTimeouts.set(toastId, dismissTimeout);
-      }
-
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === toastId || toastId === undefined
-            ? {
-                ...t,
-                open: false,
-              }
-            : t
-        ),
-      };
-    }
-
-    case actionTypes.REMOVE_TOAST:
-      if (action.toastId === undefined) {
-        return {
-          ...state,
-          toasts: [],
-        };
-      }
-      return {
-        ...state,
-        toasts: state.toasts.filter((t) => t.id !== action.toastId),
-      };
-  }
-}
-
-const listeners: Array<(state: State) => void> = [];
-
-let memoryState: State = initialState;
-
-function dispatch(action: Action) {
-  memoryState = reducer(memoryState, action);
-  listeners.forEach((listener) => {
-    listener(memoryState);
-  });
-}
-
-interface ToastFunction {
-  (props: Toast): {
-    id: string;
-    dismiss: () => void;
-    update: (props: Toast) => void;
-  };
-  success: (props: string | Toast) => void;
-  error: (props: string | Toast) => void;
-  warning: (props: string | Toast) => void;
-  info: (props: string | Toast) => void;
-}
-
-export function toast(props: Toast) {
-  const id = genId();
-
-  const update = (props: Toast) =>
-    dispatch({
-      type: actionTypes.UPDATE_TOAST,
-      toast: { ...props, id },
-    });
-
-  const dismiss = () =>
-    dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id });
-
-  dispatch({
-    type: actionTypes.ADD_TOAST,
-    toast: {
-      ...props,
+    return {
       id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) {
-          dismiss();
-        }
-      },
-    },
-  });
-
-  // Also trigger sonner toast for consistency
-  if (props.title || props.description) {
-    sonnerToast(props.title as string, {
-      description: props.description as string,
-    });
-  }
-
-  return {
-    id,
-    dismiss,
-    update,
-  };
-}
-
-// Add convenience methods to toast
-(toast as ToastFunction).success = (props) => {
-  if (typeof props === "string") {
-    sonnerToast.success(props);
-  } else {
-    sonnerToast.success(props.title as string, {
-      description: props.description as string,
-    });
-  }
-};
-
-(toast as ToastFunction).error = (props) => {
-  if (typeof props === "string") {
-    sonnerToast.error(props);
-  } else {
-    sonnerToast.error(props.title as string, {
-      description: props.description as string,
-    });
-  }
-};
-
-(toast as ToastFunction).warning = (props) => {
-  if (typeof props === "string") {
-    sonnerToast(props, { className: "bg-yellow-500" });
-  } else {
-    sonnerToast(props.title as string, {
-      description: props.description as string,
-      className: "bg-yellow-500",
-    });
-  }
-};
-
-(toast as ToastFunction).info = (props) => {
-  if (typeof props === "string") {
-    sonnerToast(props, { className: "bg-blue-500" });
-  } else {
-    sonnerToast(props.title as string, {
-      description: props.description as string,
-      className: "bg-blue-500",
-    });
-  }
-};
-
-export function useToast() {
-  const [state, setState] = React.useState<State>(memoryState);
-
-  React.useEffect(() => {
-    listeners.push(setState);
-    return () => {
-      const index = listeners.indexOf(setState);
-      if (index > -1) {
-        listeners.splice(index, 1);
-      }
+      dismiss: () => dismissToast(id),
+      update: (props: ToastProps) =>
+        setState((prev) => ({
+          ...prev,
+          toasts: prev.toasts.map((toast) =>
+            toast.id === id ? { ...toast, ...props } : toast
+          ),
+        })),
     };
-  }, [state]);
+  }) as ToastFunction;
+
+  // Dismiss a toast
+  const dismissToast = (id: string) => {
+    setState((prev) => ({
+      ...prev,
+      toasts: prev.toasts.filter((toast) => toast.id !== id),
+    }));
+  };
+
+  // Add helper methods to toast function
+  toast.success = (props) => {
+    if (typeof props === 'string') {
+      sonnerToast.success(props);
+    } else {
+      sonnerToast.success(props.title || '', {
+        description: props.description,
+        duration: props.duration || 5000,
+        id: props.id,
+      });
+    }
+  };
+
+  toast.error = (props) => {
+    if (typeof props === 'string') {
+      sonnerToast.error(props);
+    } else {
+      sonnerToast.error(props.title || '', {
+        description: props.description,
+        duration: props.duration || 5000,
+        id: props.id,
+      });
+    }
+  };
+
+  toast.info = (props) => {
+    if (typeof props === 'string') {
+      sonnerToast.info(props);
+    } else {
+      sonnerToast.info(props.title || '', {
+        description: props.description,
+        duration: props.duration || 5000,
+        id: props.id,
+      });
+    }
+  };
+
+  toast.warning = (props) => {
+    if (typeof props === 'string') {
+      sonnerToast.warning(props);
+    } else {
+      sonnerToast.warning(props.title || '', {
+        description: props.description,
+        duration: props.duration || 5000,
+        id: props.id,
+      });
+    }
+  };
+
+  return (
+    <ToastContext.Provider value={{ state, toast }}>
+      {children}
+    </ToastContext.Provider>
+  );
+}
+
+// Create a hook for using the toast
+export function useToast(): {
+  toast: ToastFunction;
+  toasts: State["toasts"];
+  dismissToast: (id: string) => void;
+} {
+  const context = useContext(ToastContext);
+  if (!context) {
+    throw new Error("useToast must be used within a ToastProvider");
+  }
 
   return {
-    ...state,
-    toast,
-    dismiss: (toastId?: string) => dispatch({ type: actionTypes.DISMISS_TOAST, toastId }),
+    toast: context.toast,
+    toasts: context.state.toasts,
+    dismissToast: (id: string) => {
+      context.state.toasts = context.state.toasts.filter(
+        (toast) => toast.id !== id
+      );
+    },
   };
 }
+
+// Export toast as a standalone function
+export const toast: ToastFunction = (props: ToastProps) => {
+  return sonnerToast(props.title as string, {
+    description: props.description,
+    duration: props.duration || 5000,
+    id: props.id,
+  });
+} as ToastFunction;
+
+// Add helper methods to toast function
+toast.success = (props: ToastProps | string) => {
+  if (typeof props === 'string') {
+    return sonnerToast.success(props);
+  }
+  return sonnerToast.success(props.title as string, {
+    description: props.description,
+    duration: props.duration || 5000,
+    id: props.id,
+  });
+};
+
+toast.error = (props: ToastProps | string) => {
+  if (typeof props === 'string') {
+    return sonnerToast.error(props);
+  }
+  return sonnerToast.error(props.title as string, {
+    description: props.description,
+    duration: props.duration || 5000,
+    id: props.id,
+  });
+};
+
+toast.info = (props: ToastProps | string) => {
+  if (typeof props === 'string') {
+    return sonnerToast.info(props);
+  }
+  return sonnerToast.info(props.title as string, {
+    description: props.description,
+    duration: props.duration || 5000,
+    id: props.id,
+  });
+};
+
+toast.warning = (props: ToastProps | string) => {
+  if (typeof props === 'string') {
+    return sonnerToast.warning(props);
+  }
+  return sonnerToast.warning(props.title as string, {
+    description: props.description,
+    duration: props.duration || 5000,
+    id: props.id,
+  });
+};
