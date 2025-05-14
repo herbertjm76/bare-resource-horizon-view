@@ -1,16 +1,3 @@
 
-import SignupFormContainer from "./SignupFormContainer";
-import { ensureUserProfile } from "@/utils/authHelpers";
-
-interface SignupFormProps {
-  onSwitchToLogin: () => void;
-}
-
-const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => (
-  <SignupFormContainer 
-    onSwitchToLogin={onSwitchToLogin} 
-    ensureProfile={ensureUserProfile}
-  />
-);
-
+import SignupForm from "./SignupForm";
 export default SignupForm;

@@ -32,12 +32,7 @@ const OfficeSettings = () => {
   });
   
   const isLoading = authLoading || companyLoading;
-  // Convert errors to strings to ensure they are valid ReactNode values
-  const errorMessage = authError 
-    ? typeof authError === 'string' ? authError : String(authError)
-    : companyError 
-      ? typeof companyError === 'string' ? companyError : String(companyError)
-      : null;
+  const error = authError || companyError;
   
   const handleRefresh = () => {
     console.log('Manually refreshing company data from OfficeSettings');
@@ -52,9 +47,9 @@ const OfficeSettings = () => {
           <p className="text-sm text-muted-foreground">
             {authLoading ? "Verifying access..." : "Loading company data..."}
           </p>
-          {errorMessage && (
+          {error && (
             <div className="text-sm text-red-500 mt-2 max-w-md text-center">
-              {errorMessage}
+              {error}
               <Button 
                 variant="link" 
                 className="ml-2 p-0 h-auto" 

@@ -19,7 +19,17 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
 import { toast } from 'sonner';
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
+type Invite = Database['public']['Tables']['invites']['Row'];
+
+interface AddResourceDialogProps {
+  projectId: string;
+  onClose: () => void;
+  onAdd: (resource: { staffId: string, name: string, role?: string, isPending?: boolean }) => void;
+}
 
 type ResourceOption = {
   id: string;
@@ -28,12 +38,6 @@ type ResourceOption = {
   type: 'active' | 'pre-registered';
   role?: string;
 };
-
-interface AddResourceDialogProps {
-  projectId: string;
-  onClose: () => void;
-  onAdd: (resource: { staffId: string, name: string, role?: string, isPending?: boolean }) => void;
-}
 
 export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({ 
   projectId, 
@@ -48,15 +52,10 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
   // Fetch team members and pre-registered invites when dialog opens
   useEffect(() => {
     const fetchResources = async () => {
-      if (!company?.id) {
-        console.error('No company ID available');
-        toast.error('Company information not available');
-        return;
-      }
+      if (!company?.id) return;
       
       try {
         setLoading(true);
-        console.log('Fetching resources for company:', company.id);
         
         // Fetch active team members from profiles
         const { data: activeMembers, error: activeError } = await supabase
@@ -64,10 +63,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
           .select('*')
           .eq('company_id', company.id);
           
-        if (activeError) {
-          console.error('Error fetching active members:', activeError);
-          throw activeError;
-        }
+        if (activeError) throw activeError;
         
         // Fetch pre-registered team members from invites
         const { data: preregisteredMembers, error: inviteError } = await supabase
@@ -77,18 +73,12 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
           .eq('invitation_type', 'pre_registered')
           .eq('status', 'pending');
           
-        if (inviteError) {
-          console.error('Error fetching pre-registered members:', inviteError);
-          throw inviteError;
-        }
-        
-        console.log('Fetched active members:', activeMembers?.length || 0);
-        console.log('Fetched pre-registered members:', preregisteredMembers?.length || 0);
+        if (inviteError) throw inviteError;
         
         // Combine and format the resources
         const formattedResources: ResourceOption[] = [
           // Active members
-          ...(activeMembers || []).map((member) => ({
+          ...(activeMembers || []).map((member: Profile) => ({
             id: member.id,
             name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || member.email,
             email: member.email,
@@ -97,7 +87,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
           })),
           
           // Pre-registered members
-          ...(preregisteredMembers || []).map((invite) => ({
+          ...(preregisteredMembers || []).map((invite: Invite) => ({
             id: invite.id,
             name: `${invite.first_name || ''} ${invite.last_name || ''}`.trim() || invite.email,
             email: invite.email || '',
@@ -119,33 +109,23 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
   }, [company]);
   
   const handleAdd = async () => {
-    if (!selectedResource) {
-      toast.error('Please select a team member');
-      return;
-    }
-    
-    if (!company?.id) {
-      toast.error('Company information not available');
-      return;
-    }
-    
-    if (!projectId) {
-      toast.error('Project ID is required');
+    if (!selectedResource || !company?.id || !projectId) {
+      toast.error('Please select a resource and try again');
       return;
     }
     
     setLoading(true);
     
     try {
-      console.log('Adding resource to project:', projectId);
       const resource = resourceOptions.find(r => r.id === selectedResource);
+      if (!resource) throw new Error('Resource not found');
       
-      if (!resource) {
-        throw new Error('Selected resource not found');
-      }
-      
-      console.log('Resource details:', resource);
-      console.log('Company ID:', company.id);
+      console.log('Adding resource:', { 
+        resource,
+        projectId,
+        companyId: company.id,
+        type: resource.type 
+      });
       
       if (resource.type === 'pre-registered') {
         // Handle pre-registered resource (store in pending_resources)
@@ -166,7 +146,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
         
         console.log('Added pending resource:', data);
       } else {
-        // Add active resource
+        // Add active resource - explicitly include company_id
         const { data, error } = await supabase
           .from('project_resources')
           .insert({
@@ -197,7 +177,7 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
       onClose();
     } catch (err: any) {
       console.error('Error adding resource:', err);
-      toast.error('Failed to add resource: ' + (err.message || 'Unknown error'));
+      toast.error('Failed to add resource: ' + (err.message || err.error_description || 'Unknown error'));
     } finally {
       setLoading(false);
     }
@@ -241,15 +221,8 @@ export const AddResourceDialog: React.FC<AddResourceDialogProps> = ({
         
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button variant="default" disabled={!selectedResource || loading} onClick={handleAdd}>
-            {loading ? (
-              <>
-                <span className="mr-2">Adding...</span>
-                <span className="animate-spin">⏳</span>
-              </>
-            ) : (
-              'Add Resource'
-            )}
+          <Button isLoading={loading} onClick={handleAdd} disabled={!selectedResource || loading}>
+            Add Resource
           </Button>
         </DialogFooter>
       </DialogContent>

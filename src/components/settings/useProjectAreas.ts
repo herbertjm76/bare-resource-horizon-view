@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { useCompany } from '@/context/CompanyContext';
-import { toast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import type { ProjectAreaFormValues, ProjectArea } from "./projectAreaTypes";
 import { useProjectAreasState } from './hooks/useProjectAreasState';
 import { 
@@ -14,6 +14,7 @@ import {
 export { getAutoRegion } from './projectAreaUtils';
 
 export default function useProjectAreas() {
+  const { toast } = useToast();
   const { company, loading: companyLoading } = useCompany();
   const { 
     areas, 
@@ -54,11 +55,15 @@ export default function useProjectAreas() {
       
       const newArea = await createProjectArea(company.id, values);
       setAreas(old => [...old, newArea]);
-      toast.success("Area added successfully.");
+      toast({ title: "Success", description: "Area added successfully." });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(errorMessage);
-      toast.error(errorMessage);
+      toast({ 
+        title: "Error", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
@@ -87,11 +92,15 @@ export default function useProjectAreas() {
             : area
         )
       );
-      toast.success("Area updated successfully.");
+      toast({ title: "Success", description: "Area updated successfully." });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(errorMessage);
-      toast.error(errorMessage);
+      toast({ 
+        title: "Error", 
+        description: errorMessage, 
+        variant: "destructive" 
+      });
     } finally {
       setLoading(false);
     }
@@ -103,11 +112,18 @@ export default function useProjectAreas() {
     try {
       await deleteProjectAreas(ids);
       setAreas(areas => areas.filter(a => !ids.includes(a.id)));
-      toast.success(`${ids.length} area(s) deleted successfully.`);
+      toast({
+        title: "Success",
+        description: `${ids.length} area(s) deleted successfully.`,
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred.";
       setError(errorMessage);
-      toast.error(errorMessage);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }

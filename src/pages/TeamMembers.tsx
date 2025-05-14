@@ -9,23 +9,18 @@ import { useTeamMembersRealtime } from '@/hooks/useTeamMembersRealtime';
 import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { useCompany } from '@/context/CompanyContext';
 
 const HEADER_HEIGHT = 56;
 
 const TeamMembersPage = () => {
-  const navigate = useNavigate();
   // Get user session
   const userId = useUserSession();
-  const { company, loading: companyLoading } = useCompany();
   
   // Fetch team members data - passing false since we don't need inactive members here
   const {
     teamMembers,
     triggerRefresh,
-    forceRefresh,
-    isLoading: isTeamMembersLoading
+    forceRefresh
   } = useTeamMembersData(false);
 
   // Fetch user profile separately since it's no longer part of useTeamMembersData
@@ -55,34 +50,12 @@ const TeamMembersPage = () => {
     enabled: !!userId
   });
 
-  // Check if user is authenticated
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        console.log("No session found, redirecting to auth");
-        navigate('/auth');
-      }
-    };
-    
-    checkAuth();
-  }, [navigate]);
-
   // Set up realtime subscriptions
   useTeamMembersRealtime(
     userProfile?.company_id,
     triggerRefresh,
     forceRefresh
   );
-
-  // Show loading state if we're still fetching data
-  if ((isProfileLoading || companyLoading) && userId) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-      </div>
-    );
-  }
 
   return (
     <SidebarProvider>

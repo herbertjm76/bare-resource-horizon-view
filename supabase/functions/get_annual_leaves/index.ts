@@ -22,7 +22,7 @@ serve(async (req) => {
     // Parse the request body
     const { company_id_param, month_param } = await req.json();
     
-    // Extract year and month from the month_param (format: "YYYY-MM%")
+    // Extract year and month from the month_param (format: "YYYY-MM")
     const [year, month] = month_param.split('-');
     
     // Create date range for the given month
@@ -30,6 +30,8 @@ serve(async (req) => {
     const endDate = month === '12' 
       ? `${parseInt(year) + 1}-01-01` 
       : `${year}-${(parseInt(month) + 1).toString().padStart(2, '0')}-01`;
+
+    console.log(`Fetching annual leaves for company: ${company_id_param}, date range: ${startDate} to ${endDate}`);
 
     // Query annual leaves
     const { data, error } = await supabase
@@ -40,8 +42,11 @@ serve(async (req) => {
       .lt('date', endDate);
 
     if (error) {
+      console.error('Error fetching annual leaves:', error);
       throw error;
     }
+
+    console.log(`Found ${data?.length || 0} annual leave entries`);
 
     // Return the data
     return new Response(JSON.stringify(data), {
@@ -49,6 +54,7 @@ serve(async (req) => {
       status: 200,
     });
   } catch (error) {
+    console.error('Error in get_annual_leaves function:', error.message);
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
