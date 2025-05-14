@@ -2,25 +2,19 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
-import { useProjectUpdate } from './submit/useProjectUpdate';
-import { useStageSubmit } from './submit/useStageSubmit';
-import { mapStatusToDb } from "../utils/projectMappings"; // Fixed import path
-import type { ProjectSubmitData } from './submit/types';
 
 export const useProjectSubmit = (projectId: string, refetch: () => void, onClose: () => void) => {
   const { company } = useCompany();
-  const { updateProject } = useProjectUpdate();
-  const { handleStageSubmit } = useStageSubmit();
 
-  const handleSubmit = async (form: ProjectSubmitData, setIsLoading: (loading: boolean) => void) => {
+  const handleSubmit = async (form: any, setIsLoading: (loading: boolean) => void) => {
     if (setIsLoading) setIsLoading(true);
     
     try {
       console.log('Submitting project update with form data:', form);
       
       // Get stage names from selected stage IDs
-      const selectedStageNames = form.stages.map(stageId => {
-        const stage = form.officeStages?.find(s => s.id === stageId);
+      const selectedStageNames = form.stages.map((stageId: string) => {
+        const stage = form.officeStages?.find((s: any) => s.id === stageId);
         return stage ? stage.name : '';
       }).filter(Boolean);
 
@@ -32,7 +26,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         name: form.name,
         project_manager_id: form.manager && form.manager !== 'not_assigned' ? form.manager : null,
         office_id: form.office || null,
-        status: mapStatusToDb(form.status), // Using the mapper function
+        status: form.status,
         country: form.country,
         current_stage: form.current_stage,
         target_profit_percentage: form.profit ? Number(form.profit) : null,
@@ -41,28 +35,128 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       
       console.log('Project update data:', projectUpdate);
 
-      // Update the main project record and get existing stages
-      const { existingStages } = await updateProject(projectId, {
-        ...projectUpdate,
-        status: form.status // Pass string status which will be handled by updateProject
-      });
+      // Update the main project record with the new data
+      const { error: projectError } = await supabase
+        .from('projects')
+        .update(projectUpdate)
+        .eq('id', projectId);
 
+      if (projectError) {
+        console.error("Error updating project:", projectError);
+        throw projectError;
+      }
+      
+      // First, fetch all current project stages to compare
+      const { data: existingStages, error: stagesError } = await supabase
+        .from('project_stages')
+        .select('id, stage_name')
+        .eq('project_id', projectId);
+        
+      if (stagesError) {
+        console.error("Error fetching existing stages:", stagesError);
+        throw stagesError;
+      }
+
+      console.log('Existing stages:', existingStages);
+      console.log('Selected stages:', selectedStageNames);
+      
       // Check if company ID is available
       if (!company?.id) {
         console.error("Missing company ID for project stage operations");
         throw new Error("Company context is not available");
       }
+      
+      // If no stages are selected, delete all existing stages
+      if (!selectedStageNames || selectedStageNames.length === 0) {
+        if (existingStages && existingStages.length > 0) {
+          const { error } = await supabase
+            .from('project_stages')
+            .delete()
+            .eq('project_id', projectId);
+            
+          if (error) {
+            console.error("Error deleting all stages:", error);
+            throw error;
+          }
+        }
+      } else {
+        // Handle the case where stages are selected
+        const stagesToKeep = new Set(selectedStageNames);
+        const existingStageNames = new Set(existingStages?.map(s => s.stage_name) || []);
+        
+        // Find existing stages that should be deleted (not selected anymore)
+        if (existingStages && existingStages.length > 0) {
+          const stagesToDelete = existingStages
+            .filter(stage => !stagesToKeep.has(stage.stage_name))
+            .map(stage => stage.id);
+          
+          if (stagesToDelete.length > 0) {
+            console.log('Deleting stages:', stagesToDelete);
+            const { error } = await supabase
+              .from('project_stages')
+              .delete()
+              .in('id', stagesToDelete);
+              
+            if (error) {
+              console.error("Error deleting stages:", error);
+              throw error;
+            }
+          }
+        }
+        
+        // Now insert or update stages
+        for (const stageName of selectedStageNames) {
+          const stage = form.officeStages?.find((s: any) => s.name === stageName);
+          if (!stage) continue;
+          
+          const stageId = stage.id;
+          const feeData = form.stageFees?.[stageId];
+          const fee = feeData?.fee ? parseFloat(feeData.fee) : 0;
+          const isApplicable = form.stageApplicability?.[stageId] ?? true;
+          
+          // Prepare stage data with new fields
+          const stageData = {
+            fee,
+            is_applicable: isApplicable,
+            company_id: company.id,
+            billing_month: feeData?.billingMonth || null,
+            invoice_date: feeData?.invoiceDate || null,
+            invoice_status: feeData?.status || 'Not Billed',
+            invoice_age: feeData?.invoiceAge ? parseInt(String(feeData.invoiceAge), 10) || 0 : 0,
+            currency: feeData?.currency || 'USD'
+          };
 
-      // Handle stages and fees
-      await handleStageSubmit({
-        projectId,
-        companyId: company.id,
-        selectedStageNames,
-        existingStages,
-        stageFees: form.stageFees,
-        stageApplicability: form.stageApplicability,
-        officeStages: form.officeStages || []
-      });
+          // Check if this stage already exists
+          const existingStage = existingStages?.find(s => s.stage_name === stageName);
+          
+          if (existingStage) {
+            // Update existing stage
+            const { error } = await supabase
+              .from('project_stages')
+              .update(stageData)
+              .eq('id', existingStage.id);
+              
+            if (error) {
+              console.error(`Error updating stage ${stageName}:`, error);
+              throw error;
+            }
+          } else if (!existingStageNames.has(stageName)) {
+            // Insert new stage
+            const { error } = await supabase
+              .from('project_stages')
+              .insert({
+                project_id: projectId,
+                stage_name: stageName,
+                ...stageData
+              });
+              
+            if (error) {
+              console.error(`Error inserting stage ${stageName}:`, error);
+              throw error;
+            }
+          }
+        }
+      }
 
       toast.success('Project updated successfully');
       refetch();

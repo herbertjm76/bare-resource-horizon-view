@@ -1,28 +1,19 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { StagesGrid } from "./components/StagesGrid";
-import type { FormState } from "../hooks/types/projectTypes";
-import { toast } from "sonner";
+import type { ProjectForm } from "../NewProjectDialog";
 
 interface ProjectStageFeesTabProps {
-  form: FormState;
+  form: ProjectForm;
   officeStages: Array<{ id: string; name: string; color?: string }>;
-  updateStageFee: (stageId: string, data: Partial<FormState['stageFees'][string]>) => void;
-  isDataLoaded: boolean;
+  updateStageFee: (stageId: string, data: Partial<ProjectForm['stageFees'][string]>) => void;
 }
 
 export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   form,
   officeStages,
-  updateStageFee,
-  isDataLoaded
+  updateStageFee
 }) => {
-  console.log("ProjectStageFeesTab - form:", form);
-  console.log("ProjectStageFeesTab - stages:", form.stages);
-  console.log("ProjectStageFeesTab - stageFees:", form.stageFees);
-  console.log("ProjectStageFeesTab - officeStages:", officeStages);
-  console.log("ProjectStageFeesTab - isDataLoaded:", isDataLoaded);
-
   const generateYearMonths = () => {
     const currentYear = new Date().getFullYear();
     const years = [currentYear - 1, currentYear, currentYear + 1];
@@ -61,17 +52,8 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
     return stage?.color || "#E5DEFF";
   };
 
-  // Get the actual office stage objects for the selected stage IDs
   const selectedStages = officeStages.filter(stage => form.stages.includes(stage.id));
   const billingOptions = generateYearMonths();
-
-  console.log("Selected stages for fees:", selectedStages);
-  
-  if (isDataLoaded) {
-    console.log("Stage fees loaded:", form.stageFees);
-  } else {
-    console.log("Stage fees not loaded yet");
-  }
 
   if (form.stages.length === 0) {
     return (
@@ -98,7 +80,6 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
         getStageColor={getStageColor}
         calculateHours={calculateHours}
         calculateInvoiceAge={calculateInvoiceAge}
-        isDataLoaded={isDataLoaded}
       />
     </div>
   );

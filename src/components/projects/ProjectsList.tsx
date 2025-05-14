@@ -128,8 +128,9 @@ export const ProjectsList = () => {
     <Card className="border shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
         <div>
-          <p className="text-sm text-muted-foreground mb-1">
-            View and manage all your ongoing projects. Use the filters below to narrow down the list by status, country, or office.
+          <CardTitle className="text-2xl font-semibold mb-1.5">All Projects</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            View and manage all your ongoing projects
           </p>
         </div>
         <ProjectsToolbar 

@@ -9,36 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      annual_leaves: {
-        Row: {
-          company_id: string
-          created_at: string | null
-          date: string
-          hours: number
-          id: string
-          member_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          company_id: string
-          created_at?: string | null
-          date: string
-          hours: number
-          id?: string
-          member_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          company_id?: string
-          created_at?: string | null
-          date?: string
-          hours?: number
-          id?: string
-          member_id?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       companies: {
         Row: {
           address: string | null
@@ -98,17 +68,9 @@ export type Database = {
           company_id: string
           created_at: string
           created_by: string
-          department: string | null
           email: string | null
-          first_name: string | null
           id: string
-          invitation_type: string
-          job_title: string | null
-          last_name: string | null
-          location: string | null
-          role: string | null
           status: string
-          weekly_capacity: number | null
         }
         Insert: {
           accepted_at?: string | null
@@ -117,17 +79,9 @@ export type Database = {
           company_id: string
           created_at?: string
           created_by: string
-          department?: string | null
           email?: string | null
-          first_name?: string | null
           id?: string
-          invitation_type?: string
-          job_title?: string | null
-          last_name?: string | null
-          location?: string | null
-          role?: string | null
           status?: string
-          weekly_capacity?: number | null
         }
         Update: {
           accepted_at?: string | null
@@ -136,17 +90,9 @@ export type Database = {
           company_id?: string
           created_at?: string
           created_by?: string
-          department?: string | null
           email?: string | null
-          first_name?: string | null
           id?: string
-          invitation_type?: string
-          job_title?: string | null
-          last_name?: string | null
-          location?: string | null
-          role?: string | null
           status?: string
-          weekly_capacity?: number | null
         }
         Relationships: [
           {
@@ -385,103 +331,39 @@ export type Database = {
         }
         Relationships: []
       }
-      pending_resources: {
-        Row: {
-          company_id: string | null
-          created_at: string
-          hours: number
-          id: string
-          invite_id: string
-          project_id: string | null
-          updated_at: string
-        }
-        Insert: {
-          company_id?: string | null
-          created_at?: string
-          hours?: number
-          id?: string
-          invite_id: string
-          project_id?: string | null
-          updated_at?: string
-        }
-        Update: {
-          company_id?: string | null
-          created_at?: string
-          hours?: number
-          id?: string
-          invite_id?: string
-          project_id?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "pending_resources_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pending_resources_invite_id_fkey"
-            columns: ["invite_id"]
-            isOneToOne: false
-            referencedRelation: "invites"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pending_resources_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       profiles: {
         Row: {
           avatar_url: string | null
           company_id: string | null
           created_at: string
-          department: string | null
           email: string
           first_name: string | null
           id: string
-          job_title: string | null
           last_name: string | null
-          location: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
-          weekly_capacity: number
         }
         Insert: {
           avatar_url?: string | null
           company_id?: string | null
           created_at?: string
-          department?: string | null
           email: string
           first_name?: string | null
           id: string
-          job_title?: string | null
           last_name?: string | null
-          location?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
-          weekly_capacity?: number
         }
         Update: {
           avatar_url?: string | null
           company_id?: string | null
           created_at?: string
-          department?: string | null
           email?: string
           first_name?: string | null
           id?: string
-          job_title?: string | null
           last_name?: string | null
-          location?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
-          weekly_capacity?: number
         }
         Relationships: [
           {
@@ -530,121 +412,6 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      project_fees: {
-        Row: {
-          billing_month: string | null
-          company_id: string
-          created_at: string | null
-          currency: string | null
-          fee: number
-          id: string
-          invoice_date: string | null
-          invoice_status: string | null
-          project_id: string
-          stage_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          billing_month?: string | null
-          company_id: string
-          created_at?: string | null
-          currency?: string | null
-          fee?: number
-          id?: string
-          invoice_date?: string | null
-          invoice_status?: string | null
-          project_id: string
-          stage_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          billing_month?: string | null
-          company_id?: string
-          created_at?: string | null
-          currency?: string | null
-          fee?: number
-          id?: string
-          invoice_date?: string | null
-          invoice_status?: string | null
-          project_id?: string
-          stage_id?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "project_fees_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "project_fees_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "project_fees_stage_id_fkey"
-            columns: ["stage_id"]
-            isOneToOne: false
-            referencedRelation: "project_stages"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      project_resource_allocations: {
-        Row: {
-          company_id: string | null
-          created_at: string
-          hours: number
-          id: string
-          project_id: string
-          resource_id: string
-          resource_type: string
-          updated_at: string
-          week_start_date: string
-        }
-        Insert: {
-          company_id?: string | null
-          created_at?: string
-          hours?: number
-          id?: string
-          project_id: string
-          resource_id: string
-          resource_type: string
-          updated_at?: string
-          week_start_date: string
-        }
-        Update: {
-          company_id?: string | null
-          created_at?: string
-          hours?: number
-          id?: string
-          project_id?: string
-          resource_id?: string
-          resource_type?: string
-          updated_at?: string
-          week_start_date?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "project_resource_allocations_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "project_resource_allocations_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]

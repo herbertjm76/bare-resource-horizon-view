@@ -3,6 +3,7 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CurrencyPicker } from "../../../components/CurrencyPicker";
+import { BillingMonthPicker } from "../../../components/BillingMonthPicker";
 import { InvoiceDatePicker } from "../../../components/InvoiceDatePicker";
 import { 
   Select,
@@ -11,8 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { StageFee } from "../../../../projects/hooks/types/projectTypes";
-import { MonthCalendar } from "../../../components/datepicker/MonthCalendar";
+import type { StageFee } from "../../../hooks/types/projectTypes";
 
 interface StageFormProps {
   stageId: string;
@@ -31,8 +31,6 @@ export const StageForm: React.FC<StageFormProps> = ({
   calculateHours,
   calculateInvoiceAge,
 }) => {
-  console.log(`StageForm for ${stageId}:`, stageFeeData);
-  
   const handleToday = () => {
     const today = new Date();
     updateStageFee(stageId, { 
@@ -40,31 +38,6 @@ export const StageForm: React.FC<StageFormProps> = ({
       invoiceAge: calculateInvoiceAge(today)
     });
   };
-
-  // Safe access to fee value with fallbacks
-  const feeValue = stageFeeData?.fee || "";
-  const statusValue = stageFeeData?.status || "Not Billed";
-  const currencyValue = stageFeeData?.currency || "USD";
-  
-  // Debug the date values
-  console.log(`Stage ${stageId} billing month:`, stageFeeData?.billingMonth);
-  console.log(`Stage ${stageId} invoice date:`, stageFeeData?.invoiceDate);
-  
-  // Ensure billingMonth is a proper Date object if it exists
-  const billingMonth = stageFeeData?.billingMonth instanceof Date ? stageFeeData.billingMonth : 
-                      (typeof stageFeeData?.billingMonth === 'string' && stageFeeData.billingMonth ? 
-                        new Date(stageFeeData.billingMonth) : null);
-                        
-  // Ensure invoiceDate is a proper Date object if it exists
-  const invoiceDate = stageFeeData?.invoiceDate instanceof Date ? stageFeeData.invoiceDate : 
-                     (typeof stageFeeData?.invoiceDate === 'string' && stageFeeData.invoiceDate ?
-                      new Date(stageFeeData.invoiceDate) : null);
-
-  // Calculate hours based on fee and average rate
-  const hours = calculateHours(feeValue);
-
-  // Calculate invoice age based on invoice date
-  const invoiceAge = calculateInvoiceAge(invoiceDate);
 
   return (
     <div className="p-4 space-y-3">
@@ -74,11 +47,8 @@ export const StageForm: React.FC<StageFormProps> = ({
           id={`fee-${stageId}`}
           type="number"
           placeholder="0.00"
-          value={feeValue}
-          onChange={(e) => {
-            console.log(`Updating fee for stage ${stageId} to ${e.target.value}`);
-            updateStageFee(stageId, { fee: e.target.value });
-          }}
+          value={stageFeeData.fee}
+          onChange={(e) => updateStageFee(stageId, { fee: e.target.value })}
           className="h-8"
         />
       </div>
@@ -87,18 +57,15 @@ export const StageForm: React.FC<StageFormProps> = ({
         <div>
           <Label className="text-xs">Currency</Label>
           <CurrencyPicker
-            value={currencyValue}
-            onValueChange={(value) => {
-              console.log(`Updating currency for stage ${stageId} to ${value}`);
-              updateStageFee(stageId, { currency: value });
-            }}
+            value={stageFeeData.currency}
+            onValueChange={(value) => updateStageFee(stageId, { currency: value })}
           />
         </div>
         <div>
           <Label htmlFor={`hours-${stageId}`} className="text-xs">Hours</Label>
           <Input
             id={`hours-${stageId}`}
-            value={hours}
+            value={calculateHours(stageFeeData.fee)}
             readOnly
             disabled
             className="h-8 bg-muted"
@@ -109,30 +76,27 @@ export const StageForm: React.FC<StageFormProps> = ({
       <div className="grid grid-cols-2 gap-3">
         <div>
           <Label className="text-xs">Billing Month</Label>
-          <MonthCalendar
-            value={billingMonth}
+          <BillingMonthPicker
+            value={stageFeeData.billingMonth ? new Date(stageFeeData.billingMonth) : undefined}
             onChange={(date) => {
-              console.log(`Updating billing month for stage ${stageId} to ${date}`);
-              updateStageFee(stageId, { billingMonth: date || null });
+              updateStageFee(stageId, { 
+                billingMonth: date ? date.toISOString() : '' 
+              });
             }}
-            showIcon={false}
           />
         </div>
         <div>
           <Label className="text-xs">Status</Label>
           <Select
-            value={statusValue}
-            onValueChange={(value) => {
-              console.log(`Updating status for stage ${stageId} to ${value}`);
-              updateStageFee(stageId, { 
-                status: value as "Not Billed" | "Invoiced" | "Paid" | "" 
-              });
-            }}
+            value={stageFeeData.status}
+            onValueChange={(value) => updateStageFee(stageId, { 
+              status: value as "Not Billed" | "Invoiced" | "Paid" | "" 
+            })}
           >
             <SelectTrigger className="h-8">
               <SelectValue placeholder="Select a status" />
             </SelectTrigger>
-            <SelectContent className="z-[60]">
+            <SelectContent>
               <SelectItem value="Not Billed">Not Billed</SelectItem>
               <SelectItem value="Invoiced">Invoiced</SelectItem>
               <SelectItem value="Paid">Paid</SelectItem>
@@ -145,23 +109,21 @@ export const StageForm: React.FC<StageFormProps> = ({
         <div>
           <Label className="text-xs">Invoice Date</Label>
           <InvoiceDatePicker
-            value={invoiceDate}
+            value={stageFeeData.invoiceDate || undefined}
             onChange={(date) => {
-              console.log(`Updating invoice date for stage ${stageId} to ${date}`);
               updateStageFee(stageId, { 
                 invoiceDate: date,
-                invoiceAge: date ? calculateInvoiceAge(date) : '0'
+                invoiceAge: date ? calculateInvoiceAge(date) : 'N/A'
               });
             }}
             onToday={handleToday}
-            showIcon={false}
           />
         </div>
         <div>
           <Label htmlFor={`invoiceAge-${stageId}`} className="text-xs">Invoice Age (Days)</Label>
           <Input
             id={`invoiceAge-${stageId}`}
-            value={invoiceAge}
+            value={calculateInvoiceAge(stageFeeData.invoiceDate)}
             readOnly
             disabled
             className="h-8 bg-muted"

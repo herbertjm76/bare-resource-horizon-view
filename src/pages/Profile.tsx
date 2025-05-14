@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,11 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/context/CompanyContext";
 import { toast } from "sonner";
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { AppHeader } from '@/components/AppHeader';
-
-const HEADER_HEIGHT = 56;
 
 type Profile = {
   id: string;
@@ -34,6 +30,7 @@ export default function Profile() {
   const { company, loading: companyLoading } = useCompany();
 
   useEffect(() => {
+    // Fetch the current user profile
     const fetchProfile = async () => {
       setLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
@@ -108,138 +105,121 @@ export default function Profile() {
 
   if (loading || companyLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <span>Loading profile...</span>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500">
+        <span className="text-white">Loading profile...</span>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <span>Profile not found.</span>
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500">
+        <span className="text-white">Profile not found.</span>
       </div>
     );
   }
 
   return (
-    <SidebarProvider>
-      <div className="w-full min-h-screen flex flex-row">
-        <div className="flex-shrink-0">
-          <DashboardSidebar />
-        </div>
-        <div className="flex-1 flex flex-col">
-          <AppHeader />
-          <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background">
-            <div className="max-w-6xl mx-auto space-y-8">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold tracking-tight text-brand-primary">My Profile</h1>
-              </div>
-              <Card className="w-full">
-                <CardHeader className="pb-2">
-                  <CardTitle>Edit Profile</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSave} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1" htmlFor="email">
-                        Email
-                      </label>
-                      <Input
-                        id="email"
-                        name="email"
-                        disabled
-                        value={profile.email}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1" htmlFor="first_name">
-                        First Name
-                      </label>
-                      <Input
-                        id="first_name"
-                        name="first_name"
-                        value={profile.first_name ?? ""}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1" htmlFor="last_name">
-                        Last Name
-                      </label>
-                      <Input
-                        id="last_name"
-                        name="last_name"
-                        value={profile.last_name ?? ""}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1" htmlFor="company">
-                        Company Name
-                      </label>
-                      <Input
-                        id="company"
-                        name="company"
-                        disabled
-                        value={company?.name ?? "Not Assigned"}
-                      />
-                    </div>
-                    {error && <div className="text-red-600 text-sm">{error}</div>}
-                    <Button
-                      type="submit"
-                      className="w-full bg-brand-primary hover:bg-brand-primary/90"
-                      isLoading={saving}
-                      disabled={saving}
-                    >
-                      Save Changes
-                    </Button>
-                  </form>
-
-                  {/* Password Change Section */}
-                  <div className="mt-8 border-t pt-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-semibold text-base">Change Password</span>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setShowPassword(v => !v)}
-                        type="button"
-                      >
-                        {showPassword ? "Cancel" : "Change"}
-                      </Button>
-                    </div>
-                    {showPassword && (
-                      <form onSubmit={handleChangePassword} className="space-y-3">
-                        <Input
-                          id="new_password"
-                          name="new_password"
-                          type="password"
-                          placeholder="Enter new password"
-                          value={newPassword}
-                          onChange={e => setNewPassword(e.target.value)}
-                          autoComplete="new-password"
-                        />
-                        {passwordError && <div className="text-red-600 text-sm">{passwordError}</div>}
-                        {passwordSuccess && <div className="text-green-600 text-sm">{passwordSuccess}</div>}
-                        <Button
-                          type="submit"
-                          className="w-full"
-                          isLoading={passwordLoading}
-                          disabled={passwordLoading}
-                        >
-                          Update Password
-                        </Button>
-                      </form>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="pb-2">
+          <CardTitle>Edit Profile</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSave} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="email">
+                Email
+              </label>
+              <Input
+                id="email"
+                name="email"
+                disabled
+                value={profile.email}
+              />
             </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="first_name">
+                First Name
+              </label>
+              <Input
+                id="first_name"
+                name="first_name"
+                value={profile.first_name ?? ""}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="last_name">
+                Last Name
+              </label>
+              <Input
+                id="last_name"
+                name="last_name"
+                value={profile.last_name ?? ""}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1" htmlFor="company">
+                Company Name
+              </label>
+              <Input
+                id="company"
+                name="company"
+                disabled
+                value={company?.name ?? "Not Assigned"}
+              />
+            </div>
+            {error && <div className="text-red-600 text-sm">{error}</div>}
+            <Button
+              type="submit"
+              className="w-full bg-blue-900 hover:bg-blue-800 dark:bg-blue-700 dark:hover:bg-blue-600"
+              isLoading={saving}
+              disabled={saving}
+            >
+              Save Changes
+            </Button>
+          </form>
+          {/* Password Change Section */}
+          <div className="mt-8 border-t pt-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-semibold text-base">Change Password</span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowPassword(v => !v)}
+                type="button"
+              >
+                {showPassword ? "Cancel" : "Change"}
+              </Button>
+            </div>
+            {showPassword && (
+              <form onSubmit={handleChangePassword} className="space-y-3">
+                <Input
+                  id="new_password"
+                  name="new_password"
+                  type="password"
+                  placeholder="Enter new password"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+                {passwordError && <div className="text-red-600 text-sm">{passwordError}</div>}
+                {passwordSuccess && <div className="text-green-600 text-sm">{passwordSuccess}</div>}
+                <Button
+                  type="submit"
+                  className="w-full bg-[#8E9196] hover:bg-[#7d8086]"
+                  isLoading={passwordLoading}
+                  disabled={passwordLoading}
+                >
+                  Update Password
+                </Button>
+              </form>
+            )}
           </div>
-        </div>
-      </div>
-    </SidebarProvider>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
