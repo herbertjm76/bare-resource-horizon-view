@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
 
 interface Company {
   id: string;
@@ -35,7 +34,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [isSubdomainMode, setIsSubdomainMode] = useState(false);
-  const navigate = useNavigate();
 
   const fetchCompanyData = async () => {
     try {

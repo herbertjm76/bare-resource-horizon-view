@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Dashboard from "./pages/Dashboard";
@@ -35,7 +35,6 @@ const queryClient = new QueryClient({
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -165,13 +164,13 @@ const AppRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <CompanyProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+      <BrowserRouter>
+        <CompanyProvider>
+          <Toaster />
+          <Sonner />
           <AppRoutes />
-        </BrowserRouter>
-      </CompanyProvider>
+        </CompanyProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
