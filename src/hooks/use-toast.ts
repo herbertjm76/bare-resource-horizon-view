@@ -26,9 +26,12 @@ export interface ToastFunction {
   warning: (props: ToastProps | string) => void;
 }
 
+// Type for a single toast with required id and open properties
+export type Toast = Required<Pick<ToastProps, "id" | "open">> & ToastProps;
+
 // Type for toast state
 type State = {
-  toasts: Required<Pick<ToastProps, "id" | "open">> & ToastProps[];
+  toasts: Toast[];
 };
 
 // Create initial state
@@ -47,9 +50,9 @@ export const ToastContext = createContext<{
   toast: ToastFunction;
 }>({
   state: initialState,
-  toast: (() => {
+  toast: ((() => {
     throw new Error("Toast context not initialized");
-  }) as ToastFunction,
+  }) as unknown) as ToastFunction,
 });
 
 // Define the provider
@@ -61,13 +64,13 @@ export function ToastProvider({
   const [state, setState] = useState<State>(initialState);
 
   // Create a new toast
-  const toast = ((props: ToastProps) => {
+  const toast = (((props: ToastProps) => {
     const id = props.id || generateId();
-    const newToast = { ...props, id, open: true };
+    const newToast: Toast = { ...props, id, open: true };
 
     setState((prev) => ({
       ...prev,
-      toasts: [...prev.toasts, newToast as Required<Pick<ToastProps, "id" | "open">> & ToastProps],
+      toasts: [...prev.toasts, newToast],
     }));
 
     return {
@@ -81,7 +84,7 @@ export function ToastProvider({
           ),
         })),
     };
-  }) as ToastFunction;
+  }) as unknown) as ToastFunction;
 
   // Dismiss a toast
   const dismissToast = (id: string) => {
@@ -151,7 +154,7 @@ export function ToastProvider({
 // Create a hook for using the toast
 export function useToast(): {
   toast: ToastFunction;
-  toasts: State["toasts"];
+  toasts: Toast[];
   dismissToast: (id: string) => void;
 } {
   const context = useContext(ToastContext);
@@ -163,21 +166,22 @@ export function useToast(): {
     toast: context.toast,
     toasts: context.state.toasts,
     dismissToast: (id: string) => {
+      // Create a proper immutable update instead of direct mutation
       context.state.toasts = context.state.toasts.filter(
         (toast) => toast.id !== id
-      );
+      ) as Toast[];
     },
   };
 }
 
 // Export toast as a standalone function
-export const toast = ((props: ToastProps) => {
+export const toast = (((props: ToastProps) => {
   return sonnerToast(props.title as string, {
     description: props.description,
     duration: props.duration || 5000,
     id: props.id,
   });
-}) as ToastFunction;
+}) as unknown) as ToastFunction;
 
 // Add helper methods to toast function
 toast.success = (props: ToastProps | string) => {
