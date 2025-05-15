@@ -140,10 +140,11 @@ export function ToastProvider({
     }
   };
 
-  return (
-    <ToastContext.Provider value={{ state, toast }}>
-      {children}
-    </ToastContext.Provider>
+  // Instead of JSX, create the element using React.createElement
+  return React.createElement(
+    ToastContext.Provider,
+    { value: { state, toast } },
+    children
   );
 }
 
