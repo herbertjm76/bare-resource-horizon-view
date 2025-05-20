@@ -1,13 +1,17 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ProjectBasicInfo } from './components/ProjectBasicInfo';
 import { ProjectManagerSelect } from './components/ProjectManagerSelect';
 import { ProjectLocationInfo } from './components/ProjectLocationInfo';
 import { ProjectStagesSelector } from './components/ProjectStagesSelector';
 import { RateCalculatorNew } from './components/RateCalculatorNew';
 import { ProjectProfitRate } from './components/ProjectProfitRate';
+import { ProjectResourceOverview } from './components/ProjectResourceOverview';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useRateCalculator } from '../hooks/useRateCalculator';
+import { format, startOfWeek } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProjectForm {
   code: string;
@@ -33,6 +37,7 @@ interface ProjectInfoTabProps {
   statusOptions: Array<{ label: string; value: string }>;
   onChange: (key: keyof ProjectForm, value: any) => void;
   updateStageApplicability?: (stageId: string, isChecked: boolean) => void;
+  projectId?: string;
 }
 
 export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
@@ -43,7 +48,8 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   officeStages,
   statusOptions,
   onChange,
-  updateStageApplicability
+  updateStageApplicability,
+  projectId
 }) => {
   const {
     showRateCalc,
@@ -53,6 +59,56 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
     openRateCalculator,
     handleRateTypeChange
   } = useRateCalculator();
+  
+  const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
+  const [resourceAllocations, setResourceAllocations] = useState<any[]>([]);
+  const [isLoadingResources, setIsLoadingResources] = useState<boolean>(false);
+  const { toast } = useToast();
+
+  // Fetch resource allocations for the selected week
+  useEffect(() => {
+    if (!projectId) return;
+    
+    const fetchResourceAllocations = async () => {
+      setIsLoadingResources(true);
+      try {
+        // Get Monday of the selected week
+        const mondayOfWeek = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+        const weekStartDate = format(mondayOfWeek, 'yyyy-MM-dd');
+        
+        console.log("Fetching resources for project:", projectId, "week:", weekStartDate);
+        
+        // Query resource allocations
+        const { data, error } = await supabase
+          .from('project_resource_allocations')
+          .select(`
+            id,
+            resource_id,
+            resource_type,
+            hours,
+            profiles:profiles(first_name, last_name, job_title)
+          `)
+          .eq('project_id', projectId)
+          .eq('week_start_date', weekStartDate);
+          
+        if (error) {
+          console.error("Error fetching resource allocations:", error);
+          toast.error("Failed to load resource allocations");
+          return;
+        }
+        
+        console.log("Resource allocations:", data);
+        setResourceAllocations(data || []);
+      } catch (err) {
+        console.error("Failed to load resource allocations:", err);
+        toast.error("An unexpected error occurred");
+      } finally {
+        setIsLoadingResources(false);
+      }
+    };
+    
+    fetchResourceAllocations();
+  }, [projectId, selectedWeek, toast]);
 
   return (
     <div className="space-y-4 py-4">
@@ -111,6 +167,17 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         officeStages={officeStages}
         onChange={(stages) => onChange("stages", stages)}
       />
+
+      {/* Add resource allocations section if project ID exists */}
+      {projectId && (
+        <ProjectResourceOverview 
+          projectId={projectId}
+          selectedWeek={selectedWeek}
+          onWeekChange={setSelectedWeek}
+          resourceAllocations={resourceAllocations}
+          isLoading={isLoadingResources}
+        />
+      )}
 
       {showRateCalc && (
         <RateCalculatorNew
