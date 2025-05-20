@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TableCell, TableRow } from "@/components/ui/table";
+import { TableRow, TableCell } from "@/components/ui/table";
 import { formatNumber } from '../utils';
 import { Project } from '../types';
 
@@ -13,43 +13,33 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
   projects,
   projectTotals
 }) => {
-  // Calculate grand total of all project hours
-  const grandTotal = Object.values(projectTotals).reduce(
-    (sum, hours) => sum + hours, 
-    0
-  );
-
+  // Calculate grand total
+  const grandTotal = Object.values(projectTotals).reduce((sum, total) => sum + total, 0);
+  
   return (
-    <TableRow className="bg-muted/20 font-medium border-t-2">
-      <TableCell colSpan={2} className="py-2 px-4">
-        Project Totals
+    <TableRow className="font-semibold bg-brand-primary/10">
+      <TableCell className="py-2 px-4">
+        Total
       </TableCell>
-
-      <TableCell className="py-1 px-1 capacity-column">
-        <div className="capacity-display font-bold">
-          {formatNumber(grandTotal)}h
-        </div>
+      
+      {/* Skip these columns in the totals row */}
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+      <TableCell></TableCell>
+      
+      <TableCell className="py-2 px-4 text-right">
+        {formatNumber(grandTotal)}h
       </TableCell>
-
-      {/* Skip utilization */}
-      <TableCell />
       
-      {/* Skip leave columns */}
-      <TableCell />
-      <TableCell />
-      <TableCell />
-      <TableCell />
-      <TableCell />
-      
-      {/* Skip remarks column */}
-      <TableCell />
-
-      {/* Project totals */}
+      {/* Project total columns */}
       {projects.map(project => (
-        <TableCell key={project.id} className="py-1 px-1 project-hours-column">
-          <div className="table-cell font-bold">
-            {projectTotals[project.id] ? `${formatNumber(projectTotals[project.id])}h` : ''}
-          </div>
+        <TableCell key={project.id} className="py-2 px-1 text-center">
+          {projectTotals[project.id] ? `${formatNumber(projectTotals[project.id])}h` : ''}
         </TableCell>
       ))}
     </TableRow>

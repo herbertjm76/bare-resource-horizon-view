@@ -1,15 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { FileText, Printer, ChevronDown } from "lucide-react";
-import { toast } from "sonner";
-import { exportToPDF } from "../utils/exportToPDF";
 import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { FileDown, ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
+import { saveAs } from 'file-saver';
+import { utils, writeFile } from 'xlsx';
 
 interface WeeklyActionButtonsProps {
   selectedWeek: Date;
@@ -18,54 +19,80 @@ interface WeeklyActionButtonsProps {
 
 export const WeeklyActionButtons: React.FC<WeeklyActionButtonsProps> = ({
   selectedWeek,
-  weekLabel,
+  weekLabel
 }) => {
-  const handlePrint = () => {
-    // Show a toast notification
-    toast.info("Preparing print view...");
+  const [isExporting, setIsExporting] = useState(false);
+  
+  const handleExportToExcel = () => {
+    setIsExporting(true);
     
-    // Give the browser a moment to display the toast
     setTimeout(() => {
-      window.print();
-    }, 300);
+      try {
+        // Get the table element
+        const table = document.querySelector('.weekly-table');
+        
+        if (!table) {
+          toast.error('Could not find table data');
+          setIsExporting(false);
+          return;
+        }
+        
+        // Create worksheet from table
+        const ws = utils.table_to_sheet(table);
+        
+        // Create workbook and add worksheet
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, 'Weekly Overview');
+        
+        // Generate file name
+        const fileName = `Weekly_Overview_${weekLabel.replace(/\s+/g, '_')}.xlsx`;
+        
+        // Write file and trigger download
+        writeFile(wb, fileName);
+        
+        // Show success message
+        toast.success('Export successful', { 
+          description: `Exported to ${fileName}` 
+        });
+      } catch (error) {
+        console.error('Export failed:', error);
+        toast.error('Export failed', { 
+          description: 'An error occurred while exporting the data.'
+        });
+      } finally {
+        setIsExporting(false);
+      }
+    }, 100);
   };
-
-  const handleExportPDF = async () => {
-    try {
-      toast.info("Generating PDF...");
-      await exportToPDF(selectedWeek, weekLabel);
-      toast.success("PDF exported successfully!");
-    } catch (error) {
-      console.error("PDF export failed:", error);
-      toast.error("Failed to export PDF. Please try again.");
-    }
+  
+  const handlePrint = () => {
+    window.print();
   };
 
   return (
-    <div className="flex items-center gap-2 print:hidden">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-1"
-          >
-            <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Export</span>
-            <ChevronDown className="h-3 w-3 opacity-50" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleExportPDF}>
-            <FileText className="mr-2 h-4 w-4" />
-            <span>PDF</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={handlePrint}>
-            <Printer className="mr-2 h-4 w-4" />
-            <span>Print</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="px-4 flex items-center gap-1">
+          <FileDown className="h-4 w-4 mr-1" />
+          <span>Export</span>
+          <ChevronDown className="h-4 w-4 ml-1" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="bg-background">
+        <DropdownMenuItem 
+          onClick={handleExportToExcel}
+          disabled={isExporting}
+          className="cursor-pointer"
+        >
+          Export to Excel
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={handlePrint}
+          className="cursor-pointer"
+        >
+          Print View
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

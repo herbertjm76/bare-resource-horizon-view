@@ -1,14 +1,15 @@
 
 import React from 'react';
 import { MemberTableRow } from '../MemberTableRow';
-import { Project } from '../types';
+import { TableRow, TableCell } from "@/components/ui/table";
+import { Project, MemberAllocation } from '../types';
 
 interface TeamMemberRowsProps {
   filteredOffices: string[];
   membersByOffice: Record<string, any[]>;
-  getMemberAllocation: (memberId: string) => any;
+  getMemberAllocation: (memberId: string) => MemberAllocation;
   getOfficeDisplay: (locationCode: string) => string;
-  handleInputChange: (memberId: string, field: string, value: any) => void;
+  handleInputChange: (memberId: string, field: keyof MemberAllocation, value: any) => void;
   projects: Project[];
 }
 
@@ -20,30 +21,40 @@ export const TeamMemberRows: React.FC<TeamMemberRowsProps> = ({
   handleInputChange,
   projects
 }) => {
-  // Combine all members into a single array
-  const allMembers = filteredOffices.flatMap(office => membersByOffice[office]);
-  
-  // Sort members by name
-  const sortedMembers = allMembers.sort((a, b) => {
-    return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`);
-  });
-  
   return (
     <>
-      {sortedMembers.map((member, memberIndex) => {
-        const allocation = getMemberAllocation(member.id);
-        const isEven = memberIndex % 2 === 0;
+      {filteredOffices.map((officeCode, officeIndex) => {
+        const members = membersByOffice[officeCode] || [];
+        const officeDisplay = getOfficeDisplay(officeCode);
         
         return (
-          <MemberTableRow
-            key={member.id}
-            member={member}
-            allocation={allocation}
-            isEven={isEven}
-            getOfficeDisplay={getOfficeDisplay}
-            onInputChange={handleInputChange}
-            projects={projects}
-          />
+          <React.Fragment key={officeCode}>
+            {/* Office header row */}
+            <TableRow className="bg-muted/30">
+              <TableCell 
+                colSpan={9 + projects.length} 
+                className="py-2 px-4 font-medium"
+              >
+                {officeDisplay} ({members.length} {members.length === 1 ? 'member' : 'members'})
+              </TableCell>
+            </TableRow>
+            
+            {/* Member rows for this office */}
+            {members.map((member, index) => {
+              const allocation = getMemberAllocation(member.id);
+              return (
+                <MemberTableRow 
+                  key={member.id}
+                  member={member}
+                  allocation={allocation}
+                  isEven={index % 2 === 0}
+                  getOfficeDisplay={getOfficeDisplay}
+                  onInputChange={handleInputChange}
+                  projects={projects}
+                />
+              );
+            })}
+          </React.Fragment>
         );
       })}
     </>

@@ -83,9 +83,9 @@ const WeeklyOverview = () => {
                   <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Weekly Overview</h1>
                 </div>
                 
-                {/* New aligned control bar with filters */}
+                {/* Control bar with filters */}
                 <div className="flex flex-wrap gap-4 mb-4 print:hidden">
-                  {/* Week selector in a bordered box */}
+                  {/* Week selector */}
                   <div className="flex border rounded-md p-2 items-center">
                     <WeekSelector 
                       selectedWeek={selectedWeek}
@@ -95,7 +95,7 @@ const WeeklyOverview = () => {
                     />
                   </div>
                   
-                  {/* Filters in a bordered box */}
+                  {/* Filters */}
                   <div className="flex-1 max-w-xs border rounded-md p-2">
                     <WeeklyResourceFilters 
                       filters={filters}
