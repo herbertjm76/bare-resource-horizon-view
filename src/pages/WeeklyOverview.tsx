@@ -11,7 +11,6 @@ import { format, startOfWeek, addWeeks, subWeeks, addDays } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
-import { useToast } from '@/hooks/use-toast';
 import '@/components/weekly-overview/weekly-overview-print.css';
 
 const HEADER_HEIGHT = 56;
@@ -32,16 +31,13 @@ const WeeklyOverview = () => {
   const [filters, setFilters] = useState({
     office: "all",
   });
-  const { toast } = useToast();
 
   const handlePreviousWeek = () => {
     setSelectedWeek(prevDate => subWeeks(prevDate, 1));
-    toast.info("Loading previous week");
   };
 
   const handleNextWeek = () => {
     setSelectedWeek(prevDate => addWeeks(prevDate, 1));
-    toast.info("Loading next week");
   };
 
   const handleFilterChange = (key: string, value: string) => {
@@ -49,7 +45,6 @@ const WeeklyOverview = () => {
       ...prev,
       [key]: value
     }));
-    toast.info(`Filter updated: ${key} = ${value}`);
   };
 
   // Get Monday of the current week

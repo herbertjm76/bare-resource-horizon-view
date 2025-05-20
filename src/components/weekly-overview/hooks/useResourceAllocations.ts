@@ -11,9 +11,6 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
   // Track if this is the initial load
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   
-  // Track if loading is stuck
-  const [loadingStuckTimer, setLoadingStuckTimer] = useState<NodeJS.Timeout | null>(null);
-  
   // Get allocation state management functions
   const {
     memberAllocations,
@@ -31,25 +28,6 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
   
   // Get allocation data fetching function
   const { fetchAllocations } = useFetchAllocations();
-  
-  // Function to ensure loading state eventually gets cleared
-  const ensureLoadingEnds = useCallback(() => {
-    // Clear any existing timer
-    if (loadingStuckTimer) {
-      clearTimeout(loadingStuckTimer);
-    }
-    
-    // Set a new timer that will force loading state to false after 10 seconds
-    const timer = setTimeout(() => {
-      console.log('Loading state was potentially stuck, forcing it to false');
-      setAllocationsStateLoading(false);
-      setIsLoading(false);
-      setIsInitialLoad(false);
-      toast.info("Data loaded with default values", { duration: 3000 });
-    }, 8000); // Reduced from 10s to 8s
-    
-    setLoadingStuckTimer(timer);
-  }, [loadingStuckTimer, setAllocationsStateLoading]);
   
   // Update isLoading based on allocationsStateLoading with a slight delay to prevent flickering
   useEffect(() => {
@@ -77,10 +55,9 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
       return;
     }
     
-    // Set loading state and start safety timer
+    // Set loading state
     setIsLoading(true);
     setAllocationsStateLoading(true);
-    ensureLoadingEnds();
     
     const loadData = async () => {
       try {
@@ -94,14 +71,10 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
         
         // Mark that initial load is complete
         setIsInitialLoad(false);
-        
-        // Clear safety timer since load completed normally
-        if (loadingStuckTimer) {
-          clearTimeout(loadingStuckTimer);
-        }
       } catch (err) {
         console.error('Failed to load allocations:', err);
-        setError(err instanceof Error ? err : new Error('Failed to load allocations'));
+        const error = err instanceof Error ? err : new Error('Failed to load allocations');
+        setError(error);
         setAllocationsStateLoading(false);
         setIsLoading(false);
         setIsInitialLoad(false);
@@ -110,21 +83,13 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
     };
     
     loadData();
-    
-    // Clean up timer on unmount
-    return () => {
-      if (loadingStuckTimer) {
-        clearTimeout(loadingStuckTimer);
-      }
-    };
-  }, [fetchAllocations, teamMembers, selectedWeek, ensureLoadingEnds, setMemberAllocations, setAllocationsStateLoading, setError, loadingStuckTimer]);
+  }, [fetchAllocations, teamMembers, selectedWeek, setMemberAllocations, setAllocationsStateLoading, setError]);
 
   // Function to manually refresh allocations
   const refreshAllocations = useCallback(() => {
     console.log('Manual refresh of allocations triggered');
     setIsLoading(true);
     setAllocationsStateLoading(true);
-    ensureLoadingEnds();
     
     fetchAllocations(
       teamMembers,
@@ -133,7 +98,7 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
       setAllocationsStateLoading,
       setError
     );
-  }, [fetchAllocations, teamMembers, selectedWeek, setMemberAllocations, setAllocationsStateLoading, setError, ensureLoadingEnds]);
+  }, [fetchAllocations, teamMembers, selectedWeek, setMemberAllocations, setAllocationsStateLoading, setError]);
 
   // Calculate totals for each project
   const projectTotals = useCallback(() => {

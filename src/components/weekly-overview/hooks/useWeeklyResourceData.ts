@@ -6,12 +6,11 @@ import { useCompany } from "@/context/CompanyContext";
 import { useResourceAllocations } from './useResourceAllocations';
 import { useOfficeMembers } from './useOfficeMembers';
 import { useOfficeDisplay } from './useOfficeDisplay';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: string }) => {
-  // Track loading state explicitly with a stabilized ref to prevent flickering
+  // Track loading state explicitly
   const [isInitializing, setIsInitializing] = useState(true);
-  const loadingTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Get company context
   const { company } = useCompany();
@@ -43,13 +42,13 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
         return [];
       }
       
-      console.log("Fetched projects:", data);
+      console.log("Fetched projects:", data?.length || 0);
       return data || [];
     },
     enabled: !!company?.id
   });
   
-  // Get team members data using the hook - pass true to include inactive members
+  // Get team members data - pass true to include inactive members
   const { teamMembers, isLoading: isLoadingMembers, error: teamMembersError } = useTeamMembersData(true);
   
   // Get pending team members (pre-registered)
@@ -70,7 +69,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
         return [];
       }
       
-      console.log("Fetched pre-registered members:", data);
+      console.log("Fetched pre-registered members:", data?.length || 0);
       
       // Transform the pre-registered members to match team member structure
       return data.map(member => ({
@@ -88,7 +87,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
   // Get all members combined (active + pre-registered)
   const allMembers = useCallback(() => {
     const combined = [...(teamMembers || []), ...(preRegisteredMembers || [])];
-    console.log("All members for resource table:", combined);
+    console.log("All members for resource table:", combined.length);
     return combined;
   }, [teamMembers, preRegisteredMembers])();
 
@@ -111,31 +110,18 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
 
   // Clear initialization state when data is loaded
   useEffect(() => {
-    // Cancel any existing timer to prevent race conditions
-    if (loadingTimerRef.current) {
-      clearTimeout(loadingTimerRef.current);
-    }
-    
     const dataIsReady = !isLoadingSession && !isLoadingMembers && 
                         !isLoadingPending && !isLoadingProjects && 
                         !isLoadingAllocations && Array.isArray(allMembers);
                          
     if (dataIsReady) {
       // Use a short delay to ensure all data is properly initialized
-      loadingTimerRef.current = setTimeout(() => {
+      const timer = setTimeout(() => {
         setIsInitializing(false);
       }, 300);
-    } else {
-      // If any data is still loading, make sure we're in loading state
-      setIsInitializing(true);
+      
+      return () => clearTimeout(timer);
     }
-    
-    // Cleanup timer on unmount
-    return () => {
-      if (loadingTimerRef.current) {
-        clearTimeout(loadingTimerRef.current);
-      }
-    };
   }, [
     isLoadingSession, 
     isLoadingMembers, 
@@ -145,10 +131,9 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
     allMembers
   ]);
 
-  // Determine overall loading state with proper dependency on allocation loading
+  // Determine overall loading state
   const isLoading = isInitializing || isLoadingSession || isLoadingMembers || 
-                    isLoadingPending || isLoadingAllocations || isLoadingProjects ||
-                    !Array.isArray(memberAllocations);
+                    isLoadingPending || isLoadingAllocations || isLoadingProjects;
 
   // Determine if there are any errors - handle both string and Error types
   const error = teamMembersError || pendingError || allocationsError;

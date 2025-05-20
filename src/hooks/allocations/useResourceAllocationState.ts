@@ -16,14 +16,14 @@ export function useResourceAllocationState() {
   
   // Force loading state to clear after a maximum time to prevent getting stuck
   useEffect(() => {
-    // If loading takes more than 12 seconds, force it to complete
+    // If loading takes more than 8 seconds, force it to complete
     const safetyTimer = setTimeout(() => {
       if (isLoading) {
         console.log('Allocation state loading safety timeout reached, forcing completion');
         toast.info("Some data may still be loading", { duration: 3000 });
         setIsLoading(false);
       }
-    }, 12000); // Reduced from 15s to 12s for quicker feedback
+    }, 8000);
     
     return () => clearTimeout(safetyTimer);
   }, [isLoading]);

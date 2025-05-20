@@ -33,6 +33,7 @@ export function useFetchAllocations() {
     setError: (error: string | Error | null) => void
   ) => {
     if (!teamMembers || teamMembers.length === 0) {
+      console.log('No team members to fetch allocations for');
       setIsLoading(false);
       setMemberAllocations({});
       return;
@@ -73,7 +74,8 @@ export function useFetchAllocations() {
       setMemberAllocations(initialAllocations);
     } catch (err) {
       console.error('Error fetching allocations:', err);
-      setError(err instanceof Error ? err : new Error('Failed to fetch resource allocations'));
+      const error = err instanceof Error ? err : new Error('Failed to fetch resource allocations');
+      setError(error);
       toast.error('Failed to fetch resource allocations');
     } finally {
       setIsLoading(false);
