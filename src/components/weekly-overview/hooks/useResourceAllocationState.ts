@@ -5,7 +5,7 @@ import { MemberAllocation } from '../types';
 export function useResourceAllocationState() {
   const [memberAllocations, setMemberAllocations] = useState<Record<string, MemberAllocation>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | Error | null>(null);
   
   // Get allocation for a member, with defaults if not found
   const getMemberAllocation = useCallback((memberId: string): MemberAllocation => {

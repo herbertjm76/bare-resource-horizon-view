@@ -150,7 +150,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
                     isLoadingPending || isLoadingAllocations || isLoadingProjects ||
                     !Array.isArray(memberAllocations);
 
-  // Determine if there are any errors
+  // Determine if there are any errors - Updated to handle both string and Error types
   const error = teamMembersError || pendingError || allocationsError;
 
   return {
