@@ -117,8 +117,8 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
     }
     
     const dataIsReady = !isLoadingSession && !isLoadingMembers && 
-                         !isLoadingPending && !isLoadingProjects && 
-                         !isLoadingAllocations && Array.isArray(allMembers);
+                        !isLoadingPending && !isLoadingProjects && 
+                        !isLoadingAllocations && Array.isArray(allMembers);
                          
     if (dataIsReady) {
       // Use a short delay to ensure all data is properly initialized
@@ -150,7 +150,7 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
                     isLoadingPending || isLoadingAllocations || isLoadingProjects ||
                     !Array.isArray(memberAllocations);
 
-  // Determine if there are any errors - Updated to handle both string and Error types
+  // Determine if there are any errors - handle both string and Error types
   const error = teamMembersError || pendingError || allocationsError;
 
   return {

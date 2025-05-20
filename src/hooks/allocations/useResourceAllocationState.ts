@@ -12,7 +12,7 @@ export function useResourceAllocationState() {
   
   // State for tracking loading and error states
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | Error | null>(null);
   
   // Force loading state to clear after a maximum time to prevent getting stuck
   useEffect(() => {
