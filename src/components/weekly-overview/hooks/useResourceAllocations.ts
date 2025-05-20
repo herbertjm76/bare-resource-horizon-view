@@ -101,7 +101,7 @@ export function useResourceAllocations(teamMembers: any[], selectedWeek: Date) {
         }
       } catch (err) {
         console.error('Failed to load allocations:', err);
-        setError(err instanceof Error ? err : 'Failed to load allocations');
+        setError(err instanceof Error ? err : new Error('Failed to load allocations'));
         setAllocationsStateLoading(false);
         setIsLoading(false);
         setIsInitialLoad(false);

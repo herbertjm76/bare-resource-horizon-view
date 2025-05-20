@@ -30,7 +30,7 @@ export function useFetchAllocations() {
     selectedWeek: Date,
     setMemberAllocations: (allocations: Record<string, MemberAllocation>) => void,
     setIsLoading: (loading: boolean) => void,
-    setError: (error: string | null) => void
+    setError: (error: string | Error | null) => void
   ) => {
     if (!teamMembers || teamMembers.length === 0) {
       setIsLoading(false);
@@ -73,7 +73,7 @@ export function useFetchAllocations() {
       setMemberAllocations(initialAllocations);
     } catch (err) {
       console.error('Error fetching allocations:', err);
-      setError('Failed to fetch resource allocations');
+      setError(err instanceof Error ? err : new Error('Failed to fetch resource allocations'));
       toast.error('Failed to fetch resource allocations');
     } finally {
       setIsLoading(false);
