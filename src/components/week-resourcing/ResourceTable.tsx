@@ -3,7 +3,7 @@ import React from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ResourceTableHeader } from './ResourceTableHeader';
-import { ResourceTableRow } from './ResourceTableRow';
+import { ResourceTableRow } from './row/ResourceTableRow';  // Updated import path
 import { useResourceTableData } from '@/hooks/useResourceTableData';
 import { ResourceTableFooter } from './ResourceTableFooter';
 
@@ -53,8 +53,8 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
       <div className="annual-leave-calendar grid-table-outer-container border rounded-md shadow-sm">
         <div className="grid-table-container">
           <Table className="resource-allocation-table">
-            {/* Table Header Component */}
-            <ResourceTableHeader projects={projects} showRemarks={false} />
+            {/* Table Header Component - removed showRemarks prop to use default value */}
+            <ResourceTableHeader projects={projects} />
             
             <TableBody>
               {/* Render each resource row */}

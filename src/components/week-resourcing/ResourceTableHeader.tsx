@@ -4,9 +4,10 @@ import { TableHeader, TableRow, TableHead } from '@/components/ui/table';
 
 interface ResourceTableHeaderProps {
   projects: any[];
+  showRemarks?: boolean;  // Added the showRemarks property as optional
 }
 
-export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projects }) => {
+export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projects, showRemarks = false }) => {
   return (
     <TableHeader className="sticky top-0 z-10 bg-white border-b">
       <TableRow className="h-12">
@@ -33,6 +34,11 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
             {!project.isEmpty ? `P${idx + 1}` : ''}
           </TableHead>
         ))}
+        
+        {/* Add Remarks column if showRemarks is true */}
+        {showRemarks && (
+          <TableHead className="w-40 text-center border-r">Remarks</TableHead>
+        )}
       </TableRow>
     </TableHeader>
   );
