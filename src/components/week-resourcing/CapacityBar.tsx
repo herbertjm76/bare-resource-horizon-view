@@ -28,58 +28,65 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
 
   const boxColor = getBoxColor();
   
-  console.log(`CapacityBar: availableHours=${availableHours}, totalCapacity=${totalCapacity}, percentageUsed=${percentageUsed}%`);
-  
   return (
-    <div className="flex items-center space-x-2 w-full py-1">
-      <div className="flex-1 flex space-x-0.5 max-w-24">
-        {/* Render 5 boxes, each representing 20% of capacity */}
-        {Array.from({ length: 5 }).map((_, index) => {
-          // Each box represents 20% (index 0 = 0-20%, index 1 = 20-40%, etc.)
-          const boxStartPercent = index * 20;
-          const boxEndPercent = (index + 1) * 20;
-          
-          // Determine if this specific box should be filled
-          const isFilled = percentageUsed >= boxEndPercent;
-          const isPartiallyFilled = !isFilled && percentageUsed > boxStartPercent;
-          
-          return (
-            <Tooltip key={index}>
-              <TooltipTrigger asChild>
-                <div 
-                  className={cn(
-                    "h-3 flex-1 border border-gray-300 rounded-sm relative overflow-hidden",
-                    !isFilled && !isPartiallyFilled && "bg-gray-100"
-                  )}
-                >
-                  {/* For completely filled boxes */}
-                  {isFilled && (
-                    <div className={cn("absolute inset-0", boxColor)} />
-                  )}
-                  
-                  {/* For partially filled boxes */}
-                  {isPartiallyFilled && (
+    <div className="flex items-center justify-center space-x-2 w-full py-1">
+      <div className="flex-1 flex justify-center">
+        {/* Round container for capacity indicators */}
+        <div className="rounded-full bg-gray-100 p-1.5 flex items-center justify-center gap-1 shadow-sm border border-gray-200">
+          {/* Capacity boxes */}
+          <div className="flex space-x-0.5">
+            {Array.from({ length: 5 }).map((_, index) => {
+              // Each box represents 20% (index 0 = 0-20%, index 1 = 20-40%, etc.)
+              const boxStartPercent = index * 20;
+              const boxEndPercent = (index + 1) * 20;
+              
+              // Determine if this specific box should be filled
+              const isFilled = percentageUsed >= boxEndPercent;
+              const isPartiallyFilled = !isFilled && percentageUsed > boxStartPercent;
+              
+              return (
+                <Tooltip key={index}>
+                  <TooltipTrigger asChild>
                     <div 
-                      className={cn("absolute top-0 bottom-0 left-0", boxColor)}
-                      style={{ width: `${((percentageUsed - boxStartPercent) / 20) * 100}%` }}
-                    />
-                  )}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-xs">
-                  {isFilled ? 
-                    'Used (100%)' : 
-                    isPartiallyFilled ? 
-                      `Used (${Math.min(100, Math.max(0, ((percentageUsed - boxStartPercent) / 20) * 100)).toFixed(0)}%)` : 
-                      'Available'}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          );
-        })}
+                      className={cn(
+                        "h-2 w-2 border border-gray-300 rounded-sm relative overflow-hidden",
+                        !isFilled && !isPartiallyFilled && "bg-gray-100"
+                      )}
+                    >
+                      {/* For completely filled boxes */}
+                      {isFilled && (
+                        <div className={cn("absolute inset-0", boxColor)} />
+                      )}
+                      
+                      {/* For partially filled boxes */}
+                      {isPartiallyFilled && (
+                        <div 
+                          className={cn("absolute top-0 bottom-0 left-0", boxColor)}
+                          style={{ width: `${((percentageUsed - boxStartPercent) / 20) * 100}%` }}
+                        />
+                      )}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">
+                      {isFilled ? 
+                        'Used (100%)' : 
+                        isPartiallyFilled ? 
+                          `Used (${Math.min(100, Math.max(0, ((percentageUsed - boxStartPercent) / 20) * 100)).toFixed(0)}%)` : 
+                          'Available'}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </div>
+          
+          {/* Available hours number */}
+          <div className="rounded-full bg-white w-5 h-5 flex items-center justify-center border border-gray-200">
+            <span className="text-[10px] font-semibold">{availableHours}</span>
+          </div>
+        </div>
       </div>
-      <span className="text-xs font-semibold w-6 text-right">{availableHours}</span>
     </div>
   );
 };
