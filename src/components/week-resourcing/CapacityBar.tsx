@@ -13,17 +13,18 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   totalCapacity
 }) => {
   // Calculate how many boxes should be filled (out of 5)
-  const percentageRemaining = (availableHours / totalCapacity) * 100;
-  const boxesFilled = Math.ceil((percentageRemaining / 100) * 5);
+  // Reverse the logic: more filled boxes = less availability
+  const percentageUsed = ((totalCapacity - availableHours) / totalCapacity) * 100;
+  const boxesFilled = Math.ceil((percentageUsed / 100) * 5);
   
-  // Determine color based on boxes filled
+  // Determine color based on boxes filled (resourced percentage)
   const getBoxColor = () => {
-    if (boxesFilled <= 2) {
-      return 'bg-red-500'; // Red for 1-2 boxes (low availability)
-    } else if (boxesFilled <= 4) {
-      return 'bg-yellow-400'; // Yellow for 3-4 boxes (medium availability)
+    if (boxesFilled >= 5) {
+      return 'bg-green-500'; // Green for 5 boxes filled (fully resourced)
+    } else if (boxesFilled >= 3) {
+      return 'bg-yellow-400'; // Yellow for 3-4 boxes filled (medium resourced)
     } else {
-      return 'bg-green-500'; // Green for 5 boxes (high availability)
+      return 'bg-red-500'; // Red for 1-2 boxes filled (low resourced)
     }
   };
 
@@ -44,7 +45,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
               />
             </TooltipTrigger>
             <TooltipContent>
-              <p className="text-xs">{index < boxesFilled ? 'Available' : 'Used'}</p>
+              <p className="text-xs">{index < boxesFilled ? 'Used' : 'Available'}</p>
             </TooltipContent>
           </Tooltip>
         ))}
