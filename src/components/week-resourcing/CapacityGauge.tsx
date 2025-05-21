@@ -29,45 +29,42 @@ export const CapacityGauge: React.FC<CapacityGaugeProps> = ({
     }
   };
 
-  // SVG parameters - reduced size and stroke width
-  const size = 45;
-  const strokeWidth = 4;
+  // SVG parameters - further reduced size
+  const size = 32;
+  const strokeWidth = 3;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (percentageUsed / 100) * circumference;
   const color = getColor();
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="relative">
-        <svg width={size} height={size} className="transform -rotate-90">
-          {/* Background circle */}
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            strokeWidth={strokeWidth}
-            stroke="#f3f4f6"
-            fill="transparent"
-          />
-          {/* Progress circle */}
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            strokeWidth={strokeWidth}
-            stroke={color}
-            fill="transparent"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs font-medium">{availableHours}</span>
-        </div>
+    <div className="relative inline-block">
+      <svg width={size} height={size} className="transform -rotate-90">
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          strokeWidth={strokeWidth}
+          stroke="#f3f4f6"
+          fill="transparent"
+        />
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          strokeWidth={strokeWidth}
+          stroke={color}
+          fill="transparent"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-[10px] font-medium">{availableHours}</span>
       </div>
-      <div className="text-xs text-muted-foreground -mt-0.5">/{totalCapacity}</div>
     </div>
   );
 };

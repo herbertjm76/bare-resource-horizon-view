@@ -226,7 +226,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                       </Tooltip>
                     </TableCell>
                     
-                    {/* Capacity Gauge - centered */}
+                    {/* Capacity Gauge - more compact */}
                     <TableCell className="sticky-column sticky-left-12 border-r p-0 align-middle">
                       <div className="flex justify-center">
                         <CapacityGauge 
