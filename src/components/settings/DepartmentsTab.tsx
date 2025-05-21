@@ -6,7 +6,7 @@ import { Plus, Trash, Check, X } from "lucide-react";
 import { useCompany } from "@/context/CompanyContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useOfficeSettings } from "@/context/OfficeSettingsContext";
+import { useOfficeSettings } from "@/context/officeSettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const DepartmentsTab = () => {

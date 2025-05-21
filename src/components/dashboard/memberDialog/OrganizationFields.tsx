@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UseFormRegister, Controller, Control } from 'react-hook-form';
 import { MemberFormData } from './types';
-import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+import { useOfficeSettings } from '@/context/officeSettings';
 import { 
   Select,
   SelectContent,
