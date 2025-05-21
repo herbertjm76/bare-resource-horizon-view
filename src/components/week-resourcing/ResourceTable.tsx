@@ -1,5 +1,4 @@
-
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { 
   Table, 
   TableBody, 
@@ -10,12 +9,14 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ResourceAllocationCell } from '@/components/week-resourcing/ResourceAllocationCell';
+import { Progress } from '@/components/ui/progress';
 import { 
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip';
+import { Input } from '@/components/ui/input';
 import '../resources/resources-grid.css'; // Import resource grid styling
 
 interface ResourceTableProps {
@@ -39,6 +40,9 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     });
     return map;
   }, [members]);
+  
+  // Leave data state for manual input
+  const [leaveData, setLeaveData] = useState<Record<string, Record<string, number>>>({});
   
   // Organize allocations by member and project for easier access
   const allocationMap = useMemo(() => {
@@ -90,6 +94,27 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed';
   };
 
+  // Handler for leave input changes
+  const handleLeaveInputChange = (memberId: string, leaveType: string, value: string) => {
+    const hours = value === '' ? 0 : Math.min(parseFloat(value), 40);
+    
+    if (isNaN(hours)) return;
+    
+    setLeaveData(prev => {
+      const newLeaveData = {...prev};
+      if (!newLeaveData[memberId]) {
+        newLeaveData[memberId] = {};
+      }
+      newLeaveData[memberId][leaveType] = hours;
+      return newLeaveData;
+    });
+  };
+  
+  // Get leave hours for a member and type
+  const getLeaveHours = (memberId: string, leaveType: string): number => {
+    return leaveData[memberId]?.[leaveType] || 0;
+  };
+
   return (
     <TooltipProvider>
       <div className="annual-leave-calendar grid-table-outer-container border rounded-md shadow-sm">
@@ -97,7 +122,22 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
           <Table className="resource-allocation-table">
             <TableHeader>
               <TableRow className="bg-muted/50 h-12">
-                <TableHead className="sticky-header sticky-left-0 border-r border-b bg-muted/50 w-[80px]">Resources</TableHead>
+                {/* Resource name column */}
+                <TableHead className="sticky-header sticky-left-0 border-r border-b bg-muted/50 w-[80px] text-center">
+                  Resources
+                </TableHead>
+                
+                {/* Capacity column */}
+                <TableHead className="sticky-header sticky-left-12 border-r border-b bg-muted/50 w-[120px] text-center">
+                  Capacity
+                </TableHead>
+                
+                {/* Leave columns group */}
+                <TableHead colSpan={3} className="sticky-header border-r border-b bg-muted/50 text-center">
+                  Leave
+                </TableHead>
+                
+                {/* Project columns - rotated headers */}
                 {projects.map(project => (
                   <TableHead 
                     key={project.id} 
@@ -115,7 +155,39 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                     </Tooltip>
                   </TableHead>
                 ))}
-                <TableHead className="sticky-header text-center border-b bg-muted/50 w-[60px]">Total</TableHead>
+                
+                {/* Total column */}
+                <TableHead className="sticky-header text-center border-b bg-muted/50 w-[60px]">
+                  Total
+                </TableHead>
+              </TableRow>
+              
+              {/* Sub-header for leave types */}
+              <TableRow className="bg-muted/30 h-8">
+                {/* Empty cell for Resource column */}
+                <TableHead className="sticky-header sticky-left-0 border-r border-b bg-muted/30"></TableHead>
+                
+                {/* Empty cell for Capacity column */}
+                <TableHead className="sticky-header sticky-left-12 border-r border-b bg-muted/30"></TableHead>
+                
+                {/* Leave sub-columns */}
+                <TableHead className="text-center border-r border-b bg-muted/30 text-xs w-[80px]">
+                  Annual
+                </TableHead>
+                <TableHead className="text-center border-r border-b bg-muted/30 text-xs w-[80px]">
+                  Sick/Medical
+                </TableHead>
+                <TableHead className="text-center border-r border-b bg-muted/30 text-xs w-[80px]">
+                  Other
+                </TableHead>
+                
+                {/* Empty cells for Project columns */}
+                {projects.map(project => (
+                  <TableHead key={`empty-${project.id}`} className="border-r border-b bg-muted/30"></TableHead>
+                ))}
+                
+                {/* Empty cell for Total column */}
+                <TableHead className="border-b bg-muted/30"></TableHead>
               </TableRow>
             </TableHeader>
             
@@ -126,12 +198,23 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                 const totalHours = memberTotals.get(member.id) || 0;
                 const utilization = Math.round((totalHours / weeklyCapacity) * 100);
                 
+                // Calculate leave hours
+                const annualLeave = getLeaveHours(member.id, 'annual') || 0;
+                const sickLeave = getLeaveHours(member.id, 'sick') || 0;
+                const otherLeave = getLeaveHours(member.id, 'other') || 0;
+                const totalLeave = annualLeave + sickLeave + otherLeave;
+                
+                // Calculate available hours after leave
+                const availableHours = Math.max(0, weeklyCapacity - totalLeave);
+                const availablePercentage = (availableHours / weeklyCapacity) * 100;
+                
                 // Alternating row background
                 const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-muted/10';
                 
                 return (
                   <TableRow key={member.id} className={`h-9 ${rowBg} hover:bg-muted/20`}>
-                    <TableCell className="sticky-column sticky-left-0 border-r font-medium pl-2 pr-1 py-1">
+                    {/* Resource Name - Centered */}
+                    <TableCell className="sticky-column sticky-left-0 border-r font-medium py-1 text-center">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <span>{getFirstName(member)}</span>
@@ -142,6 +225,65 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                       </Tooltip>
                     </TableCell>
                     
+                    {/* Capacity Progress Bar */}
+                    <TableCell className="sticky-column sticky-left-12 border-r p-0 align-middle">
+                      <div className="px-2 py-1">
+                        <div className="flex items-center space-x-2">
+                          <Progress 
+                            value={availablePercentage} 
+                            className="h-2.5 bg-gray-200" 
+                          />
+                          <span className="text-xs font-medium">{availableHours}/{weeklyCapacity}</span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    
+                    {/* Annual Leave Cell */}
+                    <TableCell className="border-r p-0 text-center w-[80px]">
+                      <div className="allocation-input-container">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="40"
+                          value={annualLeave || ''}
+                          onChange={(e) => handleLeaveInputChange(member.id, 'annual', e.target.value)}
+                          className="w-full h-8 text-center p-0 bg-[#F2FCE2]"
+                          placeholder="0"
+                        />
+                      </div>
+                    </TableCell>
+                    
+                    {/* Sick/Medical Leave Cell */}
+                    <TableCell className="border-r p-0 text-center w-[80px]">
+                      <div className="allocation-input-container">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="40"
+                          value={sickLeave || ''}
+                          onChange={(e) => handleLeaveInputChange(member.id, 'sick', e.target.value)}
+                          className="w-full h-8 text-center p-0 bg-[#FEF7CD]"
+                          placeholder="0"
+                        />
+                      </div>
+                    </TableCell>
+                    
+                    {/* Other Leave Cell */}
+                    <TableCell className="border-r p-0 text-center w-[80px]">
+                      <div className="allocation-input-container">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="40"
+                          value={otherLeave || ''}
+                          onChange={(e) => handleLeaveInputChange(member.id, 'other', e.target.value)}
+                          className="w-full h-8 text-center p-0 bg-[#FEC6A1]"
+                          placeholder="0"
+                        />
+                      </div>
+                    </TableCell>
+                    
+                    {/* Project allocation cells */}
                     {projects.map(project => {
                       const key = `${member.id}:${project.id}`;
                       const hours = allocationMap.get(key) || 0;
@@ -161,6 +303,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                       );
                     })}
                     
+                    {/* Total Column with Utilization Badge */}
                     <TableCell className="text-center p-0">
                       <div className="flex flex-col items-center py-1">
                         <span className="font-medium">{totalHours}</span>
@@ -179,7 +322,11 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
             
             {/* Totals row */}
             <TableRow className="bg-muted/30 font-medium h-10 border-t">
-              <TableCell className="sticky-column sticky-left-0 border-r font-semibold pl-2 py-1">Project Totals</TableCell>
+              <TableCell className="sticky-column sticky-left-0 border-r font-semibold pl-2 py-1 text-center">Totals</TableCell>
+              <TableCell className="sticky-column sticky-left-12 border-r text-center py-1"></TableCell>
+              <TableCell className="text-center border-r py-1"></TableCell>
+              <TableCell className="text-center border-r py-1"></TableCell>
+              <TableCell className="text-center border-r py-1"></TableCell>
               
               {projects.map(project => (
                 <TableCell key={`total-${project.id}`} className="text-center border-r py-1">

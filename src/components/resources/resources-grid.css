@@ -54,17 +54,26 @@
   padding: 0;
 }
 
+/* Ensure sub-headers have correct styling */
+.grid-table-container thead tr:nth-child(2) th {
+  height: 32px; /* Smaller height for sub-header row */
+  top: 48px;
+  z-index: 19;
+}
+
 /* Frozen left columns */
 .grid-table-container .sticky-left-0 {
   position: sticky;
   left: 0;
   z-index: 20;
+  background-color: inherit;
 }
 
 .grid-table-container .sticky-left-12 {
   position: sticky;
-  left: 48px; /* Width of the first column */
+  left: 80px; /* Width of the first column */
   z-index: 20;
+  background-color: inherit;
 }
 
 /* Header cells need higher z-index to stay on top */
@@ -91,14 +100,6 @@
 /* Hover effect for rows */
 .grid-table-container tbody tr:hover {
   background-color: rgba(0, 0, 0, 0.02);
-}
-
-/* Ensure background color persists while scrolling */
-.grid-table-container tr td.sticky-left-0,
-.grid-table-container tr th.sticky-left-0,
-.grid-table-container tr td.sticky-left-12, 
-.grid-table-container tr th.sticky-left-12 {
-  background-color: inherit;
 }
 
 /* Date column header styles - fixed rotation */
@@ -148,7 +149,7 @@
 }
 
 /* Square-shaped cells for allocation */
-.resource-allocation-table td:not(.sticky-left-0):not(:last-child) {
+.resource-allocation-table td:not(.sticky-left-0):not(.sticky-left-12):not(:last-child) {
   width: 48px;
   height: 32px;
   padding: 0;
@@ -223,4 +224,30 @@
   left: 0;
   z-index: 5;
   background-color: inherit;
+}
+
+/* Custom styling for leave types */
+.annual-leave-calendar input.bg-\[\#F2FCE2\]:focus {
+  background-color: #F2FCE2;
+}
+
+.annual-leave-calendar input.bg-\[\#FEF7CD\]:focus {
+  background-color: #FEF7CD;
+}
+
+.annual-leave-calendar input.bg-\[\#FEC6A1\]:focus {
+  background-color: #FEC6A1;
+}
+
+/* Capacity bar styling */
+.annual-leave-calendar .progress-bar-container {
+  height: 8px;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.annual-leave-calendar .progress-bar-fill {
+  height: 100%;
+  background-color: #9b87f5;
 }

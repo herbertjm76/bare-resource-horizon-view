@@ -47,8 +47,6 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
     setIsSaving(true);
     
     try {
-      console.log(`Updating allocation for resource ${resourceId}, project ${projectId}, week ${weekStartDate}, hours: ${newHours}`);
-      
       if (hours > 0) {
         // Update existing allocation
         const { error } = await supabase
