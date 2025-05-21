@@ -19,7 +19,7 @@ interface OrganizationFieldsProps {
 }
 
 const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register, control }) => {
-  const { locations, departments, loading } = useOfficeSettings();
+  const { locations, departments, roles, loading } = useOfficeSettings();
 
   return (
     <>
@@ -51,10 +51,28 @@ const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register, contr
       </div>
       <div className="space-y-2">
         <Label htmlFor="job_title">Job Title</Label>
-        <Input 
-          id="job_title"
-          placeholder="Job title"
-          {...register('job_title')}
+        <Controller
+          name="job_title"
+          control={control}
+          render={({ field }) => (
+            <Select
+              disabled={loading}
+              value={field.value}
+              onValueChange={field.onChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select job title" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="not_assigned">Not Assigned</SelectItem>
+                {roles.map((role) => (
+                  <SelectItem key={role.id} value={role.name}>
+                    {role.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         />
       </div>
       <div className="space-y-2">
