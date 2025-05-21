@@ -111,10 +111,11 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
         // Fetch departments data
         let departmentsData = [];
         try {
-          const { data, error } = await supabase
-            .from('office_departments')
+          // Using 'any' type to bypass TypeScript checking since the table was just created
+          const { data, error } = await (supabase
+            .from('office_departments' as any)
             .select('id, name, company_id')
-            .eq('company_id', company.id);
+            .eq('company_id', company.id) as any);
           
           if (error) throw error;
           departmentsData = data || [];
@@ -175,7 +176,7 @@ export const OfficeSettingsProvider = ({ children }: { children: ReactNode }) =>
 
         // Process departments data
         if (Array.isArray(departmentsData)) {
-          setDepartments(departmentsData.map((dept) => ({
+          setDepartments(departmentsData.map((dept: any) => ({
             id: dept.id,
             name: dept.name,
             company_id: (dept.company_id ?? company.id).toString()
