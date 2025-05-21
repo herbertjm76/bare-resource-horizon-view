@@ -115,6 +115,8 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       <HolidayCell 
         holidayHours={holidayHours} 
         memberId={member.id}
+        memberOffice={member.location}
+        weekStartDate={weekStartDate}
         onLeaveInputChange={onLeaveInputChange}
       />
       
