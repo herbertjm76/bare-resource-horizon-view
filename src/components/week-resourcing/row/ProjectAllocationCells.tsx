@@ -19,6 +19,20 @@ export const ProjectAllocationCells: React.FC<ProjectAllocationCellsProps> = ({
   return (
     <>
       {projects.map((project, index) => {
+        // If this is an empty project placeholder, render an empty cell
+        if (project.isEmpty) {
+          // Match the same alternating pattern as in the header
+          const isEven = index % 2 === 0;
+          const bgClass = isEven ? "bg-muted/30" : "bg-muted/10";
+          
+          return (
+            <TableCell 
+              key={`${member.id}-empty-${index}`} 
+              className={`leave-cell text-center border-r p-0 align-middle ${bgClass} w-[40px]`}
+            />
+          );
+        }
+        
         const key = `${member.id}:${project.id}`;
         const hours = allocationMap.get(key) || 0;
         

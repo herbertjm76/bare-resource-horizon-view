@@ -12,11 +12,27 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({
   projects,
   showRemarks = true 
 }) => {
+  // Ensure we always show at least 15 project columns
+  const minProjectsToShow = 15;
+  const projectsToRender = [...projects];
+  
+  // Add empty placeholders if we have less than 15 projects
+  if (projects.length < minProjectsToShow) {
+    const emptyProjectsNeeded = minProjectsToShow - projects.length;
+    for (let i = 0; i < emptyProjectsNeeded; i++) {
+      projectsToRender.push({
+        id: `empty-project-${i}`,
+        name: '',
+        isEmpty: true
+      });
+    }
+  }
+  
   return (
     <TableHeader>
       <TableRow className="border-b">
         {/* Fixed columns */}
-        <TableHead className="sticky-column sticky-left-0 min-w-[160px] bg-muted/20 border-r z-20">Name</TableHead>
+        <TableHead className="sticky-column sticky-left-0 w-[60px] bg-muted/20 border-r z-20 text-center">Name</TableHead>
         <TableHead className="sticky-column sticky-left-12 w-10 bg-muted/20 border-r z-20 text-center">#</TableHead>
         <TableHead className="sticky-column sticky-left-24 w-10 bg-muted/20 border-r z-20 text-center">Office</TableHead>
         <TableHead className="sticky-column sticky-left-36 w-[120px] bg-muted/20 border-r z-20 text-center">Capacity</TableHead>
@@ -35,10 +51,20 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({
 
         {/* Project columns - dynamically generated with distinct styling */}
         <TooltipProvider>
-          {projects.map((project: any, index: number) => {
+          {projectsToRender.map((project: any, index: number) => {
             // Alternate background colors for better distinction
             const isEven = index % 2 === 0;
             const bgClass = isEven ? "bg-muted/30" : "bg-muted/10";
+            
+            // For empty placeholder projects, just render an empty cell
+            if (project.isEmpty) {
+              return (
+                <TableHead 
+                  key={project.id} 
+                  className={`${bgClass} border-r text-center w-[40px]`}
+                />
+              );
+            }
             
             return (
               <TableHead 

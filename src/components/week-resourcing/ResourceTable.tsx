@@ -3,7 +3,6 @@ import React from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ResourceTableHeader } from './ResourceTableHeader';
-import { ResourceTableFooter } from './ResourceTableFooter';
 import { ResourceTableRow } from './ResourceTableRow';
 import { useResourceTableData } from '@/hooks/useResourceTableData';
 
@@ -80,12 +79,6 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                 );
               })}
             </TableBody>
-            
-            {/* Project totals footer */}
-            <ResourceTableFooter 
-              projects={projects} 
-              projectTotals={projectTotals} 
-            />
           </Table>
         </div>
       </div>

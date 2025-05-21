@@ -70,6 +70,21 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
     onLeaveInputChange(memberId, 'notes', notes);
   };
 
+  // Ensure we always show at least 15 project columns
+  const minProjectsToShow = 15;
+  const projectsToRender = [...projects];
+  
+  // Add empty placeholders if we have less than 15 projects
+  if (projects.length < minProjectsToShow) {
+    const emptyProjectsNeeded = minProjectsToShow - projects.length;
+    for (let i = 0; i < emptyProjectsNeeded; i++) {
+      projectsToRender.push({
+        id: `empty-project-${i}`,
+        isEmpty: true
+      });
+    }
+  }
+
   return (
     <TableRow key={member.id} className={`h-9 ${rowBg} hover:bg-muted/20`}>
       <MemberNameCell member={member} />
@@ -77,7 +92,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       <OfficeLocationCell member={member} />
       <CapacityBarCell availableHours={Math.max(0, weeklyCapacity - totalHours - annualLeave - otherLeave)} totalCapacity={weeklyCapacity} />
       
-      {/* Annual Leave Cell with compact badge */}
+      {/* Annual Leave Cell with hours value */}
       <AnnualLeaveCell annualLeave={annualLeave} leaveDays={leaveDays} />
       
       {/* Combined Other Leave Cell with Notes */}
@@ -91,7 +106,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       
       {/* Project allocation cells */}
       <ProjectAllocationCells 
-        projects={projects} 
+        projects={projectsToRender} 
         member={member} 
         allocationMap={allocationMap}
         weekStartDate={weekStartDate}
