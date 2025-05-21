@@ -2,23 +2,28 @@
 import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useOfficeDisplay } from '@/components/weekly-overview/hooks/useOfficeDisplay';
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 
 interface OfficeLocationCellProps {
   member: any;
 }
 
 export const OfficeLocationCell: React.FC<OfficeLocationCellProps> = ({ member }) => {
-  const { getOfficeDisplay } = useOfficeDisplay();
+  const { locations } = useOfficeSettings();
   
-  // Get office location and display
-  const officeLocation = member.location || 'Unassigned';
-  const displayText = getOfficeDisplay(officeLocation);
+  // Get office location code from member
+  const locationCode = member.location || 'Unassigned';
   
-  // Extract emoji if available (first character might be an emoji flag)
-  const hasEmoji = /\p{Emoji}/u.test(displayText.charAt(0));
-  const emoji = hasEmoji ? displayText.charAt(0) : '🏢';
-  const locationName = hasEmoji ? displayText.substring(1).trim() : displayText;
+  // Find the matching location in office settings
+  const locationData = locations.find(loc => loc.code === locationCode);
+  
+  // Use the emoji from office settings if found, otherwise use default emoji
+  const emoji = locationData?.emoji || '🏢';
+  
+  // Use location name from settings if found
+  const locationName = locationData 
+    ? `${locationData.city}, ${locationData.country}`
+    : locationCode;
 
   return (
     <TableCell className="sticky-column sticky-left-24 border-r p-0 text-center">

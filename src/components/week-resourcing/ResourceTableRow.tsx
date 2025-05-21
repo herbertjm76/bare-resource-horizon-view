@@ -22,7 +22,7 @@ interface ResourceTableRowProps {
   weekStartDate: string;
   allocationMap: Map<string, number>;
   projectCount: number;
-  manualLeaveData: Record<string, Record<string, number>>;
+  manualLeaveData: Record<string, Record<string, string | number>>;
   remarksData: Record<string, string>;
   leaveDays: LeaveDay[];
   weeklyCapacity: number;
@@ -44,12 +44,24 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   weeklyCapacity,
   totalHours,
   annualLeave,
-  onLeaveInputChange,
-  onRemarksUpdate
+  onLeaveInputChange
 }) => {
   // Combine sick and other leave into a single "other" leave
-  const otherLeave = (manualLeaveData[member.id]?.['sick'] || 0) + 
-                     (manualLeaveData[member.id]?.['other'] || 0);
+  // Make sure to safely convert to number for calculations
+  const otherLeaveValue = manualLeaveData[member.id]?.['sick'] || 0;
+  const otherLeaveNum = typeof otherLeaveValue === 'string' 
+    ? parseFloat(otherLeaveValue) || 0 
+    : otherLeaveValue;
+  
+  const secondLeaveValue = manualLeaveData[member.id]?.['other'] || 0;
+  const secondLeaveNum = typeof secondLeaveValue === 'string'
+    ? parseFloat(secondLeaveValue) || 0
+    : secondLeaveValue;
+
+  const otherLeave = otherLeaveNum + secondLeaveNum;
+  
+  // Get notes for this member
+  const memberNotes = manualLeaveData[member.id]?.['notes'] || '';
   
   const totalLeave = annualLeave + otherLeave;
   
@@ -59,9 +71,6 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   
   // For debugging
   console.log(`ResourceTableRow for ${member.first_name}: totalHours=${totalHours}, leave=${totalLeave}, availableHours=${availableHours}, weeklyCapacity=${weeklyCapacity}`);
-  
-  // Get notes for this member (from the existing remarks)
-  const memberNotes = manualLeaveData[member.id]?.['notes'] || '';
   
   // Alternating row background
   const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-muted/10';
@@ -83,7 +92,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       <OtherLeaveCell 
         leaveValue={otherLeave} 
         memberId={member.id}
-        notes={memberNotes}
+        notes={typeof memberNotes === 'string' ? memberNotes : ''}
         onLeaveInputChange={onLeaveInputChange}
         onNotesChange={handleNotesChange}
       />

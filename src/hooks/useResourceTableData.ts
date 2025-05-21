@@ -20,7 +20,8 @@ export const useResourceTableData = (
   const [remarksData, setRemarksData] = useState<Record<string, string>>({});
   
   // Leave data state for sick/other leave types and notes
-  const [manualLeaveData, setManualLeaveData] = useState<Record<string, Record<string, number | string>>>({});
+  // Use type with string | number to accommodate both values and notes
+  const [manualLeaveData, setManualLeaveData] = useState<Record<string, Record<string, string | number>>>({});
   
   // Create members map
   const membersMap = useMemo(() => {
@@ -125,7 +126,7 @@ export const useResourceTableData = (
         newLeaveData[memberId] = {};
       }
       
-      // If it's notes, we store it as a string, otherwise convert to number
+      // If it's notes, store it as a string, otherwise convert to number
       if (leaveType === 'notes') {
         newLeaveData[memberId][leaveType] = value;
       } else {

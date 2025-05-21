@@ -2,76 +2,86 @@
 import React, { useState } from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Textarea } from '@/components/ui/textarea';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Edit2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { PencilIcon } from 'lucide-react';
 
 interface OtherLeaveCellProps {
   leaveValue: number;
   memberId: string;
-  notes?: string;
+  notes: string;
   onLeaveInputChange: (memberId: string, leaveType: string, value: string) => void;
-  onNotesChange?: (memberId: string, notes: string) => void;
+  onNotesChange: (memberId: string, notes: string) => void;
 }
 
 export const OtherLeaveCell: React.FC<OtherLeaveCellProps> = ({
   leaveValue,
   memberId,
-  notes = '',
+  notes,
   onLeaveInputChange,
   onNotesChange
 }) => {
-  const [localNotes, setLocalNotes] = useState(notes);
+  const [open, setOpen] = useState(false);
+  const [inputValue, setInputValue] = useState(leaveValue === 0 ? '' : leaveValue.toString());
+  const [notesValue, setNotesValue] = useState(notes || '');
   
-  const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setLocalNotes(e.target.value);
+  const handleSave = () => {
+    onLeaveInputChange(memberId, 'other', inputValue);
+    onNotesChange(memberId, notesValue);
+    setOpen(false);
   };
   
-  const saveNotes = () => {
-    if (onNotesChange) {
-      onNotesChange(memberId, localNotes);
-    }
-  };
-
   return (
-    <TableCell className="border-r p-0 text-center w-[120px]">
-      <div className="flex items-center">
-        <Input
-          type="number"
-          min="0"
-          max="40"
-          value={leaveValue || ''}
-          onChange={(e) => onLeaveInputChange(memberId, 'other', e.target.value)}
-          className="w-12 h-8 text-center p-0 mr-1 bg-[#FEC6A1]"
-          placeholder="0"
-        />
-        
-        <Popover>
+    <TableCell className="relative p-0 text-center border-r">
+      <div className="p-1">
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-6 w-6 p-0 rounded-full"
-            >
-              <PencilIcon size={12} />
-            </Button>
+            <div className="flex items-center justify-center gap-1 cursor-pointer">
+              <span className="text-sm">{leaveValue || '0'}</span>
+              {notes && (
+                <span className="text-xs text-muted-foreground ml-1" title="Has notes">
+                  <Edit2 className="h-3 w-3" />
+                </span>
+              )}
+            </div>
           </PopoverTrigger>
-          <PopoverContent className="w-80 p-4">
-            <div className="space-y-2">
-              <h4 className="font-medium">Other Leave Notes</h4>
-              <Textarea 
-                placeholder="Enter notes about this leave..." 
-                className="min-h-[100px]"
-                value={localNotes}
-                onChange={handleNotesChange}
-              />
+          <PopoverContent className="w-80" align="center">
+            <div className="space-y-3 p-2">
+              <div className="space-y-2">
+                <div className="flex flex-col space-y-1">
+                  <label htmlFor="otherLeave" className="text-xs font-medium">
+                    Other Leave (hours)
+                  </label>
+                  <Input
+                    id="otherLeave"
+                    className="w-full h-8"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    type="number"
+                    min="0"
+                    max="40"
+                    placeholder="0"
+                  />
+                </div>
+
+                <div className="flex flex-col space-y-1">
+                  <label htmlFor="leaveNotes" className="text-xs font-medium">
+                    Notes
+                  </label>
+                  <Textarea
+                    id="leaveNotes"
+                    className="w-full min-h-[80px]"
+                    value={notesValue}
+                    onChange={(e) => setNotesValue(e.target.value)}
+                    placeholder="Add notes about this leave..."
+                  />
+                </div>
+              </div>
+
               <div className="flex justify-end">
-                <Button 
-                  size="sm" 
-                  onClick={saveNotes}
-                >
-                  Save Notes
+                <Button size="sm" variant="default" onClick={handleSave} className="gap-1">
+                  <Check className="h-3 w-3" /> Save
                 </Button>
               </div>
             </div>
