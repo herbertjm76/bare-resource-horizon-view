@@ -34,8 +34,8 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
         <PopoverTrigger asChild>
           <div className="w-full h-full flex justify-center items-center cursor-pointer">
             {holidayHours > 0 ? (
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center font-medium">
-                {holidayHours}
+              <div className="w-6 h-6 rounded-full bg-gray-250 flex items-center justify-center">
+                <span className="text-xs font-medium text-gray-600">{holidayHours}</span>
               </div>
             ) : (
               <span className="text-muted-foreground">-</span>

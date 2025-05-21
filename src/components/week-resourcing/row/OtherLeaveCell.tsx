@@ -45,8 +45,8 @@ export const OtherLeaveCell: React.FC<OtherLeaveCellProps> = ({
         <PopoverTrigger asChild>
           <div className="w-full h-full flex justify-center items-center cursor-pointer">
             {leaveValue > 0 ? (
-              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center font-medium">
-                {leaveValue}
+              <div className="w-6 h-6 rounded-full bg-gray-250 flex items-center justify-center">
+                <span className="text-xs font-medium text-gray-600">{leaveValue}</span>
               </div>
             ) : (
               <span className="text-muted-foreground">-</span>

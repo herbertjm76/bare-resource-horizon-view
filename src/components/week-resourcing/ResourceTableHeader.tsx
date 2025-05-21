@@ -37,7 +37,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({
         <TableHead className="sticky-column sticky-left-12 w-10 bg-muted/20 border-r z-20 text-center">
           <Tooltip>
             <TooltipTrigger className="w-full h-full flex items-center justify-center">
-              <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium">
+              <div className="w-6 h-6 rounded-full bg-gray-250 flex items-center justify-center text-xs font-medium text-gray-600">
                 #
               </div>
             </TooltipTrigger>
@@ -57,7 +57,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({
         <TableHead className="bg-muted/20 border-r text-center w-[50px]">
           <Tooltip>
             <TooltipTrigger className="w-full h-full">
-              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center text-xs font-medium mx-auto">
+              <div className="w-6 h-6 rounded-full bg-gray-250 text-gray-600 flex items-center justify-center text-xs font-medium mx-auto">
                 AL
               </div>
             </TooltipTrigger>
@@ -71,7 +71,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({
         <TableHead className="bg-muted/20 border-r text-center w-[50px]">
           <Tooltip>
             <TooltipTrigger className="w-full h-full">
-              <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center text-xs font-medium mx-auto">
+              <div className="w-6 h-6 rounded-full bg-gray-250 text-gray-600 flex items-center justify-center text-xs font-medium mx-auto">
                 OL
               </div>
             </TooltipTrigger>
@@ -85,7 +85,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({
         <TableHead className="bg-muted/20 border-r text-center w-[50px]">
           <Tooltip>
             <TooltipTrigger className="w-full h-full">
-              <div className="w-8 h-8 rounded-full bg-green-100 text-green-800 flex items-center justify-center text-xs font-medium mx-auto">
+              <div className="w-6 h-6 rounded-full bg-gray-250 text-gray-600 flex items-center justify-center text-xs font-medium mx-auto">
                 HO
               </div>
             </TooltipTrigger>
