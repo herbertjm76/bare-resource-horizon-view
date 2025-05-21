@@ -25,6 +25,11 @@ export const navigationItems = [
         url: "/weekly-overview",
         icon: LayoutList,
       },
+      {
+        title: "Week Resourcing",
+        url: "/week-resourcing",
+        icon: Calendar,
+      },
     ],
   },
   {
