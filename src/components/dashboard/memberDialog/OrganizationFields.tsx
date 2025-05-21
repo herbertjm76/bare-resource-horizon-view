@@ -38,7 +38,7 @@ const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register, contr
                 <SelectValue placeholder="Select department" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Not Assigned</SelectItem>
+                <SelectItem value="not_assigned">Not Assigned</SelectItem>
                 {departments.map((department) => (
                   <SelectItem key={department.id} value={department.name}>
                     {department.name}
