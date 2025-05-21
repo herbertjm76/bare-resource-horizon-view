@@ -26,9 +26,8 @@ import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { toast } from "sonner";
 
 const formSchema = z.object({
-  description: z.string().min(1, "Description is required"),
-  start_date: z.date({ required_error: "Start date is required" }),
-  end_date: z.date({ required_error: "End date is required" }),
+  name: z.string().min(1, "Description is required"),
+  date: z.date({ required_error: "Start date is required" }),
   offices: z.array(z.string()).min(1, "Select at least one office."),
 });
 
@@ -36,11 +35,12 @@ type HolidayFormValues = z.infer<typeof formSchema>;
 
 type Holiday = {
   id: string;
-  description: string;
-  start_date: Date;
-  end_date: Date;
+  name: string;
+  date: Date;
   offices: string[];
   company_id?: string;
+  location_id?: string;
+  is_recurring: boolean;
 };
 
 export const HolidaysTab = () => {
@@ -56,9 +56,8 @@ export const HolidaysTab = () => {
   const form = useForm<HolidayFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      description: "",
-      start_date: new Date(),
-      end_date: new Date(),
+      name: "",
+      date: new Date(),
       offices: [],
     }
   });
@@ -83,11 +82,12 @@ export const HolidaysTab = () => {
       // Transform the data format
       const transformedHolidays: Holiday[] = data.map(holiday => ({
         id: holiday.id,
-        description: holiday.description,
-        start_date: new Date(holiday.start_date),
-        end_date: new Date(holiday.end_date),
-        offices: holiday.offices || [],
-        company_id: holiday.company_id
+        name: holiday.name,
+        date: new Date(holiday.date),
+        offices: holiday.location_id ? [holiday.location_id] : [], // Handle location_id as offices array
+        is_recurring: holiday.is_recurring,
+        company_id: holiday.company_id,
+        location_id: holiday.location_id
       }));
       
       console.log("Loaded holidays from database:", transformedHolidays.length);
@@ -115,9 +115,8 @@ export const HolidaysTab = () => {
   const handleEdit = (holiday: Holiday) => {
     setEditingHoliday(holiday);
     form.reset({
-      description: holiday.description,
-      start_date: holiday.start_date,
-      end_date: holiday.end_date,
+      name: holiday.name,
+      date: holiday.date,
       offices: holiday.offices
     });
     setOpen(true);
@@ -165,10 +164,9 @@ export const HolidaysTab = () => {
         const { error } = await supabase
           .from('office_holidays')
           .update({
-            description: values.description,
-            start_date: values.start_date,
-            end_date: values.end_date,
-            offices: values.offices,
+            name: values.name,
+            date: values.date.toISOString().split('T')[0],
+            location_id: values.offices[0], // Use first office as location_id for now
             updated_at: new Date()
           })
           .eq('id', editingHoliday.id);
@@ -178,7 +176,12 @@ export const HolidaysTab = () => {
         // Update local state
         setHolidays(prev => prev.map(holiday => 
           holiday.id === editingHoliday.id
-            ? { ...holiday, ...values }
+            ? { 
+                ...holiday, 
+                name: values.name,
+                date: values.date,
+                offices: values.offices
+              }
             : holiday
         ));
         
@@ -188,11 +191,11 @@ export const HolidaysTab = () => {
         const { data, error } = await supabase
           .from('office_holidays')
           .insert({
-            description: values.description,
-            start_date: values.start_date,
-            end_date: values.end_date,
-            offices: values.offices,
-            company_id: company.id
+            name: values.name,
+            date: values.date.toISOString().split('T')[0],
+            location_id: values.offices[0], // Use first office as location_id for now
+            company_id: company.id,
+            is_recurring: false // Default to non-recurring
           })
           .select();
           
@@ -200,11 +203,12 @@ export const HolidaysTab = () => {
         
         const newHoliday: Holiday = { 
           id: data[0].id, 
-          description: values.description,
-          start_date: values.start_date,
-          end_date: values.end_date,
+          name: values.name,
+          date: values.date,
           offices: values.offices,
-          company_id: company.id 
+          is_recurring: false,
+          company_id: company.id,
+          location_id: values.offices[0]
         };
         
         // Update local state
@@ -272,9 +276,9 @@ export const HolidaysTab = () => {
                   style={editMode && selected.includes(holiday.id) ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
                 >
                   <div>
-                    <div className="font-medium">{holiday.description}</div>
+                    <div className="font-medium">{holiday.name}</div>
                     <div className="text-sm text-muted-foreground">
-                      {format(holiday.start_date, "PPP")} to {format(holiday.end_date, "PPP")} • 
+                      {format(holiday.date, "PPP")} • 
                       {holiday.offices.map(id => locations.find(o=>o.id===id)?.city).filter(Boolean).join(", ")}
                     </div>
                   </div>
@@ -314,7 +318,7 @@ export const HolidaysTab = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="description"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Description</FormLabel>
@@ -326,82 +330,43 @@ export const HolidaysTab = () => {
                 )}
               />
               
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="start_date"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Start Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={disableWeekends}
-                            initialFocus
-                            className="p-3 pointer-events-auto"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="end_date"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>End Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={disableWeekends}
-                            initialFocus
-                            className="p-3 pointer-events-auto"
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={`w-full pl-3 text-left font-normal ${!field.value && "text-muted-foreground"}`}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={disableWeekends}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
               <FormField
                 control={form.control}

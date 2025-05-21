@@ -18,10 +18,10 @@ interface HolidayCellProps {
 
 interface Holiday {
   id: string;
-  description: string;
-  start_date: Date;
-  end_date: Date;
+  name: string;
+  date: Date;
   offices: string[];
+  location_id?: string;
 }
 
 export const HolidayCell: React.FC<HolidayCellProps> = ({
@@ -50,10 +50,10 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
         // Transform the data format
         const transformedHolidays: Holiday[] = data.map(holiday => ({
           id: holiday.id,
-          description: holiday.description,
-          start_date: new Date(holiday.start_date),
-          end_date: new Date(holiday.end_date),
-          offices: holiday.offices || []
+          name: holiday.name,
+          date: new Date(holiday.date),
+          offices: holiday.location_id ? [holiday.location_id] : [],
+          location_id: holiday.location_id
         }));
         
         setHolidays(transformedHolidays);
@@ -81,43 +81,39 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
       // Filter holidays that match the member's office and fall within the week
       const applicableHolidays = holidays.filter(holiday => {
         // Check if holiday applies to this member's office
-        if (!holiday.offices.includes(locationObj.id)) {
+        // Either check the offices array or the location_id field
+        const holidayOffices = holiday.offices?.length > 0 
+          ? holiday.offices 
+          : (holiday.location_id ? [holiday.location_id] : []);
+
+        if (!holidayOffices.includes(locationObj.id)) {
           return false;
         }
         
-        // Check for any overlap between holiday period and week period
+        // Check for holiday date within the week
+        const holidayDate = holiday.date;
         return (
-          isWithinInterval(holiday.start_date, { start: weekStart, end: weekEnd }) ||
-          isWithinInterval(holiday.end_date, { start: weekStart, end: weekEnd }) ||
-          (holiday.start_date <= weekStart && holiday.end_date >= weekEnd)
+          holidayDate >= weekStart && holidayDate <= weekEnd
         );
       });
       
       if (applicableHolidays.length > 0) {
         // Collect holiday names for tooltip
-        setHolidayNames(applicableHolidays.map(h => h.description));
+        setHolidayNames(applicableHolidays.map(h => h.name));
         
         // Calculate business days in the holiday period that fall within this week
         let holidayDays = 0;
-        const currentDate = new Date(weekStart);
         
-        while (currentDate <= weekEnd) {
-          // Check if this day is a business day (not Sat/Sun)
-          const dayOfWeek = currentDate.getDay();
-          if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Not Sunday (0) or Saturday (6)
-            // Check if this day is in any of the applicable holidays
-            const isHoliday = applicableHolidays.some(holiday => {
-              return currentDate >= holiday.start_date && currentDate <= holiday.end_date;
-            });
-            
-            if (isHoliday) {
-              holidayDays++;
-            }
-          }
+        // Count number of holidays within the week that are business days
+        applicableHolidays.forEach(holiday => {
+          const holidayDate = holiday.date;
+          const dayOfWeek = holidayDate.getDay();
           
-          // Move to next day
-          currentDate.setDate(currentDate.getDate() + 1);
-        }
+          // Check if this day is a business day (not Sat/Sun)
+          if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+            holidayDays++;
+          }
+        });
         
         // Assuming 8 hours per holiday day
         return holidayDays * 8;
