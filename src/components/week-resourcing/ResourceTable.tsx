@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+
+import React, { useMemo, useState, useEffect } from 'react';
 import { 
   Table, 
   TableBody, 
@@ -9,7 +10,9 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ResourceAllocationCell } from '@/components/week-resourcing/ResourceAllocationCell';
-import { CapacityGauge } from '@/components/week-resourcing/CapacityGauge';
+import { CapacityBar } from '@/components/week-resourcing/CapacityBar';
+import { RemarksCell } from '@/components/week-resourcing/RemarksCell';
+import { LeaveTooltip } from '@/components/week-resourcing/LeaveTooltip';
 import { 
   Tooltip,
   TooltipContent,
@@ -17,7 +20,10 @@ import {
   TooltipTrigger
 } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
-import '../resources/resources-grid.css'; // Import resource grid styling
+import { Briefcase, MapPin } from 'lucide-react';
+import { useAnnualLeave } from '@/hooks/useAnnualLeave';
+import { addDays, startOfWeek, parseISO, isWithinInterval, format } from 'date-fns';
+import '../resources/resources-grid.css';
 
 interface ResourceTableProps {
   projects: any[];
@@ -41,8 +47,18 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     return map;
   }, [members]);
   
-  // Leave data state for manual input
-  const [leaveData, setLeaveData] = useState<Record<string, Record<string, number>>>({});
+  // Parse week dates for leave filtering
+  const weekStart = useMemo(() => new Date(weekStartDate), [weekStartDate]);
+  const weekEnd = useMemo(() => addDays(weekStart, 6), [weekStart]);
+  
+  // Get leave data from the annual_leave hook
+  const { leaveData, isLoading: isLoadingLeave } = useAnnualLeave(weekStart);
+  
+  // Remarks state for manual input
+  const [remarksData, setRemarksData] = useState<Record<string, string>>({});
+  
+  // Leave data state for sick/other leave types
+  const [manualLeaveData, setManualLeaveData] = useState<Record<string, Record<string, number>>>({});
   
   // Organize allocations by member and project for easier access
   const allocationMap = useMemo(() => {
@@ -55,6 +71,30 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     
     return map;
   }, [allocations]);
+  
+  // Count projects per member for this week
+  const projectCountByMember = useMemo(() => {
+    const countMap = new Map();
+    
+    members.forEach(member => {
+      // Initialize count to 0
+      countMap.set(member.id, 0);
+    });
+    
+    allocations.forEach(allocation => {
+      const memberId = allocation.resource_id;
+      // Only count if hours > 0
+      if (allocation.hours > 0) {
+        // Get current count or 0 if not set
+        const currentProjects = new Set(countMap.get(memberId + '_projects') || []);
+        currentProjects.add(allocation.project_id);
+        countMap.set(memberId + '_projects', currentProjects);
+        countMap.set(memberId, currentProjects.size);
+      }
+    });
+    
+    return countMap;
+  }, [members, allocations]);
   
   // Calculate total project hours
   const projectTotals = useMemo(() => {
@@ -82,6 +122,30 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     return totals;
   }, [allocations]);
   
+  // Filter leave data for the selected week
+  const getWeeklyLeave = (memberId: string) => {
+    if (!leaveData[memberId]) return [];
+    
+    const memberLeaves = leaveData[memberId];
+    const weekLeaveDays = Object.keys(memberLeaves)
+      .filter(dateStr => {
+        const date = new Date(dateStr);
+        return isWithinInterval(date, { start: weekStart, end: weekEnd });
+      })
+      .map(dateStr => ({
+        date: dateStr,
+        hours: memberLeaves[dateStr]
+      }));
+      
+    return weekLeaveDays;
+  };
+  
+  // Calculate total leave hours for the week
+  const getTotalWeeklyLeaveHours = (memberId: string) => {
+    const weekLeaveDays = getWeeklyLeave(memberId);
+    return weekLeaveDays.reduce((total, day) => total + day.hours, 0);
+  };
+  
   // Helper to get just the first name
   const getFirstName = (member: any): string => {
     if (!member) return 'Unknown';
@@ -93,6 +157,11 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     if (!member) return 'Unknown';
     return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed';
   };
+  
+  // Helper to get office location
+  const getOfficeLocation = (member: any): string => {
+    return member.location || 'No office';
+  };
 
   // Handler for leave input changes
   const handleLeaveInputChange = (memberId: string, leaveType: string, value: string) => {
@@ -100,7 +169,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     
     if (isNaN(hours)) return;
     
-    setLeaveData(prev => {
+    setManualLeaveData(prev => {
       const newLeaveData = {...prev};
       if (!newLeaveData[memberId]) {
         newLeaveData[memberId] = {};
@@ -110,9 +179,17 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     });
   };
   
-  // Get leave hours for a member and type
-  const getLeaveHours = (memberId: string, leaveType: string): number => {
-    return leaveData[memberId]?.[leaveType] || 0;
+  // Handler for remarks updates
+  const handleRemarksUpdate = (memberId: string, remarks: string) => {
+    setRemarksData(prev => ({
+      ...prev,
+      [memberId]: remarks
+    }));
+  };
+  
+  // Get manual leave hours for a member and type
+  const getManualLeaveHours = (memberId: string, leaveType: string): number => {
+    return manualLeaveData[memberId]?.[leaveType] || 0;
   };
 
   return (
@@ -127,14 +204,29 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                   Resources
                 </TableHead>
                 
+                {/* Projects count column */}
+                <TableHead className="sticky-header sticky-left-12 border-r border-b bg-muted/50 w-[70px] text-center">
+                  Projects
+                </TableHead>
+                
+                {/* Office location column */}
+                <TableHead className="sticky-header sticky-left-24 border-r border-b bg-muted/50 w-[90px] text-center">
+                  Location
+                </TableHead>
+                
                 {/* Capacity column */}
-                <TableHead className="sticky-header sticky-left-12 border-r border-b bg-muted/50 w-[120px] text-center">
+                <TableHead className="sticky-header sticky-left-36 border-r border-b bg-muted/50 w-[120px] text-center">
                   Capacity
                 </TableHead>
                 
                 {/* Leave columns group */}
                 <TableHead colSpan={3} className="sticky-header border-r border-b bg-muted/50 text-center">
                   Leave
+                </TableHead>
+                
+                {/* Remarks column */}
+                <TableHead className="sticky-header border-r border-b bg-muted/50 w-[160px] text-center">
+                  Remarks
                 </TableHead>
                 
                 {/* Project columns - rotated headers */}
@@ -167,8 +259,14 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                 {/* Empty cell for Resource column */}
                 <TableHead className="sticky-header sticky-left-0 border-r border-b bg-muted/30"></TableHead>
                 
-                {/* Empty cell for Capacity column */}
+                {/* Empty cell for Projects column */}
                 <TableHead className="sticky-header sticky-left-12 border-r border-b bg-muted/30"></TableHead>
+                
+                {/* Empty cell for Location column */}
+                <TableHead className="sticky-header sticky-left-24 border-r border-b bg-muted/30"></TableHead>
+                
+                {/* Empty cell for Capacity column */}
+                <TableHead className="sticky-header sticky-left-36 border-r border-b bg-muted/30"></TableHead>
                 
                 {/* Leave sub-columns */}
                 <TableHead className="text-center border-r border-b bg-muted/30 text-xs w-[80px]">
@@ -180,6 +278,9 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                 <TableHead className="text-center border-r border-b bg-muted/30 text-xs w-[80px]">
                   Other
                 </TableHead>
+                
+                {/* Remarks header */}
+                <TableHead className="text-center border-r border-b bg-muted/30 text-xs"></TableHead>
                 
                 {/* Empty cells for Project columns */}
                 {projects.map(project => (
@@ -198,16 +299,24 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                 const totalHours = memberTotals.get(member.id) || 0;
                 const utilization = Math.round((totalHours / weeklyCapacity) * 100);
                 
+                // Get project count for this member
+                const projectCount = projectCountByMember.get(member.id) || 0;
+                
                 // Calculate leave hours
-                const annualLeave = getLeaveHours(member.id, 'annual') || 0;
-                const sickLeave = getLeaveHours(member.id, 'sick') || 0;
-                const otherLeave = getLeaveHours(member.id, 'other') || 0;
+                const annualLeave = getTotalWeeklyLeaveHours(member.id) || 0;
+                const sickLeave = getManualLeaveHours(member.id, 'sick') || 0;
+                const otherLeave = getManualLeaveHours(member.id, 'other') || 0;
                 const totalLeave = annualLeave + sickLeave + otherLeave;
                 
                 // Calculate available hours after allocated hours and leave
                 const allocatedHours = totalHours + totalLeave;
                 const availableHours = Math.max(0, weeklyCapacity - allocatedHours);
-                const availablePercentage = (availableHours / weeklyCapacity) * 100;
+                
+                // Get remarks for this member
+                const memberRemarks = remarksData[member.id] || '';
+                
+                // Get leave days for tooltip
+                const leaveDays = getWeeklyLeave(member.id);
                 
                 // Alternating row background
                 const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-muted/10';
@@ -226,29 +335,46 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                       </Tooltip>
                     </TableCell>
                     
-                    {/* Capacity Gauge - more compact */}
-                    <TableCell className="sticky-column sticky-left-12 border-r p-0 align-middle">
-                      <div className="flex justify-center">
-                        <CapacityGauge 
+                    {/* Projects Count - Centered with icon */}
+                    <TableCell className="sticky-column sticky-left-12 border-r p-0 text-center">
+                      <div className="flex items-center justify-center gap-1 py-1">
+                        <Briefcase size={14} className="text-muted-foreground" />
+                        <span className="text-xs font-medium">{projectCount}</span>
+                      </div>
+                    </TableCell>
+                    
+                    {/* Office Location - Centered with icon */}
+                    <TableCell className="sticky-column sticky-left-24 border-r p-0 text-center">
+                      <div className="flex items-center justify-center gap-1 py-1">
+                        <MapPin size={14} className="text-muted-foreground" />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-xs truncate max-w-16">{getOfficeLocation(member)}</span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{getOfficeLocation(member)}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </TableCell>
+                    
+                    {/* Capacity Bar - horizontal */}
+                    <TableCell className="sticky-column sticky-left-36 border-r p-0 align-middle">
+                      <div className="flex justify-center px-2">
+                        <CapacityBar
                           availableHours={availableHours} 
                           totalCapacity={weeklyCapacity} 
                         />
                       </div>
                     </TableCell>
                     
-                    {/* Annual Leave Cell */}
+                    {/* Annual Leave Cell - with tooltip */}
                     <TableCell className="border-r p-0 text-center w-[80px]">
-                      <div className="allocation-input-container">
-                        <Input
-                          type="number"
-                          min="0"
-                          max="40"
-                          value={annualLeave || ''}
-                          onChange={(e) => handleLeaveInputChange(member.id, 'annual', e.target.value)}
-                          className="w-full h-8 text-center p-0 bg-[#F2FCE2]"
-                          placeholder="0"
-                        />
-                      </div>
+                      <LeaveTooltip leaveDays={leaveDays}>
+                        <div className={`w-full h-8 flex items-center justify-center ${annualLeave > 0 ? 'bg-[#F2FCE2]' : ''}`}>
+                          {annualLeave > 0 ? annualLeave : '—'}
+                        </div>
+                      </LeaveTooltip>
                     </TableCell>
                     
                     {/* Sick/Medical Leave Cell */}
@@ -279,6 +405,15 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                           placeholder="0"
                         />
                       </div>
+                    </TableCell>
+                    
+                    {/* Remarks Cell */}
+                    <TableCell className="border-r p-0">
+                      <RemarksCell 
+                        memberId={member.id}
+                        initialRemarks={memberRemarks}
+                        onUpdate={handleRemarksUpdate}
+                      />
                     </TableCell>
                     
                     {/* Project allocation cells */}
@@ -322,6 +457,9 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
             <TableRow className="bg-muted/30 font-medium h-10 border-t">
               <TableCell className="sticky-column sticky-left-0 border-r font-semibold pl-2 py-1 text-center">Totals</TableCell>
               <TableCell className="sticky-column sticky-left-12 border-r text-center py-1"></TableCell>
+              <TableCell className="sticky-column sticky-left-24 border-r text-center py-1"></TableCell>
+              <TableCell className="sticky-column sticky-left-36 border-r text-center py-1"></TableCell>
+              <TableCell className="text-center border-r py-1"></TableCell>
               <TableCell className="text-center border-r py-1"></TableCell>
               <TableCell className="text-center border-r py-1"></TableCell>
               <TableCell className="text-center border-r py-1"></TableCell>
