@@ -16,11 +16,13 @@ interface LeaveDay {
 interface LeaveTooltipProps {
   leaveDays: LeaveDay[];
   children: React.ReactNode;
+  leaveType?: string; // Added leaveType as an optional prop
 }
 
 export const LeaveTooltip: React.FC<LeaveTooltipProps> = ({
   leaveDays,
-  children
+  children,
+  leaveType = 'Leave' // Default value if not provided
 }) => {
   if (!leaveDays || leaveDays.length === 0) {
     return <>{children}</>;
@@ -39,7 +41,7 @@ export const LeaveTooltip: React.FC<LeaveTooltipProps> = ({
         </TooltipTrigger>
         <TooltipContent className="p-2 max-w-xs" side="top">
           <div className="space-y-1">
-            <p className="font-semibold text-sm">Leave days this week:</p>
+            <p className="font-semibold text-sm">{leaveType} days this week:</p>
             <ul className="space-y-1 text-xs">
               {sortedLeaveDays.map((day) => (
                 <li key={day.date} className="flex justify-between gap-4">

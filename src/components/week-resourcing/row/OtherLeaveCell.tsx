@@ -46,7 +46,7 @@ export const OtherLeaveCell: React.FC<OtherLeaveCellProps> = ({
           <div className="w-full h-full flex justify-center items-center cursor-pointer">
             {leaveValue > 0 ? (
               <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center font-medium">
-                {leaveValue}
+                OL
               </div>
             ) : (
               <span className="text-muted-foreground">-</span>
