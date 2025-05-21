@@ -96,7 +96,16 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
     <TableRow key={member.id} className={`h-9 ${rowBg} hover:bg-muted/20`}>
       <MemberNameCell member={member} />
       <ProjectCountCell projectCount={projectCount} />
-      <OfficeLocationCell member={member} />
+      
+      {/* Holiday Cell moved before OfficeLocationCell */}
+      <HolidayCell 
+        holidayHours={holidayHours} 
+        memberId={member.id}
+        memberOffice={member.location}
+        weekStartDate={weekStartDate}
+        onLeaveInputChange={onLeaveInputChange}
+      />
+      
       <CapacityBarCell availableHours={Math.max(0, weeklyCapacity - totalHours - annualLeave - otherLeave - holidayHours)} totalCapacity={weeklyCapacity} />
       
       {/* Annual Leave Cell with hours value */}
@@ -111,14 +120,8 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         onNotesChange={handleNotesChange}
       />
       
-      {/* Holiday Cell with office matching */}
-      <HolidayCell 
-        holidayHours={holidayHours} 
-        memberId={member.id}
-        memberOffice={member.location}
-        weekStartDate={weekStartDate}
-        onLeaveInputChange={onLeaveInputChange}
-      />
+      {/* Office Location Cell moved after all leave cells */}
+      <OfficeLocationCell member={member} />
       
       {/* Project allocation cells */}
       <ProjectAllocationCells 
