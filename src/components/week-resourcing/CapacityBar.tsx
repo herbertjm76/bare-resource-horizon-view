@@ -32,7 +32,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
     <div className="flex items-center justify-center w-full">
       <div className="flex-1 flex justify-center items-center gap-1.5">
         {/* Capacity boxes - direct without container */}
-        <div className="flex gap-[0.3px]">
+        <div className="flex gap-[0.5px]">
           {Array.from({ length: 5 }).map((_, index) => {
             // Each box represents 20% (index 0 = 0-20%, index 1 = 20-40%, etc.)
             const boxStartPercent = index * 20;
