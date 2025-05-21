@@ -117,15 +117,25 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
         }))
       : [];
 
+    // Fix the TypeScript error by properly casting the type property
     const processedRates = Array.isArray(ratesData)
-      ? ratesData.map(r => ({
-          id: r.id,
-          type: r.type === "role" ? "role" : "location",
-          reference_id: r.reference_id,
-          value: Number(r.value),
-          unit: r.unit === "hour" || r.unit === "day" || r.unit === "week" ? r.unit : "hour",
-          company_id: (r.company_id ?? companyId).toString()
-        }))
+      ? ratesData.map(r => {
+          // Validate that type is either 'role' or 'location'
+          const rateType = r.type === "role" ? "role" as const : "location" as const;
+          // Validate that unit is one of the allowed values
+          const rateUnit = r.unit === "hour" || r.unit === "day" || r.unit === "week" 
+            ? r.unit as "hour" | "day" | "week" 
+            : "hour" as const;
+            
+          return {
+            id: r.id,
+            type: rateType,
+            reference_id: r.reference_id,
+            value: Number(r.value),
+            unit: rateUnit,
+            company_id: (r.company_id ?? companyId).toString()
+          };
+        })
       : [];
 
     return {
