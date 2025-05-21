@@ -7,7 +7,7 @@ import { OfficeLocationCell } from './row/OfficeLocationCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
 import { AnnualLeaveCell } from './row/AnnualLeaveCell';
 import { OtherLeaveCell } from './row/OtherLeaveCell';
-import { HolidayCell } from './row/HolidayCell'; // We'll create this component
+import { HolidayCell } from './row/HolidayCell'; 
 import { ProjectAllocationCells } from './row/ProjectAllocationCells';
 
 interface LeaveDay {
