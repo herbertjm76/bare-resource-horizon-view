@@ -24,7 +24,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   };
   const boxColor = getBoxColor();
   return <div className="flex items-center justify-center w-full">
-      <div className="flex-1 flex justify-center items-center gap-1.0\n">
+      <div className="flex-1 flex justify-center items-center gap-1.5">
         {/* Capacity boxes - direct without container */}
         <div className="flex gap-[0.5px]">
           {Array.from({
