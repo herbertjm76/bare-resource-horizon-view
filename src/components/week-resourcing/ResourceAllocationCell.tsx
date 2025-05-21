@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -22,6 +22,11 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
   const [value, setValue] = useState<string>(hours.toString());
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  
+  // Update local state when props change
+  useEffect(() => {
+    setValue(hours.toString());
+  }, [hours]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Only allow valid numbers

@@ -37,8 +37,13 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
   const allocationMap = useMemo(() => {
     const map = new Map();
     
+    // Log allocations for debugging
+    console.log('Processing allocations:', allocations);
+    
     allocations.forEach(allocation => {
       const key = `${allocation.resource_id}:${allocation.project_id}`;
+      // Log each allocation we're processing
+      console.log(`Found allocation: ${allocation.resource_id} -> ${allocation.project_id}: ${allocation.hours}h`);
       map.set(key, allocation.hours);
     });
     
@@ -134,7 +139,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                 <TableCell className="text-center">
                   <div className="flex flex-col items-center">
                     <span className="font-medium">{totalHours}h</span>
-                    <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "warning" : "outline"}>
+                    <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "outline" : "outline"}>
                       {utilization}%
                     </Badge>
                   </div>

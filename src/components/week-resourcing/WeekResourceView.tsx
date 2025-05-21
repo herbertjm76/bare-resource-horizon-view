@@ -26,8 +26,9 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   const [loadingMembers, setLoadingMembers] = useState<boolean>(true);
   const [membersError, setMembersError] = useState<Error | null>(null);
   
-  // Format week start date for allocations
+  // Format week start date for allocations - ensure it's Monday
   const weekStartDate = getWeekStartDate(selectedWeek).toISOString().split('T')[0];
+  console.log('Week start date for allocations:', weekStartDate);
 
   // Get projects for the company
   const { data: projects, isLoading: isLoadingProjects, error: projectsError } = useQuery({
@@ -61,6 +62,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
           throw new Error(`Error fetching projects: ${error.message}`);
         }
         
+        console.log('Fetched projects:', data);
         return data || [];
       } catch (err) {
         console.error('Failed to fetch projects:', err);
@@ -103,6 +105,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
           ...(preRegisteredMembers || [])
         ];
         
+        console.log('Fetched members:', allMembers);
         setMembers(allMembers);
       } catch (error) {
         console.error('Error fetching members:', error);
@@ -121,21 +124,30 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     queryFn: async () => {
       if (!company?.id) return [];
       
-      const { data, error } = await supabase
-        .from('project_resource_allocations')
-        .select(`
-          id,
-          project_id,
-          resource_id,
-          resource_type,
-          hours,
-          week_start_date
-        `)
-        .eq('company_id', company.id)
-        .eq('week_start_date', weekStartDate);
+      try {
+        const { data, error } = await supabase
+          .from('project_resource_allocations')
+          .select(`
+            id,
+            project_id,
+            resource_id,
+            resource_type,
+            hours,
+            week_start_date
+          `)
+          .eq('company_id', company.id)
+          .eq('week_start_date', weekStartDate);
+          
+        if (error) {
+          throw new Error(`Error fetching allocations: ${error.message}`);
+        }
         
-      if (error) throw new Error(`Error fetching allocations: ${error.message}`);
-      return data || [];
+        console.log('Fetched allocations for week:', weekStartDate, data);
+        return data || [];
+      } catch (error) {
+        console.error('Error in allocation query:', error);
+        return [];
+      }
     },
     enabled: !!company?.id
   });
