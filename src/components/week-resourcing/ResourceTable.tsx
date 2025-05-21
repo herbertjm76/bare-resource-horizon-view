@@ -5,6 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { ResourceTableHeader } from './ResourceTableHeader';
 import { ResourceTableRow } from './ResourceTableRow';
 import { useResourceTableData } from '@/hooks/useResourceTableData';
+import { ResourceTableFooter } from './ResourceTableFooter';
 
 interface ResourceTableProps {
   projects: any[];
@@ -33,6 +34,19 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     handleLeaveInputChange,
     handleRemarksUpdate
   } = useResourceTableData(projects, members, allocations, weekStartDate);
+
+  // Ensure we have project totals for footer
+  const projectHourTotals = projects.map(project => {
+    let total = 0;
+    members.forEach(member => {
+      const key = `${member.id}:${project.id}`;
+      total += allocationMap.get(key) || 0;
+    });
+    return {
+      projectId: project.id,
+      totalHours: total
+    };
+  });
 
   return (
     <TooltipProvider>
@@ -79,6 +93,12 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                 );
               })}
             </TableBody>
+            
+            {/* Add footer with project hour totals */}
+            <ResourceTableFooter
+              projects={projects}
+              projectHourTotals={projectHourTotals}
+            />
           </Table>
         </div>
       </div>

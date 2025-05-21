@@ -17,9 +17,6 @@ export const OfficeLocationCell: React.FC<OfficeLocationCellProps> = ({ member }
   // Find the matching location in office settings
   const locationData = locations.find(loc => loc.code === locationCode);
   
-  // Use the emoji from office settings if found, otherwise use default emoji
-  const emoji = locationData?.emoji || '🏢';
-  
   // Use location name from settings if found
   const locationName = locationData 
     ? `${locationData.city}, ${locationData.country}`
@@ -30,7 +27,7 @@ export const OfficeLocationCell: React.FC<OfficeLocationCellProps> = ({ member }
       <div className="flex items-center justify-center gap-1 py-1">
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="text-lg">{emoji}</span>
+            <span className="text-sm font-medium">{locationCode}</span>
           </TooltipTrigger>
           <TooltipContent>
             <p>{locationName}</p>

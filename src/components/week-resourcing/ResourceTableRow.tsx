@@ -7,6 +7,7 @@ import { OfficeLocationCell } from './row/OfficeLocationCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
 import { AnnualLeaveCell } from './row/AnnualLeaveCell';
 import { OtherLeaveCell } from './row/OtherLeaveCell';
+import { HolidayCell } from './row/HolidayCell'; // We'll create this component
 import { ProjectAllocationCells } from './row/ProjectAllocationCells';
 
 interface LeaveDay {
@@ -59,6 +60,12 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
 
   const otherLeave = otherLeaveNum + secondLeaveNum;
   
+  // Get holiday values (defaulting to 0)
+  const holidayValue = manualLeaveData[member.id]?.['holiday'] || 0;
+  const holidayHours = typeof holidayValue === 'string'
+    ? parseFloat(holidayValue) || 0
+    : holidayValue;
+  
   // Get notes for this member
   const memberNotes = manualLeaveData[member.id]?.['notes'] || '';
   
@@ -90,7 +97,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       <MemberNameCell member={member} />
       <ProjectCountCell projectCount={projectCount} />
       <OfficeLocationCell member={member} />
-      <CapacityBarCell availableHours={Math.max(0, weeklyCapacity - totalHours - annualLeave - otherLeave)} totalCapacity={weeklyCapacity} />
+      <CapacityBarCell availableHours={Math.max(0, weeklyCapacity - totalHours - annualLeave - otherLeave - holidayHours)} totalCapacity={weeklyCapacity} />
       
       {/* Annual Leave Cell with hours value */}
       <AnnualLeaveCell annualLeave={annualLeave} leaveDays={leaveDays} />
@@ -102,6 +109,13 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         notes={typeof memberNotes === 'string' ? memberNotes : ''}
         onLeaveInputChange={onLeaveInputChange}
         onNotesChange={handleNotesChange}
+      />
+      
+      {/* Holiday Cell */}
+      <HolidayCell 
+        holidayHours={holidayHours} 
+        memberId={member.id}
+        onLeaveInputChange={onLeaveInputChange}
       />
       
       {/* Project allocation cells */}

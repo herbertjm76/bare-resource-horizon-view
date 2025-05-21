@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -31,22 +30,69 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({
   return (
     <TableHeader>
       <TableRow className="border-b">
-        {/* Fixed columns */}
-        <TableHead className="sticky-column sticky-left-0 w-[60px] bg-muted/20 border-r z-20 text-center">Name</TableHead>
-        <TableHead className="sticky-column sticky-left-12 w-10 bg-muted/20 border-r z-20 text-center">#</TableHead>
+        {/* Name column - 150px */}
+        <TableHead className="sticky-column sticky-left-0 w-[150px] bg-muted/20 border-r z-20 text-center">Name</TableHead>
+        
+        {/* Project count column with circled # */}
+        <TableHead className="sticky-column sticky-left-12 w-10 bg-muted/20 border-r z-20 text-center">
+          <Tooltip>
+            <TooltipTrigger className="w-full h-full flex items-center justify-center">
+              <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-xs font-medium">
+                #
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Number of Projects</p>
+            </TooltipContent>
+          </Tooltip>
+        </TableHead>
+        
+        {/* Office column - code only */}
         <TableHead className="sticky-column sticky-left-24 w-10 bg-muted/20 border-r z-20 text-center">Office</TableHead>
+        
+        {/* Capacity column */}
         <TableHead className="sticky-column sticky-left-36 w-[120px] bg-muted/20 border-r z-20 text-center">Capacity</TableHead>
         
-        {/* Leave columns with compact badges */}
+        {/* Annual Leave column with tooltip */}
         <TableHead className="bg-muted/20 border-r text-center w-[50px]">
-          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center text-xs font-medium mx-auto">
-            AL
-          </div>
+          <Tooltip>
+            <TooltipTrigger className="w-full h-full">
+              <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center text-xs font-medium mx-auto">
+                AL
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Annual Leave</p>
+            </TooltipContent>
+          </Tooltip>
         </TableHead>
+        
+        {/* Other Leave column with tooltip */}
         <TableHead className="bg-muted/20 border-r text-center w-[50px]">
-          <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center text-xs font-medium mx-auto">
-            OL
-          </div>
+          <Tooltip>
+            <TooltipTrigger className="w-full h-full">
+              <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center text-xs font-medium mx-auto">
+                OL
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Other Leave</p>
+            </TooltipContent>
+          </Tooltip>
+        </TableHead>
+        
+        {/* Holiday column with tooltip */}
+        <TableHead className="bg-muted/20 border-r text-center w-[50px]">
+          <Tooltip>
+            <TooltipTrigger className="w-full h-full">
+              <div className="w-8 h-8 rounded-full bg-green-100 text-green-800 flex items-center justify-center text-xs font-medium mx-auto">
+                HO
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Holiday</p>
+            </TooltipContent>
+          </Tooltip>
         </TableHead>
 
         {/* Project columns - dynamically generated with distinct styling */}

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Calendar, Filter, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { addWeeks, subWeeks, format, startOfWeek, addDays } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -70,7 +70,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
   return (
     <div className="flex flex-wrap gap-4 mb-4 items-center">
       {/* Week selector with dropdown */}
-      <div className="flex border rounded-md p-2 items-center shadow-sm mr-auto">
+      <div className="flex border rounded-md p-2 items-center shadow-sm">
         <Button 
           variant="ghost" 
           size="sm" 
@@ -143,7 +143,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
         </Button>
       </div>
       
-      {/* Filter button with popover */}
+      {/* Filter button moved next to the week selector */}
       <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
         <PopoverTrigger asChild>
           <div>
@@ -169,6 +169,9 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
           />
         </PopoverContent>
       </Popover>
+      
+      {/* Spacer to push other elements to the right if needed */}
+      <div className="flex-grow"></div>
     </div>
   );
 };

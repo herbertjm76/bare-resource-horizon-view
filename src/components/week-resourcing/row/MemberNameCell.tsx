@@ -21,7 +21,7 @@ export const MemberNameCell: React.FC<MemberNameCellProps> = ({ member }) => {
   };
 
   return (
-    <TableCell className="sticky-column sticky-left-0 border-r font-medium py-1 text-center w-[60px]">
+    <TableCell className="sticky-column sticky-left-0 border-r font-medium py-1 text-center w-[150px]">
       <Tooltip>
         <TooltipTrigger asChild>
           <span>{getFirstName()}</span>

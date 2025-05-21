@@ -1,46 +1,75 @@
 
 import React from 'react';
-import { TableFooter, TableRow, TableCell } from '@/components/ui/table';
+import { TableCell, TableFooter, TableRow } from '@/components/ui/table';
+
+interface ProjectTotal {
+  projectId: string;
+  totalHours: number;
+}
 
 interface ResourceTableFooterProps {
   projects: any[];
-  projectTotals: Map<string, number>;
+  projectHourTotals: ProjectTotal[];
 }
 
-export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
-  projects,
-  projectTotals
+export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({ 
+  projects, 
+  projectHourTotals 
 }) => {
+  // Ensure we always show at least 15 project columns
+  const minProjectsToShow = 15;
+  const projectsToRender = [...projects];
+  
+  // Add empty placeholders if we have less than 15 projects
+  if (projects.length < minProjectsToShow) {
+    const emptyProjectsNeeded = minProjectsToShow - projects.length;
+    for (let i = 0; i < emptyProjectsNeeded; i++) {
+      projectsToRender.push({
+        id: `empty-project-${i}`,
+        isEmpty: true
+      });
+    }
+  }
+
   return (
     <TableFooter>
-      <TableRow className="bg-muted/20 font-medium">
-        {/* First column - Total label */}
-        <TableCell 
-          colSpan={4} 
-          className="sticky-column sticky-left-0 border-r border-t bg-muted/30 z-20 text-brand-primary"
-        >
-          Total Hours Per Project
-        </TableCell>
+      <TableRow className="bg-muted/30 font-medium">
+        {/* Name column - displays "Total" */}
+        <TableCell className="sticky-column sticky-left-0 border-r text-center w-[150px]">Total</TableCell>
         
-        {/* Leave columns - empty cells */}
-        <TableCell className="border-r border-t text-center">-</TableCell>
-        <TableCell className="border-r border-t text-center">-</TableCell>
-        
-        {/* Project columns - show totals for each */}
-        {projects.map((project, index) => {
-          // Get the total hours for this project
-          const totalHours = projectTotals.get(project.id) || 0;
+        {/* Empty cells for the fixed columns */}
+        <TableCell className="border-r"></TableCell>
+        <TableCell className="border-r"></TableCell>
+        <TableCell className="border-r"></TableCell>
+        <TableCell className="border-r"></TableCell>
+        <TableCell className="border-r"></TableCell>
+        <TableCell className="border-r"></TableCell>
+
+        {/* Project total cells */}
+        {projectsToRender.map((project, index) => {
+          if (project.isEmpty) {
+            const isEven = index % 2 === 0;
+            const bgClass = isEven ? "bg-muted/30" : "bg-muted/10";
+            return (
+              <TableCell 
+                key={`total-empty-${index}`} 
+                className={`border-r text-center ${bgClass}`}
+              ></TableCell>
+            );
+          }
           
-          // Apply same alternating pattern
+          const projectTotal = projectHourTotals.find(pt => pt.projectId === project.id);
+          const totalHours = projectTotal ? projectTotal.totalHours : 0;
+          
           const isEven = index % 2 === 0;
           const bgClass = isEven ? "bg-muted/30" : "bg-muted/10";
           
           return (
             <TableCell 
-              key={project.id} 
-              className={`${bgClass} border-r border-t text-center font-bold`}
+              key={`total-${project.id}`} 
+              className={`border-r text-center font-medium ${bgClass}`}
             >
-              {totalHours}
+              {totalHours > 0 ? totalHours : '-'}
             </TableCell>
           );
         })}
