@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState } from 'react';
 import { 
   Table, 
@@ -204,8 +205,9 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                 const otherLeave = getLeaveHours(member.id, 'other') || 0;
                 const totalLeave = annualLeave + sickLeave + otherLeave;
                 
-                // Calculate available hours after leave
-                const availableHours = Math.max(0, weeklyCapacity - totalLeave);
+                // Calculate available hours after allocated hours and leave
+                const allocatedHours = totalHours + totalLeave;
+                const availableHours = Math.max(0, weeklyCapacity - allocatedHours);
                 const availablePercentage = (availableHours / weeklyCapacity) * 100;
                 
                 // Alternating row background
