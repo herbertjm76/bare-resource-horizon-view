@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState } from 'react';
 import { 
   Table, 
@@ -10,7 +9,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ResourceAllocationCell } from '@/components/week-resourcing/ResourceAllocationCell';
-import { Progress } from '@/components/ui/progress';
+import { CapacityGauge } from '@/components/week-resourcing/CapacityGauge';
 import { 
   Tooltip,
   TooltipContent,
@@ -227,16 +226,13 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                       </Tooltip>
                     </TableCell>
                     
-                    {/* Capacity Progress Bar */}
+                    {/* Capacity Gauge - centered */}
                     <TableCell className="sticky-column sticky-left-12 border-r p-0 align-middle">
-                      <div className="px-2 py-1">
-                        <div className="flex items-center space-x-2">
-                          <Progress 
-                            value={availablePercentage} 
-                            className="h-2.5 bg-gray-200" 
-                          />
-                          <span className="text-xs font-medium">{availableHours}/{weeklyCapacity}</span>
-                        </div>
+                      <div className="flex justify-center">
+                        <CapacityGauge 
+                          availableHours={availableHours} 
+                          totalCapacity={weeklyCapacity} 
+                        />
                       </div>
                     </TableCell>
                     
