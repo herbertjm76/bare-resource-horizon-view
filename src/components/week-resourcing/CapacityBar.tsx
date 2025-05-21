@@ -28,9 +28,6 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
 
   const boxColor = getBoxColor();
   
-  // Instead of rounding to whole boxes, we'll calculate exactly how many boxes should be filled
-  // by their percentage. Each box represents 20% of capacity.
-  
   return (
     <div className="flex items-center space-x-2 w-full py-1">
       <div className="flex-1 flex space-x-0.5 max-w-24">
@@ -39,7 +36,10 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
           // Calculate if this box should be filled based on percentage
           // Each box represents 20% (index 0 = 0-20%, index 1 = 20-40%, etc.)
           const boxStartPercent = index * 20;
-          const boxShouldBeFilled = percentageUsed > boxStartPercent;
+          const boxEndPercent = (index + 1) * 20;
+          
+          // A box should be filled only if the percentage used is greater than the box's starting percentage
+          const boxShouldBeFilled = percentageUsed >= boxStartPercent;
           
           return (
             <Tooltip key={index}>
