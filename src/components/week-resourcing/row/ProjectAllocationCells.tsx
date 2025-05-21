@@ -18,19 +18,18 @@ export const ProjectAllocationCells: React.FC<ProjectAllocationCellsProps> = ({
 }) => {
   return (
     <>
-      {projects.map(project => {
+      {projects.map((project, index) => {
         const key = `${member.id}:${project.id}`;
         const hours = allocationMap.get(key) || 0;
         
-        // For debugging
-        if (project.name.includes('HERB')) {
-          console.log(`Project HERB allocation for ${member.first_name}: ${hours} hours`);
-        }
+        // Match the same alternating pattern as in the header
+        const isEven = index % 2 === 0;
+        const bgClass = isEven ? "bg-muted/30" : "bg-muted/10";
         
         return (
           <TableCell 
             key={`${member.id}-${project.id}`} 
-            className="leave-cell text-center border-r p-0 align-middle"
+            className={`leave-cell text-center border-r p-0 align-middle ${bgClass}`}
           >
             <ResourceAllocationCell 
               hours={hours}
