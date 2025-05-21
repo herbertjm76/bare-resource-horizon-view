@@ -10,6 +10,12 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { ResourceAllocationCell } from '@/components/week-resourcing/ResourceAllocationCell';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip';
 
 interface ResourceTableProps {
   projects: any[];
@@ -37,13 +43,8 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
   const allocationMap = useMemo(() => {
     const map = new Map();
     
-    // Log allocations for debugging
-    console.log('Processing allocations:', allocations);
-    
     allocations.forEach(allocation => {
       const key = `${allocation.resource_id}:${allocation.project_id}`;
-      // Log each allocation we're processing
-      console.log(`Found allocation: ${allocation.resource_id} -> ${allocation.project_id}: ${allocation.hours}h`);
       map.set(key, allocation.hours);
     });
     
@@ -82,88 +83,100 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed';
   };
 
+  // Helper to get just the first name
+  const getFirstName = (member: any): string => {
+    if (!member) return 'Unknown';
+    return member.first_name || 'Unnamed';
+  };
+
   return (
-    <div className="rounded-md border shadow-sm overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/50">
-            <TableHead className="w-[200px]">Resources</TableHead>
-            {projects.map(project => (
-              <TableHead key={project.id} className="text-center">
-                <div className="flex flex-col items-center">
-                  <span className="font-semibold">{project.code}</span>
-                  <span className="text-xs text-muted-foreground truncate max-w-[120px]" title={project.name}>
-                    {project.name}
-                  </span>
-                </div>
-              </TableHead>
-            ))}
-            <TableHead className="text-center">Total</TableHead>
-          </TableRow>
-        </TableHeader>
-        
-        <TableBody>
-          {Array.from(membersMap.values()).map((member: any) => {
-            // Get weekly capacity or default to 40
-            const weeklyCapacity = member.weekly_capacity || 40;
-            const totalHours = memberTotals.get(member.id) || 0;
-            const utilization = Math.round((totalHours / weeklyCapacity) * 100);
-            
-            return (
-              <TableRow key={member.id}>
-                <TableCell className="font-medium">
-                  <div className="flex flex-col">
-                    <span>{getMemberName(member)}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {member.job_title || 'Team Member'}
-                    </span>
-                  </div>
-                </TableCell>
-                
-                {projects.map(project => {
-                  const key = `${member.id}:${project.id}`;
-                  const hours = allocationMap.get(key) || 0;
+    <TooltipProvider>
+      <div className="rounded-md border shadow-sm overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="w-[120px]">Resources</TableHead>
+              {projects.map(project => (
+                <TableHead key={project.id} className="text-center">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="font-semibold cursor-help">{project.code}</span>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{project.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+              ))}
+              <TableHead className="text-center">Total</TableHead>
+            </TableRow>
+          </TableHeader>
+          
+          <TableBody>
+            {Array.from(membersMap.values()).map((member: any) => {
+              // Get weekly capacity or default to 40
+              const weeklyCapacity = member.weekly_capacity || 40;
+              const totalHours = memberTotals.get(member.id) || 0;
+              const utilization = Math.round((totalHours / weeklyCapacity) * 100);
+              
+              return (
+                <TableRow key={member.id}>
+                  <TableCell className="font-medium">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>{getFirstName(member)}</span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{getMemberName(member)}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TableCell>
                   
-                  return (
-                    <TableCell key={`${member.id}-${project.id}`} className="text-center">
-                      <ResourceAllocationCell 
-                        hours={hours}
-                        resourceId={member.id}
-                        projectId={project.id}
-                        weekStartDate={weekStartDate}
-                      />
-                    </TableCell>
-                  );
-                })}
-                
-                <TableCell className="text-center">
-                  <div className="flex flex-col items-center">
-                    <span className="font-medium">{totalHours}h</span>
-                    <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "outline" : "outline"}>
-                      {utilization}%
-                    </Badge>
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-        
-        {/* Totals row */}
-        <TableRow className="bg-muted/30 font-medium">
-          <TableCell>Project Totals</TableCell>
+                  {projects.map(project => {
+                    const key = `${member.id}:${project.id}`;
+                    const hours = allocationMap.get(key) || 0;
+                    
+                    return (
+                      <TableCell key={`${member.id}-${project.id}`} className="text-center">
+                        <ResourceAllocationCell 
+                          hours={hours}
+                          resourceId={member.id}
+                          projectId={project.id}
+                          weekStartDate={weekStartDate}
+                        />
+                      </TableCell>
+                    );
+                  })}
+                  
+                  <TableCell className="text-center">
+                    <div className="flex flex-col items-center">
+                      <span className="font-medium">{totalHours}h</span>
+                      <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "outline" : "outline"}>
+                        {utilization}%
+                      </Badge>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
           
-          {projects.map(project => (
-            <TableCell key={`total-${project.id}`} className="text-center">
-              {projectTotals.get(project.id) || 0}h
+          {/* Totals row */}
+          <TableRow className="bg-muted/30 font-medium">
+            <TableCell>Project Totals</TableCell>
+            
+            {projects.map(project => (
+              <TableCell key={`total-${project.id}`} className="text-center">
+                {projectTotals.get(project.id) || 0}h
+              </TableCell>
+            ))}
+            
+            <TableCell className="text-center">
+              {Array.from(projectTotals.values()).reduce((sum, hours) => sum + hours, 0)}h
             </TableCell>
-          ))}
-          
-          <TableCell className="text-center">
-            {Array.from(projectTotals.values()).reduce((sum, hours) => sum + hours, 0)}h
-          </TableCell>
-        </TableRow>
-      </Table>
-    </div>
+          </TableRow>
+        </Table>
+      </div>
+    </TooltipProvider>
   );
 };
