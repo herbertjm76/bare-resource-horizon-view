@@ -15,7 +15,6 @@ import Profile from "./pages/Profile";
 import TeamMembers from "./pages/TeamMembers";
 import TeamWorkload from "./pages/TeamWorkload";
 import TeamAnnualLeave from "./pages/TeamAnnualLeave";
-import WeeklyOverview from "./pages/WeeklyOverview";
 import WeekResourcing from "./pages/WeekResourcing";
 import ProjectResourcing from "./pages/ProjectResourcing";
 import Help from "./pages/Help";
@@ -61,7 +60,6 @@ const AppRoutes = () => {
       
       {/* Protected routes requiring authentication */}
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/weekly-overview" element={<WeeklyOverview />} />
       <Route path="/week-resourcing" element={<WeekResourcing />} />
       <Route path="/project-resourcing" element={<ProjectResourcing />} />
       <Route path="/projects" element={<Projects />} />

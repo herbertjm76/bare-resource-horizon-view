@@ -1,12 +1,11 @@
 
 import { 
   LayoutDashboard,
-  LayoutList,
+  Calendar,
   GanttChartSquare,
   FolderKanban,
   UserSquare2,
   Briefcase,
-  Calendar,
   Flag,
   HelpCircle
 } from "lucide-react"
@@ -19,11 +18,6 @@ export const navigationItems = [
         title: "Dashboard",
         url: "/dashboard",
         icon: LayoutDashboard,
-      },
-      {
-        title: "Weekly Overview",
-        url: "/weekly-overview",
-        icon: LayoutList,
       },
       {
         title: "Week Resourcing",
