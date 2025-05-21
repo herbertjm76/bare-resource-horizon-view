@@ -19,16 +19,34 @@ interface OrganizationFieldsProps {
 }
 
 const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register, control }) => {
-  const { locations, loading } = useOfficeSettings();
+  const { locations, departments, loading } = useOfficeSettings();
 
   return (
     <>
       <div className="space-y-2">
         <Label htmlFor="department">Department</Label>
-        <Input 
-          id="department"
-          placeholder="Department"
-          {...register('department')}
+        <Controller
+          name="department"
+          control={control}
+          render={({ field }) => (
+            <Select
+              disabled={loading}
+              value={field.value}
+              onValueChange={field.onChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select department" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Not Assigned</SelectItem>
+                {departments.map((department) => (
+                  <SelectItem key={department.id} value={department.name}>
+                    {department.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         />
       </div>
       <div className="space-y-2">

@@ -1,14 +1,16 @@
+
 import React, { useEffect, useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Folder, Layers, MapPin, Briefcase, Currency, Calendar, AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
+import { Folder, Layers, MapPin, Briefcase, Currency, Calendar, AlertCircle, RefreshCw, Loader2, Building } from 'lucide-react';
 import { CountriesTab } from '@/components/settings/CountriesTab';
 import { StagesTab } from '@/components/settings/StagesTab';
 import { LocationsTab } from '@/components/settings/LocationsTab';
 import { RolesTab } from '@/components/settings/RolesTab';
 import { RatesTab } from '@/components/settings/RatesTab';
 import { HolidaysTab } from '@/components/settings/HolidaysTab';
+import { DepartmentsTab } from '@/components/settings/DepartmentsTab';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useNavigate } from 'react-router-dom';
 import { useCompany } from '@/context/CompanyContext';
@@ -19,7 +21,7 @@ import { toast } from 'sonner';
 import { useAuthorization } from '@/hooks/useAuthorization';
 
 const tabBarClass =
-  "w-full mb-6 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-6 gap-2 flex-nowrap rounded-none bg-transparent p-0";
+  "w-full mb-6 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-7 gap-2 flex-nowrap rounded-none bg-transparent p-0";
 
 const HEADER_HEIGHT = 56;
 
@@ -138,6 +140,10 @@ const OfficeSettings = () => {
                       <MapPin className="h-4 w-4" />
                       <span className="hidden xs:inline">Locations</span>
                     </TabsTrigger>
+                    <TabsTrigger value="departments" className="flex items-center gap-2 min-w-max px-4 h-10">
+                      <Building className="h-4 w-4" />
+                      <span className="hidden xs:inline">Departments</span>
+                    </TabsTrigger>
                     <TabsTrigger value="roles" className="flex items-center gap-2 min-w-max px-4 h-10">
                       <Briefcase className="h-4 w-4" />
                       <span className="hidden xs:inline">Roles</span>
@@ -160,6 +166,9 @@ const OfficeSettings = () => {
                     </TabsContent>
                     <TabsContent value="locations">
                       <LocationsTab />
+                    </TabsContent>
+                    <TabsContent value="departments">
+                      <DepartmentsTab />
                     </TabsContent>
                     <TabsContent value="roles">
                       <RolesTab />
