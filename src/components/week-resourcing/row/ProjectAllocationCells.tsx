@@ -29,7 +29,7 @@ export const ProjectAllocationCells: React.FC<ProjectAllocationCellsProps> = ({
         return (
           <TableCell 
             key={`${member.id}-${project.id}`} 
-            className={`leave-cell text-center border-r p-0 align-middle ${bgClass}`}
+            className={`leave-cell text-center border-r p-0 align-middle ${bgClass} w-[40px]`}
           >
             <ResourceAllocationCell 
               hours={hours}

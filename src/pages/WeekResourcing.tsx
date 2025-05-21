@@ -15,6 +15,8 @@ const WeekResourcing = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
   const [filters, setFilters] = useState({
     office: "all",
+    country: "all",
+    manager: "all",
     searchTerm: ""
   });
 
@@ -52,7 +54,6 @@ const WeekResourcing = () => {
                 <h1 className="font-bold tracking-tight text-brand-primary text-3xl">Week Resourcing</h1>
               </div>
               
-              {/* Updated control bar with reordered elements */}
               <WeekResourceControls 
                 selectedWeek={selectedWeek} 
                 setSelectedWeek={setSelectedWeek} 

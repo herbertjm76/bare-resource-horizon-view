@@ -81,7 +81,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
               })}
             </TableBody>
             
-            {/* Totals row */}
+            {/* Project totals footer */}
             <ResourceTableFooter 
               projects={projects} 
               projectTotals={projectTotals} 

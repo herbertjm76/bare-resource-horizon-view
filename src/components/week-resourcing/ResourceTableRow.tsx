@@ -8,7 +8,6 @@ import { CapacityBarCell } from './row/CapacityBarCell';
 import { AnnualLeaveCell } from './row/AnnualLeaveCell';
 import { OtherLeaveCell } from './row/OtherLeaveCell';
 import { ProjectAllocationCells } from './row/ProjectAllocationCells';
-import { TotalHoursCell } from './row/TotalHoursCell';
 
 interface LeaveDay {
   date: string;
@@ -63,15 +62,6 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   // Get notes for this member
   const memberNotes = manualLeaveData[member.id]?.['notes'] || '';
   
-  const totalLeave = annualLeave + otherLeave;
-  
-  // Calculate available hours after allocated hours and leave
-  const allocatedHours = totalHours + totalLeave;
-  const availableHours = Math.max(0, weeklyCapacity - allocatedHours);
-  
-  // For debugging
-  console.log(`ResourceTableRow for ${member.first_name}: totalHours=${totalHours}, leave=${totalLeave}, availableHours=${availableHours}, weeklyCapacity=${weeklyCapacity}`);
-  
   // Alternating row background
   const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-muted/10';
 
@@ -85,7 +75,9 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       <MemberNameCell member={member} />
       <ProjectCountCell projectCount={projectCount} />
       <OfficeLocationCell member={member} />
-      <CapacityBarCell availableHours={availableHours} totalCapacity={weeklyCapacity} />
+      <CapacityBarCell availableHours={Math.max(0, weeklyCapacity - totalHours - annualLeave - otherLeave)} totalCapacity={weeklyCapacity} />
+      
+      {/* Annual Leave Cell with compact badge */}
       <AnnualLeaveCell annualLeave={annualLeave} leaveDays={leaveDays} />
       
       {/* Combined Other Leave Cell with Notes */}
@@ -104,9 +96,6 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         allocationMap={allocationMap}
         weekStartDate={weekStartDate}
       />
-      
-      {/* Total Column with Utilization Badge */}
-      <TotalHoursCell totalHours={totalHours} weeklyCapacity={weeklyCapacity} />
     </TableRow>
   );
 };

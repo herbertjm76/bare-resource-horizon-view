@@ -7,6 +7,8 @@ import { addWeeks, subWeeks, format, startOfWeek, addDays } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
+import { FilterButton } from '@/components/resources/filters/FilterButton';
+import { AdvancedFilters } from '@/components/resources/filters/AdvancedFilters';
 
 interface WeekResourceControlsProps {
   selectedWeek: Date;
@@ -27,6 +29,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
   onFilterChange
 }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   
   const handlePreviousWeek = () => {
     setSelectedWeek(subWeeks(selectedWeek, 1));
@@ -54,6 +57,15 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
   const activeFilterCount = Object.values(filters).filter(val => 
     val !== '' && val !== 'all'
   ).length;
+
+  // Mock options for filters
+  const officeOptions = ['London', 'New York', 'Singapore', 'Tokyo', 'Paris'];
+  const countryOptions = ['UK', 'USA', 'Singapore', 'Japan', 'France'];
+  const managerOptions = [
+    { id: '1', name: 'John Smith' },
+    { id: '2', name: 'Jane Doe' },
+    { id: '3', name: 'Alex Johnson' }
+  ];
 
   return (
     <div className="flex flex-wrap gap-4 mb-4 items-center">
@@ -131,39 +143,32 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
         </Button>
       </div>
       
-      {/* Office filter */}
-      <div>
-        <Select 
-          value={filters.office} 
-          onValueChange={(value) => onFilterChange('office', value)}
-        >
-          <SelectTrigger className="h-10 min-w-[160px]">
-            <SelectValue placeholder="All Offices" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Offices</SelectItem>
-            <SelectItem value="london">London</SelectItem>
-            <SelectItem value="new_york">New York</SelectItem>
-            <SelectItem value="singapore">Singapore</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      {/* Filter button */}
-      {activeFilterCount > 0 ? (
-        <Button variant="default" className="h-10 gap-2">
-          <Filter className="h-4 w-4" />
-          <span>Filters</span>
-          <Badge variant="secondary" className="ml-1 bg-white text-primary">
-            {activeFilterCount}
-          </Badge>
-        </Button>
-      ) : (
-        <Button variant="outline" className="h-10 gap-2">
-          <Filter className="h-4 w-4" />
-          <span>Filters</span>
-        </Button>
-      )}
+      {/* Filter button with popover */}
+      <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <PopoverTrigger asChild>
+          <div>
+            <FilterButton 
+              activeFiltersCount={activeFilterCount} 
+              onClick={() => setFiltersOpen(!filtersOpen)}
+            />
+          </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-80" align="end">
+          <AdvancedFilters
+            filters={{
+              office: filters.office,
+              country: 'all',
+              manager: 'all',
+            }}
+            onFilterChange={onFilterChange}
+            officeOptions={officeOptions}
+            countryOptions={countryOptions}
+            managerOptions={managerOptions}
+            onClose={() => setFiltersOpen(false)}
+            show={true}
+          />
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };

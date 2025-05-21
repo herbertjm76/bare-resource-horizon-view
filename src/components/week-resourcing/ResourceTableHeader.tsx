@@ -21,9 +21,17 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({
         <TableHead className="sticky-column sticky-left-24 w-10 bg-muted/20 border-r z-20 text-center">Office</TableHead>
         <TableHead className="sticky-column sticky-left-36 w-[120px] bg-muted/20 border-r z-20 text-center">Capacity</TableHead>
         
-        {/* Leave columns */}
-        <TableHead className="bg-muted/20 border-r text-center w-[80px]">Annual<br />Leave</TableHead>
-        <TableHead className="bg-muted/20 border-r text-center w-[120px]">Other<br />Leave</TableHead>
+        {/* Leave columns with compact badges */}
+        <TableHead className="bg-muted/20 border-r text-center w-[50px]">
+          <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center text-xs font-medium mx-auto">
+            AL
+          </div>
+        </TableHead>
+        <TableHead className="bg-muted/20 border-r text-center w-[50px]">
+          <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center text-xs font-medium mx-auto">
+            OL
+          </div>
+        </TableHead>
 
         {/* Project columns - dynamically generated with distinct styling */}
         <TooltipProvider>
@@ -35,13 +43,15 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({
             return (
               <TableHead 
                 key={project.id} 
-                className={`${bgClass} border-r text-center min-w-[80px]`}
+                className={`${bgClass} border-r text-center w-[40px] relative`}
               >
                 <Tooltip>
-                  <TooltipTrigger className="w-full h-full flex items-center justify-center">
-                    <span className="font-medium">
-                      {project.code || project.name.substring(0, 3).toUpperCase()}
-                    </span>
+                  <TooltipTrigger className="w-full h-full flex items-end justify-center pt-12">
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 origin-center -rotate-90 whitespace-nowrap">
+                      <span className="font-medium text-xs">
+                        {project.code || project.name.substring(0, 3).toUpperCase()}
+                      </span>
+                    </div>
                   </TooltipTrigger>
                   <TooltipContent>
                     <p className="font-medium">{project.name}</p>
@@ -56,9 +66,6 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({
             );
           })}
         </TooltipProvider>
-        
-        {/* Total column */}
-        <TableHead className="bg-brand-primary/10 text-center min-w-[80px] font-semibold">Total</TableHead>
       </TableRow>
     </TableHeader>
   );

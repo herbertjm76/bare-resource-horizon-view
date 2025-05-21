@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TableCell, TableRow } from '@/components/ui/table';
+import { TableFooter, TableRow, TableCell } from '@/components/ui/table';
 
 interface ResourceTableFooterProps {
   projects: any[];
@@ -11,28 +11,40 @@ export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
   projects,
   projectTotals
 }) => {
-  const totalHours = Array.from(projectTotals.values()).reduce((sum, hours) => sum + hours, 0);
-
   return (
-    <TableRow className="bg-muted/30 font-medium h-10 border-t">
-      <TableCell className="sticky-column sticky-left-0 border-r font-semibold pl-2 py-1 text-center">Totals</TableCell>
-      <TableCell className="sticky-column sticky-left-12 border-r text-center py-1"></TableCell>
-      <TableCell className="sticky-column sticky-left-24 border-r text-center py-1"></TableCell>
-      <TableCell className="sticky-column sticky-left-36 border-r text-center py-1"></TableCell>
-      <TableCell className="text-center border-r py-1"></TableCell>
-      <TableCell className="text-center border-r py-1"></TableCell>
-      <TableCell className="text-center border-r py-1"></TableCell>
-      <TableCell className="text-center border-r py-1"></TableCell>
-      
-      {projects.map(project => (
-        <TableCell key={`total-${project.id}`} className="text-center border-r py-1">
-          {projectTotals.get(project.id) || 0}
+    <TableFooter>
+      <TableRow className="bg-muted/20 font-medium">
+        {/* First column - Total label */}
+        <TableCell 
+          colSpan={4} 
+          className="sticky-column sticky-left-0 border-r border-t bg-muted/30 z-20 text-brand-primary"
+        >
+          Total Hours Per Project
         </TableCell>
-      ))}
-      
-      <TableCell className="text-center py-1 font-semibold">
-        {totalHours}
-      </TableCell>
-    </TableRow>
+        
+        {/* Leave columns - empty cells */}
+        <TableCell className="border-r border-t text-center">-</TableCell>
+        <TableCell className="border-r border-t text-center">-</TableCell>
+        
+        {/* Project columns - show totals for each */}
+        {projects.map((project, index) => {
+          // Get the total hours for this project
+          const totalHours = projectTotals.get(project.id) || 0;
+          
+          // Apply same alternating pattern
+          const isEven = index % 2 === 0;
+          const bgClass = isEven ? "bg-muted/30" : "bg-muted/10";
+          
+          return (
+            <TableCell 
+              key={project.id} 
+              className={`${bgClass} border-r border-t text-center font-bold`}
+            >
+              {totalHours}
+            </TableCell>
+          );
+        })}
+      </TableRow>
+    </TableFooter>
   );
 };
