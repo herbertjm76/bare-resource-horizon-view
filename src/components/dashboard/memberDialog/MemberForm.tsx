@@ -24,7 +24,7 @@ const MemberForm: React.FC<MemberFormProps> = ({
   isLoading = false,
   onSubmit
 }) => {
-  const { register, handleSubmit, setValue, formState: { errors } } = form;
+  const { register, handleSubmit, setValue, control, formState: { errors } } = form;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -35,7 +35,7 @@ const MemberForm: React.FC<MemberFormProps> = ({
           defaultValue={form.getValues('role')} 
           setValue={setValue} 
         />
-        <OrganizationFields register={register} />
+        <OrganizationFields register={register} control={control} />
       </div>
       
       <DialogFooter className="gap-2">

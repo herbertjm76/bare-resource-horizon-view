@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Profile, PendingMember, TeamMember } from './types';
 import MemberForm from './memberDialog/MemberForm';
 import { MemberFormData } from './memberDialog/types';
+import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 
 interface MemberDialogProps {
   isOpen: boolean;
@@ -30,7 +31,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
       email: '',
       role: 'member',
       department: '',
-      location: '',
+      location: 'Unassigned',
       job_title: '',
       weekly_capacity: 40
     }
@@ -55,7 +56,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         email: member.email,
         role: (member.role as MemberFormData['role']) || 'member',
         department: member.department || '',
-        location: member.location || '',
+        location: member.location || 'Unassigned',
         job_title: member.job_title || '',
         weekly_capacity: member.weekly_capacity || 40
       });
@@ -67,7 +68,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         email: '',
         role: 'member',
         department: '',
-        location: '',
+        location: 'Unassigned',
         job_title: '',
         weekly_capacity: 40
       });
@@ -108,13 +109,15 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
               : 'Add a new team member to your organization using the form below.'}
           </DialogDescription>
         </DialogHeader>
-        <MemberForm
-          form={form}
-          onClose={onClose}
-          isEditing={!!member}
-          isLoading={isLoading}
-          onSubmit={handleFormSubmit}
-        />
+        <OfficeSettingsProvider>
+          <MemberForm
+            form={form}
+            onClose={onClose}
+            isEditing={!!member}
+            isLoading={isLoading}
+            onSubmit={handleFormSubmit}
+          />
+        </OfficeSettingsProvider>
       </DialogContent>
     </Dialog>
   );

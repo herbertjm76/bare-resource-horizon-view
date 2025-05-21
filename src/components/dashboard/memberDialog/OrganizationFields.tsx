@@ -2,14 +2,25 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UseFormRegister } from 'react-hook-form';
+import { UseFormRegister, Controller, Control } from 'react-hook-form';
 import { MemberFormData } from './types';
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 
 interface OrganizationFieldsProps {
   register: UseFormRegister<MemberFormData>;
+  control: Control<MemberFormData>;
 }
 
-const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register }) => {
+const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register, control }) => {
+  const { locations, loading } = useOfficeSettings();
+
   return (
     <>
       <div className="space-y-2">
@@ -30,10 +41,28 @@ const OrganizationFields: React.FC<OrganizationFieldsProps> = ({ register }) => 
       </div>
       <div className="space-y-2">
         <Label htmlFor="location">Location</Label>
-        <Input 
-          id="location"
-          placeholder="Location"
-          {...register('location')}
+        <Controller
+          name="location"
+          control={control}
+          render={({ field }) => (
+            <Select
+              disabled={loading}
+              value={field.value}
+              onValueChange={field.onChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Unassigned">Unassigned</SelectItem>
+                {locations.map((location) => (
+                  <SelectItem key={location.id} value={location.code}>
+                    {location.emoji} {location.city}, {location.country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         />
       </div>
       <div className="space-y-2">
