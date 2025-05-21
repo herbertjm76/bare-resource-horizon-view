@@ -29,9 +29,9 @@ export const CapacityGauge: React.FC<CapacityGaugeProps> = ({
     }
   };
 
-  // SVG parameters
-  const size = 60;
-  const strokeWidth = 6;
+  // SVG parameters - reduced size and stroke width
+  const size = 45;
+  const strokeWidth = 4;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (percentageUsed / 100) * circumference;
@@ -64,10 +64,10 @@ export const CapacityGauge: React.FC<CapacityGaugeProps> = ({
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-sm font-medium">{availableHours}</span>
+          <span className="text-xs font-medium">{availableHours}</span>
         </div>
       </div>
-      <div className="text-xs text-muted-foreground mt-1">/{totalCapacity}</div>
+      <div className="text-xs text-muted-foreground -mt-0.5">/{totalCapacity}</div>
     </div>
   );
 };
