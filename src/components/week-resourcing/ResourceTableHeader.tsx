@@ -15,14 +15,12 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
         <TableHead className="w-48 max-w-48 min-w-32 border-r sticky left-0 z-20 bg-white">Name</TableHead>
         <TableHead className="w-12 text-center border-r">#</TableHead>
         
-        {/* Holiday Cell Header - moved before Office */}
-        <TableHead className="w-10 text-center border-r">HO</TableHead>
-        
         {/* Capacity bar header */}
         <TableHead className="w-24 text-center border-r">Capacity</TableHead>
         
-        {/* Leave cells */}
+        {/* Leave cells - rearranged order */}
         <TableHead className="w-10 text-center border-r">AL</TableHead>
+        <TableHead className="w-10 text-center border-r">HO</TableHead>
         <TableHead className="w-10 text-center border-r">OL</TableHead>
         
         {/* Office Location Header - moved to the end */}
