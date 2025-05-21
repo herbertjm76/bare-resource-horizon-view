@@ -96,16 +96,18 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
         <div className="grid-table-container">
           <Table className="resource-allocation-table">
             <TableHeader>
-              <TableRow className="bg-muted/50 h-10">
-                <TableHead className="sticky-left-0 border-r border-b bg-muted/50 w-[100px]">Resources</TableHead>
+              <TableRow className="bg-muted/50 h-12">
+                <TableHead className="sticky-left-0 border-r border-b bg-muted/50 w-[80px]">Resources</TableHead>
                 {projects.map(project => (
                   <TableHead 
                     key={project.id} 
-                    className="text-center border-r border-b bg-muted/50 w-[80px]"
+                    className="text-center border-r border-b bg-muted/50 w-[60px] p-0 relative"
                   >
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="font-semibold cursor-help">{project.code}</span>
+                        <div className="date-label h-full w-full cursor-help">
+                          <span className="font-semibold">{project.code}</span>
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>
                         <p>{project.name}</p>
@@ -113,7 +115,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                     </Tooltip>
                   </TableHead>
                 ))}
-                <TableHead className="text-center border-b bg-muted/50 w-[80px]">Total</TableHead>
+                <TableHead className="text-center border-b bg-muted/50 w-[70px]">Total</TableHead>
               </TableRow>
             </TableHeader>
             
