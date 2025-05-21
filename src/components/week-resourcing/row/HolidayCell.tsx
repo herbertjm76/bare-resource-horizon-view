@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
-import { format, isWithinInterval, parseISO } from 'date-fns';
+import { format, isWithinInterval, parseISO, addDays } from 'date-fns';
+import { toast } from 'sonner';
 
 interface HolidayCellProps {
   holidayHours: number;
@@ -26,6 +27,7 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [calculatedHolidayHours, setCalculatedHolidayHours] = useState(holidayHours);
   const { locations } = useOfficeSettings();
+  const [holidayNames, setHolidayNames] = useState<string[]>([]);
   
   // Get holidays from localStorage
   useEffect(() => {
@@ -36,19 +38,29 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
       const holidays = JSON.parse(storedHolidays);
       if (!Array.isArray(holidays)) return;
       
+      console.log("Found holidays in localStorage:", holidays);
+      console.log("Member office:", memberOffice);
+      
       // Get the week range
       const weekStart = new Date(weekStartDate);
-      const weekEnd = new Date(weekStartDate);
-      weekEnd.setDate(weekEnd.getDate() + 6);
+      const weekEnd = addDays(weekStart, 6);
+      
+      console.log("Week range:", format(weekStart, 'yyyy-MM-dd'), "to", format(weekEnd, 'yyyy-MM-dd'));
       
       // Filter holidays that match the member's office and fall within the week
       const applicableHolidays = holidays.filter(holiday => {
         // Check if holiday applies to this member's office
-        if (!holiday.offices.includes(memberOffice)) return false;
+        if (!holiday.offices || !holiday.offices.includes(memberOffice)) {
+          return false;
+        }
         
         // Check if holiday dates overlap with this week
         const startDate = new Date(holiday.startDate);
         const endDate = new Date(holiday.endDate);
+        
+        console.log(`Checking holiday: ${holiday.description}`, 
+          format(startDate, 'yyyy-MM-dd'), "to", format(endDate, 'yyyy-MM-dd'),
+          "applies to offices:", holiday.offices);
         
         // Check for any overlap between holiday period and week period
         return (
@@ -58,8 +70,13 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
         );
       });
       
+      console.log("Applicable holidays:", applicableHolidays);
+      
       // If we found applicable holidays, update the holiday hours
       if (applicableHolidays.length > 0) {
+        // Collect holiday names for tooltip
+        setHolidayNames(applicableHolidays.map(h => h.description));
+        
         // Calculate business days in the holiday period that fall within this week
         let holidayDays = 0;
         const currentDate = new Date(weekStart);
@@ -84,20 +101,35 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
           currentDate.setDate(currentDate.getDate() + 1);
         }
         
+        console.log(`Found ${holidayDays} business days that are holidays this week`);
+        
         // Assuming 8 hours per holiday day
         const calculatedHours = holidayDays * 8;
         
         // If the calculated hours are different from the manual input, update
         // Only auto-update if the user hasn't manually set a value
         if (calculatedHours > 0 && holidayHours === 0) {
+          console.log(`Setting holiday hours to ${calculatedHours}`);
           setCalculatedHolidayHours(calculatedHours);
           onLeaveInputChange(memberId, 'holiday', calculatedHours.toString());
+          
+          // Notify the user that holidays were detected
+          if (applicableHolidays.length > 0) {
+            toast.info(`Holiday detected for ${memberOffice} office`, {
+              description: applicableHolidays.map(h => h.description).join(", ")
+            });
+          }
         }
       }
     } catch (err) {
       console.error("Error processing holidays:", err);
     }
   }, [weekStartDate, memberOffice, memberId, holidayHours, onLeaveInputChange]);
+  
+  useEffect(() => {
+    setInputValue(holidayHours.toString());
+    setCalculatedHolidayHours(holidayHours);
+  }, [holidayHours]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -112,7 +144,10 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
     <TableCell className="leave-cell text-center p-1 border-r">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <div className="w-full h-full flex justify-center items-center cursor-pointer">
+          <div 
+            className="w-full h-full flex justify-center items-center cursor-pointer"
+            title={holidayNames.length > 0 ? `Holidays: ${holidayNames.join(", ")}` : undefined}
+          >
             {calculatedHolidayHours > 0 ? (
               <div className="w-6 h-6 rounded-full bg-gray-250 flex items-center justify-center">
                 <span className="text-xs font-medium text-gray-600">{calculatedHolidayHours}</span>
@@ -125,6 +160,16 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
         <PopoverContent className="w-80 p-4">
           <div className="space-y-4">
             <h4 className="font-medium">Holiday Hours</h4>
+            {holidayNames.length > 0 && (
+              <div className="text-sm bg-muted p-2 rounded">
+                <p className="font-medium">Office Holidays:</p>
+                <ul className="list-disc pl-4 mt-1">
+                  {holidayNames.map((name, i) => (
+                    <li key={i}>{name}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div className="space-y-2">
               <label className="text-sm font-medium">Hours</label>
               <Input
