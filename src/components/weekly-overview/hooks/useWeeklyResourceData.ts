@@ -43,6 +43,11 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
       }
       
       console.log("Fetched projects:", data?.length || 0);
+      // Log the HERB project details if it exists
+      const herbProject = data?.find(p => p.name.includes('HERB'));
+      if (herbProject) {
+        console.log("Found HERB project:", herbProject);
+      }
       return data || [];
     },
     enabled: !!company?.id
