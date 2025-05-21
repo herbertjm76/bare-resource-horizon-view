@@ -29,10 +29,10 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   const boxColor = getBoxColor();
   
   return (
-    <div className="flex items-center justify-center space-x-2 w-full py-1">
+    <div className="flex items-center justify-center w-full">
       <div className="flex-1 flex justify-center">
-        {/* Round container for capacity indicators */}
-        <div className="rounded-full bg-gray-100 p-1.5 flex items-center justify-center gap-1 shadow-sm border border-gray-200">
+        {/* Compact container for capacity indicators */}
+        <div className="rounded-full bg-gray-100 p-1 flex items-center justify-center gap-0.5 shadow-sm border border-gray-200">
           {/* Capacity boxes */}
           <div className="flex space-x-0.5">
             {Array.from({ length: 5 }).map((_, index) => {
@@ -49,8 +49,9 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
                   <TooltipTrigger asChild>
                     <div 
                       className={cn(
-                        "h-2 w-2 border border-gray-300 rounded-sm relative overflow-hidden",
-                        !isFilled && !isPartiallyFilled && "bg-gray-100"
+                        "h-1.5 w-1.5 relative overflow-hidden",
+                        !isFilled && !isPartiallyFilled && "bg-gray-100",
+                        isFilled || isPartiallyFilled ? "" : "border border-gray-300"
                       )}
                     >
                       {/* For completely filled boxes */}
@@ -82,8 +83,8 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
           </div>
           
           {/* Available hours number */}
-          <div className="rounded-full bg-white w-5 h-5 flex items-center justify-center border border-gray-200">
-            <span className="text-[10px] font-semibold">{availableHours}</span>
+          <div className="rounded-full bg-white w-4 h-4 flex items-center justify-center border border-gray-200">
+            <span className="text-[8px] font-semibold">{availableHours}</span>
           </div>
         </div>
       </div>
