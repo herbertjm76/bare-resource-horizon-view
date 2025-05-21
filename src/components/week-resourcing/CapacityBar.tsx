@@ -31,10 +31,10 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   return (
     <div className="flex items-center justify-center w-full">
       <div className="flex-1 flex justify-center">
-        {/* Compact container for capacity indicators */}
-        <div className="rounded-full bg-gray-100 p-1 flex items-center justify-center gap-0.5 shadow-sm border border-gray-200">
+        {/* Square container for capacity indicators */}
+        <div className="bg-gray-100 border border-gray-200 shadow-sm px-0.5 py-0.5 flex items-center justify-center gap-0.5">
           {/* Capacity boxes */}
-          <div className="flex space-x-0.5">
+          <div className="flex space-x-px">
             {Array.from({ length: 5 }).map((_, index) => {
               // Each box represents 20% (index 0 = 0-20%, index 1 = 20-40%, etc.)
               const boxStartPercent = index * 20;
@@ -83,7 +83,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
           </div>
           
           {/* Available hours number */}
-          <div className="rounded-full bg-white w-4 h-4 flex items-center justify-center border border-gray-200">
+          <div className="bg-white border border-gray-200 w-4 h-4 flex items-center justify-center">
             <span className="text-[8px] font-semibold">{availableHours}</span>
           </div>
         </div>
