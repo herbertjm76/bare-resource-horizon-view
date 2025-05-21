@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -165,9 +164,9 @@ export const HolidaysTab = () => {
           .from('office_holidays')
           .update({
             name: values.name,
-            date: values.date.toISOString().split('T')[0],
+            date: values.date.toISOString().split('T')[0], // Convert Date to YYYY-MM-DD string
             location_id: values.offices[0], // Use first office as location_id for now
-            updated_at: new Date()
+            updated_at: new Date().toISOString() // Use string for timestamp
           })
           .eq('id', editingHoliday.id);
           
@@ -192,7 +191,7 @@ export const HolidaysTab = () => {
           .from('office_holidays')
           .insert({
             name: values.name,
-            date: values.date.toISOString().split('T')[0],
+            date: values.date.toISOString().split('T')[0], // Convert Date to YYYY-MM-DD string
             location_id: values.offices[0], // Use first office as location_id for now
             company_id: company.id,
             is_recurring: false // Default to non-recurring
