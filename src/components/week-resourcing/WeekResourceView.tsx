@@ -8,6 +8,7 @@ import { ResourceTableErrorState } from '@/components/weekly-overview/components
 import { EmptyResourceState } from '@/components/weekly-overview/components/EmptyResourceState';
 import { getWeekStartDate } from '@/hooks/allocations/utils/dateUtils';
 import { ResourceTable } from '@/components/week-resourcing/ResourceTable';
+import { addDays, format, startOfWeek } from 'date-fns';
 
 interface WeekResourceViewProps {
   selectedWeek: Date;
@@ -27,7 +28,8 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   const [membersError, setMembersError] = useState<Error | null>(null);
   
   // Format week start date for allocations - ensure it's Monday
-  const weekStartDate = getWeekStartDate(selectedWeek).toISOString().split('T')[0];
+  const monday = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const weekStartDate = format(monday, 'yyyy-MM-dd');
   console.log('Week start date for allocations:', weekStartDate);
 
   // Get projects for the company
@@ -125,6 +127,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       if (!company?.id) return [];
       
       try {
+        // Try to fetch with the exact date
         const { data, error } = await supabase
           .from('project_resource_allocations')
           .select(`
