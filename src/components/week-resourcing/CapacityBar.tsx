@@ -36,10 +36,10 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
           // Calculate if this box should be filled based on percentage
           // Each box represents 20% (index 0 = 0-20%, index 1 = 20-40%, etc.)
           const boxStartPercent = index * 20;
-          const boxEndPercent = (index + 1) * 20;
           
-          // A box should be filled only if the percentage used is greater than the box's starting percentage
-          const boxShouldBeFilled = percentageUsed >= boxStartPercent;
+          // Fix: Only fill boxes if the percentageUsed is GREATER than the box's starting percentage
+          // This way, 33% will only fill the first box and partially the second box
+          const boxShouldBeFilled = percentageUsed > boxStartPercent;
           
           return (
             <Tooltip key={index}>
