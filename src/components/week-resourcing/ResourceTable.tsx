@@ -16,6 +16,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip';
+import '../resources/resources-grid.css'; // Import resource grid styling
 
 interface ResourceTableProps {
   projects: any[];
@@ -77,105 +78,119 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
     return totals;
   }, [allocations]);
   
-  // Helper to get member display name
-  const getMemberName = (member: any): string => {
-    if (!member) return 'Unknown';
-    return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed';
-  };
-
   // Helper to get just the first name
   const getFirstName = (member: any): string => {
     if (!member) return 'Unknown';
     return member.first_name || 'Unnamed';
   };
 
+  // Helper to get member display name for tooltip
+  const getMemberName = (member: any): string => {
+    if (!member) return 'Unknown';
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed';
+  };
+
   return (
     <TooltipProvider>
-      <div className="rounded-md border shadow-sm overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="w-[120px]">Resources</TableHead>
-              {projects.map(project => (
-                <TableHead key={project.id} className="text-center">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="font-semibold cursor-help">{project.code}</span>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{project.name}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TableHead>
-              ))}
-              <TableHead className="text-center">Total</TableHead>
-            </TableRow>
-          </TableHeader>
-          
-          <TableBody>
-            {Array.from(membersMap.values()).map((member: any) => {
-              // Get weekly capacity or default to 40
-              const weeklyCapacity = member.weekly_capacity || 40;
-              const totalHours = memberTotals.get(member.id) || 0;
-              const utilization = Math.round((totalHours / weeklyCapacity) * 100);
-              
-              return (
-                <TableRow key={member.id}>
-                  <TableCell className="font-medium">
+      <div className="grid-table-outer-container border rounded-md shadow-sm">
+        <div className="grid-table-container">
+          <Table className="resource-allocation-table">
+            <TableHeader>
+              <TableRow className="bg-muted/50 h-10">
+                <TableHead className="sticky-left-0 border-r border-b bg-muted/50 w-[100px]">Resources</TableHead>
+                {projects.map(project => (
+                  <TableHead 
+                    key={project.id} 
+                    className="text-center border-r border-b bg-muted/50 w-[80px]"
+                  >
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span>{getFirstName(member)}</span>
+                        <span className="font-semibold cursor-help">{project.code}</span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{getMemberName(member)}</p>
+                        <p>{project.name}</p>
                       </TooltipContent>
                     </Tooltip>
-                  </TableCell>
-                  
-                  {projects.map(project => {
-                    const key = `${member.id}:${project.id}`;
-                    const hours = allocationMap.get(key) || 0;
+                  </TableHead>
+                ))}
+                <TableHead className="text-center border-b bg-muted/50 w-[80px]">Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            
+            <TableBody>
+              {Array.from(membersMap.values()).map((member: any, idx: number) => {
+                // Get weekly capacity or default to 40
+                const weeklyCapacity = member.weekly_capacity || 40;
+                const totalHours = memberTotals.get(member.id) || 0;
+                const utilization = Math.round((totalHours / weeklyCapacity) * 100);
+                
+                // Alternating row background
+                const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-muted/10';
+                
+                return (
+                  <TableRow key={member.id} className={`h-9 ${rowBg} hover:bg-muted/20`}>
+                    <TableCell className="font-medium sticky-left-0 border-r pl-2 pr-1 py-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>{getFirstName(member)}</span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{getMemberName(member)}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TableCell>
                     
-                    return (
-                      <TableCell key={`${member.id}-${project.id}`} className="text-center">
-                        <ResourceAllocationCell 
-                          hours={hours}
-                          resourceId={member.id}
-                          projectId={project.id}
-                          weekStartDate={weekStartDate}
-                        />
-                      </TableCell>
-                    );
-                  })}
-                  
-                  <TableCell className="text-center">
-                    <div className="flex flex-col items-center">
-                      <span className="font-medium">{totalHours}h</span>
-                      <Badge variant={utilization > 100 ? "destructive" : utilization > 80 ? "outline" : "outline"}>
-                        {utilization}%
-                      </Badge>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-          
-          {/* Totals row */}
-          <TableRow className="bg-muted/30 font-medium">
-            <TableCell>Project Totals</TableCell>
+                    {projects.map(project => {
+                      const key = `${member.id}:${project.id}`;
+                      const hours = allocationMap.get(key) || 0;
+                      
+                      return (
+                        <TableCell 
+                          key={`${member.id}-${project.id}`} 
+                          className="text-center border-r p-0 align-middle"
+                        >
+                          <ResourceAllocationCell 
+                            hours={hours}
+                            resourceId={member.id}
+                            projectId={project.id}
+                            weekStartDate={weekStartDate}
+                          />
+                        </TableCell>
+                      );
+                    })}
+                    
+                    <TableCell className="text-center p-0">
+                      <div className="flex flex-col items-center py-1">
+                        <span className="font-medium">{totalHours}</span>
+                        <Badge 
+                          variant={utilization > 100 ? "destructive" : utilization > 80 ? "warning" : "outline"} 
+                          className="text-xs py-0 px-1.5 h-5"
+                        >
+                          {utilization}%
+                        </Badge>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
             
-            {projects.map(project => (
-              <TableCell key={`total-${project.id}`} className="text-center">
-                {projectTotals.get(project.id) || 0}h
+            {/* Totals row */}
+            <TableRow className="bg-muted/30 font-medium h-10 border-t">
+              <TableCell className="sticky-left-0 border-r font-semibold pl-2 py-1">Project Totals</TableCell>
+              
+              {projects.map(project => (
+                <TableCell key={`total-${project.id}`} className="text-center border-r py-1">
+                  {projectTotals.get(project.id) || 0}
+                </TableCell>
+              ))}
+              
+              <TableCell className="text-center py-1 font-semibold">
+                {Array.from(projectTotals.values()).reduce((sum, hours) => sum + hours, 0)}
               </TableCell>
-            ))}
-            
-            <TableCell className="text-center">
-              {Array.from(projectTotals.values()).reduce((sum, hours) => sum + hours, 0)}h
-            </TableCell>
-          </TableRow>
-        </Table>
+            </TableRow>
+          </Table>
+        </div>
       </div>
     </TooltipProvider>
   );
