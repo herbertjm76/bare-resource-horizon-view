@@ -92,16 +92,16 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="grid-table-outer-container border rounded-md shadow-sm">
+      <div className="annual-leave-calendar grid-table-outer-container border rounded-md shadow-sm">
         <div className="grid-table-container">
           <Table className="resource-allocation-table">
             <TableHeader>
               <TableRow className="bg-muted/50 h-12">
-                <TableHead className="sticky-left-0 border-r border-b bg-muted/50 w-[80px]">Resources</TableHead>
+                <TableHead className="sticky-header sticky-left-0 border-r border-b bg-muted/50 w-[80px]">Resources</TableHead>
                 {projects.map(project => (
                   <TableHead 
                     key={project.id} 
-                    className="text-center border-r border-b bg-muted/50 w-[60px] p-0 relative"
+                    className="sticky-header text-center border-r border-b bg-muted/50 w-[48px] p-0 relative"
                   >
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -115,7 +115,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                     </Tooltip>
                   </TableHead>
                 ))}
-                <TableHead className="text-center border-b bg-muted/50 w-[70px]">Total</TableHead>
+                <TableHead className="sticky-header text-center border-b bg-muted/50 w-[60px]">Total</TableHead>
               </TableRow>
             </TableHeader>
             
@@ -131,7 +131,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                 
                 return (
                   <TableRow key={member.id} className={`h-9 ${rowBg} hover:bg-muted/20`}>
-                    <TableCell className="font-medium sticky-left-0 border-r pl-2 pr-1 py-1">
+                    <TableCell className="sticky-column sticky-left-0 border-r font-medium pl-2 pr-1 py-1">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <span>{getFirstName(member)}</span>
@@ -149,7 +149,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                       return (
                         <TableCell 
                           key={`${member.id}-${project.id}`} 
-                          className="text-center border-r p-0 align-middle"
+                          className="leave-cell text-center border-r p-0 align-middle"
                         >
                           <ResourceAllocationCell 
                             hours={hours}
@@ -179,7 +179,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
             
             {/* Totals row */}
             <TableRow className="bg-muted/30 font-medium h-10 border-t">
-              <TableCell className="sticky-left-0 border-r font-semibold pl-2 py-1">Project Totals</TableCell>
+              <TableCell className="sticky-column sticky-left-0 border-r font-semibold pl-2 py-1">Project Totals</TableCell>
               
               {projects.map(project => (
                 <TableCell key={`total-${project.id}`} className="text-center border-r py-1">

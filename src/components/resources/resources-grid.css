@@ -149,8 +149,8 @@
 
 /* Square-shaped cells for allocation */
 .resource-allocation-table td:not(.sticky-left-0):not(:last-child) {
-  width: 60px;
-  height: 36px;
+  width: 48px;
+  height: 32px;
   padding: 0;
 }
 
@@ -181,4 +181,46 @@
   height: 24px;
 }
 
+/* Styling from annual-leave-calendar for consistent look */
+.annual-leave-calendar table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
 
+.annual-leave-calendar th,
+.annual-leave-calendar td {
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Alternating row colors */
+.annual-leave-calendar tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* Row hover effect */
+.annual-leave-calendar tbody tr:hover {
+  background-color: rgba(111, 75, 246, 0.05) !important;
+}
+
+/* Cell with hours styling */
+.annual-leave-calendar td.leave-cell-filled input,
+.leave-cell-filled {
+  background-color: #ECECFB; /* Light purple background for filled cells */
+}
+
+/* Sticky header and column styling */
+.annual-leave-calendar .sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.annual-leave-calendar .sticky-column {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background-color: inherit;
+}

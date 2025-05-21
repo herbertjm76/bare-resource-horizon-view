@@ -85,8 +85,10 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
     }
   };
 
+  const filledClass = hours > 0 ? 'leave-cell-filled' : '';
+
   return (
-    <div className="allocation-input-container w-full h-full">
+    <div className={`allocation-input-container w-full h-full ${filledClass}`}>
       {isEditing ? (
         <Input
           className="w-full h-8 text-center p-0"
@@ -98,7 +100,7 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
         />
       ) : (
         <div
-          className="cursor-pointer w-full h-8 flex items-center justify-center hover:bg-gray-50 rounded-md"
+          className="cursor-pointer w-full h-8 flex items-center justify-center hover:bg-gray-50"
           onClick={() => setIsEditing(true)}
         >
           {hours > 0 ? hours : '—'}
