@@ -35,25 +35,37 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     queryFn: async () => {
       if (!company?.id) return [];
       
-      let query = supabase
-        .from('projects')
-        .select('id, name, code, office:office_locations(id, name, code)')
-        .eq('company_id', company.id);
-      
-      // Apply office filter if needed
-      if (filters.office !== 'all') {
-        query = query.eq('office.name', filters.office);
+      try {
+        let query = supabase
+          .from('projects')
+          .select('id, name, code, office:offices(id, name, country)');
+          
+        // Add company filter
+        query = query.eq('company_id', company.id);
+        
+        // Apply office filter if needed
+        if (filters.office !== 'all') {
+          // Need to match by office name from the joined offices table
+          query = query.eq('office.name', filters.office);
+        }
+        
+        // Apply search filter if provided
+        if (filters.searchTerm) {
+          query = query.or(`name.ilike.%${filters.searchTerm}%,code.ilike.%${filters.searchTerm}%`);
+        }
+        
+        const { data, error } = await query;
+        
+        if (error) {
+          console.error('Error fetching projects:', error);
+          throw new Error(`Error fetching projects: ${error.message}`);
+        }
+        
+        return data || [];
+      } catch (err) {
+        console.error('Failed to fetch projects:', err);
+        throw err;
       }
-      
-      // Apply search filter if provided
-      if (filters.searchTerm) {
-        query = query.or(`name.ilike.%${filters.searchTerm}%,code.ilike.%${filters.searchTerm}%`);
-      }
-      
-      const { data, error } = await query;
-      
-      if (error) throw new Error(`Error fetching projects: ${error.message}`);
-      return data || [];
     },
     enabled: !!company?.id
   });

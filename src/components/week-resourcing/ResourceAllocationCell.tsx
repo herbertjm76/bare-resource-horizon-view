@@ -1,137 +1,100 @@
 
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { useCompany } from '@/context/CompanyContext';
 import { supabase } from '@/integrations/supabase/client';
+import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface ResourceAllocationCellProps {
-  hours: number;
   resourceId: string;
   projectId: string;
+  hours: number;
   weekStartDate: string;
 }
 
 export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
-  hours,
   resourceId,
   projectId,
+  hours,
   weekStartDate
 }) => {
-  const [value, setValue] = useState(hours.toString());
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const { company } = useCompany();
-  const queryClient = useQueryClient();
-  
+  const [value, setValue] = useState<string>(hours.toString());
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Restrict to numbers only
-    const newValue = e.target.value.replace(/[^0-9]/g, '');
-    setValue(newValue);
+    // Only allow valid numbers
+    if (e.target.value === '' || /^\d+(\.\d{0,1})?$/.test(e.target.value)) {
+      setValue(e.target.value);
+    }
   };
-  
-  const handleStartEdit = () => {
-    setIsEditing(true);
-  };
-  
+
   const handleBlur = async () => {
+    if (!company?.id) return;
+    
+    const newHours = parseFloat(value) || 0;
     setIsEditing(false);
-    const numericValue = parseInt(value) || 0;
     
-    // If the value hasn't changed, do nothing
-    if (numericValue === hours) {
-      return;
-    }
-    
-    if (!company?.id) {
-      toast.error("Company ID is missing");
-      return;
-    }
+    // No change - skip update
+    if (newHours === hours) return;
     
     setIsSaving(true);
     
     try {
-      // Check if we already have an allocation
-      const { data: existingAllocation } = await supabase
-        .from('project_resource_allocations')
-        .select('id')
-        .eq('resource_id', resourceId)
-        .eq('project_id', projectId)
-        .eq('week_start_date', weekStartDate)
-        .eq('company_id', company.id)
-        .maybeSingle();
-      
-      if (existingAllocation) {
+      if (hours > 0) {
         // Update existing allocation
-        if (numericValue === 0) {
-          // Delete if the value is 0
-          await supabase
-            .from('project_resource_allocations')
-            .delete()
-            .eq('id', existingAllocation.id);
-        } else {
-          // Update with new value
-          await supabase
-            .from('project_resource_allocations')
-            .update({ hours: numericValue })
-            .eq('id', existingAllocation.id);
-        }
-      } else if (numericValue > 0) {
+        const { error } = await supabase
+          .from('project_resource_allocations')
+          .update({ hours: newHours, updated_at: new Date().toISOString() })
+          .eq('project_id', projectId)
+          .eq('resource_id', resourceId)
+          .eq('week_start_date', weekStartDate);
+          
+        if (error) throw error;
+      } else {
         // Create new allocation
-        await supabase
+        const { error } = await supabase
           .from('project_resource_allocations')
           .insert({
-            resource_id: resourceId,
             project_id: projectId,
-            week_start_date: weekStartDate,
-            hours: numericValue,
+            resource_id: resourceId,
             resource_type: 'active',
+            hours: newHours,
+            week_start_date: weekStartDate,
             company_id: company.id
           });
+          
+        if (error) throw error;
       }
       
-      // Invalidate related queries
-      queryClient.invalidateQueries({ queryKey: ['week-resource-allocations'] });
-      
+      toast.success('Resource allocation updated');
     } catch (error) {
-      console.error('Error saving allocation:', error);
-      toast.error('Failed to save allocation');
+      console.error('Error updating allocation:', error);
+      toast.error('Failed to update allocation');
+      setValue(hours.toString());
     } finally {
       setIsSaving(false);
     }
   };
-  
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleBlur();
-    } else if (e.key === 'Escape') {
-      setValue(hours.toString());
-      setIsEditing(false);
-    }
-  };
 
   return (
-    <div className={`resource-cell ${isSaving ? 'opacity-50' : ''}`}>
+    <div className="relative">
       {isEditing ? (
         <Input
-          type="text"
+          className="w-16 h-8 text-center"
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          className="w-16 h-8 text-center"
           autoFocus
+          disabled={isSaving}
         />
       ) : (
-        <div 
-          className={`
-            cursor-pointer py-1 px-2 rounded hover:bg-muted
-            ${parseFloat(hours.toString()) > 0 ? 'bg-blue-50' : ''}
-          `}
-          onClick={handleStartEdit}
+        <div
+          className="cursor-pointer w-16 h-8 flex items-center justify-center hover:bg-gray-50 rounded-md"
+          onClick={() => setIsEditing(true)}
         >
-          {parseFloat(hours.toString()) > 0 ? `${hours}h` : '-'}
+          {hours > 0 ? `${hours}h` : '—'}
         </div>
       )}
     </div>
