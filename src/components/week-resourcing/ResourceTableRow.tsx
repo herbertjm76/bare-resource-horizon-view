@@ -111,7 +111,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         onNotesChange={handleNotesChange}
       />
       
-      {/* Holiday Cell */}
+      {/* Holiday Cell - now auto-fetches holiday data */}
       <HolidayCell 
         holidayHours={holidayHours} 
         memberId={member.id}
