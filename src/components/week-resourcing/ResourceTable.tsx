@@ -41,7 +41,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
         <div className="grid-table-container">
           <Table className="resource-allocation-table">
             {/* Table Header Component */}
-            <ResourceTableHeader projects={projects} />
+            <ResourceTableHeader projects={projects} showRemarks={false} />
             
             <TableBody>
               {/* Render each resource row */}

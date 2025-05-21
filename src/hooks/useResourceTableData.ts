@@ -19,8 +19,8 @@ export const useResourceTableData = (
   // Remarks state for manual input
   const [remarksData, setRemarksData] = useState<Record<string, string>>({});
   
-  // Leave data state for sick/other leave types
-  const [manualLeaveData, setManualLeaveData] = useState<Record<string, Record<string, number>>>({});
+  // Leave data state for sick/other leave types and notes
+  const [manualLeaveData, setManualLeaveData] = useState<Record<string, Record<string, number | string>>>({});
   
   // Create members map
   const membersMap = useMemo(() => {
@@ -117,18 +117,24 @@ export const useResourceTableData = (
     return weekLeaveDays.reduce((total, day) => total + day.hours, 0);
   };
   
-  // Handler for leave input changes
+  // Handler for leave input changes, now supporting notes
   const handleLeaveInputChange = (memberId: string, leaveType: string, value: string) => {
-    const hours = value === '' ? 0 : Math.min(parseFloat(value), 40);
-    
-    if (isNaN(hours)) return;
-    
     setManualLeaveData(prev => {
       const newLeaveData = {...prev};
       if (!newLeaveData[memberId]) {
         newLeaveData[memberId] = {};
       }
-      newLeaveData[memberId][leaveType] = hours;
+      
+      // If it's notes, we store it as a string, otherwise convert to number
+      if (leaveType === 'notes') {
+        newLeaveData[memberId][leaveType] = value;
+      } else {
+        const hours = value === '' ? 0 : Math.min(parseFloat(value), 40);
+        
+        if (isNaN(hours)) return prev;
+        newLeaveData[memberId][leaveType] = hours;
+      }
+      
       return newLeaveData;
     });
   };

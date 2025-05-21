@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { MemberNameCell } from './row/MemberNameCell';
@@ -5,8 +6,7 @@ import { ProjectCountCell } from './row/ProjectCountCell';
 import { OfficeLocationCell } from './row/OfficeLocationCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
 import { AnnualLeaveCell } from './row/AnnualLeaveCell';
-import { LeaveInputCell } from './row/LeaveInputCell';
-import { RemarksCell } from './RemarksCell';
+import { OtherLeaveCell } from './row/OtherLeaveCell';
 import { ProjectAllocationCells } from './row/ProjectAllocationCells';
 import { TotalHoursCell } from './row/TotalHoursCell';
 
@@ -40,7 +40,6 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   allocationMap,
   projectCount,
   manualLeaveData,
-  remarksData,
   leaveDays,
   weeklyCapacity,
   totalHours,
@@ -48,10 +47,11 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   onLeaveInputChange,
   onRemarksUpdate
 }) => {
-  // Get sick and other leave
-  const sickLeave = manualLeaveData[member.id]?.['sick'] || 0;
-  const otherLeave = manualLeaveData[member.id]?.['other'] || 0;
-  const totalLeave = annualLeave + sickLeave + otherLeave;
+  // Combine sick and other leave into a single "other" leave
+  const otherLeave = (manualLeaveData[member.id]?.['sick'] || 0) + 
+                     (manualLeaveData[member.id]?.['other'] || 0);
+  
+  const totalLeave = annualLeave + otherLeave;
   
   // Calculate available hours after allocated hours and leave
   const allocatedHours = totalHours + totalLeave;
@@ -60,11 +60,16 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   // For debugging
   console.log(`ResourceTableRow for ${member.first_name}: totalHours=${totalHours}, leave=${totalLeave}, availableHours=${availableHours}, weeklyCapacity=${weeklyCapacity}`);
   
-  // Get remarks for this member
-  const memberRemarks = remarksData[member.id] || '';
+  // Get notes for this member (from the existing remarks)
+  const memberNotes = manualLeaveData[member.id]?.['notes'] || '';
   
   // Alternating row background
   const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-muted/10';
+
+  // Handler for notes
+  const handleNotesChange = (memberId: string, notes: string) => {
+    onLeaveInputChange(memberId, 'notes', notes);
+  };
 
   return (
     <TableRow key={member.id} className={`h-9 ${rowBg} hover:bg-muted/20`}>
@@ -74,29 +79,13 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       <CapacityBarCell availableHours={availableHours} totalCapacity={weeklyCapacity} />
       <AnnualLeaveCell annualLeave={annualLeave} leaveDays={leaveDays} />
       
-      {/* Sick/Medical Leave Cell */}
-      <LeaveInputCell 
-        leaveValue={sickLeave} 
-        leaveType="sick" 
-        memberId={member.id}
-        bgColor="bg-[#FEF7CD]"
-        onLeaveInputChange={onLeaveInputChange}
-      />
-      
-      {/* Other Leave Cell */}
-      <LeaveInputCell 
+      {/* Combined Other Leave Cell with Notes */}
+      <OtherLeaveCell 
         leaveValue={otherLeave} 
-        leaveType="other" 
         memberId={member.id}
-        bgColor="bg-[#FEC6A1]"
+        notes={memberNotes}
         onLeaveInputChange={onLeaveInputChange}
-      />
-      
-      {/* Remarks Cell */}
-      <RemarksCell 
-        memberId={member.id}
-        initialRemarks={memberRemarks}
-        onUpdate={onRemarksUpdate}
+        onNotesChange={handleNotesChange}
       />
       
       {/* Project allocation cells */}
