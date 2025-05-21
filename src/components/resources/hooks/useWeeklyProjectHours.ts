@@ -21,7 +21,9 @@ export const useWeeklyProjectHours = (
       const weekKey = compositeKey.split(':')[1];
       
       if (weekHours[weekKey] !== undefined) {
-        weekHours[weekKey] += Number(hours); // Ensure we're adding numbers
+        // Ensure we're adding numbers - handle any potential string values
+        const numericHours = typeof hours === 'number' ? hours : parseFloat(hours.toString()) || 0;
+        weekHours[weekKey] += numericHours;
       }
     });
     

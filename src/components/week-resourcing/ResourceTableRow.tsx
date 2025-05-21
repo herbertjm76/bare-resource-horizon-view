@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -58,6 +59,9 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   
   // Calculate utilization percentage
   const utilization = Math.round((totalHours / weeklyCapacity) * 100);
+  
+  // For debugging
+  console.log(`ResourceTableRow for ${member.first_name}: totalHours=${totalHours}, leave=${totalLeave}, availableHours=${availableHours}, weeklyCapacity=${weeklyCapacity}, utilization=${utilization}%`);
   
   // Get remarks for this member
   const memberRemarks = remarksData[member.id] || '';
@@ -181,6 +185,11 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       {projects.map(project => {
         const key = `${member.id}:${project.id}`;
         const hours = allocationMap.get(key) || 0;
+        
+        // For debugging
+        if (project.name.includes('HERB')) {
+          console.log(`Project HERB allocation for ${member.first_name}: ${hours} hours`);
+        }
         
         return (
           <TableCell 

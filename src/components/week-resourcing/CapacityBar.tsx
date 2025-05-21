@@ -28,6 +28,8 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
 
   const boxColor = getBoxColor();
   
+  console.log(`CapacityBar: availableHours=${availableHours}, totalCapacity=${totalCapacity}, percentageUsed=${percentageUsed}%`);
+  
   return (
     <div className="flex items-center space-x-2 w-full py-1">
       <div className="flex-1 flex space-x-0.5 max-w-24">
@@ -38,8 +40,6 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
           const boxEndPercent = (index + 1) * 20;
           
           // Determine if this specific box should be filled
-          // Only fill if the percentage used is AT OR ABOVE the box's starting percentage
-          // For partial filling, check if it's within the current box's range
           const isFilled = percentageUsed >= boxEndPercent;
           const isPartiallyFilled = !isFilled && percentageUsed > boxStartPercent;
           
