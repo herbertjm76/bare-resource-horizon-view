@@ -12,14 +12,10 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   availableHours,
   totalCapacity
 }) => {
-  // Calculate the percentage of capacity that is used
+  // Calculate the percentage of capacity that is USED (not available)
   const percentageUsed = Math.min(100, Math.max(0, ((totalCapacity - availableHours) / totalCapacity) * 100));
   
-  // Calculate how many boxes should be filled (out of 5)
-  // Each box represents 20% of capacity
-  const boxesFilled = Math.round((percentageUsed / 20));
-  
-  // Determine color based on utilization percentage
+  // Calculate color based on utilization percentage
   const getBoxColor = () => {
     if (percentageUsed >= 80) {
       return 'bg-green-500'; // Green for high utilization (80-100%)
@@ -32,29 +28,39 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
 
   const boxColor = getBoxColor();
   
+  // Instead of rounding to whole boxes, we'll calculate exactly how many boxes should be filled
+  // by their percentage. Each box represents 20% of capacity.
+  
   return (
     <div className="flex items-center space-x-2 w-full py-1">
       <div className="flex-1 flex space-x-0.5 max-w-24">
         {/* Render 5 boxes, each representing 20% of capacity */}
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Tooltip key={index}>
-            <TooltipTrigger asChild>
-              <div 
-                className={cn(
-                  "h-3 flex-1 border border-gray-300 rounded-sm",
-                  index < boxesFilled ? boxColor : "bg-gray-100"
-                )}
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="text-xs">
-                {index < boxesFilled ? 
-                  `Used (${Math.min(20, Math.max(0, percentageUsed - index * 20)).toFixed(0)}%)` : 
-                  'Available'}
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        ))}
+        {Array.from({ length: 5 }).map((_, index) => {
+          // Calculate if this box should be filled based on percentage
+          // Each box represents 20% (index 0 = 0-20%, index 1 = 20-40%, etc.)
+          const boxStartPercent = index * 20;
+          const boxShouldBeFilled = percentageUsed > boxStartPercent;
+          
+          return (
+            <Tooltip key={index}>
+              <TooltipTrigger asChild>
+                <div 
+                  className={cn(
+                    "h-3 flex-1 border border-gray-300 rounded-sm",
+                    boxShouldBeFilled ? boxColor : "bg-gray-100"
+                  )}
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">
+                  {boxShouldBeFilled ? 
+                    `Used (${Math.min(20, Math.max(0, percentageUsed - boxStartPercent)).toFixed(0)}%)` : 
+                    'Available'}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          );
+        })}
       </div>
       <span className="text-xs font-semibold w-6 text-right">{availableHours}</span>
     </div>
