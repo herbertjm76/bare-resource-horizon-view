@@ -6,6 +6,7 @@ import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { format, isWithinInterval, parseISO, addDays } from 'date-fns';
 import { toast } from 'sonner';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { supabase } from '@/integrations/supabase/client';
 
 interface HolidayCellProps {
   holidayHours: number;
@@ -13,6 +14,14 @@ interface HolidayCellProps {
   memberOffice?: string;
   weekStartDate: string;
   onLeaveInputChange: (memberId: string, leaveType: string, value: string) => void;
+}
+
+interface Holiday {
+  id: string;
+  description: string;
+  start_date: Date;
+  end_date: Date;
+  offices: string[];
 }
 
 export const HolidayCell: React.FC<HolidayCellProps> = ({
@@ -26,17 +35,44 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
   const { locations } = useOfficeSettings();
   const [holidayNames, setHolidayNames] = useState<string[]>([]);
   const [autoDetected, setAutoDetected] = useState(false);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
   
-  // Function to get holidays from localStorage and calculate hours
+  // Fetch holidays from the database
+  useEffect(() => {
+    const fetchHolidays = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('office_holidays')
+          .select('*');
+          
+        if (error) throw error;
+        
+        // Transform the data format
+        const transformedHolidays: Holiday[] = data.map(holiday => ({
+          id: holiday.id,
+          description: holiday.description,
+          start_date: new Date(holiday.start_date),
+          end_date: new Date(holiday.end_date),
+          offices: holiday.offices || []
+        }));
+        
+        setHolidays(transformedHolidays);
+      } catch (error) {
+        console.error("Error fetching holidays:", error);
+      }
+    };
+    
+    fetchHolidays();
+  }, []);
+  
+  // Function to calculate holiday hours based on fetched holidays
   const calculateHolidayHours = () => {
-    if (!memberOffice) return 0;
+    if (!memberOffice || !holidays.length) return 0;
     
     try {
-      const storedHolidays = localStorage.getItem("office_holidays");
-      if (!storedHolidays) return 0;
-      
-      const holidays = JSON.parse(storedHolidays);
-      if (!Array.isArray(holidays)) return 0;
+      // Find the location id for the member's office
+      const locationObj = locations.find(loc => loc.city === memberOffice || loc.code === memberOffice);
+      if (!locationObj) return 0;
       
       // Get the week range
       const weekStart = new Date(weekStartDate);
@@ -45,24 +81,15 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
       // Filter holidays that match the member's office and fall within the week
       const applicableHolidays = holidays.filter(holiday => {
         // Check if holiday applies to this member's office
-        if (!holiday.offices || !holiday.offices.includes(memberOffice)) {
+        if (!holiday.offices.includes(locationObj.id)) {
           return false;
         }
         
-        // Parse dates properly - ensure we have Date objects
-        const startDate = holiday.startDate instanceof Date 
-          ? holiday.startDate 
-          : new Date(holiday.startDate);
-        
-        const endDate = holiday.endDate instanceof Date 
-          ? holiday.endDate 
-          : new Date(holiday.endDate);
-        
         // Check for any overlap between holiday period and week period
         return (
-          (isWithinInterval(startDate, { start: weekStart, end: weekEnd }) ||
-           isWithinInterval(endDate, { start: weekStart, end: weekEnd }) ||
-           (startDate <= weekStart && endDate >= weekEnd))
+          isWithinInterval(holiday.start_date, { start: weekStart, end: weekEnd }) ||
+          isWithinInterval(holiday.end_date, { start: weekStart, end: weekEnd }) ||
+          (holiday.start_date <= weekStart && holiday.end_date >= weekEnd)
         );
       });
       
@@ -80,9 +107,7 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
           if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Not Sunday (0) or Saturday (6)
             // Check if this day is in any of the applicable holidays
             const isHoliday = applicableHolidays.some(holiday => {
-              const holidayStart = new Date(holiday.startDate);
-              const holidayEnd = new Date(holiday.endDate);
-              return currentDate >= holidayStart && currentDate <= holidayEnd;
+              return currentDate >= holiday.start_date && currentDate <= holiday.end_date;
             });
             
             if (isHoliday) {
@@ -105,7 +130,7 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
     }
   };
   
-  // Auto-detect holidays when component mounts or when weekStartDate/memberOffice changes
+  // Auto-detect holidays when component mounts or when weekStartDate/memberOffice/holidays changes
   useEffect(() => {
     const calculatedHours = calculateHolidayHours();
     
@@ -125,7 +150,7 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
       setHolidayHours(0);
       setAutoDetected(false);
     }
-  }, [weekStartDate, memberOffice, memberId]);
+  }, [weekStartDate, memberOffice, memberId, holidays]);
   
   return (
     <TableCell className="leave-cell text-center p-1 border-r">

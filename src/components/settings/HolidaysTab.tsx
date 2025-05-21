@@ -19,7 +19,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useCompany } from "@/context/CompanyContext";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
@@ -27,8 +27,8 @@ import { toast } from "sonner";
 
 const formSchema = z.object({
   description: z.string().min(1, "Description is required"),
-  startDate: z.date({ required_error: "Start date is required" }),
-  endDate: z.date({ required_error: "End date is required" }),
+  start_date: z.date({ required_error: "Start date is required" }),
+  end_date: z.date({ required_error: "End date is required" }),
   offices: z.array(z.string()).min(1, "Select at least one office."),
 });
 
@@ -37,8 +37,8 @@ type HolidayFormValues = z.infer<typeof formSchema>;
 type Holiday = {
   id: string;
   description: string;
-  startDate: Date;
-  endDate: Date;
+  start_date: Date;
+  end_date: Date;
   offices: string[];
   company_id?: string;
 };
@@ -57,8 +57,8 @@ export const HolidaysTab = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       description: "",
-      startDate: new Date(),
-      endDate: new Date(),
+      start_date: new Date(),
+      end_date: new Date(),
       offices: [],
     }
   });
@@ -70,24 +70,31 @@ export const HolidaysTab = () => {
     console.log("Fetching holidays for company:", company.id);
     
     try {
-      // Get holidays from localStorage first
-      const storedHolidays = localStorage.getItem("office_holidays");
-      let holidaysData: Holiday[] = [];
-      
-      if (storedHolidays) {
-        try {
-          const parsed = JSON.parse(storedHolidays);
-          holidaysData = Array.isArray(parsed) ? parsed : [];
-        } catch (err) {
-          console.error("Error parsing localStorage holidays:", err);
-        }
+      // Fetch holidays from Supabase
+      const { data, error } = await supabase
+        .from('office_holidays')
+        .select('*')
+        .eq('company_id', company.id);
+        
+      if (error) {
+        throw error;
       }
       
-      console.log("Loaded holidays from localStorage:", holidaysData);
-      setHolidays(holidaysData);
+      // Transform the data format
+      const transformedHolidays: Holiday[] = data.map(holiday => ({
+        id: holiday.id,
+        description: holiday.description,
+        start_date: new Date(holiday.start_date),
+        end_date: new Date(holiday.end_date),
+        offices: holiday.offices || [],
+        company_id: holiday.company_id
+      }));
+      
+      console.log("Loaded holidays from database:", transformedHolidays.length);
+      setHolidays(transformedHolidays);
     } catch (error) {
       console.error("Error fetching holidays:", error);
-      toast("Failed to load holidays");
+      toast.error("Failed to load holidays");
     } finally {
       setLoading(false);
     }
@@ -96,14 +103,6 @@ export const HolidaysTab = () => {
   useEffect(() => {
     fetchHolidays();
   }, [company]);
-
-  const persistHolidays = (updatedHolidays: Holiday[]) => {
-    try {
-      localStorage.setItem("office_holidays", JSON.stringify(updatedHolidays));
-    } catch (err) {
-      console.error("Error saving holidays to localStorage:", err);
-    }
-  };
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
@@ -117,8 +116,8 @@ export const HolidaysTab = () => {
     setEditingHoliday(holiday);
     form.reset({
       description: holiday.description,
-      startDate: holiday.startDate,
-      endDate: holiday.endDate,
+      start_date: holiday.start_date,
+      end_date: holiday.end_date,
       offices: holiday.offices
     });
     setOpen(true);
@@ -128,42 +127,100 @@ export const HolidaysTab = () => {
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
-  const handleBulkDelete = () => {
-    const updatedHolidays = holidays.filter(h => !selected.includes(h.id));
-    setHolidays(updatedHolidays);
-    persistHolidays(updatedHolidays);
-    setSelected([]);
-    setEditMode(false);
-    toast("Holidays deleted", { description: "Selected holidays have been deleted" });
+  const handleBulkDelete = async () => {
+    if (!selected.length || !company) return;
+    
+    setLoading(true);
+    try {
+      // Delete from Supabase
+      const { error } = await supabase
+        .from('office_holidays')
+        .delete()
+        .in('id', selected);
+        
+      if (error) throw error;
+      
+      // Update local state
+      const updatedHolidays = holidays.filter(h => !selected.includes(h.id));
+      setHolidays(updatedHolidays);
+      setSelected([]);
+      setEditMode(false);
+      toast.success("Holidays deleted");
+    } catch (error) {
+      console.error("Error deleting holidays:", error);
+      toast.error("Failed to delete holidays");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const onSubmit = (values: HolidayFormValues) => {
-    if (editingHoliday) {
-      const updatedHolidays = holidays.map(holiday => 
-        holiday.id === editingHoliday.id
-        ? { ...holiday, ...values }
-        : holiday
-      );
-      setHolidays(updatedHolidays);
-      persistHolidays(updatedHolidays);
-      toast("Holiday updated");
-    } else {
-      const newHoliday: Holiday = { 
-        id: Date.now().toString(), 
-        description: values.description,
-        startDate: values.startDate,
-        endDate: values.endDate,
-        offices: values.offices,
-        company_id: company?.id 
-      };
-      const updatedHolidays = [...holidays, newHoliday];
-      setHolidays(updatedHolidays);
-      persistHolidays(updatedHolidays);
-      toast("Holiday added");
+  const onSubmit = async (values: HolidayFormValues) => {
+    if (!company) return;
+    
+    setLoading(true);
+    
+    try {
+      if (editingHoliday) {
+        // Update existing holiday
+        const { error } = await supabase
+          .from('office_holidays')
+          .update({
+            description: values.description,
+            start_date: values.start_date,
+            end_date: values.end_date,
+            offices: values.offices,
+            updated_at: new Date()
+          })
+          .eq('id', editingHoliday.id);
+          
+        if (error) throw error;
+        
+        // Update local state
+        setHolidays(prev => prev.map(holiday => 
+          holiday.id === editingHoliday.id
+            ? { ...holiday, ...values }
+            : holiday
+        ));
+        
+        toast.success("Holiday updated");
+      } else {
+        // Create new holiday
+        const { data, error } = await supabase
+          .from('office_holidays')
+          .insert({
+            description: values.description,
+            start_date: values.start_date,
+            end_date: values.end_date,
+            offices: values.offices,
+            company_id: company.id
+          })
+          .select();
+          
+        if (error) throw error;
+        
+        const newHoliday: Holiday = { 
+          id: data[0].id, 
+          description: values.description,
+          start_date: values.start_date,
+          end_date: values.end_date,
+          offices: values.offices,
+          company_id: company.id 
+        };
+        
+        // Update local state
+        setHolidays(prev => [...prev, newHoliday]);
+        
+        toast.success("Holiday added");
+      }
+    } catch (error) {
+      console.error("Error saving holiday:", error);
+      toast.error("Failed to save holiday");
+    } finally {
+      setLoading(false);
+      setOpen(false);
+      form.reset();
+      setEditingHoliday(null);
     }
-    setOpen(false);
-    form.reset();
-    setEditingHoliday(null);
   };
 
   // Disable weekends
@@ -217,7 +274,8 @@ export const HolidaysTab = () => {
                   <div>
                     <div className="font-medium">{holiday.description}</div>
                     <div className="text-sm text-muted-foreground">
-                      {format(holiday.startDate, "PPP")} to {format(holiday.endDate, "PPP")} • {holiday.offices.map(id => locations.find(o=>o.id===id)?.city).filter(Boolean).join(", ")}
+                      {format(holiday.start_date, "PPP")} to {format(holiday.end_date, "PPP")} • 
+                      {holiday.offices.map(id => locations.find(o=>o.id===id)?.city).filter(Boolean).join(", ")}
                     </div>
                   </div>
                   {editMode ? (
@@ -271,7 +329,7 @@ export const HolidaysTab = () => {
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="startDate"
+                  name="start_date"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Start Date</FormLabel>
@@ -308,7 +366,7 @@ export const HolidaysTab = () => {
                 />
                 <FormField
                   control={form.control}
-                  name="endDate"
+                  name="end_date"
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>End Date</FormLabel>
@@ -374,7 +432,9 @@ export const HolidaysTab = () => {
                 )}
               />
               <DialogFooter>
-                <Button type="submit">{editingHoliday ? 'Update' : 'Add'} Holiday</Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? "Saving..." : editingHoliday ? 'Update' : 'Add'} Holiday
+                </Button>
               </DialogFooter>
             </form>
           </Form>
