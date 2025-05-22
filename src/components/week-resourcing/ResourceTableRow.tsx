@@ -104,7 +104,6 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       
       {/* Holiday Cell moved between AL and OL */}
       <HolidayCell 
-        holidayHours={holidayHours} 
         memberId={member.id}
         memberOffice={member.location}
         weekStartDate={weekStartDate}
