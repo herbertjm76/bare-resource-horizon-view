@@ -3,25 +3,18 @@ import React, { useState, useEffect } from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
-import { format, isWithinInterval, parseISO, addDays } from 'date-fns';
+import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
-import { supabase } from '@/integrations/supabase/client';
+import { fetchHolidays } from '@/components/settings/holidays/HolidayService';
+import { Holiday } from '@/components/settings/holidays/types';
+import { useCompany } from "@/context/CompanyContext";
 
 interface HolidayCellProps {
-  holidayHours: number;
   memberId: string;
   memberOffice?: string;
   weekStartDate: string;
   onLeaveInputChange: (memberId: string, leaveType: string, value: string) => void;
-}
-
-interface Holiday {
-  id: string;
-  name: string;
-  date: Date;
-  offices: string[];
-  location_id?: string;
 }
 
 export const HolidayCell: React.FC<HolidayCellProps> = ({
@@ -36,34 +29,23 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
   const [holidayNames, setHolidayNames] = useState<string[]>([]);
   const [autoDetected, setAutoDetected] = useState(false);
   const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const { company } = useCompany();
   
   // Fetch holidays from the database
   useEffect(() => {
-    const fetchHolidays = async () => {
+    const loadHolidays = async () => {
+      if (!company) return;
+      
       try {
-        const { data, error } = await supabase
-          .from('office_holidays')
-          .select('*');
-          
-        if (error) throw error;
-        
-        // Transform the data format
-        const transformedHolidays: Holiday[] = data.map(holiday => ({
-          id: holiday.id,
-          name: holiday.name,
-          date: new Date(holiday.date),
-          offices: holiday.location_id ? [holiday.location_id] : [],
-          location_id: holiday.location_id
-        }));
-        
-        setHolidays(transformedHolidays);
+        const holidaysData = await fetchHolidays(company.id);
+        setHolidays(holidaysData);
       } catch (error) {
         console.error("Error fetching holidays:", error);
       }
     };
     
-    fetchHolidays();
-  }, []);
+    loadHolidays();
+  }, [company]);
   
   // Function to calculate holiday hours based on fetched holidays
   const calculateHolidayHours = () => {
@@ -76,22 +58,18 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
       
       // Get the week range
       const weekStart = new Date(weekStartDate);
-      const weekEnd = addDays(weekStart, 6);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
       
       // Filter holidays that match the member's office and fall within the week
       const applicableHolidays = holidays.filter(holiday => {
         // Check if holiday applies to this member's office
-        // Either check the offices array or the location_id field
-        const holidayOffices = holiday.offices?.length > 0 
-          ? holiday.offices 
-          : (holiday.location_id ? [holiday.location_id] : []);
-
-        if (!holidayOffices.includes(locationObj.id)) {
+        if (holiday.location_id !== locationObj.id) {
           return false;
         }
         
         // Check for holiday date within the week
-        const holidayDate = holiday.date;
+        const holidayDate = new Date(holiday.date);
         return (
           holidayDate >= weekStart && holidayDate <= weekEnd
         );
@@ -106,7 +84,7 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
         
         // Count number of holidays within the week that are business days
         applicableHolidays.forEach(holiday => {
-          const holidayDate = holiday.date;
+          const holidayDate = new Date(holiday.date);
           const dayOfWeek = holidayDate.getDay();
           
           // Check if this day is a business day (not Sat/Sun)
