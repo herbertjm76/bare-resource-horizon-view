@@ -23,8 +23,8 @@ export const fetchHolidays = async (companyId: string): Promise<Holiday[]> => {
       id: holiday.id,
       name: holiday.name,
       date: new Date(holiday.date),
-      // Handle the case where end_date might not exist in the database yet
-      end_date: holiday.end_date ? new Date(holiday.end_date) : undefined,
+      // Safely handle end_date which might not exist in the database schema yet
+      end_date: 'end_date' in holiday && holiday.end_date ? new Date(holiday.end_date) : undefined,
       offices: holiday.location_id ? [holiday.location_id] : [], // Handle location_id as offices array
       is_recurring: holiday.is_recurring,
       company_id: holiday.company_id,
