@@ -43,6 +43,8 @@ export const fetchHolidays = async (companyId: string): Promise<Holiday[]> => {
 
 export const createHoliday = async (values: HolidayFormValues, companyId: string): Promise<Holiday | null> => {
   try {
+    console.log("Creating holiday with values:", values);
+    
     const { data, error } = await supabase
       .from('office_holidays')
       .insert({
@@ -55,7 +57,12 @@ export const createHoliday = async (values: HolidayFormValues, companyId: string
       })
       .select();
       
-    if (error) throw error;
+    if (error) {
+      console.error("Database error creating holiday:", error);
+      throw error;
+    }
+    
+    console.log("Holiday created successfully:", data);
     
     const newHoliday: Holiday = { 
       id: data[0].id, 
@@ -79,6 +86,8 @@ export const createHoliday = async (values: HolidayFormValues, companyId: string
 
 export const updateHoliday = async (id: string, values: HolidayFormValues): Promise<boolean> => {
   try {
+    console.log("Updating holiday:", id, values);
+    
     const { error } = await supabase
       .from('office_holidays')
       .update({

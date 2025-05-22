@@ -195,6 +195,7 @@ export type Database = {
           company_id: string | null
           created_at: string
           date: string
+          end_date: string | null
           id: string
           is_recurring: boolean
           location_id: string | null
@@ -205,6 +206,7 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           date: string
+          end_date?: string | null
           id?: string
           is_recurring?: boolean
           location_id?: string | null
@@ -215,6 +217,7 @@ export type Database = {
           company_id?: string | null
           created_at?: string
           date?: string
+          end_date?: string | null
           id?: string
           is_recurring?: boolean
           location_id?: string | null
