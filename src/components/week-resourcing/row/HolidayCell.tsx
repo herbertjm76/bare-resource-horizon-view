@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
-import { format } from 'date-fns';
+import { format, isWithinInterval, parseISO } from 'date-fns';
 import { toast } from 'sonner';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { fetchHolidays } from '@/components/settings/holidays/HolidayService';
@@ -68,10 +68,23 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
           return false;
         }
         
-        // Check for holiday date within the week
-        const holidayDate = new Date(holiday.date);
+        // Handle single day holiday
+        if (!holiday.end_date) {
+          const holidayDate = new Date(holiday.date);
+          return (
+            holidayDate >= weekStart && holidayDate <= weekEnd
+          );
+        }
+        
+        // Handle date range holidays
+        const startDate = new Date(holiday.date);
+        const endDate = new Date(holiday.end_date);
+        
+        // Check if holiday date range overlaps with the week
         return (
-          holidayDate >= weekStart && holidayDate <= weekEnd
+          (startDate <= weekEnd && startDate >= weekStart) || // Start date is within week
+          (endDate <= weekEnd && endDate >= weekStart) || // End date is within week
+          (startDate <= weekStart && endDate >= weekEnd) // Holiday range contains the entire week
         );
       });
       
@@ -83,15 +96,37 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
         let holidayDays = 0;
         
         // Count number of holidays within the week that are business days
-        applicableHolidays.forEach(holiday => {
-          const holidayDate = new Date(holiday.date);
-          const dayOfWeek = holidayDate.getDay();
-          
-          // Check if this day is a business day (not Sat/Sun)
-          if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-            holidayDays++;
+        for (const holiday of applicableHolidays) {
+          if (!holiday.end_date) {
+            // Single day holiday
+            const holidayDate = new Date(holiday.date);
+            const dayOfWeek = holidayDate.getDay();
+            
+            // Check if this day is a business day (not Sat/Sun) and within the week
+            if (dayOfWeek !== 0 && dayOfWeek !== 6 && 
+                holidayDate >= weekStart && holidayDate <= weekEnd) {
+              holidayDays++;
+            }
+          } else {
+            // Date range holiday
+            const startDate = new Date(holiday.date);
+            const endDate = new Date(holiday.end_date);
+            
+            // Adjust range to only include days within this week
+            const rangeStartInWeek = startDate < weekStart ? weekStart : startDate;
+            const rangeEndInWeek = endDate > weekEnd ? weekEnd : endDate;
+            
+            // Count business days in the adjusted range
+            let currentDay = new Date(rangeStartInWeek);
+            while (currentDay <= rangeEndInWeek) {
+              const dayOfWeek = currentDay.getDay();
+              if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                holidayDays++;
+              }
+              currentDay.setDate(currentDay.getDate() + 1);
+            }
           }
-        });
+        }
         
         // Assuming 8 hours per holiday day
         return holidayDays * 8;

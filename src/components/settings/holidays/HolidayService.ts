@@ -23,6 +23,7 @@ export const fetchHolidays = async (companyId: string): Promise<Holiday[]> => {
       id: holiday.id,
       name: holiday.name,
       date: new Date(holiday.date),
+      end_date: holiday.end_date ? new Date(holiday.end_date) : undefined,
       offices: holiday.location_id ? [holiday.location_id] : [], // Handle location_id as offices array
       is_recurring: holiday.is_recurring,
       company_id: holiday.company_id,
@@ -45,6 +46,7 @@ export const createHoliday = async (values: HolidayFormValues, companyId: string
       .insert({
         name: values.name,
         date: values.date.toISOString().split('T')[0], // Convert Date to YYYY-MM-DD string
+        end_date: values.end_date ? values.end_date.toISOString().split('T')[0] : null, // Include end_date if available
         location_id: values.offices[0], // Use first office as location_id for now
         company_id: companyId,
         is_recurring: false // Default to non-recurring
@@ -57,6 +59,7 @@ export const createHoliday = async (values: HolidayFormValues, companyId: string
       id: data[0].id, 
       name: values.name,
       date: values.date,
+      end_date: values.end_date,
       offices: values.offices,
       is_recurring: false,
       company_id: companyId,
@@ -79,6 +82,7 @@ export const updateHoliday = async (id: string, values: HolidayFormValues): Prom
       .update({
         name: values.name,
         date: values.date.toISOString().split('T')[0], // Convert Date to YYYY-MM-DD string
+        end_date: values.end_date ? values.end_date.toISOString().split('T')[0] : null, // Include end_date if available
         location_id: values.offices[0], // Use first office as location_id for now
         updated_at: new Date().toISOString() // Use string for timestamp
       })

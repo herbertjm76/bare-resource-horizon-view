@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, CalendarRangeIcon } from 'lucide-react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -11,9 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { Holiday, HolidayFormValues, holidayFormSchema } from './types';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+import { DateRange } from '@/components/ui/date-range-picker';
 
 interface HolidayDialogProps {
   open: boolean;
@@ -31,12 +33,14 @@ export const HolidayDialog: React.FC<HolidayDialogProps> = ({
   loading
 }) => {
   const { locations } = useOfficeSettings();
+  const [useDateRange, setUseDateRange] = useState<boolean>(false);
   
   const form = useForm<HolidayFormValues>({
     resolver: zodResolver(holidayFormSchema),
     defaultValues: {
       name: editingHoliday?.name || "",
       date: editingHoliday?.date || new Date(),
+      end_date: editingHoliday?.end_date || undefined,
       offices: editingHoliday?.offices || [],
     }
   });
@@ -46,14 +50,18 @@ export const HolidayDialog: React.FC<HolidayDialogProps> = ({
       form.reset({
         name: editingHoliday.name,
         date: editingHoliday.date,
+        end_date: editingHoliday.end_date,
         offices: editingHoliday.offices
       });
+      setUseDateRange(!!editingHoliday.end_date);
     } else if (open) {
       form.reset({
         name: "",
         date: new Date(),
+        end_date: undefined,
         offices: []
       });
+      setUseDateRange(false);
     }
   }, [editingHoliday, open, form]);
 
@@ -64,6 +72,10 @@ export const HolidayDialog: React.FC<HolidayDialogProps> = ({
   };
 
   const handleSubmit = (values: HolidayFormValues) => {
+    // If not using date range, ensure end_date is undefined
+    if (!useDateRange) {
+      values.end_date = undefined;
+    }
     onSubmit(values);
   };
 
@@ -92,46 +104,143 @@ export const HolidayDialog: React.FC<HolidayDialogProps> = ({
               )}
             />
             
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={disableWeekends}
-                        initialFocus
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="use-date-range"
+                checked={useDateRange}
+                onCheckedChange={setUseDateRange}
+              />
+              <label htmlFor="use-date-range" className="text-sm font-medium">
+                Use date range
+              </label>
+            </div>
+
+            {!useDateRange ? (
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={disableWeekends}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : (
+              <div className="grid gap-2">
+                <FormField
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Start Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick start date</span>
+                              )}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="end_date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>End Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick end date</span>
+                              )}
+                              <CalendarRangeIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            defaultMonth={form.getValues().date}
+                            fromDate={form.getValues().date}
+                            initialFocus
+                            className="p-3 pointer-events-auto"
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
             
             <FormField
               control={form.control}
