@@ -9,6 +9,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { useTeamFilters } from '@/hooks/useTeamFilters';
 import { TeamWorkloadContent } from '@/components/workload/TeamWorkloadContent';
 import '@/components/resources/resources-grid.css';
+import '@/components/workload/workload.css';
 
 const HEADER_HEIGHT = 56;
 

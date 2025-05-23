@@ -41,7 +41,7 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
         // Fetch all resource allocations for these members in the given weeks
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
-          .select('resource_id, hours, week_start_date')
+          .select('resource_id, hours, week_start_date, project_id, project:projects(name, code)')
           .eq('company_id', company.id)
           .in('resource_id', memberIds)
           .in('week_start_date', Array.from(weekStartDates));
@@ -51,6 +51,8 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
           setIsLoadingWorkload(false);
           return;
         }
+        
+        console.log('Fetched resource allocations:', allocations);
         
         // Process allocations to create a daily workload distribution
         const workload: Record<string, Record<string, number>> = {};
@@ -65,39 +67,41 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
         });
 
         // Process each allocation to distribute hours across the week
-        allocations?.forEach(allocation => {
-          if (!allocation.resource_id || !allocation.week_start_date) return;
-          
-          const weekStart = new Date(allocation.week_start_date);
-          const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-          
-          // Get workdays in this week that are also in the month
-          const workdays = eachDayOfInterval({ start: weekStart, end: weekEnd })
-            .filter(day => {
-              // Only consider days that are in the selected month
-              return day.getMonth() === selectedMonth.getMonth();
-            })
-            .filter(day => {
-              // Filter out weekends (Saturday and Sunday)
-              const dayOfWeek = day.getDay();
-              return dayOfWeek !== 0 && dayOfWeek !== 6;
-            });
-
-          if (workdays.length === 0) return;
-          
-          // Calculate hours per day (evenly distributed across workdays)
-          const hoursPerDay = allocation.hours / workdays.length;
-
-          // Assign hours to each workday
-          workdays.forEach(day => {
-            const dateKey = format(day, 'yyyy-MM-dd');
+        if (allocations) {
+          allocations.forEach(allocation => {
+            if (!allocation.resource_id || !allocation.week_start_date) return;
             
-            if (workload[allocation.resource_id] && 
-                workload[allocation.resource_id][dateKey] !== undefined) {
-              workload[allocation.resource_id][dateKey] += hoursPerDay;
-            }
+            const weekStart = new Date(allocation.week_start_date);
+            const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+            
+            // Get workdays in this week that are also in the month
+            const workdays = eachDayOfInterval({ start: weekStart, end: weekEnd })
+              .filter(day => {
+                // Only consider days that are in the selected month
+                return day.getMonth() === selectedMonth.getMonth();
+              })
+              .filter(day => {
+                // Filter out weekends (Saturday and Sunday)
+                const dayOfWeek = day.getDay();
+                return dayOfWeek !== 0 && dayOfWeek !== 6;
+              });
+
+            if (workdays.length === 0) return;
+            
+            // Calculate hours per day (evenly distributed across workdays)
+            const hoursPerDay = allocation.hours / workdays.length;
+
+            // Assign hours to each workday
+            workdays.forEach(day => {
+              const dateKey = format(day, 'yyyy-MM-dd');
+              
+              if (workload[allocation.resource_id] && 
+                  workload[allocation.resource_id][dateKey] !== undefined) {
+                workload[allocation.resource_id][dateKey] += hoursPerDay;
+              }
+            });
           });
-        });
+        }
         
         setWorkloadData(workload);
       } catch (error) {
