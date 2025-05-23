@@ -5,7 +5,7 @@ import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 
 interface ResourceGridContainerProps {
   startDate: Date;
-  weeksToShow: number;
+  periodToShow: number; // Changed from weeksToShow to periodToShow
   filters: {
     office: string;
     country: string;
@@ -16,7 +16,7 @@ interface ResourceGridContainerProps {
 
 export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
   startDate,
-  weeksToShow,
+  periodToShow,
   filters
 }) => {
   return (
@@ -24,7 +24,7 @@ export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
       <OfficeSettingsProvider>
         <ResourceAllocationGrid 
           startDate={startDate}
-          weeksToShow={weeksToShow}
+          periodToShow={periodToShow}
           filters={filters}
         />
       </OfficeSettingsProvider>

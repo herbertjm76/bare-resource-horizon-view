@@ -1,15 +1,13 @@
 
 import React from 'react';
-import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
-import { SearchInput } from '@/components/resources/filters/SearchInput';
-import { FilterPopover } from '@/components/filters/FilterPopover';
+import { SearchInput } from './filters/SearchInput';
+import { FilterButton } from './filters/FilterButton';
+import { MonthYearSelector } from './filters/MonthYearSelector';
 
 interface ResourcesHeaderProps {
   title: string;
-  selectedWeek: Date;
-  onPreviousWeek: () => void;
-  onNextWeek: () => void;
-  weekLabel: string;
+  selectedMonth: Date;
+  onMonthChange: (date: Date) => void;
   searchTerm: string;
   onSearchChange: (value: string) => void;
   filterContent: React.ReactNode;
@@ -19,10 +17,8 @@ interface ResourcesHeaderProps {
 
 export const ResourcesHeader: React.FC<ResourcesHeaderProps> = ({
   title,
-  selectedWeek,
-  onPreviousWeek,
-  onNextWeek,
-  weekLabel,
+  selectedMonth,
+  onMonthChange,
   searchTerm,
   onSearchChange,
   filterContent,
@@ -30,40 +26,33 @@ export const ResourcesHeader: React.FC<ResourcesHeaderProps> = ({
   onClearFilters
 }) => {
   return (
-    <>
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-brand-primary">{title}</h1>
-      </div>
-      
-      <div className="flex flex-wrap gap-4 mb-4">
-        {/* Week selector in a bordered box */}
-        <div className="flex border rounded-md p-2 items-center">
-          <WeekSelector
-            selectedWeek={selectedWeek}
-            onPreviousWeek={onPreviousWeek}
-            onNextWeek={onNextWeek}
-            weekLabel={weekLabel}
+    <div className="space-y-4 mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-brand-primary">
+          {title}
+        </h1>
+        
+        <div className="flex flex-wrap items-center gap-2">
+          <SearchInput
+            value={searchTerm}
+            onChange={onSearchChange}
+            className="w-full sm:w-auto"
+          />
+          
+          <FilterButton
+            activeFiltersCount={activeFiltersCount}
+            filterContent={filterContent}
+            onClearFilters={onClearFilters}
           />
         </div>
-        
-        {/* Search and filter in a bordered box */}
-        <div className="flex items-center border rounded-md p-2 gap-2 flex-1 max-w-md">
-          <div className="flex-1">
-            <SearchInput 
-              value={searchTerm}
-              onChange={onSearchChange}
-              placeholder="Search projects..."
-            />
-          </div>
-          
-          <FilterPopover
-            activeFiltersCount={activeFiltersCount}
-            onClearFilters={onClearFilters}
-          >
-            {filterContent}
-          </FilterPopover>
-        </div>
       </div>
-    </>
+      
+      <div className="flex flex-wrap justify-between items-center gap-4">
+        <MonthYearSelector 
+          selectedDate={selectedMonth} 
+          onDateChange={onMonthChange}
+        />
+      </div>
+    </div>
   );
 };

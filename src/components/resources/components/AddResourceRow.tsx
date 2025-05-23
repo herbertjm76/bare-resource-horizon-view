@@ -1,48 +1,40 @@
 
 import React from 'react';
-import { PlusCircle } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 interface AddResourceRowProps {
   isExpanded: boolean;
   rowBgClass: string;
-  weeksCount: number;
+  daysCount: number; // Changed from weeksCount to daysCount
   onAddResource: () => void;
 }
 
 export const AddResourceRow: React.FC<AddResourceRowProps> = ({
   isExpanded,
   rowBgClass,
-  weeksCount,
+  daysCount,
   onAddResource
 }) => {
   if (!isExpanded) return null;
   
   return (
-    <tr className={`border-b ${rowBgClass} h-6`}>
+    <tr className={`border-b ${rowBgClass} hover:bg-gray-50 h-8`}>
       {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${rowBgClass} z-10 p-0 w-12`}></td>
+      <td className={`sticky-left-0 ${rowBgClass} z-10 p-0.5 w-12 hover:bg-gray-50`}></td>
       
-      {/* Resource info column */}
-      <td 
-        className={`sticky-left-12 ${rowBgClass} z-10 px-1 py-0`} 
-        style={{ width: '200px', minWidth: '200px' }}
-      >
-        <button 
-          className="flex items-center text-xs text-muted-foreground hover:text-foreground ml-5"
+      {/* Add Resource column */}
+      <td className={`sticky-left-12 ${rowBgClass} z-10 p-1 hover:bg-gray-50`} colSpan={daysCount + 1}>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="flex items-center text-xs text-muted-foreground hover:text-brand-primary ml-4"
           onClick={onAddResource}
         >
-          <PlusCircle className="h-3 w-3 mr-1" />
-          <span>Add resource</span>
-        </button>
+          <UserPlus className="h-3 w-3 mr-1" />
+          Add Resource
+        </Button>
       </td>
-      
-      {/* Empty cells for week columns */}
-      {Array(weeksCount).fill(0).map((_, index) => (
-        <td key={index} className="p-0"></td>
-      ))}
-      
-      {/* Add blank flexible cell */}
-      <td className="p-0"></td>
     </tr>
   );
 };

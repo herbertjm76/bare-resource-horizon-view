@@ -6,8 +6,17 @@ import { toast } from 'sonner';
 import { Input } from "@/components/ui/input";
 import { useResourceAllocationsDB } from '@/hooks/allocations';
 import { ResourceUtilizationBadge } from './components/ResourceUtilizationBadge';
-import { getWeekStartDate } from '@/hooks/allocations/utils/dateUtils';
 import { format } from 'date-fns';
+
+interface DayInfo {
+  date: Date;
+  label: string;
+  dayName: string;
+  monthLabel: string;
+  isWeekend: boolean;
+  isSunday: boolean;
+  isFirstOfMonth: boolean;
+}
 
 interface ResourceRowProps {
   resource: {
@@ -17,20 +26,16 @@ interface ResourceRowProps {
     allocations?: Record<string, number>;
     isPending?: boolean;
   };
-  weeks: {
-    startDate: Date;
-    label: string;
-    days: Date[];
-  }[];
+  days: DayInfo[];
   projectId: string;
-  onAllocationChange: (resourceId: string, weekKey: string, hours: number) => void;
+  onAllocationChange: (resourceId: string, dayKey: string, hours: number) => void;
   onDeleteResource: (resourceId: string) => void;
   isEven?: boolean;
 }
 
 export const ResourceRow: React.FC<ResourceRowProps> = ({
   resource,
-  weeks,
+  days,
   projectId,
   onAllocationChange,
   onDeleteResource,
@@ -52,8 +57,8 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
   useEffect(() => {
     const initialValues: Record<string, string> = {};
     
-    Object.entries(allocations).forEach(([weekKey, hours]) => {
-      initialValues[weekKey] = hours > 0 ? hours.toString() : '';
+    Object.entries(allocations).forEach(([dayKey, hours]) => {
+      initialValues[dayKey] = hours > 0 ? hours.toString() : '';
     });
     
     setInputValues(initialValues);
@@ -65,37 +70,36 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     : "bg-gray-50";
 
   // Handle input change locally without saving to DB immediately
-  const handleInputChange = (weekKey: string, value: string) => {
+  const handleInputChange = (dayKey: string, value: string) => {
     setInputValues(prev => ({
       ...prev,
-      [weekKey]: value
+      [dayKey]: value
     }));
   };
   
   // Save allocation when user is done typing (on blur)
-  const handleInputBlur = (weekKey: string, value: string) => {
+  const handleInputBlur = (dayKey: string, value: string) => {
     const numValue = parseInt(value, 10);
     const hours = isNaN(numValue) ? 0 : numValue;
     
-    console.log(`Saving allocation for resource ${resource.id}, week ${weekKey}: ${hours} hours`);
+    console.log(`Saving allocation for resource ${resource.id}, day ${dayKey}: ${hours} hours`);
     
     // Save to database with the specific date
-    saveAllocation(weekKey, hours);
+    saveAllocation(dayKey, hours);
     
     // Propagate change to parent for UI updates
-    onAllocationChange(resource.id, weekKey, hours);
+    onAllocationChange(resource.id, dayKey, hours);
   };
   
-  const getWeekKey = (startDate: Date) => {
-    // Ensure we're using Monday as the week start date
-    const mondayDate = getWeekStartDate(startDate);
-    return format(mondayDate, 'yyyy-MM-dd');
+  // Helper to get day key for allocation lookup
+  const getDayKey = (date: Date): string => {
+    return format(date, 'yyyy-MM-dd');
   };
 
-  // Calculate total allocated hours across all weeks
+  // Calculate total allocated hours across all days
   const totalAllocatedHours = Object.values(allocations).reduce((sum, hours) => sum + hours, 0);
-  // Standard capacity would be 40 hours per week
-  const standardCapacity = 40 * weeks.length;
+  // Standard capacity would be 8 hours per workday
+  const standardCapacity = days.filter(d => !d.isWeekend).length * 8;
   // Calculate utilization percentage
   const utilizationPercentage = standardCapacity > 0 
     ? (totalAllocatedHours / standardCapacity) * 100 
@@ -136,24 +140,31 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
         </div>
       </td>
       
-      {/* Allocation input cells */}
-      {weeks.map((week, index) => {
-        const weekKey = getWeekKey(week.startDate);
-        const inputValue = inputValues[weekKey] || '';
+      {/* Allocation input cells - one for each day */}
+      {days.map((day) => {
+        const dayKey = getDayKey(day.date);
+        const inputValue = inputValues[dayKey] || '';
+        const isWeekendClass = day.isWeekend ? 'bg-muted/40' : '';
+        const isSundayClass = day.isSunday ? 'sunday-border' : '';
+        const isFirstOfMonthClass = day.isFirstOfMonth ? 'border-l-2 border-l-brand-primary/40' : '';
         
         return (
-          <td key={weekKey} className="p-0 text-center" style={{ width: '35px', minWidth: '35px' }}>
+          <td 
+            key={dayKey} 
+            className={`p-0 text-center ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass}`} 
+            style={{ width: '30px', minWidth: '30px' }}
+          >
             <div className="allocation-input-container px-0.5">
               <Input
                 type="number"
                 min="0"
-                max="168"
+                max="24"
                 value={inputValue}
-                onChange={(e) => handleInputChange(weekKey, e.target.value)}
-                onBlur={(e) => handleInputBlur(weekKey, e.target.value)}
-                className={`w-full h-5 px-0 text-center text-xs border-gray-200 focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''}`}
-                placeholder="0"
-                disabled={isLoading || isSaving}
+                onChange={(e) => handleInputChange(dayKey, e.target.value)}
+                onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
+                className={`w-full h-5 px-0 text-center text-xs border-gray-200 focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''} ${day.isWeekend ? 'bg-muted/20' : ''}`}
+                placeholder=""
+                disabled={isLoading || isSaving || day.isWeekend}
               />
             </div>
           </td>
@@ -164,4 +175,4 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
       <td className="p-0"></td>
     </tr>
   );
-}
+};

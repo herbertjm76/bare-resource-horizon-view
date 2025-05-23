@@ -3,28 +3,25 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
-import { format, addWeeks, subWeeks, startOfWeek } from 'date-fns';
 import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { ProjectResourceFilters } from '@/components/resources/filters/ProjectResourceFilters';
 import { ResourcesHeader } from '@/components/resources/ResourcesHeader';
 import { ResourceGridContainer } from '@/components/resources/ResourceGridContainer';
+import { format } from 'date-fns';
 
 const HEADER_HEIGHT = 56;
 
 const ProjectResourcing = () => {
-  // Get the start of the current week (Monday)
-  const today = new Date();
-  const mondayOfCurrentWeek = startOfWeek(today, { weekStartsOn: 1 });
-  
-  const [selectedWeek, setSelectedWeek] = useState<Date>(mondayOfCurrentWeek);
+  // Use the current month as the default view
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
   const [searchTerm, setSearchTerm] = useState('');
   
   const [filters, setFilters] = useState({
     office: "all",
     country: "all",
     manager: "all",
-    weeksToShow: 12, // Default is 12 weeks
+    periodToShow: 12, // Default is 12 weeks
   });
   
   // Get project data
@@ -40,10 +37,10 @@ const ProjectResourcing = () => {
     }));
   };
   
-  const handleWeeksChange = (weeks: number) => {
+  const handlePeriodChange = (period: number) => {
     setFilters(prev => ({
       ...prev,
-      weeksToShow: weeks
+      periodToShow: period
     }));
   };
   
@@ -51,19 +48,14 @@ const ProjectResourcing = () => {
     setSearchTerm(value);
   };
   
-  // Week navigation functions
-  const goToPreviousWeek = useCallback(() => {
-    setSelectedWeek(prevWeek => subWeeks(prevWeek, 1));
+  const handleMonthChange = useCallback((date: Date) => {
+    setSelectedMonth(date);
   }, []);
 
-  const goToNextWeek = useCallback(() => {
-    setSelectedWeek(prevWeek => addWeeks(prevWeek, 1));
-  }, []);
-
-  // Format the week label
-  const weekLabel = useCallback((date: Date) => {
-    return `Week of ${format(date, 'MMM d, yyyy')}`;
-  }, []);
+  // Format the month label
+  const monthLabel = useMemo(() => {
+    return format(selectedMonth, 'MMMM yyyy');
+  }, [selectedMonth]);
   
   // Extract unique offices, countries, and managers for filters
   const officeOptions = useMemo(() => {
@@ -99,7 +91,7 @@ const ProjectResourcing = () => {
       office: "all",
       country: "all",
       manager: "all",
-      weeksToShow: filters.weeksToShow // Keep the weeks setting
+      periodToShow: filters.periodToShow // Keep the period setting
     });
     setSearchTerm('');
   };
@@ -110,7 +102,7 @@ const ProjectResourcing = () => {
       filters={filters}
       searchTerm={searchTerm}
       onFilterChange={handleFilterChange}
-      onWeeksChange={handleWeeksChange}
+      onPeriodChange={handlePeriodChange}
       onSearchChange={handleSearchChange}
       officeOptions={officeOptions}
       countryOptions={countryOptions}
@@ -128,14 +120,15 @@ const ProjectResourcing = () => {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background flex flex-col" style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)`, overflowY: 'auto' }}>
+          <div 
+            className="flex-1 p-4 sm:p-8 bg-background flex flex-col" 
+            style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)`, overflowY: 'auto' }}
+          >
             <div className="flex flex-col max-w-full">
               <ResourcesHeader
                 title="Project Resourcing"
-                selectedWeek={selectedWeek}
-                onPreviousWeek={goToPreviousWeek}
-                onNextWeek={goToNextWeek}
-                weekLabel={weekLabel(selectedWeek)}
+                selectedMonth={selectedMonth}
+                onMonthChange={handleMonthChange}
                 searchTerm={searchTerm}
                 onSearchChange={handleSearchChange}
                 filterContent={filterContent}
@@ -144,8 +137,8 @@ const ProjectResourcing = () => {
               />
               
               <ResourceGridContainer
-                startDate={selectedWeek}
-                weeksToShow={filters.weeksToShow}
+                startDate={selectedMonth}
+                periodToShow={filters.periodToShow}
                 filters={{
                   ...filters,
                   searchTerm
