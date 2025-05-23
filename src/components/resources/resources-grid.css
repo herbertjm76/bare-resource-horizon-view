@@ -251,3 +251,29 @@
   height: 100%;
   background-color: #9b87f5;
 }
+
+/* Project column styling - NEW */
+.annual-leave-calendar th.project-column-header {
+  background-color: rgba(111, 75, 246, 0.1);
+  color: #6F4BF6;
+  font-weight: 500;
+}
+
+/* Project column group separator - NEW */
+.annual-leave-calendar th.project-column-separator,
+.annual-leave-calendar td.project-column-separator {
+  border-right: 2px solid rgba(111, 75, 246, 0.2);
+}
+
+/* Project count badge - NEW */
+.project-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(111, 75, 246, 0.1);
+  color: #6F4BF6;
+  font-weight: 500;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  min-width: 2rem;
+}

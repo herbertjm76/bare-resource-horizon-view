@@ -26,12 +26,19 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
         {/* Office Location Header - moved to the end */}
         <TableHead className="w-14 text-center border-r">Off</TableHead>
         
-        {/* Project allocation headers */}
-        {projects.map((project, idx) => (
-          <TableHead key={project.id} className="w-10 text-center border-r">
-            {!project.isEmpty ? `P${idx + 1}` : ''}
-          </TableHead>
-        ))}
+        {/* Project allocation headers - with more distinct styling */}
+        {projects.map((project, idx) => {
+          // Add a thicker border between every third project
+          const borderClass = (idx + 1) % 3 === 0 ? "border-r-2 border-r-brand-violet/20" : "border-r";
+          return (
+            <TableHead 
+              key={project.id} 
+              className={`w-10 text-center ${borderClass} ${!project.isEmpty ? "bg-brand-violet-light/40 text-brand-violet font-medium" : ""}`}
+            >
+              {!project.isEmpty ? `P${idx + 1}` : ''}
+            </TableHead>
+          );
+        })}
         
         {/* Add Remarks column if showRemarks is true */}
         {showRemarks && (
