@@ -1,0 +1,39 @@
+
+/* Additional workload specific styles */
+.workload-header {
+  background-color: #f9f9fb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* Intensity colors for workload cells */
+.workload-high {
+  background-color: rgba(111, 75, 246, 0.9) !important;
+  color: white;
+}
+
+.workload-medium {
+  background-color: rgba(111, 75, 246, 0.6) !important;
+}
+
+.workload-low {
+  background-color: rgba(111, 75, 246, 0.3) !important;
+}
+
+/* Cell hover effect for workload */
+.workload-cell:hover {
+  outline: 2px solid rgba(111, 75, 246, 0.5);
+  outline-offset: -2px;
+  z-index: 5;
+  position: relative;
+}
+
+/* Total column styling */
+.total-column {
+  background-color: rgba(0, 0, 0, 0.03);
+  font-weight: 500;
+}
+
+/* Special styling for overallocated members */
+.overallocated {
+  color: #e11d48;
+}
