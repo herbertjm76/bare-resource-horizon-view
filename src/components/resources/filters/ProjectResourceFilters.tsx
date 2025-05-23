@@ -100,8 +100,9 @@ export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
       <FilterBadges
         filters={filters}
         searchTerm={searchTerm}
-        onFilterChange={onFilterChange}
         onSearchChange={onSearchChange}
+        onFilterChange={onFilterChange}
+        managerOptions={managers}
       />
     </div>
   );
