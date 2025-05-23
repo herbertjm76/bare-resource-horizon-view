@@ -38,19 +38,22 @@ export const ResourcesHeader: React.FC<ResourcesHeaderProps> = ({
             onChange={onSearchChange}
             className="w-full sm:w-auto"
           />
-          
-          <FilterButton
-            activeFiltersCount={activeFiltersCount}
-            filterContent={filterContent}
-            onClearFilters={onClearFilters}
-          />
         </div>
       </div>
       
-      <div className="flex flex-wrap justify-between items-center gap-4">
-        <MonthYearSelector 
-          selectedDate={selectedMonth} 
-          onDateChange={onMonthChange}
+      <div className="flex flex-wrap justify-between items-center gap-4 bg-white p-2 rounded-md shadow-sm">
+        <div className="flex items-center gap-2">
+          <MonthYearSelector 
+            selectedDate={selectedMonth} 
+            onDateChange={onMonthChange}
+          />
+        </div>
+        
+        <FilterButton
+          activeFiltersCount={activeFiltersCount}
+          filterContent={filterContent}
+          onClearFilters={onClearFilters}
+          className="ml-auto"
         />
       </div>
     </div>

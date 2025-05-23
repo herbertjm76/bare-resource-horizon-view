@@ -9,8 +9,8 @@ interface FilterButtonProps {
   activeFiltersCount: number;
   onClick?: () => void;
   className?: string;
-  filterContent?: React.ReactNode; // Added filterContent prop
-  onClearFilters?: () => void; // Added onClearFilters prop
+  filterContent?: React.ReactNode;
+  onClearFilters?: () => void;
 }
 
 export const FilterButton: React.FC<FilterButtonProps> = ({
@@ -28,16 +28,16 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button 
-            variant="default" 
-            className={`flex items-center bg-brand-primary hover:bg-brand-primary/90 ${className || ''}`}
+            variant="outline" 
+            className={`flex items-center px-3 ${className || ''}`}
             type="button"
           >
-            <Filter className="w-4 h-4 mr-2" />
-            <span>Filters</span>
+            <Filter className="h-4 w-4 mr-2" />
+            <span>Options</span>
             {activeFiltersCount > 0 && (
               <Badge 
-                className="ml-2 bg-white text-brand-primary hover:bg-white" 
-                variant="outline"
+                className="ml-2 bg-brand-primary text-white" 
+                variant="default"
               >
                 {activeFiltersCount}
               </Badge>
@@ -56,7 +56,7 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
                   setOpen(false);
                 }}
               >
-                Clear All Filters
+                Reset All Options
               </Button>
             )}
           </div>
@@ -67,17 +67,17 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
 
   return (
     <Button 
-      variant="default" 
-      className={`flex items-center bg-brand-primary hover:bg-brand-primary/90 ${className || ''}`}
+      variant="outline" 
+      className={`flex items-center ${className || ''}`}
       onClick={onClick}
       type="button"
     >
-      <Filter className="w-4 h-4 mr-2" />
-      <span>Filters</span>
+      <Filter className="h-4 w-4 mr-2" />
+      <span>Options</span>
       {activeFiltersCount > 0 && (
         <Badge 
-          className="ml-2 bg-white text-brand-primary hover:bg-white" 
-          variant="outline"
+          className="ml-2 bg-brand-primary text-white" 
+          variant="default"
         >
           {activeFiltersCount}
         </Badge>

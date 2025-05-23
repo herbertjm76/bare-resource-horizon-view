@@ -10,19 +10,24 @@ import './resources-grid.css';
 
 interface ResourceAllocationGridProps {
   startDate: Date;
-  periodToShow: number; // Changed from weeksToShow to periodToShow
+  periodToShow: number;
   filters: {
     office: string;
     country: string;
     manager: string;
     searchTerm?: string;
   };
+  displayOptions: {
+    showWeekends: boolean;
+    showWorkdaysOnly: boolean;
+  };
 }
 
 export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   startDate,
   periodToShow,
-  filters
+  filters,
+  displayOptions
 }) => {
   const {
     projects,
@@ -38,12 +43,24 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   // Generate array of days for the selected period
   const days = useMemo(() => {
     const monthStart = startOfMonth(startDate);
-    const endDate = addWeeks(monthStart, periodToShow);
+    const endDate = addWeeks(monthStart, periodToShow / 4); // Convert weeks to months (approx)
     
-    return eachDayOfInterval({
+    let allDays = eachDayOfInterval({
       start: monthStart,
       end: endDate
-    }).map(day => {
+    });
+    
+    // Filter days based on display options
+    if (!displayOptions.showWeekends) {
+      allDays = allDays.filter(day => !isWeekend(day));
+    } else if (displayOptions.showWorkdaysOnly) {
+      allDays = allDays.filter(day => {
+        const dayOfWeek = day.getDay();
+        return dayOfWeek !== 0 && dayOfWeek !== 6; // Filter out Sunday (0) and Saturday (6)
+      });
+    }
+    
+    return allDays.map(day => {
       return {
         date: day,
         label: format(day, 'd'), // Day of month
@@ -54,7 +71,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
         isFirstOfMonth: day.getDate() === 1
       };
     });
-  }, [startDate, periodToShow]);
+  }, [startDate, periodToShow, displayOptions.showWeekends, displayOptions.showWorkdaysOnly]);
 
   // Filter projects based on criteria including search term
   const filteredProjects = projects.filter(project => {

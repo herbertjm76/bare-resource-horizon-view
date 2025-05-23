@@ -14,8 +14,8 @@ interface FilterBadgesProps {
   managerOptions?: {id: string, name: string}[];
   officeOptions?: string[];
   countryOptions?: string[];
-  searchTerm?: string; // Added searchTerm prop
-  onSearchChange?: (value: string) => void; // Added onSearchChange prop
+  searchTerm?: string;
+  onSearchChange?: (value: string) => void;
 }
 
 export const FilterBadges: React.FC<FilterBadgesProps> = ({
@@ -54,6 +54,7 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
           </Button>
         </Badge>
       )}
+      
       {filters.country !== 'all' && (
         <Badge 
           variant="outline" 
@@ -70,6 +71,7 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
           </Button>
         </Badge>
       )}
+      
       {filters.manager !== 'all' && (
         <Badge 
           variant="outline" 
@@ -86,6 +88,7 @@ export const FilterBadges: React.FC<FilterBadgesProps> = ({
           </Button>
         </Badge>
       )}
+      
       {searchTerm && searchTerm.trim() !== '' && onSearchChange && (
         <Badge 
           variant="outline" 

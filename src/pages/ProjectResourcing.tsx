@@ -24,6 +24,11 @@ const ProjectResourcing = () => {
     periodToShow: 12, // Default is 12 weeks
   });
   
+  const [displayOptions, setDisplayOptions] = useState({
+    showWeekends: true,
+    showWorkdaysOnly: false
+  });
+  
   // Get project data
   const { projects, isLoading: isLoadingProjects } = useProjects();
   
@@ -42,6 +47,21 @@ const ProjectResourcing = () => {
       ...prev,
       periodToShow: period
     }));
+  };
+  
+  const handleDisplayOptionChange = (option: string, value: boolean) => {
+    setDisplayOptions(prev => ({
+      ...prev,
+      [option]: value
+    }));
+    
+    // If we're hiding weekends, we can't show workdays only
+    if (option === 'showWeekends' && !value) {
+      setDisplayOptions(prev => ({
+        ...prev,
+        showWorkdaysOnly: false
+      }));
+    }
   };
   
   const handleSearchChange = (value: string) => {
@@ -78,14 +98,16 @@ const ProjectResourcing = () => {
     }, [] as Array<{id: string, name: string}>);
   }, [projects]);
 
-  // Calculate active filters count
+  // Calculate active filters count (include display options)
   const activeFiltersCount = 
     (filters.office !== 'all' ? 1 : 0) + 
     (filters.country !== 'all' ? 1 : 0) + 
     (filters.manager !== 'all' ? 1 : 0) +
-    (searchTerm ? 1 : 0);
+    (searchTerm ? 1 : 0) +
+    (!displayOptions.showWeekends ? 1 : 0) +
+    (displayOptions.showWorkdaysOnly ? 1 : 0);
   
-  // Clear all filters
+  // Clear all filters and reset display options
   const clearFilters = () => {
     setFilters({
       office: "all",
@@ -94,6 +116,10 @@ const ProjectResourcing = () => {
       periodToShow: filters.periodToShow // Keep the period setting
     });
     setSearchTerm('');
+    setDisplayOptions({
+      showWeekends: true,
+      showWorkdaysOnly: false
+    });
   };
 
   // Prepare filter props for the ProjectResourceFilters component
@@ -108,6 +134,8 @@ const ProjectResourcing = () => {
       countryOptions={countryOptions}
       managers={managers}
       activeFiltersCount={activeFiltersCount}
+      displayOptions={displayOptions}
+      onDisplayOptionChange={handleDisplayOptionChange}
     />
   );
 
@@ -143,6 +171,7 @@ const ProjectResourcing = () => {
                   ...filters,
                   searchTerm
                 }}
+                displayOptions={displayOptions}
               />
             </div>
           </div>

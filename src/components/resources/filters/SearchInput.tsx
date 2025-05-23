@@ -8,14 +8,14 @@ interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  className?: string; // Added className prop
+  className?: string;
 }
 
 export const SearchInput: React.FC<SearchInputProps> = ({ 
   value, 
   onChange, 
   placeholder = "Search projects...", 
-  className = "" // Default to empty string
+  className = ""
 }) => {
   return (
     <div className={`relative w-full ${className}`}>

@@ -5,19 +5,24 @@ import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 
 interface ResourceGridContainerProps {
   startDate: Date;
-  periodToShow: number; // Changed from weeksToShow to periodToShow
+  periodToShow: number;
   filters: {
     office: string;
     country: string;
     manager: string;
     searchTerm?: string;
   };
+  displayOptions?: {
+    showWeekends: boolean;
+    showWorkdaysOnly: boolean;
+  };
 }
 
 export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
   startDate,
   periodToShow,
-  filters
+  filters,
+  displayOptions = { showWeekends: true, showWorkdaysOnly: false }
 }) => {
   return (
     <div className="rounded-lg border shadow-sm overflow-hidden">
@@ -26,6 +31,7 @@ export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
           startDate={startDate}
           periodToShow={periodToShow}
           filters={filters}
+          displayOptions={displayOptions}
         />
       </OfficeSettingsProvider>
     </div>

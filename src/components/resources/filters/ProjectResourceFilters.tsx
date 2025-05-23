@@ -2,6 +2,8 @@
 import React from 'react';
 import { PeriodSelector } from './PeriodSelector';
 import { FilterBadges } from './FilterBadges';
+import { DisplayOptions } from './DisplayOptions';
+import { Separator } from "@/components/ui/separator";
 
 interface ProjectResourceFiltersProps {
   filters: {
@@ -18,6 +20,11 @@ interface ProjectResourceFiltersProps {
   countryOptions: string[];
   managers: Array<{id: string, name: string}>;
   activeFiltersCount: number;
+  displayOptions: {
+    showWeekends: boolean;
+    showWorkdaysOnly: boolean;
+  };
+  onDisplayOptionChange: (option: string, value: boolean) => void;
 }
 
 export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
@@ -29,7 +36,9 @@ export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
   officeOptions,
   countryOptions,
   managers,
-  activeFiltersCount
+  activeFiltersCount,
+  displayOptions,
+  onDisplayOptionChange
 }) => {
   return (
     <div className="space-y-4 p-4">
@@ -38,6 +47,17 @@ export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
           selectedPeriod={filters.periodToShow}
           onPeriodChange={onPeriodChange}
         />
+        
+        <Separator className="my-2" />
+        
+        <DisplayOptions 
+          showWeekends={displayOptions.showWeekends}
+          onToggleWeekends={(show) => onDisplayOptionChange('showWeekends', show)}
+          showWorkdaysOnly={displayOptions.showWorkdaysOnly}
+          onToggleWorkdays={(workdaysOnly) => onDisplayOptionChange('showWorkdaysOnly', workdaysOnly)}
+        />
+        
+        <Separator className="my-2" />
         
         {/* Office filter */}
         <div className="space-y-2">
@@ -103,6 +123,8 @@ export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
         onSearchChange={onSearchChange}
         onFilterChange={onFilterChange}
         managerOptions={managers}
+        officeOptions={officeOptions}
+        countryOptions={countryOptions}
       />
     </div>
   );
