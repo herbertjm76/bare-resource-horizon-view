@@ -1,42 +1,4 @@
-
 /* Base styles for the resource allocation grid */
-
-/* ---------------  wrapper --------------- */
-.grid-scroll {
-  width: 100%;          /* fills card */
-  overflow-x: auto;     /* horizontal scroll appears here */
-  overflow-y: visible;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 1px; /* Prevents scroll jank */
-}
-
-/* ---------------  table --------------- */
-.allocation-grid {
-  width: max-content;   /* keep real width, don't shrink to card */
-  border-collapse: collapse;
-  table-layout: fixed;  /* cols don't flex */
-  white-space: nowrap;  /* prevent wrapping inside cells */
-  border-spacing: 0;
-  min-width: max-content; /* Ensures table can expand beyond container */
-}
-
-/* every column stays a fixed width so grid is wider than card */
-.allocation-grid th,
-.allocation-grid td {
-  min-width: 72px;      /* adjust to taste */
-  border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
-  border-bottom: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
-}
-
-.allocation-grid th {
-  border-bottom: 1px solid rgba(156, 163, 175, 0.8); /* Even darker for headers */
-}
-
-/* ---------------  page --------------- */
-body { 
-  overflow-x: hidden;  /* never show browser-level bar */
-}
-
 .grid-table-card-scroll {
   overflow-x: auto;
   overflow-y: visible;
@@ -72,14 +34,12 @@ body {
   position: sticky;
   left: 0;
   z-index: 20;
-  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
 }
 
 .sticky-left-12 {
   position: sticky;
   left: 48px; /* Width of the first column */
   z-index: 20;
-  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
 }
 
 /* Date cell styling */
@@ -163,29 +123,41 @@ body {
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+/* Grid styles for all cells - darker borders for better visibility */
+.resource-allocation-table td {
+  border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+  border-bottom: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+}
+
+.resource-allocation-table th {
+  border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+  border-bottom: 1px solid rgba(156, 163, 175, 0.8); /* Even darker for headers */
+}
+
+/* Make sticky columns have a more visible separator */
+.sticky-left-0, .sticky-left-12 {
+  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
+}
+
 /* Override for cells that need special styling */
 .resource-allocation-table td.no-border-right,
-.resource-allocation-table th.no-border-right,
-.allocation-grid td.no-border-right,
-.allocation-grid th.no-border-right {
+.resource-allocation-table th.no-border-right {
   border-right: none;
 }
 
 /* Special styling for the weekend cells */
-.resource-allocation-table td.weekend,
-.allocation-grid td.weekend {
+.resource-allocation-table td.weekend {
   border-right: 1px solid rgba(156, 163, 175, 0.4);
   background-color: rgba(107, 114, 128, 0.15) !important; /* Consistent weekend background */
 }
 
 /* Weekend headers also get the gray background */
-.resource-allocation-table th.weekend,
-.allocation-grid th.weekend {
+.resource-allocation-table th.weekend {
   background-color: rgba(107, 114, 128, 0.15) !important;
 }
 
 /* Card-specific adjustments */
-.resource-allocation-table, .allocation-grid {
+.resource-allocation-table {
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
   overflow: hidden;
