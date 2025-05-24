@@ -110,3 +110,29 @@
 .week-separator {
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
+
+/* Grid styles for all cells - similar to team workload/annual leave */
+.resource-allocation-table td {
+  border-right: 1px solid rgba(229, 231, 235, 0.5);
+  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+.resource-allocation-table th {
+  border-right: 1px solid rgba(229, 231, 235, 0.5);
+}
+
+/* Make sticky columns have a more visible separator */
+.sticky-left-0, .sticky-left-12 {
+  border-right: 1px solid rgba(229, 231, 235, 1);
+}
+
+/* Override for cells that need special styling */
+.resource-allocation-table td.no-border-right,
+.resource-allocation-table th.no-border-right {
+  border-right: none;
+}
+
+/* Special styling for the weekend cells */
+.resource-allocation-table td.bg-muted\/40 {
+  border-right: 1px solid rgba(229, 231, 235, 0.3);
+}

@@ -54,7 +54,7 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
   return (
     <>
       {/* Month headers row */}
-      <tr>
+      <tr className="bg-gray-50/70">
         {/* Empty cells for the frozen columns */}
         <th className="sticky-left-0 bg-muted/50 z-30 border-b border-r"></th>
         <th className="sticky-left-12 bg-muted/50 z-30 border-b border-r"></th>
@@ -75,7 +75,7 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
       </tr>
     
       {/* Day headers row */}
-      <tr>
+      <tr className="bg-gray-50/70">
         {/* Resources count column - frozen */}
         <th 
           className="sticky-left-0 bg-muted/50 z-30 border-b text-center font-medium w-12 shadow-[1px_0_0_0_#e5e7eb]" 
