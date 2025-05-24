@@ -1,0 +1,77 @@
+
+/* Resource Planning Grid Styles */
+
+.planning-container {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+}
+
+.planning-scroll {
+  width: 100%;
+  overflow-x: auto !important;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  
+  /* Enhanced scrollbar visibility */
+  scrollbar-width: auto;
+  scrollbar-color: #374151 #e5e7eb;
+}
+
+.planning-scroll::-webkit-scrollbar {
+  height: 14px;
+  background-color: #e5e7eb;
+}
+
+.planning-scroll::-webkit-scrollbar-track {
+  background-color: #e5e7eb;
+  border-radius: 7px;
+}
+
+.planning-scroll::-webkit-scrollbar-thumb {
+  background-color: #374151;
+  border-radius: 7px;
+  border: 2px solid #e5e7eb;
+}
+
+.planning-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: #1f2937;
+}
+
+.planning-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: white;
+}
+
+.sticky-project-col {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: inherit;
+  border-right: 2px solid #e5e7eb;
+}
+
+.project-name-cell {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.day-header {
+  text-align: center;
+  padding: 8px 4px;
+  border-bottom: 2px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-weight: 500;
+}
+
+.day-cell {
+  border-bottom: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb;
+  padding: 0;
+}
+
+/* Ensure horizontal scroll is always visible */
+body {
+  overflow-x: hidden;
+}
