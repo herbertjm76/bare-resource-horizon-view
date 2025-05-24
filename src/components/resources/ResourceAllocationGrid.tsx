@@ -65,7 +65,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   
   return (
     <div className="w-full max-w-full">
-      <Card className="w-full max-w-full overflow-hidden">
+      <Card className="w-full overflow-hidden border">
         <div className="grid-table-card-scroll">
           <div className="grid-table-container">
             <table 

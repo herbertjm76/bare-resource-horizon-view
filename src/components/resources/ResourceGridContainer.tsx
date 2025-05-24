@@ -26,14 +26,19 @@ export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
   displayOptions
 }) => {
   return (
-    <div className="mt-4">
+    <div className="mt-4 w-full max-w-full overflow-hidden">
       <OfficeSettingsProvider>
-        <ResourceAllocationGrid 
-          startDate={startDate}
-          periodToShow={periodToShow}
-          filters={filters}
-          displayOptions={displayOptions}
-        />
+        <div className="w-full" style={{ maxWidth: '100vw' }}>
+          <ResourceAllocationGrid 
+            startDate={startDate}
+            periodToShow={periodToShow}
+            filters={{
+              ...filters,
+              searchTerm
+            }}
+            displayOptions={displayOptions}
+          />
+        </div>
       </OfficeSettingsProvider>
     </div>
   );

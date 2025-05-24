@@ -1,3 +1,4 @@
+
 /* Base styles for the resource allocation grid */
 .grid-table-card-scroll {
   overflow-x: auto;
@@ -6,6 +7,8 @@
   max-width: 100%;
   width: 100%;
   padding-bottom: 1px; /* Prevents scroll jank */
+  /* Constrain to viewport width to prevent browser horizontal scroll */
+  max-width: calc(100vw - 2rem); /* Account for page padding */
 }
 
 .grid-table-outer-container {
@@ -18,7 +21,8 @@
 .grid-table-container {
   min-height: 300px;
   position: relative;
-  width: max-content;
+  /* Remove width: max-content to prevent overflow */
+  width: 100%;
   min-width: 100%;
 }
 
@@ -166,4 +170,23 @@
 /* Ensure the sticky columns work properly within the card */
 .sticky-left-0, .sticky-left-12 {
   background-color: inherit;
+}
+
+/* Enhanced scrollbar styling for better UX */
+.grid-table-card-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.grid-table-card-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.grid-table-card-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.grid-table-card-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
