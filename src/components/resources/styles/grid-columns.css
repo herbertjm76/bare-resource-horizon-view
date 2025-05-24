@@ -1,0 +1,60 @@
+
+/* Column positioning and sticky styles for the resource allocation grid */
+
+/* Sticky columns */
+.sticky-left-0 {
+  position: sticky;
+  left: 0;
+  z-index: 20;
+  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
+  min-width: 60px; /* Wider for better visibility */
+  width: 60px;
+  background-color: inherit;
+}
+
+.sticky-left-12 {
+  position: sticky;
+  left: 60px; /* Adjusted to match new width of first column */
+  z-index: 20;
+  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
+  min-width: 250px; /* Much wider for project/resource names */
+  width: 250px;
+  background-color: inherit;
+}
+
+/* Column width definitions */
+.allocation-grid th,
+.allocation-grid td {
+  min-width: 72px;      /* adjust to taste */
+  border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+  border-bottom: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+}
+
+.allocation-grid th {
+  border-bottom: 1px solid rgba(156, 163, 175, 0.8); /* Even darker for headers */
+}
+
+/* Week and day separators */
+.day-separator {
+  border-right: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.week-separator {
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.sunday-border {
+  border-left: 2px solid rgba(111, 75, 246, 0.3);
+}
+
+.month-start {
+  border-left: 2px solid rgba(111, 75, 246, 0.5);
+}
+
+/* Override for cells that need special styling */
+.resource-allocation-table td.no-border-right,
+.resource-allocation-table th.no-border-right,
+.allocation-grid td.no-border-right,
+.allocation-grid th.no-border-right {
+  border-right: none;
+}
