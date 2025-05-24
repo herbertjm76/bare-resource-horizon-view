@@ -1,4 +1,26 @@
+
 /* Base styles for the resource allocation grid */
+.grid-scroll {
+  width: 100%;
+  overflow-x: auto;    /* horizontal scroll inside card */
+  overflow-y: visible; /* keep vertical flow */
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 1px; /* Prevents scroll jank */
+}
+
+.allocation-grid {
+  width: max-content;  /* table decides width */
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: max-content; /* Ensures table can expand beyond container */
+}
+
+/* Prevent page-level horizontal scroll */
+body {
+  overflow-x: hidden;  /* stop browser-level bar */
+}
+
 .grid-table-card-scroll {
   overflow-x: auto;
   overflow-y: visible;
@@ -124,12 +146,12 @@
 }
 
 /* Grid styles for all cells - darker borders for better visibility */
-.resource-allocation-table td {
+.resource-allocation-table td, .allocation-grid td {
   border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
   border-bottom: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
 }
 
-.resource-allocation-table th {
+.resource-allocation-table th, .allocation-grid th {
   border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
   border-bottom: 1px solid rgba(156, 163, 175, 0.8); /* Even darker for headers */
 }
@@ -141,23 +163,27 @@
 
 /* Override for cells that need special styling */
 .resource-allocation-table td.no-border-right,
-.resource-allocation-table th.no-border-right {
+.resource-allocation-table th.no-border-right,
+.allocation-grid td.no-border-right,
+.allocation-grid th.no-border-right {
   border-right: none;
 }
 
 /* Special styling for the weekend cells */
-.resource-allocation-table td.weekend {
+.resource-allocation-table td.weekend,
+.allocation-grid td.weekend {
   border-right: 1px solid rgba(156, 163, 175, 0.4);
   background-color: rgba(107, 114, 128, 0.15) !important; /* Consistent weekend background */
 }
 
 /* Weekend headers also get the gray background */
-.resource-allocation-table th.weekend {
+.resource-allocation-table th.weekend,
+.allocation-grid th.weekend {
   background-color: rgba(107, 114, 128, 0.15) !important;
 }
 
 /* Card-specific adjustments */
-.resource-allocation-table {
+.resource-allocation-table, .allocation-grid {
   border-top-left-radius: 0.5rem;
   border-top-right-radius: 0.5rem;
   overflow: hidden;
