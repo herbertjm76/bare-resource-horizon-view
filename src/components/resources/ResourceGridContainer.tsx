@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { ResourceAllocationGrid } from '@/components/resources/ResourceAllocationGrid';
-import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
+import { ResourceAllocationGrid } from './ResourceAllocationGrid';
 
 interface ResourceGridContainerProps {
   startDate: Date;
@@ -12,9 +11,10 @@ interface ResourceGridContainerProps {
     manager: string;
     searchTerm?: string;
   };
-  displayOptions?: {
+  displayOptions: {
     showWeekends: boolean;
-    showWorkdaysOnly: boolean;
+    selectedDays: string[];
+    weekStartsOnSunday: boolean;
   };
 }
 
@@ -22,18 +22,16 @@ export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
   startDate,
   periodToShow,
   filters,
-  displayOptions = { showWeekends: true, showWorkdaysOnly: false }
+  displayOptions
 }) => {
   return (
-    <div className="rounded-lg border shadow-sm overflow-hidden">
-      <OfficeSettingsProvider>
-        <ResourceAllocationGrid 
-          startDate={startDate}
-          periodToShow={periodToShow}
-          filters={filters}
-          displayOptions={displayOptions}
-        />
-      </OfficeSettingsProvider>
+    <div className="mt-4">
+      <ResourceAllocationGrid 
+        startDate={startDate}
+        periodToShow={periodToShow}
+        filters={filters}
+        displayOptions={displayOptions}
+      />
     </div>
   );
 };

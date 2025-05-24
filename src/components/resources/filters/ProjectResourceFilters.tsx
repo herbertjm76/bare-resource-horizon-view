@@ -22,9 +22,10 @@ interface ProjectResourceFiltersProps {
   activeFiltersCount: number;
   displayOptions: {
     showWeekends: boolean;
-    showWorkdaysOnly: boolean;
+    selectedDays: string[];
+    weekStartsOnSunday: boolean;
   };
-  onDisplayOptionChange: (option: string, value: boolean) => void;
+  onDisplayOptionChange: (option: string, value: boolean | string[]) => void;
 }
 
 export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
@@ -53,8 +54,10 @@ export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
         <DisplayOptions 
           showWeekends={displayOptions.showWeekends}
           onToggleWeekends={(show) => onDisplayOptionChange('showWeekends', show)}
-          showWorkdaysOnly={displayOptions.showWorkdaysOnly}
-          onToggleWorkdays={(workdaysOnly) => onDisplayOptionChange('showWorkdaysOnly', workdaysOnly)}
+          selectedDays={displayOptions.selectedDays}
+          onSelectedDaysChange={(days) => onDisplayOptionChange('selectedDays', days)}
+          weekStartsOnSunday={displayOptions.weekStartsOnSunday}
+          onWeekStartChange={(startOnSunday) => onDisplayOptionChange('weekStartsOnSunday', startOnSunday)}
         />
         
         <Separator className="my-2" />
@@ -120,8 +123,8 @@ export const ProjectResourceFilters: React.FC<ProjectResourceFiltersProps> = ({
       <FilterBadges
         filters={filters}
         searchTerm={searchTerm}
-        onSearchChange={onSearchChange}
         onFilterChange={onFilterChange}
+        onSearchChange={onSearchChange}
         managerOptions={managers}
         officeOptions={officeOptions}
         countryOptions={countryOptions}

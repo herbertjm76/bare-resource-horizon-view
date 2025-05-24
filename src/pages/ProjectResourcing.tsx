@@ -26,7 +26,8 @@ const ProjectResourcing = () => {
   
   const [displayOptions, setDisplayOptions] = useState({
     showWeekends: true,
-    showWorkdaysOnly: false
+    selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], // Default: all days
+    weekStartsOnSunday: false // Default: week starts on Monday
   });
   
   // Get project data
@@ -49,17 +50,17 @@ const ProjectResourcing = () => {
     }));
   };
   
-  const handleDisplayOptionChange = (option: string, value: boolean) => {
+  const handleDisplayOptionChange = (option: string, value: boolean | string[]) => {
     setDisplayOptions(prev => ({
       ...prev,
       [option]: value
     }));
     
-    // If we're hiding weekends, we can't show workdays only
-    if (option === 'showWeekends' && !value) {
+    // If we're hiding weekends, remove weekend days from selectedDays
+    if (option === 'showWeekends' && value === false) {
       setDisplayOptions(prev => ({
         ...prev,
-        showWorkdaysOnly: false
+        selectedDays: prev.selectedDays.filter(day => day !== 'sat' && day !== 'sun')
       }));
     }
   };
@@ -105,7 +106,8 @@ const ProjectResourcing = () => {
     (filters.manager !== 'all' ? 1 : 0) +
     (searchTerm ? 1 : 0) +
     (!displayOptions.showWeekends ? 1 : 0) +
-    (displayOptions.showWorkdaysOnly ? 1 : 0);
+    (displayOptions.selectedDays.length < 7 ? 1 : 0) +
+    (displayOptions.weekStartsOnSunday ? 1 : 0);
   
   // Clear all filters and reset display options
   const clearFilters = () => {
@@ -118,7 +120,8 @@ const ProjectResourcing = () => {
     setSearchTerm('');
     setDisplayOptions({
       showWeekends: true,
-      showWorkdaysOnly: false
+      selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+      weekStartsOnSunday: false
     });
   };
 

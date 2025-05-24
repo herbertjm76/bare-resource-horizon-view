@@ -14,8 +14,33 @@ interface DayInfo {
 
 interface DisplayOptions {
   showWeekends: boolean;
-  showWorkdaysOnly: boolean;
+  selectedDays: string[];
+  weekStartsOnSunday: boolean;
 }
+
+// Map day of week number to day ID in our system
+const dayOfWeekToId = (day: number, weekStartsOnSunday: boolean): string => {
+  // If week starts on Sunday, day 0 is Sunday
+  // If week starts on Monday, day 0 is Monday, day 6 is Sunday
+  const daysMap = weekStartsOnSunday 
+    ? ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] 
+    : ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  
+  return daysMap[day];
+};
+
+// Get the day of week (0-6) based on our system
+const getDayOfWeek = (date: Date, weekStartsOnSunday: boolean): number => {
+  // JavaScript: 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+  let day = date.getDay();
+  
+  if (!weekStartsOnSunday) {
+    // Convert to Monday = 0, ..., Sunday = 6
+    day = day === 0 ? 6 : day - 1;
+  }
+  
+  return day;
+};
 
 export const useGridDays = (
   startDate: Date,
@@ -32,14 +57,17 @@ export const useGridDays = (
     });
     
     // Filter days based on display options
-    if (!displayOptions.showWeekends) {
-      allDays = allDays.filter(day => !isWeekend(day));
-    } else if (displayOptions.showWorkdaysOnly) {
-      allDays = allDays.filter(day => {
-        const dayOfWeek = day.getDay();
-        return dayOfWeek !== 0 && dayOfWeek !== 6; // Filter out Sunday (0) and Saturday (6)
-      });
-    }
+    allDays = allDays.filter(day => {
+      // Apply weekend filter if needed
+      if (!displayOptions.showWeekends && isWeekend(day)) {
+        return false;
+      }
+      
+      // Apply selected days filter
+      const dayOfWeek = displayOptions.weekStartsOnSunday ? day.getDay() : (day.getDay() || 7) - 1;
+      const dayId = dayOfWeekToId(dayOfWeek, displayOptions.weekStartsOnSunday);
+      return displayOptions.selectedDays.includes(dayId);
+    });
     
     return allDays.map(day => {
       return {
@@ -52,5 +80,11 @@ export const useGridDays = (
         isFirstOfMonth: day.getDate() === 1
       };
     });
-  }, [startDate, periodToShow, displayOptions.showWeekends, displayOptions.showWorkdaysOnly]);
+  }, [
+    startDate, 
+    periodToShow, 
+    displayOptions.showWeekends, 
+    displayOptions.selectedDays, 
+    displayOptions.weekStartsOnSunday
+  ]);
 };

@@ -23,7 +23,8 @@ interface ResourceAllocationGridProps {
   };
   displayOptions: {
     showWeekends: boolean;
-    showWorkdaysOnly: boolean;
+    selectedDays: string[];
+    weekStartsOnSunday: boolean;
   };
 }
 
