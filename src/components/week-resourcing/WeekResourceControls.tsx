@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -150,6 +149,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
             <FilterButton 
               activeFiltersCount={activeFilterCount} 
               onClick={() => setFiltersOpen(!filtersOpen)}
+              buttonText="Filters"
             />
           </div>
         </PopoverTrigger>
@@ -170,8 +170,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
         </PopoverContent>
       </Popover>
       
-      {/* Spacer to push other elements to the right if needed */}
-      <div className="flex-grow"></div>
+      {/* Remove spacer to keep everything left aligned */}
     </div>
   );
 };

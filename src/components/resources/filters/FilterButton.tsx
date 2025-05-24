@@ -11,6 +11,7 @@ interface FilterButtonProps {
   className?: string;
   filterContent?: React.ReactNode;
   onClearFilters?: () => void;
+  buttonText?: string;
 }
 
 export const FilterButton: React.FC<FilterButtonProps> = ({
@@ -18,7 +19,8 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
   onClick,
   className,
   filterContent,
-  onClearFilters
+  onClearFilters,
+  buttonText = "Filters"
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -33,7 +35,7 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
             type="button"
           >
             <Filter className="h-4 w-4 mr-2" />
-            <span>Options</span>
+            <span>{buttonText}</span>
             {activeFiltersCount > 0 && (
               <Badge 
                 className="ml-2 bg-brand-primary text-white" 
@@ -56,7 +58,7 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
                   setOpen(false);
                 }}
               >
-                Reset All Options
+                Reset All Filters
               </Button>
             )}
           </div>
@@ -73,7 +75,7 @@ export const FilterButton: React.FC<FilterButtonProps> = ({
       type="button"
     >
       <Filter className="h-4 w-4 mr-2" />
-      <span>Options</span>
+      <span>{buttonText}</span>
       {activeFiltersCount > 0 && (
         <Badge 
           className="ml-2 bg-brand-primary text-white" 

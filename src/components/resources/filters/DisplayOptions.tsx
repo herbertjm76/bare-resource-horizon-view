@@ -18,7 +18,7 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-medium mb-2">Display Options</h3>
+      <h3 className="text-sm font-medium mb-2">Display Settings</h3>
       
       <div className="flex items-center justify-between">
         <Label htmlFor="show-weekends" className="cursor-pointer">
