@@ -1,24 +1,40 @@
 
 /* Base styles for the resource allocation grid */
+
+/* ---------------  wrapper --------------- */
 .grid-scroll {
-  width: 100%;
-  overflow-x: auto;    /* horizontal scroll inside card */
-  overflow-y: visible; /* keep vertical flow */
+  width: 100%;          /* fills card */
+  overflow-x: auto;     /* horizontal scroll appears here */
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 1px; /* Prevents scroll jank */
 }
 
+/* ---------------  table --------------- */
 .allocation-grid {
-  width: max-content;  /* table decides width */
-  table-layout: fixed;
-  border-collapse: separate;
+  width: max-content;   /* keep real width, don't shrink to card */
+  border-collapse: collapse;
+  table-layout: fixed;  /* cols don't flex */
+  white-space: nowrap;  /* prevent wrapping inside cells */
   border-spacing: 0;
   min-width: max-content; /* Ensures table can expand beyond container */
 }
 
-/* Prevent page-level horizontal scroll */
-body {
-  overflow-x: hidden;  /* stop browser-level bar */
+/* every column stays a fixed width so grid is wider than card */
+.allocation-grid th,
+.allocation-grid td {
+  min-width: 72px;      /* adjust to taste */
+  border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+  border-bottom: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+}
+
+.allocation-grid th {
+  border-bottom: 1px solid rgba(156, 163, 175, 0.8); /* Even darker for headers */
+}
+
+/* ---------------  page --------------- */
+body { 
+  overflow-x: hidden;  /* never show browser-level bar */
 }
 
 .grid-table-card-scroll {
@@ -56,12 +72,14 @@ body {
   position: sticky;
   left: 0;
   z-index: 20;
+  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
 }
 
 .sticky-left-12 {
   position: sticky;
   left: 48px; /* Width of the first column */
   z-index: 20;
+  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
 }
 
 /* Date cell styling */
@@ -143,22 +161,6 @@ body {
 /* Week separator */
 .week-separator {
   border-right: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-/* Grid styles for all cells - darker borders for better visibility */
-.resource-allocation-table td, .allocation-grid td {
-  border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
-  border-bottom: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
-}
-
-.resource-allocation-table th, .allocation-grid th {
-  border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
-  border-bottom: 1px solid rgba(156, 163, 175, 0.8); /* Even darker for headers */
-}
-
-/* Make sticky columns have a more visible separator */
-.sticky-left-0, .sticky-left-12 {
-  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
 }
 
 /* Override for cells that need special styling */
