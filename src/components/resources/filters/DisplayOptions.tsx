@@ -13,21 +13,19 @@ interface DisplayOptionsProps {
   onWeekStartChange: (startsOnSunday: boolean) => void;
 }
 
-// Days of the week
+// Only weekdays
 const weekdays = [
   { id: 'mon', name: 'Monday' },
   { id: 'tue', name: 'Tuesday' },
   { id: 'wed', name: 'Wednesday' },
   { id: 'thu', name: 'Thursday' },
   { id: 'fri', name: 'Friday' },
-  { id: 'sat', name: 'Saturday' },
-  { id: 'sun', name: 'Sunday' },
 ];
 
 export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
   showWeekends,
   onToggleWeekends,
-  selectedDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], // Provide default value
+  selectedDays = ['mon', 'tue', 'wed', 'thu', 'fri'], // Default to weekdays only
   onSelectedDaysChange,
   weekStartsOnSunday,
   onWeekStartChange
@@ -60,18 +58,14 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
       </div>
       
       <div>
-        <p className="text-sm font-medium mb-2">Days to Display</p>
-        <div className="grid grid-cols-2 gap-2">
+        <p className="text-sm font-medium mb-2">Weekdays to Display</p>
+        <div className="grid grid-cols-1 gap-2">
           {weekdays.map(day => (
             <div key={day.id} className="flex items-center space-x-2">
               <Checkbox 
                 id={`day-${day.id}`}
                 checked={selectedDays?.includes(day.id)} // Add null check
                 onCheckedChange={() => handleDayToggle(day.id)}
-                disabled={
-                  // Disable weekend checkboxes if weekends are hidden
-                  !showWeekends && (day.id === 'sat' || day.id === 'sun')
-                }
               />
               <Label 
                 htmlFor={`day-${day.id}`} 

@@ -26,7 +26,7 @@ const ProjectResourcing = () => {
   
   const [displayOptions, setDisplayOptions] = useState({
     showWeekends: true,
-    selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], // Default: all days
+    selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri'], // Default to weekdays only
     weekStartsOnSunday: false // Default: week starts on Monday
   });
   
@@ -120,7 +120,7 @@ const ProjectResourcing = () => {
     setSearchTerm('');
     setDisplayOptions({
       showWeekends: true,
-      selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'],
+      selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri'],
       weekStartsOnSunday: false
     });
   };
