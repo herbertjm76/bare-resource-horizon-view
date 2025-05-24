@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { format } from 'date-fns';
@@ -69,15 +68,9 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   }
   
   return (
-    <div className="w-full max-w-full">
-      <Card className="w-full max-w-full overflow-hidden">
-        <div 
-          className="grid-scroll"
-          style={{
-            width: '100%',
-            maxWidth: '100%'
-          }}
-        >
+    <div className="w-full">
+      <Card className="overflow-hidden">
+        <div className="grid-scroll">
           <table 
             className="allocation-grid"
             style={{
