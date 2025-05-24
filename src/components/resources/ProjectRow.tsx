@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/dialogs/AddResourceDialog';
@@ -130,12 +129,11 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           const dayKey = getDayKey(day.date);
           const projectHours = dailyProjectHours[dayKey] || 0;
           
-          // Style classes
-          const isWeekendClass = day.isWeekend ? 'bg-muted/40' : '';
+          // Style classes - apply weekend class for consistent styling
+          const isWeekendClass = day.isWeekend ? 'weekend' : '';
           const isSundayClass = day.isSunday ? 'sunday-border' : '';
           const isFirstOfMonthClass = day.isFirstOfMonth ? 'border-l-2 border-l-brand-primary/40' : '';
           const isEndOfWeekClass = day.isEndOfWeek ? 'border-r border-r-gray-300' : '';
-          const hasHoursClass = projectHours > 0 ? 'font-medium' : 'text-muted-foreground';
           
           return (
             <td 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -144,7 +143,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
       {days.map((day) => {
         const dayKey = getDayKey(day.date);
         const inputValue = inputValues[dayKey] || '';
-        const isWeekendClass = day.isWeekend ? 'bg-muted/40' : '';
+        const isWeekendClass = day.isWeekend ? 'weekend' : '';
         const isSundayClass = day.isSunday ? 'sunday-border' : '';
         const isFirstOfMonthClass = day.isFirstOfMonth ? 'border-l-2 border-l-brand-primary/40' : '';
         const isEndOfWeekClass = day.isEndOfWeek ? 'border-r border-r-gray-300' : '';

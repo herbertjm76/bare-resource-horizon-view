@@ -40,9 +40,9 @@
   font-size: 12px;
 }
 
-/* Weekend styling */
+/* Weekend styling - more prominent gray background */
 .weekend {
-  background-color: rgba(241, 245, 249, 0.7);
+  background-color: rgba(107, 114, 128, 0.15) !important; /* Darker gray for weekends */
 }
 
 /* Sunday border - thicker separation */
@@ -67,7 +67,7 @@
   text-align: center;
   font-size: 11px;
   height: 28px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d1d5db; /* Slightly darker border for inputs */
   background: transparent;
 }
 
@@ -85,7 +85,7 @@
 .month-header {
   font-size: 10px;
   color: #6b7280;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #d1d5db; /* Darker border */
   text-align: center;
 }
 
@@ -111,19 +111,20 @@
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-/* Grid styles for all cells - similar to team workload/annual leave */
+/* Grid styles for all cells - darker borders for better visibility */
 .resource-allocation-table td {
-  border-right: 1px solid rgba(229, 231, 235, 0.5);
-  border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+  border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+  border-bottom: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
 }
 
 .resource-allocation-table th {
-  border-right: 1px solid rgba(229, 231, 235, 0.5);
+  border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+  border-bottom: 1px solid rgba(156, 163, 175, 0.8); /* Even darker for headers */
 }
 
 /* Make sticky columns have a more visible separator */
 .sticky-left-0, .sticky-left-12 {
-  border-right: 1px solid rgba(229, 231, 235, 1);
+  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
 }
 
 /* Override for cells that need special styling */
@@ -133,6 +134,12 @@
 }
 
 /* Special styling for the weekend cells */
-.resource-allocation-table td.bg-muted\/40 {
-  border-right: 1px solid rgba(229, 231, 235, 0.3);
+.resource-allocation-table td.weekend {
+  border-right: 1px solid rgba(156, 163, 175, 0.4);
+  background-color: rgba(107, 114, 128, 0.15) !important; /* Consistent weekend background */
+}
+
+/* Weekend headers also get the gray background */
+.resource-allocation-table th.weekend {
+  background-color: rgba(107, 114, 128, 0.15) !important;
 }

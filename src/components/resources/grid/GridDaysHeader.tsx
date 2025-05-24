@@ -100,7 +100,7 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
         
         {/* Date columns - fixed width columns */}
         {days.map((day, i) => {
-          const isWeekendClass = day.isWeekend ? 'bg-muted/40' : '';
+          const isWeekendClass = day.isWeekend ? 'weekend' : '';
           const isSundayClass = day.isSunday ? 'sunday-border' : '';
           const isFirstOfMonthClass = day.isFirstOfMonth ? 'border-l-2 border-l-brand-primary/40' : '';
           const isEndOfWeekClass = day.isEndOfWeek ? 'border-r border-r-gray-300' : '';
