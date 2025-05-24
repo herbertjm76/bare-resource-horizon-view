@@ -48,6 +48,11 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   // Calculate the table width
   const tableWidth = useGridTableWidth(days.length);
   
+  console.log('Grid container dimensions:', {
+    daysCount: days.length,
+    calculatedTableWidth: tableWidth
+  });
+  
   // Toggle project expansion
   const toggleProjectExpanded = (projectId: string) => {
     setExpandedProjects(prev => 
@@ -66,12 +71,18 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   return (
     <div className="w-full max-w-full">
       <Card className="w-full max-w-full overflow-hidden">
-        <div className="grid-scroll">
+        <div 
+          className="grid-scroll"
+          style={{
+            width: '100%',
+            maxWidth: '100%'
+          }}
+        >
           <table 
             className="allocation-grid"
             style={{
               width: `${tableWidth}px`,
-              minWidth: 'max-content'
+              minWidth: `${tableWidth}px`
             }}
           >
             <thead>
