@@ -164,7 +164,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
                 onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
                 className={`w-full h-5 px-0 text-center text-xs border-gray-200 rounded-md focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''} ${day.isWeekend ? 'bg-muted/20' : ''}`}
                 placeholder=""
-                disabled={isLoading || isSaving || day.isWeekend}
+                disabled={isLoading || isSaving}
               />
             </div>
           </td>

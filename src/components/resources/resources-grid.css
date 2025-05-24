@@ -4,6 +4,7 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 1px; /* Prevents scroll jank */
+  border-radius: 0.5rem; /* Match card border radius */
 }
 
 .grid-table-container {
@@ -142,4 +143,16 @@
 /* Weekend headers also get the gray background */
 .resource-allocation-table th.weekend {
   background-color: rgba(107, 114, 128, 0.15) !important;
+}
+
+/* Card-specific adjustments */
+.resource-allocation-table {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Ensure the sticky columns work properly within the card */
+.sticky-left-0, .sticky-left-12 {
+  background-color: inherit;
 }

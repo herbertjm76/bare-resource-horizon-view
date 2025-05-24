@@ -10,6 +10,7 @@ import { GridEmptyState } from './grid/GridEmptyState';
 import { useGridDays } from './hooks/useGridDays';
 import { useFilteredProjects } from './hooks/useFilteredProjects';
 import { useGridTableWidth } from './hooks/useGridTableWidth';
+import { Card } from '@/components/ui/card';
 import './resources-grid.css';
 
 interface ResourceAllocationGridProps {
@@ -63,32 +64,34 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   }
   
   return (
-    <div className="grid-table-outer-container">
-      <div className="grid-table-container">
-        <table 
-          className="resource-allocation-table" 
-          style={{
-            width: `${tableWidth}px`,
-            minWidth: '100%'
-          }}
-        >
-          <thead>
-            <GridDaysHeader days={days} />
-          </thead>
-          <tbody>
-            {filteredProjects.map((project, index) => (
-              <ProjectRow 
-                key={project.id} 
-                project={project} 
-                days={days} 
-                isExpanded={expandedProjects.includes(project.id)} 
-                onToggleExpand={() => toggleProjectExpanded(project.id)} 
-                isEven={index % 2 === 0} 
-              />
-            ))}
-          </tbody>
-        </table>
+    <Card className="w-full">
+      <div className="grid-table-outer-container overflow-x-auto">
+        <div className="grid-table-container">
+          <table 
+            className="resource-allocation-table" 
+            style={{
+              width: `${tableWidth}px`,
+              minWidth: '100%'
+            }}
+          >
+            <thead>
+              <GridDaysHeader days={days} />
+            </thead>
+            <tbody>
+              {filteredProjects.map((project, index) => (
+                <ProjectRow 
+                  key={project.id} 
+                  project={project} 
+                  days={days} 
+                  isExpanded={expandedProjects.includes(project.id)} 
+                  onToggleExpand={() => toggleProjectExpanded(project.id)} 
+                  isEven={index % 2 === 0} 
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };
