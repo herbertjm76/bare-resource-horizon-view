@@ -7,8 +7,8 @@
   max-width: 100%;
   width: 100%;
   padding-bottom: 1px; /* Prevents scroll jank */
-  /* Constrain to viewport width to prevent browser horizontal scroll */
-  max-width: calc(100vw - 2rem); /* Account for page padding */
+  /* Use the container's width which is now 90vw */
+  max-width: 100%;
 }
 
 .grid-table-outer-container {
