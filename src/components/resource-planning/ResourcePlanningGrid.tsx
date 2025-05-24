@@ -108,8 +108,8 @@ export const ResourcePlanningGrid: React.FC<ResourcePlanningGridProps> = ({
               <tr key={project.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
                 <td className="sticky-project-col project-name-cell">
                   <div className="p-3">
-                    <div className="font-medium text-sm">{project.project_name}</div>
-                    <div className="text-xs text-muted-foreground">{project.project_code}</div>
+                    <div className="font-medium text-sm">{project.name}</div>
+                    <div className="text-xs text-muted-foreground">{project.code}</div>
                   </div>
                 </td>
                 {days.map((day, i) => (

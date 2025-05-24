@@ -50,8 +50,8 @@ export const ResourcePlanningContent: React.FC<ResourcePlanningContentProps> = (
             />
           </div>
           <MonthYearSelector
-            selectedMonth={selectedMonth}
-            onChange={onMonthChange}
+            selectedDate={selectedMonth}
+            onDateChange={onMonthChange}
           />
           <ResourcePlanningFilters
             filters={filters}
