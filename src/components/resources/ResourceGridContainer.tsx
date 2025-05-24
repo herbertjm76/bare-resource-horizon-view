@@ -28,7 +28,7 @@ export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
   return (
     <div className="mt-4 w-full max-w-full overflow-hidden">
       <OfficeSettingsProvider>
-        <div className="w-full" style={{ width: 'calc(100vw - 20rem)', maxWidth: 'calc(100vw - 20rem)' }}>
+        <div className="w-full" style={{ width: 'calc(100vw - 25rem)', maxWidth: 'calc(100vw - 25rem)' }}>
           <ResourceAllocationGrid 
             startDate={startDate}
             periodToShow={periodToShow}
