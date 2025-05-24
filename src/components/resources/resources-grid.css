@@ -1,5 +1,12 @@
 
 /* Base styles for the resource allocation grid */
+.grid-table-card-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  width: 100%;
+}
+
 .grid-table-outer-container {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -10,6 +17,8 @@
 .grid-table-container {
   min-height: 300px;
   position: relative;
+  width: max-content;
+  min-width: 100%;
 }
 
 .resource-allocation-table {
