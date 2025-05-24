@@ -16,6 +16,7 @@ interface DayInfo {
   isWeekend: boolean;
   isSunday: boolean;
   isFirstOfMonth: boolean;
+  isEndOfWeek?: boolean; // Added for week separators
 }
 
 interface ResourceRowProps {
@@ -122,7 +123,6 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
                 {resource.name}
                 <ResourceUtilizationBadge utilization={utilizationPercentage} size="xs" />
               </div>
-              <div className="text-[10px] text-muted-foreground truncate">{resource.role}</div>
             </div>
           </div>
           <Button 
@@ -147,11 +147,12 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
         const isWeekendClass = day.isWeekend ? 'bg-muted/40' : '';
         const isSundayClass = day.isSunday ? 'sunday-border' : '';
         const isFirstOfMonthClass = day.isFirstOfMonth ? 'border-l-2 border-l-brand-primary/40' : '';
+        const isEndOfWeekClass = day.isEndOfWeek ? 'border-r border-r-gray-300' : '';
         
         return (
           <td 
             key={dayKey} 
-            className={`p-0 text-center ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass}`} 
+            className={`p-0 text-center ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass} ${isEndOfWeekClass}`} 
             style={{ width: '30px', minWidth: '30px' }}
           >
             <div className="allocation-input-container px-0.5">
@@ -162,7 +163,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
                 value={inputValue}
                 onChange={(e) => handleInputChange(dayKey, e.target.value)}
                 onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
-                className={`w-full h-5 px-0 text-center text-xs border-gray-200 focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''} ${day.isWeekend ? 'bg-muted/20' : ''}`}
+                className={`w-full h-5 px-0 text-center text-xs border-gray-200 rounded-md focus:border-brand-violet ${isSaving ? 'bg-gray-50' : ''} ${day.isWeekend ? 'bg-muted/20' : ''}`}
                 placeholder=""
                 disabled={isLoading || isSaving || day.isWeekend}
               />

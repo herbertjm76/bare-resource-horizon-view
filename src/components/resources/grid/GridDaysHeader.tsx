@@ -10,6 +10,7 @@ interface DayInfo {
   isWeekend: boolean;
   isSunday: boolean;
   isFirstOfMonth: boolean;
+  isEndOfWeek: boolean; // Added for week separators
 }
 
 interface GridDaysHeaderProps {
@@ -102,6 +103,7 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
           const isWeekendClass = day.isWeekend ? 'bg-muted/40' : '';
           const isSundayClass = day.isSunday ? 'sunday-border' : '';
           const isFirstOfMonthClass = day.isFirstOfMonth ? 'border-l-2 border-l-brand-primary/40' : '';
+          const isEndOfWeekClass = day.isEndOfWeek ? 'border-r border-r-gray-300' : '';
           
           return (
             <th 
@@ -110,7 +112,7 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
                 width: '30px',
                 minWidth: '30px'
               }} 
-              className={`border-b text-center font-medium ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass}`}
+              className={`border-b text-center font-medium ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass} ${isEndOfWeekClass}`}
             >
               <div className="date-label flex flex-col items-center">
                 {/* Day number */}

@@ -9,7 +9,6 @@ import { useWeekMilestones } from './hooks/useWeekMilestones';
 import { useProjectResources } from './hooks/useProjectResources';
 import { useWeeklyProjectHours } from './hooks/useWeeklyProjectHours';
 import { format } from 'date-fns';
-import { ProjectTotalsRow } from './components/ProjectTotalsRow';
 
 interface DayInfo {
   date: Date;
@@ -19,6 +18,7 @@ interface DayInfo {
   isWeekend: boolean;
   isSunday: boolean;
   isFirstOfMonth: boolean;
+  isEndOfWeek?: boolean; // Added for week separators
 }
 
 interface ProjectRowProps {
@@ -134,17 +134,22 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           const isWeekendClass = day.isWeekend ? 'bg-muted/40' : '';
           const isSundayClass = day.isSunday ? 'sunday-border' : '';
           const isFirstOfMonthClass = day.isFirstOfMonth ? 'border-l-2 border-l-brand-primary/40' : '';
+          const isEndOfWeekClass = day.isEndOfWeek ? 'border-r border-r-gray-300' : '';
           const hasHoursClass = projectHours > 0 ? 'font-medium' : 'text-muted-foreground';
           
           return (
             <td 
               key={dayKey} 
-              className={`p-0 text-center w-[30px] ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass}`}
+              className={`p-0 text-center w-[30px] ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass} ${isEndOfWeekClass}`}
             >
               <div className="px-0.5 py-1 text-xs">
-                <span className={hasHoursClass}>
-                  {projectHours > 0 ? projectHours : ''}
-                </span>
+                {projectHours > 0 ? (
+                  <span className="bg-white/80 rounded-full px-1.5 py-0.5 font-medium text-xs inline-block min-w-[22px]">
+                    {projectHours}
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground"></span>
+                )}
               </div>
             </td>
           );

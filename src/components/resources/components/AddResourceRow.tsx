@@ -19,19 +19,19 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
   if (!isExpanded) return null;
   
   return (
-    <tr className={`border-b ${rowBgClass} hover:bg-gray-50 h-8`}>
+    <tr className={`border-b ${rowBgClass} hover:bg-gray-50 h-10`}>
       {/* Fixed counter column */}
       <td className={`sticky-left-0 ${rowBgClass} z-10 p-0.5 w-12 hover:bg-gray-50`}></td>
       
       {/* Add Resource column */}
-      <td className={`sticky-left-12 ${rowBgClass} z-10 p-1 hover:bg-gray-50`} colSpan={daysCount + 1}>
+      <td className={`sticky-left-12 ${rowBgClass} z-10 p-2 hover:bg-gray-50`} colSpan={daysCount + 1}>
         <Button 
-          variant="ghost" 
+          variant="outline" 
           size="sm" 
-          className="flex items-center text-xs text-muted-foreground hover:text-brand-primary ml-4"
+          className="flex items-center text-xs ml-4"
           onClick={onAddResource}
         >
-          <UserPlus className="h-3 w-3 mr-1" />
+          <UserPlus className="h-3.5 w-3.5 mr-1.5" />
           Add Resource
         </Button>
       </td>

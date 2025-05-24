@@ -1,11 +1,11 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { format, addMonths, subMonths } from 'date-fns';
+import { format, addMonths, subMonths, setDate } from 'date-fns';
 import { ChevronLeft, ChevronRight, CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface MonthYearSelectorProps {
   selectedDate: Date;
@@ -16,7 +16,7 @@ export const MonthYearSelector: React.FC<MonthYearSelectorProps> = ({
   selectedDate,
   onDateChange
 }) => {
-  const [isCalendarOpen, setIsCalendarOpen] = React.useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
 
   const handlePreviousMonth = () => {
     onDateChange(subMonths(selectedDate, 1));
@@ -24,6 +24,34 @@ export const MonthYearSelector: React.FC<MonthYearSelectorProps> = ({
   
   const handleNextMonth = () => {
     onDateChange(addMonths(selectedDate, 1));
+  };
+
+  const currentYear = selectedDate.getFullYear();
+  const currentMonth = selectedDate.getMonth();
+  
+  // Generate month options
+  const months = [
+    "January", "February", "March", "April", "May", "June", 
+    "July", "August", "September", "October", "November", "December"
+  ];
+  
+  // Generate year options (current year - 2 to current year + 5)
+  const years = [];
+  const currentYearNum = new Date().getFullYear();
+  for (let year = currentYearNum - 2; year <= currentYearNum + 5; year++) {
+    years.push(year);
+  }
+  
+  const handleMonthChange = (value: string) => {
+    const newMonth = parseInt(value, 10);
+    const newDate = new Date(currentYear, newMonth, 1);
+    onDateChange(newDate);
+  };
+  
+  const handleYearChange = (value: string) => {
+    const newYear = parseInt(value, 10);
+    const newDate = new Date(newYear, currentMonth, 1);
+    onDateChange(newDate);
   };
   
   return (
@@ -33,7 +61,7 @@ export const MonthYearSelector: React.FC<MonthYearSelectorProps> = ({
         <span className="sr-only">Previous month</span>
       </Button>
       
-      <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
         <PopoverTrigger asChild>
           <Button 
             variant="outline" 
@@ -46,18 +74,49 @@ export const MonthYearSelector: React.FC<MonthYearSelectorProps> = ({
             {format(selectedDate, 'MMMM yyyy')}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={(date) => {
-              if (date) {
-                onDateChange(date);
-                setIsCalendarOpen(false);
-              }
-            }}
-            initialFocus
-          />
+        <PopoverContent className="w-auto p-4" align="start">
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Month</label>
+                  <Select
+                    value={currentMonth.toString()}
+                    onValueChange={handleMonthChange}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Month" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((month, idx) => (
+                        <SelectItem key={idx} value={idx.toString()}>
+                          {month}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-1 block">Year</label>
+                  <Select
+                    value={currentYear.toString()}
+                    onValueChange={handleYearChange}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map(year => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+          </div>
         </PopoverContent>
       </Popover>
       
