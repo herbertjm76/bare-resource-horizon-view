@@ -7,8 +7,7 @@ import {
   UserSquare2,
   Briefcase,
   Flag,
-  HelpCircle,
-  PieChart
+  HelpCircle
 } from "lucide-react"
 
 export const navigationItems = [
@@ -34,11 +33,6 @@ export const navigationItems = [
         title: "Project Resourcing",
         url: "/project-resourcing",
         icon: GanttChartSquare,
-      },
-      {
-        title: "Resource Planning",
-        url: "/resource-planning",
-        icon: PieChart,
       },
       {
         title: "All Projects",

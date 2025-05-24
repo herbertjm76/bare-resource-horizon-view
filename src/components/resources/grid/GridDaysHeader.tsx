@@ -78,10 +78,10 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
       <tr className="bg-gray-50/70">
         {/* Resources count column - frozen */}
         <th 
-          className="sticky-left-0 bg-muted/50 z-30 border-b text-center font-medium shadow-[1px_0_0_0_#e5e7eb]" 
+          className="sticky-left-0 bg-muted/50 z-30 border-b text-center font-medium w-12 shadow-[1px_0_0_0_#e5e7eb]" 
           style={{
-            width: '60px',
-            minWidth: '60px'
+            width: '48px',
+            minWidth: '48px'
           }}
         >
           {/* Empty header for the counter column */}
@@ -91,14 +91,14 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
         <th 
           className="sticky-left-12 bg-muted/50 z-30 border-b text-left font-medium shadow-[1px_0_0_0_#e5e7eb]" 
           style={{
-            width: '250px',
-            minWidth: '250px'
+            width: '200px',
+            minWidth: '200px'
           }}
         >
           Project / Resource
         </th>
         
-        {/* Date columns - consistent 45px width */}
+        {/* Date columns - fixed width columns */}
         {days.map((day, i) => {
           const isWeekendClass = day.isWeekend ? 'weekend' : '';
           const isSundayClass = day.isSunday ? 'sunday-border' : '';
@@ -109,8 +109,8 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
             <th 
               key={i}
               style={{
-                width: '45px',
-                minWidth: '45px'
+                width: '30px',
+                minWidth: '30px'
               }} 
               className={`border-b text-center font-medium ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass} ${isEndOfWeekClass}`}
             >

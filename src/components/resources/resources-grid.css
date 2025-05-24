@@ -1,129 +1,197 @@
 
-/* Resource Allocation Grid Styles */
+/* Base styles for the resource allocation grid */
 
-.planning-container {
-  width: 100%;
-  max-width: 100%;
-  position: relative;
-  height: 100%;
-}
-
-.planning-scroll {
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  
-  /* Enhanced scrollbar visibility */
-  scrollbar-width: auto;
-  scrollbar-color: #374151 #e5e7eb;
-}
-
-.planning-scroll::-webkit-scrollbar {
-  height: 12px;
-  width: 12px;
-  background-color: #e5e7eb;
-}
-
-.planning-scroll::-webkit-scrollbar-track {
-  background-color: #e5e7eb;
-  border-radius: 6px;
-}
-
-.planning-scroll::-webkit-scrollbar-thumb {
-  background-color: #374151;
-  border-radius: 6px;
-  border: 2px solid #e5e7eb;
-}
-
-.planning-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: #1f2937;
-}
-
-.planning-scroll::-webkit-scrollbar-corner {
-  background-color: #e5e7eb;
-}
-
-.planning-table {
-  border-collapse: collapse;
-  table-layout: fixed;
-  background: white;
-  width: 100%;
-}
-
-.sticky-project-col {
-  position: sticky;
-  left: 0;
-  z-index: 10;
-  background: inherit;
-  border-right: 2px solid #e5e7eb;
-}
-
-.project-name-cell {
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.day-header {
-  text-align: center;
-  padding: 8px 4px;
-  border-bottom: 2px solid #e5e7eb;
-  border-right: 1px solid #e5e7eb;
-  background: #f9fafb;
-  font-weight: 500;
-}
-
-.day-cell {
-  border-bottom: 1px solid #e5e7eb;
-  border-right: 1px solid #e5e7eb;
-  padding: 0;
-}
-
-/* Grid container styles */
-.allocation-grid {
-  min-width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
+/* ---------------  wrapper --------------- */
 .grid-scroll {
-  overflow: auto;
+  width: 100%;          /* fills card */
+  overflow-x: auto;     /* horizontal scroll appears here */
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 1px; /* Prevents scroll jank */
+}
+
+/* ---------------  table --------------- */
+.allocation-grid {
+  width: max-content;   /* keep real width, don't shrink to card */
+  border-collapse: collapse;
+  table-layout: fixed;  /* cols don't flex */
+  white-space: nowrap;  /* prevent wrapping inside cells */
+  border-spacing: 0;
+  min-width: max-content; /* Ensures table can expand beyond container */
+}
+
+/* every column stays a fixed width so grid is wider than card */
+.allocation-grid th,
+.allocation-grid td {
+  min-width: 72px;      /* adjust to taste */
+  border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+  border-bottom: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
+}
+
+.allocation-grid th {
+  border-bottom: 1px solid rgba(156, 163, 175, 0.8); /* Even darker for headers */
+}
+
+/* ---------------  page --------------- */
+body { 
+  overflow-x: hidden;  /* never show browser-level bar */
+}
+
+.grid-table-card-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
   width: 100%;
-  height: 100%;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  padding-bottom: 1px; /* Prevents scroll jank */
+}
+
+.grid-table-outer-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 1px; /* Prevents scroll jank */
+  border-radius: 0.5rem; /* Match card border radius */
+}
+
+.grid-table-container {
+  min-height: 300px;
+  position: relative;
+  width: max-content;
+  min-width: 100%;
+}
+
+.resource-allocation-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  min-width: max-content; /* Ensures table can expand beyond container */
 }
 
 /* Sticky columns */
 .sticky-left-0 {
   position: sticky;
   left: 0;
-  z-index: 10;
-  background: inherit;
+  z-index: 20;
+  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
 }
 
 .sticky-left-12 {
   position: sticky;
-  left: 60px;
-  z-index: 10;
-  background: inherit;
+  left: 48px; /* Width of the first column */
+  z-index: 20;
+  border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
 }
 
-/* Weekend styling */
+/* Date cell styling */
+.date-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+/* Weekend styling - more prominent gray background */
 .weekend {
-  background-color: #f8fafc;
+  background-color: rgba(107, 114, 128, 0.15) !important; /* Darker gray for weekends */
 }
 
+/* Sunday border - thicker separation */
 .sunday-border {
-  border-left: 2px solid #e2e8f0;
+  border-left: 2px solid rgba(111, 75, 246, 0.3);
 }
 
-/* Ensure no horizontal overflow on body */
-body {
-  overflow-x: hidden;
+/* Month start border */
+.month-start {
+  border-left: 2px solid rgba(111, 75, 246, 0.5);
 }
 
-/* Card content styling for full height */
-.resource-grid-card {
-  height: calc(100vh - 200px);
-  min-height: 400px;
+/* Input styling for allocation cells */
+.allocation-input-container {
+  width: 100%;
+  height: 100%;
+}
+
+.allocation-input-container input {
+  border-radius: 6px;
+  padding: 0;
+  text-align: center;
+  font-size: 11px;
+  height: 28px;
+  border: 1px solid #d1d5db; /* Slightly darker border for inputs */
+  background: transparent;
+}
+
+.allocation-input-container input:focus {
+  outline: 2px solid rgba(111, 75, 246, 0.5);
+  outline-offset: -1px;
+}
+
+/* Add vertical lines between days to help visually group weeks */
+.day-separator {
+  border-right: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+/* Header for month names */
+.month-header {
+  font-size: 10px;
+  color: #6b7280;
+  border-bottom: 1px solid #d1d5db; /* Darker border */
+  text-align: center;
+}
+
+/* Project header styling */
+.project-header {
+  background-color: rgba(111, 75, 246, 0.1);
+}
+
+/* Project total hours badge */
+.project-hours-badge {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 9999px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Week separator */
+.week-separator {
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Override for cells that need special styling */
+.resource-allocation-table td.no-border-right,
+.resource-allocation-table th.no-border-right,
+.allocation-grid td.no-border-right,
+.allocation-grid th.no-border-right {
+  border-right: none;
+}
+
+/* Special styling for the weekend cells */
+.resource-allocation-table td.weekend,
+.allocation-grid td.weekend {
+  border-right: 1px solid rgba(156, 163, 175, 0.4);
+  background-color: rgba(107, 114, 128, 0.15) !important; /* Consistent weekend background */
+}
+
+/* Weekend headers also get the gray background */
+.resource-allocation-table th.weekend,
+.allocation-grid th.weekend {
+  background-color: rgba(107, 114, 128, 0.15) !important;
+}
+
+/* Card-specific adjustments */
+.resource-allocation-table, .allocation-grid {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Ensure the sticky columns work properly within the card */
+.sticky-left-0, .sticky-left-12 {
+  background-color: inherit;
 }

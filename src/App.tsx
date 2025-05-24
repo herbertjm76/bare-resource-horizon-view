@@ -17,7 +17,6 @@ import TeamWorkload from "./pages/TeamWorkload";
 import TeamAnnualLeave from "./pages/TeamAnnualLeave";
 import WeekResourcing from "./pages/WeekResourcing";
 import ProjectResourcing from "./pages/ProjectResourcing";
-import ResourcePlanning from "./pages/ResourcePlanning";
 import Help from "./pages/Help";
 import { CompanyProvider, useCompany } from "./context/CompanyContext";
 
@@ -63,7 +62,6 @@ const AppRoutes = () => {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/week-resourcing" element={<WeekResourcing />} />
       <Route path="/project-resourcing" element={<ProjectResourcing />} />
-      <Route path="/resource-planning" element={<ResourcePlanning />} />
       <Route path="/projects" element={<Projects />} />
       <Route path="/profile" element={<Profile />} />
       

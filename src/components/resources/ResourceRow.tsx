@@ -108,12 +108,12 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
   return (
     <tr className={`border-b ${rowBgClass} group hover:bg-gray-50 h-7`}>
       {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${rowBgClass} z-10 p-0.5 w-15 group-hover:bg-gray-50`}></td>
+      <td className={`sticky-left-0 ${rowBgClass} z-10 p-0.5 w-12 group-hover:bg-gray-50`}></td>
       
-      {/* Resource info column - updated width */}
+      {/* Resource info column */}
       <td 
         className={`sticky-left-12 ${rowBgClass} z-10 p-0.5 group-hover:bg-gray-50`} 
-        style={{ width: '250px', minWidth: '250px' }}
+        style={{ width: '200px', minWidth: '200px' }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center">

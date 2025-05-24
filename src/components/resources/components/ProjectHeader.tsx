@@ -27,7 +27,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   return (
     <>
       {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${headerBgClass} z-10 p-1 w-15 text-center`}>
+      <td className={`sticky-left-0 ${headerBgClass} z-10 p-1 w-12 text-center`}>
         <button 
           onClick={onToggleExpand} 
           className="rounded-full p-1 hover:bg-white/30 transition-colors"
@@ -40,10 +40,10 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
         </button>
       </td>
       
-      {/* Fixed project name column - updated width */}
+      {/* Fixed project name column */}
       <td 
         className={`sticky-left-12 ${headerBgClass} z-10 p-1 font-medium`}
-        style={{ width: '250px', minWidth: '250px' }}
+        style={{ width: '200px', minWidth: '200px' }}
       >
         <div className="flex flex-col">
           <div className="text-sm font-medium line-clamp-1 mb-0.5">{project.name || 'Untitled Project'}</div>
