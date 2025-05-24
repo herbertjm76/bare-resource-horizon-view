@@ -1,4 +1,3 @@
-
 /* Base styles for the resource allocation grid */
 
 /* ---------------  wrapper --------------- */
@@ -8,6 +7,29 @@
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   padding-bottom: 1px; /* Prevents scroll jank */
+  
+  /* Make scrollbar more visible */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) rgba(243, 244, 246, 0.5);
+}
+
+/* Webkit scrollbar styling for better visibility */
+.grid-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.grid-scroll::-webkit-scrollbar-track {
+  background: rgba(243, 244, 246, 0.5);
+  border-radius: 4px;
+}
+
+.grid-scroll::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.5);
+  border-radius: 4px;
+}
+
+.grid-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.7);
 }
 
 /* ---------------  table --------------- */
@@ -73,13 +95,17 @@ body {
   left: 0;
   z-index: 20;
   border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
+  min-width: 60px; /* Wider for better visibility */
+  width: 60px;
 }
 
 .sticky-left-12 {
   position: sticky;
-  left: 48px; /* Width of the first column */
+  left: 60px; /* Adjusted to match new width of first column */
   z-index: 20;
   border-right: 2px solid rgba(156, 163, 175, 0.8); /* Thicker border for sticky columns */
+  min-width: 250px; /* Much wider for project/resource names */
+  width: 250px;
 }
 
 /* Date cell styling */
