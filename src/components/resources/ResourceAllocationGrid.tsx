@@ -64,34 +64,36 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   }
   
   return (
-    <Card className="w-full max-w-full overflow-hidden">
-      <div className="grid-table-card-scroll overflow-x-auto max-w-full">
-        <div className="grid-table-container">
-          <table 
-            className="resource-allocation-table" 
-            style={{
-              width: `${tableWidth}px`,
-              minWidth: '100%'
-            }}
-          >
-            <thead>
-              <GridDaysHeader days={days} />
-            </thead>
-            <tbody>
-              {filteredProjects.map((project, index) => (
-                <ProjectRow 
-                  key={project.id} 
-                  project={project} 
-                  days={days} 
-                  isExpanded={expandedProjects.includes(project.id)} 
-                  onToggleExpand={() => toggleProjectExpanded(project.id)} 
-                  isEven={index % 2 === 0} 
-                />
-              ))}
-            </tbody>
-          </table>
+    <div className="w-full max-w-full">
+      <Card className="w-full max-w-full overflow-hidden">
+        <div className="grid-table-card-scroll">
+          <div className="grid-table-container">
+            <table 
+              className="resource-allocation-table" 
+              style={{
+                width: `${tableWidth}px`,
+                minWidth: 'max-content'
+              }}
+            >
+              <thead>
+                <GridDaysHeader days={days} />
+              </thead>
+              <tbody>
+                {filteredProjects.map((project, index) => (
+                  <ProjectRow 
+                    key={project.id} 
+                    project={project} 
+                    days={days} 
+                    isExpanded={expandedProjects.includes(project.id)} 
+                    onToggleExpand={() => toggleProjectExpanded(project.id)} 
+                    isEven={index % 2 === 0} 
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 };
