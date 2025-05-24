@@ -42,15 +42,9 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   // Filter and enhance projects
   const filteredProjects = useFilteredProjects(projects, filters, office_stages);
 
-  // Calculate total width needed
-  const fixedColumnsWidth = 320; // Project name column
-  const dayColumnsWidth = days.length * 50; // 50px per day
-  const totalWidth = fixedColumnsWidth + dayColumnsWidth + 200; // Extra padding
-
   console.log('ResourceAllocationGrid:', {
     daysCount: days.length,
-    projectsCount: filteredProjects.length,
-    containerWidth: `${totalWidth}px`
+    projectsCount: filteredProjects.length
   });
   
   // Toggle project expansion
@@ -69,36 +63,23 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   }
   
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-0">
-        <div className="planning-container">
-          <div 
-            className="planning-scroll"
-            style={{
-              width: '100%',
-              overflowX: 'auto',
-              overflowY: 'visible'
-            }}
-          >
-            <table 
-              className="planning-table"
-              style={{
-                width: `${totalWidth}px`,
-                minWidth: `${totalWidth}px`
-              }}
-            >
-              <thead>
-                <tr className="bg-gray-50">
+    <Card className="border shadow-sm h-full flex flex-col">
+      <CardContent className="p-0 flex-1 flex flex-col min-h-0">
+        <div className="flex-1 overflow-hidden">
+          <div className="h-full overflow-auto">
+            <table className="w-full border-collapse">
+              <thead className="sticky top-0 z-20 bg-gray-50 border-b-2 border-gray-200">
+                <tr>
                   <th 
-                    className="sticky-project-col"
-                    style={{ width: '320px', minWidth: '320px' }}
+                    className="sticky left-0 z-30 bg-gray-50 border-r-2 border-gray-200 p-3 text-left font-medium"
+                    style={{ width: '280px', minWidth: '280px' }}
                   >
                     Project / Resource
                   </th>
                   {days.map((day, i) => (
                     <th 
                       key={i}
-                      className="day-header"
+                      className="border-r border-gray-200 p-2 text-center font-medium bg-gray-50"
                       style={{ width: '50px', minWidth: '50px' }}
                     >
                       <div className="text-xs">
@@ -114,7 +95,10 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               <tbody>
                 {filteredProjects.map((project, index) => (
                   <tr key={project.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                    <td className="sticky-project-col project-name-cell">
+                    <td 
+                      className="sticky left-0 z-10 bg-inherit border-r-2 border-gray-200 border-b border-gray-100"
+                      style={{ width: '280px', minWidth: '280px' }}
+                    >
                       <div className="p-3 flex items-center gap-2">
                         <button 
                           onClick={() => toggleProjectExpanded(project.id)}
@@ -134,7 +118,11 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
                       </div>
                     </td>
                     {days.map((day, i) => (
-                      <td key={i} className="day-cell">
+                      <td 
+                        key={i} 
+                        className="border-r border-gray-200 border-b border-gray-100 p-0"
+                        style={{ width: '50px', minWidth: '50px' }}
+                      >
                         <div className="h-12 w-full flex items-center justify-center">
                           {/* Placeholder for allocation data */}
                           <div className="w-2 h-2 bg-blue-200 rounded-full"></div>
