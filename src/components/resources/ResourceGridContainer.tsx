@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ResourceAllocationGrid } from './ResourceAllocationGrid';
+import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 
 interface ResourceGridContainerProps {
   startDate: Date;
@@ -26,12 +27,14 @@ export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
 }) => {
   return (
     <div className="mt-4">
-      <ResourceAllocationGrid 
-        startDate={startDate}
-        periodToShow={periodToShow}
-        filters={filters}
-        displayOptions={displayOptions}
-      />
+      <OfficeSettingsProvider>
+        <ResourceAllocationGrid 
+          startDate={startDate}
+          periodToShow={periodToShow}
+          filters={filters}
+          displayOptions={displayOptions}
+        />
+      </OfficeSettingsProvider>
     </div>
   );
 };

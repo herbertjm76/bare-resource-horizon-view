@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -9,6 +8,7 @@ import { ProjectResourceFilters } from '@/components/resources/filters/ProjectRe
 import { ResourcesHeader } from '@/components/resources/ResourcesHeader';
 import { ResourceGridContainer } from '@/components/resources/ResourceGridContainer';
 import { format } from 'date-fns';
+import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 
 const HEADER_HEIGHT = 56;
 
@@ -167,15 +167,17 @@ const ProjectResourcing = () => {
                 onClearFilters={clearFilters}
               />
               
-              <ResourceGridContainer
-                startDate={selectedMonth}
-                periodToShow={filters.periodToShow}
-                filters={{
-                  ...filters,
-                  searchTerm
-                }}
-                displayOptions={displayOptions}
-              />
+              <OfficeSettingsProvider>
+                <ResourceGridContainer
+                  startDate={selectedMonth}
+                  periodToShow={filters.periodToShow}
+                  filters={{
+                    ...filters,
+                    searchTerm
+                  }}
+                  displayOptions={displayOptions}
+                />
+              </OfficeSettingsProvider>
             </div>
           </div>
         </div>

@@ -27,7 +27,7 @@ const weekdays = [
 export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
   showWeekends,
   onToggleWeekends,
-  selectedDays,
+  selectedDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'], // Provide default value
   onSelectedDaysChange,
   weekStartsOnSunday,
   onWeekStartChange
@@ -66,7 +66,7 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
             <div key={day.id} className="flex items-center space-x-2">
               <Checkbox 
                 id={`day-${day.id}`}
-                checked={selectedDays.includes(day.id)} 
+                checked={selectedDays?.includes(day.id)} // Add null check
                 onCheckedChange={() => handleDayToggle(day.id)}
                 disabled={
                   // Disable weekend checkboxes if weekends are hidden
