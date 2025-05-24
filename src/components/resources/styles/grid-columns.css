@@ -22,10 +22,10 @@
   background-color: inherit;
 }
 
-/* Column width definitions */
+/* Column width definitions - reduced day column width */
 .allocation-grid th,
 .allocation-grid td {
-  min-width: 72px;      /* adjust to taste */
+  min-width: 45px;      /* Reduced from 72px to 45px for day columns */
   border-right: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
   border-bottom: 1px solid rgba(156, 163, 175, 0.6); /* Darker gray borders */
 }

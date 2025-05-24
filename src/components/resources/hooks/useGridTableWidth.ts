@@ -3,12 +3,12 @@ import { useMemo } from 'react';
 
 export const useGridTableWidth = (daysCount: number): number => {
   return useMemo(() => {
-    // Fixed columns: counter (60px) + project name (250px) - updated from previous values
+    // Fixed columns: counter (60px) + project name (250px)
     const fixedColumnsWidth = 60 + 250;
-    // Day columns: 72px per day (matching CSS min-width)
-    const daysColumnsWidth = daysCount * 72;
-    // Add significant padding to force horizontal scroll
-    const paddingBuffer = 400;
+    // Day columns: 45px per day (matching reduced CSS width)
+    const daysColumnsWidth = daysCount * 45;
+    // Add significant padding to force horizontal scroll - increased buffer
+    const paddingBuffer = 800; // Increased from 400 to ensure scrolling
     const totalWidth = fixedColumnsWidth + daysColumnsWidth + paddingBuffer;
     
     console.log('Table width calculation:', {
@@ -16,7 +16,8 @@ export const useGridTableWidth = (daysCount: number): number => {
       fixedColumnsWidth,
       daysColumnsWidth,
       paddingBuffer,
-      totalWidth
+      totalWidth,
+      windowWidth: window.innerWidth
     });
     
     return totalWidth;
