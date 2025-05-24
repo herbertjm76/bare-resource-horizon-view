@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useMemo } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -25,7 +26,7 @@ const ProjectResourcing = () => {
   });
   
   const [displayOptions, setDisplayOptions] = useState({
-    showWeekends: true,
+    showWeekends: false, // Default to not showing weekends
     selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri'], // Default to weekdays only
     weekStartsOnSunday: false // Default: week starts on Monday
   });
@@ -56,12 +57,29 @@ const ProjectResourcing = () => {
       [option]: value
     }));
     
-    // If we're hiding weekends, remove weekend days from selectedDays
-    if (option === 'showWeekends' && value === false) {
-      setDisplayOptions(prev => ({
-        ...prev,
-        selectedDays: prev.selectedDays.filter(day => day !== 'sat' && day !== 'sun')
-      }));
+    // Ensure weekend toggle and selectedDays stay in sync
+    if (option === 'showWeekends') {
+      const showWeekends = value as boolean;
+      
+      if (showWeekends) {
+        // Add weekend days if they're not already in the list
+        setDisplayOptions(prev => {
+          const updatedDays = [...prev.selectedDays];
+          if (!updatedDays.includes('sat')) updatedDays.push('sat');
+          if (!updatedDays.includes('sun')) updatedDays.push('sun');
+          
+          return {
+            ...prev,
+            selectedDays: updatedDays
+          };
+        });
+      } else {
+        // Remove weekend days from the selectedDays
+        setDisplayOptions(prev => ({
+          ...prev,
+          selectedDays: prev.selectedDays.filter(day => day !== 'sat' && day !== 'sun')
+        }));
+      }
     }
   };
   
@@ -105,8 +123,8 @@ const ProjectResourcing = () => {
     (filters.country !== 'all' ? 1 : 0) + 
     (filters.manager !== 'all' ? 1 : 0) +
     (searchTerm ? 1 : 0) +
-    (!displayOptions.showWeekends ? 1 : 0) +
-    (displayOptions.selectedDays.length < 7 ? 1 : 0) +
+    (displayOptions.showWeekends ? 1 : 0) +
+    (displayOptions.selectedDays.length < 5 ? 1 : 0) +
     (displayOptions.weekStartsOnSunday ? 1 : 0);
   
   // Clear all filters and reset display options
@@ -119,7 +137,7 @@ const ProjectResourcing = () => {
     });
     setSearchTerm('');
     setDisplayOptions({
-      showWeekends: true,
+      showWeekends: false,
       selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri'],
       weekStartsOnSunday: false
     });

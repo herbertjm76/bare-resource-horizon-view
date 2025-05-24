@@ -58,14 +58,17 @@ export const useGridDays = (
     
     // Filter days based on display options
     allDays = allDays.filter(day => {
-      // Apply weekend filter if needed
-      if (!displayOptions.showWeekends && isWeekend(day)) {
-        return false;
+      // Get the day ID for the current date (e.g., 'mon', 'tue', etc.)
+      const dayOfWeek = getDayOfWeek(day, displayOptions.weekStartsOnSunday);
+      const dayId = dayOfWeekToId(dayOfWeek, displayOptions.weekStartsOnSunday);
+      
+      // Weekend handling - ensure weekends are shown if showWeekends is true
+      // This should override the selectedDays filter for weekend days
+      if (isWeekend(day)) {
+        return displayOptions.showWeekends && displayOptions.selectedDays.includes(dayId);
       }
       
-      // Apply selected days filter
-      const dayOfWeek = displayOptions.weekStartsOnSunday ? day.getDay() : (day.getDay() || 7) - 1;
-      const dayId = dayOfWeekToId(dayOfWeek, displayOptions.weekStartsOnSunday);
+      // For non-weekend days, check if they are in the selectedDays list
       return displayOptions.selectedDays.includes(dayId);
     });
     

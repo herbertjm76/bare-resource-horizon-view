@@ -42,6 +42,24 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
     }
   };
 
+  // Handler for weekend toggle - this should add/remove Saturday and Sunday together
+  const handleWeekendToggle = (show: boolean) => {
+    let updatedDays = [...selectedDays];
+    
+    if (show) {
+      // Add weekend days if not already included
+      if (!updatedDays.includes('sat')) updatedDays.push('sat');
+      if (!updatedDays.includes('sun')) updatedDays.push('sun');
+    } else {
+      // Remove weekend days
+      updatedDays = updatedDays.filter(day => day !== 'sat' && day !== 'sun');
+    }
+    
+    // Update both the weekend toggle and selected days
+    onToggleWeekends(show);
+    onSelectedDaysChange(updatedDays);
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-sm font-medium mb-2">Display Settings</h3>
@@ -53,7 +71,7 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
         <Switch 
           id="show-weekends" 
           checked={showWeekends} 
-          onCheckedChange={onToggleWeekends}
+          onCheckedChange={handleWeekendToggle}
         />
       </div>
       
@@ -64,7 +82,7 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
             <div key={day.id} className="flex items-center space-x-2">
               <Checkbox 
                 id={`day-${day.id}`}
-                checked={selectedDays?.includes(day.id)} // Add null check
+                checked={selectedDays.includes(day.id)}
                 onCheckedChange={() => handleDayToggle(day.id)}
               />
               <Label 
