@@ -32,10 +32,7 @@ export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
           <ResourceAllocationGrid 
             startDate={startDate}
             periodToShow={periodToShow}
-            filters={{
-              ...filters,
-              searchTerm
-            }}
+            filters={filters}
             displayOptions={displayOptions}
           />
         </div>
