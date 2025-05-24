@@ -1,3 +1,4 @@
+
 /* Base styles for the resource allocation grid */
 
 /* ---------------  wrapper --------------- */
@@ -8,28 +9,37 @@
   -webkit-overflow-scrolling: touch;
   padding-bottom: 1px; /* Prevents scroll jank */
   
-  /* Make scrollbar more visible */
-  scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.5) rgba(243, 244, 246, 0.5);
+  /* Force scrollbar visibility and make it more prominent */
+  scrollbar-width: auto; /* Force visible scrollbar in Firefox */
+  scrollbar-color: rgba(107, 114, 128, 0.8) rgba(229, 231, 235, 0.8); /* Darker thumb, lighter track */
 }
 
-/* Webkit scrollbar styling for better visibility */
+/* Webkit scrollbar styling for maximum visibility */
 .grid-scroll::-webkit-scrollbar {
-  height: 8px;
+  height: 12px; /* Increased from 8px for better visibility */
+  background: rgba(229, 231, 235, 0.8); /* Light gray track */
 }
 
 .grid-scroll::-webkit-scrollbar-track {
-  background: rgba(243, 244, 246, 0.5);
-  border-radius: 4px;
+  background: rgba(229, 231, 235, 0.8); /* Light gray track */
+  border-radius: 6px;
+  border: 1px solid rgba(209, 213, 219, 0.6); /* Subtle border */
 }
 
 .grid-scroll::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.5);
-  border-radius: 4px;
+  background: rgba(107, 114, 128, 0.8); /* Much darker gray thumb */
+  border-radius: 6px;
+  border: 1px solid rgba(75, 85, 99, 0.6); /* Darker border */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
 .grid-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.7);
+  background: rgba(75, 85, 99, 0.9); /* Even darker on hover */
+  border-color: rgba(55, 65, 81, 0.8);
+}
+
+.grid-scroll::-webkit-scrollbar-thumb:active {
+  background: rgba(55, 65, 81, 1); /* Darkest when clicked */
 }
 
 /* ---------------  table --------------- */
