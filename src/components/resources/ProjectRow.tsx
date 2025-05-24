@@ -144,7 +144,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
             >
               <div className="px-0.5 py-1 text-xs">
                 {projectHours > 0 ? (
-                  <span className="bg-white/80 rounded-full px-1.5 py-0.5 font-medium text-xs inline-block min-w-[22px]">
+                  <span className="bg-white/80 rounded-lg px-1.5 py-0.5 font-medium text-sm inline-block min-w-[22px]">
                     {projectHours}
                   </span>
                 ) : (

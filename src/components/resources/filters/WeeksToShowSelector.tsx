@@ -31,7 +31,7 @@ export const WeeksToShowSelector: React.FC<WeeksToShowSelectorProps> = ({
       <label className="text-sm font-medium">Weeks to Show</label>
       <Select
         value={weeksToShow.toString()}
-        onValueChange={(value) => onWeeksChange(Number(value))}
+        onValueChange={(value) => onWeeksChange(parseInt(value, 10))}
       >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Select period" />

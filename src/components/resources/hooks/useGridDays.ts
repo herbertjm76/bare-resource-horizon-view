@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { format, addDays, isWeekend, isSunday, startOfMonth, eachDayOfInterval, addWeeks, isFirstDayOfWeek } from 'date-fns';
+import { format, addDays, isWeekend, isSunday, startOfMonth, eachDayOfInterval, addWeeks } from 'date-fns';
 
 interface DayInfo {
   date: Date;
@@ -50,7 +50,11 @@ export const useGridDays = (
 ): DayInfo[] => {
   return useMemo(() => {
     const monthStart = startOfMonth(startDate);
-    const endDate = addWeeks(monthStart, periodToShow / 4); // Convert weeks to months (approx)
+    
+    // Convert periodToShow from weeks to days for eachDayOfInterval
+    // Using 7 days per week to ensure full weeks are shown
+    const daysToAdd = periodToShow * 7;
+    const endDate = addDays(monthStart, daysToAdd - 1);
     
     let allDays = eachDayOfInterval({
       start: monthStart,
