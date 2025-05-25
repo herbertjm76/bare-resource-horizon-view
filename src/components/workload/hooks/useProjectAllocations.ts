@@ -12,9 +12,10 @@ export const useProjectAllocations = (
   workload: Record<string, Record<string, WorkloadBreakdown>>
 ) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [hasDataLoaded, setHasDataLoaded] = useState(false);
 
   useEffect(() => {
-    if (!companyId || teamMembers.length === 0) return;
+    if (!companyId || teamMembers.length === 0 || hasDataLoaded) return;
 
     const fetchProjectAllocations = async () => {
       setIsLoading(true);
@@ -62,6 +63,7 @@ export const useProjectAllocations = (
               }
             }
           });
+          setHasDataLoaded(true);
         }
       } catch (error) {
         console.error('Error in fetchProjectAllocations:', error);
@@ -71,7 +73,12 @@ export const useProjectAllocations = (
     };
 
     fetchProjectAllocations();
-  }, [companyId, selectedMonth, teamMembers, workload]);
+  }, [companyId, selectedMonth, teamMembers, workload, hasDataLoaded]);
+
+  // Reset hasDataLoaded when key dependencies change
+  useEffect(() => {
+    setHasDataLoaded(false);
+  }, [companyId, selectedMonth, teamMembers]);
 
   return { isLoading };
 };

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './types';
@@ -16,19 +16,23 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
   const [isLoadingWorkload, setIsLoadingWorkload] = useState<boolean>(true);
   const { company } = useCompany();
 
+  // Create a stable workload data structure that doesn't change on every render
+  const initialWorkloadData = useMemo(() => {
+    if (!company?.id || teamMembers.length === 0) return {};
+    return initializeWorkloadData(selectedMonth, teamMembers);
+  }, [company?.id, selectedMonth, teamMembers]);
+
   useEffect(() => {
     if (!company?.id || teamMembers.length === 0) {
       setIsLoadingWorkload(false);
+      setWorkloadData({});
       return;
     }
 
     console.log('Initializing comprehensive workload data for:', teamMembers.length, 'members');
-    
-    // Initialize the workload data structure
-    const workload = initializeWorkloadData(selectedMonth, teamMembers);
-    setWorkloadData(workload);
+    setWorkloadData({ ...initialWorkloadData });
     setIsLoadingWorkload(true);
-  }, [company?.id, selectedMonth, teamMembers]);
+  }, [company?.id, selectedMonth, teamMembers, initialWorkloadData]);
 
   // Use individual hooks for each data source
   const { isLoading: isLoadingProjects } = useProjectAllocations(selectedMonth, teamMembers, company?.id, workloadData);
@@ -41,11 +45,14 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
     const allLoaded = !isLoadingProjects && !isLoadingAnnualLeave && !isLoadingHolidays && !isLoadingOtherLeave;
     
     if (allLoaded && Object.keys(workloadData).length > 0) {
-      // Calculate totals for each day
-      calculateTotals(workloadData);
+      // Create a new copy of the workload data to avoid mutations
+      const updatedWorkloadData = JSON.parse(JSON.stringify(workloadData));
       
-      console.log('Final comprehensive workload data:', workloadData);
-      setWorkloadData({ ...workloadData }); // Trigger re-render
+      // Calculate totals for each day
+      calculateTotals(updatedWorkloadData);
+      
+      console.log('Final comprehensive workload data:', updatedWorkloadData);
+      setWorkloadData(updatedWorkloadData);
       setIsLoadingWorkload(false);
     }
   }, [isLoadingProjects, isLoadingAnnualLeave, isLoadingHolidays, isLoadingOtherLeave, workloadData]);
