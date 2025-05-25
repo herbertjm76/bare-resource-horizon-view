@@ -3,18 +3,21 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, eachDayOfInterval } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
-import { WorkloadBreakdown } from './types';
 
 export const useOfficeHolidays = (
   selectedMonth: Date, 
   teamMembers: TeamMember[], 
-  companyId: string | undefined,
-  workload: Record<string, Record<string, WorkloadBreakdown>>
+  companyId: string | undefined
 ) => {
+  const [data, setData] = useState<Record<string, Record<string, number>>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!companyId || teamMembers.length === 0) return;
+    if (!companyId || teamMembers.length === 0) {
+      setData({});
+      setIsLoading(false);
+      return;
+    }
 
     const fetchOfficeHolidays = async () => {
       setIsLoading(true);
@@ -34,7 +37,15 @@ export const useOfficeHolidays = (
         
         if (error) {
           console.error('Error fetching office holidays:', error);
+          setData({});
         } else if (holidaysData) {
+          const holidayHours: Record<string, Record<string, number>> = {};
+          
+          // Initialize structure
+          memberIds.forEach(memberId => {
+            holidayHours[memberId] = {};
+          });
+          
           holidaysData.forEach(holiday => {
             const startDate = new Date(holiday.date);
             const endDate = holiday.end_date ? new Date(holiday.end_date) : startDate;
@@ -48,23 +59,25 @@ export const useOfficeHolidays = (
                   day.getFullYear() === selectedMonth.getFullYear()) {
                 
                 memberIds.forEach(memberId => {
-                  if (workload[memberId] && workload[memberId][dateKey]) {
-                    workload[memberId][dateKey].officeHolidays = 8;
-                  }
+                  holidayHours[memberId][dateKey] = 8; // Standard 8-hour holiday
                 });
               }
             });
           });
+          
+          console.log('Processed office holidays data:', holidayHours);
+          setData(holidayHours);
         }
       } catch (error) {
         console.error('Error in fetchOfficeHolidays:', error);
+        setData({});
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchOfficeHolidays();
-  }, [companyId, selectedMonth, teamMembers, workload]);
+  }, [companyId, selectedMonth, teamMembers]);
 
-  return { isLoading };
+  return { data, isLoading };
 };

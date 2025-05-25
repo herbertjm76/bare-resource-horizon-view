@@ -3,18 +3,21 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, startOfWeek, endOfMonth, addDays } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
-import { WorkloadBreakdown } from './types';
 
 export const useWeeklyOtherLeave = (
   selectedMonth: Date, 
   teamMembers: TeamMember[], 
-  companyId: string | undefined,
-  workload: Record<string, Record<string, WorkloadBreakdown>>
+  companyId: string | undefined
 ) => {
+  const [data, setData] = useState<Record<string, Record<string, number>>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!companyId || teamMembers.length === 0) return;
+    if (!companyId || teamMembers.length === 0) {
+      setData({});
+      setIsLoading(false);
+      return;
+    }
 
     const fetchWeeklyOtherLeave = async () => {
       setIsLoading(true);
@@ -43,7 +46,15 @@ export const useWeeklyOtherLeave = (
         
         if (error) {
           console.error('Error fetching weekly other leave data:', error);
+          setData({});
         } else if (otherLeaveData) {
+          const otherLeaveHours: Record<string, Record<string, number>> = {};
+          
+          // Initialize structure
+          memberIds.forEach(memberId => {
+            otherLeaveHours[memberId] = {};
+          });
+          
           otherLeaveData.forEach(leave => {
             const weekStartDate = new Date(leave.week_start_date);
             const hours = Number(leave.hours) || 0;
@@ -58,22 +69,27 @@ export const useWeeklyOtherLeave = (
               if (workDay.getMonth() === selectedMonth.getMonth() && 
                   workDay.getFullYear() === selectedMonth.getFullYear()) {
                 
-                if (workload[leave.member_id] && workload[leave.member_id][dateKey]) {
-                  workload[leave.member_id][dateKey].otherLeave += dailyHours;
+                if (!otherLeaveHours[leave.member_id][dateKey]) {
+                  otherLeaveHours[leave.member_id][dateKey] = 0;
                 }
+                otherLeaveHours[leave.member_id][dateKey] += dailyHours;
               }
             }
           });
+          
+          console.log('Processed weekly other leave data:', otherLeaveHours);
+          setData(otherLeaveHours);
         }
       } catch (error) {
         console.error('Error in fetchWeeklyOtherLeave:', error);
+        setData({});
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchWeeklyOtherLeave();
-  }, [companyId, selectedMonth, teamMembers, workload]);
+  }, [companyId, selectedMonth, teamMembers]);
 
-  return { isLoading };
+  return { data, isLoading };
 };

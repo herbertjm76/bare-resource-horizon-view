@@ -3,18 +3,21 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
-import { WorkloadBreakdown } from './types';
 
 export const useAnnualLeaveData = (
   selectedMonth: Date, 
   teamMembers: TeamMember[], 
-  companyId: string | undefined,
-  workload: Record<string, Record<string, WorkloadBreakdown>>
+  companyId: string | undefined
 ) => {
+  const [data, setData] = useState<Record<string, Record<string, number>>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!companyId || teamMembers.length === 0) return;
+    if (!companyId || teamMembers.length === 0) {
+      setData({});
+      setIsLoading(false);
+      return;
+    }
 
     const fetchAnnualLeaveData = async () => {
       setIsLoading(true);
@@ -36,25 +39,38 @@ export const useAnnualLeaveData = (
         
         if (error) {
           console.error('Error fetching annual leave data:', error);
+          setData({});
         } else if (annualLeaveData) {
+          const leaveHours: Record<string, Record<string, number>> = {};
+          
+          // Initialize structure
+          memberIds.forEach(memberId => {
+            leaveHours[memberId] = {};
+          });
+          
           annualLeaveData.forEach(leave => {
             const dateKey = format(new Date(leave.date), 'yyyy-MM-dd');
             const hours = Number(leave.hours) || 0;
             
-            if (workload[leave.member_id] && workload[leave.member_id][dateKey]) {
-              workload[leave.member_id][dateKey].annualLeave += hours;
+            if (!leaveHours[leave.member_id][dateKey]) {
+              leaveHours[leave.member_id][dateKey] = 0;
             }
+            leaveHours[leave.member_id][dateKey] += hours;
           });
+          
+          console.log('Processed annual leave data:', leaveHours);
+          setData(leaveHours);
         }
       } catch (error) {
         console.error('Error in fetchAnnualLeaveData:', error);
+        setData({});
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchAnnualLeaveData();
-  }, [companyId, selectedMonth, teamMembers, workload]);
+  }, [companyId, selectedMonth, teamMembers]);
 
-  return { isLoading };
+  return { data, isLoading };
 };

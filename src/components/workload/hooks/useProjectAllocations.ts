@@ -3,19 +3,21 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, addDays } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
-import { WorkloadBreakdown } from './types';
 
 export const useProjectAllocations = (
   selectedMonth: Date, 
   teamMembers: TeamMember[], 
-  companyId: string | undefined,
-  workload: Record<string, Record<string, WorkloadBreakdown>>
+  companyId: string | undefined
 ) => {
+  const [data, setData] = useState<Record<string, Record<string, number>>>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [hasDataLoaded, setHasDataLoaded] = useState(false);
 
   useEffect(() => {
-    if (!companyId || teamMembers.length === 0 || hasDataLoaded) return;
+    if (!companyId || teamMembers.length === 0) {
+      setData({});
+      setIsLoading(false);
+      return;
+    }
 
     const fetchProjectAllocations = async () => {
       setIsLoading(true);
@@ -37,7 +39,15 @@ export const useProjectAllocations = (
         
         if (error) {
           console.error('Error fetching project allocations:', error);
+          setData({});
         } else if (allocations) {
+          const projectHours: Record<string, Record<string, number>> = {};
+          
+          // Initialize structure
+          memberIds.forEach(memberId => {
+            projectHours[memberId] = {};
+          });
+          
           allocations.forEach(allocation => {
             if (!allocation.resource_id || !allocation.week_start_date || !allocation.hours) return;
             
@@ -56,29 +66,27 @@ export const useProjectAllocations = (
               if (workDay.getMonth() === selectedMonth.getMonth() && 
                   workDay.getFullYear() === selectedMonth.getFullYear()) {
                 
-                if (workload[allocation.resource_id] && 
-                    workload[allocation.resource_id][dateKey] !== undefined) {
-                  workload[allocation.resource_id][dateKey].projectHours += dailyHours;
+                if (!projectHours[allocation.resource_id][dateKey]) {
+                  projectHours[allocation.resource_id][dateKey] = 0;
                 }
+                projectHours[allocation.resource_id][dateKey] += dailyHours;
               }
             }
           });
-          setHasDataLoaded(true);
+          
+          console.log('Processed project allocations:', projectHours);
+          setData(projectHours);
         }
       } catch (error) {
         console.error('Error in fetchProjectAllocations:', error);
+        setData({});
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProjectAllocations();
-  }, [companyId, selectedMonth, teamMembers, workload, hasDataLoaded]);
-
-  // Reset hasDataLoaded when key dependencies change
-  useEffect(() => {
-    setHasDataLoaded(false);
   }, [companyId, selectedMonth, teamMembers]);
 
-  return { isLoading };
+  return { data, isLoading };
 };
