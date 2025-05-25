@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/dialogs/AddResourceDialog';
@@ -17,7 +18,7 @@ interface DayInfo {
   isWeekend: boolean;
   isSunday: boolean;
   isFirstOfMonth: boolean;
-  isEndOfWeek?: boolean; // Added for week separators
+  isEndOfWeek?: boolean;
 }
 
 interface ProjectRowProps {
@@ -45,6 +46,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     handleAllocationChange,
     handleDeleteResource,
     handleAddResource,
+    checkResourceInOtherProjects,
     getAllocationKey
   } = useProjectResources(project.id);
 
@@ -166,6 +168,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           projectId={project.id} 
           onAllocationChange={handleAllocationChange} 
           onDeleteResource={handleDeleteResource}
+          onCheckOtherProjects={checkResourceInOtherProjects}
           isEven={isEven}
         />
       ))}

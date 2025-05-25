@@ -18,6 +18,7 @@ export const useProjectResources = (projectId: string) => {
     handleAllocationChange, 
     handleDeleteResource, 
     handleAddResource,
+    checkResourceInOtherProjects,
     getAllocationKey,
     isLoadingAllocations
   } = useResourceManagement(projectId, resources, setResources);
@@ -32,6 +33,7 @@ export const useProjectResources = (projectId: string) => {
     handleAllocationChange,
     handleDeleteResource,
     handleAddResource,
+    checkResourceInOtherProjects,
     refreshResources,
     getAllocationKey
   };

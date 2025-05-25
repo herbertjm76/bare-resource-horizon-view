@@ -87,58 +87,108 @@ export const useResourceManagement = (
     }));
   };
 
-  // Handle resource deletion
-  const handleDeleteResource = async (resourceId: string) => {
+  // Check if resource has allocations in other projects
+  const checkResourceInOtherProjects = async (resourceId: string, resourceType: 'active' | 'pre_registered') => {
+    if (!company?.id) return { hasOtherAllocations: false, projectCount: 0 };
+    
+    try {
+      const { data, error } = await supabase
+        .from('project_resource_allocations')
+        .select('project_id')
+        .eq('resource_id', resourceId)
+        .eq('resource_type', resourceType)
+        .eq('company_id', company.id)
+        .neq('project_id', projectId);
+        
+      if (error) {
+        console.error('Error checking other project allocations:', error);
+        return { hasOtherAllocations: false, projectCount: 0 };
+      }
+      
+      const uniqueProjects = new Set(data?.map(d => d.project_id) || []);
+      return { 
+        hasOtherAllocations: uniqueProjects.size > 0, 
+        projectCount: uniqueProjects.size 
+      };
+    } catch (error) {
+      console.error('Error in checkResourceInOtherProjects:', error);
+      return { hasOtherAllocations: false, projectCount: 0 };
+    }
+  };
+
+  // Handle resource deletion with global option
+  const handleDeleteResource = async (resourceId: string, globalDelete: boolean = false) => {
     if (!projectId || !company?.id) return;
     
     try {
-      console.log('Deleting resource:', resourceId);
+      console.log('Deleting resource:', resourceId, 'globalDelete:', globalDelete);
       
       const resourceToDelete = resources.find(r => r.id === resourceId);
+      const resourceType = resourceToDelete?.isPending ? 'pre_registered' : 'active';
       
-      if (resourceToDelete?.isPending) {
-        // Delete pre-registered resource
-        await supabase
-          .from('pending_resources')
-          .delete()
-          .eq('project_id', projectId)
-          .eq('invite_id', resourceId)
-          .eq('company_id', company.id);
-          
-        // Also delete any allocations
+      if (globalDelete) {
+        // Global deletion - remove from all projects and clean up all allocations
+        console.log('Performing global deletion for resource:', resourceId);
+        
+        if (resourceToDelete?.isPending) {
+          // Delete all pre-registered resource entries
+          await supabase
+            .from('pending_resources')
+            .delete()
+            .eq('invite_id', resourceId)
+            .eq('company_id', company.id);
+        } else {
+          // Delete all active resource entries
+          await supabase
+            .from('project_resources')
+            .delete()
+            .eq('staff_id', resourceId)
+            .eq('company_id', company.id);
+        }
+        
+        // Delete ALL allocations for this resource across all projects
         await supabase
           .from('project_resource_allocations')
           .delete()
-          .eq('project_id', projectId)
           .eq('resource_id', resourceId)
-          .eq('resource_type', 'pre_registered')
           .eq('company_id', company.id);
+          
+        toast.success(`${resourceToDelete?.name} removed from all projects and allocations cleared`);
       } else {
-        // Delete active resource
-        await supabase
-          .from('project_resources')
-          .delete()
-          .eq('project_id', projectId)
-          .eq('staff_id', resourceId)
-          .eq('company_id', company.id);
-          
-        // Also delete any allocations
+        // Project-specific deletion - only remove from current project
+        if (resourceToDelete?.isPending) {
+          await supabase
+            .from('pending_resources')
+            .delete()
+            .eq('project_id', projectId)
+            .eq('invite_id', resourceId)
+            .eq('company_id', company.id);
+        } else {
+          await supabase
+            .from('project_resources')
+            .delete()
+            .eq('project_id', projectId)
+            .eq('staff_id', resourceId)
+            .eq('company_id', company.id);
+        }
+        
+        // Only delete allocations for this specific project
         await supabase
           .from('project_resource_allocations')
           .delete()
           .eq('project_id', projectId)
           .eq('resource_id', resourceId)
-          .eq('resource_type', 'active')
           .eq('company_id', company.id);
+          
+        toast.success(`${resourceToDelete?.name} removed from this project`);
       }
       
       // Update UI state
       setResources(resources.filter(r => r.id !== resourceId));
       
-      // Remove all allocations for this resource
+      // Remove all allocations for this resource from local state
       setProjectAllocations(prev => {
         const updated = { ...prev };
-        // Loop through and remove any keys that start with this resourceId
         Object.keys(updated).forEach(key => {
           if (key.startsWith(`${resourceId}:`)) {
             delete updated[key];
@@ -179,6 +229,7 @@ export const useResourceManagement = (
     handleAllocationChange,
     handleDeleteResource,
     handleAddResource,
+    checkResourceInOtherProjects,
     getAllocationKey,
     isLoadingAllocations
   };
