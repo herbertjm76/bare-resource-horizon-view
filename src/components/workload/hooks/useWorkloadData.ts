@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { format, eachDayOfInterval, startOfMonth, endOfMonth, startOfWeek, endOfWeek } from 'date-fns';
+import { format, eachDayOfInterval, startOfMonth, endOfMonth } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 
 export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) => {
@@ -26,28 +26,25 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
           end: endOfMonth(selectedMonth)
         });
         
-        // Generate all week start dates that cover the month
-        const weekStartDates = new Set<string>();
-        
-        daysInMonth.forEach(day => {
-          // Get Monday of the week containing this day
-          const weekStart = startOfWeek(day, { weekStartsOn: 1 });
-          weekStartDates.add(format(weekStart, 'yyyy-MM-dd'));
-        });
+        // Create start and end date strings for the month
+        const monthStart = format(startOfMonth(selectedMonth), 'yyyy-MM-dd');
+        const monthEnd = format(endOfMonth(selectedMonth), 'yyyy-MM-dd');
         
         // Create a member ID list for the query
         const memberIds = teamMembers.map(member => member.id);
         
         console.log('Fetching workload data for member IDs:', memberIds);
-        console.log('Week start dates for month:', Array.from(weekStartDates));
+        console.log('Month range:', monthStart, 'to', monthEnd);
         
-        // Fetch all resource allocations for these members in the given weeks
+        // Fetch all resource allocations for these members in the given month
+        // Query by actual allocation date rather than week ranges
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
           .select('resource_id, hours, week_start_date, project_id, project:projects(name, code)')
           .eq('company_id', company.id)
           .in('resource_id', memberIds)
-          .in('week_start_date', Array.from(weekStartDates));
+          .gte('week_start_date', monthStart)
+          .lte('week_start_date', monthEnd);
         
         if (error) {
           console.error('Error fetching workload data:', error);
@@ -57,7 +54,7 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
         
         console.log('Fetched resource allocations for workload:', allocations);
         
-        // Process allocations to create a daily workload distribution
+        // Process allocations as daily data (not weekly redistribution)
         const workload: Record<string, Record<string, number>> = {};
         
         // Initialize data structure for all members and days with zero hours
@@ -69,43 +66,30 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
           });
         });
 
-        // Process each allocation to distribute hours across the week
+        // Process each allocation as a daily allocation
         if (allocations) {
           allocations.forEach(allocation => {
             if (!allocation.resource_id || !allocation.week_start_date || !allocation.hours) return;
             
-            const weekStart = new Date(allocation.week_start_date);
-            const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+            // Use the week_start_date as the actual allocation date
+            const allocationDate = allocation.week_start_date;
+            const dateKey = format(new Date(allocationDate), 'yyyy-MM-dd');
             
-            // Get workdays in this week that are also in the month
-            const workdays = eachDayOfInterval({ start: weekStart, end: weekEnd })
-              .filter(day => {
-                // Only consider days that are in the selected month
-                return day.getMonth() === selectedMonth.getMonth() && day.getFullYear() === selectedMonth.getFullYear();
-              })
-              .filter(day => {
-                // Filter out weekends (Saturday and Sunday)
-                const dayOfWeek = day.getDay();
-                return dayOfWeek !== 0 && dayOfWeek !== 6;
-              });
-
-            if (workdays.length === 0) return;
-            
-            // Calculate hours per day (evenly distributed across workdays)
-            const totalHours = Number(allocation.hours) || 0;
-            const hoursPerDay = totalHours / workdays.length;
-
-            console.log(`Distributing ${totalHours} hours across ${workdays.length} workdays for resource ${allocation.resource_id}, project ${allocation.project?.name || allocation.project_id}`);
-
-            // Assign hours to each workday
-            workdays.forEach(day => {
-              const dateKey = format(day, 'yyyy-MM-dd');
+            // Check if this date falls within our month
+            const allocationDateObj = new Date(allocationDate);
+            if (allocationDateObj.getMonth() === selectedMonth.getMonth() && 
+                allocationDateObj.getFullYear() === selectedMonth.getFullYear()) {
               
+              const totalHours = Number(allocation.hours) || 0;
+              
+              console.log(`Adding ${totalHours} hours for resource ${allocation.resource_id} on ${dateKey}, project ${allocation.project?.name || allocation.project_id}`);
+
+              // Add hours directly to the specific date
               if (workload[allocation.resource_id] && 
                   workload[allocation.resource_id][dateKey] !== undefined) {
-                workload[allocation.resource_id][dateKey] += hoursPerDay;
+                workload[allocation.resource_id][dateKey] += totalHours;
               }
-            });
+            }
           });
         }
         
