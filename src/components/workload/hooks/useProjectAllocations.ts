@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './types';
 
@@ -40,18 +40,25 @@ export const useProjectAllocations = (
           allocations.forEach(allocation => {
             if (!allocation.resource_id || !allocation.week_start_date || !allocation.hours) return;
             
-            const allocationDate = allocation.week_start_date;
-            const dateKey = format(new Date(allocationDate), 'yyyy-MM-dd');
-            const allocationDateObj = new Date(allocationDate);
+            const weekStartDate = new Date(allocation.week_start_date);
+            const weeklyHours = Number(allocation.hours) || 0;
             
-            if (allocationDateObj.getMonth() === selectedMonth.getMonth() && 
-                allocationDateObj.getFullYear() === selectedMonth.getFullYear()) {
+            // Distribute weekly hours across 5 workdays (Monday to Friday)
+            const dailyHours = weeklyHours / 5;
+            
+            // Generate all 5 weekdays for this allocation
+            for (let i = 0; i < 5; i++) {
+              const workDay = addDays(weekStartDate, i);
+              const dateKey = format(workDay, 'yyyy-MM-dd');
               
-              const totalHours = Number(allocation.hours) || 0;
-              
-              if (workload[allocation.resource_id] && 
-                  workload[allocation.resource_id][dateKey] !== undefined) {
-                workload[allocation.resource_id][dateKey].projectHours += totalHours;
+              // Only add hours for days that fall within the selected month
+              if (workDay.getMonth() === selectedMonth.getMonth() && 
+                  workDay.getFullYear() === selectedMonth.getFullYear()) {
+                
+                if (workload[allocation.resource_id] && 
+                    workload[allocation.resource_id][dateKey] !== undefined) {
+                  workload[allocation.resource_id][dateKey].projectHours += dailyHours;
+                }
               }
             }
           });
