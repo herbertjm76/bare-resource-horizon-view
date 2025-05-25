@@ -923,6 +923,42 @@ export type Database = {
           },
         ]
       }
+      weekly_other_leave: {
+        Row: {
+          company_id: string
+          created_at: string
+          hours: number
+          id: string
+          leave_type: string
+          member_id: string
+          notes: string | null
+          updated_at: string
+          week_start_date: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          hours?: number
+          id?: string
+          leave_type?: string
+          member_id: string
+          notes?: string | null
+          updated_at?: string
+          week_start_date: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          hours?: number
+          id?: string
+          leave_type?: string
+          member_id?: string
+          notes?: string | null
+          updated_at?: string
+          week_start_date?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
