@@ -50,25 +50,39 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
     }
   };
 
-  // Helper to determine cell styling based on workload breakdown
-  const getCellStyle = (breakdown: WorkloadBreakdown | undefined) => {
-    if (!breakdown || breakdown.total === 0) return '';
+  // Helper to calculate utilization percentage and determine cell styling
+  const getCellStyleAndPercentage = (breakdown: WorkloadBreakdown | undefined, member: TeamMember) => {
+    if (!breakdown || breakdown.total === 0) {
+      return { 
+        style: 'bg-gray-200 text-gray-600', 
+        percentage: 0,
+        displayText: ''
+      };
+    }
     
-    const { projectHours, annualLeave, officeHolidays, otherLeave, total } = breakdown;
+    // Calculate daily capacity (weekly capacity / 5 working days)
+    const dailyCapacity = (member.weekly_capacity || 40) / 5;
+    const utilizationPercentage = Math.round((breakdown.total / dailyCapacity) * 100);
     
-    // Prioritize styling based on the dominant type
-    if (officeHolidays > 0) return 'bg-red-200 font-medium text-red-900'; // Office holidays
-    if (annualLeave >= projectHours && annualLeave >= otherLeave) return 'bg-green-200 font-medium text-green-900'; // Annual leave
-    if (otherLeave >= projectHours) return 'bg-yellow-200 font-medium text-yellow-900'; // Other leave
+    let style = '';
+    let displayText = `${utilizationPercentage}%`;
     
-    // Project hours styling (existing logic)
-    if (total >= 8) return 'bg-brand-violet font-medium text-white';
-    if (total >= 6) return 'bg-brand-violet-light font-medium';
-    if (total >= 4) return 'bg-brand-violet-light/70 font-medium';
-    if (total >= 2) return 'bg-brand-violet-light/50';
-    if (total > 0) return 'bg-brand-violet-light/30';
+    if (utilizationPercentage === 0) {
+      style = 'bg-gray-200 text-gray-600';
+      displayText = '';
+    } else if (utilizationPercentage >= 1 && utilizationPercentage <= 49) {
+      style = 'bg-pink-300 text-pink-900 font-medium'; // Magenta
+    } else if (utilizationPercentage >= 50 && utilizationPercentage <= 99) {
+      style = 'bg-purple-500 text-white font-medium'; // Purple
+    } else if (utilizationPercentage >= 100) {
+      style = 'bg-green-500 text-white font-medium'; // Green
+    }
     
-    return '';
+    return { 
+      style, 
+      percentage: utilizationPercentage,
+      displayText
+    };
   };
   
   // Helper to check if the cell should have a thick border (Sunday-Monday separator)
@@ -102,26 +116,6 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
   return (
     <TooltipProvider>
       <div className="space-y-4">
-        {/* Legend */}
-        <div className="flex flex-wrap gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-brand-violet rounded"></div>
-            <span>Project Hours (8h+)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-green-200 rounded"></div>
-            <span>Annual Leave</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-red-200 rounded"></div>
-            <span>Office Holidays</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-yellow-200 rounded"></div>
-            <span>Other Leave</span>
-          </div>
-        </div>
-
         <div className="overflow-x-auto annual-leave-calendar">
           <Table>
             <TableHeader className="sticky top-0 bg-background z-10">
@@ -167,8 +161,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                       const breakdown = workloadData[member.id]?.[dateKey];
                       const isSundayCol = isSundayBorder(day);
                       
-                      // Round total hours to 1 decimal place for display
-                      const displayHours = breakdown ? Math.round(breakdown.total * 10) / 10 : 0;
+                      const { style, displayText } = getCellStyleAndPercentage(breakdown, member);
                       
                       return (
                         <Tooltip key={`${member.id}-${dateKey}`}>
@@ -177,9 +170,9 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                               className={`p-0 text-center cursor-help ${isWeekend ? 'bg-muted/60' : ''} 
                                 ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''} 
                                 ${isSundayCol ? 'sunday-border' : ''}
-                                ${getCellStyle(breakdown)}`}
+                                ${style}`}
                             >
-                              {displayHours > 0 ? displayHours : ''}
+                              {displayText}
                             </TableCell>
                           </TooltipTrigger>
                           <TooltipContent side="top" className="whitespace-pre-line">
@@ -194,7 +187,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <TableCell className="p-1 text-center border-l font-medium cursor-help">
-                          {Math.round(monthlyTotal.total * 10) / 10}
+                          {Math.round(monthlyTotal.total * 10) / 10}h
                         </TableCell>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="whitespace-pre-line">
