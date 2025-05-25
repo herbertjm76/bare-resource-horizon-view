@@ -38,6 +38,9 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
         // Create a member ID list for the query
         const memberIds = teamMembers.map(member => member.id);
         
+        console.log('Fetching workload data for member IDs:', memberIds);
+        console.log('Week start dates for month:', Array.from(weekStartDates));
+        
         // Fetch all resource allocations for these members in the given weeks
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
@@ -52,7 +55,7 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
           return;
         }
         
-        console.log('Fetched resource allocations:', allocations);
+        console.log('Fetched resource allocations for workload:', allocations);
         
         // Process allocations to create a daily workload distribution
         const workload: Record<string, Record<string, number>> = {};
@@ -69,7 +72,7 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
         // Process each allocation to distribute hours across the week
         if (allocations) {
           allocations.forEach(allocation => {
-            if (!allocation.resource_id || !allocation.week_start_date) return;
+            if (!allocation.resource_id || !allocation.week_start_date || !allocation.hours) return;
             
             const weekStart = new Date(allocation.week_start_date);
             const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
@@ -78,7 +81,7 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
             const workdays = eachDayOfInterval({ start: weekStart, end: weekEnd })
               .filter(day => {
                 // Only consider days that are in the selected month
-                return day.getMonth() === selectedMonth.getMonth();
+                return day.getMonth() === selectedMonth.getMonth() && day.getFullYear() === selectedMonth.getFullYear();
               })
               .filter(day => {
                 // Filter out weekends (Saturday and Sunday)
@@ -89,7 +92,10 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
             if (workdays.length === 0) return;
             
             // Calculate hours per day (evenly distributed across workdays)
-            const hoursPerDay = allocation.hours / workdays.length;
+            const totalHours = Number(allocation.hours) || 0;
+            const hoursPerDay = totalHours / workdays.length;
+
+            console.log(`Distributing ${totalHours} hours across ${workdays.length} workdays for resource ${allocation.resource_id}, project ${allocation.project?.name || allocation.project_id}`);
 
             // Assign hours to each workday
             workdays.forEach(day => {
@@ -103,6 +109,7 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
           });
         }
         
+        console.log('Final workload data:', workload);
         setWorkloadData(workload);
       } catch (error) {
         console.error('Error in workload data processing:', error);

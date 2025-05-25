@@ -50,7 +50,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
 
   // Helper to determine cell styling based on hours value
   const getCellStyle = (hours: number | undefined) => {
-    if (!hours) return '';
+    if (!hours || hours === 0) return '';
     
     // Different intensity classes based on hours
     if (hours >= 8) return 'bg-brand-violet font-medium text-white';
