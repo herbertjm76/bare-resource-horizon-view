@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from 'lucide-react';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface TeamMember {
   id: string;
@@ -110,47 +111,51 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Insight Count Badge */}
-      <div className="flex justify-end">
-        <Badge variant="outline" className="text-xs">
-          {insightCount} insight{insightCount !== 1 ? 's' : ''}
-        </Badge>
-      </div>
+    <div className="h-full flex flex-col">
+      <ScrollArea className="flex-1">
+        <div className="space-y-4 p-1">
+          {/* Insight Count Badge */}
+          <div className="flex justify-end">
+            <Badge variant="outline" className="text-xs">
+              {insightCount} insight{insightCount !== 1 ? 's' : ''}
+            </Badge>
+          </div>
 
-      {/* Primary Insight Card */}
-      <div className={`${getSeverityColor(primaryInsight.severity)} border-l-4 rounded-lg p-4 transition-all hover:shadow-sm`}>
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3 flex-1 min-w-0">
-            {primaryInsight.icon && (
-              <div className="mt-1 flex-shrink-0">
-                {primaryInsight.icon}
+          {/* Primary Insight Card */}
+          <div className={`${getSeverityColor(primaryInsight.severity)} border-l-4 rounded-lg p-4 transition-all hover:shadow-sm`}>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3 flex-1 min-w-0">
+                {primaryInsight.icon && (
+                  <div className="mt-1 flex-shrink-0">
+                    {primaryInsight.icon}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold text-gray-900 truncate">{primaryInsight.title}</h3>
+                    {getSeverityBadge(primaryInsight.severity)}
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">{primaryInsight.description}</p>
+                  {primaryInsight.metric && (
+                    <div className="text-2xl font-bold text-brand-violet mb-3">{primaryInsight.metric}</div>
+                  )}
+                  {primaryInsight.actionLabel && primaryInsight.onAction && (
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={primaryInsight.onAction}
+                      className="text-sm h-8 px-3 flex items-center gap-2"
+                    >
+                      {primaryInsight.actionLabel}
+                      <ArrowRight className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
               </div>
-            )}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="font-semibold text-gray-900 truncate">{primaryInsight.title}</h3>
-                {getSeverityBadge(primaryInsight.severity)}
-              </div>
-              <p className="text-sm text-gray-600 mb-3">{primaryInsight.description}</p>
-              {primaryInsight.metric && (
-                <div className="text-2xl font-bold text-brand-violet mb-3">{primaryInsight.metric}</div>
-              )}
-              {primaryInsight.actionLabel && primaryInsight.onAction && (
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  onClick={primaryInsight.onAction}
-                  className="text-sm h-8 px-3 flex items-center gap-2"
-                >
-                  {primaryInsight.actionLabel}
-                  <ArrowRight className="h-3 w-3" />
-                </Button>
-              )}
             </div>
           </div>
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 };

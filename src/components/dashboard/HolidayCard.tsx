@@ -6,6 +6,7 @@ import { Calendar, MapPin } from 'lucide-react';
 import { useCompany } from "@/context/CompanyContext";
 import { useOfficeSettings } from "@/context/officeSettings";
 import { supabase } from '@/integrations/supabase/client';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Holiday {
   id: string;
@@ -84,14 +85,14 @@ export const HolidayCard: React.FC = () => {
   });
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="h-full flex flex-col">
+      <CardHeader className="pb-3 flex-shrink-0">
         <CardTitle className="text-lg flex items-center gap-2">
           <Calendar className="h-5 w-5 text-brand-violet" />
           Upcoming Holidays
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="flex-1 flex flex-col p-0">
         {loading ? (
           <div className="text-center py-8 text-gray-500">
             <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50 animate-pulse" />
@@ -103,33 +104,37 @@ export const HolidayCard: React.FC = () => {
             <p className="text-sm">No upcoming holidays</p>
           </div>
         ) : (
-          upcomingHolidays.map((holiday, index) => {
-            const dateInfo = formatDate(holiday.date);
-            
-            return (
-              <div key={holiday.id} className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
-                <div className="flex-shrink-0 text-center min-w-[50px]">
-                  <div className="text-xl font-bold text-brand-violet">{dateInfo.day}</div>
-                  <div className="text-xs font-medium text-gray-600 uppercase">{dateInfo.month}</div>
-                  <div className="text-xs text-gray-500">{dateInfo.weekday}</div>
-                </div>
+          <ScrollArea className="flex-1">
+            <div className="space-y-3 px-6 pb-6">
+              {upcomingHolidays.map((holiday, index) => {
+                const dateInfo = formatDate(holiday.date);
                 
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-gray-900 truncate">{holiday.name}</div>
-                  <div className="flex items-center gap-1 mt-1">
-                    <MapPin className="h-3 w-3 text-gray-500" />
-                    <div className="flex gap-1 flex-wrap">
-                      {holiday.offices.map((office, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs py-0 px-1.5">
-                          {office}
-                        </Badge>
-                      ))}
+                return (
+                  <div key={holiday.id} className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                    <div className="flex-shrink-0 text-center min-w-[50px]">
+                      <div className="text-xl font-bold text-brand-violet">{dateInfo.day}</div>
+                      <div className="text-xs font-medium text-gray-600 uppercase">{dateInfo.month}</div>
+                      <div className="text-xs text-gray-500">{dateInfo.weekday}</div>
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-900 truncate">{holiday.name}</div>
+                      <div className="flex items-center gap-1 mt-1">
+                        <MapPin className="h-3 w-3 text-gray-500" />
+                        <div className="flex gap-1 flex-wrap">
+                          {holiday.offices.map((office, idx) => (
+                            <Badge key={idx} variant="secondary" className="text-xs py-0 px-1.5">
+                              {office}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            );
-          })
+                );
+              })}
+            </div>
+          </ScrollArea>
         )}
       </CardContent>
     </Card>
