@@ -24,18 +24,13 @@ export const HolidayCard: React.FC<HolidayCardProps> = ({ holidays }) => {
     };
   };
 
-  const getTimeUntil = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = date.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Tomorrow';
-    if (diffDays < 7) return `${diffDays} days`;
-    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks`;
-    return `${Math.ceil(diffDays / 30)} months`;
-  };
+  // Filter to only show upcoming holidays (today and future)
+  const upcomingHolidays = holidays.filter(holiday => {
+    const holidayDate = new Date(holiday.date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+    return holidayDate >= today;
+  });
 
   return (
     <Card className="h-full">
@@ -46,15 +41,14 @@ export const HolidayCard: React.FC<HolidayCardProps> = ({ holidays }) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {holidays.length === 0 ? (
+        {upcomingHolidays.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No upcoming holidays</p>
           </div>
         ) : (
-          holidays.map((holiday, index) => {
+          upcomingHolidays.map((holiday, index) => {
             const dateInfo = formatDate(holiday.date);
-            const timeUntil = getTimeUntil(holiday.date);
             
             return (
               <div key={index} className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
@@ -76,12 +70,6 @@ export const HolidayCard: React.FC<HolidayCardProps> = ({ holidays }) => {
                       ))}
                     </div>
                   </div>
-                </div>
-                
-                <div className="flex-shrink-0">
-                  <Badge variant="outline" className="text-xs whitespace-nowrap">
-                    {timeUntil}
-                  </Badge>
                 </div>
               </div>
             );
