@@ -11,6 +11,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
+import { useTeamUtilization } from '@/hooks/useTeamUtilization';
 import { MobileDashboard } from './MobileDashboard';
 import { DesktopDashboard } from './DesktopDashboard';
 
@@ -22,6 +23,9 @@ export const DashboardMetrics = () => {
   const { projects, isLoading: isLoadingProjects } = useProjects();
   const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData(true);
   
+  // Get real utilization data
+  const { utilization: utilizationTrends, isLoading: isLoadingUtilization } = useTeamUtilization(teamMembers || []);
+  
   const today = new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
     month: 'long', 
@@ -32,13 +36,6 @@ export const DashboardMetrics = () => {
   // Calculate real metrics from actual data
   const activeProjects = projects?.length || 0;
   const activeResources = teamMembers?.length || 0;
-  
-  // Calculate utilization trends (using reasonable estimates based on team size)
-  const utilizationTrends = {
-    days7: Math.min(Math.max(Math.round((activeProjects / Math.max(activeResources, 1)) * 30), 45), 95),
-    days30: Math.min(Math.max(Math.round((activeProjects / Math.max(activeResources, 1)) * 28), 40), 90),
-    days90: Math.min(Math.max(Math.round((activeProjects / Math.max(activeResources, 1)) * 32), 50), 85)
-  };
 
   // Staff data based on real team members
   const staffData = teamMembers?.slice(0, 4).map((member, index) => ({
@@ -79,7 +76,7 @@ export const DashboardMetrics = () => {
   };
 
   // Show loading state
-  if (isLoadingProjects || isLoadingMembers) {
+  if (isLoadingProjects || isLoadingMembers || isLoadingUtilization) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-lg">Loading dashboard data...</div>
