@@ -2,8 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Users, Building2, MapPin, TrendingUp, UserCheck, UserPlus } from 'lucide-react';
+import { Users, Building2, MapPin, UserCheck, UserPlus } from 'lucide-react';
 import { TeamMember } from './types';
 
 interface TeamMembersSummaryProps {
@@ -58,9 +57,8 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
   };
 
   const totalMembers = activeMembers.length + preRegisteredMembers.length;
-  const activationRate = totalMembers > 0 ? Math.round((activeMembers.length / totalMembers) * 100) : 0;
 
-  // Get top locations with counts
+  // Get top locations with counts (limit to 3)
   const topLocations = Object.entries(locationStats)
     .sort(([,a], [,b]) => b - a)
     .slice(0, 3);
@@ -73,159 +71,118 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
   };
 
   return (
-    <div className="mb-8">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Team Overview</h2>
-        <p className="text-gray-600">Monitor your team composition and growth at a glance</p>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Total Members Card */}
-        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-100">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="p-2 bg-blue-500 rounded-lg">
-                <Users className="h-6 w-6 text-white" />
-              </div>
-              <Badge variant="secondary" className="bg-blue-100 text-blue-700 font-medium">
-                Team Size
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">{totalMembers}</div>
-              <div className="text-sm text-gray-600">Total Team Members</div>
-            </div>
-            
+    <div className="mb-6">
+      <Card className="bg-brand-gray text-white border-0 shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-white text-xl font-semibold">Team Overview</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Main Stats Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Total Members */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <UserCheck className="h-4 w-4 text-green-600" />
-                  <span className="text-gray-700">Active</span>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-lg">
+                  <Users className="h-5 w-5 text-white" />
                 </div>
-                <span className="font-semibold text-gray-900">{activeMembers.length}</span>
+                <div>
+                  <div className="text-sm text-white/80">Total Members</div>
+                  <div className="text-2xl font-bold text-white">{totalMembers}</div>
+                </div>
               </div>
               
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <UserPlus className="h-4 w-4 text-orange-600" />
-                  <span className="text-gray-700">Pending</span>
-                </div>
-                <span className="font-semibold text-gray-900">{preRegisteredMembers.length}</span>
-              </div>
-              
-              <div className="pt-2">
-                <div className="flex items-center justify-between text-xs mb-2">
-                  <span className="text-gray-600">Activation Rate</span>
-                  <span className="font-medium text-blue-700">{activationRate}%</span>
-                </div>
-                <Progress value={activationRate} className="h-2 bg-blue-200" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Departments Card */}
-        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-green-50 to-emerald-100">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="p-2 bg-green-500 rounded-lg">
-                <Building2 className="h-6 w-6 text-white" />
-              </div>
-              <Badge variant="secondary" className="bg-green-100 text-green-700 font-medium">
-                Organization
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">{Object.keys(departmentStats).length}</div>
-              <div className="text-sm text-gray-600">Active Departments</div>
-            </div>
-            
-            <div className="space-y-3">
-              {Object.entries(departmentStats)
-                .filter(([_, count]) => count > 0)
-                .map(([dept, count]) => (
-                  <div key={dept} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${departmentColors[dept as keyof typeof departmentColors]}`}></div>
-                      <span className="text-sm font-medium text-gray-700">{dept}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-gray-900">{count}</span>
-                      <span className="text-xs text-gray-500">
-                        {activeMembers.length > 0 ? Math.round((count / activeMembers.length) * 100) : 0}%
-                      </span>
-                    </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <UserCheck className="h-4 w-4 text-green-300" />
+                    <span className="text-white/90">Active</span>
                   </div>
-                ))}
-              
-              {Object.keys(departmentStats).length === 0 && (
-                <div className="text-center py-2">
-                  <span className="text-sm text-gray-500">No departments assigned</span>
+                  <span className="font-medium text-white">{activeMembers.length}</span>
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Locations Card */}
-        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-purple-50 to-violet-100">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="p-2 bg-purple-500 rounded-lg">
-                <MapPin className="h-6 w-6 text-white" />
+                
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <UserPlus className="h-4 w-4 text-orange-300" />
+                    <span className="text-white/90">Pending</span>
+                  </div>
+                  <span className="font-medium text-white">{preRegisteredMembers.length}</span>
+                </div>
               </div>
-              <Badge variant="secondary" className="bg-purple-100 text-purple-700 font-medium">
-                Global Reach
-              </Badge>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="text-3xl font-bold text-gray-900 mb-1">{Object.keys(locationStats).length}</div>
-              <div className="text-sm text-gray-600">Countries/Regions</div>
-            </div>
-            
+
+            {/* Departments */}
             <div className="space-y-3">
-              {topLocations.length > 0 ? (
-                <>
-                  {topLocations.map(([location, count]) => (
-                    <div key={location} className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-lg">{getLocationEmoji(location)}</span>
-                        <span className="text-sm font-medium text-gray-700">
-                          {location === 'Unknown' ? 'Not specified' : location}
-                        </span>
-                      </div>
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-lg">
+                  <Building2 className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-sm text-white/80">Departments</div>
+                  <div className="text-2xl font-bold text-white">{Object.keys(departmentStats).length}</div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                {Object.entries(departmentStats)
+                  .filter(([_, count]) => count > 0)
+                  .slice(0, 2)
+                  .map(([dept, count]) => (
+                    <div key={dept} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-gray-900">{count}</span>
-                        <span className="text-xs text-gray-500">
-                          {activeMembers.length > 0 ? Math.round((count / activeMembers.length) * 100) : 0}%
-                        </span>
+                        <div className={`w-3 h-3 rounded-full ${departmentColors[dept as keyof typeof departmentColors]} opacity-80`}></div>
+                        <span className="text-white/90">{dept}</span>
                       </div>
+                      <span className="font-medium text-white">{count}</span>
                     </div>
                   ))}
-                  
-                  {Object.keys(locationStats).length > 3 && (
-                    <div className="pt-2 border-t border-purple-200">
-                      <span className="text-xs text-gray-500">
-                        +{Object.keys(locationStats).length - 3} more locations
-                      </span>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-center py-2">
-                  <span className="text-sm text-gray-500">No locations specified</span>
-                </div>
-              )}
+                
+                {Object.keys(departmentStats).length === 0 && (
+                  <div className="text-sm text-white/70">No departments assigned</div>
+                )}
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+
+            {/* Locations */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-lg">
+                  <MapPin className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-sm text-white/80">Locations</div>
+                  <div className="text-2xl font-bold text-white">{Object.keys(locationStats).length}</div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                {topLocations.length > 0 ? (
+                  <>
+                    {topLocations.slice(0, 2).map(([location, count]) => (
+                      <div key={location} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">{getLocationEmoji(location)}</span>
+                          <span className="text-white/90">
+                            {location === 'Unknown' ? 'Not specified' : location}
+                          </span>
+                        </div>
+                        <span className="font-medium text-white">{count}</span>
+                      </div>
+                    ))}
+                    
+                    {Object.keys(locationStats).length > 2 && (
+                      <div className="text-sm text-white/70">
+                        +{Object.keys(locationStats).length - 2} more
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-sm text-white/70">No locations specified</div>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
