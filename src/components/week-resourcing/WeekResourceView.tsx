@@ -8,6 +8,7 @@ import { ResourceTableErrorState } from '@/components/weekly-overview/components
 import { EmptyResourceState } from '@/components/weekly-overview/components/EmptyResourceState';
 import { getWeekStartDate } from '@/hooks/allocations/utils/dateUtils';
 import { ResourceTable } from '@/components/week-resourcing/ResourceTable';
+import { WeekResourceSummary } from '@/components/week-resourcing/WeekResourceSummary';
 import { addDays, format, startOfWeek } from 'date-fns';
 
 interface WeekResourceViewProps {
@@ -177,11 +178,20 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   }
 
   return (
-    <ResourceTable 
-      projects={projects}
-      members={members}
-      allocations={weekAllocations || []}
-      weekStartDate={weekStartDate}
-    />
+    <>
+      <WeekResourceSummary 
+        projects={projects}
+        members={members}
+        allocations={weekAllocations || []}
+        weekStartDate={weekStartDate}
+      />
+      
+      <ResourceTable 
+        projects={projects}
+        members={members}
+        allocations={weekAllocations || []}
+        weekStartDate={weekStartDate}
+      />
+    </>
   );
 };
