@@ -5,7 +5,7 @@ import { Target } from 'lucide-react';
 import { EnhancedInsights } from './EnhancedInsights';
 import { HolidayCard } from './HolidayCard';
 import { ExecutiveSummaryCard } from './ExecutiveSummaryCard';
-import { StaffStatusCard } from './StaffStatusCard';
+import { StaffStatusCard } from './staff/StaffStatusCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { HerbieFloatingButton } from './HerbieFloatingButton';
 
