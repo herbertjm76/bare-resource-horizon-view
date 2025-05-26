@@ -39,17 +39,26 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   const utilizationStatus = getUtilizationStatus(utilizationTrends.days7);
 
+  // Separate staff by availability
+  const overloadedStaff = staffData.filter(member => member.availability > 85);
+  const availableStaff = staffData.filter(member => member.availability <= 85);
+
   return (
     <div className="space-y-8 p-6">
-      {/* CEO Priority 1: Executive Summary */}
-      <div className="bg-gradient-to-br from-brand-violet/5 to-blue-50/50 rounded-2xl p-6 border border-brand-violet/10">
-        <h2 className="text-2xl font-bold text-brand-violet mb-6 flex items-center gap-3">
+      {/* CEO Priority 1: Executive Summary with 45-degree gradient */}
+      <div 
+        className="rounded-2xl p-6 border border-brand-violet/10"
+        style={{
+          background: 'linear-gradient(45deg, #6F4BF6 0%, #5669F7 55%, #E64FC4 100%)'
+        }}
+      >
+        <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
           <DollarSign className="h-6 w-6" />
           Executive Summary
         </h2>
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <Card className="bg-white/80 backdrop-blur-sm">
+          <Card className="bg-white/90 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -66,7 +75,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 backdrop-blur-sm">
+          <Card className="bg-white/90 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -81,7 +90,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 backdrop-blur-sm">
+          <Card className="bg-white/90 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -96,7 +105,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             </CardContent>
           </Card>
 
-          <Card className="bg-white/80 backdrop-blur-sm">
+          <Card className="bg-white/90 backdrop-blur-sm">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -115,9 +124,10 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         </div>
       </div>
 
-      {/* CEO Priority 2: Strategic Insights & Holidays */}
+      {/* CEO Priority 2: Three Column Layout - Smart Insights, Staff Status & Holidays */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
+        {/* Smart Insights */}
+        <div className="lg:col-span-1">
           <EnhancedInsights 
             teamMembers={teamMembers}
             activeProjects={activeProjects}
@@ -127,7 +137,86 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           />
         </div>
 
-        <HolidayCard holidays={mockData.upcomingHolidays} />
+        {/* Staff Availability & Overloaded */}
+        <div className="lg:col-span-1">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Users className="h-5 w-5 text-brand-violet" />
+                Staff Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Overloaded Staff */}
+              {overloadedStaff.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="h-4 w-4 text-red-500" />
+                    <h4 className="font-semibold text-red-700">Overloaded ({overloadedStaff.length})</h4>
+                  </div>
+                  <div className="space-y-3">
+                    {overloadedStaff.map((member, index) => (
+                      <div key={index} className="flex items-center gap-3 p-2 bg-red-50 rounded-lg border border-red-100">
+                        <div className="w-8 h-8 rounded-full bg-red-200 flex-shrink-0" />
+                        <div className="flex-1">
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="font-medium text-gray-800">{member.name}</span>
+                            <span className="text-red-600 font-semibold">{member.availability}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-red-100 rounded-full">
+                            <div 
+                              className="h-1.5 rounded-full bg-red-500"
+                              style={{ width: `${Math.min(member.availability, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Available Staff */}
+              {availableStaff.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="h-4 w-4 text-green-500" />
+                    <h4 className="font-semibold text-green-700">Available ({availableStaff.length})</h4>
+                  </div>
+                  <div className="space-y-3">
+                    {availableStaff.slice(0, 3).map((member, index) => (
+                      <div key={index} className="flex items-center gap-3 p-2 bg-green-50 rounded-lg border border-green-100">
+                        <div className="w-8 h-8 rounded-full bg-green-200 flex-shrink-0" />
+                        <div className="flex-1">
+                          <div className="flex justify-between text-sm mb-1">
+                            <span className="font-medium text-gray-800">{member.name}</span>
+                            <span className="text-green-600 font-semibold">{member.availability}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-green-100 rounded-full">
+                            <div 
+                              className="h-1.5 rounded-full bg-green-500"
+                              style={{ width: `${member.availability}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {availableStaff.length > 3 && (
+                      <p className="text-xs text-gray-500 text-center">
+                        +{availableStaff.length - 3} more available
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Upcoming Holidays */}
+        <div className="lg:col-span-1">
+          <HolidayCard holidays={mockData.upcomingHolidays} />
+        </div>
       </div>
 
       {/* CEO Priority 3: Analytics & Business Metrics */}
