@@ -11,7 +11,7 @@ interface TeamDialogsProps {
   currentMember: TeamMember | null;
   onCloseAddEdit: () => void;
   onCloseDelete: () => void;
-  onSaveMember: (data: Partial<Profile | PendingMember>) => void;
+  onSaveMember: (data: Partial<Profile | PendingMember>) => Promise<boolean>;
   onConfirmDelete: () => void;
   isSaving: boolean;
   isDeleting: boolean;

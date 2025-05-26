@@ -1,11 +1,11 @@
 
 import { useTeamDialogsState } from '@/hooks/useTeamDialogsState';
 import { useTeamMemberHandlers } from '../handlers/TeamMemberHandlers';
-import { TeamMember, Profile } from '../types';
+import { TeamMember, Profile, PendingMember } from '../types';
 
 interface UseTeamManagementHandlersProps {
   companyId: string;
-  preRegisteredMembers: TeamMember[];
+  preRegisteredMembers: PendingMember[];
   selectedMembers: string[];
   setSelectedMembers: (members: string[]) => void;
   setEditMode: (mode: boolean) => void;
@@ -52,11 +52,13 @@ export const useTeamManagementHandlers = ({
     }
   };
 
-  const handleSaveMemberDialogSubmit = async (memberData: Partial<Profile | TeamMember>) => {
+  const handleSaveMemberDialogSubmit = async (memberData: Partial<Profile | PendingMember>): Promise<boolean> => {
     const success = await handleSaveMemberWrapper(memberData, currentMember);
     if (success) {
       closeAddEditDialog();
+      return true;
     }
+    return false;
   };
 
   const handleBulkDeleteWrapper = () => {

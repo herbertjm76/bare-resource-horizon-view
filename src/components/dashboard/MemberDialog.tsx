@@ -11,7 +11,7 @@ interface MemberDialogProps {
   isOpen: boolean;
   onClose: () => void;
   member: TeamMember | null;
-  onSave: (data: Partial<Profile | PendingMember>) => void;
+  onSave: (data: Partial<Profile | PendingMember>) => Promise<boolean>;
   title: string;
   isLoading?: boolean;
 }
@@ -75,7 +75,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
     }
   }, [member, reset]);
 
-  const handleFormSubmit = (data: MemberFormData) => {
+  const handleFormSubmit = async (data: MemberFormData) => {
     const isPending = isPendingMember(member);
     
     // Create a consistent data structure for both profile and pending member
@@ -93,7 +93,8 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
       console.log('Submitting form for an active member or new member');
     }
     
-    onSave(formData);
+    const success = await onSave(formData);
+    return success;
   };
 
   return (

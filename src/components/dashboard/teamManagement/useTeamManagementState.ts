@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
-import { Profile, TeamMember } from '../types';
+import { Profile, TeamMember, PendingMember } from '../types';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useTeamDialogsState } from '@/hooks/useTeamDialogsState';
 import { useInviteActions } from '@/hooks/useInviteActions';
@@ -77,6 +77,7 @@ export const useTeamManagementState = ({
     toggleInviteEditMode,
     dialogsState,
     inviteActions,
-    memberHandlers
+    memberHandlers,
+    handleRefresh
   };
 };
