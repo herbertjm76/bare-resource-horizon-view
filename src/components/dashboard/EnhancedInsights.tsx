@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { CompactInsightCard } from './CompactInsightCard';
-import { AlertTriangle, Users, Target, TrendingUp, Calendar, Briefcase, Clock, UserCheck, Zap, BarChart3, DollarSign, TrendingDown, PiggyBank, Banknote } from 'lucide-react';
+import { AlertTriangle, Users, Target, TrendingUp, Calendar, Briefcase, Clock, UserCheck, Zap, BarChart3, DollarSign } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,14 +39,14 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
   const navigate = useNavigate();
   const { financialData, isLoading } = useFinancialInsights();
   
-  const generateFinancialInsights = () => {
+  const generateOperationalInsights = () => {
     const insights = [];
     const teamSize = teamMembers.length;
     
     if (isLoading || !financialData) {
       return [{
-        title: "Analyzing Financials",
-        description: "Calculating revenue, costs, and profit margins...",
+        title: "Analyzing Operations",
+        description: "Checking team utilization and project resourcing...",
         severity: 'low' as const,
         metric: "Loading...",
         icon: <BarChart3 className="h-4 w-4 text-gray-500" />
@@ -55,49 +55,30 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
 
     const {
       totalProjectRevenue,
-      averageProjectValue,
-      totalMonthlyCosts,
-      profitMargin,
-      revenuePerEmployee,
-      unpaidInvoices,
-      overdueAmount,
-      highestRateEmployee,
-      lowestRateEmployee,
       projectsWithoutFees,
       averageHourlyRate
     } = financialData;
 
-    // 1. CASH FLOW ISSUES - Critical Priority
-    if (unpaidInvoices > 0) {
+    // 1. TEAM OVERWORKING - Critical Priority
+    const overworkedMembers = staffMembers.filter(member => member.availability > 100);
+    if (overworkedMembers.length > 0) {
+      const maxUtilization = Math.max(...overworkedMembers.map(m => m.availability));
       insights.push({
-        title: "Outstanding Invoices",
-        description: `${unpaidInvoices} unpaid invoices worth $${overdueAmount.toLocaleString()}. This affects cash flow.`,
+        title: "Team Overworking",
+        description: `${overworkedMembers.length} team members over 100% capacity. Risk of burnout and quality issues.`,
         severity: 'critical' as const,
-        actionLabel: "Review Invoicing",
-        onAction: () => navigate('/projects'),
-        metric: `$${overdueAmount.toLocaleString()}`,
+        actionLabel: "Review Workload",
+        onAction: () => navigate('/workload'),
+        metric: `${maxUtilization}% max`,
         icon: <AlertTriangle className="h-4 w-4 text-red-500" />
       });
     }
 
-    // 2. LOW PROFIT MARGINS - Critical
-    if (profitMargin < 20) {
-      insights.push({
-        title: "Low Profit Margins",
-        description: `Only ${profitMargin}% profit margin. Industry standard is 25-35%. Review costs and pricing.`,
-        severity: 'critical' as const,
-        actionLabel: "Review Pricing",
-        onAction: () => navigate('/projects'),
-        metric: `${profitMargin}%`,
-        icon: <TrendingDown className="h-4 w-4 text-red-500" />
-      });
-    }
-
-    // 3. MISSING PROJECT FEES - High Priority
+    // 2. MISSING PROJECT FEES - High Priority for Revenue
     if (projectsWithoutFees > 0) {
       insights.push({
-        title: "Projects Missing Fees",
-        description: `${projectsWithoutFees} projects have no fee structure. This creates revenue risk.`,
+        title: "Missing Project Fees",
+        description: `${projectsWithoutFees} projects have no fee structure. Revenue at risk.`,
         severity: 'high' as const,
         actionLabel: "Set Project Fees",
         onAction: () => navigate('/projects'),
@@ -106,105 +87,91 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
       });
     }
 
-    // 4. REVENUE PER EMPLOYEE ANALYSIS
-    const industryBenchmark = 150000; // $150k annual revenue per employee benchmark
-    if (revenuePerEmployee < industryBenchmark) {
+    // 3. HIRING NEEDS - Based on sustained high utilization
+    if (utilizationTrends.days30 > 85 && utilizationTrends.days90 > 80) {
       insights.push({
-        title: "Low Revenue Per Employee",
-        description: `$${Math.round(revenuePerEmployee/1000)}k per employee. Industry benchmark is $150k+. Consider higher-value projects.`,
+        title: "Consider Hiring",
+        description: `Sustained high utilization (${utilizationTrends.days30}% last 30 days). Team may need expansion.`,
         severity: 'high' as const,
-        actionLabel: "Strategy Review",
-        onAction: () => navigate('/projects'),
-        metric: `$${Math.round(revenuePerEmployee/1000)}k/person`,
-        icon: <BarChart3 className="h-4 w-4 text-orange-600" />
-      });
-    }
-
-    // 5. RATE OPTIMIZATION OPPORTUNITY
-    const rateDifference = highestRateEmployee - lowestRateEmployee;
-    if (rateDifference > 50 && teamSize > 1) {
-      insights.push({
-        title: "Rate Gap Opportunity",
-        description: `$${rateDifference}/hr difference between highest and lowest rates. Consider upskilling lower-rate team members.`,
-        severity: 'medium' as const,
-        actionLabel: "Review Rates",
+        actionLabel: "Plan Hiring",
         onAction: () => navigate('/team-members'),
-        metric: `$${rateDifference}/hr gap`,
-        icon: <TrendingUp className="h-4 w-4 text-blue-500" />
+        metric: `${utilizationTrends.days30}% utilization`,
+        icon: <Users className="h-4 w-4 text-blue-500" />
       });
     }
 
-    // 6. SMALL PROJECT SIZE WARNING
-    if (averageProjectValue < 50000 && activeProjects > 2) {
+    // 4. LOW UTILIZATION - Capacity Available
+    if (utilizationRate < 60) {
       insights.push({
-        title: "Small Project Focus",
-        description: `Average project value is $${Math.round(averageProjectValue/1000)}k. Consider targeting larger projects for better margins.`,
+        title: "Capacity Available",
+        description: `Team at ${utilizationRate}% utilization. Opportunity for new projects or training.`,
         severity: 'medium' as const,
-        actionLabel: "Growth Strategy",
-        onAction: () => navigate('/projects'),
-        metric: `$${Math.round(averageProjectValue/1000)}k avg`,
-        icon: <Target className="h-4 w-4 text-purple-500" />
-      });
-    }
-
-    // 7. COST MANAGEMENT
-    const costPerEmployee = totalMonthlyCosts / teamSize;
-    if (costPerEmployee > 8000) { // $8k monthly cost per employee is high for small teams
-      insights.push({
-        title: "High Operating Costs",
-        description: `$${Math.round(costPerEmployee)}k monthly cost per employee. Review expenses and overhead.`,
-        severity: 'medium' as const,
-        actionLabel: "Cost Analysis",
-        onAction: () => navigate('/settings'),
-        metric: `$${Math.round(costPerEmployee)}k/person`,
-        icon: <PiggyBank className="h-4 w-4 text-red-400" />
-      });
-    }
-
-    // 8. CAPACITY VS REVENUE MISMATCH
-    const revenueEfficiency = totalProjectRevenue / (teamSize * 40 * 4 * averageHourlyRate);
-    if (revenueEfficiency < 0.7) {
-      insights.push({
-        title: "Underpriced Services",
-        description: `Team could generate ${Math.round((1-revenueEfficiency)*100)}% more revenue with better pricing or utilization.`,
-        severity: 'high' as const,
-        actionLabel: "Pricing Review",
-        onAction: () => navigate('/projects'),
-        metric: `${Math.round(revenueEfficiency*100)}% efficiency`,
-        icon: <Zap className="h-4 w-4 text-orange-500" />
-      });
-    }
-
-    // 9. EXCELLENT FINANCIAL PERFORMANCE
-    if (profitMargin > 30 && unpaidInvoices === 0 && revenuePerEmployee > industryBenchmark) {
-      insights.push({
-        title: "Strong Financial Performance",
-        description: `${profitMargin}% profit margin, no outstanding invoices, and strong revenue per employee. Excellent work!`,
-        severity: 'low' as const,
-        metric: `${profitMargin}% margin`,
-        icon: <Banknote className="h-4 w-4 text-green-500" />
-      });
-    }
-
-    // 10. GROWTH OPPORTUNITY
-    if (utilizationRate > 85 && profitMargin > 25) {
-      insights.push({
-        title: "Ready for Growth",
-        description: `High utilization (${utilizationRate}%) and good margins (${profitMargin}%). Perfect time to expand the team.`,
-        severity: 'low' as const,
-        actionLabel: "Hiring Plan",
-        onAction: () => navigate('/team-members'),
+        actionLabel: "View Capacity",
+        onAction: () => navigate('/resources'),
         metric: `${utilizationRate}% utilized`,
-        icon: <Users className="h-4 w-4 text-green-600" />
+        icon: <Calendar className="h-4 w-4 text-green-500" />
+      });
+    }
+
+    // 5. PROJECT RESOURCING ANALYSIS - Compare revenue to team cost
+    if (totalProjectRevenue > 0 && teamSize > 0) {
+      const estimatedMonthlyCost = teamSize * averageHourlyRate * 160; // Assume 160 hours/month
+      const monthlyRevenue = totalProjectRevenue / 12;
+      
+      if (monthlyRevenue < estimatedMonthlyCost * 0.8) {
+        insights.push({
+          title: "Under-Resourced Projects",
+          description: `Revenue suggests projects may be under-priced for current team size.`,
+          severity: 'medium' as const,
+          actionLabel: "Review Pricing",
+          onAction: () => navigate('/projects'),
+          metric: `$${Math.round(monthlyRevenue/1000)}k monthly`,
+          icon: <TrendingUp className="h-4 w-4 text-orange-400" />
+        });
+      } else if (monthlyRevenue > estimatedMonthlyCost * 2) {
+        insights.push({
+          title: "Well-Resourced Projects",
+          description: `Strong revenue-to-cost ratio. Projects are well-priced for team capacity.`,
+          severity: 'low' as const,
+          metric: `$${Math.round(monthlyRevenue/1000)}k monthly`,
+          icon: <Target className="h-4 w-4 text-green-500" />
+        });
+      }
+    }
+
+    // 6. UTILIZATION TRENDS - Declining performance
+    if (utilizationTrends.days7 < utilizationTrends.days30 - 15) {
+      insights.push({
+        title: "Utilization Declining",
+        description: `Current week (${utilizationTrends.days7}%) down from 30-day average (${utilizationTrends.days30}%).`,
+        severity: 'medium' as const,
+        actionLabel: "Check Schedule",
+        onAction: () => navigate('/workload'),
+        metric: `${utilizationTrends.days7}% this week`,
+        icon: <Clock className="h-4 w-4 text-orange-500" />
+      });
+    }
+
+    // 7. TEAM AT OPTIMAL CAPACITY
+    const atCapacityMembers = staffMembers.filter(member => 
+      member.availability >= 80 && member.availability <= 100
+    );
+    if (atCapacityMembers.length === teamSize && teamSize > 0) {
+      insights.push({
+        title: "Optimal Team Utilization",
+        description: `All ${teamSize} team members operating at ideal capacity (80-100%).`,
+        severity: 'low' as const,
+        metric: `${teamSize} members`,
+        icon: <UserCheck className="h-4 w-4 text-green-500" />
       });
     }
 
     return insights;
   };
 
-  const insights = generateFinancialInsights();
+  const insights = generateOperationalInsights();
 
-  // Show most important insights first (financial issues are highest priority)
+  // Show most important insights first (overworking and missing fees are top priority)
   const prioritizedInsights = insights.sort((a, b) => {
     const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
     return severityOrder[a.severity] - severityOrder[b.severity];
@@ -239,8 +206,8 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <Target className="h-8 w-8 text-green-600 mx-auto mb-3" />
-            <h3 className="text-sm font-semibold text-green-900 mb-2">Business Running Smoothly!</h3>
-            <p className="text-xs text-green-700">Strong financials and optimal operations.</p>
+            <h3 className="text-sm font-semibold text-green-900 mb-2">Operations Running Smoothly!</h3>
+            <p className="text-xs text-green-700">Team utilization and project resourcing are optimal.</p>
           </div>
         </div>
       </div>
@@ -291,7 +258,7 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
           {prioritizedInsights.length > 3 && (
             <div className="text-center py-2">
               <Badge variant="outline" className="text-xs">
-                +{prioritizedInsights.length - 3} more financial insights
+                +{prioritizedInsights.length - 3} more operational insights
               </Badge>
             </div>
           )}
