@@ -58,7 +58,7 @@ export const DashboardMetrics = () => {
     first_name: member.first_name,
     last_name: member.last_name,
     email: member.email,
-    avatar_url: member.avatar_url,
+    avatar_url: 'avatar_url' in member ? member.avatar_url : undefined,
     isPending: 'isPending' in member ? member.isPending : false
   })));
 
@@ -94,7 +94,7 @@ export const DashboardMetrics = () => {
       name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Team Member',
       role: member.job_title || 'Team Member',
       availability: utilization,
-      avatar_url: member.avatar_url // Use the correct property name from the database
+      avatar_url: 'avatar_url' in member ? member.avatar_url : undefined // Safe access to avatar_url
     };
     
     console.log('Created staff member:', staffMember);
