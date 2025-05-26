@@ -44,7 +44,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   const utilizationStatus = getUtilizationStatus(utilizationTrends.days7);
 
-  // Separate staff by availability
+  // Separate staff by availability - fix the threshold and ensure proper display
   const overloadedStaff = staffData.filter(member => member.availability > 85);
   const availableStaff = staffData.filter(member => member.availability <= 85);
 
@@ -177,7 +177,9 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                             <div className="w-8 h-8 rounded-full bg-red-200 flex-shrink-0" />
                             <div className="flex-1">
                               <div className="flex justify-between text-sm mb-1">
-                                <span className="font-medium text-gray-800">{member.name}</span>
+                                <span className="font-medium text-gray-800">
+                                  {member.first_name} {member.last_name}
+                                </span>
                                 <span className="text-red-600 font-semibold">{member.availability}%</span>
                               </div>
                               <div className="w-full h-1.5 bg-red-100 rounded-full">
@@ -198,7 +200,12 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                     <div>
                       <div className="flex items-center gap-2 mb-3">
                         <Target className="h-4 w-4 text-green-500" />
-                        <h4 className="font-semibold text-green-700">Available ({availableStaff.length})</h4>
+                        <h4 className="font-semibold text-green-700">
+                          Available ({availableStaff.length})
+                          <span className="text-xs font-normal text-gray-500 ml-1">
+                            within next 7 days
+                          </span>
+                        </h4>
                       </div>
                       <div className="space-y-3">
                         {availableStaff.slice(0, 4).map((member, index) => (
@@ -206,7 +213,9 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                             <div className="w-8 h-8 rounded-full bg-green-200 flex-shrink-0" />
                             <div className="flex-1">
                               <div className="flex justify-between text-sm mb-1">
-                                <span className="font-medium text-gray-800">{member.name}</span>
+                                <span className="font-medium text-gray-800">
+                                  {member.first_name} {member.last_name}
+                                </span>
                                 <span className="text-green-600 font-semibold">{member.availability}%</span>
                               </div>
                               <div className="w-full h-1.5 bg-green-100 rounded-full">
