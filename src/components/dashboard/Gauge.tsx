@@ -10,7 +10,7 @@ interface GaugeProps {
 
 export const Gauge: React.FC<GaugeProps> = ({ value, max, title, size = 'sm' }) => {
   const percentage = Math.min((value / max) * 100, 100);
-  const circumference = 2 * Math.PI * 45;
+  const circumference = 2 * Math.PI * 40; // Reduced radius for better fit
   const strokeDasharray = `${(percentage / 100) * circumference} ${circumference}`;
   
   const getColor = (value: number) => {
@@ -20,11 +20,13 @@ export const Gauge: React.FC<GaugeProps> = ({ value, max, title, size = 'sm' }) 
     return '#EF4444'; // red
   };
 
-  const dimensions = size === 'lg' ? { size: 120, strokeWidth: 8, fontSize: 'text-xl' } : { size: 80, strokeWidth: 6, fontSize: 'text-sm' };
+  const dimensions = size === 'lg' 
+    ? { size: 100, strokeWidth: 6, fontSize: 'text-lg', radius: 40 }
+    : { size: 70, strokeWidth: 4, fontSize: 'text-sm', radius: 30 };
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative" style={{ width: dimensions.size, height: dimensions.size }}>
+    <div className="flex flex-col items-center justify-center p-2">
+      <div className="relative flex items-center justify-center" style={{ width: dimensions.size, height: dimensions.size }}>
         <svg
           width={dimensions.size}
           height={dimensions.size}
@@ -35,7 +37,7 @@ export const Gauge: React.FC<GaugeProps> = ({ value, max, title, size = 'sm' }) 
           <circle
             cx={dimensions.size / 2}
             cy={dimensions.size / 2}
-            r="45"
+            r={dimensions.radius}
             stroke="#E5E7EB"
             strokeWidth={dimensions.strokeWidth}
             fill="none"
@@ -44,7 +46,7 @@ export const Gauge: React.FC<GaugeProps> = ({ value, max, title, size = 'sm' }) 
           <circle
             cx={dimensions.size / 2}
             cy={dimensions.size / 2}
-            r="45"
+            r={dimensions.radius}
             stroke={getColor(value)}
             strokeWidth={dimensions.strokeWidth}
             fill="none"
@@ -60,7 +62,7 @@ export const Gauge: React.FC<GaugeProps> = ({ value, max, title, size = 'sm' }) 
           </span>
         </div>
       </div>
-      <p className="mt-2 text-xs text-gray-600 text-center">{title}</p>
+      <p className="mt-1 text-xs text-gray-600 text-center leading-tight">{title}</p>
     </div>
   );
 };

@@ -65,147 +65,134 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4 auto-rows-max">
-      {/* Strategic Overview - Spans 2 columns on large screens */}
-      <div className="lg:col-span-2">
-        <SummaryDashboard 
-          title="Strategic Overview"
-          metrics={summaryMetrics}
-        />
+    <div className="space-y-6">
+      {/* Top Row - Strategic Overview and Key Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3">
+          <SummaryDashboard 
+            title="Strategic Overview"
+            metrics={summaryMetrics}
+          />
+        </div>
+        
+        <Card className="shadow-sm border border-gray-100 rounded-xl">
+          <CardContent className="p-6">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-brand-violet">{activeResources}</p>
+                  <p className="text-sm text-gray-600">Active members</p>
+                </div>
+                <Users size={24} strokeWidth={1.5} className="text-brand-violet/30" />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-brand-violet">{activeProjects}</p>
+                  <p className="text-sm text-gray-600">Live projects</p>
+                </div>
+                <Activity size={24} strokeWidth={1.5} className="text-brand-violet/30" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Key Stats */}
-      <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-        <CardContent className="p-4 flex items-center">
-          <div className="space-y-4 flex-grow">
-            <div>
-              <p className="text-3xl font-bold text-brand-violet">{activeResources}</p>
-              <p className="text-sm">Active members</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold text-brand-violet">{activeProjects}</p>
-              <p className="text-sm">Live projects</p>
-            </div>
-          </div>
-          <div className="flex flex-col space-y-4 ml-4 opacity-30">
-            <Users 
-              size={36} 
-              strokeWidth={1.5} 
-              className="text-brand-violet/30" 
-            />
-            <Activity 
-              size={36} 
-              strokeWidth={1.5} 
-              className="text-brand-violet/30" 
-            />
-          </div>
-        </CardContent>
-      </Card>
+      {/* Second Row - Insights and Utilization */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3">
+          <EnhancedInsights 
+            teamMembers={teamMembers}
+            activeProjects={activeProjects}
+            utilizationRate={utilizationTrends.days7}
+            utilizationTrends={utilizationTrends}
+            staffMembers={staffData}
+          />
+        </div>
 
-      {/* Utilization Trends */}
-      <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-        <CardContent className="p-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Utilization Trends</h3>
-          <div className="space-y-4">
-            <div className="text-center">
-              <Gauge 
-                value={utilizationTrends.days7} 
-                max={100} 
-                title="7 Days"
-                size="sm"
-              />
+        <Card className="shadow-sm border border-gray-100 rounded-xl">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-6 text-center">Utilization</h3>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                <Gauge 
+                  value={utilizationTrends.days7} 
+                  max={100} 
+                  title="7 Days"
+                  size="sm"
+                />
+              </div>
+              <div className="flex justify-center">
+                <Gauge 
+                  value={utilizationTrends.days30} 
+                  max={100} 
+                  title="30 Days"
+                  size="sm"
+                />
+              </div>
+              <div className="flex justify-center">
+                <Gauge 
+                  value={utilizationTrends.days90} 
+                  max={100} 
+                  title="90 Days"
+                  size="sm"
+                />
+              </div>
             </div>
-            <div className="text-center">
-              <Gauge 
-                value={utilizationTrends.days30} 
-                max={100} 
-                title="30 Days"
-                size="sm"
-              />
-            </div>
-            <div className="text-center">
-              <Gauge 
-                value={utilizationTrends.days90} 
-                max={100} 
-                title="90 Days"
-                size="sm"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Enhanced Insights - Spans 2 columns */}
-      <div className="lg:col-span-2">
-        <EnhancedInsights 
-          teamMembers={teamMembers}
-          activeProjects={activeProjects}
-          utilizationRate={utilizationTrends.days7}
-          utilizationTrends={utilizationTrends}
-          staffMembers={staffData}
-        />
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Holidays */}
-      <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-        <CardContent className="p-4">
-          <HolidaysList holidays={mockData.upcomingHolidays} />
-        </CardContent>
-      </Card>
+      {/* Third Row - Analytics Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <Card className="shadow-sm border border-gray-100 rounded-xl">
+          <CardContent className="p-4">
+            <Donut 
+              data={mockData.projectsByStatus} 
+              title="Project By Status" 
+              colors={['#6F4BF6', '#FFB443']}
+              height={200}
+            />
+          </CardContent>
+        </Card>
 
-      {/* Resource Planning Chat - Spans 2 columns */}
-      <div className="lg:col-span-2">
+        <Card className="shadow-sm border border-gray-100 rounded-xl">
+          <CardContent className="p-4">
+            <Donut 
+              data={mockData.projectsByStage} 
+              title="Project By Stage"
+              colors={['#6F4BF6', '#FFB443']}
+              height={200}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border border-gray-100 rounded-xl">
+          <CardContent className="p-4">
+            <Donut 
+              data={mockData.projectsByRegion} 
+              title="Project By Region"
+              colors={['#6F4BF6', '#91D3FF']}
+              height={200}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm border border-gray-100 rounded-xl">
+          <CardContent className="p-4">
+            <HolidaysList holidays={mockData.upcomingHolidays} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Fourth Row - Chat and Staff */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ResourcePlanningChat 
           teamSize={teamMembers.length}
           activeProjects={activeProjects}
           utilizationRate={utilizationTrends.days7}
         />
-      </div>
 
-      {/* Project Analytics Cards */}
-      <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-        <CardContent className="p-4">
-          <Donut 
-            data={mockData.projectsByStatus} 
-            title="Project By Status" 
-            colors={['#6F4BF6', '#FFB443']}
-          />
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-        <CardContent className="p-4">
-          <Donut 
-            data={mockData.projectsByStage} 
-            title="Project By Stage"
-            colors={['#6F4BF6', '#FFB443']}
-          />
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-        <CardContent className="p-4">
-          <Donut 
-            data={mockData.projectsByRegion} 
-            title="Project By Region"
-            colors={['#6F4BF6', '#91D3FF']}
-          />
-        </CardContent>
-      </Card>
-
-      <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-        <CardContent className="p-4">
-          <Donut 
-            data={mockData.resourcesByOffice} 
-            title="Resource by Office"
-            colors={['#FF6B6B', '#91D3FF']}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Staff Availability - Full width */}
-      <div className="lg:col-span-3 xl:col-span-4">
-        <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
+        <Card className="shadow-sm border border-gray-100 rounded-xl">
           <CardContent className="p-6">
             <StaffAvailability staffMembers={staffData} />
           </CardContent>

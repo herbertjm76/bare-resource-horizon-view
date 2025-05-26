@@ -61,35 +61,35 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   ];
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-6 p-4">
       {/* Key Metrics - Mobile Stacked */}
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-          <CardContent className="p-3 text-center">
-            <div className="flex items-center justify-center mb-2 opacity-30">
-              <Users size={24} strokeWidth={1.5} className="text-brand-violet/30" />
+      <div className="grid grid-cols-2 gap-4">
+        <Card className="shadow-sm border border-gray-100 rounded-xl">
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center mb-3 opacity-30">
+              <Users size={20} strokeWidth={1.5} className="text-brand-violet/30" />
             </div>
-            <p className="text-xl font-bold text-brand-violet">{activeResources}</p>
+            <p className="text-2xl font-bold text-brand-violet mb-1">{activeResources}</p>
             <p className="text-xs text-gray-600">Active members</p>
           </CardContent>
         </Card>
         
-        <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-          <CardContent className="p-3 text-center">
-            <div className="flex items-center justify-center mb-2 opacity-30">
-              <Activity size={24} strokeWidth={1.5} className="text-brand-violet/30" />
+        <Card className="shadow-sm border border-gray-100 rounded-xl">
+          <CardContent className="p-4 text-center">
+            <div className="flex items-center justify-center mb-3 opacity-30">
+              <Activity size={20} strokeWidth={1.5} className="text-brand-violet/30" />
             </div>
-            <p className="text-xl font-bold text-brand-violet">{activeProjects}</p>
+            <p className="text-2xl font-bold text-brand-violet mb-1">{activeProjects}</p>
             <p className="text-xs text-gray-600">Live projects</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Current Utilization - Large on Mobile */}
-      <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-        <CardContent className="p-4">
-          <h3 className="text-base font-semibold text-gray-800 mb-4 text-center">Current Utilization</h3>
-          <div className="flex justify-center">
+      <Card className="shadow-sm border border-gray-100 rounded-xl">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-6 text-center">Current Utilization</h3>
+          <div className="flex justify-center mb-6">
             <Gauge 
               value={utilizationTrends.days7} 
               max={100} 
@@ -97,8 +97,8 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
               size="lg"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="text-center">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="flex justify-center">
               <Gauge 
                 value={utilizationTrends.days30} 
                 max={100} 
@@ -106,7 +106,7 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
                 size="sm"
               />
             </div>
-            <div className="text-center">
+            <div className="flex justify-center">
               <Gauge 
                 value={utilizationTrends.days90} 
                 max={100} 
