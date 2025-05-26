@@ -95,6 +95,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
             ) || [];
             
             console.log(`Member allocations found: ${memberAllocations.length}`);
+            console.log(`Member allocations data:`, memberAllocations);
 
             // Calculate for different periods
             const calculatePeriodUtilization = (startDate: Date, periodName: string) => {
@@ -102,6 +103,8 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
                 { start: startDate, end: currentWeekStart },
                 { weekStartsOn: 1 }
               );
+              
+              console.log(`${periodName} weeks to check:`, weeks.map(w => format(w, 'yyyy-MM-dd')));
               
               let totalAllocatedHours = 0;
               
@@ -171,6 +174,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
             ) || [];
             
             console.log(`Member allocations found: ${memberAllocations.length}`);
+            console.log(`Member allocations data:`, memberAllocations);
 
             if (memberAllocations.length > 0) {
               // Calculate for different periods (same logic as active members)
@@ -179,6 +183,8 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
                   { start: startDate, end: currentWeekStart },
                   { weekStartsOn: 1 }
                 );
+                
+                console.log(`${periodName} weeks to check:`, weeks.map(w => format(w, 'yyyy-MM-dd')));
                 
                 let totalAllocatedHours = 0;
                 
