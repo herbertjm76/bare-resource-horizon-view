@@ -41,19 +41,36 @@ export const HolidayCard: React.FC = () => {
           console.error('Error fetching holidays:', error);
           setHolidays([]);
         } else if (holidaysData) {
-          // Transform the data and match with location names
-          const transformedHolidays: Holiday[] = holidaysData.map(holiday => {
+          // Group holidays by name and date to combine multiple location entries
+          const holidayMap = new Map<string, Holiday>();
+          
+          holidaysData.forEach(holiday => {
+            const holidayKey = `${holiday.name}-${holiday.date}`;
             const location = locations.find(loc => loc.id === holiday.location_id);
             const locationName = location ? `${location.emoji} ${location.city}` : 'Unknown Location';
             
-            return {
-              id: holiday.id,
-              name: holiday.name,
-              date: new Date(holiday.date),
-              end_date: holiday.end_date ? new Date(holiday.end_date) : undefined,
-              offices: [locationName]
-            };
+            if (holidayMap.has(holidayKey)) {
+              // Add location to existing holiday
+              const existingHoliday = holidayMap.get(holidayKey)!;
+              if (!existingHoliday.offices.includes(locationName)) {
+                existingHoliday.offices.push(locationName);
+              }
+            } else {
+              // Create new holiday entry
+              holidayMap.set(holidayKey, {
+                id: holiday.id,
+                name: holiday.name,
+                date: new Date(holiday.date),
+                end_date: holiday.end_date ? new Date(holiday.end_date) : undefined,
+                offices: [locationName]
+              });
+            }
           });
+          
+          // Convert map to array and sort by date
+          const transformedHolidays = Array.from(holidayMap.values()).sort((a, b) => 
+            a.date.getTime() - b.date.getTime()
+          );
           
           setHolidays(transformedHolidays);
         }
@@ -110,7 +127,7 @@ export const HolidayCard: React.FC = () => {
                 const dateInfo = formatDate(holiday.date);
                 
                 return (
-                  <div key={holiday.id} className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                  <div key={`${holiday.name}-${holiday.date.toISOString()}`} className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
                     <div className="flex-shrink-0 text-center min-w-[50px]">
                       <div className="text-xl font-bold text-brand-violet">{dateInfo.day}</div>
                       <div className="text-xs font-medium text-gray-600 uppercase">{dateInfo.month}</div>
