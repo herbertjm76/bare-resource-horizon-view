@@ -15,7 +15,7 @@ export const HerbieChat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: 'Hi there! I\'m HERBIE, your resource assistant. How can I help you today?',
+      content: "Hi there! I'm Herbie, your resource planning assistant. How can I help optimize your team's workload today?",
       isUser: false,
       timestamp: new Date()
     }
@@ -34,11 +34,21 @@ export const HerbieChat: React.FC = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     
-    // Simulate assistant response
+    // Simulate Herbie response based on user input
     setTimeout(() => {
+      let response = "I'm analyzing your resource needs. Let me help you optimize your team's allocation.";
+      
+      if (input.toLowerCase().includes('overload') || input.toLowerCase().includes('overwork')) {
+        response = "I've detected several team members are over-allocated. Would you like me to suggest a rebalancing strategy?";
+      } else if (input.toLowerCase().includes('hire') || input.toLowerCase().includes('hiring')) {
+        response = "Based on current utilization trends, adding 1-2 new team members could bring your overall utilization to optimal levels (70-80%).";
+      } else if (input.toLowerCase().includes('project') || input.toLowerCase().includes('deadline')) {
+        response = "I can help you analyze project capacity. Which specific project timeline are you concerned about?";
+      }
+      
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "Thanks for your message. This is a placeholder response since this is just a UI demo.",
+        content: response,
         isUser: false,
         timestamp: new Date()
       };
@@ -49,8 +59,7 @@ export const HerbieChat: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Ask HERBIE</h3>
-      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+      <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4">
         {messages.map(message => (
           <div 
             key={message.id} 
@@ -72,19 +81,22 @@ export const HerbieChat: React.FC = () => {
         ))}
       </div>
       
-      <div className="flex items-center gap-2 mt-auto">
+      <div className="flex items-center gap-2 p-4 border-t">
         <input 
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Type your question..."
+          placeholder="Ask Herbie about resource planning..."
           className="flex-1 p-3 rounded-full border border-gray-200 focus:outline-none focus:border-[#6F4BF6] text-sm"
         />
         <Button
           onClick={handleSend}
           size="icon"
-          className="rounded-full bg-[#6F4BF6] hover:bg-[#5d3ed9] h-10 w-10"
+          className="rounded-full h-10 w-10"
+          style={{
+            background: 'linear-gradient(45deg, #6F4BF6 0%, #5669F7 100%)'
+          }}
         >
           <Send className="h-4 w-4" />
         </Button>

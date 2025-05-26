@@ -1,14 +1,13 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign, Briefcase, Bot } from 'lucide-react';
+import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign, Briefcase, Bot, MessageCircle } from 'lucide-react';
 import { EnhancedInsights } from './EnhancedInsights';
-import { ResourcePlanningChat } from './ResourcePlanningChat';
 import { Donut } from './Donut';
 import { HolidayCard } from './HolidayCard';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { HerbieChat } from './HerbieChat';
 
 interface DesktopDashboardProps {
   teamMembers: any[];
@@ -31,7 +30,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   staffData,
   mockData
 }) => {
-  const [isResourcePlanningOpen, setIsResourcePlanningOpen] = useState(false);
+  const [isHerbieOpen, setIsHerbieOpen] = useState(false);
 
   const getUtilizationStatus = (rate: number) => {
     if (rate > 90) return { color: 'destructive', label: 'Overutilized' };
@@ -47,7 +46,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   const availableStaff = staffData.filter(member => member.availability <= 85);
 
   return (
-    <div className="space-y-8 p-6">
+    <div className="space-y-8 p-6 relative">
       {/* CEO Priority 1: Executive Summary with 45-degree gradient */}
       <div 
         className="rounded-2xl p-6 border border-brand-violet/10"
@@ -129,15 +128,25 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
       {/* CEO Priority 2: Three Column Layout - Smart Insights, Staff Status & Holidays */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Smart Insights */}
+        {/* Smart Insights - Single Column Format */}
         <div className="lg:col-span-1">
-          <EnhancedInsights 
-            teamMembers={teamMembers}
-            activeProjects={activeProjects}
-            utilizationRate={utilizationTrends.days7}
-            utilizationTrends={utilizationTrends}
-            staffMembers={staffData}
-          />
+          <Card className="h-full">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Target className="h-5 w-5 text-brand-violet" />
+                Smart Insights
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EnhancedInsights 
+                teamMembers={teamMembers}
+                activeProjects={activeProjects}
+                utilizationRate={utilizationTrends.days7}
+                utilizationTrends={utilizationTrends}
+                staffMembers={staffData}
+              />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Staff Availability & Overloaded */}
@@ -159,7 +168,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                   </div>
                   <div className="space-y-3">
                     {overloadedStaff.map((member, index) => (
-                      <div key={index} className="flex items-center gap-3 p-2 bg-red-50 rounded-lg border border-red-100">
+                      <div key={index} className="flex items-center gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
                         <div className="w-8 h-8 rounded-full bg-red-200 flex-shrink-0" />
                         <div className="flex-1">
                           <div className="flex justify-between text-sm mb-1">
@@ -187,8 +196,8 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                     <h4 className="font-semibold text-green-700">Available ({availableStaff.length})</h4>
                   </div>
                   <div className="space-y-3">
-                    {availableStaff.slice(0, 3).map((member, index) => (
-                      <div key={index} className="flex items-center gap-3 p-2 bg-green-50 rounded-lg border border-green-100">
+                    {availableStaff.slice(0, 4).map((member, index) => (
+                      <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
                         <div className="w-8 h-8 rounded-full bg-green-200 flex-shrink-0" />
                         <div className="flex-1">
                           <div className="flex justify-between text-sm mb-1">
@@ -204,44 +213,14 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                         </div>
                       </div>
                     ))}
-                    {availableStaff.length > 3 && (
+                    {availableStaff.length > 4 && (
                       <p className="text-xs text-gray-500 text-center">
-                        +{availableStaff.length - 3} more available
+                        +{availableStaff.length - 4} more available
                       </p>
                     )}
                   </div>
                 </div>
               )}
-
-              {/* Resource Planning Assistant Button */}
-              <div className="pt-4 border-t">
-                <Dialog open={isResourcePlanningOpen} onOpenChange={setIsResourcePlanningOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                      size="sm"
-                    >
-                      <Bot className="h-4 w-4 mr-2" />
-                      Resource Planning Assistant
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl w-full h-[80vh]">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-2">
-                        <Bot className="h-5 w-5 text-blue-600" />
-                        Resource Planning Assistant
-                      </DialogTitle>
-                    </DialogHeader>
-                    <div className="flex-1 overflow-hidden">
-                      <ResourcePlanningChat 
-                        teamSize={teamMembers.length}
-                        activeProjects={activeProjects}
-                        utilizationRate={utilizationTrends.days7}
-                      />
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
             </CardContent>
           </Card>
         </div>
@@ -259,7 +238,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             <Donut 
               data={mockData.projectsByStatus} 
               title="Project Status" 
-              colors={['#6F4BF6', '#FFB443', '#91D3FF']}
+              colors={['#6F4BF6', '#5669F7', '#E64FC4']}
               height={200}
             />
           </CardContent>
@@ -270,7 +249,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             <Donut 
               data={mockData.projectsByStage} 
               title="Project Stages"
-              colors={['#6F4BF6', '#FFB443', '#91D3FF']}
+              colors={['#6F4BF6', '#5669F7', '#E64FC4']}
               height={200}
             />
           </CardContent>
@@ -281,7 +260,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             <Donut 
               data={mockData.projectsByRegion} 
               title="Regional Split"
-              colors={['#6F4BF6', '#91D3FF', '#FFB443']}
+              colors={['#6F4BF6', '#5669F7', '#E64FC4']}
               height={200}
             />
           </CardContent>
@@ -298,6 +277,35 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           </CardContent>
         </Card>
       </div>
+
+      {/* Floating Herbie Button */}
+      <Dialog open={isHerbieOpen} onOpenChange={setIsHerbieOpen}>
+        <DialogTrigger asChild>
+          <Button 
+            className="fixed bottom-8 right-8 h-16 w-16 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 z-50 group"
+            style={{
+              background: 'linear-gradient(45deg, #6F4BF6 0%, #5669F7 55%, #E64FC4 100%)'
+            }}
+          >
+            <div className="flex flex-col items-center justify-center">
+              <Bot className="h-6 w-6 text-white mb-0.5" />
+              <span className="text-xs text-white font-medium">Herbie</span>
+            </div>
+            <div className="absolute -top-2 -right-2 bg-green-500 h-4 w-4 rounded-full animate-pulse" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-4xl w-full h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bot className="h-5 w-5 text-brand-violet" />
+              Herbie - Your Resource Planning Assistant
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-hidden">
+            <HerbieChat />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
