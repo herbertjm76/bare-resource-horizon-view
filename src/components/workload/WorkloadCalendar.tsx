@@ -2,7 +2,6 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { format, addWeeks, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/useWorkloadData';
@@ -159,214 +158,212 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
     <div className="space-y-4">
       <div className="border rounded-lg bg-card shadow-sm">
         <div className="workload-grid-container">
-          <ScrollArea className="w-full">
-            <div className="workload-calendar min-w-fit">
-              <Table>
-                <TableHeader className="sticky top-0 bg-background z-10">
-                  <TableRow className="border-b-2">
-                    <TableHead className="sticky left-0 bg-background z-10 min-w-[140px] border-r-2 font-semibold">
-                      Team Member
-                    </TableHead>
-                    {weeks.map(weekStart => {
-                      const weekLabel = format(weekStart, 'MMM d');
-                      
-                      return (
-                        <TableHead 
-                          key={weekStart.toString()} 
-                          className="p-0 text-center w-[60px] border-l font-semibold relative"
-                        >
-                          <div className="h-16 flex items-center justify-center">
-                            <div 
-                              className="transform -rotate-90 whitespace-nowrap text-xs font-medium"
-                              style={{ transformOrigin: 'center' }}
-                            >
-                              {weekLabel}
-                            </div>
-                          </div>
-                        </TableHead>
-                      );
-                    })}
-                    <TableHead className="p-0 text-center w-[90px] border-l font-semibold">
-                      Available
-                    </TableHead>
-                    <TableHead className="p-0 text-center w-16 border-l font-semibold">
-                      Total
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedMembers.map((member, rowIndex) => {
-                    const totalForPeriod = getTotalForPeriod(member.id);
-                    const totalCapacity = (member.weekly_capacity || 40) * periodToShow;
-                    const totalAvailable = Math.max(0, totalCapacity - totalForPeriod.total);
+          <div className="workload-calendar min-w-fit">
+            <Table>
+              <TableHeader className="sticky top-0 bg-background z-10">
+                <TableRow className="border-b-2">
+                  <TableHead className="sticky left-0 bg-background z-10 min-w-[140px] border-r-2 font-semibold">
+                    Team Member
+                  </TableHead>
+                  {weeks.map(weekStart => {
+                    const weekLabel = format(weekStart, 'MMM d');
                     
                     return (
-                      <TableRow key={member.id} className="hover:bg-muted/30">
-                        <TableCell 
-                          className="whitespace-nowrap font-medium sticky left-0 z-10 p-2 border-r-2" 
-                          style={{ backgroundColor: rowIndex % 2 === 0 ? 'white' : 'rgba(0,0,0,0.02)' }}
-                        >
-                          <div className="flex flex-col">
-                            <span className="text-sm font-medium">{getMemberName(member)}</span>
-                            <span className="text-xs text-muted-foreground">{member.job_title}</span>
+                      <TableHead 
+                        key={weekStart.toString()} 
+                        className="p-0 text-center w-[60px] border-l font-semibold relative"
+                      >
+                        <div className="h-16 flex items-center justify-center">
+                          <div 
+                            className="transform -rotate-90 whitespace-nowrap text-xs font-medium"
+                            style={{ transformOrigin: 'center' }}
+                          >
+                            {weekLabel}
                           </div>
-                        </TableCell>
-                        {weeks.map(weekStart => {
-                          const weeklyBreakdown = getWeeklyBreakdown(member.id, weekStart);
-                          const cellData = getEnhancedCellData(weeklyBreakdown, member);
-                          const hoverData = formatBreakdownHover(weeklyBreakdown, member);
-                          const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-                          
-                          return (
-                            <HoverCard key={`${member.id}-${weekStart.toString()}`}>
-                              <HoverCardTrigger asChild>
-                                <TableCell 
-                                  className={`p-1 text-center cursor-help border-l relative h-16 w-[60px] ${cellData.bgColor}`}
-                                >
-                                  <div className="flex flex-col items-center justify-center h-full space-y-1">
-                                    <div className={`flex items-center justify-center text-xs font-medium ${cellData.textColor}`}>
-                                      {cellData.utilization > 0 && (
-                                        <>
-                                          {getStatusIcon(cellData.status)}
-                                          <span className="ml-1">{cellData.utilization}%</span>
-                                        </>
-                                      )}
-                                    </div>
+                        </div>
+                      </TableHead>
+                    );
+                  })}
+                  <TableHead className="p-0 text-center w-[90px] border-l font-semibold">
+                    Available
+                  </TableHead>
+                  <TableHead className="p-0 text-center w-16 border-l font-semibold">
+                    Total
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sortedMembers.map((member, rowIndex) => {
+                  const totalForPeriod = getTotalForPeriod(member.id);
+                  const totalCapacity = (member.weekly_capacity || 40) * periodToShow;
+                  const totalAvailable = Math.max(0, totalCapacity - totalForPeriod.total);
+                  
+                  return (
+                    <TableRow key={member.id} className="hover:bg-muted/30">
+                      <TableCell 
+                        className="whitespace-nowrap font-medium sticky left-0 z-10 p-2 border-r-2" 
+                        style={{ backgroundColor: rowIndex % 2 === 0 ? 'white' : 'rgba(0,0,0,0.02)' }}
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium">{getMemberName(member)}</span>
+                          <span className="text-xs text-muted-foreground">{member.job_title}</span>
+                        </div>
+                      </TableCell>
+                      {weeks.map(weekStart => {
+                        const weeklyBreakdown = getWeeklyBreakdown(member.id, weekStart);
+                        const cellData = getEnhancedCellData(weeklyBreakdown, member);
+                        const hoverData = formatBreakdownHover(weeklyBreakdown, member);
+                        const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+                        
+                        return (
+                          <HoverCard key={`${member.id}-${weekStart.toString()}`}>
+                            <HoverCardTrigger asChild>
+                              <TableCell 
+                                className={`p-1 text-center cursor-help border-l relative h-16 w-[60px] ${cellData.bgColor}`}
+                              >
+                                <div className="flex flex-col items-center justify-center h-full space-y-1">
+                                  <div className={`flex items-center justify-center text-xs font-medium ${cellData.textColor}`}>
                                     {cellData.utilization > 0 && (
-                                      <Progress 
-                                        value={cellData.progressValue} 
-                                        className="h-1 w-8"
-                                        indicatorClassName={
-                                          cellData.status === 'low' ? 'bg-red-500' :
-                                          cellData.status === 'good' ? 'bg-blue-500' :
-                                          cellData.status === 'high' ? 'bg-green-500' : 'bg-orange-500'
-                                        }
-                                      />
+                                      <>
+                                        {getStatusIcon(cellData.status)}
+                                        <span className="ml-1">{cellData.utilization}%</span>
+                                      </>
                                     )}
                                   </div>
-                                </TableCell>
-                              </HoverCardTrigger>
-                              <HoverCardContent side="top" className="w-64 p-0">
-                                <div className="bg-white rounded-lg border shadow-lg p-4">
-                                  <div className="text-sm font-medium text-gray-900 mb-3">
-                                    Week of {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
+                                  {cellData.utilization > 0 && (
+                                    <Progress 
+                                      value={cellData.progressValue} 
+                                      className="h-1 w-8"
+                                      indicatorClassName={
+                                        cellData.status === 'low' ? 'bg-red-500' :
+                                        cellData.status === 'good' ? 'bg-blue-500' :
+                                        cellData.status === 'high' ? 'bg-green-500' : 'bg-orange-500'
+                                      }
+                                    />
+                                  )}
+                                </div>
+                              </TableCell>
+                            </HoverCardTrigger>
+                            <HoverCardContent side="top" className="w-64 p-0">
+                              <div className="bg-white rounded-lg border shadow-lg p-4">
+                                <div className="text-sm font-medium text-gray-900 mb-3">
+                                  Week of {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
+                                </div>
+                                <div className="space-y-3">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-xs text-gray-600">Utilization:</span>
+                                    <Badge variant="outline" className="text-xs">
+                                      {hoverData.utilization}%
+                                    </Badge>
                                   </div>
-                                  <div className="space-y-3">
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-xs text-gray-600">Utilization:</span>
-                                      <Badge variant="outline" className="text-xs">
-                                        {hoverData.utilization}%
-                                      </Badge>
+                                  <div className="border-t pt-2 space-y-2">
+                                    {hoverData.breakdown.projectHours > 0 && (
+                                      <div className="flex justify-between items-center text-xs">
+                                        <span className="text-blue-600">Project Hours:</span>
+                                        <span className="font-medium">{Math.round(hoverData.breakdown.projectHours * 10) / 10}h</span>
+                                      </div>
+                                    )}
+                                    {hoverData.breakdown.annualLeave > 0 && (
+                                      <div className="flex justify-between items-center text-xs">
+                                        <span className="text-orange-600">Annual Leave:</span>
+                                        <span className="font-medium">{Math.round(hoverData.breakdown.annualLeave * 10) / 10}h</span>
+                                      </div>
+                                    )}
+                                    {hoverData.breakdown.officeHolidays > 0 && (
+                                      <div className="flex justify-between items-center text-xs">
+                                        <span className="text-purple-600">Holidays:</span>
+                                        <span className="font-medium">{Math.round(hoverData.breakdown.officeHolidays * 10) / 10}h</span>
+                                      </div>
+                                    )}
+                                    {hoverData.breakdown.otherLeave > 0 && (
+                                      <div className="flex justify-between items-center text-xs">
+                                        <span className="text-gray-600">Other Leave:</span>
+                                        <span className="font-medium">{Math.round(hoverData.breakdown.otherLeave * 10) / 10}h</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="border-t pt-2 space-y-1">
+                                    <div className="flex justify-between items-center text-xs">
+                                      <span className="text-gray-900 font-medium">Total Hours:</span>
+                                      <span className="font-semibold">{Math.round(hoverData.breakdown.total * 10) / 10}h</span>
                                     </div>
-                                    <div className="border-t pt-2 space-y-2">
-                                      {hoverData.breakdown.projectHours > 0 && (
-                                        <div className="flex justify-between items-center text-xs">
-                                          <span className="text-blue-600">Project Hours:</span>
-                                          <span className="font-medium">{Math.round(hoverData.breakdown.projectHours * 10) / 10}h</span>
-                                        </div>
-                                      )}
-                                      {hoverData.breakdown.annualLeave > 0 && (
-                                        <div className="flex justify-between items-center text-xs">
-                                          <span className="text-orange-600">Annual Leave:</span>
-                                          <span className="font-medium">{Math.round(hoverData.breakdown.annualLeave * 10) / 10}h</span>
-                                        </div>
-                                      )}
-                                      {hoverData.breakdown.officeHolidays > 0 && (
-                                        <div className="flex justify-between items-center text-xs">
-                                          <span className="text-purple-600">Holidays:</span>
-                                          <span className="font-medium">{Math.round(hoverData.breakdown.officeHolidays * 10) / 10}h</span>
-                                        </div>
-                                      )}
-                                      {hoverData.breakdown.otherLeave > 0 && (
-                                        <div className="flex justify-between items-center text-xs">
-                                          <span className="text-gray-600">Other Leave:</span>
-                                          <span className="font-medium">{Math.round(hoverData.breakdown.otherLeave * 10) / 10}h</span>
-                                        </div>
-                                      )}
+                                    <div className="flex justify-between items-center text-xs">
+                                      <span className="text-green-600">Available:</span>
+                                      <span className="font-medium text-green-600">{Math.round(hoverData.available * 10) / 10}h</span>
                                     </div>
-                                    <div className="border-t pt-2 space-y-1">
-                                      <div className="flex justify-between items-center text-xs">
-                                        <span className="text-gray-900 font-medium">Total Hours:</span>
-                                        <span className="font-semibold">{Math.round(hoverData.breakdown.total * 10) / 10}h</span>
-                                      </div>
-                                      <div className="flex justify-between items-center text-xs">
-                                        <span className="text-green-600">Available:</span>
-                                        <span className="font-medium text-green-600">{Math.round(hoverData.available * 10) / 10}h</span>
-                                      </div>
-                                      <div className="flex justify-between items-center text-xs">
-                                        <span className="text-gray-500">Capacity:</span>
-                                        <span className="text-gray-500">{hoverData.capacity}h</span>
-                                      </div>
+                                    <div className="flex justify-between items-center text-xs">
+                                      <span className="text-gray-500">Capacity:</span>
+                                      <span className="text-gray-500">{hoverData.capacity}h</span>
                                     </div>
                                   </div>
                                 </div>
-                              </HoverCardContent>
-                            </HoverCard>
-                          );
-                        })}
-                        <TableCell className="p-2 text-center border-l">
-                          <div className="flex flex-col items-center">
-                            <span className="text-sm font-medium text-green-600">
-                              {Math.round(totalAvailable * 10) / 10}h
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              / {totalCapacity}h
-                            </span>
-                          </div>
-                        </TableCell>
-                        <HoverCard>
-                          <HoverCardTrigger asChild>
-                            <TableCell className="p-2 text-center border-l font-medium cursor-help">
-                              {Math.round(totalForPeriod.total * 10) / 10}h
-                            </TableCell>
-                          </HoverCardTrigger>
-                          <HoverCardContent side="top" className="w-64 p-0">
-                            <div className="bg-white rounded-lg border shadow-lg p-4">
-                              <div className="text-sm font-medium text-gray-900 mb-2">
-                                {periodToShow}-Week Total
                               </div>
-                              <div className="space-y-1">
-                                {totalForPeriod.projectHours > 0 && (
-                                  <div className="flex justify-between items-center text-xs">
-                                    <span className="text-blue-600">Project Hours:</span>
-                                    <span className="font-medium">{Math.round(totalForPeriod.projectHours * 10) / 10}h</span>
-                                  </div>
-                                )}
-                                {totalForPeriod.annualLeave > 0 && (
-                                  <div className="flex justify-between items-center text-xs">
-                                    <span className="text-orange-600">Annual Leave:</span>
-                                    <span className="font-medium">{Math.round(totalForPeriod.annualLeave * 10) / 10}h</span>
-                                  </div>
-                                )}
-                                {totalForPeriod.officeHolidays > 0 && (
-                                  <div className="flex justify-between items-center text-xs">
-                                    <span className="text-purple-600">Holidays:</span>
-                                    <span className="font-medium">{Math.round(totalForPeriod.officeHolidays * 10) / 10}h</span>
-                                  </div>
-                                )}
-                                {totalForPeriod.otherLeave > 0 && (
-                                  <div className="flex justify-between items-center text-xs">
-                                    <span className="text-gray-600">Other Leave:</span>
-                                    <span className="font-medium">{Math.round(totalForPeriod.otherLeave * 10) / 10}h</span>
-                                  </div>
-                                )}
-                                <div className="border-t pt-2">
-                                  <div className="flex justify-between items-center text-xs">
-                                    <span className="text-gray-900 font-medium">Total:</span>
-                                    <span className="font-semibold">{Math.round(totalForPeriod.total * 10) / 10}h</span>
-                                  </div>
+                            </HoverCardContent>
+                          </HoverCard>
+                        );
+                      })}
+                      <TableCell className="p-2 text-center border-l">
+                        <div className="flex flex-col items-center">
+                          <span className="text-sm font-medium text-green-600">
+                            {Math.round(totalAvailable * 10) / 10}h
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            / {totalCapacity}h
+                          </span>
+                        </div>
+                      </TableCell>
+                      <HoverCard>
+                        <HoverCardTrigger asChild>
+                          <TableCell className="p-2 text-center border-l font-medium cursor-help">
+                            {Math.round(totalForPeriod.total * 10) / 10}h
+                          </TableCell>
+                        </HoverCardTrigger>
+                        <HoverCardContent side="top" className="w-64 p-0">
+                          <div className="bg-white rounded-lg border shadow-lg p-4">
+                            <div className="text-sm font-medium text-gray-900 mb-2">
+                              {periodToShow}-Week Total
+                            </div>
+                            <div className="space-y-1">
+                              {totalForPeriod.projectHours > 0 && (
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="text-blue-600">Project Hours:</span>
+                                  <span className="font-medium">{Math.round(totalForPeriod.projectHours * 10) / 10}h</span>
+                                </div>
+                              )}
+                              {totalForPeriod.annualLeave > 0 && (
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="text-orange-600">Annual Leave:</span>
+                                  <span className="font-medium">{Math.round(totalForPeriod.annualLeave * 10) / 10}h</span>
+                                </div>
+                              )}
+                              {totalForPeriod.officeHolidays > 0 && (
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="text-purple-600">Holidays:</span>
+                                  <span className="font-medium">{Math.round(totalForPeriod.officeHolidays * 10) / 10}h</span>
+                                </div>
+                              )}
+                              {totalForPeriod.otherLeave > 0 && (
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="text-gray-600">Other Leave:</span>
+                                  <span className="font-medium">{Math.round(totalForPeriod.otherLeave * 10) / 10}h</span>
+                                </div>
+                              )}
+                              <div className="border-t pt-2">
+                                <div className="flex justify-between items-center text-xs">
+                                  <span className="text-gray-900 font-medium">Total:</span>
+                                  <span className="font-semibold">{Math.round(totalForPeriod.total * 10) / 10}h</span>
                                 </div>
                               </div>
                             </div>
-                          </HoverCardContent>
-                        </HoverCard>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          </ScrollArea>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
     </div>
