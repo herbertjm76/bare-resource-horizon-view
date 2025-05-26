@@ -24,4 +24,5 @@ export interface StaffSectionProps {
 export interface StaffMemberCardProps {
   member: StaffMember;
   colorScheme: 'red' | 'blue' | 'green';
+  onClick?: () => void;
 }
