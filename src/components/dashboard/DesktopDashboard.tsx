@@ -6,8 +6,9 @@ import { Donut } from './Donut';
 import { HolidayCard } from './HolidayCard';
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogPortal } from "@/components/ui/dialog";
 import { HerbieChat } from './HerbieChat';
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 interface DesktopDashboardProps {
   teamMembers: any[];
@@ -278,7 +279,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         </Card>
       </div>
 
-      {/* Floating Herbie Button */}
+      {/* Floating Herbie Button with Custom Dialog */}
       <Dialog open={isHerbieOpen} onOpenChange={setIsHerbieOpen}>
         <DialogTrigger asChild>
           <Button 
@@ -294,17 +295,21 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             <div className="absolute -top-2 -right-2 bg-green-500 h-4 w-4 rounded-full animate-pulse" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="fixed bottom-8 right-8 top-auto left-auto translate-x-0 translate-y-0 max-w-sm w-80 h-96 m-0 p-0">
-          <DialogHeader className="p-4 pb-2">
-            <DialogTitle className="flex items-center gap-2 text-sm">
-              <Bot className="h-4 w-4 text-brand-violet" />
-              Herbie
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 overflow-hidden px-4 pb-4">
-            <HerbieChat />
-          </div>
-        </DialogContent>
+        <DialogPortal>
+          <DialogPrimitive.Content
+            className="fixed bottom-8 right-8 z-50 w-80 h-96 bg-background border rounded-lg shadow-lg p-0 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+          >
+            <DialogHeader className="p-4 pb-2">
+              <DialogTitle className="flex items-center gap-2 text-sm">
+                <Bot className="h-4 w-4 text-brand-violet" />
+                Herbie
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-hidden px-4 pb-4 h-[calc(100%-60px)]">
+              <HerbieChat />
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPortal>
       </Dialog>
     </div>
   );
