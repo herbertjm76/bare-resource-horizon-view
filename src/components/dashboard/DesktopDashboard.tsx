@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign, Briefcase, Bot, MessageCircle } from 'lucide-react';
@@ -49,76 +50,76 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
     <div className="space-y-8 p-6 relative">
       {/* CEO Priority 1: Executive Summary with 45-degree gradient */}
       <div 
-        className="rounded-2xl p-6 border border-brand-violet/10"
+        className="rounded-2xl p-4 border border-brand-violet/10"
         style={{
           background: 'linear-gradient(45deg, #6F4BF6 0%, #5669F7 55%, #E64FC4 100%)'
         }}
       >
-        <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-          <DollarSign className="h-6 w-6" />
+        <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <DollarSign className="h-5 w-5" />
           Executive Summary
         </h2>
         
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <Card className="bg-white/90 backdrop-blur-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Team Utilization</p>
-                  <p className="text-3xl font-bold text-brand-violet mt-1">{utilizationTrends.days7}%</p>
-                  <Badge variant={utilizationStatus.color as any} className="mt-2 text-xs">
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-600 mb-1">Team Utilization</p>
+                  <p className="text-2xl font-bold text-gray-900 mb-2">{utilizationTrends.days7}%</p>
+                  <Badge variant={utilizationStatus.color as any} className="text-xs">
                     {utilizationStatus.label}
                   </Badge>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-brand-violet/10 flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-brand-violet" />
+                <div className="h-10 w-10 rounded-full bg-brand-violet/10 flex items-center justify-center flex-shrink-0">
+                  <TrendingUp className="h-5 w-5 text-brand-violet" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-white/90 backdrop-blur-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Available Capacity</p>
-                  <p className="text-3xl font-bold text-brand-violet mt-1">2,340h</p>
-                  <p className="text-xs text-gray-500 mt-1">Next 12 weeks</p>
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-600 mb-1">Available Capacity</p>
+                  <p className="text-2xl font-bold text-gray-900 mb-1">2,340h</p>
+                  <p className="text-xs text-gray-500">Next 12 weeks</p>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-blue-600" />
+                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <Clock className="h-5 w-5 text-blue-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-white/90 backdrop-blur-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Active Projects</p>
-                  <p className="text-3xl font-bold text-brand-violet mt-1">{activeProjects}</p>
-                  <p className="text-xs text-gray-500 mt-1">{(activeProjects / activeResources).toFixed(1)} per person</p>
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-600 mb-1">Active Projects</p>
+                  <p className="text-2xl font-bold text-gray-900 mb-1">{activeProjects}</p>
+                  <p className="text-xs text-gray-500">{(activeProjects / activeResources).toFixed(1)} per person</p>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
-                  <Briefcase className="h-6 w-6 text-green-600" />
+                <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Briefcase className="h-5 w-5 text-green-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-white/90 backdrop-blur-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Team Size</p>
-                  <p className="text-3xl font-bold text-brand-violet mt-1">{activeResources}</p>
-                  <Badge variant="outline" className="mt-2 text-xs">
+                <div className="flex-1">
+                  <p className="text-xs font-medium text-gray-600 mb-1">Team Size</p>
+                  <p className="text-2xl font-bold text-gray-900 mb-2">{activeResources}</p>
+                  <Badge variant="outline" className="text-xs">
                     {utilizationTrends.days7 > 85 ? 'Consider Hiring' : 'Stable'}
                   </Badge>
                 </div>
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-purple-600" />
+                <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                  <Users className="h-5 w-5 text-purple-600" />
                 </div>
               </div>
             </CardContent>
