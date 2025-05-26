@@ -44,9 +44,16 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   const utilizationStatus = getUtilizationStatus(utilizationTrends.days7);
 
-  // Separate staff by availability - fix the threshold and ensure proper display
-  const overloadedStaff = staffData.filter(member => member.availability > 85);
-  const availableStaff = staffData.filter(member => member.availability <= 85);
+  // Updated staff categorization with better thresholds
+  const overloadedStaff = staffData.filter(member => member.availability > 90);
+  const healthyStaff = staffData.filter(member => member.availability > 65 && member.availability <= 90);
+  const availableStaff = staffData.filter(member => member.availability <= 65);
+
+  console.log('Staff categorization:', {
+    overloaded: overloadedStaff,
+    healthy: healthyStaff,
+    available: availableStaff
+  });
 
   return (
     <div className="space-y-8 p-6 relative">
@@ -152,7 +159,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           </Card>
         </div>
 
-        {/* Staff Availability & Overloaded - Fixed Height with Scroll */}
+        {/* Staff Availability & Status - Fixed Height with Scroll */}
         <div className="lg:col-span-1">
           <Card className="h-[400px] flex flex-col">
             <CardHeader className="flex-shrink-0">
@@ -164,7 +171,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             <CardContent className="flex-1 overflow-hidden p-0">
               <ScrollArea className="h-full">
                 <div className="space-y-6 px-6 pb-6">
-                  {/* Overloaded Staff */}
+                  {/* Overloaded Staff (>90%) */}
                   {overloadedStaff.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-3">
@@ -195,7 +202,38 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                     </div>
                   )}
 
-                  {/* Available Staff */}
+                  {/* Healthy/Just Right Staff (66-90%) */}
+                  {healthyStaff.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Target className="h-4 w-4 text-blue-500" />
+                        <h4 className="font-semibold text-blue-700">Just Right ({healthyStaff.length})</h4>
+                      </div>
+                      <div className="space-y-3">
+                        {healthyStaff.map((member, index) => (
+                          <div key={index} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
+                            <div className="w-8 h-8 rounded-full bg-blue-200 flex-shrink-0" />
+                            <div className="flex-1">
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="font-medium text-gray-800">
+                                  {member.first_name} {member.last_name}
+                                </span>
+                                <span className="text-blue-600 font-semibold">{member.availability}%</span>
+                              </div>
+                              <div className="w-full h-1.5 bg-blue-100 rounded-full">
+                                <div 
+                                  className="h-1.5 rounded-full bg-blue-500"
+                                  style={{ width: `${member.availability}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Available Staff (≤65%) */}
                   {availableStaff.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-3">
@@ -203,7 +241,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                         <h4 className="font-semibold text-green-700">
                           Available ({availableStaff.length})
                           <span className="text-xs font-normal text-gray-500 ml-1">
-                            within next 7 days
+                            for new projects
                           </span>
                         </h4>
                       </div>
