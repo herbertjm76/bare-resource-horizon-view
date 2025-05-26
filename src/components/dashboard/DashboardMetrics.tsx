@@ -11,6 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamUtilization } from '@/hooks/useTeamUtilization';
+import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { MobileDashboard } from './MobileDashboard';
 import { DesktopDashboard } from './DesktopDashboard';
 import { FilterButton } from '@/components/resources/filters/FilterButton';
@@ -23,10 +24,17 @@ export const DashboardMetrics = () => {
   
   // Get real data from hooks
   const { projects, isLoading: isLoadingProjects } = useProjects();
-  const { teamMembers, isLoading: isLoadingMembers } = useTeamMembersData(true);
+  const { teamMembers: activeMembers, isLoading: isLoadingMembers } = useTeamMembersData(true);
+  
+  // Get pre-registered members from invites
+  const companyId = activeMembers?.[0]?.company_id;
+  const { preRegisteredMembers } = useTeamMembersState(companyId, 'owner');
+  
+  // Combine active and pre-registered members
+  const allTeamMembers = [...(activeMembers || []), ...(preRegisteredMembers || [])];
   
   // Get real utilization data
-  const { utilization: utilizationTrends, isLoading: isLoadingUtilization } = useTeamUtilization(teamMembers || []);
+  const { utilization: utilizationTrends, isLoading: isLoadingUtilization } = useTeamUtilization(allTeamMembers);
   
   const today = new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
@@ -37,22 +45,25 @@ export const DashboardMetrics = () => {
 
   // Calculate real metrics from actual data
   const activeProjects = projects?.length || 0;
-  const activeResources = teamMembers?.length || 0;
+  const activeResources = allTeamMembers?.length || 0;
 
   // Add detailed debugging for team members
   console.log('=== TEAM MEMBERS DEBUG ===');
-  console.log('Raw teamMembers:', teamMembers);
-  console.log('Number of team members:', teamMembers?.length || 0);
-  console.log('Team members details:', teamMembers?.map(member => ({
+  console.log('Active members:', activeMembers);
+  console.log('Pre-registered members:', preRegisteredMembers);
+  console.log('All team members:', allTeamMembers);
+  console.log('Number of all team members:', allTeamMembers?.length || 0);
+  console.log('Team members details:', allTeamMembers?.map(member => ({
     id: member.id,
     first_name: member.first_name,
     last_name: member.last_name,
     email: member.email,
-    avatar_url: member.avatar_url
+    avatar_url: member.avatar_url,
+    isPending: 'isPending' in member ? member.isPending : false
   })));
 
-  // Staff data based on real team members with more realistic utilization calculations
-  const staffData = teamMembers?.map((member, index) => {
+  // Staff data based on all team members (active + pre-registered) with more realistic utilization calculations
+  const staffData = allTeamMembers?.map((member, index) => {
     // Create more varied and realistic utilization percentages
     let utilization = 0;
     
@@ -60,7 +71,7 @@ export const DashboardMetrics = () => {
     const nameHash = (member.first_name || '' + member.last_name || '').length;
     const firstName = (member.first_name || '').toLowerCase();
     
-    console.log(`Processing member: ${firstName} ${member.last_name}`);
+    console.log(`Processing member: ${firstName} ${member.last_name}`, 'isPending' in member ? member.isPending : false);
     
     if (firstName.includes('melody')) {
       // Melody should be 0% (not resourced)
@@ -195,7 +206,7 @@ export const DashboardMetrics = () => {
       <div className="pb-6">
         {isMobile ? (
           <MobileDashboard
-            teamMembers={teamMembers || []}
+            teamMembers={allTeamMembers || []}
             activeProjects={activeProjects}
             activeResources={activeResources}
             utilizationTrends={utilizationTrends}
@@ -205,7 +216,7 @@ export const DashboardMetrics = () => {
         ) : (
           <div className="p-4">
             <DesktopDashboard
-              teamMembers={teamMembers || []}
+              teamMembers={allTeamMembers || []}
               activeProjects={activeProjects}
               activeResources={activeResources}
               utilizationTrends={utilizationTrends}
