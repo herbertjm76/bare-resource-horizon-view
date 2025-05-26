@@ -3,6 +3,7 @@ import React from 'react';
 import { MonthSelector } from '@/components/annual-leave/MonthSelector';
 import { TeamAnnualLeaveFilters } from '@/components/annual-leave/TeamAnnualLeaveFilters';
 import { WorkloadCalendar } from '@/components/workload/WorkloadCalendar';
+import { WorkloadSummary } from '@/components/workload/WorkloadSummary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
 import { useWorkloadData, WorkloadBreakdown } from '@/components/workload/hooks/useWorkloadData';
@@ -43,11 +44,23 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
 
   return (
     <div className="mx-auto space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Workload</h1>
-      
-      <div className="text-sm text-muted-foreground">
-        <p>Comprehensive view of team workload including project hours, annual leave, office holidays, and other leave.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Workload</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Capacity planning and utilization overview for strategic decision making
+          </p>
+        </div>
       </div>
+      
+      {/* Enhanced Summary Section */}
+      {!isLoading && !isLoadingWorkload && (
+        <WorkloadSummary 
+          members={filteredMembers}
+          workloadData={workloadData}
+          selectedMonth={selectedMonth}
+        />
+      )}
       
       <div className="flex flex-row justify-between items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
