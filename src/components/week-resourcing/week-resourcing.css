@@ -1,4 +1,5 @@
 
+
 /* Week Resourcing specific styles */
 
 /* Responsive grid container with horizontal scrollbar */
@@ -85,28 +86,29 @@
   border-bottom: 1px solid rgba(156, 163, 175, 0.3);
 }
 
-/* Project section separator - thick border before projects */
+/* Project section separator - enhanced thick border before projects with full row coverage */
 .resource-allocation-table .project-section-divider {
-  border-left: 4px solid #6f4bf6 !important;
+  border-left: 6px solid #6f4bf6 !important;
   position: relative;
+  background: linear-gradient(135deg, rgba(111, 75, 246, 0.08) 0%, rgba(88, 85, 247, 0.05) 100%);
 }
 
 .resource-allocation-table .project-section-divider::before {
   content: '';
   position: absolute;
-  left: -4px;
+  left: -6px;
   top: 0;
   bottom: 0;
-  width: 4px;
+  width: 6px;
   background: linear-gradient(180deg, #6f4bf6 0%, #5855f7 100%);
-  box-shadow: 2px 0 8px rgba(111, 75, 246, 0.3);
+  box-shadow: 3px 0 12px rgba(111, 75, 246, 0.4);
 }
 
-/* Enhanced project header styling */
+/* Enhanced project header styling with full coverage */
 .resource-allocation-table th.project-header {
-  background: linear-gradient(135deg, rgba(111, 75, 246, 0.15) 0%, rgba(88, 85, 247, 0.12) 100%);
-  border-left: 3px solid #6f4bf6;
-  border-right: 1px solid rgba(111, 75, 246, 0.4);
+  background: linear-gradient(135deg, rgba(111, 75, 246, 0.20) 0%, rgba(88, 85, 247, 0.15) 100%);
+  border-left: 4px solid #6f4bf6;
+  border-right: 1px solid rgba(111, 75, 246, 0.5);
   position: relative;
 }
 
@@ -116,27 +118,37 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 2px;
+  height: 3px;
   background: linear-gradient(90deg, #6f4bf6 0%, #5855f7 100%);
 }
 
-/* Project column cells - enhanced styling */
+.resource-allocation-table th.project-header::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(111, 75, 246, 0.6) 0%, rgba(88, 85, 247, 0.4) 100%);
+}
+
+/* Project column cells - enhanced styling with full row coverage */
 .resource-allocation-table .project-column-cell {
-  background: linear-gradient(135deg, rgba(111, 75, 246, 0.08) 0%, rgba(88, 85, 247, 0.05) 100%);
-  border-left: 2px solid rgba(111, 75, 246, 0.2);
+  background: linear-gradient(135deg, rgba(111, 75, 246, 0.12) 0%, rgba(88, 85, 247, 0.08) 100%);
+  border-left: 3px solid rgba(111, 75, 246, 0.3);
   border-right: 1px solid rgba(111, 75, 246, 0.3);
   position: relative;
   transition: all 0.2s ease;
 }
 
 .resource-allocation-table .project-column-cell:hover {
-  background: linear-gradient(135deg, rgba(111, 75, 246, 0.12) 0%, rgba(88, 85, 247, 0.08) 100%);
-  box-shadow: inset 0 0 0 1px rgba(111, 75, 246, 0.2);
+  background: linear-gradient(135deg, rgba(111, 75, 246, 0.18) 0%, rgba(88, 85, 247, 0.12) 100%);
+  box-shadow: inset 0 0 0 2px rgba(111, 75, 246, 0.25);
 }
 
-/* Project column group separators - every 3rd column */
+/* Project column group separators - enhanced every 3rd column with full coverage */
 .resource-allocation-table .project-group-separator {
-  border-right: 3px solid rgba(111, 75, 246, 0.4) !important;
+  border-right: 5px solid rgba(111, 75, 246, 0.6) !important;
   position: relative;
 }
 
@@ -144,11 +156,22 @@
   content: '';
   position: absolute;
   top: 0;
-  right: -3px;
+  right: -5px;
   bottom: 0;
-  width: 3px;
-  background: linear-gradient(180deg, rgba(111, 75, 246, 0.4) 0%, rgba(88, 85, 247, 0.3) 100%);
-  box-shadow: 1px 0 4px rgba(111, 75, 246, 0.2);
+  width: 5px;
+  background: linear-gradient(180deg, rgba(111, 75, 246, 0.6) 0%, rgba(88, 85, 247, 0.4) 100%);
+  box-shadow: 2px 0 8px rgba(111, 75, 246, 0.3);
+}
+
+/* Enhanced project area visual grouping */
+.resource-allocation-table .project-column-cell::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(111, 75, 246, 0.4) 0%, rgba(88, 85, 247, 0.2) 100%);
 }
 
 /* Non-project columns - subtle styling for contrast */
@@ -178,15 +201,31 @@
 /* Enhanced project code text styling in headers */
 .project-code-text {
   color: #4c1d95;
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(111, 75, 246, 0.1);
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(111, 75, 246, 0.2);
   letter-spacing: 0.5px;
 }
 
-/* Footer styling for project totals */
+/* Footer styling for project totals with enhanced project area coverage */
 .resource-allocation-table tfoot .project-column-cell {
-  background: linear-gradient(135deg, rgba(111, 75, 246, 0.12) 0%, rgba(88, 85, 247, 0.08) 100%);
-  border-top: 2px solid rgba(111, 75, 246, 0.3);
+  background: linear-gradient(135deg, rgba(111, 75, 246, 0.15) 0%, rgba(88, 85, 247, 0.10) 100%);
+  border-top: 3px solid rgba(111, 75, 246, 0.4);
+  border-left: 3px solid rgba(111, 75, 246, 0.3);
   font-weight: 600;
   color: #4c1d95;
 }
+
+/* Enhanced project area visual continuity */
+.resource-allocation-table tbody tr:nth-child(even) .project-column-cell {
+  background: linear-gradient(135deg, rgba(111, 75, 246, 0.10) 0%, rgba(88, 85, 247, 0.06) 100%);
+}
+
+.resource-allocation-table tbody tr:nth-child(odd) .project-column-cell {
+  background: linear-gradient(135deg, rgba(111, 75, 246, 0.14) 0%, rgba(88, 85, 247, 0.10) 100%);
+}
+
+/* Project area left border enhancement for visual continuity */
+.resource-allocation-table .project-column-cell:first-of-type {
+  border-left: 4px solid #6f4bf6;
+}
+
