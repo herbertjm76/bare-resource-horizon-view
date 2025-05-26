@@ -21,24 +21,23 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
   const topLocations = getTopLocations(locationStats, 3);
 
   return (
-    <div className="mb-6">
-      <Card className="border-0 shadow-lg relative overflow-hidden">
-        {/* Glass morphism background */}
+    <div className="mb-6 relative">
+      {/* Glass morphism background container */}
+      <div className="relative overflow-hidden rounded-2xl">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500" />
         <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
         
         {/* Top highlight gradient */}
         <div className="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(120%_30%_at_50%_0%,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_70%)]" />
         
-        <div className="relative z-10">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-white text-xl font-semibold">Team Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Main Stats in a single row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Total Members */}
-              <div className="space-y-3">
+        <div className="relative z-10 p-6">
+          <h2 className="text-white text-xl font-semibold mb-6">Team Overview</h2>
+          
+          {/* Three rounded square cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Total Members Card */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white/20 rounded-lg">
                     <Users className="h-5 w-5 text-white" />
@@ -67,9 +66,11 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Departments */}
-              <div className="space-y-3">
+            {/* Departments Card */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white/20 rounded-lg">
                     <Building2 className="h-5 w-5 text-white" />
@@ -99,9 +100,11 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
                   )}
                 </div>
               </div>
+            </div>
 
-              {/* Locations */}
-              <div className="space-y-3">
+            {/* Locations Card */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+              <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white/20 rounded-lg">
                     <MapPin className="h-5 w-5 text-white" />
@@ -139,9 +142,9 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
                 </div>
               </div>
             </div>
-          </CardContent>
+          </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
