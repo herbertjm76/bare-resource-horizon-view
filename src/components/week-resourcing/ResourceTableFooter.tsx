@@ -1,22 +1,24 @@
-
 import React from 'react';
-import { TableCell, TableFooter, TableRow } from '@/components/ui/table';
+import { TableRow, TableCell, TableFooter } from '@/components/ui/table';
 
-interface ProjectTotal {
+interface ProjectHourTotal {
   projectId: string;
   totalHours: number;
 }
 
 interface ResourceTableFooterProps {
   projects: any[];
-  projectHourTotals: ProjectTotal[];
+  projectHourTotals: ProjectHourTotal[];
 }
 
-export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({ 
-  projects, 
-  projectHourTotals 
+export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
+  projects,
+  projectHourTotals
 }) => {
-  // Ensure we always show at least 15 project columns
+  // Calculate grand total
+  const grandTotal = projectHourTotals.reduce((sum, project) => sum + project.totalHours, 0);
+  
+  // Ensure we show totals for at least 15 project columns
   const minProjectsToShow = 15;
   const projectsToRender = [...projects];
   
@@ -32,39 +34,64 @@ export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
   }
 
   return (
-    <TableFooter>
-      <TableRow className="bg-muted/30 font-medium">
-        {/* Name column - displays "Total" */}
-        <TableCell className="sticky-column sticky-left-0 border-r text-center w-[150px] non-project-column">Total</TableCell>
+    <TableFooter className="bg-brand-primary text-white">
+      <TableRow className="bg-brand-primary hover:bg-brand-primary">
+        {/* Resource Name Column */}
+        <TableCell className="font-medium text-white bg-brand-primary">
+          Total Hours
+        </TableCell>
         
-        {/* Empty cells for the fixed columns */}
-        <TableCell className="border-r non-project-column"></TableCell>
-        <TableCell className="border-r non-project-column"></TableCell>
-        <TableCell className="border-r non-project-column"></TableCell>
-        <TableCell className="border-r non-project-column"></TableCell>
-        <TableCell className="border-r non-project-column"></TableCell>
-        <TableCell className="border-r non-project-column"></TableCell>
-
-        {/* Project total cells */}
-        {projectsToRender.map((project, index) => {
+        {/* Project Count Column */}
+        <TableCell className="text-center font-medium text-white bg-brand-primary">
+          —
+        </TableCell>
+        
+        {/* Capacity Bar Column */}
+        <TableCell className="text-center font-medium text-white bg-brand-primary">
+          —
+        </TableCell>
+        
+        {/* Annual Leave Column */}
+        <TableCell className="text-center font-medium text-white bg-brand-primary">
+          —
+        </TableCell>
+        
+        {/* Holiday Column */}
+        <TableCell className="text-center font-medium text-white bg-brand-primary">
+          —
+        </TableCell>
+        
+        {/* Other Leave Column */}
+        <TableCell className="text-center font-medium text-white bg-brand-primary">
+          —
+        </TableCell>
+        
+        {/* Office Location Column */}
+        <TableCell className="text-center font-medium text-white bg-brand-primary">
+          —
+        </TableCell>
+        
+        {/* Project allocation columns */}
+        {projectsToRender.map((project) => {
           if (project.isEmpty) {
             return (
               <TableCell 
-                key={`total-empty-${index}`} 
-                className="border-r text-center project-column-cell"
-              ></TableCell>
+                key={`footer-empty-${project.id}`} 
+                className="text-center font-bold text-lg text-white bg-brand-primary w-[40px]"
+              >
+                —
+              </TableCell>
             );
           }
           
-          const projectTotal = projectHourTotals.find(pt => pt.projectId === project.id);
-          const totalHours = projectTotal ? projectTotal.totalHours : 0;
+          const total = projectHourTotals.find(p => p.projectId === project.id)?.totalHours || 0;
           
           return (
             <TableCell 
-              key={`total-${project.id}`} 
-              className="border-r text-center font-medium project-column-cell"
+              key={`footer-${project.id}`} 
+              className="text-center font-bold text-lg text-white bg-brand-primary w-[40px]"
             >
-              {totalHours > 0 ? totalHours : '-'}
+              {total > 0 ? total : '—'}
             </TableCell>
           );
         })}

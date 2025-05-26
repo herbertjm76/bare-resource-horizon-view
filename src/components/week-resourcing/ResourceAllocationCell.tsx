@@ -89,7 +89,8 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
     <div className={`allocation-input-container w-full h-full ${filledClass}`}>
       {isEditing ? (
         <Input
-          className="w-full h-8 text-center p-0"
+          className="w-full h-8 text-center p-0 text-lg font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          type="number"
           value={value}
           onChange={handleChange}
           onBlur={handleBlur}
@@ -98,7 +99,7 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
         />
       ) : (
         <div
-          className="cursor-pointer w-full h-8 flex items-center justify-center hover:bg-gray-50"
+          className="cursor-pointer w-full h-8 flex items-center justify-center hover:bg-gray-50 text-lg font-medium"
           onClick={() => setIsEditing(true)}
         >
           {hours > 0 ? hours : '—'}
