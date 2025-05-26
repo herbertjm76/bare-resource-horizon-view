@@ -85,14 +85,14 @@ export const HolidayCard: React.FC = () => {
   });
 
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-[400px] flex flex-col">
       <CardHeader className="pb-3 flex-shrink-0">
         <CardTitle className="text-lg flex items-center gap-2">
           <Calendar className="h-5 w-5 text-brand-violet" />
           Upcoming Holidays
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-0">
+      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
         {loading ? (
           <div className="text-center py-8 text-gray-500">
             <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50 animate-pulse" />
@@ -118,9 +118,9 @@ export const HolidayCard: React.FC = () => {
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 truncate">{holiday.name}</div>
-                      <div className="flex items-center gap-1 mt-1">
-                        <MapPin className="h-3 w-3 text-gray-500" />
+                      <div className="font-medium text-gray-900 truncate mb-2">{holiday.name}</div>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3 text-gray-500 flex-shrink-0" />
                         <div className="flex gap-1 flex-wrap">
                           {holiday.offices.map((office, idx) => (
                             <Badge key={idx} variant="secondary" className="text-xs py-0 px-1.5">
