@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +9,7 @@ import { getWeekStartDate } from '@/hooks/allocations/utils/dateUtils';
 import { ResourceTable } from '@/components/week-resourcing/ResourceTable';
 import { WeekResourceSummary } from '@/components/week-resourcing/WeekResourceSummary';
 import { addDays, format, startOfWeek } from 'date-fns';
+import './week-resourcing.css';
 
 interface WeekResourceViewProps {
   selectedWeek: Date;

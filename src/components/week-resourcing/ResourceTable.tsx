@@ -50,8 +50,14 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="annual-leave-calendar grid-table-outer-container border rounded-md shadow-sm">
-        <div className="grid-table-container">
+      <div className="w-full max-w-full overflow-hidden border rounded-md shadow-sm">
+        <div 
+          className="overflow-x-auto overflow-y-visible -webkit-overflow-scrolling-touch"
+          style={{
+            width: 'calc(100vw - 22rem)',
+            maxWidth: 'calc(100vw - 22rem)'
+          }}
+        >
           <Table className="resource-allocation-table">
             {/* Table Header Component - removed showRemarks prop to use default value */}
             <ResourceTableHeader projects={projects} />
