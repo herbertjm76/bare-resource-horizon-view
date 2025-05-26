@@ -12,33 +12,35 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
     <TableHeader className="sticky top-0 z-10 bg-white border-b">
       <TableRow className="h-12">
         {/* Member info cells */}
-        <TableHead className="w-48 max-w-48 min-w-32 border-r sticky left-0 z-20 bg-white">Name</TableHead>
-        <TableHead className="w-12 text-center border-r">#</TableHead>
+        <TableHead className="w-48 max-w-48 min-w-32 border-r sticky left-0 z-20 bg-white non-project-column">Name</TableHead>
+        <TableHead className="w-12 text-center border-r non-project-column">#</TableHead>
         
         {/* Capacity bar header */}
-        <TableHead className="w-24 text-center border-r">Capacity</TableHead>
+        <TableHead className="w-24 text-center border-r non-project-column">Capacity</TableHead>
         
         {/* Leave cells - rearranged order */}
-        <TableHead className="w-10 text-center border-r">AL</TableHead>
-        <TableHead className="w-10 text-center border-r">HO</TableHead>
-        <TableHead className="w-10 text-center border-r">OL</TableHead>
+        <TableHead className="w-10 text-center border-r non-project-column">AL</TableHead>
+        <TableHead className="w-10 text-center border-r non-project-column">HO</TableHead>
+        <TableHead className="w-10 text-center border-r non-project-column">OL</TableHead>
         
         {/* Office Location Header - moved to the end with thick separator before projects */}
-        <TableHead className="w-14 text-center border-r-4 border-r-brand-violet/40">Off</TableHead>
+        <TableHead className="w-14 text-center project-section-divider non-project-column">Off</TableHead>
         
-        {/* Project allocation headers - with rotated text and project codes */}
+        {/* Project allocation headers - with enhanced styling and project codes */}
         {projects.map((project, idx) => {
           // Add a thicker border between every third project
-          const borderClass = (idx + 1) % 3 === 0 ? "border-r-2 border-r-brand-violet/20" : "border-r";
+          const isGroupSeparator = (idx + 1) % 3 === 0;
+          const borderClass = isGroupSeparator ? "project-group-separator" : "";
+          
           return (
             <TableHead 
               key={project.id} 
-              className={`w-10 text-center ${borderClass} ${!project.isEmpty ? "bg-brand-violet-light/40 text-brand-violet font-medium" : ""} relative`}
+              className={`w-10 text-center project-header ${borderClass} relative`}
             >
               {!project.isEmpty && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div 
-                    className="text-xs font-semibold whitespace-nowrap"
+                    className="project-code-text text-xs font-bold whitespace-nowrap"
                     style={{
                       transform: 'rotate(-90deg)',
                       transformOrigin: 'center',
@@ -59,7 +61,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
         
         {/* Add Remarks column if showRemarks is true */}
         {showRemarks && (
-          <TableHead className="w-40 text-center border-r">Remarks</TableHead>
+          <TableHead className="w-40 text-center border-r non-project-column">Remarks</TableHead>
         )}
       </TableRow>
     </TableHeader>
