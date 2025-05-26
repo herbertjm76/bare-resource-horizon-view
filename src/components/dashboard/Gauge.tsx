@@ -5,61 +5,62 @@ interface GaugeProps {
   value: number;
   max: number;
   title: string;
-  subtitle?: string;
-  size?: 'sm' | 'md' | 'lg';
-  color?: string;
-  trackColor?: string;
+  size?: 'sm' | 'lg';
 }
 
-export const Gauge: React.FC<GaugeProps> = ({
-  value,
-  max,
-  title,
-  subtitle,
-  size = 'md',
-  color = '#6F4BF6',
-  trackColor = '#ECECFB',
-}) => {
-  const percentage = Math.min(100, Math.round((value / max) * 100));
-  const radius = size === 'sm' ? 35 : size === 'md' ? 45 : 55;
-  const strokeWidth = size === 'sm' ? 6 : size === 'md' ? 8 : 10;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+export const Gauge: React.FC<GaugeProps> = ({ value, max, title, size = 'sm' }) => {
+  const percentage = Math.min((value / max) * 100, 100);
+  const circumference = 2 * Math.PI * 45;
+  const strokeDasharray = `${(percentage / 100) * circumference} ${circumference}`;
+  
+  const getColor = (value: number) => {
+    if (value < 60) return '#3B82F6'; // blue
+    if (value < 80) return '#10B981'; // green
+    if (value < 90) return '#F59E0B'; // yellow
+    return '#EF4444'; // red
+  };
+
+  const dimensions = size === 'lg' ? { size: 120, strokeWidth: 8, fontSize: 'text-xl' } : { size: 80, strokeWidth: 6, fontSize: 'text-sm' };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <div className="relative">
-        <svg 
-          width={(radius + strokeWidth) * 2} 
-          height={(radius + strokeWidth) * 2}
+    <div className="flex flex-col items-center">
+      <div className="relative" style={{ width: dimensions.size, height: dimensions.size }}>
+        <svg
+          width={dimensions.size}
+          height={dimensions.size}
+          viewBox={`0 0 ${dimensions.size} ${dimensions.size}`}
           className="transform -rotate-90"
         >
+          {/* Background circle */}
           <circle
-            cx={radius + strokeWidth}
-            cy={radius + strokeWidth}
-            r={radius}
-            strokeWidth={strokeWidth}
-            stroke={trackColor}
-            fill="transparent"
+            cx={dimensions.size / 2}
+            cy={dimensions.size / 2}
+            r="45"
+            stroke="#E5E7EB"
+            strokeWidth={dimensions.strokeWidth}
+            fill="none"
           />
+          {/* Progress circle */}
           <circle
-            cx={radius + strokeWidth}
-            cy={radius + strokeWidth}
-            r={radius}
-            strokeWidth={strokeWidth}
-            stroke={color}
-            fill="transparent"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
+            cx={dimensions.size / 2}
+            cy={dimensions.size / 2}
+            r="45"
+            stroke={getColor(value)}
+            strokeWidth={dimensions.strokeWidth}
+            fill="none"
+            strokeDasharray={strokeDasharray}
             strokeLinecap="round"
+            className="transition-all duration-300 ease-in-out"
           />
         </svg>
-        <div className="absolute inset-0 flex items-center justify-center flex-col">
-          <span className="text-3xl font-bold text-gray-900">{percentage}%</span>
+        {/* Center text */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className={`font-bold ${dimensions.fontSize}`} style={{ color: getColor(value) }}>
+            {value}%
+          </span>
         </div>
       </div>
-      <h3 className="mt-3 text-lg font-semibold text-gray-800">{title}</h3>
-      {subtitle && <p className="text-sm text-gray-600">{subtitle}</p>}
+      <p className="mt-2 text-xs text-gray-600 text-center">{title}</p>
     </div>
   );
 };

@@ -1,10 +1,6 @@
 
 import React, { useState } from 'react';
-import { Filter, Activity, Users, Calendar, Clock, Target, AlertTriangle, TrendingUp } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Filter } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -12,14 +8,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Gauge } from './Gauge';
-import { Donut } from './Donut';
-import { HolidaysList } from './HolidaysList';
-import { StaffAvailability } from './StaffAvailability';
-import { HerbieChat } from './HerbieChat';
-import { SummaryDashboard } from './SummaryDashboard';
-import { IntelligentInsights } from './IntelligentInsights';
-import { ResourcePlanningChat } from './ResourcePlanningChat';
+import { useIsMobile } from "@/hooks/use-mobile";
+import { MobileDashboard } from './MobileDashboard';
+import { DesktopDashboard } from './DesktopDashboard';
 
 const mockData = {
   activeResources: 96,
@@ -68,6 +59,7 @@ const mockData = {
 
 export const DashboardMetrics = () => {
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
+  const isMobile = useIsMobile();
   
   const today = new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
@@ -76,227 +68,58 @@ export const DashboardMetrics = () => {
     year: 'numeric' 
   }).toUpperCase();
 
-  // Summary metrics for consolidated dashboard
-  const summaryMetrics = [
-    {
-      title: 'Team Utilization',
-      value: '81%',
-      subtitle: 'Current 7-day average',
-      progress: 81,
-      icon: <TrendingUp className="h-4 w-4" />,
-      trend: 'up' as const,
-      status: 'good' as const
-    },
-    {
-      title: 'Available Capacity',
-      value: '2,340h',
-      subtitle: 'Next 12 weeks',
-      icon: <Clock className="h-4 w-4" />,
-      status: 'info' as const
-    },
-    {
-      title: 'Active Projects',
-      value: mockData.activeProjects,
-      subtitle: 'Currently in progress',
-      icon: <Target className="h-4 w-4" />,
-      status: 'good' as const
-    },
-    {
-      title: 'Hiring Status',
-      value: 'Monitor',
-      subtitle: 'Based on capacity trends',
-      icon: <AlertTriangle className="h-4 w-4" />,
-      status: 'warning' as const
-    }
-  ];
-
   return (
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h2 className="text-sm text-gray-600 mb-0.5">TODAY IS</h2>
-          <p className="text-2xl font-bold">{today}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-gray-600" />
-          <Select
-            value={selectedOffice}
-            onValueChange={setSelectedOffice}
-          >
-            <SelectTrigger className="w-[180px] bg-white border border-gray-300 text-gray-700">
-              <SelectValue placeholder="All Offices" />
-            </SelectTrigger>
-            <SelectContent>
-              {mockData.offices.map((office) => (
-                <SelectItem key={office} value={office}>
-                  {office}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-background border-b border-gray-200 p-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 className="text-xs sm:text-sm text-gray-600 mb-0.5">TODAY IS</h2>
+            <p className="text-lg sm:text-2xl font-bold">{today}</p>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Filter className="h-4 w-4 text-gray-600 flex-shrink-0" />
+            <Select
+              value={selectedOffice}
+              onValueChange={setSelectedOffice}
+            >
+              <SelectTrigger className="w-full sm:w-[180px] bg-white border border-gray-300 text-gray-700">
+                <SelectValue placeholder="All Offices" />
+              </SelectTrigger>
+              <SelectContent>
+                {mockData.offices.map((office) => (
+                  <SelectItem key={office} value={office}>
+                    {office}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
-      {/* Masonry Grid Layout - Maximum 4 columns */}
-      <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-        
-        {/* Strategic Overview - Full width on mobile, spans columns on larger screens */}
-        <div className="break-inside-avoid mb-4">
-          <SummaryDashboard 
-            title="Strategic Overview"
-            metrics={summaryMetrics}
-          />
-        </div>
-
-        {/* Smart Insights - Compact */}
-        <div className="break-inside-avoid mb-4">
-          <IntelligentInsights 
+      {/* Main Content */}
+      <div className="pb-6">
+        {isMobile ? (
+          <MobileDashboard
             teamMembers={mockData.teamMembers}
             activeProjects={mockData.activeProjects}
-            utilizationRate={mockData.utilizationRate.days7}
+            activeResources={mockData.activeResources}
+            utilizationTrends={mockData.utilizationRate}
+            staffData={mockData.staffData}
           />
-        </div>
-
-        {/* Key Stats */}
-        <div className="break-inside-avoid mb-4">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-4 flex items-center">
-              <div className="space-y-4 flex-grow">
-                <div>
-                  <p className="text-3xl font-bold text-brand-violet">{mockData.activeResources}</p>
-                  <p className="text-sm">Active members</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-brand-violet">{mockData.activeProjects}</p>
-                  <p className="text-sm">Live projects</p>
-                </div>
-              </div>
-              <div className="flex flex-col space-y-4 ml-4 opacity-30">
-                <Users 
-                  size={36} 
-                  strokeWidth={1.5} 
-                  className="text-brand-violet/30" 
-                />
-                <Activity 
-                  size={36} 
-                  strokeWidth={1.5} 
-                  className="text-brand-violet/30" 
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Utilization Trends */}
-        <div className="break-inside-avoid mb-4">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Utilization Trends</h3>
-              <div className="space-y-4">
-                <div className="text-center">
-                  <Gauge 
-                    value={mockData.utilizationRate.days7} 
-                    max={100} 
-                    title="7 Days"
-                    size="sm"
-                  />
-                </div>
-                <div className="text-center">
-                  <Gauge 
-                    value={mockData.utilizationRate.days30} 
-                    max={100} 
-                    title="30 Days"
-                    size="sm"
-                  />
-                </div>
-                <div className="text-center">
-                  <Gauge 
-                    value={mockData.utilizationRate.days90} 
-                    max={100} 
-                    title="90 Days"
-                    size="sm"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Holidays */}
-        <div className="break-inside-avoid mb-4">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-4">
-              <HolidaysList holidays={mockData.upcomingHolidays} />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Resource Planning Chat */}
-        <div className="break-inside-avoid mb-4">
-          <ResourcePlanningChat 
-            teamSize={mockData.teamMembers.length}
-            activeProjects={mockData.activeProjects}
-            utilizationRate={mockData.utilizationRate.days7}
-          />
-        </div>
-
-        {/* Project Analytics Cards */}
-        <div className="break-inside-avoid mb-4">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-4">
-              <Donut 
-                data={mockData.projectsByStatus} 
-                title="Project By Status" 
-                colors={['#6F4BF6', '#FFB443']}
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="break-inside-avoid mb-4">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-4">
-              <Donut 
-                data={mockData.projectsByStage} 
-                title="Project By Stage"
-                colors={['#6F4BF6', '#FFB443']}
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="break-inside-avoid mb-4">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-4">
-              <Donut 
-                data={mockData.projectsByRegion} 
-                title="Project By Region"
-                colors={['#6F4BF6', '#91D3FF']}
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="break-inside-avoid mb-4">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-4">
-              <Donut 
-                data={mockData.resourcesByOffice} 
-                title="Resource by Office"
-                colors={['#FF6B6B', '#91D3FF']}
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Staff Availability - Full width */}
-        <div className="break-inside-avoid mb-4 col-span-full">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-6">
-              <StaffAvailability staffMembers={mockData.staffData} />
-            </CardContent>
-          </Card>
-        </div>
+        ) : (
+          <div className="p-4">
+            <DesktopDashboard
+              teamMembers={mockData.teamMembers}
+              activeProjects={mockData.activeProjects}
+              activeResources={mockData.activeResources}
+              utilizationTrends={mockData.utilizationRate}
+              staffData={mockData.staffData}
+              mockData={mockData}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
