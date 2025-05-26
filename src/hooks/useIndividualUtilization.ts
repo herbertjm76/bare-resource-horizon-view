@@ -21,6 +21,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
 
   useEffect(() => {
     if (!company?.id || memberIds.length === 0) {
+      console.log('Individual utilization: No company or members, setting loading to false');
       setIsLoading(false);
       return;
     }
@@ -39,6 +40,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
         console.log('30 days ago week start:', format(thirtyDaysAgo, 'yyyy-MM-dd'));
         console.log('90 days ago week start:', format(ninetyDaysAgo, 'yyyy-MM-dd'));
         console.log('Team members for utilization:', teamMembers.map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}` })));
+        console.log('Member IDs to query:', memberIds);
         
         // Fetch allocations for all members for the past 90 days
         // Include both 'active' and 'pre_registered' resource types
@@ -46,7 +48,6 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
           .from('project_resource_allocations')
           .select('resource_id, hours, week_start_date, project_id, resource_type')
           .eq('company_id', company.id)
-          .in('resource_type', ['active', 'pre_registered'])
           .in('resource_id', memberIds)
           .gte('week_start_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
           .lte('week_start_date', format(currentWeekStart, 'yyyy-MM-dd'));
@@ -54,6 +55,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
         if (error) throw error;
 
         console.log('Individual allocations fetched:', allocations?.length || 0);
+        console.log('Raw allocations data:', allocations);
         console.log('Allocations by member:', allocations?.reduce((acc, allocation) => {
           const memberName = teamMembers.find(m => m.id === allocation.resource_id);
           const key = `${memberName?.first_name || 'Unknown'} ${memberName?.last_name || ''} (${allocation.resource_id})`;
