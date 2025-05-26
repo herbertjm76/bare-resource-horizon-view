@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Filter, Activity, Users, Calendar, Clock, Target, AlertTriangle, TrendingUp } from 'lucide-react';
 import {
@@ -17,6 +18,8 @@ import { HolidaysList } from './HolidaysList';
 import { StaffAvailability } from './StaffAvailability';
 import { HerbieChat } from './HerbieChat';
 import { SummaryDashboard } from './SummaryDashboard';
+import { IntelligentInsights } from './IntelligentInsights';
+import { ResourcePlanningChat } from './ResourcePlanningChat';
 
 const mockData = {
   activeResources: 96,
@@ -53,6 +56,14 @@ const mockData = {
     { name: 'Hong Kong', value: 55 },
   ],
   offices: ['All Offices', 'London', 'Dubai', 'Hong Kong', 'New York', 'Mumbai', 'Riyadh', 'Beijing'],
+  // Mock team members for insights
+  teamMembers: [
+    { id: '1', first_name: 'John', last_name: 'Doe', weekly_capacity: 40, job_title: 'Senior Developer' },
+    { id: '2', first_name: 'Jane', last_name: 'Smith', weekly_capacity: 40, job_title: 'Designer' },
+    { id: '3', first_name: 'Mike', last_name: 'Johnson', weekly_capacity: 35, job_title: 'Project Manager' },
+    { id: '4', first_name: 'Sarah', last_name: 'Wilson', weekly_capacity: 40, job_title: 'Developer' },
+    { id: '5', first_name: 'Tom', last_name: 'Brown', weekly_capacity: 40, job_title: 'Designer' },
+  ]
 };
 
 export const DashboardMetrics = () => {
@@ -133,63 +144,53 @@ export const DashboardMetrics = () => {
         className="mb-6"
       />
 
+      {/* New Intelligent Insights Section */}
+      <div className="mb-6">
+        <IntelligentInsights 
+          teamMembers={mockData.teamMembers}
+          activeProjects={mockData.activeProjects}
+          utilizationRate={mockData.utilizationRate.days7}
+        />
+      </div>
+
       <div className="grid grid-cols-12 gap-4">
-        <div className="col-span-3">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-4 flex items-center">
-              <div className="space-y-4 flex-grow">
-                <div>
-                  <p className="text-4xl font-bold text-brand-violet">{mockData.activeResources}</p>
-                  <p className="text-base">Active members</p>
-                </div>
-                <div>
-                  <p className="text-4xl font-bold text-brand-violet">{mockData.activeProjects}</p>
-                  <p className="text-base">Live projects</p>
-                </div>
-              </div>
-              <div className="flex flex-col space-y-4 ml-4 opacity-30">
-                <Users 
-                  size={48} 
-                  strokeWidth={1.5} 
-                  className="text-brand-violet/30" 
-                />
-                <Activity 
-                  size={48} 
-                  strokeWidth={1.5} 
-                  className="text-brand-violet/30" 
-                />
-              </div>
-            </CardContent>
-          </Card>
+        {/* Resource Planning AI Chat - Takes up more space */}
+        <div className="col-span-5">
+          <ResourcePlanningChat 
+            teamSize={mockData.teamMembers.length}
+            activeProjects={mockData.activeProjects}
+            utilizationRate={mockData.utilizationRate.days7}
+          />
         </div>
 
-        <div className="col-span-6">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
+        {/* Utilization Trends - Condensed */}
+        <div className="col-span-4">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-[600px]">
             <CardContent className="p-6">
-              <h3 className="text-2xl font-semibold text-gray-800 mb-6">Resource Utilization Trends</h3>
-              <div className="flex justify-between items-center">
-                <div className="flex-1 flex flex-col items-center">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Utilization Trends</h3>
+              <div className="space-y-6">
+                <div className="text-center">
                   <Gauge 
                     value={mockData.utilizationRate.days7} 
                     max={100} 
                     title="7 Days"
-                    size="lg"
+                    size="md"
                   />
                 </div>
-                <div className="flex-1 flex flex-col items-center">
+                <div className="text-center">
                   <Gauge 
                     value={mockData.utilizationRate.days30} 
                     max={100} 
                     title="30 Days"
-                    size="lg"
+                    size="md"
                   />
                 </div>
-                <div className="flex-1 flex flex-col items-center">
+                <div className="text-center">
                   <Gauge 
                     value={mockData.utilizationRate.days90} 
                     max={100} 
                     title="90 Days"
-                    size="lg"
+                    size="md"
                   />
                 </div>
               </div>
@@ -197,23 +198,44 @@ export const DashboardMetrics = () => {
           </Card>
         </div>
 
+        {/* Key Stats */}
         <div className="col-span-3">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
-            <CardContent className="p-6">
-              <HerbieChat />
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl mb-4">
+            <CardContent className="p-4 flex items-center">
+              <div className="space-y-4 flex-grow">
+                <div>
+                  <p className="text-3xl font-bold text-brand-violet">{mockData.activeResources}</p>
+                  <p className="text-sm">Active members</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-brand-violet">{mockData.activeProjects}</p>
+                  <p className="text-sm">Live projects</p>
+                </div>
+              </div>
+              <div className="flex flex-col space-y-4 ml-4 opacity-30">
+                <Users 
+                  size={36} 
+                  strokeWidth={1.5} 
+                  className="text-brand-violet/30" 
+                />
+                <Activity 
+                  size={36} 
+                  strokeWidth={1.5} 
+                  className="text-brand-violet/30" 
+                />
+              </div>
             </CardContent>
           </Card>
-        </div>
 
-        <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <HolidaysList holidays={mockData.upcomingHolidays} />
             </CardContent>
           </Card>
         </div>
 
-        <div className="col-span-9">
+        {/* Staff Availability - Full width */}
+        <div className="col-span-12">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
             <CardContent className="p-6">
               <StaffAvailability staffMembers={mockData.staffData} />
@@ -221,9 +243,10 @@ export const DashboardMetrics = () => {
           </Card>
         </div>
 
+        {/* Project Analytics - Smaller cards */}
         <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <Donut 
                 data={mockData.projectsByStatus} 
                 title="Project By Status" 
@@ -235,7 +258,7 @@ export const DashboardMetrics = () => {
 
         <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <Donut 
                 data={mockData.projectsByStage} 
                 title="Project By Stage"
@@ -247,7 +270,7 @@ export const DashboardMetrics = () => {
 
         <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <Donut 
                 data={mockData.projectsByRegion} 
                 title="Project By Region"
@@ -259,7 +282,7 @@ export const DashboardMetrics = () => {
 
         <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <Donut 
                 data={mockData.resourcesByOffice} 
                 title="Resource by Office"
