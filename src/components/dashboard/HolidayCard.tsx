@@ -4,17 +4,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin } from 'lucide-react';
 import { useCompany } from "@/context/CompanyContext";
-import { fetchHolidays } from "@/components/settings/holidays/HolidayService";
-import { Holiday } from "@/components/settings/holidays/types";
+import { useOfficeSettings } from "@/context/officeSettings";
+import { supabase } from '@/integrations/supabase/client';
 
-interface HolidayCardProps {
-  // Remove the holidays prop since we'll fetch from database
+interface Holiday {
+  id: string;
+  name: string;
+  date: Date;
+  end_date?: Date;
+  offices: string[];
 }
 
-export const HolidayCard: React.FC<HolidayCardProps> = () => {
+export const HolidayCard: React.FC = () => {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [loading, setLoading] = useState(true);
   const { company } = useCompany();
+  const { locations } = useOfficeSettings();
 
   useEffect(() => {
     const loadHolidays = async () => {
@@ -24,13 +29,43 @@ export const HolidayCard: React.FC<HolidayCardProps> = () => {
       }
       
       setLoading(true);
-      const data = await fetchHolidays(company.id);
-      setHolidays(data);
-      setLoading(false);
+      
+      try {
+        const { data: holidaysData, error } = await supabase
+          .from('office_holidays')
+          .select('*')
+          .eq('company_id', company.id);
+        
+        if (error) {
+          console.error('Error fetching holidays:', error);
+          setHolidays([]);
+        } else if (holidaysData) {
+          // Transform the data and match with location names
+          const transformedHolidays: Holiday[] = holidaysData.map(holiday => {
+            const location = locations.find(loc => loc.id === holiday.location_id);
+            const locationName = location ? `${location.emoji} ${location.city}` : 'Unknown Location';
+            
+            return {
+              id: holiday.id,
+              name: holiday.name,
+              date: new Date(holiday.date),
+              end_date: holiday.end_date ? new Date(holiday.end_date) : undefined,
+              offices: [locationName]
+            };
+          });
+          
+          setHolidays(transformedHolidays);
+        }
+      } catch (error) {
+        console.error('Error loading holidays:', error);
+        setHolidays([]);
+      } finally {
+        setLoading(false);
+      }
     };
 
     loadHolidays();
-  }, [company]);
+  }, [company, locations]);
 
   const formatDate = (date: Date) => {
     return {
