@@ -7,85 +7,71 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
-
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-
-    --bare-light-gray: #8E9196;      /* UPDATED: standardized medium grey */
-    --sidebar-background: #8E9196;   /* Sidebar now matches button grey */
-    --sidebar-foreground: #fff;      /* White icons/text on grey for contrast */
-    --sidebar-primary: #8E9196;
-    --sidebar-primary-foreground: #fff;
-    --sidebar-accent: #7d8086;
-    --sidebar-accent-foreground: #fff;
-    --sidebar-border: #7d8086;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-
-    --grad-a: #895CF7;   /* violet  */
-    --grad-b: #5669F7;   /* blue    */ 
-    --grad-c: #E64FC4;   /* pink    */
   }
 
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
-
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-
-    --sidebar-background: #8E9196;
-    --sidebar-foreground: #fff;
-    --sidebar-primary: #8E9196;
-    --sidebar-primary-foreground: #fff;
-    --sidebar-accent: #7d8086;
-    --sidebar-accent-foreground: #fff;
-    --sidebar-border: #7d8086;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 224 71.4% 4.1%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 224 71.4% 4.1%;
+    --sidebar-primary-foreground: 210 20% 98%;
+    --sidebar-accent: 216 34% 17%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 216 34% 17%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
@@ -94,51 +80,12 @@
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
   }
-  
-  /* Remove default number input arrows */
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  input[type="number"] {
-    -moz-appearance: textfield;
-  }
 }
 
-/* 
- * BareResource logo shadow effect utility for consistent branding
- * Usage: className="bare-logo-shadow"
- */
-.bare-logo-shadow {
-  /* For both light and dark, strong blurred shadow effect */
-  text-shadow:
-    0 4px 18px rgba(40,40,76,0.18),
-    1px 0px 4px rgba(60,60,100,0.15);
-  /* Ensures the shadow is smooth and soft like the PNG */
-}
-
-/* Resource allocation input styling */
-.allocation-input-container {
-  position: relative;
-  display: inline-block;
-}
-
-.allocation-input-container input:focus {
-  box-shadow: 0 0 0 2px rgba(137, 92, 247, 0.2);
-}
-
-@layer components {
-  .hero-gradient {
-    background: linear-gradient(145deg, var(--grad-a) 0%, var(--grad-b) 55%, var(--grad-c) 100%);
-  }
-  
-  .btn-primary-gradient {
-    background: linear-gradient(145deg, var(--grad-a), var(--grad-c));
-  }
+/* Add hero gradient class */
+.hero-gradient {
+  background: linear-gradient(145deg, #895CF7 0%, #5669F7 55%, #E64FC4 100%);
 }

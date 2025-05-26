@@ -1,7 +1,9 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProjectsToolbar from './ProjectsToolbar';
 import ProjectsTable from './ProjectsTable';
+import { ProjectsSummary } from './ProjectsSummary';
 import { useProjects } from '@/hooks/useProjects';
 import { ProjectFilters } from './ProjectFilters';
 import { supabase } from '@/integrations/supabase/client';
@@ -125,71 +127,75 @@ export const ProjectsList = () => {
   };
 
   return (
-    <Card className="border shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
-        <div>
-          <p className="text-sm text-muted-foreground mb-1">
-            View and manage all your ongoing projects. Use the filters below to narrow down the list by status, country, or office.
-          </p>
-        </div>
-        <ProjectsToolbar 
-          onProjectCreated={handleProjectCreated}
-          editMode={editMode}
-          setEditMode={handleToggleEditMode}
-          selectedCount={selectedProjects.length}
-          onBulkDelete={handleBulkDelete}
-        />
-      </CardHeader>
-      <CardContent>
-        <ProjectFilters 
-          onFilterChange={setFilters} 
-          currentFilters={filters}
-        />
-        <ProjectsTable 
-          projects={filteredProjects} 
-          loading={isLoading} 
-          error={error ? error.message : ''}
-          editMode={editMode}
-          onDelete={handleDeleteProject}
-          selectedProjects={selectedProjects}
-          onSelectProject={handleSelectProject}
-          refetch={refetch}
-        />
-      </CardContent>
+    <>
+      <ProjectsSummary projects={filteredProjects} />
+      
+      <Card className="border shadow-sm">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
+          <div>
+            <p className="text-sm text-muted-foreground mb-1">
+              View and manage all your ongoing projects. Use the filters below to narrow down the list by status, country, or office.
+            </p>
+          </div>
+          <ProjectsToolbar 
+            onProjectCreated={handleProjectCreated}
+            editMode={editMode}
+            setEditMode={handleToggleEditMode}
+            selectedCount={selectedProjects.length}
+            onBulkDelete={handleBulkDelete}
+          />
+        </CardHeader>
+        <CardContent>
+          <ProjectFilters 
+            onFilterChange={setFilters} 
+            currentFilters={filters}
+          />
+          <ProjectsTable 
+            projects={filteredProjects} 
+            loading={isLoading} 
+            error={error ? error.message : ''}
+            editMode={editMode}
+            onDelete={handleDeleteProject}
+            selectedProjects={selectedProjects}
+            onSelectProject={handleSelectProject}
+            refetch={refetch}
+          />
+        </CardContent>
 
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {projectToDelete === 'bulk' 
-                ? `Delete ${selectedProjects.length} project(s)` 
-                : 'Delete project'}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {projectToDelete === 'bulk'
-                ? `Are you sure you want to delete ${selectedProjects.length} selected project(s)? This action cannot be undone.`
-                : 'Are you sure you want to delete this project? This action cannot be undone.'}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive hover:bg-destructive/90"
-              onClick={() => {
-                if (projectToDelete === 'bulk') {
-                  confirmDeleteSelected();
-                } else if (projectToDelete) {
-                  deleteProject(projectToDelete);
-                }
-              }}
-              disabled={isDeleting}
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </Card>
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {projectToDelete === 'bulk' 
+                  ? `Delete ${selectedProjects.length} project(s)` 
+                  : 'Delete project'}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {projectToDelete === 'bulk'
+                  ? `Are you sure you want to delete ${selectedProjects.length} selected project(s)? This action cannot be undone.`
+                  : 'Are you sure you want to delete this project? This action cannot be undone.'}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive hover:bg-destructive/90"
+                onClick={() => {
+                  if (projectToDelete === 'bulk') {
+                    confirmDeleteSelected();
+                  } else if (projectToDelete) {
+                    deleteProject(projectToDelete);
+                  }
+                }}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </Card>
+    </>
   );
 };
 
