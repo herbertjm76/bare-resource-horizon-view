@@ -52,10 +52,12 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
         
         return (
           <td key={weekKey} className="p-0 text-center" style={{ width: '10px', minWidth: '10px' }}>
-            <div className="py-2 px-0">
-              <span className="text-lg font-bold text-white">
-                {totalHoursForWeek > 0 ? `${totalHoursForWeek}h` : '0h'}
-              </span>
+            <div className="py-2 px-0 flex justify-center">
+              <div className="bg-brand-primary text-white rounded-lg px-3 py-2 min-w-[50px] flex items-center justify-center">
+                <span className="text-lg font-bold">
+                  {totalHoursForWeek > 0 ? `${totalHoursForWeek}h` : '0h'}
+                </span>
+              </div>
             </div>
           </td>
         );
