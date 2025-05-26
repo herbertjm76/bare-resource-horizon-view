@@ -84,7 +84,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                 <div className="flex-1">
                   <p className="text-xs font-medium text-gray-600 mb-1">Available Capacity</p>
                   <p className="text-2xl font-bold text-gray-900 mb-1">2,340h</p>
-                  <p className="text-xs text-gray-500">Next 12 weeks</p>
+                  <p className="text-xs font-medium text-gray-500">Next 12 weeks</p>
                 </div>
                 <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                   <Clock className="h-5 w-5 text-blue-600" />
@@ -99,7 +99,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                 <div className="flex-1">
                   <p className="text-xs font-medium text-gray-600 mb-1">Active Projects</p>
                   <p className="text-2xl font-bold text-gray-900 mb-1">{activeProjects}</p>
-                  <p className="text-xs text-gray-500">{(activeProjects / activeResources).toFixed(1)} per person</p>
+                  <p className="text-xs font-medium text-gray-500">{(activeProjects / activeResources).toFixed(1)} per person</p>
                 </div>
                 <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                   <Briefcase className="h-5 w-5 text-green-600" />
