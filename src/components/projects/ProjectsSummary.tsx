@@ -53,9 +53,16 @@ export const ProjectsSummary: React.FC<ProjectsSummaryProps> = ({ projects }) =>
   const riskPercentage = totalProjects > 0 ? Math.round((riskProjects / totalProjects) * 100) : 0;
 
   return (
-    <div className="mb-4">
-      <Card className="border shadow-sm overflow-hidden bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500">
-        <CardContent className="p-4">
+    <div className="mb-4 relative">
+      {/* Glass morphism background container */}
+      <div className="relative overflow-hidden rounded-2xl">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500" />
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
+        
+        {/* Top highlight gradient */}
+        <div className="absolute inset-x-0 top-0 h-20 bg-[radial-gradient(120%_30%_at_50%_0%,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_70%)]" />
+        
+        <div className="relative z-10 p-4">
           {/* Four rounded square cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Total Projects & Status */}
@@ -191,8 +198,8 @@ export const ProjectsSummary: React.FC<ProjectsSummaryProps> = ({ projects }) =>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };
