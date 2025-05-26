@@ -1,13 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign, Briefcase } from 'lucide-react';
+import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign, Briefcase, Bot } from 'lucide-react';
 import { EnhancedInsights } from './EnhancedInsights';
 import { ResourcePlanningChat } from './ResourcePlanningChat';
 import { Donut } from './Donut';
 import { HolidayCard } from './HolidayCard';
-import { StaffAvailability } from './StaffAvailability';
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface DesktopDashboardProps {
   teamMembers: any[];
@@ -30,6 +31,8 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   staffData,
   mockData
 }) => {
+  const [isResourcePlanningOpen, setIsResourcePlanningOpen] = useState(false);
+
   const getUtilizationStatus = (rate: number) => {
     if (rate > 90) return { color: 'destructive', label: 'Overutilized' };
     if (rate > 80) return { color: 'default', label: 'High Utilization' };
@@ -209,6 +212,36 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                   </div>
                 </div>
               )}
+
+              {/* Resource Planning Assistant Button */}
+              <div className="pt-4 border-t">
+                <Dialog open={isResourcePlanningOpen} onOpenChange={setIsResourcePlanningOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      size="sm"
+                    >
+                      <Bot className="h-4 w-4 mr-2" />
+                      Resource Planning Assistant
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl w-full h-[80vh]">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <Bot className="h-5 w-5 text-blue-600" />
+                        Resource Planning Assistant
+                      </DialogTitle>
+                    </DialogHeader>
+                    <div className="flex-1 overflow-hidden">
+                      <ResourcePlanningChat 
+                        teamSize={teamMembers.length}
+                        activeProjects={activeProjects}
+                        utilizationRate={utilizationTrends.days7}
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -262,24 +295,6 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
               colors={['#22C55E', '#F59E0B', '#EF4444']}
               height={200}
             />
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* CEO Priority 4: Planning & Team Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <ResourcePlanningChat 
-          teamSize={teamMembers.length}
-          activeProjects={activeProjects}
-          utilizationRate={utilizationTrends.days7}
-        />
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Team Availability</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <StaffAvailability staffMembers={staffData} />
           </CardContent>
         </Card>
       </div>
