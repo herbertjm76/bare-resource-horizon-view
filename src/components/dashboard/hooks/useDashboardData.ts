@@ -28,6 +28,7 @@ export const useDashboardData = () => {
     const combined = [...(activeTeamMembers || []), ...(preRegisteredMembers || [])];
     console.log('Total combined members:', combined.length);
     console.log('Combined members:', combined.map(m => ({ 
+      id: m.id,
       name: `${m.first_name} ${m.last_name}`, 
       isPending: 'isPending' in m ? m.isPending : false 
     })));
@@ -38,7 +39,7 @@ export const useDashboardData = () => {
   // Get utilization data for all members
   const { memberUtilizations, isLoading: isLoadingUtilization } = useIndividualUtilization(allTeamMembers);
 
-  // Calculate staff data with proper utilization
+  // Calculate staff data with proper utilization and all member properties
   const staffData = useMemo(() => {
     console.log('=== CALCULATING STAFF DATA ===');
     console.log('All team members for staff data:', allTeamMembers.length);
@@ -51,18 +52,26 @@ export const useDashboardData = () => {
       console.log(`Member: ${memberName}, ID: ${member.id}, Utilization: ${utilization}%`);
       
       return {
+        id: member.id,
         first_name: member.first_name || '',
         last_name: member.last_name || '',
         name: memberName,
         role: member.job_title || 'Team Member',
         availability: utilization,
-        avatar_url: 'avatar_url' in member ? member.avatar_url : undefined
+        avatar_url: 'avatar_url' in member ? member.avatar_url : undefined,
+        email: 'email' in member ? member.email : undefined,
+        department: 'department' in member ? member.department : undefined,
+        location: 'location' in member ? member.location : undefined,
+        weekly_capacity: 'weekly_capacity' in member ? member.weekly_capacity : 40,
+        isPending: 'isPending' in member ? member.isPending : false
       };
     });
 
     console.log('Final staff data:', staffMembers.map(s => ({ 
+      id: s.id,
       name: s.name, 
-      availability: s.availability 
+      availability: s.availability,
+      isPending: s.isPending
     })));
     console.log('=== END STAFF DATA CALCULATION ===');
 

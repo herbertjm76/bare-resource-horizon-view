@@ -16,12 +16,18 @@ export const StaffSection: React.FC<StaffSectionProps> = ({
   const [selectedMember, setSelectedMember] = useState<typeof members[0] | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   
-  const { allocations, isLoading } = useStaffAllocations(selectedMember?.first_name && selectedMember?.last_name ? 
-    // We need the actual member ID, but for now we'll use a placeholder
-    selectedMember.name : null
-  );
+  // Use the actual member ID from the selected member
+  const memberId = selectedMember ? 
+    // Check if it's a regular team member with an id property
+    ('id' in selectedMember ? selectedMember.id : 
+     // Or if it's from invites, try to find the actual member ID
+     selectedMember.first_name && selectedMember.last_name ? 
+     `${selectedMember.first_name}_${selectedMember.last_name}` : null) : null;
+
+  const { allocations, isLoading } = useStaffAllocations(memberId);
 
   const handleMemberClick = (member: typeof members[0]) => {
+    console.log('Selected member:', member);
     setSelectedMember(member);
     setDialogOpen(true);
   };
@@ -63,7 +69,8 @@ export const StaffSection: React.FC<StaffSectionProps> = ({
         onOpenChange={setDialogOpen}
         member={selectedMember}
         allocations={allocations}
-        weeklyCapacity={40} // Default capacity, you might want to get this from member data
+        isLoading={isLoading}
+        weeklyCapacity={selectedMember?.weekly_capacity || 40}
       />
     </div>
   );
