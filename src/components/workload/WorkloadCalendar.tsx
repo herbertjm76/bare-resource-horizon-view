@@ -3,7 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { format, eachWeekOfInterval, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
+import { format, addWeeks, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/useWorkloadData';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
@@ -11,20 +11,19 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface WorkloadCalendarProps {
   members: TeamMember[];
-  selectedMonth: Date;
+  selectedWeek: Date;
   workloadData: Record<string, Record<string, WorkloadBreakdown>>;
 }
 
 export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
   members,
-  selectedMonth,
+  selectedWeek,
   workloadData
 }) => {
-  // Get all weeks in the selected month
-  const weeksInMonth = eachWeekOfInterval({
-    start: startOfMonth(selectedMonth),
-    end: endOfMonth(selectedMonth)
-  }, { weekStartsOn: 1 }); // Start weeks on Monday
+  // Generate 12 weeks starting from the selected week
+  const weeks = Array.from({ length: 12 }, (_, i) => {
+    return addWeeks(startOfWeek(selectedWeek, { weekStartsOn: 1 }), i);
+  });
 
   // Sort members by name
   const sortedMembers = [...members].sort((a, b) => {
@@ -118,8 +117,8 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
     };
   };
   
-  // Calculate monthly total for each member
-  const getMonthlyTotal = (memberId: string): WorkloadBreakdown => {
+  // Calculate 12-week total for each member
+  const get12WeekTotal = (memberId: string): WorkloadBreakdown => {
     if (!workloadData[memberId]) return { projectHours: 0, annualLeave: 0, officeHolidays: 0, otherLeave: 0, total: 0 };
     
     return Object.values(workloadData[memberId]).reduce((acc, breakdown) => ({
@@ -163,17 +162,22 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
               <TableHead className="sticky left-0 bg-background z-10 min-w-[140px] border-r-2 font-semibold">
                 Team Member
               </TableHead>
-              {weeksInMonth.map(weekStart => {
+              {weeks.map(weekStart => {
                 const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-                const weekLabel = `${format(weekStart, 'd MMM')} - ${format(weekEnd, 'd')}`;
+                const weekLabel = format(weekStart, 'MMM d');
                 
                 return (
                   <TableHead 
                     key={weekStart.toString()} 
-                    className="p-0 text-center w-[90px] border-l font-semibold"
+                    className="p-0 text-center w-[60px] border-l font-semibold relative"
                   >
-                    <div className="flex flex-col items-center text-xs py-2 px-2">
-                      <span className="font-medium leading-tight">{weekLabel}</span>
+                    <div className="h-16 flex items-center justify-center">
+                      <div 
+                        className="transform -rotate-90 whitespace-nowrap text-xs font-medium"
+                        style={{ transformOrigin: 'center' }}
+                      >
+                        {weekLabel}
+                      </div>
                     </div>
                   </TableHead>
                 );
@@ -188,9 +192,9 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
           </TableHeader>
           <TableBody>
             {sortedMembers.map((member, rowIndex) => {
-              const monthlyTotal = getMonthlyTotal(member.id);
-              const monthlyCapacity = (member.weekly_capacity || 40) * weeksInMonth.length;
-              const monthlyAvailable = Math.max(0, monthlyCapacity - monthlyTotal.total);
+              const twelveWeekTotal = get12WeekTotal(member.id);
+              const twelveWeekCapacity = (member.weekly_capacity || 40) * 12;
+              const twelveWeekAvailable = Math.max(0, twelveWeekCapacity - twelveWeekTotal.total);
               
               return (
                 <TableRow key={member.id} className="hover:bg-muted/30">
@@ -203,7 +207,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                       <span className="text-xs text-muted-foreground">{member.job_title}</span>
                     </div>
                   </TableCell>
-                  {weeksInMonth.map(weekStart => {
+                  {weeks.map(weekStart => {
                     const weeklyBreakdown = getWeeklyBreakdown(member.id, weekStart);
                     const cellData = getEnhancedCellData(weeklyBreakdown, member);
                     const hoverData = formatBreakdownHover(weeklyBreakdown, member);
@@ -213,17 +217,21 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                       <HoverCard key={`${member.id}-${weekStart.toString()}`}>
                         <HoverCardTrigger asChild>
                           <TableCell 
-                            className={`p-1 text-center cursor-help border-l relative ${cellData.bgColor}`}
+                            className={`p-1 text-center cursor-help border-l relative h-16 w-[60px] ${cellData.bgColor}`}
                           >
-                            <div className="flex flex-col items-center space-y-1">
-                              <div className={`flex items-center gap-1 text-sm font-medium ${cellData.textColor}`}>
-                                {getStatusIcon(cellData.status)}
-                                <span>{cellData.displayText}</span>
+                            <div className="flex flex-col items-center justify-center h-full space-y-1">
+                              <div className={`flex items-center justify-center text-xs font-medium ${cellData.textColor}`}>
+                                {cellData.utilization > 0 && (
+                                  <>
+                                    {getStatusIcon(cellData.status)}
+                                    <span className="ml-1">{cellData.utilization}%</span>
+                                  </>
+                                )}
                               </div>
                               {cellData.utilization > 0 && (
                                 <Progress 
                                   value={cellData.progressValue} 
-                                  className="h-1 w-full"
+                                  className="h-1 w-8"
                                   indicatorClassName={
                                     cellData.status === 'low' ? 'bg-red-500' :
                                     cellData.status === 'good' ? 'bg-blue-500' :
@@ -295,53 +303,53 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                   <TableCell className="p-2 text-center border-l">
                     <div className="flex flex-col items-center">
                       <span className="text-sm font-medium text-green-600">
-                        {Math.round(monthlyAvailable * 10) / 10}h
+                        {Math.round(twelveWeekAvailable * 10) / 10}h
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        / {monthlyCapacity}h
+                        / {twelveWeekCapacity}h
                       </span>
                     </div>
                   </TableCell>
                   <HoverCard>
                     <HoverCardTrigger asChild>
                       <TableCell className="p-2 text-center border-l font-medium cursor-help">
-                        {Math.round(monthlyTotal.total * 10) / 10}h
+                        {Math.round(twelveWeekTotal.total * 10) / 10}h
                       </TableCell>
                     </HoverCardTrigger>
                     <HoverCardContent side="top" className="w-64 p-0">
                       <div className="bg-white rounded-lg border shadow-lg p-4">
                         <div className="text-sm font-medium text-gray-900 mb-2">
-                          Monthly Total
+                          12-Week Total
                         </div>
                         <div className="space-y-1">
-                          {monthlyTotal.projectHours > 0 && (
+                          {twelveWeekTotal.projectHours > 0 && (
                             <div className="flex justify-between items-center text-xs">
                               <span className="text-blue-600">Project Hours:</span>
-                              <span className="font-medium">{Math.round(monthlyTotal.projectHours * 10) / 10}h</span>
+                              <span className="font-medium">{Math.round(twelveWeekTotal.projectHours * 10) / 10}h</span>
                             </div>
                           )}
-                          {monthlyTotal.annualLeave > 0 && (
+                          {twelveWeekTotal.annualLeave > 0 && (
                             <div className="flex justify-between items-center text-xs">
                               <span className="text-orange-600">Annual Leave:</span>
-                              <span className="font-medium">{Math.round(monthlyTotal.annualLeave * 10) / 10}h</span>
+                              <span className="font-medium">{Math.round(twelveWeekTotal.annualLeave * 10) / 10}h</span>
                             </div>
                           )}
-                          {monthlyTotal.officeHolidays > 0 && (
+                          {twelveWeekTotal.officeHolidays > 0 && (
                             <div className="flex justify-between items-center text-xs">
                               <span className="text-purple-600">Holidays:</span>
-                              <span className="font-medium">{Math.round(monthlyTotal.officeHolidays * 10) / 10}h</span>
+                              <span className="font-medium">{Math.round(twelveWeekTotal.officeHolidays * 10) / 10}h</span>
                             </div>
                           )}
-                          {monthlyTotal.otherLeave > 0 && (
+                          {twelveWeekTotal.otherLeave > 0 && (
                             <div className="flex justify-between items-center text-xs">
                               <span className="text-gray-600">Other Leave:</span>
-                              <span className="font-medium">{Math.round(monthlyTotal.otherLeave * 10) / 10}h</span>
+                              <span className="font-medium">{Math.round(twelveWeekTotal.otherLeave * 10) / 10}h</span>
                             </div>
                           )}
                           <div className="border-t pt-2">
                             <div className="flex justify-between items-center text-xs">
                               <span className="text-gray-900 font-medium">Total:</span>
-              <span className="font-semibold">{Math.round(monthlyTotal.total * 10) / 10}h</span>
+                              <span className="font-semibold">{Math.round(twelveWeekTotal.total * 10) / 10}h</span>
                             </div>
                           </div>
                         </div>

@@ -8,14 +8,17 @@ import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
 import { useTeamFilters } from '@/hooks/useTeamFilters';
 import { TeamWorkloadContent } from '@/components/workload/TeamWorkloadContent';
+import { startOfWeek, format, addWeeks, subWeeks } from 'date-fns';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
 const HEADER_HEIGHT = 56;
 
 const TeamWorkload = () => {
-  // State for selected month
-  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  // State for selected week (starting Monday)
+  const [selectedWeek, setSelectedWeek] = useState<Date>(
+    startOfWeek(new Date(), { weekStartsOn: 1 })
+  );
   
   // Fetch team members data
   const { teamMembers, isLoading: isLoadingTeamMembers } = useTeamMembersData(true);
@@ -43,10 +46,21 @@ const TeamWorkload = () => {
     clearFilters
   } = useTeamFilters(allMembers);
   
-  // Handle month change
-  const handleMonthChange = (newMonth: Date) => {
-    setSelectedMonth(newMonth);
+  // Handle week navigation
+  const handleWeekChange = (newWeek: Date) => {
+    setSelectedWeek(startOfWeek(newWeek, { weekStartsOn: 1 }));
   };
+
+  const handlePreviousWeek = () => {
+    setSelectedWeek(prev => subWeeks(prev, 1));
+  };
+
+  const handleNextWeek = () => {
+    setSelectedWeek(prev => addWeeks(prev, 1));
+  };
+
+  // Format week label
+  const weekLabel = `Week of ${format(selectedWeek, 'MMMM d, yyyy')}`;
 
   const isLoading = isLoadingTeamMembers;
 
@@ -61,8 +75,8 @@ const TeamWorkload = () => {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <TeamWorkloadContent
-              selectedMonth={selectedMonth}
-              onMonthChange={handleMonthChange}
+              selectedWeek={selectedWeek}
+              onWeekChange={handleWeekChange}
               isLoading={isLoading}
               filteredMembers={filteredMembers}
               departments={departments}
@@ -74,6 +88,9 @@ const TeamWorkload = () => {
               setFilterValue={setFilterValue}
               setSearchQuery={setSearchQuery}
               clearFilters={clearFilters}
+              weekLabel={weekLabel}
+              onPreviousWeek={handlePreviousWeek}
+              onNextWeek={handleNextWeek}
             />
           </div>
         </div>

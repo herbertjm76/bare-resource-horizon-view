@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MonthSelector } from '@/components/annual-leave/MonthSelector';
+import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { TeamAnnualLeaveFilters } from '@/components/annual-leave/TeamAnnualLeaveFilters';
 import { WorkloadCalendar } from '@/components/workload/WorkloadCalendar';
 import { WorkloadSummary } from '@/components/workload/WorkloadSummary';
@@ -9,8 +9,8 @@ import { TeamMember } from '@/components/dashboard/types';
 import { useWorkloadData, WorkloadBreakdown } from '@/components/workload/hooks/useWorkloadData';
 
 interface TeamWorkloadContentProps {
-  selectedMonth: Date;
-  onMonthChange: (month: Date) => void;
+  selectedWeek: Date;
+  onWeekChange: (week: Date) => void;
   isLoading: boolean;
   filteredMembers: TeamMember[];
   departments: string[];
@@ -22,11 +22,14 @@ interface TeamWorkloadContentProps {
   setFilterValue: (value: string) => void;
   setSearchQuery: (query: string) => void;
   clearFilters: () => void;
+  weekLabel: string;
+  onPreviousWeek: () => void;
+  onNextWeek: () => void;
 }
 
 export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
-  selectedMonth,
-  onMonthChange,
+  selectedWeek,
+  onWeekChange,
   isLoading,
   filteredMembers,
   departments,
@@ -37,18 +40,21 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   setActiveFilter,
   setFilterValue,
   setSearchQuery,
-  clearFilters
+  clearFilters,
+  weekLabel,
+  onPreviousWeek,
+  onNextWeek
 }) => {
-  // Use the enhanced workload data hook
-  const { workloadData, isLoadingWorkload } = useWorkloadData(selectedMonth, filteredMembers);
+  // Use the enhanced workload data hook with the selected week
+  const { workloadData, isLoadingWorkload } = useWorkloadData(selectedWeek, filteredMembers);
 
   return (
-    <div className="mx-auto space-y-6">
+    <div className="mx-auto space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Workload</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Capacity planning and utilization overview for strategic decision making
+            12-week capacity planning and utilization overview for strategic decision making
           </p>
         </div>
       </div>
@@ -58,15 +64,17 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
         <WorkloadSummary 
           members={filteredMembers}
           workloadData={workloadData}
-          selectedMonth={selectedMonth}
+          selectedWeek={selectedWeek}
         />
       )}
       
       <div className="flex flex-row justify-between items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
-          <MonthSelector 
-            selectedMonth={selectedMonth} 
-            onMonthChange={onMonthChange} 
+          <WeekSelector 
+            selectedWeek={selectedWeek}
+            onPreviousWeek={onPreviousWeek}
+            onNextWeek={onNextWeek}
+            weekLabel={weekLabel}
           />
           
           <TeamAnnualLeaveFilters 
@@ -94,7 +102,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
         ) : (
           <WorkloadCalendar 
             members={filteredMembers}
-            selectedMonth={selectedMonth}
+            selectedWeek={selectedWeek}
             workloadData={workloadData}
           />
         )}

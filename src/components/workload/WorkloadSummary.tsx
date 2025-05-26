@@ -6,19 +6,20 @@ import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, TrendingUp, TrendingDown, Users, Calendar } from 'lucide-react';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/useWorkloadData';
+import { addWeeks, format } from 'date-fns';
 
 interface WorkloadSummaryProps {
   members: TeamMember[];
   workloadData: Record<string, Record<string, WorkloadBreakdown>>;
-  selectedMonth: Date;
+  selectedWeek: Date;
 }
 
 export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   members,
   workloadData,
-  selectedMonth
+  selectedWeek
 }) => {
-  // Calculate overall team utilization
+  // Calculate overall team utilization for the next 12 weeks
   const calculateOverallUtilization = () => {
     if (members.length === 0) return 0;
     
@@ -26,8 +27,8 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     let totalAllocated = 0;
     
     members.forEach(member => {
-      const memberCapacity = (member.weekly_capacity || 40) * 4; // Monthly capacity
-      totalCapacity += memberCapacity;
+      const weeklyCapacity = member.weekly_capacity || 40;
+      totalCapacity += weeklyCapacity * 12; // 12 weeks
       
       const memberData = workloadData[member.id] || {};
       const memberTotal = Object.values(memberData).reduce((sum, breakdown) => sum + breakdown.total, 0);
@@ -37,15 +38,17 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     return totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
   };
 
-  // Calculate available capacity
+  // Calculate available capacity for the next 12 weeks
   const calculateAvailableCapacity = () => {
     let totalAvailable = 0;
     
     members.forEach(member => {
-      const memberCapacity = (member.weekly_capacity || 40) * 4; // Monthly capacity
+      const weeklyCapacity = member.weekly_capacity || 40;
+      const totalCapacity = weeklyCapacity * 12; // 12 weeks
+      
       const memberData = workloadData[member.id] || {};
       const memberAllocated = Object.values(memberData).reduce((sum, breakdown) => sum + breakdown.total, 0);
-      totalAvailable += Math.max(0, memberCapacity - memberAllocated);
+      totalAvailable += Math.max(0, totalCapacity - memberAllocated);
     });
     
     return Math.round(totalAvailable);
@@ -57,7 +60,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
       return { status: 'urgent', message: 'Urgent hiring needed', color: 'destructive' };
     } else if (utilization >= 80) {
       return { status: 'consider', message: 'Consider hiring soon', color: 'secondary' };
-    } else if (availableHours > 320) {
+    } else if (availableHours > 960) { // 3 people * 40 hours * 8 weeks
       return { status: 'capacity', message: 'Good capacity available', color: 'default' };
     } else {
       return { status: 'monitor', message: 'Monitor capacity', color: 'default' };
@@ -69,11 +72,11 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   const availableCapacity = calculateAvailableCapacity();
   const hiringRec = getHiringRecommendation(overallUtilization, availableCapacity);
   
-  // Count underutilized and overallocated members
+  // Count underutilized and overallocated members for the period
   const memberStats = members.reduce((stats, member) => {
     const memberData = workloadData[member.id] || {};
     const memberTotal = Object.values(memberData).reduce((sum, breakdown) => sum + breakdown.total, 0);
-    const memberCapacity = (member.weekly_capacity || 40) * 4;
+    const memberCapacity = (member.weekly_capacity || 40) * 12; // 12 weeks
     const utilization = memberCapacity > 0 ? (memberTotal / memberCapacity) * 100 : 0;
     
     if (utilization < 50) stats.underutilized++;
@@ -84,7 +87,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   }, { underutilized: 0, overallocated: 0, optimal: 0 });
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
       <Card>
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
@@ -116,7 +119,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-4">
-            {availableCapacity > 160 ? 'Good capacity for new projects' : 'Limited capacity available'}
+            Next 12 weeks capacity
           </p>
         </CardContent>
       </Card>
@@ -169,7 +172,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Based on current utilization
+            Based on 12-week projection
           </p>
         </CardContent>
       </Card>

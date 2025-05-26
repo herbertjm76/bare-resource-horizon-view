@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Filter, Activity, Users } from 'lucide-react';
+import { Filter, Activity, Users, Calendar, Clock, Target, AlertTriangle, TrendingUp } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -16,6 +16,7 @@ import { Donut } from './Donut';
 import { HolidaysList } from './HolidaysList';
 import { StaffAvailability } from './StaffAvailability';
 import { HerbieChat } from './HerbieChat';
+import { SummaryDashboard } from './SummaryDashboard';
 
 const mockData = {
   activeResources: 96,
@@ -64,6 +65,40 @@ export const DashboardMetrics = () => {
     year: 'numeric' 
   }).toUpperCase();
 
+  // Summary metrics for consolidated dashboard
+  const summaryMetrics = [
+    {
+      title: 'Team Utilization',
+      value: '81%',
+      subtitle: 'Current 7-day average',
+      progress: 81,
+      icon: <TrendingUp className="h-4 w-4" />,
+      trend: 'up' as const,
+      status: 'good' as const
+    },
+    {
+      title: 'Available Capacity',
+      value: '2,340h',
+      subtitle: 'Next 12 weeks',
+      icon: <Clock className="h-4 w-4" />,
+      status: 'info' as const
+    },
+    {
+      title: 'Active Projects',
+      value: mockData.activeProjects,
+      subtitle: 'Currently in progress',
+      icon: <Target className="h-4 w-4" />,
+      status: 'good' as const
+    },
+    {
+      title: 'Hiring Status',
+      value: 'Monitor',
+      subtitle: 'Based on capacity trends',
+      icon: <AlertTriangle className="h-4 w-4" />,
+      status: 'warning' as const
+    }
+  ];
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
@@ -90,6 +125,13 @@ export const DashboardMetrics = () => {
           </Select>
         </div>
       </div>
+
+      {/* Consolidated Summary Dashboard */}
+      <SummaryDashboard 
+        title="Strategic Overview"
+        metrics={summaryMetrics}
+        className="mb-6"
+      />
 
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-3">
@@ -157,7 +199,7 @@ export const DashboardMetrics = () => {
 
         <div className="col-span-3">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-full">
-            <CardContent className="p-6 h-full">
+            <CardContent className="p-6">
               <HerbieChat />
             </CardContent>
           </Card>
