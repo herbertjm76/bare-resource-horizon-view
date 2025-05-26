@@ -24,7 +24,7 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
     <div className="mb-4 relative">
       {/* Glass morphism background container */}
       <div className="relative overflow-hidden rounded-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(45deg, #895CF7 0%, #5669F7 55%, #E64FC4 100%)' }} />
         <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
         
         {/* Top highlight gradient */}
