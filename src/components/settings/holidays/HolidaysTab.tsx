@@ -9,8 +9,34 @@ import { HolidayDialog } from "./HolidayDialog";
 import { fetchHolidays, createHoliday, updateHoliday, deleteHolidays } from "./HolidayService";
 import { Holiday, HolidayFormValues } from "./types";
 
+// Helper function to consolidate holidays with same name and date
+const consolidateHolidays = (holidays: Holiday[]): Holiday[] => {
+  const holidayMap = new Map<string, Holiday>();
+  
+  holidays.forEach(holiday => {
+    const key = `${holiday.name}-${holiday.date.toISOString().split('T')[0]}`;
+    
+    if (holidayMap.has(key)) {
+      // Merge offices for holidays with same name and date
+      const existing = holidayMap.get(key)!;
+      const combinedOffices = [...new Set([...existing.offices, ...holiday.offices])];
+      holidayMap.set(key, {
+        ...existing,
+        offices: combinedOffices
+      });
+    } else {
+      holidayMap.set(key, { ...holiday });
+    }
+  });
+  
+  return Array.from(holidayMap.values()).sort((a, b) => 
+    a.date.getTime() - b.date.getTime()
+  );
+};
+
 export const HolidaysTab = () => {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const [consolidatedHolidays, setConsolidatedHolidays] = useState<Holiday[]>([]);
   const [open, setOpen] = useState(false);
   const [editingHoliday, setEditingHoliday] = useState<Holiday | null>(null);
   const [editMode, setEditMode] = useState(false);
@@ -30,6 +56,12 @@ export const HolidaysTab = () => {
 
     loadHolidays();
   }, [company]);
+
+  // Consolidate holidays whenever the holidays array changes
+  useEffect(() => {
+    const consolidated = consolidateHolidays(holidays);
+    setConsolidatedHolidays(consolidated);
+  }, [holidays]);
 
   const onOpenChange = (open: boolean) => {
     setOpen(open);
@@ -63,7 +95,32 @@ export const HolidaysTab = () => {
   };
 
   const handleSelect = (id: string) => {
-    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    // When selecting a consolidated holiday, we need to select all related database entries
+    const selectedHoliday = consolidatedHolidays.find(h => h.id === id);
+    if (!selectedHoliday) return;
+    
+    const holidayName = selectedHoliday.name;
+    const holidayDate = selectedHoliday.date.toISOString().split('T')[0];
+    
+    // Find all related holiday IDs in the original holidays array
+    const relatedHolidayIds = holidays
+      .filter(h => 
+        h.name === holidayName && 
+        h.date.toISOString().split('T')[0] === holidayDate
+      )
+      .map(h => h.id);
+    
+    setSelected(prev => {
+      const isCurrentlySelected = relatedHolidayIds.every(relatedId => prev.includes(relatedId));
+      
+      if (isCurrentlySelected) {
+        // Remove all related IDs
+        return prev.filter(selectedId => !relatedHolidayIds.includes(selectedId));
+      } else {
+        // Add all related IDs
+        return [...new Set([...prev, ...relatedHolidayIds])];
+      }
+    });
   };
 
   const handleBulkDelete = async () => {
@@ -145,7 +202,7 @@ export const HolidaysTab = () => {
           )}
           
           <HolidayList 
-            holidays={holidays}
+            holidays={consolidatedHolidays}
             selected={selected}
             editMode={editMode}
             onEdit={handleEdit}

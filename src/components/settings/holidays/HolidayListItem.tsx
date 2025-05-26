@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { Edit } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Holiday } from './types';
-import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+import { useOfficeSettings } from '@/context/officeSettings';
 
 interface HolidayListItemProps {
   holiday: Holiday;
@@ -25,15 +25,17 @@ export const HolidayListItem: React.FC<HolidayListItemProps> = ({
   
   const getLocationNames = () => {
     return holiday.offices
-      .map(id => locations.find(o => o.id === id)?.city)
+      .map(id => {
+        const location = locations.find(o => o.id === id);
+        return location ? `${location.emoji} ${location.city}` : id; // Fallback to ID if location not found
+      })
       .filter(Boolean)
       .join(", ");
   };
   
   return (
     <div 
-      className={`flex items-center justify-between p-3 border rounded-md ${editMode && "ring-2"}`}
-      style={editMode && isSelected ? { borderColor: "#dc2626", background: "#fee2e2" } : {}}
+      className={`flex items-center justify-between p-3 border rounded-md ${editMode && isSelected ? "ring-2 border-red-600 bg-red-50" : ""}`}
     >
       <div>
         <div className="font-medium">{holiday.name}</div>
