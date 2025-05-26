@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { SummaryDashboard } from './SummaryDashboard';
-import { Users, Building2, Shield, UserCheck, UserX, Calendar } from 'lucide-react';
+import { Users, Building2, MapPin } from 'lucide-react';
 import { TeamMember } from './types';
 
 interface TeamMembersSummaryProps {
@@ -11,79 +11,84 @@ interface TeamMembersSummaryProps {
 export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
   teamMembers
 }) => {
-  // Calculate department distribution
-  const departmentStats = teamMembers.reduce((acc, member) => {
-    if ('isPending' in member && member.isPending) return acc; // Skip pending members for department stats
-    
+  // Calculate active and preregistered members
+  const activeMembers = teamMembers.filter(member => !('isPending' in member && member.isPending));
+  const preRegisteredMembers = teamMembers.filter(member => 'isPending' in member && member.isPending);
+  
+  // Calculate department distribution for active members only
+  const departmentStats = activeMembers.reduce((acc, member) => {
     const department = (member as any).department || 'Unassigned';
-    acc[department] = (acc[department] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  // Calculate role distribution
-  const roleStats = teamMembers.reduce((acc, member) => {
-    if ('isPending' in member && member.isPending) {
-      acc['Pending'] = (acc['Pending'] || 0) + 1;
+    const normalizedDept = department.toLowerCase();
+    
+    if (normalizedDept.includes('architecture')) {
+      acc['Architecture'] = (acc['Architecture'] || 0) + 1;
+    } else if (normalizedDept.includes('landscape')) {
+      acc['Landscape'] = (acc['Landscape'] || 0) + 1;
     } else {
-      const role = (member as any).role || 'member';
-      const roleName = role.charAt(0).toUpperCase() + role.slice(1);
-      acc[roleName] = (acc[roleName] || 0) + 1;
+      acc['Unassigned'] = (acc['Unassigned'] || 0) + 1;
     }
     return acc;
   }, {} as Record<string, number>);
 
-  // Calculate status breakdown
-  const activeMembers = teamMembers.filter(member => !('isPending' in member && member.isPending));
-  const pendingMembers = teamMembers.filter(member => 'isPending' in member && member.isPending);
+  // Calculate location distribution with emojis
+  const locationStats = activeMembers.reduce((acc, member) => {
+    const location = (member as any).location || 'Unknown';
+    acc[location] = (acc[location] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
-  // Calculate capacity metrics
-  const totalCapacity = activeMembers.reduce((sum, member) => {
-    const capacity = (member as any).weekly_capacity || 40;
-    return sum + capacity;
-  }, 0);
+  // Get location emoji mapping
+  const getLocationEmoji = (location: string) => {
+    const emojiMap: Record<string, string> = {
+      'US': '🇺🇸',
+      'UK': '🇬🇧', 
+      'CA': '🇨🇦',
+      'AU': '🇦🇺',
+      'DE': '🇩🇪',
+      'FR': '🇫🇷',
+      'BR': '🇧🇷',
+      'IN': '🇮🇳',
+      'JP': '🇯🇵',
+      'CN': '🇨🇳',
+      'Unknown': '🌍'
+    };
+    return emojiMap[location] || '🌍';
+  };
 
-  const averageCapacity = activeMembers.length > 0 ? Math.round(totalCapacity / activeMembers.length) : 0;
-
-  // Get top department
-  const topDepartment = Object.entries(departmentStats).reduce((max, [dept, count]) => 
-    count > (max.count || 0) ? { name: dept, count } : max, 
-    { name: 'None', count: 0 }
+  // Get most common location
+  const topLocation = Object.entries(locationStats).reduce((max, [loc, count]) => 
+    count > (max.count || 0) ? { location: loc, count } : max, 
+    { location: 'Unknown', count: 0 }
   );
 
-  // Get admin count
-  const adminCount = Object.entries(roleStats).reduce((sum, [role, count]) => 
-    ['Admin', 'Owner'].includes(role) ? sum + count : sum, 0
-  );
+  // Get department summary
+  const departmentSummary = Object.entries(departmentStats)
+    .filter(([_, count]) => count > 0)
+    .map(([dept, count]) => `${dept} (${count})`)
+    .join(', ') || 'No departments assigned';
 
   const summaryMetrics = [
     {
       title: 'Total Members',
-      value: teamMembers.length,
-      subtitle: `${activeMembers.length} active, ${pendingMembers.length} pending`,
-      progress: activeMembers.length > 0 ? Math.round((activeMembers.length / teamMembers.length) * 100) : 0,
+      value: activeMembers.length + preRegisteredMembers.length,
+      subtitle: `${activeMembers.length} active, ${preRegisteredMembers.length} preregistered`,
+      progress: activeMembers.length > 0 ? Math.round((activeMembers.length / (activeMembers.length + preRegisteredMembers.length)) * 100) : 0,
       icon: <Users className="h-4 w-4" />,
-      status: teamMembers.length > 0 ? 'good' : 'warning' as const
+      status: 'good' as const
     },
     {
       title: 'Departments',
       value: Object.keys(departmentStats).length,
-      subtitle: topDepartment.count > 0 ? `${topDepartment.name} (${topDepartment.count})` : 'No departments',
+      subtitle: departmentSummary,
       icon: <Building2 className="h-4 w-4" />,
-      status: Object.keys(departmentStats).length > 1 ? 'good' : 'info' as const
+      status: Object.keys(departmentStats).length > 1 ? 'good' as const : 'info' as const
     },
     {
-      title: 'Admin Users',
-      value: adminCount,
-      subtitle: `${Math.round((adminCount / Math.max(activeMembers.length, 1)) * 100)}% of active members`,
-      icon: <Shield className="h-4 w-4" />,
-      status: adminCount > 0 ? 'good' : 'warning' as const
-    },
-    {
-      title: 'Team Capacity',
-      value: `${totalCapacity}h`,
-      subtitle: `${averageCapacity}h average per member`,
-      icon: <Calendar className="h-4 w-4" />,
-      status: totalCapacity > 0 ? 'good' : 'info' as const
+      title: 'Locations',
+      value: `${getLocationEmoji(topLocation.location)} ${Object.keys(locationStats).length}`,
+      subtitle: topLocation.count > 0 ? `${topLocation.location} (${topLocation.count} members)` : 'No locations',
+      icon: <MapPin className="h-4 w-4" />,
+      status: Object.keys(locationStats).length > 0 ? 'good' as const : 'info' as const
     }
   ];
 
