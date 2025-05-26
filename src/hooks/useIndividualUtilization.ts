@@ -90,7 +90,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
               
               const weekHours = weekAllocations.reduce((sum, allocation) => {
                 console.log(`  Week ${weekKey}: ${allocation.hours}h (project: ${allocation.project_id})`);
-                return sum + (allocation.hours || 0);
+                return sum + (Number(allocation.hours) || 0);
               }, 0);
               
               totalAllocatedHours += weekHours;
@@ -102,7 +102,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
             
             console.log(`  ${periodName} - Total hours: ${totalAllocatedHours}, Capacity: ${totalCapacity}, Utilization: ${utilizationPercentage}%`);
             
-            return utilizationPercentage;
+            return Math.min(utilizationPercentage, 100); // Cap at 100%
           };
 
           utilizationMap[memberId] = {
