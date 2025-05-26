@@ -39,7 +39,26 @@ export const HolidaysTab = () => {
   };
 
   const handleEdit = (holiday: Holiday) => {
-    setEditingHoliday(holiday);
+    // When editing, we need to find all database entries for this holiday
+    // and combine their offices into one Holiday object for the form
+    const holidayName = holiday.name;
+    const holidayDate = holiday.date.toISOString().split('T')[0];
+    
+    // Find all holidays with the same name and date (these represent the same holiday across multiple offices)
+    const relatedHolidays = holidays.filter(h => 
+      h.name === holidayName && 
+      h.date.toISOString().split('T')[0] === holidayDate
+    );
+    
+    // Combine all office IDs
+    const allOffices = relatedHolidays.flatMap(h => h.offices);
+    
+    const combinedHoliday: Holiday = {
+      ...holiday,
+      offices: allOffices
+    };
+    
+    setEditingHoliday(combinedHoliday);
     setOpen(true);
   };
 
@@ -73,25 +92,18 @@ export const HolidaysTab = () => {
       const success = await updateHoliday(editingHoliday.id, values);
       
       if (success) {
-        // Update local state
-        setHolidays(prev => prev.map(holiday => 
-          holiday.id === editingHoliday.id
-            ? { 
-                ...holiday, 
-                name: values.name,
-                date: values.date,
-                offices: values.offices
-              }
-            : holiday
-        ));
+        // Reload holidays from the database to get the updated data
+        const updatedHolidays = await fetchHolidays(company.id);
+        setHolidays(updatedHolidays);
       }
     } else {
       // Create new holiday
       const newHoliday = await createHoliday(values, company.id);
       
       if (newHoliday) {
-        // Update local state
-        setHolidays(prev => [...prev, newHoliday]);
+        // Reload holidays from the database to get the updated data
+        const updatedHolidays = await fetchHolidays(company.id);
+        setHolidays(updatedHolidays);
       }
     }
     
@@ -116,7 +128,7 @@ export const HolidaysTab = () => {
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground mb-4">
-            Manage office holidays and closures.
+            Manage office holidays and closures. You can assign holidays to multiple office locations.
           </div>
           {editMode && (
             <div className="flex items-center gap-2 mb-2">
