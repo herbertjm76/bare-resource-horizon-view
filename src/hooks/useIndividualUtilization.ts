@@ -17,10 +17,20 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
 
-  const memberIds = useMemo(() => teamMembers.map(member => member.id), [teamMembers]);
+  // Separate active and pre-registered members
+  const { activeMembers, preRegisteredMembers } = useMemo(() => {
+    const active = teamMembers.filter(member => 'company_id' in member && member.company_id);
+    const preRegistered = teamMembers.filter(member => !('company_id' in member) || !member.company_id);
+    
+    console.log('=== MEMBER CATEGORIZATION ===');
+    console.log('Active members:', active.map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}` })));
+    console.log('Pre-registered members:', preRegistered.map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}` })));
+    
+    return { activeMembers: active, preRegisteredMembers: preRegistered };
+  }, [teamMembers]);
 
   useEffect(() => {
-    if (!company?.id || memberIds.length === 0) {
+    if (!company?.id || teamMembers.length === 0) {
       console.log('Individual utilization: No company or members, setting loading to false');
       setIsLoading(false);
       return;
@@ -39,98 +49,175 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
         console.log('Current week start (Monday):', format(currentWeekStart, 'yyyy-MM-dd'));
         console.log('30 days ago week start:', format(thirtyDaysAgo, 'yyyy-MM-dd'));
         console.log('90 days ago week start:', format(ninetyDaysAgo, 'yyyy-MM-dd'));
-        console.log('Team members for utilization:', teamMembers.map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}` })));
-        console.log('Member IDs to query:', memberIds);
         
-        // Fetch allocations for all members for the past 90 days
-        // Include both 'active' and 'pre_registered' resource types
-        const { data: allocations, error } = await supabase
-          .from('project_resource_allocations')
-          .select('resource_id, hours, week_start_date, project_id, resource_type')
-          .eq('company_id', company.id)
-          .in('resource_id', memberIds)
-          .gte('week_start_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
-          .lte('week_start_date', format(currentWeekStart, 'yyyy-MM-dd'));
-
-        if (error) throw error;
-
-        console.log('Individual allocations fetched:', allocations?.length || 0);
-        console.log('Raw allocations data:', allocations);
-        console.log('Allocations by member:', allocations?.reduce((acc, allocation) => {
-          const memberName = teamMembers.find(m => m.id === allocation.resource_id);
-          const key = `${memberName?.first_name || 'Unknown'} ${memberName?.last_name || ''} (${allocation.resource_id})`;
-          if (!acc[key]) acc[key] = [];
-          acc[key].push(allocation);
-          return acc;
-        }, {} as Record<string, any[]>));
-
         const utilizationMap: Record<string, IndividualUtilization> = {};
 
-        // Initialize utilization data for all members
-        memberIds.forEach(memberId => {
-          utilizationMap[memberId] = {
-            memberId,
+        // Initialize utilization data for all members (active and pre-registered)
+        teamMembers.forEach(member => {
+          utilizationMap[member.id] = {
+            memberId: member.id,
             days7: 0,
             days30: 0,
             days90: 0
           };
         });
 
-        // Calculate utilization for each member
-        memberIds.forEach(memberId => {
-          const member = teamMembers.find(m => m.id === memberId);
-          const memberCapacity = member?.weekly_capacity || 40;
+        // Only fetch allocations for active members
+        if (activeMembers.length > 0) {
+          const activeMemberIds = activeMembers.map(member => member.id);
           
-          console.log(`--- Member ${member?.first_name} ${member?.last_name} (${memberId}) (Capacity: ${memberCapacity}h/week) ---`);
-
-          // Get allocations for this specific member
-          const memberAllocations = allocations?.filter(allocation => 
-            allocation.resource_id === memberId
-          ) || [];
+          console.log('Fetching allocations for active member IDs:', activeMemberIds);
           
-          console.log(`Member allocations found: ${memberAllocations.length}`);
+          // Fetch allocations for active members
+          const { data: activeAllocations, error: activeError } = await supabase
+            .from('project_resource_allocations')
+            .select('resource_id, hours, week_start_date, project_id, resource_type')
+            .eq('company_id', company.id)
+            .eq('resource_type', 'active')
+            .in('resource_id', activeMemberIds)
+            .gte('week_start_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
+            .lte('week_start_date', format(currentWeekStart, 'yyyy-MM-dd'));
 
-          // Calculate for different periods
-          const calculatePeriodUtilization = (startDate: Date, periodName: string) => {
-            const weeks = eachWeekOfInterval(
-              { start: startDate, end: currentWeekStart },
-              { weekStartsOn: 1 }
-            );
+          if (activeError) throw activeError;
+
+          console.log('Active allocations fetched:', activeAllocations?.length || 0);
+          console.log('Active allocations data:', activeAllocations);
+
+          // Calculate utilization for active members
+          activeMembers.forEach(member => {
+            const memberCapacity = member.weekly_capacity || 40;
             
-            let totalAllocatedHours = 0;
+            console.log(`--- Active Member ${member.first_name} ${member.last_name} (${member.id}) (Capacity: ${memberCapacity}h/week) ---`);
+
+            // Get allocations for this specific member
+            const memberAllocations = activeAllocations?.filter(allocation => 
+              allocation.resource_id === member.id
+            ) || [];
             
-            weeks.forEach(weekStart => {
-              const weekKey = format(weekStart, 'yyyy-MM-dd');
-              const weekAllocations = memberAllocations.filter(allocation => 
-                allocation.week_start_date === weekKey
+            console.log(`Member allocations found: ${memberAllocations.length}`);
+
+            // Calculate for different periods
+            const calculatePeriodUtilization = (startDate: Date, periodName: string) => {
+              const weeks = eachWeekOfInterval(
+                { start: startDate, end: currentWeekStart },
+                { weekStartsOn: 1 }
               );
               
-              const weekHours = weekAllocations.reduce((sum, allocation) => {
-                console.log(`  Week ${weekKey}: ${allocation.hours}h (project: ${allocation.project_id}, type: ${allocation.resource_type})`);
-                return sum + (Number(allocation.hours) || 0);
-              }, 0);
+              let totalAllocatedHours = 0;
               
-              totalAllocatedHours += weekHours;
-              if (weekHours > 0) {
-                console.log(`  Week ${weekKey} total: ${weekHours}h`);
-              }
-            });
-            
-            const totalCapacity = memberCapacity * weeks.length;
-            const utilizationPercentage = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
-            
-            console.log(`  ${periodName} - Total hours: ${totalAllocatedHours}, Capacity: ${totalCapacity}, Utilization: ${utilizationPercentage}%`);
-            
-            return Math.min(utilizationPercentage, 100); // Cap at 100%
-          };
+              weeks.forEach(weekStart => {
+                const weekKey = format(weekStart, 'yyyy-MM-dd');
+                const weekAllocations = memberAllocations.filter(allocation => 
+                  allocation.week_start_date === weekKey
+                );
+                
+                const weekHours = weekAllocations.reduce((sum, allocation) => {
+                  const hours = Number(allocation.hours) || 0;
+                  console.log(`  Week ${weekKey}: ${hours}h (project: ${allocation.project_id}, type: ${allocation.resource_type})`);
+                  return sum + hours;
+                }, 0);
+                
+                totalAllocatedHours += weekHours;
+                if (weekHours > 0) {
+                  console.log(`  Week ${weekKey} total: ${weekHours}h`);
+                }
+              });
+              
+              const totalCapacity = memberCapacity * weeks.length;
+              const utilizationPercentage = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
+              
+              console.log(`  ${periodName} - Total hours: ${totalAllocatedHours}, Capacity: ${totalCapacity}, Utilization: ${utilizationPercentage}%`);
+              
+              return Math.min(utilizationPercentage, 100); // Cap at 100%
+            };
 
-          utilizationMap[memberId] = {
-            memberId,
-            days7: calculatePeriodUtilization(currentWeekStart, '7-day'),
-            days30: calculatePeriodUtilization(thirtyDaysAgo, '30-day'),
-            days90: calculatePeriodUtilization(ninetyDaysAgo, '90-day')
-          };
-        });
+            utilizationMap[member.id] = {
+              memberId: member.id,
+              days7: calculatePeriodUtilization(currentWeekStart, '7-day'),
+              days30: calculatePeriodUtilization(thirtyDaysAgo, '30-day'),
+              days90: calculatePeriodUtilization(ninetyDaysAgo, '90-day')
+            };
+          });
+        }
+
+        // Fetch allocations for pre-registered members
+        if (preRegisteredMembers.length > 0) {
+          const preRegisteredIds = preRegisteredMembers.map(member => member.id);
+          
+          console.log('Fetching allocations for pre-registered member IDs:', preRegisteredIds);
+          
+          const { data: preRegAllocations, error: preRegError } = await supabase
+            .from('project_resource_allocations')
+            .select('resource_id, hours, week_start_date, project_id, resource_type')
+            .eq('company_id', company.id)
+            .eq('resource_type', 'pre_registered')
+            .in('resource_id', preRegisteredIds)
+            .gte('week_start_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
+            .lte('week_start_date', format(currentWeekStart, 'yyyy-MM-dd'));
+
+          if (preRegError) throw preRegError;
+
+          console.log('Pre-registered allocations fetched:', preRegAllocations?.length || 0);
+          console.log('Pre-registered allocations data:', preRegAllocations);
+
+          // Calculate utilization for pre-registered members
+          preRegisteredMembers.forEach(member => {
+            const memberCapacity = member.weekly_capacity || 40;
+            
+            console.log(`--- Pre-registered Member ${member.first_name} ${member.last_name} (${member.id}) (Capacity: ${memberCapacity}h/week) ---`);
+
+            const memberAllocations = preRegAllocations?.filter(allocation => 
+              allocation.resource_id === member.id
+            ) || [];
+            
+            console.log(`Member allocations found: ${memberAllocations.length}`);
+
+            if (memberAllocations.length > 0) {
+              // Calculate for different periods (same logic as active members)
+              const calculatePeriodUtilization = (startDate: Date, periodName: string) => {
+                const weeks = eachWeekOfInterval(
+                  { start: startDate, end: currentWeekStart },
+                  { weekStartsOn: 1 }
+                );
+                
+                let totalAllocatedHours = 0;
+                
+                weeks.forEach(weekStart => {
+                  const weekKey = format(weekStart, 'yyyy-MM-dd');
+                  const weekAllocations = memberAllocations.filter(allocation => 
+                    allocation.week_start_date === weekKey
+                  );
+                  
+                  const weekHours = weekAllocations.reduce((sum, allocation) => {
+                    const hours = Number(allocation.hours) || 0;
+                    console.log(`  Week ${weekKey}: ${hours}h (project: ${allocation.project_id}, type: ${allocation.resource_type})`);
+                    return sum + hours;
+                  }, 0);
+                  
+                  totalAllocatedHours += weekHours;
+                  if (weekHours > 0) {
+                    console.log(`  Week ${weekKey} total: ${weekHours}h`);
+                  }
+                });
+                
+                const totalCapacity = memberCapacity * weeks.length;
+                const utilizationPercentage = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
+                
+                console.log(`  ${periodName} - Total hours: ${totalAllocatedHours}, Capacity: ${totalCapacity}, Utilization: ${utilizationPercentage}%`);
+                
+                return Math.min(utilizationPercentage, 100); // Cap at 100%
+              };
+
+              utilizationMap[member.id] = {
+                memberId: member.id,
+                days7: calculatePeriodUtilization(currentWeekStart, '7-day'),
+                days30: calculatePeriodUtilization(thirtyDaysAgo, '30-day'),
+                days90: calculatePeriodUtilization(ninetyDaysAgo, '90-day')
+              };
+            }
+            // If no allocations found, utilization remains 0 (already initialized)
+          });
+        }
 
         console.log('Final individual utilizations:', utilizationMap);
         console.log('=== END INDIVIDUAL UTILIZATION DEBUG ===');
@@ -140,8 +227,8 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
         console.error('Error calculating individual utilizations:', error);
         // Initialize with zeros on error
         const errorMap: Record<string, IndividualUtilization> = {};
-        memberIds.forEach(memberId => {
-          errorMap[memberId] = { memberId, days7: 0, days30: 0, days90: 0 };
+        teamMembers.forEach(member => {
+          errorMap[member.id] = { memberId: member.id, days7: 0, days30: 0, days90: 0 };
         });
         setIndividualUtilizations(errorMap);
       } finally {
@@ -150,7 +237,7 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
     };
 
     fetchIndividualUtilizations();
-  }, [company?.id, memberIds, teamMembers]);
+  }, [company?.id, activeMembers, preRegisteredMembers, teamMembers]);
 
   const getIndividualUtilization = (memberId: string): IndividualUtilization => {
     return individualUtilizations[memberId] || { memberId, days7: 0, days30: 0, days90: 0 };

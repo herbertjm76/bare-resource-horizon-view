@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
@@ -27,8 +26,8 @@ export const useDashboardData = () => {
   // Get real utilization data
   const { utilization: utilizationTrends, isLoading: isLoadingUtilization } = useTeamUtilization(allTeamMembers);
   
-  // Get individual utilization data for active members only
-  const { getIndividualUtilization, isLoading: isLoadingIndividualUtilization, individualUtilizations } = useIndividualUtilization(activeMembers || []);
+  // Get individual utilization data for ALL members (active and pre-registered)
+  const { getIndividualUtilization, isLoading: isLoadingIndividualUtilization, individualUtilizations } = useIndividualUtilization(allTeamMembers);
   
   // Calculate real metrics from actual data with memoization
   const metrics = useMemo(() => ({
@@ -46,30 +45,25 @@ export const useDashboardData = () => {
     console.log('Selected time range:', selectedTimeRange);
     
     return allTeamMembers.map((member) => {
-      let utilization = 0;
+      const individualUtil = getIndividualUtilization(member.id);
       
-      // For active members, use real allocation data
-      if ('company_id' in member && member.company_id) {
-        const individualUtil = getIndividualUtilization(member.id);
-        // Use the time range selected by the user, defaulting to 30-day
-        switch (selectedTimeRange) {
-          case 'week':
-            utilization = individualUtil.days7;
-            break;
-          case '3months':
-            utilization = individualUtil.days90;
-            break;
-          case 'month':
-          default:
-            utilization = individualUtil.days30;
-            break;
-        }
-        console.log(`Active member ${member.first_name} ${member.last_name}: ${utilization}% utilization (${selectedTimeRange})`);
-      } else {
-        // For pre-registered members (invites), utilization is 0
-        utilization = 0;
-        console.log(`Pre-registered member ${member.first_name} ${member.last_name}: 0% utilization (not yet active)`);
+      // Use the time range selected by the user, defaulting to 30-day
+      let utilization = 0;
+      switch (selectedTimeRange) {
+        case 'week':
+          utilization = individualUtil.days7;
+          break;
+        case '3months':
+          utilization = individualUtil.days90;
+          break;
+        case 'month':
+        default:
+          utilization = individualUtil.days30;
+          break;
       }
+      
+      const memberType = 'company_id' in member && member.company_id ? 'active' : 'pre-registered';
+      console.log(`${memberType} member ${member.first_name} ${member.last_name}: ${utilization}% utilization (${selectedTimeRange})`);
       
       return {
         first_name: member.first_name || 'Unknown',
