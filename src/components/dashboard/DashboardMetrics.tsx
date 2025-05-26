@@ -67,7 +67,7 @@ export const DashboardMetrics = () => {
       name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Team Member',
       role: member.job_title || 'Team Member',
       availability: utilization,
-      profile_image_url: member.profile_image_url // Include profile image if available
+      avatar_url: member.avatar_url // Use the correct property name from the database
     };
   }) || [];
 

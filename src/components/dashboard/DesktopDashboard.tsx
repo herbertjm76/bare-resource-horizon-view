@@ -46,9 +46,9 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   // Get profile image URL or return default based on gender
   const getProfileImage = (member: any) => {
-    // Check if member has a profile image
-    if (member.profile_image_url) {
-      return member.profile_image_url;
+    // Check if member has an avatar image
+    if (member.avatar_url) {
+      return member.avatar_url;
     }
     
     // Use placeholder images as defaults based on name patterns
