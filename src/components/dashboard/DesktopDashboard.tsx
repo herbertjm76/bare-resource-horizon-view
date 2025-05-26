@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign, Briefcase, Bot, MessageCircle } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { EnhancedInsights } from './EnhancedInsights';
 import { Donut } from './Donut';
 import { HolidayCard } from './HolidayCard';
@@ -36,23 +37,49 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   const [isHerbieOpen, setIsHerbieOpen] = useState(false);
 
   const getUtilizationStatus = (rate: number) => {
-    if (rate > 90) return { color: 'destructive', label: 'Overutilized' };
-    if (rate > 80) return { color: 'default', label: 'High Utilization' };
-    if (rate > 60) return { color: 'secondary', label: 'Healthy' };
-    return { color: 'outline', label: 'Underutilized' };
+    if (rate > 90) return { color: 'destructive', label: 'At Capacity' };
+    if (rate > 65) return { color: 'default', label: 'Optimally Allocated' };
+    return { color: 'outline', label: 'Ready for Projects' };
   };
 
   const utilizationStatus = getUtilizationStatus(utilizationTrends.days7);
 
+  // Get profile image URL or return default based on gender
+  const getProfileImage = (member: any) => {
+    // Check if member has a profile image
+    if (member.profile_image_url) {
+      return member.profile_image_url;
+    }
+    
+    // Use placeholder images as defaults based on name patterns
+    // This is a simple approach - in a real app you'd have gender info or user uploads
+    const firstName = (member.first_name || '').toLowerCase();
+    const isFemale = firstName.includes('melody') || firstName.includes('sarah') || firstName.includes('emma') || firstName.includes('lisa');
+    
+    if (isFemale) {
+      return 'https://images.unsplash.com/photo-1494790108755-2616c86b8e73?w=150&h=150&fit=crop&crop=face';
+    } else {
+      return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face';
+    }
+  };
+
+  // Get initials for avatar fallback
+  const getInitials = (member: any) => {
+    const first = member.first_name || '';
+    const last = member.last_name || '';
+    return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase();
+  };
+
   // Updated staff categorization with better thresholds
-  const overloadedStaff = staffData.filter(member => member.availability > 90);
-  const healthyStaff = staffData.filter(member => member.availability > 65 && member.availability <= 90);
-  const availableStaff = staffData.filter(member => member.availability <= 65);
+  const atCapacityStaff = staffData.filter(member => member.availability > 90);
+  const optimalStaff = staffData.filter(member => member.availability > 65 && member.availability <= 90);
+  const readyStaff = staffData.filter(member => member.availability <= 65);
 
   console.log('Staff categorization:', {
-    overloaded: overloadedStaff,
-    healthy: healthyStaff,
-    available: availableStaff
+    atCapacity: atCapacityStaff,
+    optimal: optimalStaff,
+    ready: readyStaff,
+    allStaff: staffData
   });
 
   return (
@@ -171,17 +198,22 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             <CardContent className="flex-1 overflow-hidden p-0">
               <ScrollArea className="h-full">
                 <div className="space-y-6 px-6 pb-6">
-                  {/* Overloaded Staff (>90%) */}
-                  {overloadedStaff.length > 0 && (
+                  {/* At Capacity Staff (>90%) */}
+                  {atCapacityStaff.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-3">
                         <AlertTriangle className="h-4 w-4 text-red-500" />
-                        <h4 className="font-semibold text-red-700">Overloaded ({overloadedStaff.length})</h4>
+                        <h4 className="font-semibold text-red-700">At Capacity ({atCapacityStaff.length})</h4>
                       </div>
                       <div className="space-y-3">
-                        {overloadedStaff.map((member, index) => (
+                        {atCapacityStaff.map((member, index) => (
                           <div key={index} className="flex items-center gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
-                            <div className="w-8 h-8 rounded-full bg-red-200 flex-shrink-0" />
+                            <Avatar className="w-8 h-8 flex-shrink-0">
+                              <AvatarImage src={getProfileImage(member)} alt={`${member.first_name} ${member.last_name}`} />
+                              <AvatarFallback className="bg-red-200 text-red-800 text-sm">
+                                {getInitials(member)}
+                              </AvatarFallback>
+                            </Avatar>
                             <div className="flex-1">
                               <div className="flex justify-between text-sm mb-1">
                                 <span className="font-medium text-gray-800">
@@ -202,17 +234,22 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                     </div>
                   )}
 
-                  {/* Healthy/Just Right Staff (66-90%) */}
-                  {healthyStaff.length > 0 && (
+                  {/* Optimally Allocated Staff (66-90%) */}
+                  {optimalStaff.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-3">
                         <Target className="h-4 w-4 text-blue-500" />
-                        <h4 className="font-semibold text-blue-700">Just Right ({healthyStaff.length})</h4>
+                        <h4 className="font-semibold text-blue-700">Optimally Allocated ({optimalStaff.length})</h4>
                       </div>
                       <div className="space-y-3">
-                        {healthyStaff.map((member, index) => (
+                        {optimalStaff.map((member, index) => (
                           <div key={index} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                            <div className="w-8 h-8 rounded-full bg-blue-200 flex-shrink-0" />
+                            <Avatar className="w-8 h-8 flex-shrink-0">
+                              <AvatarImage src={getProfileImage(member)} alt={`${member.first_name} ${member.last_name}`} />
+                              <AvatarFallback className="bg-blue-200 text-blue-800 text-sm">
+                                {getInitials(member)}
+                              </AvatarFallback>
+                            </Avatar>
                             <div className="flex-1">
                               <div className="flex justify-between text-sm mb-1">
                                 <span className="font-medium text-gray-800">
@@ -233,22 +270,27 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                     </div>
                   )}
 
-                  {/* Available Staff (≤65%) */}
-                  {availableStaff.length > 0 && (
+                  {/* Ready for Projects Staff (≤65%) */}
+                  {readyStaff.length > 0 && (
                     <div>
                       <div className="flex items-center gap-2 mb-3">
                         <Target className="h-4 w-4 text-green-500" />
                         <h4 className="font-semibold text-green-700">
-                          Available ({availableStaff.length})
+                          Ready for Projects ({readyStaff.length})
                           <span className="text-xs font-normal text-gray-500 ml-1">
-                            for new projects
+                            available for new work
                           </span>
                         </h4>
                       </div>
                       <div className="space-y-3">
-                        {availableStaff.slice(0, 4).map((member, index) => (
+                        {readyStaff.slice(0, 4).map((member, index) => (
                           <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
-                            <div className="w-8 h-8 rounded-full bg-green-200 flex-shrink-0" />
+                            <Avatar className="w-8 h-8 flex-shrink-0">
+                              <AvatarImage src={getProfileImage(member)} alt={`${member.first_name} ${member.last_name}`} />
+                              <AvatarFallback className="bg-green-200 text-green-800 text-sm">
+                                {getInitials(member)}
+                              </AvatarFallback>
+                            </Avatar>
                             <div className="flex-1">
                               <div className="flex justify-between text-sm mb-1">
                                 <span className="font-medium text-gray-800">
@@ -265,9 +307,9 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
                             </div>
                           </div>
                         ))}
-                        {availableStaff.length > 4 && (
+                        {readyStaff.length > 4 && (
                           <p className="text-xs text-gray-500 text-center">
-                            +{availableStaff.length - 4} more available
+                            +{readyStaff.length - 4} more available
                           </p>
                         )}
                       </div>

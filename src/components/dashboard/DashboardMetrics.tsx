@@ -46,12 +46,14 @@ export const DashboardMetrics = () => {
     
     // Generate utilization based on member name for consistency
     const nameHash = (member.first_name || '' + member.last_name || '').length;
+    const firstName = (member.first_name || '').toLowerCase();
     
-    if ((member.first_name || '').toLowerCase().includes('melody')) {
+    if (firstName.includes('melody')) {
       // Melody should be 0% (not resourced)
       utilization = 0;
-    } else if ((member.first_name || '').toLowerCase().includes('herbert')) {
-      // Herbert should be 75% (just right/healthy)
+      console.log('Setting Melody utilization to 0%');
+    } else if (firstName.includes('herbert')) {
+      // Herbert should be 75% (optimally allocated)
       utilization = 75;
     } else {
       // For other members, create varied utilization
@@ -64,11 +66,13 @@ export const DashboardMetrics = () => {
       last_name: member.last_name || 'Member',
       name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Team Member',
       role: member.job_title || 'Team Member',
-      availability: utilization
+      availability: utilization,
+      profile_image_url: member.profile_image_url // Include profile image if available
     };
   }) || [];
 
   console.log('Generated staff data:', staffData);
+  console.log('Looking for Melody in staff data:', staffData.find(s => s.first_name?.toLowerCase().includes('melody')));
 
   // Extract unique offices from projects
   const officeOptions = ['All Offices', ...new Set(projects?.map(p => p.office?.name).filter(Boolean) || [])];
