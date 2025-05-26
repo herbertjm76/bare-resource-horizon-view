@@ -39,6 +39,18 @@ export const DashboardMetrics = () => {
   const activeProjects = projects?.length || 0;
   const activeResources = teamMembers?.length || 0;
 
+  // Add detailed debugging for team members
+  console.log('=== TEAM MEMBERS DEBUG ===');
+  console.log('Raw teamMembers:', teamMembers);
+  console.log('Number of team members:', teamMembers?.length || 0);
+  console.log('Team members details:', teamMembers?.map(member => ({
+    id: member.id,
+    first_name: member.first_name,
+    last_name: member.last_name,
+    email: member.email,
+    avatar_url: member.avatar_url
+  })));
+
   // Staff data based on real team members with more realistic utilization calculations
   const staffData = teamMembers?.map((member, index) => {
     // Create more varied and realistic utilization percentages
@@ -48,6 +60,8 @@ export const DashboardMetrics = () => {
     const nameHash = (member.first_name || '' + member.last_name || '').length;
     const firstName = (member.first_name || '').toLowerCase();
     
+    console.log(`Processing member: ${firstName} ${member.last_name}`);
+    
     if (firstName.includes('melody')) {
       // Melody should be 0% (not resourced)
       utilization = 0;
@@ -55,13 +69,15 @@ export const DashboardMetrics = () => {
     } else if (firstName.includes('herbert')) {
       // Herbert should be 75% (optimally allocated)
       utilization = 75;
+      console.log('Setting Herbert utilization to 75%');
     } else {
       // For other members, create varied utilization
       const baseUtilization = 60 + (nameHash * 3) % 35; // Range from 60-95%
       utilization = Math.min(95, baseUtilization);
+      console.log(`Setting ${firstName} utilization to ${utilization}%`);
     }
     
-    return {
+    const staffMember = {
       first_name: member.first_name || 'Unknown',
       last_name: member.last_name || 'Member',
       name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Team Member',
@@ -69,10 +85,16 @@ export const DashboardMetrics = () => {
       availability: utilization,
       avatar_url: member.avatar_url // Use the correct property name from the database
     };
+    
+    console.log('Created staff member:', staffMember);
+    return staffMember;
   }) || [];
 
   console.log('Generated staff data:', staffData);
+  console.log('Staff data length:', staffData.length);
   console.log('Looking for Melody in staff data:', staffData.find(s => s.first_name?.toLowerCase().includes('melody')));
+  console.log('Staff with 0% utilization:', staffData.filter(s => s.availability === 0));
+  console.log('=== END TEAM MEMBERS DEBUG ===');
 
   // Extract unique offices from projects
   const officeOptions = ['All Offices', ...new Set(projects?.map(p => p.office?.name).filter(Boolean) || [])];
