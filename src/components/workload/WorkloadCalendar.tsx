@@ -1,12 +1,11 @@
+
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { format, addWeeks, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/useWorkloadData';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface WorkloadCalendarProps {
   members: TeamMember[];
@@ -28,14 +27,14 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
 
   // Sort members by name
   const sortedMembers = [...members].sort((a, b) => {
-    const nameA = `${a.first_name || ''} ${a.last_name || ''}`.trim();
-    const nameB = `${b.first_name || ''} ${b.last_name || ''}`.trim();
+    const nameA = `${a.first_name || ''}`.trim();
+    const nameB = `${b.first_name || ''}`.trim();
     return nameA.localeCompare(nameB);
   });
   
-  // Helper to get the name for a member
-  const getMemberName = (member: TeamMember) => {
-    return `${member.first_name || ''} ${member.last_name || ''}`.trim();
+  // Helper to get the first name for a member
+  const getMemberFirstName = (member: TeamMember) => {
+    return `${member.first_name || ''}`.trim();
   };
   
   // Helper to aggregate daily data into weekly totals
@@ -75,7 +74,6 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
         displayText: '',
         bgColor: 'bg-gray-50',
         textColor: 'text-gray-400',
-        progressValue: 0,
         status: 'empty' as const,
         availableHours: member.weekly_capacity || 40
       };
@@ -112,7 +110,6 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
       displayText: utilization.toString(),
       bgColor,
       textColor,
-      progressValue: Math.min(utilization, 100),
       status,
       availableHours
     };
@@ -143,16 +140,6 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
       available: Math.max(0, weeklyCapacity - breakdown.total)
     };
   };
-
-  // Get status icon for trends
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'low': return <TrendingDown className="h-3 w-3" />;
-      case 'high': 
-      case 'over': return <TrendingUp className="h-3 w-3" />;
-      default: return <Minus className="h-3 w-3" />;
-    }
-  };
   
   return (
     <div className="space-y-4">
@@ -162,7 +149,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
             <Table>
               <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow className="border-b-2">
-                  <TableHead className="sticky left-0 bg-background z-10 min-w-[140px] border-r-2 font-semibold">
+                  <TableHead className="sticky left-0 bg-background z-10 min-w-[100px] border-r-2 font-semibold">
                     Team Member
                   </TableHead>
                   {weeks.map(weekStart => {
@@ -204,10 +191,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                         className="whitespace-nowrap font-medium sticky left-0 z-10 p-2 border-r-2" 
                         style={{ backgroundColor: rowIndex % 2 === 0 ? 'white' : 'rgba(0,0,0,0.02)' }}
                       >
-                        <div className="flex flex-col">
-                          <span className="text-sm font-medium">{getMemberName(member)}</span>
-                          <span className="text-xs text-muted-foreground">{member.job_title}</span>
-                        </div>
+                        <span className="text-sm font-medium">{getMemberFirstName(member)}</span>
                       </TableCell>
                       {weeks.map(weekStart => {
                         const weeklyBreakdown = getWeeklyBreakdown(member.id, weekStart);
@@ -221,25 +205,11 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                               <TableCell 
                                 className={`p-1 text-center cursor-help border-l relative h-16 w-[60px] ${cellData.bgColor}`}
                               >
-                                <div className="flex flex-col items-center justify-center h-full space-y-1">
-                                  <div className={`flex items-center justify-center text-xs font-medium ${cellData.textColor}`}>
-                                    {cellData.utilization > 0 && (
-                                      <>
-                                        {getStatusIcon(cellData.status)}
-                                        <span className="ml-1">{cellData.utilization}%</span>
-                                      </>
-                                    )}
-                                  </div>
+                                <div className="flex items-center justify-center h-full">
                                   {cellData.utilization > 0 && (
-                                    <Progress 
-                                      value={cellData.progressValue} 
-                                      className="h-1 w-8"
-                                      indicatorClassName={
-                                        cellData.status === 'low' ? 'bg-red-500' :
-                                        cellData.status === 'good' ? 'bg-blue-500' :
-                                        cellData.status === 'high' ? 'bg-green-500' : 'bg-orange-500'
-                                      }
-                                    />
+                                    <span className={`text-sm font-medium ${cellData.textColor}`}>
+                                      {cellData.utilization}
+                                    </span>
                                   )}
                                 </div>
                               </TableCell>
