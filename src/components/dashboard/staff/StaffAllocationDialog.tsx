@@ -9,7 +9,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Clock, Briefcase, Calendar, User, MapPin, Building } from 'lucide-react';
+import { Clock, Briefcase, Calendar, User } from 'lucide-react';
 import { StaffMember } from './types';
 
 interface StaffAllocationDialogProps {
@@ -37,24 +37,37 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
 }) => {
   if (!member) return null;
 
-  const totalAllocatedHours = allocations.reduce((sum, allocation) => sum + allocation.hours, 0);
+  // Consolidate allocations by project
+  const consolidatedAllocations = allocations.reduce((acc, allocation) => {
+    const key = `${allocation.projectId}-${allocation.projectCode}`;
+    if (acc[key]) {
+      acc[key].hours += allocation.hours;
+    } else {
+      acc[key] = {
+        projectName: allocation.projectName,
+        projectCode: allocation.projectCode,
+        hours: allocation.hours,
+        weekStartDate: allocation.weekStartDate
+      };
+    }
+    return acc;
+  }, {} as Record<string, { projectName: string; projectCode: string; hours: number; weekStartDate: string; }>);
+
+  const consolidatedAllocationsList = Object.values(consolidatedAllocations);
+  const totalAllocatedHours = consolidatedAllocationsList.reduce((sum, allocation) => sum + allocation.hours, 0);
   const utilizationPercentage = weeklyCapacity > 0 ? (totalAllocatedHours / weeklyCapacity) * 100 : 0;
 
   // Get member details - handle both active members and pre-registered invites
   const memberDetails = {
-    id: 'id' in member ? member.id : 'N/A',
     name: member.name,
     role: member.role || 'Team Member',
-    email: 'email' in member ? member.email : 'N/A',
-    department: 'department' in member ? member.department : 'N/A',
-    location: 'location' in member ? member.location : 'N/A',
     weeklyCapacity: 'weekly_capacity' in member ? member.weekly_capacity : weeklyCapacity,
     isPending: 'isPending' in member ? member.isPending : false
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center">
@@ -75,44 +88,6 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Member Information Card */}
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Member Information
-              </h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="space-y-2">
-                  <div>
-                    <span className="text-gray-500">ID:</span>
-                    <span className="ml-2 font-mono text-xs">{memberDetails.id}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Email:</span>
-                    <span className="ml-2">{memberDetails.email}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Building className="h-3 w-3 text-gray-400 mr-1" />
-                    <span className="text-gray-500">Department:</span>
-                    <span className="ml-2">{memberDetails.department}</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <MapPin className="h-3 w-3 text-gray-400 mr-1" />
-                    <span className="text-gray-500">Location:</span>
-                    <span className="ml-2">{memberDetails.location}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Weekly Capacity:</span>
-                    <span className="ml-2 font-medium">{memberDetails.weeklyCapacity}h</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Summary Card */}
           <Card>
             <CardContent className="p-4">
@@ -141,7 +116,7 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
           <div>
             <h3 className="font-semibold mb-3 flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
-              Project Allocations ({allocations.length} projects)
+              Project Allocations ({consolidatedAllocationsList.length} projects)
             </h3>
             
             {isLoading ? (
@@ -161,7 +136,7 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
                   </Card>
                 ))}
               </div>
-            ) : allocations.length === 0 ? (
+            ) : consolidatedAllocationsList.length === 0 ? (
               <Card>
                 <CardContent className="p-4 text-center text-gray-500">
                   <div className="mb-2">No project allocations found for this week</div>
@@ -175,7 +150,7 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
               </Card>
             ) : (
               <div className="space-y-2">
-                {allocations.map((allocation, index) => (
+                {consolidatedAllocationsList.map((allocation, index) => (
                   <Card key={index} className="hover:bg-gray-50">
                     <CardContent className="p-3">
                       <div className="flex justify-between items-start">
@@ -185,9 +160,6 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
                           <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             Week of {new Date(allocation.weekStartDate).toLocaleDateString()}
-                          </div>
-                          <div className="text-xs text-gray-400 font-mono">
-                            Project ID: {allocation.projectId}
                           </div>
                         </div>
                         <Badge variant="secondary" className="ml-2">
