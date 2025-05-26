@@ -12,14 +12,16 @@ interface WorkloadSummaryProps {
   members: TeamMember[];
   workloadData: Record<string, Record<string, WorkloadBreakdown>>;
   selectedWeek: Date;
+  periodToShow?: number;
 }
 
 export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   members,
   workloadData,
-  selectedWeek
+  selectedWeek,
+  periodToShow = 12
 }) => {
-  // Calculate overall team utilization for the next 12 weeks
+  // Calculate overall team utilization for the specified period
   const calculateOverallUtilization = () => {
     if (members.length === 0) return 0;
     
@@ -28,7 +30,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     
     members.forEach(member => {
       const weeklyCapacity = member.weekly_capacity || 40;
-      totalCapacity += weeklyCapacity * 12; // 12 weeks
+      totalCapacity += weeklyCapacity * periodToShow;
       
       const memberData = workloadData[member.id] || {};
       const memberTotal = Object.values(memberData).reduce((sum, breakdown) => sum + breakdown.total, 0);
@@ -38,13 +40,13 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     return totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
   };
 
-  // Calculate available capacity for the next 12 weeks
+  // Calculate available capacity for the specified period
   const calculateAvailableCapacity = () => {
     let totalAvailable = 0;
     
     members.forEach(member => {
       const weeklyCapacity = member.weekly_capacity || 40;
-      const totalCapacity = weeklyCapacity * 12; // 12 weeks
+      const totalCapacity = weeklyCapacity * periodToShow;
       
       const memberData = workloadData[member.id] || {};
       const memberAllocated = Object.values(memberData).reduce((sum, breakdown) => sum + breakdown.total, 0);
@@ -60,7 +62,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
       return { status: 'urgent', message: 'Urgent hiring needed', color: 'destructive' };
     } else if (utilization >= 80) {
       return { status: 'consider', message: 'Consider hiring soon', color: 'secondary' };
-    } else if (availableHours > 960) { // 3 people * 40 hours * 8 weeks
+    } else if (availableHours > (periodToShow * 120)) { // 3 people equivalent capacity
       return { status: 'capacity', message: 'Good capacity available', color: 'default' };
     } else {
       return { status: 'monitor', message: 'Monitor capacity', color: 'default' };
@@ -76,7 +78,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   const memberStats = members.reduce((stats, member) => {
     const memberData = workloadData[member.id] || {};
     const memberTotal = Object.values(memberData).reduce((sum, breakdown) => sum + breakdown.total, 0);
-    const memberCapacity = (member.weekly_capacity || 40) * 12; // 12 weeks
+    const memberCapacity = (member.weekly_capacity || 40) * periodToShow;
     const utilization = memberCapacity > 0 ? (memberTotal / memberCapacity) * 100 : 0;
     
     if (utilization < 50) stats.underutilized++;
@@ -119,7 +121,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-4">
-            Next 12 weeks capacity
+            Next {periodToShow} weeks capacity
           </p>
         </CardContent>
       </Card>
@@ -172,7 +174,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
             </div>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Based on 12-week projection
+            Based on {periodToShow}-week projection
           </p>
         </CardContent>
       </Card>

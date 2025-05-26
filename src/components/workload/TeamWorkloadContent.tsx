@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { TeamAnnualLeaveFilters } from '@/components/annual-leave/TeamAnnualLeaveFilters';
 import { WorkloadCalendar } from '@/components/workload/WorkloadCalendar';
@@ -45,6 +45,9 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   onPreviousWeek,
   onNextWeek
 }) => {
+  // State for period selector
+  const [periodToShow, setPeriodToShow] = useState(12);
+  
   // Use the enhanced workload data hook with the selected week
   const { workloadData, isLoadingWorkload } = useWorkloadData(selectedWeek, filteredMembers);
 
@@ -54,7 +57,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Workload</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            12-week capacity planning and utilization overview for strategic decision making
+            {periodToShow}-week capacity planning and utilization overview for strategic decision making
           </p>
         </div>
       </div>
@@ -65,6 +68,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
           members={filteredMembers}
           workloadData={workloadData}
           selectedWeek={selectedWeek}
+          periodToShow={periodToShow}
         />
       )}
       
@@ -87,6 +91,8 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
             setFilterValue={setFilterValue}
             setSearchQuery={setSearchQuery}
             clearFilters={clearFilters}
+            periodToShow={periodToShow}
+            onPeriodChange={setPeriodToShow}
           />
         </div>
       </div>
@@ -104,6 +110,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
             members={filteredMembers}
             selectedWeek={selectedWeek}
             workloadData={workloadData}
+            periodToShow={periodToShow}
           />
         )}
       </div>

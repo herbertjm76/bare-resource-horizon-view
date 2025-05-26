@@ -6,6 +6,8 @@ import { Users, Building, X, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FilterPopover } from '@/components/filters/FilterPopover';
+import { PeriodSelector } from '@/components/resources/filters/PeriodSelector';
+import { Separator } from '@/components/ui/separator';
 import { TeamMember } from '@/components/dashboard/types';
 
 type FilterType = 'all' | 'department' | 'location';
@@ -20,6 +22,8 @@ interface TeamAnnualLeaveFiltersProps {
   setFilterValue: (value: string) => void;
   setSearchQuery: (query: string) => void;
   clearFilters: () => void;
+  periodToShow?: number;
+  onPeriodChange?: (period: number) => void;
 }
 
 export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
@@ -31,7 +35,9 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
   setActiveFilter,
   setFilterValue,
   setSearchQuery,
-  clearFilters
+  clearFilters,
+  periodToShow = 12,
+  onPeriodChange
 }) => {
   const activeFiltersCount = (activeFilter === 'all' ? 0 : 1) + (searchQuery ? 1 : 0);
 
@@ -51,6 +57,16 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
     return (
       <>
         <div className="space-y-4">
+          {onPeriodChange && (
+            <>
+              <PeriodSelector
+                selectedPeriod={periodToShow}
+                onPeriodChange={onPeriodChange}
+              />
+              <Separator className="my-2" />
+            </>
+          )}
+          
           <div className="space-y-2">
             <label className="text-sm font-medium">Filter Type</label>
             <div className="flex gap-2">
