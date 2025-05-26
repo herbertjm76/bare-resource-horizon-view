@@ -1,35 +1,13 @@
 
 import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useOfficeSettings } from "@/context/officeSettings";
-import { Holiday, HolidayFormValues, holidayFormSchema } from "./types";
+import { Holiday, HolidayFormValues } from "./types";
+import { HolidayForm } from "./HolidayForm";
 
 interface HolidayDialogProps {
   open: boolean;
@@ -46,55 +24,8 @@ export const HolidayDialog: React.FC<HolidayDialogProps> = ({
   editingHoliday,
   loading = false,
 }) => {
-  const { locations } = useOfficeSettings();
-  const [datePopoverOpen, setDatePopoverOpen] = React.useState(false);
-  const [endDatePopoverOpen, setEndDatePopoverOpen] = React.useState(false);
-
-  const form = useForm<HolidayFormValues>({
-    resolver: zodResolver(holidayFormSchema),
-    defaultValues: {
-      name: "",
-      date: new Date(),
-      end_date: undefined,
-      offices: [],
-    },
-  });
-
-  React.useEffect(() => {
-    if (editingHoliday) {
-      form.reset({
-        name: editingHoliday.name,
-        date: editingHoliday.date,
-        end_date: editingHoliday.end_date,
-        offices: editingHoliday.offices,
-      });
-    } else {
-      form.reset({
-        name: "",
-        date: new Date(),
-        end_date: undefined,
-        offices: [],
-      });
-    }
-  }, [editingHoliday, form]);
-
-  const handleSubmit = (values: HolidayFormValues) => {
-    onSubmit(values);
-    form.reset();
-  };
-
-  const handleDateSelect = (date: Date | undefined, field: any) => {
-    if (date) {
-      field.onChange(date);
-      setDatePopoverOpen(false);
-    }
-  };
-
-  const handleEndDateSelect = (date: Date | undefined, field: any) => {
-    if (date) {
-      field.onChange(date);
-      setEndDatePopoverOpen(false);
-    }
+  const handleCancel = () => {
+    onOpenChange(false);
   };
 
   return (
@@ -105,153 +36,12 @@ export const HolidayDialog: React.FC<HolidayDialogProps> = ({
             {editingHoliday ? "Edit Holiday" : "Add Holiday"}
           </DialogTitle>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Holiday Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="e.g., Christmas Day" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Start Date</FormLabel>
-                  <Popover open={datePopoverOpen} onOpenChange={setDatePopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={(date) => handleDateSelect(date, field)}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="end_date"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>End Date (Optional)</FormLabel>
-                  <Popover open={endDatePopoverOpen} onOpenChange={setEndDatePopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick an end date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={(date) => handleEndDateSelect(date, field)}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="offices"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Office Locations</FormLabel>
-                  <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3">
-                    {locations.map((location) => (
-                      <div key={location.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={location.id}
-                          checked={field.value?.includes(location.id)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              field.onChange([...(field.value || []), location.id]);
-                            } else {
-                              field.onChange(
-                                field.value?.filter((id) => id !== location.id) || []
-                              );
-                            }
-                          }}
-                        />
-                        <label
-                          htmlFor={location.id}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                        >
-                          {location.emoji} {location.city}, {location.country}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-end space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={loading}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? "Saving..." : editingHoliday ? "Update" : "Add"} Holiday
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <HolidayForm
+          onSubmit={onSubmit}
+          onCancel={handleCancel}
+          editingHoliday={editingHoliday}
+          loading={loading}
+        />
       </DialogContent>
     </Dialog>
   );
