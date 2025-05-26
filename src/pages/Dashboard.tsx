@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +9,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
 import { AppHeader } from '@/components/AppHeader';
 import { useCompany } from '@/context/CompanyContext';
+import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 import AuthGuard from '@/components/AuthGuard';
 
 // Create a proper Profile type based on the database schema
@@ -170,20 +172,22 @@ const Dashboard: React.FC = () => {
 
   return (
     <AuthGuard>
-      <SidebarProvider>
-        <div className="flex flex-col w-full min-h-screen bg-background">
-          <div className="flex flex-1 w-full">
-            <DashboardSidebar />
-            <div className="flex-1 flex flex-col">
-              <AppHeader />
-              <div style={{ height: HEADER_HEIGHT }} />
-              <div className="flex-1 bg-background">
-                <DashboardMetrics />
+      <OfficeSettingsProvider>
+        <SidebarProvider>
+          <div className="flex flex-col w-full min-h-screen bg-background">
+            <div className="flex flex-1 w-full">
+              <DashboardSidebar />
+              <div className="flex-1 flex flex-col">
+                <AppHeader />
+                <div style={{ height: HEADER_HEIGHT }} />
+                <div className="flex-1 bg-background">
+                  <DashboardMetrics />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </SidebarProvider>
+        </SidebarProvider>
+      </OfficeSettingsProvider>
     </AuthGuard>
   );
 };
