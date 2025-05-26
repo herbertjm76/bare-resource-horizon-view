@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign, Briefcase, Bot, MessageCircle } from 'lucide-react';
@@ -295,14 +294,14 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             <div className="absolute -top-2 -right-2 bg-green-500 h-4 w-4 rounded-full animate-pulse" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="max-w-4xl w-full h-[80vh]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-brand-violet" />
-              Herbie - Your Resource Planning Assistant
+        <DialogContent className="fixed bottom-8 right-8 top-auto left-auto translate-x-0 translate-y-0 max-w-sm w-80 h-96 m-0 p-0">
+          <DialogHeader className="p-4 pb-2">
+            <DialogTitle className="flex items-center gap-2 text-sm">
+              <Bot className="h-4 w-4 text-brand-violet" />
+              Herbie
             </DialogTitle>
           </DialogHeader>
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden px-4 pb-4">
             <HerbieChat />
           </div>
         </DialogContent>
