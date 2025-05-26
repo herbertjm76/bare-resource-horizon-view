@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,6 +19,17 @@ interface StaffStatusCardProps {
 }
 
 export const StaffStatusCard: React.FC<StaffStatusCardProps> = ({ staffData }) => {
+  // Debug logging
+  useEffect(() => {
+    console.log('=== STAFF STATUS CARD UPDATE ===');
+    console.log('Staff data received:', staffData.length);
+    console.log('Staff members with availability:', staffData.map(s => ({ 
+      name: s.name, 
+      availability: s.availability 
+    })));
+    console.log('=== END STAFF STATUS CARD ===');
+  }, [staffData]);
+
   // Get profile image URL or return default based on gender
   const getProfileImage = (member: StaffMember) => {
     // Check if member has an avatar image
@@ -51,10 +62,10 @@ export const StaffStatusCard: React.FC<StaffStatusCardProps> = ({ staffData }) =
   const readyStaff = staffData.filter(member => member.availability <= 65);
 
   console.log('Staff categorization:', {
-    atCapacity: atCapacityStaff,
-    optimal: optimalStaff,
-    ready: readyStaff,
-    allStaff: staffData
+    atCapacity: atCapacityStaff.length,
+    optimal: optimalStaff.length,
+    ready: readyStaff.length,
+    totalStaff: staffData.length
   });
 
   return (
@@ -183,6 +194,13 @@ export const StaffStatusCard: React.FC<StaffStatusCardProps> = ({ staffData }) =
                     </p>
                   )}
                 </div>
+              </div>
+            )}
+
+            {/* Show message if no staff data */}
+            {staffData.length === 0 && (
+              <div className="text-center text-gray-500 py-8">
+                No staff data available
               </div>
             )}
           </div>

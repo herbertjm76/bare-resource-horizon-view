@@ -1,5 +1,5 @@
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamUtilization } from '@/hooks/useTeamUtilization';
@@ -28,7 +28,7 @@ export const useDashboardData = () => {
   const { utilization: utilizationTrends, isLoading: isLoadingUtilization } = useTeamUtilization(allTeamMembers);
   
   // Get individual utilization data for active members only
-  const { getIndividualUtilization, isLoading: isLoadingIndividualUtilization } = useIndividualUtilization(activeMembers || []);
+  const { getIndividualUtilization, isLoading: isLoadingIndividualUtilization, individualUtilizations } = useIndividualUtilization(activeMembers || []);
   
   // Calculate real metrics from actual data with memoization
   const metrics = useMemo(() => ({
@@ -40,7 +40,10 @@ export const useDashboardData = () => {
   const staffData = useMemo(() => {
     if (!allTeamMembers?.length) return [];
     
-    console.log('Generating staff data with real utilization for', allTeamMembers.length, 'members');
+    console.log('=== DASHBOARD STAFF DATA GENERATION ===');
+    console.log('Generating staff data for', allTeamMembers.length, 'members');
+    console.log('Individual utilizations available:', Object.keys(individualUtilizations).length);
+    console.log('Selected time range:', selectedTimeRange);
     
     return allTeamMembers.map((member) => {
       let utilization = 0;
@@ -77,7 +80,17 @@ export const useDashboardData = () => {
         avatar_url: 'avatar_url' in member ? member.avatar_url : undefined
       };
     });
-  }, [allTeamMembers, getIndividualUtilization, selectedTimeRange]);
+  }, [allTeamMembers, getIndividualUtilization, selectedTimeRange, individualUtilizations]);
+
+  // Add effect to log when staff data changes
+  useEffect(() => {
+    console.log('=== STAFF DATA UPDATED ===');
+    console.log('Staff data:', staffData.map(s => ({ 
+      name: s.name, 
+      availability: s.availability 
+    })));
+    console.log('=== END STAFF DATA ===');
+  }, [staffData]);
 
   // Extract unique offices from projects with memoization
   const officeOptions = useMemo(() => {
