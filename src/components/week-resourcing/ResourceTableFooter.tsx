@@ -43,18 +43,15 @@ export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
         <TableCell className="border-r non-project-column"></TableCell>
         <TableCell className="border-r non-project-column"></TableCell>
         <TableCell className="border-r non-project-column"></TableCell>
-        <TableCell className="border-r project-section-divider non-project-column"></TableCell>
+        <TableCell className="border-r non-project-column"></TableCell>
 
         {/* Project total cells */}
         {projectsToRender.map((project, index) => {
-          const isGroupSeparator = (index + 1) % 3 === 0;
-          const borderClass = isGroupSeparator ? "project-group-separator" : "";
-          
           if (project.isEmpty) {
             return (
               <TableCell 
                 key={`total-empty-${index}`} 
-                className={`border-r text-center project-column-cell ${borderClass}`}
+                className="border-r text-center project-column-cell"
               ></TableCell>
             );
           }
@@ -65,7 +62,7 @@ export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
           return (
             <TableCell 
               key={`total-${project.id}`} 
-              className={`border-r text-center font-medium project-column-cell ${borderClass}`}
+              className="border-r text-center font-medium project-column-cell"
             >
               {totalHours > 0 ? totalHours : '-'}
             </TableCell>

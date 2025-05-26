@@ -32,14 +32,10 @@ export const ProjectAllocationCells: React.FC<ProjectAllocationCellsProps> = ({
         const key = `${member.id}:${project.id}`;
         const hours = allocationMap.get(key) || 0;
         
-        // Add a thicker border between every third project
-        const isGroupSeparator = (index + 1) % 3 === 0;
-        const borderClass = isGroupSeparator ? "project-group-separator" : "";
-        
         return (
           <TableCell 
             key={`${member.id}-${project.id}`} 
-            className={`leave-cell text-center p-0 align-middle project-column-cell ${borderClass} w-[40px]`}
+            className="leave-cell text-center p-0 align-middle project-column-cell w-[40px]"
           >
             <ResourceAllocationCell 
               hours={hours}
