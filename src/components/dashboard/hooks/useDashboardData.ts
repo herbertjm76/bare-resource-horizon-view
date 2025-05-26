@@ -4,8 +4,7 @@ import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
 import { useIndividualUtilization } from './useIndividualUtilization';
-
-export type TimeRange = 'week' | 'month' | '3months';
+import { TimeRange } from '../TimeRangeSelector';
 
 export const useDashboardData = () => {
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
@@ -57,7 +56,7 @@ export const useDashboardData = () => {
         name: memberName,
         role: member.job_title || 'Team Member',
         availability: utilization,
-        avatar_url: member.avatar_url
+        avatar_url: 'avatar_url' in member ? member.avatar_url : undefined
       };
     });
 
