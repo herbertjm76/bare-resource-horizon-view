@@ -2,10 +2,10 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign } from 'lucide-react';
+import { Activity, Users, DollarSign } from 'lucide-react';
 import { EnhancedInsights } from './EnhancedInsights';
 import { ResourcePlanningChat } from './ResourcePlanningChat';
-import { Gauge } from './Gauge';
+import { HolidayCard } from './HolidayCard';
 
 interface MobileDashboardProps {
   teamMembers: any[];
@@ -17,6 +17,7 @@ interface MobileDashboardProps {
     days90: number;
   };
   staffData: any[];
+  mockData: any;
 }
 
 export const MobileDashboard: React.FC<MobileDashboardProps> = ({
@@ -24,7 +25,8 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   activeProjects,
   activeResources,
   utilizationTrends,
-  staffData
+  staffData,
+  mockData
 }) => {
   return (
     <div className="space-y-6 p-4">
@@ -77,32 +79,8 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         </Card>
       </div>
 
-      {/* CEO Priority 3: Utilization Trends */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Utilization Trends</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-center">
-            <Gauge 
-              value={utilizationTrends.days7} 
-              max={100} 
-              title="Current (7 days)"
-              size="lg"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-lg font-semibold text-gray-800">{utilizationTrends.days30}%</p>
-              <p className="text-xs text-gray-600">30 Days</p>
-            </div>
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
-              <p className="text-lg font-semibold text-gray-800">{utilizationTrends.days90}%</p>
-              <p className="text-xs text-gray-600">90 Days</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* CEO Priority 3: Upcoming Holidays */}
+      <HolidayCard holidays={mockData.upcomingHolidays} />
 
       {/* CEO Priority 4: Smart Insights */}
       <EnhancedInsights 

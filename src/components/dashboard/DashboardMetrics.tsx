@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { Filter } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -14,9 +13,12 @@ import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamUtilization } from '@/hooks/useTeamUtilization';
 import { MobileDashboard } from './MobileDashboard';
 import { DesktopDashboard } from './DesktopDashboard';
+import { FilterButton } from '@/components/resources/filters/FilterButton';
+import { TimeRangeSelector, TimeRange } from './TimeRangeSelector';
 
 export const DashboardMetrics = () => {
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
+  const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('month');
   const isMobile = useIsMobile();
   
   // Get real data from hooks
@@ -52,11 +54,50 @@ export const DashboardMetrics = () => {
   // Extract unique offices from projects
   const officeOptions = ['All Offices', ...new Set(projects?.map(p => p.office?.name).filter(Boolean) || [])];
 
+  // Clear all filters function
+  const clearAllFilters = () => {
+    setSelectedOffice('All Offices');
+    setSelectedTimeRange('month');
+  };
+
+  // Count active filters
+  const activeFiltersCount = (selectedOffice !== 'All Offices' ? 1 : 0) + (selectedTimeRange !== 'month' ? 1 : 0);
+
+  // Filter content for the FilterButton
+  const filterContent = (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Office</label>
+        <Select
+          value={selectedOffice}
+          onValueChange={setSelectedOffice}
+        >
+          <SelectTrigger className="w-full bg-white">
+            <SelectValue placeholder="All Offices" />
+          </SelectTrigger>
+          <SelectContent>
+            {officeOptions.map((office) => (
+              <SelectItem key={office} value={office}>
+                {office}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <TimeRangeSelector
+        selectedRange={selectedTimeRange}
+        onRangeChange={setSelectedTimeRange}
+      />
+    </div>
+  );
+
   // Mock data for charts and holidays (these would typically come from other data sources)
   const mockData = {
     upcomingHolidays: [
       { date: '2025-04-20', name: 'Memorial Day', offices: ['LDN'] },
       { date: '2025-06-23', name: 'Independence Day', offices: ['DUB'] },
+      { date: '2025-07-15', name: 'Summer Holiday', offices: ['NYC', 'LDN'] },
     ],
     projectsByStatus: [
       { name: 'In Progress', value: projects?.filter(p => p.status === 'In Progress').length || 0 },
@@ -73,6 +114,11 @@ export const DashboardMetrics = () => {
       { name: 'United Kingdom', value: projects?.filter(p => p.country === 'United Kingdom').length || 0 },
       { name: 'Singapore', value: projects?.filter(p => p.country === 'Singapore').length || 0 },
     ].filter(item => item.value > 0),
+    projectInvoicesThisMonth: [
+      { name: 'Invoiced', value: 12 },
+      { name: 'Pending', value: 8 },
+      { name: 'Overdue', value: 3 },
+    ]
   };
 
   // Show loading state
@@ -94,22 +140,12 @@ export const DashboardMetrics = () => {
             <p className="text-lg sm:text-2xl font-bold">{today}</p>
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Filter className="h-4 w-4 text-gray-600 flex-shrink-0" />
-            <Select
-              value={selectedOffice}
-              onValueChange={setSelectedOffice}
-            >
-              <SelectTrigger className="w-full sm:w-[180px] bg-white border border-gray-300 text-gray-700">
-                <SelectValue placeholder="All Offices" />
-              </SelectTrigger>
-              <SelectContent>
-                {officeOptions.map((office) => (
-                  <SelectItem key={office} value={office}>
-                    {office}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <FilterButton
+              activeFiltersCount={activeFiltersCount}
+              filterContent={filterContent}
+              onClearFilters={clearAllFilters}
+              buttonText="Filters"
+            />
           </div>
         </div>
       </div>
@@ -123,6 +159,7 @@ export const DashboardMetrics = () => {
             activeResources={activeResources}
             utilizationTrends={utilizationTrends}
             staffData={staffData}
+            mockData={mockData}
           />
         ) : (
           <div className="p-4">

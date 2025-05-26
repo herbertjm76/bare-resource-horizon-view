@@ -4,9 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign, Briefcase } from 'lucide-react';
 import { EnhancedInsights } from './EnhancedInsights';
 import { ResourcePlanningChat } from './ResourcePlanningChat';
-import { Gauge } from './Gauge';
 import { Donut } from './Donut';
-import { HolidaysList } from './HolidaysList';
+import { HolidayCard } from './HolidayCard';
 import { StaffAvailability } from './StaffAvailability';
 import { Badge } from "@/components/ui/badge";
 
@@ -116,7 +115,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         </div>
       </div>
 
-      {/* CEO Priority 2: Strategic Insights & Utilization */}
+      {/* CEO Priority 2: Strategic Insights & Holidays */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <EnhancedInsights 
@@ -128,41 +127,17 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           />
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Utilization Trends</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex justify-center">
-              <Gauge 
-                value={utilizationTrends.days7} 
-                max={100} 
-                title="Current (7 days)"
-                size="lg"
-              />
-            </div>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm font-medium">30 Days</span>
-                <span className="text-lg font-bold text-brand-violet">{utilizationTrends.days30}%</span>
-              </div>
-              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <span className="text-sm font-medium">90 Days</span>
-                <span className="text-lg font-bold text-brand-violet">{utilizationTrends.days90}%</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <HolidayCard holidays={mockData.upcomingHolidays} />
       </div>
 
-      {/* CEO Priority 3: Analytics & Team Data */}
+      {/* CEO Priority 3: Analytics & Business Metrics */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <Card>
           <CardContent className="p-4">
             <Donut 
               data={mockData.projectsByStatus} 
               title="Project Status" 
-              colors={['#6F4BF6', '#FFB443']}
+              colors={['#6F4BF6', '#FFB443', '#91D3FF']}
               height={200}
             />
           </CardContent>
@@ -173,7 +148,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             <Donut 
               data={mockData.projectsByStage} 
               title="Project Stages"
-              colors={['#6F4BF6', '#FFB443']}
+              colors={['#6F4BF6', '#FFB443', '#91D3FF']}
               height={200}
             />
           </CardContent>
@@ -184,7 +159,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             <Donut 
               data={mockData.projectsByRegion} 
               title="Regional Split"
-              colors={['#6F4BF6', '#91D3FF']}
+              colors={['#6F4BF6', '#91D3FF', '#FFB443']}
               height={200}
             />
           </CardContent>
@@ -192,7 +167,12 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
         <Card>
           <CardContent className="p-4">
-            <HolidaysList holidays={mockData.upcomingHolidays} />
+            <Donut 
+              data={mockData.projectInvoicesThisMonth} 
+              title="Project Invoices This Month"
+              colors={['#22C55E', '#F59E0B', '#EF4444']}
+              height={200}
+            />
           </CardContent>
         </Card>
       </div>
