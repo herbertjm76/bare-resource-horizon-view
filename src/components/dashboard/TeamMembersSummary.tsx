@@ -23,8 +23,9 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
   return (
     <div className="mb-6">
       <Card className="border-0 shadow-lg relative overflow-hidden">
-        {/* Gradient background matching sidebar */}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,#4A2A93_0%,#1E2C6C_45%,#682A6D_100%)]" />
+        {/* Glass morphism background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500" />
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
         
         {/* Top highlight gradient */}
         <div className="absolute inset-x-0 top-0 h-28 bg-[radial-gradient(120%_30%_at_50%_0%,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_70%)]" />
