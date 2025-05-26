@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { format, eachDayOfInterval, startOfMonth, endOfMonth } from 'date-fns';
+import { format, eachWeekOfInterval, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/useWorkloadData';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
@@ -17,11 +17,11 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
   selectedMonth,
   workloadData
 }) => {
-  // Get all days in the selected month
-  const daysInMonth = eachDayOfInterval({
+  // Get all weeks in the selected month
+  const weeksInMonth = eachWeekOfInterval({
     start: startOfMonth(selectedMonth),
     end: endOfMonth(selectedMonth)
-  });
+  }, { weekStartsOn: 1 }); // Start weeks on Monday
 
   // Sort members by name
   const sortedMembers = [...members].sort((a, b) => {
@@ -35,19 +35,33 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
     return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
   
-  // Custom day formatter for minimal day representation with unique identifiers
-  const getMinimalDayLabel = (day: Date): string => {
-    const dayOfWeek = day.getDay();
-    switch(dayOfWeek) {
-      case 0: return 'Su';
-      case 1: return 'M';
-      case 2: return 'Tu';
-      case 3: return 'W';
-      case 4: return 'Th';
-      case 5: return 'F';
-      case 6: return 'Sa';
-      default: return '';
-    }
+  // Helper to aggregate daily data into weekly totals
+  const getWeeklyBreakdown = (memberId: string, weekStart: Date): WorkloadBreakdown => {
+    const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+    const daysInWeek = eachDayOfInterval({ start: weekStart, end: weekEnd });
+    
+    let weeklyBreakdown: WorkloadBreakdown = {
+      projectHours: 0,
+      annualLeave: 0,
+      officeHolidays: 0,
+      otherLeave: 0,
+      total: 0
+    };
+    
+    daysInWeek.forEach(day => {
+      const dateKey = format(day, 'yyyy-MM-dd');
+      const dailyBreakdown = workloadData[memberId]?.[dateKey];
+      
+      if (dailyBreakdown) {
+        weeklyBreakdown.projectHours += dailyBreakdown.projectHours;
+        weeklyBreakdown.annualLeave += dailyBreakdown.annualLeave;
+        weeklyBreakdown.officeHolidays += dailyBreakdown.officeHolidays;
+        weeklyBreakdown.otherLeave += dailyBreakdown.otherLeave;
+        weeklyBreakdown.total += dailyBreakdown.total;
+      }
+    });
+    
+    return weeklyBreakdown;
   };
 
   // Helper to calculate utilization percentage and determine cell styling
@@ -60,9 +74,9 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
       };
     }
     
-    // Calculate daily capacity (weekly capacity / 5 working days)
-    const dailyCapacity = (member.weekly_capacity || 40) / 5;
-    const utilizationPercentage = Math.round((breakdown.total / dailyCapacity) * 100);
+    // Calculate weekly utilization percentage
+    const weeklyCapacity = member.weekly_capacity || 40;
+    const utilizationPercentage = Math.round((breakdown.total / weeklyCapacity) * 100);
     
     let style = '';
     let displayText = `${utilizationPercentage}`;
@@ -85,11 +99,6 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
     };
   };
   
-  // Helper to check if the cell should have a thick border (Sunday-Monday separator)
-  const isSundayBorder = (day: Date): boolean => {
-    return day.getDay() === 0;
-  };
-  
   // Calculate monthly total for each member
   const getMonthlyTotal = (memberId: string): WorkloadBreakdown => {
     if (!workloadData[memberId]) return { projectHours: 0, annualLeave: 0, officeHolidays: 0, otherLeave: 0, total: 0 };
@@ -105,8 +114,8 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
 
   // Format breakdown for hover card
   const formatBreakdownHover = (breakdown: WorkloadBreakdown, member: TeamMember) => {
-    const dailyCapacity = (member.weekly_capacity || 40) / 5;
-    const utilizationPercentage = breakdown.total > 0 ? Math.round((breakdown.total / dailyCapacity) * 100) : 0;
+    const weeklyCapacity = member.weekly_capacity || 40;
+    const utilizationPercentage = breakdown.total > 0 ? Math.round((breakdown.total / weeklyCapacity) * 100) : 0;
     
     return {
       utilization: utilizationPercentage,
@@ -121,21 +130,17 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
               <TableHead className="sticky left-0 bg-background z-10 min-w-[180px] border-r">Member</TableHead>
-              {daysInMonth.map(day => {
-                const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-                const dayNumber = format(day, 'd');
-                const dayLabel = getMinimalDayLabel(day);
-                const isSundayCol = isSundayBorder(day);
+              {weeksInMonth.map(weekStart => {
+                const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+                const weekLabel = `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'd')}`;
                 
                 return (
                   <TableHead 
-                    key={day.toString()} 
-                    className={`p-0 text-center w-8 ${isWeekend ? 'bg-muted/60' : ''} ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''} ${isSundayCol ? 'sunday-border' : ''}`}
-                    aria-label={format(day, 'EEEE')}
+                    key={weekStart.toString()} 
+                    className="p-0 text-center min-w-[120px] border-l"
                   >
-                    <div className="flex flex-col items-center text-xs py-1 px-2">
-                      <span className={`text-muted-foreground ${isWeekend ? 'font-medium' : ''}`}>{dayLabel}</span>
-                      <span className={`${isWeekend ? 'font-bold' : 'font-medium'}`}>{dayNumber}</span>
+                    <div className="flex flex-col items-center text-xs py-2 px-3">
+                      <span className="font-medium">{weekLabel}</span>
                     </div>
                   </TableHead>
                 );
@@ -155,23 +160,17 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                   >
                     {getMemberName(member)}
                   </TableCell>
-                  {daysInMonth.map(day => {
-                    const dateKey = format(day, 'yyyy-MM-dd');
-                    const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-                    const breakdown = workloadData[member.id]?.[dateKey];
-                    const isSundayCol = isSundayBorder(day);
-                    
-                    const { style, displayText } = getCellStyleAndPercentage(breakdown, member);
-                    const hoverData = formatBreakdownHover(breakdown || { projectHours: 0, annualLeave: 0, officeHolidays: 0, otherLeave: 0, total: 0 }, member);
+                  {weeksInMonth.map(weekStart => {
+                    const weeklyBreakdown = getWeeklyBreakdown(member.id, weekStart);
+                    const { style, displayText } = getCellStyleAndPercentage(weeklyBreakdown, member);
+                    const hoverData = formatBreakdownHover(weeklyBreakdown, member);
+                    const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
                     
                     return (
-                      <HoverCard key={`${member.id}-${dateKey}`}>
+                      <HoverCard key={`${member.id}-${weekStart.toString()}`}>
                         <HoverCardTrigger asChild>
                           <TableCell 
-                            className={`p-0 text-center cursor-help ${isWeekend ? 'bg-muted/60' : ''} 
-                              ${day.getDate() === 1 || day.getDay() === 0 ? 'border-l' : ''} 
-                              ${isSundayCol ? 'sunday-border' : ''}
-                              ${style}`}
+                            className={`p-0 text-center cursor-help border-l ${style}`}
                           >
                             {displayText}
                           </TableCell>
@@ -179,12 +178,12 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                         <HoverCardContent side="top" className="w-64 p-0">
                           <div className="bg-white rounded-lg border shadow-lg p-4">
                             <div className="text-sm font-medium text-gray-900 mb-2">
-                              {format(day, 'MMM d, yyyy')}
+                              Week of {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
                             </div>
                             <div className="space-y-2">
                               <div className="flex justify-between items-center">
                                 <span className="text-xs text-gray-600">Utilization:</span>
-                                <span className="text-sm font-semibold text-gray-900">{hoverData.utilization}</span>
+                                <span className="text-sm font-semibold text-gray-900">{hoverData.utilization}%</span>
                               </div>
                               <div className="border-t pt-2 space-y-1">
                                 {hoverData.breakdown.projectHours > 0 && (
@@ -268,7 +267,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                           <div className="border-t pt-2">
                             <div className="flex justify-between items-center text-xs">
                               <span className="text-gray-900 font-medium">Total:</span>
-                              <span className="font-semibold">{Math.round(monthlyTotal.total * 10) / 10}h</span>
+              <span className="font-semibold">{Math.round(monthlyTotal.total * 10) / 10}h</span>
                             </div>
                           </div>
                         </div>
