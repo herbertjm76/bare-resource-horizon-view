@@ -95,7 +95,7 @@ export const useDashboardData = () => {
     days90: 82
   };
 
-  // Mock data for charts
+  // Mock data for charts - ensure all required properties exist
   const mockData = {
     weeklyData: [
       { name: 'Mon', utilization: 85, capacity: 100 },
@@ -109,6 +109,26 @@ export const useDashboardData = () => {
       { name: 'Interior Design', value: 28, color: '#06B6D4' },
       { name: 'Planning', value: 22, color: '#10B981' },
       { name: 'Consulting', value: 15, color: '#F59E0B' },
+    ],
+    projectsByStatus: [
+      { name: 'Active', value: 8 },
+      { name: 'On Hold', value: 3 },
+      { name: 'Completed', value: 12 },
+    ],
+    projectsByStage: [
+      { name: '50% CD', value: 5 },
+      { name: '100% CD', value: 4 },
+      { name: '50% SD', value: 3 },
+    ],
+    projectsByRegion: [
+      { name: 'North', value: 6 },
+      { name: 'South', value: 4 },
+      { name: 'East', value: 2 },
+    ],
+    projectInvoicesThisMonth: [
+      { name: 'Paid', value: 8 },
+      { name: 'Pending', value: 3 },
+      { name: 'Overdue', value: 1 },
     ],
   };
 

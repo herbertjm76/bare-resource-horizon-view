@@ -14,13 +14,28 @@ interface DonutProps {
 }
 
 export const Donut: React.FC<DonutProps> = ({ 
-  data, 
+  data = [], // Add default empty array
   title, 
   colors = ['#6F4BF6', '#5669F7', '#E64FC4'],
   height = 250 
 }) => {
-  // Calculate total for percentages
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+  // Add null check and default to empty array
+  const safeData = data || [];
+  
+  // Calculate total for percentages - handle empty data
+  const total = safeData.reduce((sum, item) => sum + (item?.value || 0), 0);
+
+  // Don't render chart if no data
+  if (safeData.length === 0 || total === 0) {
+    return (
+      <div className="h-full">
+        <div className="text-sm font-medium text-gray-700 mb-3">{title}</div>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-gray-500 text-sm">No data available</div>
+        </div>
+      </div>
+    );
+  }
 
   // Custom tooltip to show values and percentages
   const CustomTooltip = ({ active, payload }: any) => {
@@ -41,7 +56,7 @@ export const Donut: React.FC<DonutProps> = ({
   };
 
   // Format data for the legend
-  const formattedData = data.map((item, index) => {
+  const formattedData = safeData.map((item, index) => {
     return {
       ...item,
       percentage: ((item.value / total) * 100).toFixed(1),
@@ -58,7 +73,7 @@ export const Donut: React.FC<DonutProps> = ({
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={data}
+                data={safeData}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
@@ -68,7 +83,7 @@ export const Donut: React.FC<DonutProps> = ({
                 stroke="#fff"
                 strokeWidth={2}
               >
-                {data.map((_, index) => (
+                {safeData.map((_, index) => (
                   <Cell 
                     key={`cell-${index}`} 
                     fill={colors[index % colors.length]} 
