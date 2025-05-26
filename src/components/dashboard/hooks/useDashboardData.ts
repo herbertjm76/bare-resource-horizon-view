@@ -1,123 +1,119 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useProjects } from '@/hooks/useProjects';
+
+import { useState, useEffect, useMemo } from 'react';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
-import { useTeamUtilization } from '@/hooks/useTeamUtilization';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
-import { useIndividualUtilization } from '@/hooks/useIndividualUtilization';
-import { TimeRange } from '../TimeRangeSelector';
+import { useCompany } from '@/context/CompanyContext';
+import { useIndividualUtilization } from './useIndividualUtilization';
+
+export type TimeRange = 'week' | 'month' | '3months';
 
 export const useDashboardData = () => {
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('month');
   
-  // Get real data from hooks
-  const { projects, isLoading: isLoadingProjects } = useProjects();
-  const { teamMembers: activeMembers, isLoading: isLoadingMembers } = useTeamMembersData(true);
+  // Get active team members
+  const { teamMembers: activeTeamMembers, isLoading: isLoadingActive } = useTeamMembersData(true);
   
-  // Get pre-registered members from invites
-  const companyId = activeMembers?.[0]?.company_id;
-  const { preRegisteredMembers } = useTeamMembersState(companyId, 'owner');
+  // Get company context
+  const { company } = useCompany();
   
-  // Combine active and pre-registered members with memoization
+  // Get pre-registered members
+  const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
+  
+  // Combine all team members (active + pre-registered)
   const allTeamMembers = useMemo(() => {
-    return [...(activeMembers || []), ...(preRegisteredMembers || [])];
-  }, [activeMembers, preRegisteredMembers]);
-  
-  // Get real utilization data
-  const { utilization: utilizationTrends, isLoading: isLoadingUtilization } = useTeamUtilization(allTeamMembers);
-  
-  // Get individual utilization data for ALL members (active and pre-registered)
-  const { getIndividualUtilization, isLoading: isLoadingIndividualUtilization, individualUtilizations } = useIndividualUtilization(allTeamMembers);
-  
-  // Calculate real metrics from actual data with memoization
-  const metrics = useMemo(() => ({
-    activeProjects: projects?.length || 0,
-    activeResources: allTeamMembers?.length || 0
-  }), [projects, allTeamMembers]);
+    console.log('=== DASHBOARD DATA HOOK ===');
+    console.log('Active team members:', activeTeamMembers?.length || 0);
+    console.log('Pre-registered members:', preRegisteredMembers?.length || 0);
+    
+    const combined = [...(activeTeamMembers || []), ...(preRegisteredMembers || [])];
+    console.log('Total combined members:', combined.length);
+    console.log('Combined members:', combined.map(m => ({ 
+      name: `${m.first_name} ${m.last_name}`, 
+      isPending: 'isPending' in m ? m.isPending : false 
+    })));
+    
+    return combined;
+  }, [activeTeamMembers, preRegisteredMembers]);
 
-  // Generate staff data with real utilization based on actual allocation data
+  // Get utilization data for all members
+  const { memberUtilizations, isLoading: isLoadingUtilization } = useIndividualUtilization(allTeamMembers);
+
+  // Calculate staff data with proper utilization
   const staffData = useMemo(() => {
-    if (!allTeamMembers?.length) return [];
+    console.log('=== CALCULATING STAFF DATA ===');
+    console.log('All team members for staff data:', allTeamMembers.length);
+    console.log('Member utilizations:', memberUtilizations);
     
-    console.log('=== DASHBOARD STAFF DATA GENERATION ===');
-    console.log('Generating staff data for', allTeamMembers.length, 'members');
-    console.log('Individual utilizations available:', Object.keys(individualUtilizations).length);
-    console.log('Selected time range:', selectedTimeRange);
-    
-    return allTeamMembers.map((member) => {
-      const individualUtil = getIndividualUtilization(member.id);
+    const staffMembers = allTeamMembers.map(member => {
+      const memberName = `${member.first_name || ''} ${member.last_name || ''}`.trim();
+      const utilization = memberUtilizations[member.id] || 0;
       
-      // Use the time range selected by the user, defaulting to 30-day
-      let utilization = 0;
-      switch (selectedTimeRange) {
-        case 'week':
-          utilization = individualUtil.days7;
-          break;
-        case '3months':
-          utilization = individualUtil.days90;
-          break;
-        case 'month':
-        default:
-          utilization = individualUtil.days30;
-          break;
-      }
-      
-      const memberType = 'company_id' in member && member.company_id ? 'active' : 'pre-registered';
-      console.log(`${memberType} member ${member.first_name} ${member.last_name}: ${utilization}% utilization (${selectedTimeRange})`);
+      console.log(`Member: ${memberName}, ID: ${member.id}, Utilization: ${utilization}%`);
       
       return {
-        first_name: member.first_name || 'Unknown',
-        last_name: member.last_name || 'Member',
-        name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Team Member',
+        first_name: member.first_name || '',
+        last_name: member.last_name || '',
+        name: memberName,
         role: member.job_title || 'Team Member',
         availability: utilization,
-        avatar_url: 'avatar_url' in member ? member.avatar_url : undefined
+        avatar_url: member.avatar_url
       };
     });
-  }, [allTeamMembers, getIndividualUtilization, selectedTimeRange, individualUtilizations]);
 
-  // Add effect to log when staff data changes
-  useEffect(() => {
-    console.log('=== STAFF DATA UPDATED ===');
-    console.log('Staff data:', staffData.map(s => ({ 
+    console.log('Final staff data:', staffMembers.map(s => ({ 
       name: s.name, 
       availability: s.availability 
     })));
-    console.log('=== END STAFF DATA ===');
-  }, [staffData]);
+    console.log('=== END STAFF DATA CALCULATION ===');
 
-  // Extract unique offices from projects with memoization
+    return staffMembers;
+  }, [allTeamMembers, memberUtilizations]);
+
+  // Generate office options from team members
   const officeOptions = useMemo(() => {
-    return ['All Offices', ...new Set(projects?.map(p => p.office?.name).filter(Boolean) || [])];
-  }, [projects]);
+    const offices = new Set(['All Offices']);
+    allTeamMembers.forEach(member => {
+      if (member.location) {
+        offices.add(member.location);
+      }
+    });
+    return Array.from(offices);
+  }, [allTeamMembers]);
 
-  // Real data for charts based on actual projects with memoization
-  const mockData = useMemo(() => ({
-    projectsByStatus: [
-      { name: 'In Progress', value: projects?.filter(p => p.status === 'In Progress').length || 0 },
-      { name: 'Complete', value: projects?.filter(p => p.status === 'Complete').length || 0 },
-      { name: 'Planning', value: projects?.filter(p => p.status === 'Planning').length || 0 },
-    ].filter(item => item.value > 0),
-    projectsByStage: [
-      { name: '50% CD', value: projects?.filter(p => p.current_stage === '50% CD').length || 0 },
-      { name: '100% CD', value: projects?.filter(p => p.current_stage === '100% CD').length || 0 },
-      { name: '50% SD', value: projects?.filter(p => p.current_stage === '50% SD').length || 0 },
-    ].filter(item => item.value > 0),
-    projectsByRegion: [
-      { name: 'Vietnam', value: projects?.filter(p => p.country === 'Vietnam').length || 0 },
-      { name: 'United Kingdom', value: projects?.filter(p => p.country === 'United Kingdom').length || 0 },
-      { name: 'Singapore', value: projects?.filter(p => p.country === 'Singapore').length || 0 },
-      { name: 'Brazil', value: projects?.filter(p => p.country === 'Brazil').length || 0 },
-    ].filter(item => item.value > 0),
-    projectInvoicesThisMonth: [
-      { name: 'Invoiced', value: 12 },
-      { name: 'Pending', value: 8 },
-      { name: 'Overdue', value: 3 },
-    ]
-  }), [projects]);
+  // Calculate metrics
+  const metrics = useMemo(() => {
+    return {
+      activeProjects: 12, // Mock data
+      activeResources: allTeamMembers.length,
+    };
+  }, [allTeamMembers]);
 
-  // Consolidate loading state
-  const isLoading = isLoadingProjects || isLoadingMembers || isLoadingUtilization || isLoadingIndividualUtilization;
+  // Mock utilization trends
+  const utilizationTrends = {
+    days7: 75,
+    days30: 78,
+    days90: 82
+  };
+
+  // Mock data for charts
+  const mockData = {
+    weeklyData: [
+      { name: 'Mon', utilization: 85, capacity: 100 },
+      { name: 'Tue', utilization: 92, capacity: 100 },
+      { name: 'Wed', utilization: 78, capacity: 100 },
+      { name: 'Thu', utilization: 88, capacity: 100 },
+      { name: 'Fri', utilization: 95, capacity: 100 },
+    ],
+    projectTypes: [
+      { name: 'Architecture', value: 35, color: '#8B5CF6' },
+      { name: 'Interior Design', value: 28, color: '#06B6D4' },
+      { name: 'Planning', value: 22, color: '#10B981' },
+      { name: 'Consulting', value: 15, color: '#F59E0B' },
+    ],
+  };
+
+  const isLoading = isLoadingActive || isLoadingUtilization;
 
   return {
     selectedOffice,
