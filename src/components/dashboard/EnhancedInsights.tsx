@@ -37,141 +37,116 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  const generateAdvancedInsights = () => {
+  const generateSimpleInsights = () => {
     const insights = [];
     const teamSize = teamMembers.length;
-    const averageCapacity = teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0) / teamSize;
-    const totalWeeklyCapacity = teamSize * averageCapacity;
-    const availableCapacity = totalWeeklyCapacity * (1 - utilizationRate / 100);
     
-    // Calculate utilization trends
-    const trend7to30 = utilizationTrends.days30 - utilizationTrends.days7;
-    const trend30to90 = utilizationTrends.days90 - utilizationTrends.days30;
-    
-    // 1. CAPACITY FORECASTING - Priority insight
-    if (utilizationRate > 85) {
-      const weeksUntilOvercapacity = Math.max(1, Math.round(availableCapacity / (utilizationRate * 0.1)));
+    // 1. TEAM OVERLOAD - Critical
+    if (utilizationRate > 90) {
       insights.push({
-        title: "Capacity Crisis Approaching",
-        description: `Team will be overcapacity in ~${weeksUntilOvercapacity} weeks at current growth rate.`,
+        title: "Team Overloaded",
+        description: `Your team is working at ${utilizationRate}%. This is unsustainable.`,
         severity: 'critical' as const,
-        actionLabel: "Plan Hiring",
+        actionLabel: "Consider Hiring",
         onAction: () => navigate('/team-members'),
-        metric: `${weeksUntilOvercapacity}w`,
+        metric: `${utilizationRate}%`,
         icon: <AlertTriangle className="h-4 w-4 text-red-500" />
       });
-    } else if (utilizationRate < 50 && trend7to30 < -5) {
+    }
+
+    // 2. NOT ENOUGH WORK - High Priority
+    else if (utilizationRate < 60) {
       insights.push({
-        title: "Declining Utilization",
-        description: `Utilization dropped ${Math.abs(trend7to30).toFixed(1)}% recently. Need more projects.`,
+        title: "Team Underutilized",
+        description: `Your team is only ${utilizationRate}% busy. You could take on more work.`,
         severity: 'high' as const,
-        actionLabel: "Business Development",
+        actionLabel: "Find More Projects",
         onAction: () => navigate('/projects'),
-        metric: `${trend7to30.toFixed(1)}%`,
+        metric: `${utilizationRate}%`,
         icon: <TrendingUp className="h-4 w-4 text-orange-500" />
       });
     }
 
-    // 2. WORKLOAD DISTRIBUTION ANALYSIS
-    const memberStats = staffMembers.map(member => ({
-      ...member,
-      utilizationCategory: member.availability < 50 ? 'under' : 
-                          member.availability > 100 ? 'over' : 'optimal'
-    }));
-    
-    const overAllocated = memberStats.filter(m => m.utilizationCategory === 'over').length;
-    const underAllocated = memberStats.filter(m => m.utilizationCategory === 'under').length;
-    
-    if (overAllocated > 0 && underAllocated > 0) {
+    // 3. TOO MANY PROJECTS PER PERSON
+    const projectsPerPerson = activeProjects / teamSize;
+    if (projectsPerPerson > 3) {
       insights.push({
-        title: "Workload Imbalance",
-        description: `${overAllocated} members overloaded, ${underAllocated} underutilized. Rebalance needed.`,
+        title: "Too Many Projects",
+        description: `Each person is handling ${projectsPerPerson.toFixed(1)} projects. This hurts quality.`,
         severity: 'high' as const,
-        actionLabel: "Rebalance Work",
+        actionLabel: "Review Projects",
+        onAction: () => navigate('/projects'),
+        metric: `${projectsPerPerson.toFixed(1)} per person`,
+        icon: <Briefcase className="h-4 w-4 text-orange-600" />
+      });
+    }
+
+    // 4. WORKLOAD IMBALANCE
+    const overWorked = staffMembers.filter(m => m.availability > 100).length;
+    const underWorked = staffMembers.filter(m => m.availability < 50).length;
+    
+    if (overWorked > 0 && underWorked > 0) {
+      insights.push({
+        title: "Uneven Workload",
+        description: `${overWorked} people are overworked while ${underWorked} have too little work.`,
+        severity: 'medium' as const,
+        actionLabel: "Balance Work",
         onAction: () => navigate('/workload'),
-        metric: `${overAllocated}/${underAllocated}`,
+        metric: `${overWorked} overworked`,
         icon: <BarChart3 className="h-4 w-4 text-orange-600" />
       });
     }
 
-    // 3. PROJECT COMPLEXITY ANALYSIS
-    const projectsPerPerson = activeProjects / teamSize;
-    const complexityScore = projectsPerPerson * (utilizationRate / 100);
-    
-    if (complexityScore > 2.5) {
+    // 5. GROWING TOO FAST
+    const recentGrowth = utilizationTrends.days7 - utilizationTrends.days30;
+    if (recentGrowth > 15) {
       insights.push({
-        title: "High Project Complexity",
-        description: `${projectsPerPerson.toFixed(1)} projects per person with ${utilizationRate}% utilization creates complexity.`,
-        severity: 'medium' as const,
-        actionLabel: "Simplify Portfolio",
-        onAction: () => navigate('/projects'),
-        metric: `${complexityScore.toFixed(1)}x`,
-        icon: <Briefcase className="h-4 w-4 text-yellow-600" />
-      });
-    }
-
-    // 4. TEAM VELOCITY INSIGHTS
-    if (trend7to30 > 10) {
-      insights.push({
-        title: "Rapid Growth Pattern",
-        description: `Utilization increased ${trend7to30.toFixed(1)}% recently. Monitor for burnout risk.`,
+        title: "Growing Very Fast",
+        description: `Workload increased ${recentGrowth.toFixed(0)}% recently. Watch for burnout.`,
         severity: 'medium' as const,
         actionLabel: "Monitor Team",
         onAction: () => navigate('/team-members'),
-        metric: `+${trend7to30.toFixed(1)}%`,
+        metric: `+${recentGrowth.toFixed(0)}%`,
         icon: <Zap className="h-4 w-4 text-purple-500" />
       });
     }
 
-    // 5. EFFICIENCY OPPORTUNITIES
-    if (utilizationRate > 70 && utilizationRate < 85 && teamSize >= 5) {
-      const efficiencyGain = Math.round((85 - utilizationRate) * totalWeeklyCapacity / 100);
+    // 6. NEED MORE PEOPLE
+    if (teamSize < 5 && activeProjects > 8) {
       insights.push({
-        title: "Efficiency Opportunity",
-        description: `Could gain ${efficiencyGain}h weekly capacity through optimization.`,
-        severity: 'low' as const,
-        actionLabel: "Optimize Workflow",
-        onAction: () => navigate('/workload'),
-        metric: `+${efficiencyGain}h`,
-        icon: <Target className="h-4 w-4 text-green-500" />
-      });
-    }
-
-    // 6. HIRING RECOMMENDATIONS
-    const optimalTeamSize = Math.ceil(activeProjects / 2.5); // 2.5 projects per person is optimal
-    if (teamSize < optimalTeamSize && utilizationRate > 80) {
-      const hiringNeed = optimalTeamSize - teamSize;
-      insights.push({
-        title: "Strategic Hiring Need",
-        description: `Consider hiring ${hiringNeed} more team member${hiringNeed > 1 ? 's' : ''} for optimal project distribution.`,
+        title: "Need More People",
+        description: `${activeProjects} projects with only ${teamSize} people is risky.`,
         severity: 'medium' as const,
-        actionLabel: "Hiring Plan",
+        actionLabel: "Plan Hiring",
         onAction: () => navigate('/team-members'),
-        metric: `+${hiringNeed}`,
+        metric: `${teamSize} people`,
         icon: <Users className="h-4 w-4 text-blue-500" />
       });
     }
 
-    // 7. CAPACITY BUFFER WARNING
-    if (availableCapacity < 80 && utilizationRate > 75) {
+    // 7. NO BREATHING ROOM
+    const totalWeeklyHours = teamSize * 40;
+    const availableHours = totalWeeklyHours * (1 - utilizationRate / 100);
+    
+    if (availableHours < 40 && utilizationRate > 80) {
       insights.push({
-        title: "Low Capacity Buffer",
-        description: `Only ${Math.round(availableCapacity)}h buffer remaining. Risk for emergency projects.`,
+        title: "No Emergency Capacity",
+        description: `Only ${Math.round(availableHours)} hours left for urgent work.`,
         severity: 'high' as const,
-        actionLabel: "Build Buffer",
+        actionLabel: "Create Buffer",
         onAction: () => navigate('/resources'),
-        metric: `${Math.round(availableCapacity)}h`,
+        metric: `${Math.round(availableHours)}h left`,
         icon: <Clock className="h-4 w-4 text-red-400" />
       });
     }
 
-    // 8. TEAM STABILITY
-    if (utilizationTrends.days90 > 60 && Math.abs(trend30to90) < 5) {
+    // 8. EVERYTHING IS GOOD
+    if (utilizationRate >= 70 && utilizationRate <= 85 && projectsPerPerson <= 3) {
       insights.push({
-        title: "Stable Team Performance",
-        description: `Consistent ${utilizationTrends.days90}% utilization over 90 days shows good stability.`,
+        title: "Team Performing Well",
+        description: `Good balance at ${utilizationRate}% utilization with manageable project load.`,
         severity: 'low' as const,
-        metric: `${utilizationTrends.days90}%`,
+        metric: `${utilizationRate}%`,
         icon: <UserCheck className="h-4 w-4 text-green-500" />
       });
     }
@@ -179,9 +154,9 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
     return insights;
   };
 
-  const insights = generateAdvancedInsights();
+  const insights = generateSimpleInsights();
 
-  // Prioritize insights by severity
+  // Show most important insights first
   const prioritizedInsights = insights.sort((a, b) => {
     const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
     return severityOrder[a.severity] - severityOrder[b.severity];
@@ -199,9 +174,9 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
-      case 'critical': return <Badge variant="destructive" className="text-xs">Critical</Badge>;
-      case 'high': return <Badge className="bg-orange-500 text-white text-xs">High</Badge>;
-      case 'medium': return <Badge className="bg-yellow-500 text-white text-xs">Medium</Badge>;
+      case 'critical': return <Badge variant="destructive" className="text-xs">Action Needed</Badge>;
+      case 'high': return <Badge className="bg-orange-500 text-white text-xs">Important</Badge>;
+      case 'medium': return <Badge className="bg-yellow-500 text-white text-xs">Monitor</Badge>;
       case 'low': return <Badge variant="secondary" className="text-xs">Good</Badge>;
       default: return null;
     }
@@ -211,13 +186,13 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
     return (
       <div className="h-full flex flex-col">
         <div className="flex justify-end mb-4">
-          <Badge variant="outline" className="text-xs">0 insights</Badge>
+          <Badge variant="outline" className="text-xs">No issues</Badge>
         </div>
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <Target className="h-8 w-8 text-green-600 mx-auto mb-3" />
-            <h3 className="text-sm font-semibold text-green-900 mb-2">Optimal Performance</h3>
-            <p className="text-xs text-green-700">Team utilization and project load are well-balanced.</p>
+            <h3 className="text-sm font-semibold text-green-900 mb-2">All Good!</h3>
+            <p className="text-xs text-green-700">Your team is running smoothly.</p>
           </div>
         </div>
       </div>
@@ -228,14 +203,7 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
     <div className="h-full flex flex-col">
       <ScrollArea className="flex-1">
         <div className="space-y-4 p-1">
-          {/* Insight Count Badge */}
-          <div className="flex justify-end">
-            <Badge variant="outline" className="text-xs">
-              {prioritizedInsights.length} insight{prioritizedInsights.length !== 1 ? 's' : ''}
-            </Badge>
-          </div>
-
-          {/* Show top 3 insights */}
+          {/* Show top 3 most important insights */}
           {prioritizedInsights.slice(0, 3).map((insight, index) => (
             <div key={index} className={`${getSeverityColor(insight.severity)} border-l-4 rounded-lg p-4 transition-all hover:shadow-sm`}>
               <div className="flex items-start justify-between gap-3">
@@ -271,11 +239,11 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
             </div>
           ))}
 
-          {/* Show additional insights count if there are more */}
+          {/* Show count if there are more insights */}
           {prioritizedInsights.length > 3 && (
             <div className="text-center py-2">
               <Badge variant="outline" className="text-xs">
-                +{prioritizedInsights.length - 3} more insights available
+                +{prioritizedInsights.length - 3} more insights
               </Badge>
             </div>
           )}
