@@ -1,14 +1,14 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign, Briefcase } from 'lucide-react';
 import { EnhancedInsights } from './EnhancedInsights';
 import { ResourcePlanningChat } from './ResourcePlanningChat';
-import { SummaryDashboard } from './SummaryDashboard';
 import { Gauge } from './Gauge';
 import { Donut } from './Donut';
 import { HolidaysList } from './HolidaysList';
 import { StaffAvailability } from './StaffAvailability';
+import { Badge } from "@/components/ui/badge";
 
 interface DesktopDashboardProps {
   teamMembers: any[];
@@ -31,75 +31,94 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   staffData,
   mockData
 }) => {
-  const summaryMetrics = [
-    {
-      title: 'Team Utilization',
-      value: `${utilizationTrends.days7}%`,
-      subtitle: 'Current 7-day average',
-      progress: utilizationTrends.days7,
-      icon: <TrendingUp className="h-4 w-4" />,
-      trend: 'up' as const,
-      status: 'good' as const
-    },
-    {
-      title: 'Available Capacity',
-      value: '2,340h',
-      subtitle: 'Next 12 weeks',
-      icon: <Clock className="h-4 w-4" />,
-      status: 'info' as const
-    },
-    {
-      title: 'Active Projects',
-      value: activeProjects,
-      subtitle: 'Currently in progress',
-      icon: <Target className="h-4 w-4" />,
-      status: 'good' as const
-    },
-    {
-      title: 'Hiring Status',
-      value: 'Monitor',
-      subtitle: 'Based on capacity trends',
-      icon: <AlertTriangle className="h-4 w-4" />,
-      status: 'warning' as const
-    }
-  ];
+  const getUtilizationStatus = (rate: number) => {
+    if (rate > 90) return { color: 'destructive', label: 'Overutilized' };
+    if (rate > 80) return { color: 'default', label: 'High Utilization' };
+    if (rate > 60) return { color: 'secondary', label: 'Healthy' };
+    return { color: 'outline', label: 'Underutilized' };
+  };
+
+  const utilizationStatus = getUtilizationStatus(utilizationTrends.days7);
 
   return (
-    <div className="space-y-6">
-      {/* Top Row - Strategic Overview and Key Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
-          <SummaryDashboard 
-            title="Strategic Overview"
-            metrics={summaryMetrics}
-          />
-        </div>
+    <div className="space-y-8 p-6">
+      {/* CEO Priority 1: Executive Summary */}
+      <div className="bg-gradient-to-br from-brand-violet/5 to-blue-50/50 rounded-2xl p-6 border border-brand-violet/10">
+        <h2 className="text-2xl font-bold text-brand-violet mb-6 flex items-center gap-3">
+          <DollarSign className="h-6 w-6" />
+          Executive Summary
+        </h2>
         
-        <Card className="shadow-sm border border-gray-100 rounded-xl">
-          <CardContent className="p-6">
-            <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <Card className="bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-2xl font-bold text-brand-violet">{activeResources}</p>
-                  <p className="text-sm text-gray-600">Active members</p>
+                  <p className="text-sm font-medium text-gray-600">Team Utilization</p>
+                  <p className="text-3xl font-bold text-brand-violet mt-1">{utilizationTrends.days7}%</p>
+                  <Badge variant={utilizationStatus.color as any} className="mt-2 text-xs">
+                    {utilizationStatus.label}
+                  </Badge>
                 </div>
-                <Users size={24} strokeWidth={1.5} className="text-brand-violet/30" />
+                <div className="h-12 w-12 rounded-full bg-brand-violet/10 flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-brand-violet" />
+                </div>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-2xl font-bold text-brand-violet">{activeProjects}</p>
-                  <p className="text-sm text-gray-600">Live projects</p>
+                  <p className="text-sm font-medium text-gray-600">Available Capacity</p>
+                  <p className="text-3xl font-bold text-brand-violet mt-1">2,340h</p>
+                  <p className="text-xs text-gray-500 mt-1">Next 12 weeks</p>
                 </div>
-                <Activity size={24} strokeWidth={1.5} className="text-brand-violet/30" />
+                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-blue-600" />
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Active Projects</p>
+                  <p className="text-3xl font-bold text-brand-violet mt-1">{activeProjects}</p>
+                  <p className="text-xs text-gray-500 mt-1">{(activeProjects / activeResources).toFixed(1)} per person</p>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                  <Briefcase className="h-6 w-6 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Team Size</p>
+                  <p className="text-3xl font-bold text-brand-violet mt-1">{activeResources}</p>
+                  <Badge variant="outline" className="mt-2 text-xs">
+                    {utilizationTrends.days7 > 85 ? 'Consider Hiring' : 'Stable'}
+                  </Badge>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
-      {/* Second Row - Insights and Utilization */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-3">
+      {/* CEO Priority 2: Strategic Insights & Utilization */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
           <EnhancedInsights 
             teamMembers={teamMembers}
             activeProjects={activeProjects}
@@ -109,91 +128,88 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           />
         </div>
 
-        <Card className="shadow-sm border border-gray-100 rounded-xl">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-6 text-center">Utilization</h3>
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                <Gauge 
-                  value={utilizationTrends.days7} 
-                  max={100} 
-                  title="7 Days"
-                  size="sm"
-                />
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Utilization Trends</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex justify-center">
+              <Gauge 
+                value={utilizationTrends.days7} 
+                max={100} 
+                title="Current (7 days)"
+                size="lg"
+              />
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span className="text-sm font-medium">30 Days</span>
+                <span className="text-lg font-bold text-brand-violet">{utilizationTrends.days30}%</span>
               </div>
-              <div className="flex justify-center">
-                <Gauge 
-                  value={utilizationTrends.days30} 
-                  max={100} 
-                  title="30 Days"
-                  size="sm"
-                />
-              </div>
-              <div className="flex justify-center">
-                <Gauge 
-                  value={utilizationTrends.days90} 
-                  max={100} 
-                  title="90 Days"
-                  size="sm"
-                />
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span className="text-sm font-medium">90 Days</span>
+                <span className="text-lg font-bold text-brand-violet">{utilizationTrends.days90}%</span>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Third Row - Analytics Cards */}
+      {/* CEO Priority 3: Analytics & Team Data */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <Card className="shadow-sm border border-gray-100 rounded-xl">
+        <Card>
           <CardContent className="p-4">
             <Donut 
               data={mockData.projectsByStatus} 
-              title="Project By Status" 
+              title="Project Status" 
               colors={['#6F4BF6', '#FFB443']}
               height={200}
             />
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border border-gray-100 rounded-xl">
+        <Card>
           <CardContent className="p-4">
             <Donut 
               data={mockData.projectsByStage} 
-              title="Project By Stage"
+              title="Project Stages"
               colors={['#6F4BF6', '#FFB443']}
               height={200}
             />
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border border-gray-100 rounded-xl">
+        <Card>
           <CardContent className="p-4">
             <Donut 
               data={mockData.projectsByRegion} 
-              title="Project By Region"
+              title="Regional Split"
               colors={['#6F4BF6', '#91D3FF']}
               height={200}
             />
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border border-gray-100 rounded-xl">
+        <Card>
           <CardContent className="p-4">
             <HolidaysList holidays={mockData.upcomingHolidays} />
           </CardContent>
         </Card>
       </div>
 
-      {/* Fourth Row - Chat and Staff */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* CEO Priority 4: Planning & Team Details */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <ResourcePlanningChat 
           teamSize={teamMembers.length}
           activeProjects={activeProjects}
           utilizationRate={utilizationTrends.days7}
         />
 
-        <Card className="shadow-sm border border-gray-100 rounded-xl">
-          <CardContent className="p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Team Availability</CardTitle>
+          </CardHeader>
+          <CardContent>
             <StaffAvailability staffMembers={staffData} />
           </CardContent>
         </Card>
