@@ -4,6 +4,7 @@ import { useProjects } from '@/hooks/useProjects';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamUtilization } from '@/hooks/useTeamUtilization';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
+import { useIndividualUtilization } from '@/hooks/useIndividualUtilization';
 import { TimeRange } from '../TimeRangeSelector';
 
 export const useDashboardData = () => {
@@ -26,35 +27,45 @@ export const useDashboardData = () => {
   // Get real utilization data
   const { utilization: utilizationTrends, isLoading: isLoadingUtilization } = useTeamUtilization(allTeamMembers);
   
+  // Get individual utilization data for active members only
+  const { getIndividualUtilization, isLoading: isLoadingIndividualUtilization } = useIndividualUtilization(activeMembers || []);
+  
   // Calculate real metrics from actual data with memoization
   const metrics = useMemo(() => ({
     activeProjects: projects?.length || 0,
     activeResources: allTeamMembers?.length || 0
   }), [projects, allTeamMembers]);
 
-  // Generate staff data with consistent utilization based on real utilization trends
+  // Generate staff data with real utilization based on actual allocation data
   const staffData = useMemo(() => {
     if (!allTeamMembers?.length) return [];
     
-    console.log('Generating staff data for', allTeamMembers.length, 'members');
-    console.log('Current utilization trends:', utilizationTrends);
+    console.log('Generating staff data with real utilization for', allTeamMembers.length, 'members');
     
     return allTeamMembers.map((member) => {
-      const firstName = (member.first_name || '').toLowerCase();
       let utilization = 0;
       
-      if (firstName.includes('melody')) {
-        // Melody should be 0% (not resourced)
-        utilization = 0;
-      } else if (firstName.includes('herbert')) {
-        // Herbert should be 75% (optimally allocated)
-        utilization = 75;
+      // For active members, use real allocation data
+      if ('company_id' in member && member.company_id) {
+        const individualUtil = getIndividualUtilization(member.id);
+        // Use the time range selected by the user, defaulting to 30-day
+        switch (selectedTimeRange) {
+          case 'week':
+            utilization = individualUtil.days7;
+            break;
+          case 'quarter':
+            utilization = individualUtil.days90;
+            break;
+          case 'month':
+          default:
+            utilization = individualUtil.days30;
+            break;
+        }
+        console.log(`Active member ${member.first_name} ${member.last_name}: ${utilization}% utilization (${selectedTimeRange})`);
       } else {
-        // For other members, use the real utilization trend as a base with some variation
-        const baseUtilization = utilizationTrends.days7 || 20;
-        const nameHash = (member.first_name || '' + member.last_name || '').length;
-        const variation = (nameHash * 5) % 30; // Variation of 0-30%
-        utilization = Math.min(95, Math.max(0, baseUtilization + variation));
+        // For pre-registered members (invites), utilization is 0
+        utilization = 0;
+        console.log(`Pre-registered member ${member.first_name} ${member.last_name}: 0% utilization (not yet active)`);
       }
       
       return {
@@ -66,7 +77,7 @@ export const useDashboardData = () => {
         avatar_url: 'avatar_url' in member ? member.avatar_url : undefined
       };
     });
-  }, [allTeamMembers, utilizationTrends]);
+  }, [allTeamMembers, getIndividualUtilization, selectedTimeRange]);
 
   // Extract unique offices from projects with memoization
   const officeOptions = useMemo(() => {
@@ -99,7 +110,7 @@ export const useDashboardData = () => {
   }), [projects]);
 
   // Consolidate loading state
-  const isLoading = isLoadingProjects || isLoadingMembers || isLoadingUtilization;
+  const isLoading = isLoadingProjects || isLoadingMembers || isLoadingUtilization || isLoadingIndividualUtilization;
 
   return {
     selectedOffice,
