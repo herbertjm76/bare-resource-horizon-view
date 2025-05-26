@@ -80,7 +80,7 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
       </div>
 
       {/* CEO Priority 3: Upcoming Holidays */}
-      <HolidayCard holidays={mockData.upcomingHolidays} />
+      <HolidayCard />
 
       {/* CEO Priority 4: Smart Insights */}
       <EnhancedInsights 
