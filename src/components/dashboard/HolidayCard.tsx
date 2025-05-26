@@ -1,22 +1,38 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin } from 'lucide-react';
-
-interface Holiday {
-  date: string;
-  name: string;
-  offices: string[];
-}
+import { useCompany } from "@/context/CompanyContext";
+import { fetchHolidays } from "@/components/settings/holidays/HolidayService";
+import { Holiday } from "@/components/settings/holidays/types";
 
 interface HolidayCardProps {
-  holidays: Holiday[];
+  // Remove the holidays prop since we'll fetch from database
 }
 
-export const HolidayCard: React.FC<HolidayCardProps> = ({ holidays }) => {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+export const HolidayCard: React.FC<HolidayCardProps> = () => {
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { company } = useCompany();
+
+  useEffect(() => {
+    const loadHolidays = async () => {
+      if (!company) {
+        setLoading(false);
+        return;
+      }
+      
+      setLoading(true);
+      const data = await fetchHolidays(company.id);
+      setHolidays(data);
+      setLoading(false);
+    };
+
+    loadHolidays();
+  }, [company]);
+
+  const formatDate = (date: Date) => {
     return {
       day: date.getDate(),
       month: date.toLocaleDateString('en-US', { month: 'short' }),
@@ -41,7 +57,12 @@ export const HolidayCard: React.FC<HolidayCardProps> = ({ holidays }) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {upcomingHolidays.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-8 text-gray-500">
+            <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50 animate-pulse" />
+            <p className="text-sm">Loading holidays...</p>
+          </div>
+        ) : upcomingHolidays.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">No upcoming holidays</p>
@@ -51,7 +72,7 @@ export const HolidayCard: React.FC<HolidayCardProps> = ({ holidays }) => {
             const dateInfo = formatDate(holiday.date);
             
             return (
-              <div key={index} className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+              <div key={holiday.id} className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
                 <div className="flex-shrink-0 text-center min-w-[50px]">
                   <div className="text-xl font-bold text-brand-violet">{dateInfo.day}</div>
                   <div className="text-xs font-medium text-gray-600 uppercase">{dateInfo.month}</div>

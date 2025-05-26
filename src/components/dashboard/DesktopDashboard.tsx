@@ -228,7 +228,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
         {/* Upcoming Holidays */}
         <div className="lg:col-span-1">
-          <HolidayCard holidays={mockData.upcomingHolidays} />
+          <HolidayCard />
         </div>
       </div>
 
