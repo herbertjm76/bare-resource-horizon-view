@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { format, startOfWeek, subWeeks, addDays } from 'date-fns';
+import { format, startOfWeek, subWeeks, addDays, eachWeekOfInterval } from 'date-fns';
 
 interface UtilizationData {
   days7: number;
@@ -43,7 +43,8 @@ export const useTeamUtilization = (teamMembers: any[]) => {
         console.log('90 days ago week start:', format(ninetyDaysAgo, 'yyyy-MM-dd'));
         console.log('Team member IDs:', memberIds);
         
-        // Fetch allocations for the past 90 days
+        // Fetch allocations for the past 90 days - we need to get from project_resource_allocations
+        // which stores weekly allocations, not daily ones
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
           .select('resource_id, hours, week_start_date, project_id')
@@ -67,32 +68,42 @@ export const useTeamUtilization = (teamMembers: any[]) => {
 
         // Calculate utilization for different periods
         const calculatePeriodUtilization = (startDate: Date, periodName: string) => {
-          const periodAllocations = allocations?.filter(allocation => {
-            const allocationDate = new Date(allocation.week_start_date);
-            return allocationDate >= startDate && allocationDate <= currentWeekStart;
-          }) || [];
+          // Get all weeks in the period
+          const weeks = eachWeekOfInterval(
+            { start: startDate, end: currentWeekStart },
+            { weekStartsOn: 1 }
+          );
           
           console.log(`--- ${periodName} Period ---`);
           console.log(`Period start: ${format(startDate, 'yyyy-MM-dd')}`);
           console.log(`Period end: ${format(currentWeekStart, 'yyyy-MM-dd')}`);
-          console.log(`Allocations in period:`, periodAllocations.length);
+          console.log(`Weeks in period: ${weeks.length}`);
           
-          const totalAllocatedHours = periodAllocations.reduce((sum, allocation) => {
-            console.log(`Allocation: ${allocation.resource_id} - ${allocation.hours}h on ${allocation.week_start_date}`);
-            return sum + (allocation.hours || 0);
-          }, 0);
+          let totalAllocatedHours = 0;
           
-          // Calculate number of weeks in the period (including current week)
-          const timeDiff = currentWeekStart.getTime() - startDate.getTime();
-          const weeksInPeriod = Math.floor(timeDiff / (7 * 24 * 60 * 60 * 1000)) + 1; // +1 to include current week
-          const totalCapacity = totalWeeklyCapacity * weeksInPeriod;
+          // For each week, sum up all allocations
+          weeks.forEach(weekStart => {
+            const weekKey = format(weekStart, 'yyyy-MM-dd');
+            const weekAllocations = allocations?.filter(allocation => 
+              allocation.week_start_date === weekKey
+            ) || [];
+            
+            const weekHours = weekAllocations.reduce((sum, allocation) => {
+              console.log(`Week ${weekKey}: ${allocation.resource_id} - ${allocation.hours}h (project: ${allocation.project_id})`);
+              return sum + (allocation.hours || 0);
+            }, 0);
+            
+            totalAllocatedHours += weekHours;
+            console.log(`Week ${weekKey} total hours: ${weekHours}`);
+          });
           
-          console.log(`Total allocated hours: ${totalAllocatedHours}`);
-          console.log(`Weeks in period: ${weeksInPeriod}`);
-          console.log(`Total capacity: ${totalCapacity}`);
+          const totalCapacity = totalWeeklyCapacity * weeks.length;
+          
+          console.log(`Total allocated hours in period: ${totalAllocatedHours}`);
+          console.log(`Total capacity in period: ${totalCapacity}`);
           
           const utilizationPercentage = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
-          console.log(`Utilization: ${utilizationPercentage}%`);
+          console.log(`${periodName} utilization: ${utilizationPercentage}%`);
           
           return utilizationPercentage;
         };
