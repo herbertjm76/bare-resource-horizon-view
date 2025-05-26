@@ -27,13 +27,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useOfficeSettings } from "@/context/officeSettings";
 import { Holiday, HolidayFormValues, holidayFormSchema } from "./types";
 
@@ -92,14 +86,14 @@ export const HolidayDialog: React.FC<HolidayDialogProps> = ({
   const handleDateSelect = (date: Date | undefined, field: any) => {
     if (date) {
       field.onChange(date);
-      setDatePopoverOpen(false); // Auto-close the popover
+      setDatePopoverOpen(false);
     }
   };
 
   const handleEndDateSelect = (date: Date | undefined, field: any) => {
     if (date) {
       field.onChange(date);
-      setEndDatePopoverOpen(false); // Auto-close the popover
+      setEndDatePopoverOpen(false);
     }
   };
 
@@ -212,24 +206,32 @@ export const HolidayDialog: React.FC<HolidayDialogProps> = ({
               name="offices"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Office Location</FormLabel>
-                  <Select
-                    onValueChange={(value) => field.onChange([value])}
-                    value={field.value?.[0] || ""}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an office" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {locations.map((location) => (
-                        <SelectItem key={location.id} value={location.id}>
+                  <FormLabel>Office Locations</FormLabel>
+                  <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-3">
+                    {locations.map((location) => (
+                      <div key={location.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={location.id}
+                          checked={field.value?.includes(location.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              field.onChange([...(field.value || []), location.id]);
+                            } else {
+                              field.onChange(
+                                field.value?.filter((id) => id !== location.id) || []
+                              );
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor={location.id}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
                           {location.emoji} {location.city}, {location.country}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
