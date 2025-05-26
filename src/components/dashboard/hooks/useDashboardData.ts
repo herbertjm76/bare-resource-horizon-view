@@ -53,7 +53,7 @@ export const useDashboardData = () => {
           case 'week':
             utilization = individualUtil.days7;
             break;
-          case 'quarter':
+          case '3months':
             utilization = individualUtil.days90;
             break;
           case 'month':
