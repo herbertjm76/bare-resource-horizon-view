@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Users, TrendingUp, Clock, Target, AlertTriangle, DollarSign, Briefcase, Bot, MessageCircle } from 'lucide-react';
@@ -8,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogPortal } from "@/components/ui/dialog";
 import { HerbieChat } from './HerbieChat';
+import { ScrollArea } from "@/components/ui/scroll-area";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 interface DesktopDashboardProps {
@@ -129,16 +131,16 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
       {/* CEO Priority 2: Three Column Layout - Smart Insights, Staff Status & Holidays */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Smart Insights - Single Column Format */}
+        {/* Smart Insights - Fixed Height with Scroll */}
         <div className="lg:col-span-1">
-          <Card className="h-full">
-            <CardHeader className="pb-4">
+          <Card className="h-[400px] flex flex-col">
+            <CardHeader className="pb-4 flex-shrink-0">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Target className="h-5 w-5 text-brand-violet" />
                 Smart Insights
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex-1 overflow-hidden p-0">
               <EnhancedInsights 
                 teamMembers={teamMembers}
                 activeProjects={activeProjects}
@@ -150,78 +152,82 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           </Card>
         </div>
 
-        {/* Staff Availability & Overloaded */}
+        {/* Staff Availability & Overloaded - Fixed Height with Scroll */}
         <div className="lg:col-span-1">
-          <Card className="h-full">
-            <CardHeader>
+          <Card className="h-[400px] flex flex-col">
+            <CardHeader className="flex-shrink-0">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Users className="h-5 w-5 text-brand-violet" />
                 Staff Status
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Overloaded Staff */}
-              {overloadedStaff.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <AlertTriangle className="h-4 w-4 text-red-500" />
-                    <h4 className="font-semibold text-red-700">Overloaded ({overloadedStaff.length})</h4>
-                  </div>
-                  <div className="space-y-3">
-                    {overloadedStaff.map((member, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
-                        <div className="w-8 h-8 rounded-full bg-red-200 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="font-medium text-gray-800">{member.name}</span>
-                            <span className="text-red-600 font-semibold">{member.availability}%</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-red-100 rounded-full">
-                            <div 
-                              className="h-1.5 rounded-full bg-red-500"
-                              style={{ width: `${Math.min(member.availability, 100)}%` }}
-                            />
-                          </div>
-                        </div>
+            <CardContent className="flex-1 overflow-hidden p-0">
+              <ScrollArea className="h-full">
+                <div className="space-y-6 px-6 pb-6">
+                  {/* Overloaded Staff */}
+                  {overloadedStaff.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        <h4 className="font-semibold text-red-700">Overloaded ({overloadedStaff.length})</h4>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                      <div className="space-y-3">
+                        {overloadedStaff.map((member, index) => (
+                          <div key={index} className="flex items-center gap-3 p-3 bg-red-50 rounded-lg border border-red-100">
+                            <div className="w-8 h-8 rounded-full bg-red-200 flex-shrink-0" />
+                            <div className="flex-1">
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="font-medium text-gray-800">{member.name}</span>
+                                <span className="text-red-600 font-semibold">{member.availability}%</span>
+                              </div>
+                              <div className="w-full h-1.5 bg-red-100 rounded-full">
+                                <div 
+                                  className="h-1.5 rounded-full bg-red-500"
+                                  style={{ width: `${Math.min(member.availability, 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-              {/* Available Staff */}
-              {availableStaff.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Target className="h-4 w-4 text-green-500" />
-                    <h4 className="font-semibold text-green-700">Available ({availableStaff.length})</h4>
-                  </div>
-                  <div className="space-y-3">
-                    {availableStaff.slice(0, 4).map((member, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
-                        <div className="w-8 h-8 rounded-full bg-green-200 flex-shrink-0" />
-                        <div className="flex-1">
-                          <div className="flex justify-between text-sm mb-1">
-                            <span className="font-medium text-gray-800">{member.name}</span>
-                            <span className="text-green-600 font-semibold">{member.availability}%</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-green-100 rounded-full">
-                            <div 
-                              className="h-1.5 rounded-full bg-green-500"
-                              style={{ width: `${member.availability}%` }}
-                            />
-                          </div>
-                        </div>
+                  {/* Available Staff */}
+                  {availableStaff.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <Target className="h-4 w-4 text-green-500" />
+                        <h4 className="font-semibold text-green-700">Available ({availableStaff.length})</h4>
                       </div>
-                    ))}
-                    {availableStaff.length > 4 && (
-                      <p className="text-xs text-gray-500 text-center">
-                        +{availableStaff.length - 4} more available
-                      </p>
-                    )}
-                  </div>
+                      <div className="space-y-3">
+                        {availableStaff.slice(0, 4).map((member, index) => (
+                          <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
+                            <div className="w-8 h-8 rounded-full bg-green-200 flex-shrink-0" />
+                            <div className="flex-1">
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="font-medium text-gray-800">{member.name}</span>
+                                <span className="text-green-600 font-semibold">{member.availability}%</span>
+                              </div>
+                              <div className="w-full h-1.5 bg-green-100 rounded-full">
+                                <div 
+                                  className="h-1.5 rounded-full bg-green-500"
+                                  style={{ width: `${member.availability}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        {availableStaff.length > 4 && (
+                          <p className="text-xs text-gray-500 text-center">
+                            +{availableStaff.length - 4} more available
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              </ScrollArea>
             </CardContent>
           </Card>
         </div>
