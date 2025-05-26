@@ -137,70 +137,29 @@ export const DashboardMetrics = () => {
         </div>
       </div>
 
-      {/* Consolidated Summary Dashboard */}
-      <SummaryDashboard 
-        title="Strategic Overview"
-        metrics={summaryMetrics}
-        className="mb-6"
-      />
+      {/* Masonry Grid Layout - Maximum 4 columns */}
+      <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
+        
+        {/* Strategic Overview - Full width on mobile, spans columns on larger screens */}
+        <div className="break-inside-avoid mb-4">
+          <SummaryDashboard 
+            title="Strategic Overview"
+            metrics={summaryMetrics}
+          />
+        </div>
 
-      {/* New Intelligent Insights Section */}
-      <div className="mb-6">
-        <IntelligentInsights 
-          teamMembers={mockData.teamMembers}
-          activeProjects={mockData.activeProjects}
-          utilizationRate={mockData.utilizationRate.days7}
-        />
-      </div>
-
-      <div className="grid grid-cols-12 gap-4">
-        {/* Resource Planning AI Chat - Takes up more space */}
-        <div className="col-span-5">
-          <ResourcePlanningChat 
-            teamSize={mockData.teamMembers.length}
+        {/* Smart Insights - Compact */}
+        <div className="break-inside-avoid mb-4">
+          <IntelligentInsights 
+            teamMembers={mockData.teamMembers}
             activeProjects={mockData.activeProjects}
             utilizationRate={mockData.utilizationRate.days7}
           />
         </div>
 
-        {/* Utilization Trends - Condensed */}
-        <div className="col-span-4">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl h-[600px]">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">Utilization Trends</h3>
-              <div className="space-y-6">
-                <div className="text-center">
-                  <Gauge 
-                    value={mockData.utilizationRate.days7} 
-                    max={100} 
-                    title="7 Days"
-                    size="md"
-                  />
-                </div>
-                <div className="text-center">
-                  <Gauge 
-                    value={mockData.utilizationRate.days30} 
-                    max={100} 
-                    title="30 Days"
-                    size="md"
-                  />
-                </div>
-                <div className="text-center">
-                  <Gauge 
-                    value={mockData.utilizationRate.days90} 
-                    max={100} 
-                    title="90 Days"
-                    size="md"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Key Stats */}
-        <div className="col-span-3">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl mb-4">
+        <div className="break-inside-avoid mb-4">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
             <CardContent className="p-4 flex items-center">
               <div className="space-y-4 flex-grow">
                 <div>
@@ -226,7 +185,45 @@ export const DashboardMetrics = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
 
+        {/* Utilization Trends */}
+        <div className="break-inside-avoid mb-4">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
+            <CardContent className="p-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Utilization Trends</h3>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <Gauge 
+                    value={mockData.utilizationRate.days7} 
+                    max={100} 
+                    title="7 Days"
+                    size="sm"
+                  />
+                </div>
+                <div className="text-center">
+                  <Gauge 
+                    value={mockData.utilizationRate.days30} 
+                    max={100} 
+                    title="30 Days"
+                    size="sm"
+                  />
+                </div>
+                <div className="text-center">
+                  <Gauge 
+                    value={mockData.utilizationRate.days90} 
+                    max={100} 
+                    title="90 Days"
+                    size="sm"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Holidays */}
+        <div className="break-inside-avoid mb-4">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
             <CardContent className="p-4">
               <HolidaysList holidays={mockData.upcomingHolidays} />
@@ -234,17 +231,17 @@ export const DashboardMetrics = () => {
           </Card>
         </div>
 
-        {/* Staff Availability - Full width */}
-        <div className="col-span-12">
-          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
-            <CardContent className="p-6">
-              <StaffAvailability staffMembers={mockData.staffData} />
-            </CardContent>
-          </Card>
+        {/* Resource Planning Chat */}
+        <div className="break-inside-avoid mb-4">
+          <ResourcePlanningChat 
+            teamSize={mockData.teamMembers.length}
+            activeProjects={mockData.activeProjects}
+            utilizationRate={mockData.utilizationRate.days7}
+          />
         </div>
 
-        {/* Project Analytics - Smaller cards */}
-        <div className="col-span-3">
+        {/* Project Analytics Cards */}
+        <div className="break-inside-avoid mb-4">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
             <CardContent className="p-4">
               <Donut 
@@ -256,7 +253,7 @@ export const DashboardMetrics = () => {
           </Card>
         </div>
 
-        <div className="col-span-3">
+        <div className="break-inside-avoid mb-4">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
             <CardContent className="p-4">
               <Donut 
@@ -268,7 +265,7 @@ export const DashboardMetrics = () => {
           </Card>
         </div>
 
-        <div className="col-span-3">
+        <div className="break-inside-avoid mb-4">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
             <CardContent className="p-4">
               <Donut 
@@ -280,7 +277,7 @@ export const DashboardMetrics = () => {
           </Card>
         </div>
 
-        <div className="col-span-3">
+        <div className="break-inside-avoid mb-4">
           <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
             <CardContent className="p-4">
               <Donut 
@@ -288,6 +285,15 @@ export const DashboardMetrics = () => {
                 title="Resource by Office"
                 colors={['#FF6B6B', '#91D3FF']}
               />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Staff Availability - Full width */}
+        <div className="break-inside-avoid mb-4 col-span-full">
+          <Card className="shadow-xs border border-[#F0F0F4] rounded-2xl">
+            <CardContent className="p-6">
+              <StaffAvailability staffMembers={mockData.staffData} />
             </CardContent>
           </Card>
         </div>
