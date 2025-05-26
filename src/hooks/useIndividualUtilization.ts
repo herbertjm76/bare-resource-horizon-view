@@ -38,14 +38,15 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
         console.log('Current week start (Monday):', format(currentWeekStart, 'yyyy-MM-dd'));
         console.log('30 days ago week start:', format(thirtyDaysAgo, 'yyyy-MM-dd'));
         console.log('90 days ago week start:', format(ninetyDaysAgo, 'yyyy-MM-dd'));
-        console.log('Member IDs:', memberIds);
+        console.log('Team members for utilization:', teamMembers.map(m => ({ id: m.id, name: `${m.first_name} ${m.last_name}` })));
         
         // Fetch allocations for all members for the past 90 days
+        // Include both 'active' and 'pre_registered' resource types
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
-          .select('resource_id, hours, week_start_date, project_id')
+          .select('resource_id, hours, week_start_date, project_id, resource_type')
           .eq('company_id', company.id)
-          .eq('resource_type', 'active')
+          .in('resource_type', ['active', 'pre_registered'])
           .in('resource_id', memberIds)
           .gte('week_start_date', format(ninetyDaysAgo, 'yyyy-MM-dd'))
           .lte('week_start_date', format(currentWeekStart, 'yyyy-MM-dd'));
@@ -53,6 +54,13 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
         if (error) throw error;
 
         console.log('Individual allocations fetched:', allocations?.length || 0);
+        console.log('Allocations by member:', allocations?.reduce((acc, allocation) => {
+          const memberName = teamMembers.find(m => m.id === allocation.resource_id);
+          const key = `${memberName?.first_name || 'Unknown'} ${memberName?.last_name || ''} (${allocation.resource_id})`;
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(allocation);
+          return acc;
+        }, {} as Record<string, any[]>));
 
         const utilizationMap: Record<string, IndividualUtilization> = {};
 
@@ -71,7 +79,14 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
           const member = teamMembers.find(m => m.id === memberId);
           const memberCapacity = member?.weekly_capacity || 40;
           
-          console.log(`--- Member ${memberId} (Capacity: ${memberCapacity}h/week) ---`);
+          console.log(`--- Member ${member?.first_name} ${member?.last_name} (${memberId}) (Capacity: ${memberCapacity}h/week) ---`);
+
+          // Get allocations for this specific member
+          const memberAllocations = allocations?.filter(allocation => 
+            allocation.resource_id === memberId
+          ) || [];
+          
+          console.log(`Member allocations found: ${memberAllocations.length}`);
 
           // Calculate for different periods
           const calculatePeriodUtilization = (startDate: Date, periodName: string) => {
@@ -84,17 +99,19 @@ export const useIndividualUtilization = (teamMembers: TeamMember[]) => {
             
             weeks.forEach(weekStart => {
               const weekKey = format(weekStart, 'yyyy-MM-dd');
-              const weekAllocations = allocations?.filter(allocation => 
-                allocation.week_start_date === weekKey && allocation.resource_id === memberId
-              ) || [];
+              const weekAllocations = memberAllocations.filter(allocation => 
+                allocation.week_start_date === weekKey
+              );
               
               const weekHours = weekAllocations.reduce((sum, allocation) => {
-                console.log(`  Week ${weekKey}: ${allocation.hours}h (project: ${allocation.project_id})`);
+                console.log(`  Week ${weekKey}: ${allocation.hours}h (project: ${allocation.project_id}, type: ${allocation.resource_type})`);
                 return sum + (Number(allocation.hours) || 0);
               }, 0);
               
               totalAllocatedHours += weekHours;
-              console.log(`  Week ${weekKey} total: ${weekHours}h`);
+              if (weekHours > 0) {
+                console.log(`  Week ${weekKey} total: ${weekHours}h`);
+              }
             });
             
             const totalCapacity = memberCapacity * weeks.length;
