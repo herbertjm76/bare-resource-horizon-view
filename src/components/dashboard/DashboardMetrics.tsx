@@ -6,6 +6,7 @@ import { DesktopDashboard } from './DesktopDashboard';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardLoadingState } from './DashboardLoadingState';
 import { useDashboardData } from './hooks/useDashboardData';
+import { toast } from "sonner";
 
 export const DashboardMetrics = () => {
   const isMobile = useIsMobile();
@@ -28,6 +29,22 @@ export const DashboardMetrics = () => {
     return <DashboardLoadingState />;
   }
 
+  // Show toast when time range changes
+  const handleTimeRangeChange = (newRange: typeof selectedTimeRange) => {
+    setSelectedTimeRange(newRange);
+    
+    const rangeText = {
+      'week': 'This Week',
+      'month': 'This Month',
+      '3months': 'This Quarter',
+      '4months': '4 Months',
+      '6months': '6 Months',
+      'year': 'This Year'
+    }[newRange];
+    
+    toast.success(`Dashboard updated to show data for ${rangeText}`);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -35,7 +52,7 @@ export const DashboardMetrics = () => {
         selectedOffice={selectedOffice}
         setSelectedOffice={setSelectedOffice}
         selectedTimeRange={selectedTimeRange}
-        setSelectedTimeRange={setSelectedTimeRange}
+        setSelectedTimeRange={handleTimeRangeChange}
         officeOptions={officeOptions}
       />
 
@@ -59,6 +76,7 @@ export const DashboardMetrics = () => {
               utilizationTrends={utilizationTrends}
               staffData={staffData}
               mockData={mockData}
+              selectedTimeRange={selectedTimeRange}
             />
           </div>
         )}

@@ -4,6 +4,7 @@ import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
 import { useIndividualUtilization } from './useIndividualUtilization';
+import { useTimeRangeMetrics } from './useTimeRangeMetrics';
 import { TimeRange } from '../TimeRangeSelector';
 
 export const useDashboardData = () => {
@@ -19,37 +20,42 @@ export const useDashboardData = () => {
   // Get pre-registered members
   const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
   
+  // Get time-range specific metrics
+  const { metrics: timeRangeMetrics, isLoading: isLoadingMetrics } = useTimeRangeMetrics(selectedTimeRange);
+  
   // Combine all team members (active + pre-registered)
   const allTeamMembers = useMemo(() => {
     console.log('=== DASHBOARD DATA HOOK ===');
     console.log('Active team members:', activeTeamMembers?.length || 0);
     console.log('Pre-registered members:', preRegisteredMembers?.length || 0);
+    console.log('Selected time range:', selectedTimeRange);
     
     const combined = [...(activeTeamMembers || []), ...(preRegisteredMembers || [])];
     console.log('Total combined members:', combined.length);
-    console.log('Combined members:', combined.map(m => ({ 
-      id: m.id,
-      name: `${m.first_name} ${m.last_name}`, 
-      isPending: 'isPending' in m ? m.isPending : false 
-    })));
     
     return combined;
   }, [activeTeamMembers, preRegisteredMembers]);
 
-  // Get utilization data for all members
-  const { memberUtilizations, isLoading: isLoadingUtilization } = useIndividualUtilization(allTeamMembers);
+  // Filter team members by selected office
+  const filteredTeamMembers = useMemo(() => {
+    if (selectedOffice === 'All Offices') {
+      return allTeamMembers;
+    }
+    return allTeamMembers.filter(member => member.location === selectedOffice);
+  }, [allTeamMembers, selectedOffice]);
+
+  // Get utilization data for filtered members
+  const { memberUtilizations, isLoading: isLoadingUtilization } = useIndividualUtilization(filteredTeamMembers);
 
   // Calculate staff data with proper utilization and all member properties
   const staffData = useMemo(() => {
     console.log('=== CALCULATING STAFF DATA ===');
-    console.log('All team members for staff data:', allTeamMembers.length);
+    console.log('Filtered team members for staff data:', filteredTeamMembers.length);
     console.log('Member utilizations:', memberUtilizations);
     
-    const staffMembers = allTeamMembers.map(member => {
+    const staffMembers = filteredTeamMembers.map(member => {
       const memberName = `${member.first_name || ''} ${member.last_name || ''}`.trim();
       const utilization = memberUtilizations[member.id] || 0;
-      
-      console.log(`Member: ${memberName}, ID: ${member.id}, Utilization: ${utilization}%`);
       
       return {
         id: member.id,
@@ -76,7 +82,7 @@ export const useDashboardData = () => {
     console.log('=== END STAFF DATA CALCULATION ===');
 
     return staffMembers;
-  }, [allTeamMembers, memberUtilizations]);
+  }, [filteredTeamMembers, memberUtilizations]);
 
   // Generate office options from team members
   const officeOptions = useMemo(() => {
@@ -89,23 +95,19 @@ export const useDashboardData = () => {
     return Array.from(offices);
   }, [allTeamMembers]);
 
-  // Calculate metrics
+  // Mock utilization trends - replaced with actual data when available
+  const utilizationTrends = timeRangeMetrics.utilizationTrends;
+
+  // Use metrics from time range metrics hook
   const metrics = useMemo(() => {
     return {
-      activeProjects: 12, // Mock data
-      activeResources: allTeamMembers.length,
+      activeProjects: timeRangeMetrics.activeProjects,
+      activeResources: filteredTeamMembers.length,
     };
-  }, [allTeamMembers]);
+  }, [timeRangeMetrics.activeProjects, filteredTeamMembers.length]);
 
-  // Mock utilization trends
-  const utilizationTrends = {
-    days7: 75,
-    days30: 78,
-    days90: 82
-  };
-
-  // Mock data for charts - ensure all required properties exist
-  const mockData = {
+  // Mock data for charts - enhanced with time range metrics
+  const mockData = useMemo(() => ({
     weeklyData: [
       { name: 'Mon', utilization: 85, capacity: 100 },
       { name: 'Tue', utilization: 92, capacity: 100 },
@@ -119,36 +121,42 @@ export const useDashboardData = () => {
       { name: 'Planning', value: 22, color: '#10B981' },
       { name: 'Consulting', value: 15, color: '#F59E0B' },
     ],
-    projectsByStatus: [
-      { name: 'Active', value: 8 },
-      { name: 'On Hold', value: 3 },
-      { name: 'Completed', value: 12 },
-    ],
-    projectsByStage: [
-      { name: '50% CD', value: 5 },
-      { name: '100% CD', value: 4 },
-      { name: '50% SD', value: 3 },
-    ],
-    projectsByRegion: [
-      { name: 'North', value: 6 },
-      { name: 'South', value: 4 },
-      { name: 'East', value: 2 },
-    ],
+    projectsByStatus: timeRangeMetrics.projectsByStatus.length > 0 
+      ? timeRangeMetrics.projectsByStatus 
+      : [
+          { name: 'Active', value: 8 },
+          { name: 'On Hold', value: 3 },
+          { name: 'Completed', value: 12 },
+        ],
+    projectsByStage: timeRangeMetrics.projectsByStage.length > 0 
+      ? timeRangeMetrics.projectsByStage 
+      : [
+          { name: '50% CD', value: 5 },
+          { name: '100% CD', value: 4 },
+          { name: '50% SD', value: 3 },
+        ],
+    projectsByRegion: timeRangeMetrics.projectsByRegion.length > 0 
+      ? timeRangeMetrics.projectsByRegion 
+      : [
+          { name: 'North', value: 6 },
+          { name: 'South', value: 4 },
+          { name: 'East', value: 2 },
+        ],
     projectInvoicesThisMonth: [
       { name: 'Paid', value: 8 },
       { name: 'Pending', value: 3 },
       { name: 'Overdue', value: 1 },
     ],
-  };
+  }), [timeRangeMetrics]);
 
-  const isLoading = isLoadingActive || isLoadingUtilization;
+  const isLoading = isLoadingActive || isLoadingUtilization || isLoadingMetrics;
 
   return {
     selectedOffice,
     setSelectedOffice,
     selectedTimeRange,
     setSelectedTimeRange,
-    allTeamMembers,
+    allTeamMembers: filteredTeamMembers,
     utilizationTrends,
     metrics,
     staffData,

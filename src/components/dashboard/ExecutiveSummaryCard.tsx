@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DollarSign, TrendingUp, Clock, Briefcase, Users } from 'lucide-react';
+import { TimeRange } from './TimeRangeSelector';
 
 interface ExecutiveSummaryCardProps {
   activeProjects: number;
@@ -12,12 +13,14 @@ interface ExecutiveSummaryCardProps {
     days30: number;
     days90: number;
   };
+  selectedTimeRange: TimeRange;
 }
 
 export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
   activeProjects,
   activeResources,
-  utilizationTrends
+  utilizationTrends,
+  selectedTimeRange
 }) => {
   const getUtilizationStatus = (rate: number) => {
     if (rate > 90) return { color: 'destructive', label: 'At Capacity' };
@@ -25,7 +28,28 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
     return { color: 'outline', label: 'Ready for Projects' };
   };
 
-  const utilizationStatus = getUtilizationStatus(utilizationTrends.days7);
+  // Get the appropriate utilization value based on the time range
+  const getTimeRangeUtilization = () => {
+    switch (selectedTimeRange) {
+      case 'week': return utilizationTrends.days7;
+      case 'month': return utilizationTrends.days30;
+      case '3months': return utilizationTrends.days90;
+      default: return utilizationTrends.days30;
+    }
+  };
+
+  const utilizationRate = getTimeRangeUtilization();
+  const utilizationStatus = getUtilizationStatus(utilizationRate);
+
+  // Format time range for display
+  const getTimeRangeText = () => {
+    switch (selectedTimeRange) {
+      case 'week': return 'This Week';
+      case 'month': return 'This Month';
+      case '3months': return 'This Quarter';
+      default: return 'Selected Period';
+    }
+  };
 
   return (
     <div 
@@ -37,6 +61,9 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
       <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
         <DollarSign className="h-5 w-5" />
         Executive Summary
+        <span className="text-sm font-normal ml-2 bg-white/20 px-2 py-0.5 rounded">
+          {getTimeRangeText()}
+        </span>
       </h2>
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -45,7 +72,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-xs font-medium text-gray-600 mb-1">Team Utilization</p>
-                <p className="text-2xl font-bold text-gray-900 mb-2">{utilizationTrends.days7}%</p>
+                <p className="text-2xl font-bold text-gray-900 mb-2">{utilizationRate}%</p>
                 <Badge variant={utilizationStatus.color as any} className="text-xs">
                   {utilizationStatus.label}
                 </Badge>

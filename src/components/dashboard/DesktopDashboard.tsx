@@ -8,6 +8,7 @@ import { ExecutiveSummaryCard } from './ExecutiveSummaryCard';
 import { StaffStatusCard } from './staff/StaffStatusCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { HerbieFloatingButton } from './HerbieFloatingButton';
+import { TimeRange } from './TimeRangeSelector';
 
 interface DesktopDashboardProps {
   teamMembers: any[];
@@ -20,6 +21,7 @@ interface DesktopDashboardProps {
   };
   staffData: any[];
   mockData: any;
+  selectedTimeRange: TimeRange;
 }
 
 export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
@@ -28,7 +30,8 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   activeResources,
   utilizationTrends,
   staffData,
-  mockData
+  mockData,
+  selectedTimeRange
 }) => {
   return (
     <div className="space-y-8 p-6 relative">
@@ -37,6 +40,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         activeProjects={activeProjects}
         activeResources={activeResources}
         utilizationTrends={utilizationTrends}
+        selectedTimeRange={selectedTimeRange}
       />
 
       {/* CEO Priority 2: Three Column Layout - Smart Insights, Staff Status & Holidays */}

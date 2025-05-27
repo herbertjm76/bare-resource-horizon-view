@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Donut } from './Donut';
 
 interface AnalyticsSectionProps {
@@ -13,49 +13,91 @@ interface AnalyticsSectionProps {
 }
 
 export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) => {
+  // Check if chart data arrays have any entries
+  const hasStatusData = mockData.projectsByStatus && mockData.projectsByStatus.length > 0;
+  const hasStageData = mockData.projectsByStage && mockData.projectsByStage.length > 0;
+  const hasRegionData = mockData.projectsByRegion && mockData.projectsByRegion.length > 0;
+  const hasInvoiceData = mockData.projectInvoicesThisMonth && mockData.projectInvoicesThisMonth.length > 0;
+  
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       <Card>
+        <CardHeader className="pb-1">
+          <CardTitle className="text-sm">Project Status</CardTitle>
+        </CardHeader>
         <CardContent className="p-4">
-          <Donut 
-            data={mockData.projectsByStatus} 
-            title="Project Status" 
-            colors={['#6F4BF6', '#5669F7', '#E64FC4']}
-            height={200}
-          />
+          {hasStatusData ? (
+            <Donut 
+              data={mockData.projectsByStatus} 
+              title="" 
+              colors={['#6F4BF6', '#5669F7', '#E64FC4']}
+              height={200}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-[200px] text-gray-500 text-sm">
+              No data available
+            </div>
+          )}
         </CardContent>
       </Card>
 
       <Card>
+        <CardHeader className="pb-1">
+          <CardTitle className="text-sm">Project Stages</CardTitle>
+        </CardHeader>
         <CardContent className="p-4">
-          <Donut 
-            data={mockData.projectsByStage} 
-            title="Project Stages"
-            colors={['#6F4BF6', '#5669F7', '#E64FC4']}
-            height={200}
-          />
+          {hasStageData ? (
+            <Donut 
+              data={mockData.projectsByStage} 
+              title=""
+              colors={['#6F4BF6', '#5669F7', '#E64FC4']}
+              height={200}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-[200px] text-gray-500 text-sm">
+              No data available
+            </div>
+          )}
         </CardContent>
       </Card>
 
       <Card>
+        <CardHeader className="pb-1">
+          <CardTitle className="text-sm">Regional Split</CardTitle>
+        </CardHeader>
         <CardContent className="p-4">
-          <Donut 
-            data={mockData.projectsByRegion} 
-            title="Regional Split"
-            colors={['#6F4BF6', '#5669F7', '#E64FC4']}
-            height={200}
-          />
+          {hasRegionData ? (
+            <Donut 
+              data={mockData.projectsByRegion} 
+              title=""
+              colors={['#6F4BF6', '#5669F7', '#E64FC4']}
+              height={200}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-[200px] text-gray-500 text-sm">
+              No data available
+            </div>
+          )}
         </CardContent>
       </Card>
 
       <Card>
+        <CardHeader className="pb-1">
+          <CardTitle className="text-sm">Project Invoices</CardTitle>
+        </CardHeader>
         <CardContent className="p-4">
-          <Donut 
-            data={mockData.projectInvoicesThisMonth} 
-            title="Project Invoices This Month"
-            colors={['#22C55E', '#F59E0B', '#EF4444']}
-            height={200}
-          />
+          {hasInvoiceData ? (
+            <Donut 
+              data={mockData.projectInvoicesThisMonth} 
+              title=""
+              colors={['#22C55E', '#F59E0B', '#EF4444']}
+              height={200}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-[200px] text-gray-500 text-sm">
+              No data available
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
