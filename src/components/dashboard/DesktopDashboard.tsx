@@ -72,9 +72,9 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           </Card>
         </div>
 
-        {/* Staff Availability & Status */}
+        {/* Staff Availability & Status - NOW INCLUDES TIME RANGE */}
         <div className="lg:col-span-1">
-          <StaffStatusCard staffData={staffData} />
+          <StaffStatusCard staffData={staffData} selectedTimeRange={selectedTimeRange} />
         </div>
 
         {/* Upcoming Holidays */}

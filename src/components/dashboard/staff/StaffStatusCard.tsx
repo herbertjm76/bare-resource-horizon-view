@@ -6,20 +6,42 @@ import { Users, AlertTriangle, Target } from 'lucide-react';
 import { StaffStatusCardProps } from './types';
 import { StaffSection } from './StaffSection';
 import { categorizeStaff } from './utils';
+import { TimeRange } from '../TimeRangeSelector';
 
-export const StaffStatusCard: React.FC<StaffStatusCardProps> = ({ staffData }) => {
+interface ExtendedStaffStatusCardProps extends StaffStatusCardProps {
+  selectedTimeRange: TimeRange;
+}
+
+export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({ 
+  staffData, 
+  selectedTimeRange 
+}) => {
   // Debug logging
   useEffect(() => {
     console.log('=== STAFF STATUS CARD UPDATE ===');
     console.log('Staff data received:', staffData.length);
+    console.log('Selected time range:', selectedTimeRange);
     console.log('Staff members with availability:', staffData.map(s => ({ 
       name: s.name, 
       availability: s.availability 
     })));
     console.log('=== END STAFF STATUS CARD ===');
-  }, [staffData]);
+  }, [staffData, selectedTimeRange]);
 
   const { atCapacityStaff, optimalStaff, readyStaff } = categorizeStaff(staffData);
+
+  // Get time range display text
+  const getTimeRangeText = () => {
+    switch (selectedTimeRange) {
+      case 'week': return 'This Week';
+      case 'month': return 'This Month';
+      case '3months': return 'This Quarter';
+      case '4months': return '4 Months';
+      case '6months': return '6 Months';
+      case 'year': return 'This Year';
+      default: return 'Selected Period';
+    }
+  };
 
   return (
     <Card className="h-[400px] flex flex-col">
@@ -27,6 +49,9 @@ export const StaffStatusCard: React.FC<StaffStatusCardProps> = ({ staffData }) =
         <CardTitle className="text-lg flex items-center gap-2">
           <Users className="h-5 w-5 text-brand-violet" />
           Staff Status
+          <span className="text-sm font-normal ml-2 bg-gray-100 px-2 py-0.5 rounded">
+            {getTimeRangeText()}
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden p-0">

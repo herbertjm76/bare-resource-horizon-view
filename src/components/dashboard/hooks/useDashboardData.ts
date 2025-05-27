@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from 'react';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
@@ -44,14 +45,15 @@ export const useDashboardData = () => {
     return allTeamMembers.filter(member => member.location === selectedOffice);
   }, [allTeamMembers, selectedOffice]);
 
-  // Get utilization data for filtered members
-  const { memberUtilizations, isLoading: isLoadingUtilization } = useIndividualUtilization(filteredTeamMembers);
+  // Get utilization data for filtered members - NOW INCLUDES TIME RANGE
+  const { memberUtilizations, isLoading: isLoadingUtilization } = useIndividualUtilization(filteredTeamMembers, selectedTimeRange);
 
   // Calculate staff data with proper utilization and all member properties
   const staffData = useMemo(() => {
     console.log('=== CALCULATING STAFF DATA ===');
     console.log('Filtered team members for staff data:', filteredTeamMembers.length);
     console.log('Member utilizations:', memberUtilizations);
+    console.log('Selected time range for staff data:', selectedTimeRange);
     
     const staffMembers = filteredTeamMembers.map(member => {
       const memberName = `${member.first_name || ''} ${member.last_name || ''}`.trim();
@@ -73,7 +75,7 @@ export const useDashboardData = () => {
       };
     });
 
-    console.log('Final staff data:', staffMembers.map(s => ({ 
+    console.log('Final staff data for', selectedTimeRange, ':', staffMembers.map(s => ({ 
       id: s.id,
       name: s.name, 
       availability: s.availability,
@@ -82,7 +84,7 @@ export const useDashboardData = () => {
     console.log('=== END STAFF DATA CALCULATION ===');
 
     return staffMembers;
-  }, [filteredTeamMembers, memberUtilizations]);
+  }, [filteredTeamMembers, memberUtilizations, selectedTimeRange]);
 
   // Generate office options from team members
   const officeOptions = useMemo(() => {
