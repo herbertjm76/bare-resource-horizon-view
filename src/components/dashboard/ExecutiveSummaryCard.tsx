@@ -62,21 +62,41 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
     }
   };
 
-  // Calculate available capacity based on time range
+  // Calculate available capacity based on time range - ALLOW NEGATIVE VALUES
   const getCapacityHours = () => {
     const baseWeeklyHours = activeResources * 40;
+    let totalCapacity: number;
+    
     switch (selectedTimeRange) {
-      case 'week': return Math.round(baseWeeklyHours * (1 - utilizationRate / 100));
-      case 'month': return Math.round(baseWeeklyHours * 4 * (1 - utilizationRate / 100));
-      case '3months': return Math.round(baseWeeklyHours * 12 * (1 - utilizationRate / 100));
-      case '4months': return Math.round(baseWeeklyHours * 16 * (1 - utilizationRate / 100));
-      case '6months': return Math.round(baseWeeklyHours * 24 * (1 - utilizationRate / 100));
-      case 'year': return Math.round(baseWeeklyHours * 48 * (1 - utilizationRate / 100));
-      default: return Math.round(baseWeeklyHours * 4 * (1 - utilizationRate / 100));
+      case 'week': 
+        totalCapacity = baseWeeklyHours;
+        break;
+      case 'month': 
+        totalCapacity = baseWeeklyHours * 4;
+        break;
+      case '3months': 
+        totalCapacity = baseWeeklyHours * 12;
+        break;
+      case '4months': 
+        totalCapacity = baseWeeklyHours * 16;
+        break;
+      case '6months': 
+        totalCapacity = baseWeeklyHours * 24;
+        break;
+      case 'year': 
+        totalCapacity = baseWeeklyHours * 48;
+        break;
+      default: 
+        totalCapacity = baseWeeklyHours * 4;
     }
+    
+    // Calculate available capacity (can be negative if overallocated)
+    const availableCapacity = totalCapacity * (1 - utilizationRate / 100);
+    return Math.round(availableCapacity);
   };
 
   const capacityHours = getCapacityHours();
+  const isOverCapacity = capacityHours < 0;
 
   console.log('Executive Summary Card Data:', {
     selectedTimeRange,
@@ -85,7 +105,8 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
     utilizationRate,
     totalRevenue,
     avgProjectValue,
-    capacityHours
+    capacityHours,
+    isOverCapacity
   });
 
   return (
@@ -125,12 +146,18 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-xs font-medium text-gray-600 mb-1">Available Capacity</p>
-                <p className="text-2xl font-bold text-gray-900 mb-1">{capacityHours.toLocaleString()}h</p>
+                <p className="text-xs font-medium text-gray-600 mb-1">
+                  {isOverCapacity ? 'Over Capacity' : 'Available Capacity'}
+                </p>
+                <p className={`text-2xl font-bold mb-1 ${isOverCapacity ? 'text-red-600' : 'text-gray-900'}`}>
+                  {isOverCapacity ? '' : ''}{Math.abs(capacityHours).toLocaleString()}h
+                </p>
                 <p className="text-xs font-medium text-gray-500">{getTimeRangeText()}</p>
               </div>
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                <Clock className="h-5 w-5 text-blue-600" />
+              <div className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                isOverCapacity ? 'bg-red-100' : 'bg-blue-100'
+              }`}>
+                <Clock className={`h-5 w-5 ${isOverCapacity ? 'text-red-600' : 'text-blue-600'}`} />
               </div>
             </div>
           </CardContent>
