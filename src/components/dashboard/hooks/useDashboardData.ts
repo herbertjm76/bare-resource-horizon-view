@@ -95,8 +95,10 @@ export const useDashboardData = () => {
     return Array.from(offices);
   }, [allTeamMembers]);
 
-  // Mock utilization trends - replaced with actual data when available
-  const utilizationTrends = timeRangeMetrics.utilizationTrends;
+  // Use utilization trends from time range metrics
+  const utilizationTrends = useMemo(() => {
+    return timeRangeMetrics.utilizationTrends;
+  }, [timeRangeMetrics.utilizationTrends]);
 
   // Use metrics from time range metrics hook
   const metrics = useMemo(() => {

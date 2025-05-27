@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { TimeRange } from '../TimeRangeSelector';
@@ -18,18 +18,21 @@ interface TimeRangeMetrics {
   avgProjectValue: number;
 }
 
+const defaultMetrics: TimeRangeMetrics = {
+  activeProjects: 0,
+  utilizationTrends: { days7: 0, days30: 0, days90: 0 },
+  projectsByStatus: [],
+  projectsByStage: [],
+  projectsByRegion: [],
+  totalRevenue: 0,
+  avgProjectValue: 0
+};
+
 export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
-  const [metrics, setMetrics] = useState<TimeRangeMetrics>({
-    activeProjects: 0,
-    utilizationTrends: { days7: 0, days30: 0, days90: 0 },
-    projectsByStatus: [],
-    projectsByStage: [],
-    projectsByRegion: [],
-    totalRevenue: 0,
-    avgProjectValue: 0
-  });
+  const [metrics, setMetrics] = useState<TimeRangeMetrics>(defaultMetrics);
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Calculate date range based on selected time range
   const dateRange = useMemo(() => {
@@ -46,6 +49,15 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       case '3months':
         startDate = subMonths(startOfMonth(now), 3);
         break;
+      case '4months':
+        startDate = subMonths(startOfMonth(now), 4);
+        break;
+      case '6months':
+        startDate = subMonths(startOfMonth(now), 6);
+        break;
+      case 'year':
+        startDate = subMonths(startOfMonth(now), 12);
+        break;
       default:
         startDate = startOfMonth(now);
     }
@@ -56,121 +68,141 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
     };
   }, [selectedTimeRange]);
 
-  useEffect(() => {
-    const fetchTimeRangeMetrics = async () => {
-      if (!company?.id) {
-        setIsLoading(false);
-        return;
+  const fetchTimeRangeMetrics = useCallback(async () => {
+    if (!company?.id) {
+      setIsLoading(false);
+      return;
+    }
+
+    // Cancel previous request if it exists
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
+    setIsLoading(true);
+    
+    try {
+      console.log('Fetching metrics for time range:', selectedTimeRange, dateRange);
+
+      // Fetch projects within date range
+      const { data: projects, error: projectsError } = await supabase
+        .from('projects')
+        .select(`
+          id,
+          name,
+          status,
+          current_stage,
+          country,
+          created_at,
+          office:offices(name, country)
+        `)
+        .eq('company_id', company.id)
+        .gte('created_at', dateRange.startDate)
+        .lte('created_at', dateRange.endDate)
+        .abortSignal(signal);
+
+      if (projectsError) {
+        console.error('Error fetching projects:', projectsError);
+        throw projectsError;
       }
 
-      setIsLoading(true);
+      // Check if request was aborted
+      if (signal.aborted) return;
+
+      // Fetch project stages/fees for revenue calculation
+      const { data: projectStages, error: stagesError } = await supabase
+        .from('project_stages')
+        .select('fee, project_id, created_at')
+        .eq('company_id', company.id)
+        .gte('created_at', dateRange.startDate)
+        .lte('created_at', dateRange.endDate)
+        .abortSignal(signal);
+
+      if (stagesError) {
+        console.error('Error fetching project stages:', stagesError);
+        throw stagesError;
+      }
+
+      if (signal.aborted) return;
+
+      // Fetch allocations for utilization trends
+      const { data: allocations, error: allocationsError } = await supabase
+        .from('project_resource_allocations')
+        .select('hours, week_start_date, resource_id')
+        .eq('company_id', company.id)
+        .gte('week_start_date', dateRange.startDate)
+        .lte('week_start_date', dateRange.endDate)
+        .abortSignal(signal);
+
+      if (allocationsError) {
+        console.error('Error fetching allocations:', allocationsError);
+        throw allocationsError;
+      }
+
+      if (signal.aborted) return;
+
+      // Calculate metrics
+      const activeProjects = projects?.length || 0;
       
-      try {
-        console.log('Fetching metrics for time range:', selectedTimeRange, dateRange);
+      // Calculate revenue
+      const totalRevenue = projectStages?.reduce((sum, stage) => sum + (stage.fee || 0), 0) || 0;
+      const avgProjectValue = activeProjects > 0 ? totalRevenue / activeProjects : 0;
 
-        // Fetch projects within date range
-        const { data: projects, error: projectsError } = await supabase
-          .from('projects')
-          .select(`
-            id,
-            name,
-            status,
-            current_stage,
-            country,
-            created_at,
-            office:offices(name, country)
-          `)
-          .eq('company_id', company.id)
-          .gte('created_at', dateRange.startDate)
-          .lte('created_at', dateRange.endDate);
+      // Calculate utilization (simplified for now)
+      const totalHours = allocations?.reduce((sum, alloc) => sum + (alloc.hours || 0), 0) || 0;
+      const uniqueResources = new Set(allocations?.map(alloc => alloc.resource_id) || []).size;
+      const avgUtilization = uniqueResources > 0 ? Math.min((totalHours / (uniqueResources * 40)) * 100, 100) : 0;
 
-        if (projectsError) {
-          console.error('Error fetching projects:', projectsError);
-          throw projectsError;
-        }
+      // Group projects by status
+      const statusGroups = projects?.reduce((acc, project) => {
+        const status = project.status || 'Unknown';
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>) || {};
 
-        // Fetch project stages/fees for revenue calculation
-        const { data: projectStages, error: stagesError } = await supabase
-          .from('project_stages')
-          .select('fee, project_id, created_at')
-          .eq('company_id', company.id)
-          .gte('created_at', dateRange.startDate)
-          .lte('created_at', dateRange.endDate);
+      const projectsByStatus = Object.entries(statusGroups).map(([name, value]) => ({
+        name,
+        value
+      }));
 
-        if (stagesError) {
-          console.error('Error fetching project stages:', stagesError);
-          throw stagesError;
-        }
+      // Group projects by stage
+      const stageGroups = projects?.reduce((acc, project) => {
+        const stage = project.current_stage || 'Unknown';
+        acc[stage] = (acc[stage] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>) || {};
 
-        // Fetch allocations for utilization trends
-        const { data: allocations, error: allocationsError } = await supabase
-          .from('project_resource_allocations')
-          .select('hours, week_start_date, resource_id')
-          .eq('company_id', company.id)
-          .gte('week_start_date', dateRange.startDate)
-          .lte('week_start_date', dateRange.endDate);
+      const projectsByStage = Object.entries(stageGroups).map(([name, value]) => ({
+        name,
+        value
+      }));
 
-        if (allocationsError) {
-          console.error('Error fetching allocations:', allocationsError);
-          throw allocationsError;
-        }
+      // Group projects by region/country
+      const regionGroups = projects?.reduce((acc, project) => {
+        const region = project.country || 'Unknown';
+        acc[region] = (acc[region] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>) || {};
 
-        // Calculate metrics
-        const activeProjects = projects?.length || 0;
-        
-        // Calculate revenue
-        const totalRevenue = projectStages?.reduce((sum, stage) => sum + (stage.fee || 0), 0) || 0;
-        const avgProjectValue = activeProjects > 0 ? totalRevenue / activeProjects : 0;
+      const projectsByRegion = Object.entries(regionGroups).map(([name, value]) => ({
+        name,
+        value
+      }));
 
-        // Calculate utilization (simplified for now)
-        const totalHours = allocations?.reduce((sum, alloc) => sum + (alloc.hours || 0), 0) || 0;
-        const uniqueResources = new Set(allocations?.map(alloc => alloc.resource_id) || []).size;
-        const avgUtilization = uniqueResources > 0 ? Math.min((totalHours / (uniqueResources * 40)) * 100, 100) : 0;
+      console.log('Calculated metrics:', {
+        activeProjects,
+        totalRevenue,
+        avgProjectValue,
+        avgUtilization,
+        timeRange: selectedTimeRange
+      });
 
-        // Group projects by status
-        const statusGroups = projects?.reduce((acc, project) => {
-          const status = project.status || 'Unknown';
-          acc[status] = (acc[status] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>) || {};
-
-        const projectsByStatus = Object.entries(statusGroups).map(([name, value]) => ({
-          name,
-          value
-        }));
-
-        // Group projects by stage
-        const stageGroups = projects?.reduce((acc, project) => {
-          const stage = project.current_stage || 'Unknown';
-          acc[stage] = (acc[stage] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>) || {};
-
-        const projectsByStage = Object.entries(stageGroups).map(([name, value]) => ({
-          name,
-          value
-        }));
-
-        // Group projects by region/country
-        const regionGroups = projects?.reduce((acc, project) => {
-          const region = project.country || 'Unknown';
-          acc[region] = (acc[region] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>) || {};
-
-        const projectsByRegion = Object.entries(regionGroups).map(([name, value]) => ({
-          name,
-          value
-        }));
-
-        console.log('Calculated metrics:', {
-          activeProjects,
-          totalRevenue,
-          avgProjectValue,
-          avgUtilization,
-          timeRange: selectedTimeRange
-        });
-
+      // Only update state if request wasn't aborted
+      if (!signal.aborted) {
         setMetrics({
           activeProjects,
           utilizationTrends: {
@@ -184,17 +216,31 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
           totalRevenue,
           avgProjectValue
         });
+      }
 
-      } catch (error) {
+    } catch (error) {
+      if (!signal.aborted) {
         console.error('Error calculating time range metrics:', error);
         // Keep default metrics on error
-      } finally {
+        setMetrics(defaultMetrics);
+      }
+    } finally {
+      if (!signal.aborted) {
         setIsLoading(false);
       }
-    };
-
-    fetchTimeRangeMetrics();
+    }
   }, [company?.id, selectedTimeRange, dateRange.startDate, dateRange.endDate]);
+
+  useEffect(() => {
+    fetchTimeRangeMetrics();
+    
+    // Cleanup function to abort any pending requests
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [fetchTimeRangeMetrics]);
 
   return { metrics, isLoading };
 };
