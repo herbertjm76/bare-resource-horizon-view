@@ -22,6 +22,8 @@ interface DesktopDashboardProps {
   staffData: any[];
   mockData: any;
   selectedTimeRange: TimeRange;
+  totalRevenue?: number;
+  avgProjectValue?: number;
 }
 
 export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
@@ -31,7 +33,9 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   utilizationTrends,
   staffData,
   mockData,
-  selectedTimeRange
+  selectedTimeRange,
+  totalRevenue,
+  avgProjectValue
 }) => {
   return (
     <div className="space-y-8 p-6 relative">
@@ -41,6 +45,8 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         activeResources={activeResources}
         utilizationTrends={utilizationTrends}
         selectedTimeRange={selectedTimeRange}
+        totalRevenue={totalRevenue}
+        avgProjectValue={avgProjectValue}
       />
 
       {/* CEO Priority 2: Three Column Layout - Smart Insights, Staff Status & Holidays */}

@@ -77,6 +77,8 @@ export const DashboardMetrics = () => {
               staffData={staffData}
               mockData={mockData}
               selectedTimeRange={selectedTimeRange}
+              totalRevenue={metrics.totalRevenue}
+              avgProjectValue={metrics.avgProjectValue}
             />
           </div>
         )}

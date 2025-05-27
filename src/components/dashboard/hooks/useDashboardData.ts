@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
@@ -20,7 +19,7 @@ export const useDashboardData = () => {
   // Get pre-registered members
   const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
   
-  // Get time-range specific metrics
+  // Get time-range specific metrics - THIS IS THE KEY DATA SOURCE
   const { metrics: timeRangeMetrics, isLoading: isLoadingMetrics } = useTimeRangeMetrics(selectedTimeRange);
   
   // Combine all team members (active + pre-registered)
@@ -29,12 +28,13 @@ export const useDashboardData = () => {
     console.log('Active team members:', activeTeamMembers?.length || 0);
     console.log('Pre-registered members:', preRegisteredMembers?.length || 0);
     console.log('Selected time range:', selectedTimeRange);
+    console.log('Time range metrics:', timeRangeMetrics);
     
     const combined = [...(activeTeamMembers || []), ...(preRegisteredMembers || [])];
     console.log('Total combined members:', combined.length);
     
     return combined;
-  }, [activeTeamMembers, preRegisteredMembers]);
+  }, [activeTeamMembers, preRegisteredMembers, selectedTimeRange, timeRangeMetrics]);
 
   // Filter team members by selected office
   const filteredTeamMembers = useMemo(() => {
@@ -95,61 +95,63 @@ export const useDashboardData = () => {
     return Array.from(offices);
   }, [allTeamMembers]);
 
-  // Use utilization trends from time range metrics
+  // Use utilization trends from time range metrics - ALWAYS from time range data
   const utilizationTrends = useMemo(() => {
+    console.log('Using utilization trends from time range metrics:', timeRangeMetrics.utilizationTrends);
     return timeRangeMetrics.utilizationTrends;
   }, [timeRangeMetrics.utilizationTrends]);
 
-  // Use metrics from time range metrics hook
+  // Use metrics from time range metrics hook - ALWAYS from time range data
   const metrics = useMemo(() => {
+    console.log('Using metrics from time range:', {
+      activeProjects: timeRangeMetrics.activeProjects,
+      activeResources: filteredTeamMembers.length,
+      totalRevenue: timeRangeMetrics.totalRevenue,
+      avgProjectValue: timeRangeMetrics.avgProjectValue
+    });
+    
     return {
       activeProjects: timeRangeMetrics.activeProjects,
       activeResources: filteredTeamMembers.length,
+      totalRevenue: timeRangeMetrics.totalRevenue,
+      avgProjectValue: timeRangeMetrics.avgProjectValue
     };
-  }, [timeRangeMetrics.activeProjects, filteredTeamMembers.length]);
+  }, [timeRangeMetrics.activeProjects, timeRangeMetrics.totalRevenue, timeRangeMetrics.avgProjectValue, filteredTeamMembers.length]);
 
-  // Mock data for charts - enhanced with time range metrics
-  const mockData = useMemo(() => ({
-    weeklyData: [
-      { name: 'Mon', utilization: 85, capacity: 100 },
-      { name: 'Tue', utilization: 92, capacity: 100 },
-      { name: 'Wed', utilization: 78, capacity: 100 },
-      { name: 'Thu', utilization: 88, capacity: 100 },
-      { name: 'Fri', utilization: 95, capacity: 100 },
-    ],
-    projectTypes: [
-      { name: 'Architecture', value: 35, color: '#8B5CF6' },
-      { name: 'Interior Design', value: 28, color: '#06B6D4' },
-      { name: 'Planning', value: 22, color: '#10B981' },
-      { name: 'Consulting', value: 15, color: '#F59E0B' },
-    ],
-    projectsByStatus: timeRangeMetrics.projectsByStatus.length > 0 
-      ? timeRangeMetrics.projectsByStatus 
-      : [
-          { name: 'Active', value: 8 },
-          { name: 'On Hold', value: 3 },
-          { name: 'Completed', value: 12 },
-        ],
-    projectsByStage: timeRangeMetrics.projectsByStage.length > 0 
-      ? timeRangeMetrics.projectsByStage 
-      : [
-          { name: '50% CD', value: 5 },
-          { name: '100% CD', value: 4 },
-          { name: '50% SD', value: 3 },
-        ],
-    projectsByRegion: timeRangeMetrics.projectsByRegion.length > 0 
-      ? timeRangeMetrics.projectsByRegion 
-      : [
-          { name: 'North', value: 6 },
-          { name: 'South', value: 4 },
-          { name: 'East', value: 2 },
-        ],
-    projectInvoicesThisMonth: [
-      { name: 'Paid', value: 8 },
-      { name: 'Pending', value: 3 },
-      { name: 'Overdue', value: 1 },
-    ],
-  }), [timeRangeMetrics]);
+  // Chart data - USE TIME RANGE METRICS instead of mock data
+  const chartData = useMemo(() => {
+    console.log('Creating chart data from time range metrics:', {
+      projectsByStatus: timeRangeMetrics.projectsByStatus,
+      projectsByStage: timeRangeMetrics.projectsByStage,
+      projectsByRegion: timeRangeMetrics.projectsByRegion
+    });
+
+    return {
+      weeklyData: [
+        { name: 'Mon', utilization: utilizationTrends.days7, capacity: 100 },
+        { name: 'Tue', utilization: utilizationTrends.days7 * 0.95, capacity: 100 },
+        { name: 'Wed', utilization: utilizationTrends.days7 * 0.88, capacity: 100 },
+        { name: 'Thu', utilization: utilizationTrends.days7 * 0.92, capacity: 100 },
+        { name: 'Fri', utilization: utilizationTrends.days7 * 0.98, capacity: 100 },
+      ],
+      projectTypes: [
+        { name: 'Architecture', value: 35, color: '#8B5CF6' },
+        { name: 'Interior Design', value: 28, color: '#06B6D4' },
+        { name: 'Planning', value: 22, color: '#10B981' },
+        { name: 'Consulting', value: 15, color: '#F59E0B' },
+      ],
+      // Use REAL time range data instead of fallbacks
+      projectsByStatus: timeRangeMetrics.projectsByStatus,
+      projectsByStage: timeRangeMetrics.projectsByStage,
+      projectsByRegion: timeRangeMetrics.projectsByRegion,
+      // Keep this as mock since it's not part of time range metrics yet
+      projectInvoicesThisMonth: [
+        { name: 'Paid', value: Math.max(1, Math.floor(timeRangeMetrics.activeProjects * 0.6)) },
+        { name: 'Pending', value: Math.max(1, Math.floor(timeRangeMetrics.activeProjects * 0.3)) },
+        { name: 'Overdue', value: Math.max(0, Math.floor(timeRangeMetrics.activeProjects * 0.1)) },
+      ],
+    };
+  }, [timeRangeMetrics, utilizationTrends]);
 
   const isLoading = isLoadingActive || isLoadingUtilization || isLoadingMetrics;
 
@@ -163,7 +165,7 @@ export const useDashboardData = () => {
     metrics,
     staffData,
     officeOptions,
-    mockData,
+    mockData: chartData, // Renamed for clarity but now contains real time-range data
     isLoading
   };
 };

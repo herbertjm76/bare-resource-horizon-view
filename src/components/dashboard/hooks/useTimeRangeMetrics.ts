@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -33,11 +34,19 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
   const abortControllerRef = useRef<AbortController | null>(null);
+  // Track previous time range for logging
+  const prevTimeRangeRef = useRef<TimeRange>(selectedTimeRange);
 
   // Calculate date range based on selected time range
   const dateRange = useMemo(() => {
     const now = new Date();
     let startDate: Date;
+    
+    // Log time range change
+    if (prevTimeRangeRef.current !== selectedTimeRange) {
+      console.log(`🕒 TIME RANGE CHANGED: ${prevTimeRangeRef.current} → ${selectedTimeRange}`);
+      prevTimeRangeRef.current = selectedTimeRange;
+    }
     
     switch (selectedTimeRange) {
       case 'week':
@@ -86,7 +95,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
     setIsLoading(true);
     
     try {
-      console.log('Fetching metrics for time range:', selectedTimeRange, dateRange);
+      console.log('📊 Fetching metrics for time range:', selectedTimeRange, dateRange);
 
       // Fetch projects within date range
       const { data: projects, error: projectsError } = await supabase
@@ -193,12 +202,14 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         value
       }));
 
-      console.log('Calculated metrics:', {
+      console.log('📈 Calculated metrics for ' + selectedTimeRange + ':', {
         activeProjects,
         totalRevenue,
         avgProjectValue,
         avgUtilization,
-        timeRange: selectedTimeRange
+        statusGroups,
+        stageGroups,
+        regionGroups
       });
 
       // Only update state if request wasn't aborted
@@ -232,6 +243,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
   }, [company?.id, selectedTimeRange, dateRange.startDate, dateRange.endDate]);
 
   useEffect(() => {
+    console.log(`🔄 useTimeRangeMetrics effect running for: ${selectedTimeRange}`);
     fetchTimeRangeMetrics();
     
     // Cleanup function to abort any pending requests

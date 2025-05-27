@@ -14,13 +14,17 @@ interface ExecutiveSummaryCardProps {
     days90: number;
   };
   selectedTimeRange: TimeRange;
+  totalRevenue?: number;
+  avgProjectValue?: number;
 }
 
 export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
   activeProjects,
   activeResources,
   utilizationTrends,
-  selectedTimeRange
+  selectedTimeRange,
+  totalRevenue = 0,
+  avgProjectValue = 0
 }) => {
   const getUtilizationStatus = (rate: number) => {
     if (rate > 90) return { color: 'destructive', label: 'At Capacity' };
@@ -33,7 +37,11 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
     switch (selectedTimeRange) {
       case 'week': return utilizationTrends.days7;
       case 'month': return utilizationTrends.days30;
-      case '3months': return utilizationTrends.days90;
+      case '3months': 
+      case '4months':
+      case '6months':
+      case 'year':
+        return utilizationTrends.days90;
       default: return utilizationTrends.days30;
     }
   };
@@ -47,9 +55,38 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
       case 'week': return 'This Week';
       case 'month': return 'This Month';
       case '3months': return 'This Quarter';
+      case '4months': return '4 Months';
+      case '6months': return '6 Months';
+      case 'year': return 'This Year';
       default: return 'Selected Period';
     }
   };
+
+  // Calculate available capacity based on time range
+  const getCapacityHours = () => {
+    const baseWeeklyHours = activeResources * 40;
+    switch (selectedTimeRange) {
+      case 'week': return Math.round(baseWeeklyHours * (1 - utilizationRate / 100));
+      case 'month': return Math.round(baseWeeklyHours * 4 * (1 - utilizationRate / 100));
+      case '3months': return Math.round(baseWeeklyHours * 12 * (1 - utilizationRate / 100));
+      case '4months': return Math.round(baseWeeklyHours * 16 * (1 - utilizationRate / 100));
+      case '6months': return Math.round(baseWeeklyHours * 24 * (1 - utilizationRate / 100));
+      case 'year': return Math.round(baseWeeklyHours * 48 * (1 - utilizationRate / 100));
+      default: return Math.round(baseWeeklyHours * 4 * (1 - utilizationRate / 100));
+    }
+  };
+
+  const capacityHours = getCapacityHours();
+
+  console.log('Executive Summary Card Data:', {
+    selectedTimeRange,
+    activeProjects,
+    activeResources,
+    utilizationRate,
+    totalRevenue,
+    avgProjectValue,
+    capacityHours
+  });
 
   return (
     <div 
@@ -72,7 +109,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-xs font-medium text-gray-600 mb-1">Team Utilization</p>
-                <p className="text-2xl font-bold text-gray-900 mb-2">{utilizationRate}%</p>
+                <p className="text-2xl font-bold text-gray-900 mb-2">{Math.round(utilizationRate)}%</p>
                 <Badge variant={utilizationStatus.color as any} className="text-xs">
                   {utilizationStatus.label}
                 </Badge>
@@ -89,8 +126,8 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-xs font-medium text-gray-600 mb-1">Available Capacity</p>
-                <p className="text-2xl font-bold text-gray-900 mb-1">2,340h</p>
-                <p className="text-xs font-medium text-gray-500">Next 12 weeks</p>
+                <p className="text-2xl font-bold text-gray-900 mb-1">{capacityHours.toLocaleString()}h</p>
+                <p className="text-xs font-medium text-gray-500">{getTimeRangeText()}</p>
               </div>
               <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                 <Clock className="h-5 w-5 text-blue-600" />
@@ -105,7 +142,11 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
               <div className="flex-1">
                 <p className="text-xs font-medium text-gray-600 mb-1">Active Projects</p>
                 <p className="text-2xl font-bold text-gray-900 mb-1">{activeProjects}</p>
-                <p className="text-xs font-medium text-gray-500">{(activeProjects / activeResources).toFixed(1)} per person</p>
+                <p className="text-xs font-medium text-gray-500">
+                  {activeResources > 0 
+                    ? `${(activeProjects / activeResources).toFixed(1)} per person` 
+                    : 'No team members'}
+                </p>
               </div>
               <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                 <Briefcase className="h-5 w-5 text-green-600" />
@@ -121,7 +162,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
                 <p className="text-xs font-medium text-gray-600 mb-1">Team Size</p>
                 <p className="text-2xl font-bold text-gray-900 mb-2">{activeResources}</p>
                 <Badge variant="outline" className="text-xs">
-                  {utilizationTrends.days7 > 85 ? 'Consider Hiring' : 'Stable'}
+                  {utilizationRate > 85 ? 'Consider Hiring' : 'Stable'}
                 </Badge>
               </div>
               <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
