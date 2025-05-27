@@ -15,7 +15,7 @@ interface AnalyticsSectionProps {
 export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      <Card className="bg-white/40 backdrop-blur-sm border border-white/30 shadow-lg hover:bg-white/50 transition-all duration-300">
+      <Card>
         <CardContent className="p-4">
           <Donut 
             data={mockData.projectsByStatus} 
@@ -26,7 +26,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
         </CardContent>
       </Card>
 
-      <Card className="bg-white/40 backdrop-blur-sm border border-white/30 shadow-lg hover:bg-white/50 transition-all duration-300">
+      <Card>
         <CardContent className="p-4">
           <Donut 
             data={mockData.projectsByStage} 
@@ -37,7 +37,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
         </CardContent>
       </Card>
 
-      <Card className="bg-white/40 backdrop-blur-sm border border-white/30 shadow-lg hover:bg-white/50 transition-all duration-300">
+      <Card>
         <CardContent className="p-4">
           <Donut 
             data={mockData.projectsByRegion} 
@@ -48,7 +48,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
         </CardContent>
       </Card>
 
-      <Card className="bg-white/40 backdrop-blur-sm border border-white/30 shadow-lg hover:bg-white/50 transition-all duration-300">
+      <Card>
         <CardContent className="p-4">
           <Donut 
             data={mockData.projectInvoicesThisMonth} 
