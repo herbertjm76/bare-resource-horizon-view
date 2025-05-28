@@ -47,6 +47,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         selectedTimeRange={selectedTimeRange}
         totalRevenue={totalRevenue}
         avgProjectValue={avgProjectValue}
+        staffData={staffData}
       />
 
       {/* CEO Priority 2: Three Column Layout - Smart Insights, Staff Status & Holidays */}

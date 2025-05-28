@@ -16,6 +16,12 @@ interface ExecutiveSummaryCardProps {
   selectedTimeRange: TimeRange;
   totalRevenue?: number;
   avgProjectValue?: number;
+  staffData?: Array<{
+    id: string;
+    name: string;
+    availability: number;
+    weekly_capacity?: number;
+  }>;
 }
 
 export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
@@ -24,10 +30,11 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
   utilizationTrends,
   selectedTimeRange,
   totalRevenue = 0,
-  avgProjectValue = 0
+  avgProjectValue = 0,
+  staffData = []
 }) => {
   const getUtilizationStatus = (rate: number) => {
-    if (rate > 90) return { color: 'destructive', label: 'At Capacity' };
+    if (rate > 90) return { color: 'destructive', label: 'Over Capacity' };
     if (rate > 65) return { color: 'default', label: 'Optimally Allocated' };
     return { color: 'outline', label: 'Ready for Projects' };
   };
@@ -46,7 +53,25 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
     }
   };
 
-  const utilizationRate = getTimeRangeUtilization();
+  // Calculate actual team utilization from individual staff data
+  const getActualTeamUtilization = () => {
+    if (staffData.length === 0) {
+      return getTimeRangeUtilization();
+    }
+
+    const totalCapacity = staffData.reduce((sum, member) => {
+      return sum + (member.weekly_capacity || 40);
+    }, 0);
+
+    const totalAllocated = staffData.reduce((sum, member) => {
+      const memberCapacity = member.weekly_capacity || 40;
+      return sum + (memberCapacity * member.availability / 100);
+    }, 0);
+
+    return totalCapacity > 0 ? (totalAllocated / totalCapacity) * 100 : 0;
+  };
+
+  const utilizationRate = getActualTeamUtilization();
   const utilizationStatus = getUtilizationStatus(utilizationRate);
 
   // Format time range for display
@@ -62,36 +87,63 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
     }
   };
 
-  // Calculate available capacity based on time range - ALLOW NEGATIVE VALUES
+  // Calculate available capacity based on individual staff data
   const getCapacityHours = () => {
-    const baseWeeklyHours = activeResources * 40;
-    let totalCapacity: number;
-    
-    switch (selectedTimeRange) {
-      case 'week': 
-        totalCapacity = baseWeeklyHours;
-        break;
-      case 'month': 
-        totalCapacity = baseWeeklyHours * 4;
-        break;
-      case '3months': 
-        totalCapacity = baseWeeklyHours * 12;
-        break;
-      case '4months': 
-        totalCapacity = baseWeeklyHours * 16;
-        break;
-      case '6months': 
-        totalCapacity = baseWeeklyHours * 24;
-        break;
-      case 'year': 
-        totalCapacity = baseWeeklyHours * 48;
-        break;
-      default: 
-        totalCapacity = baseWeeklyHours * 4;
+    if (staffData.length === 0) {
+      // Fallback to original calculation if no staff data
+      const baseWeeklyHours = activeResources * 40;
+      let totalCapacity: number;
+      
+      switch (selectedTimeRange) {
+        case 'week': 
+          totalCapacity = baseWeeklyHours;
+          break;
+        case 'month': 
+          totalCapacity = baseWeeklyHours * 4;
+          break;
+        case '3months': 
+          totalCapacity = baseWeeklyHours * 12;
+          break;
+        case '4months': 
+          totalCapacity = baseWeeklyHours * 16;
+          break;
+        case '6months': 
+          totalCapacity = baseWeeklyHours * 24;
+          break;
+        case 'year': 
+          totalCapacity = baseWeeklyHours * 48;
+          break;
+        default: 
+          totalCapacity = baseWeeklyHours * 4;
+      }
+      
+      const availableCapacity = totalCapacity * (1 - utilizationRate / 100);
+      return Math.round(availableCapacity);
     }
-    
-    // Calculate available capacity (can be negative if overallocated)
-    const availableCapacity = totalCapacity * (1 - utilizationRate / 100);
+
+    // Calculate based on actual staff data
+    const multiplier = (() => {
+      switch (selectedTimeRange) {
+        case 'week': return 1;
+        case 'month': return 4;
+        case '3months': return 12;
+        case '4months': return 16;
+        case '6months': return 24;
+        case 'year': return 48;
+        default: return 4;
+      }
+    })();
+
+    const totalCapacity = staffData.reduce((sum, member) => {
+      return sum + (member.weekly_capacity || 40) * multiplier;
+    }, 0);
+
+    const totalAllocated = staffData.reduce((sum, member) => {
+      const memberCapacity = (member.weekly_capacity || 40) * multiplier;
+      return sum + (memberCapacity * member.availability / 100);
+    }, 0);
+
+    const availableCapacity = totalCapacity - totalAllocated;
     return Math.round(availableCapacity);
   };
 
@@ -106,7 +158,9 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
     totalRevenue,
     avgProjectValue,
     capacityHours,
-    isOverCapacity
+    isOverCapacity,
+    staffDataCount: staffData.length,
+    staffUtilizations: staffData.map(s => ({ name: s.name, util: s.availability }))
   });
 
   return (
@@ -150,7 +204,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
                   {isOverCapacity ? 'Over Capacity' : 'Available Capacity'}
                 </p>
                 <p className={`text-2xl font-bold mb-1 ${isOverCapacity ? 'text-red-600' : 'text-gray-900'}`}>
-                  {isOverCapacity ? '' : ''}{Math.abs(capacityHours).toLocaleString()}h
+                  {Math.abs(capacityHours).toLocaleString()}h
                 </p>
                 <p className="text-xs font-medium text-gray-500">{getTimeRangeText()}</p>
               </div>
