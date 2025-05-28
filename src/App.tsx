@@ -12,7 +12,7 @@ import Projects from "./pages/Projects";
 import TeamMembers from "./pages/TeamMembers";
 import OfficeSettings from "./pages/OfficeSettings";
 import WeekResourcing from "./pages/WeekResourcing";
-import { WeeklyOverview } from "./pages/WeeklyOverview";
+import WeeklyOverview from "./pages/WeeklyOverview";
 import TeamWorkload from "./pages/TeamWorkload";
 import TeamAnnualLeave from "./pages/TeamAnnualLeave";
 import ProjectResourcing from "./pages/ProjectResourcing";
