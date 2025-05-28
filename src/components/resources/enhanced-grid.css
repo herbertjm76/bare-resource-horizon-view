@@ -294,17 +294,19 @@
   transform: scale(1.1);
 }
 
-/* Enhanced Project Hours Badge - Darker purple background for better visibility */
+/* Enhanced Project Hours Badge - Black pill design */
 .enhanced-project-hours-badge {
-  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
-  border: 1px solid rgba(91,33,182,0.3);
-  border-radius: 12px;
-  padding: 4px 10px;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 20px;
+  padding: 6px 12px;
   font-size: 11px;
   font-weight: 600;
   color: white;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  box-shadow: 0 2px 4px rgba(91,33,182,0.2);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-width: 40px;
+  justify-content: center;
 }
