@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { ResourcesHeader } from '@/components/resources/ResourcesHeader';
-import { ResourceGridContainer } from '@/components/resources/ResourceGridContainer';
+import { ModernResourcesHeader } from '@/components/resources/ModernResourcesHeader';
+import { ModernResourceGridContainer } from '@/components/resources/ModernResourceGridContainer';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 import { ProjectResourcingFilters } from './ProjectResourcingFilters';
 
@@ -64,8 +64,8 @@ export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> =
   );
 
   return (
-    <div className="flex flex-col max-w-full">
-      <ResourcesHeader
+    <div className="flex flex-col max-w-full bg-gradient-to-br from-gray-50 to-white min-h-screen">
+      <ModernResourcesHeader
         title="Project Resourcing"
         selectedMonth={selectedMonth}
         onMonthChange={onMonthChange}
@@ -74,10 +74,13 @@ export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> =
         filterContent={filterContent}
         activeFiltersCount={activeFiltersCount}
         onClearFilters={onClearFilters}
+        totalProjects={0} // TODO: Calculate from data
+        totalResources={0} // TODO: Calculate from data
+        timeRange={`${filters.periodToShow} days`}
       />
       
       <OfficeSettingsProvider>
-        <ResourceGridContainer
+        <ModernResourceGridContainer
           startDate={selectedMonth}
           periodToShow={filters.periodToShow}
           filters={{

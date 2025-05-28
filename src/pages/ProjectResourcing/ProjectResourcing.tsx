@@ -45,7 +45,7 @@ const ProjectResourcing = () => {
 
   return (
     <SidebarProvider>
-      <div className="w-full min-h-screen flex flex-row">
+      <div className="w-full min-h-screen flex flex-row bg-gradient-to-br from-gray-50 to-white">
         <div className="flex-shrink-0">
           <DashboardSidebar />
         </div>
@@ -53,7 +53,7 @@ const ProjectResourcing = () => {
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
           <div 
-            className="flex-1 p-4 sm:p-8 bg-background flex flex-col" 
+            className="flex-1 p-6 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20 flex flex-col" 
             style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)`, overflowY: 'auto' }}
           >
             <ProjectResourcingContent
