@@ -1,10 +1,11 @@
 
 import React, { useEffect } from 'react';
-import { WeeklyResourceTableContainer } from './WeeklyResourceTableContainer';
+import { EnhancedWeeklyResourceTable } from '../EnhancedWeeklyResourceTable';
 import { ResourceTableLoadingState } from './ResourceTableLoadingState';
 import { ResourceTableErrorState } from './ResourceTableErrorState';
 import { EmptyResourceState } from './EmptyResourceState';
 import { useWeeklyResourceData } from '../hooks/useWeeklyResourceData';
+import { format, startOfWeek, addDays } from 'date-fns';
 
 interface WeeklyResourceTableWrapperProps {
   selectedWeek: Date;
@@ -43,6 +44,11 @@ export const WeeklyResourceTableWrapper: React.FC<WeeklyResourceTableWrapperProp
   const hasMembers = Array.isArray(allMembers) && allMembers.length > 0;
   const hasProjects = Array.isArray(projects) && projects.length > 0;
 
+  // Generate week label
+  const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const weekEnd = addDays(weekStart, 6);
+  const weekLabel = `${format(weekStart, 'MMM d')} - ${format(weekEnd, 'MMM d, yyyy')}`;
+
   // Render loading state
   if (isLoading || !hasProjects) {
     return <ResourceTableLoadingState />;
@@ -59,7 +65,7 @@ export const WeeklyResourceTableWrapper: React.FC<WeeklyResourceTableWrapperProp
   }
 
   return (
-    <WeeklyResourceTableContainer
+    <EnhancedWeeklyResourceTable
       projects={projects}
       filteredOffices={filteredOffices}
       membersByOffice={membersByOffice}
@@ -67,6 +73,7 @@ export const WeeklyResourceTableWrapper: React.FC<WeeklyResourceTableWrapperProp
       getOfficeDisplay={getOfficeDisplay}
       handleInputChange={handleInputChange}
       projectTotals={projectTotals}
+      weekLabel={weekLabel}
     />
   );
 };
