@@ -21,8 +21,8 @@ export const navigationItems = [
         icon: LayoutDashboard,
       },
       {
-        title: "Week Resourcing",
-        url: "/week-resourcing",
+        title: "Weekly Overview",
+        url: "/weekly-overview",
         icon: Calendar,
       },
     ],

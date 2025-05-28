@@ -51,7 +51,7 @@ const WeekResourcing = () => {
           <div className="flex-1 p-4 sm:p-6 bg-background">
             <div className="max-w-full mx-auto space-y-4">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
-                <h1 className="font-bold tracking-tight text-brand-primary text-3xl">Week Resourcing</h1>
+                <h1 className="font-bold tracking-tight text-brand-primary text-3xl">Weekly Overview</h1>
               </div>
               
               <WeekResourceControls 
