@@ -17,12 +17,12 @@ export const PeriodSelector: React.FC<PeriodSelectorProps> = ({
   selectedPeriod,
   onPeriodChange
 }) => {
-  // Period options for the dropdown with clearer labels
+  // Period options for the dropdown with week labels instead of day labels
   const periodOptions = [
-    { value: '12', label: '12 Weeks (3 Months)' },
-    { value: '16', label: '16 Weeks (4 Months)' },
-    { value: '24', label: '24 Weeks (6 Months)' },
-    { value: '52', label: '52 Weeks (1 Year)' }
+    { value: '12', label: '12 Weeks' },
+    { value: '16', label: '16 Weeks' },
+    { value: '24', label: '24 Weeks' },
+    { value: '52', label: '52 Weeks' }
   ];
 
   return (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { format } from 'date-fns';
@@ -99,7 +98,7 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
             {filteredProjects.length} Projects
           </Badge>
           <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-            {periodToShow} Days View
+            {periodToShow} Weeks View
           </Badge>
         </div>
         
@@ -188,7 +187,7 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-violet-600 font-medium">Period</p>
-              <p className="text-2xl font-bold text-violet-800">{periodToShow} days</p>
+              <p className="text-2xl font-bold text-violet-800">{periodToShow} weeks</p>
             </div>
             <div className="h-10 w-10 bg-violet-500 rounded-lg flex items-center justify-center">
               <ExpandIcon className="h-5 w-5 text-white" />

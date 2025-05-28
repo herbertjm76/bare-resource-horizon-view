@@ -87,16 +87,16 @@
   border-right: none;
 }
 
-/* Project Header Enhancements */
+/* Project Header Enhancements - Less white, more colored */
 .enhanced-resource-table .project-header-row {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
   color: white;
   font-weight: 600;
   position: relative;
 }
 
 .enhanced-resource-table .project-header-row:hover {
-  background: linear-gradient(135deg, #5855eb 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #4c1d95 0%, #6b21a8 100%);
   transform: none;
 }
 
@@ -105,16 +105,16 @@
   padding: 12px 8px;
 }
 
-/* Resource Row Enhancements */
+/* Resource Row Enhancements - Less white */
 .enhanced-resource-table .resource-row {
-  background: white;
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
   border-left: 3px solid transparent;
   transition: all 0.2s ease;
 }
 
 .enhanced-resource-table .resource-row:hover {
   border-left-color: #6366f1;
-  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+  background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 100%);
 }
 
 /* Allocation Input Enhancements */
@@ -294,17 +294,17 @@
   transform: scale(1.1);
 }
 
-/* Enhanced Project Hours Badge */
+/* Enhanced Project Hours Badge - Darker purple background for better visibility */
 .enhanced-project-hours-badge {
-  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%);
-  border: 1px solid rgba(99,102,241,0.2);
+  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+  border: 1px solid rgba(91,33,182,0.3);
   border-radius: 12px;
-  padding: 2px 8px;
+  padding: 4px 10px;
   font-size: 11px;
   font-weight: 600;
-  color: #6366f1;
+  color: white;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(91,33,182,0.2);
 }
