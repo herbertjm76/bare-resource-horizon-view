@@ -69,10 +69,9 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
     setExpandedProjects([]);
   };
 
-  // Calculate grid statistics
-  const totalResources = filteredProjects.reduce((sum, project) => {
-    return sum + (project.resources?.length || 0);
-  }, 0);
+  // Calculate grid statistics - we'll show project count instead of resource count for now
+  // since resources aren't fetched at the project level in the current implementation
+  const totalProjects = filteredProjects.length;
 
   const utilizationData = filteredProjects.map(project => ({
     name: project.name,
@@ -100,7 +99,7 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
             {filteredProjects.length} Projects
           </Badge>
           <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-            {totalResources} Resources
+            {periodToShow} Days View
           </Badge>
         </div>
         
@@ -174,8 +173,10 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
         <Card className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-emerald-600 font-medium">Total Resources</p>
-              <p className="text-2xl font-bold text-emerald-800">{totalResources}</p>
+              <p className="text-sm text-emerald-600 font-medium">Active Filters</p>
+              <p className="text-2xl font-bold text-emerald-800">
+                {[filters.office, filters.country, filters.manager].filter(f => f !== 'all').length + (filters.searchTerm ? 1 : 0)}
+              </p>
             </div>
             <div className="h-10 w-10 bg-emerald-500 rounded-lg flex items-center justify-center">
               <Users className="h-5 w-5 text-white" />
