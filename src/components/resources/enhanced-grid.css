@@ -49,6 +49,7 @@
   text-transform: uppercase;
   border-right: 1px solid rgba(255,255,255,0.2);
   position: relative;
+  color: #1f2937; /* Black text for table headers */
 }
 
 .enhanced-resource-table thead th:last-child {
