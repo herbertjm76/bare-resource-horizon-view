@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -7,6 +8,7 @@ import { useUserSession } from '@/hooks/useUserSession';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersRealtime } from '@/hooks/useTeamMembersRealtime';
 import { ModernTeamMembersHeader } from '@/components/team-members/ModernTeamMembersHeader';
+import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -214,6 +216,13 @@ const TeamMembersContent = () => {
           totalDepartments={totalDepartments}
           totalLocations={totalLocations}
         />
+        
+        <TeamMemberContent
+          userProfile={userProfile}
+          isProfileLoading={isLoading}
+          teamMembers={teamMembers || []}
+          onRefresh={triggerRefresh}
+        />
       </div>
     </div>
   );
@@ -239,3 +248,4 @@ const TeamMembersPage = () => {
 };
 
 export default TeamMembersPage;
+
