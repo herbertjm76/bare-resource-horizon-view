@@ -79,12 +79,14 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
             <Skeleton className="h-12 w-full" />
           </div>
         ) : (
-          <LeaveCalendar 
-            members={filteredMembers}
-            selectedMonth={selectedMonth}
-            leaveData={leaveData}
-            onLeaveChange={onLeaveChange}
-          />
+          <div className="annual-leave-grid-container">
+            <LeaveCalendar 
+              members={filteredMembers}
+              selectedMonth={selectedMonth}
+              leaveData={leaveData}
+              onLeaveChange={onLeaveChange}
+            />
+          </div>
         )}
       </div>
     </div>
