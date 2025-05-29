@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { TeamManagement } from "@/components/dashboard/TeamManagement";
-import { TeamMembersSummary } from "@/components/dashboard/TeamMembersSummary";
 import { Profile } from "@/components/dashboard/types";
 import { Card, CardContent } from '@/components/ui/card';
 import { AlertCircle, Loader2, UserX, RefreshCw } from 'lucide-react';
@@ -31,7 +30,6 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
   if (isProfileLoading) {
     return (
       <div className="max-w-6xl mx-auto space-y-8">
-        <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
         <Card>
           <CardContent className="p-6 flex items-center justify-center">
             <div className="text-center py-8">
@@ -47,7 +45,6 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
   if (!userProfile) {
     return (
       <div className="max-w-6xl mx-auto space-y-8">
-        <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center space-x-3 text-amber-600 mb-2">
@@ -80,11 +77,6 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
     
     return (
       <div className="max-w-6xl mx-auto space-y-8">
-        <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
-        
-        {/* Show empty state summary */}
-        <TeamMembersSummary teamMembers={safeTeamMembers} />
-        
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center space-x-3 text-blue-600 mb-2">
@@ -118,11 +110,6 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
-      <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Members</h1>
-      
-      {/* Add the summary dashboard */}
-      <TeamMembersSummary teamMembers={safeTeamMembers} />
-      
       <TeamManagement 
         teamMembers={safeTeamMembers} 
         inviteUrl={inviteUrl} 
