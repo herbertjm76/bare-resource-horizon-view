@@ -26,8 +26,8 @@ const SignUpSection = () => {
   const benefits = [
     "14-day free trial",
     "No credit card required", 
-    "Setup in under 5 minutes",
-    "Cancel anytime"
+    "Setup in 10 minutes",
+    "Import from Excel instantly"
   ];
 
   return (
@@ -42,18 +42,18 @@ const SignUpSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Copy */}
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-full border border-white/20 text-white text-sm font-medium mb-4">
-              ⚡ Limited Time Offer
+            <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm rounded-full border border-white/20 text-white text-sm font-medium mb-4">
+              🎯 Join 500+ Design Teams
             </div>
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight">
-              Transform Your Business
-              <span className="block bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                Starting Today
+              Break Free From
+              <span className="block bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                Spreadsheet Hell
               </span>
             </h2>
             <p className="text-lg text-white/80 mb-6">
-              Join the resource management revolution. Get instant access to AI-powered 
-              planning tools that leading companies use to boost efficiency by 40%.
+              Stop losing hours to Excel wrestling. Get back to doing what you love: 
+              creating amazing design work for happy clients.
             </p>
             
             {/* Benefits List */}
@@ -70,8 +70,8 @@ const SignUpSection = () => {
             
             {/* Social Proof */}
             <div className="text-white/70 text-sm">
-              <p className="mb-1">⭐⭐⭐⭐⭐ Rated 4.9/5 by 500+ teams</p>
-              <p>"BareResource transformed our project delivery speed" - Sarah Chen, Operations Director</p>
+              <p className="mb-1">⭐⭐⭐⭐⭐ "Finally ditched Excel!" - 47 reviews this month</p>
+              <p>"Set up our entire 12-person studio in one afternoon" - Design Director, Portland</p>
             </div>
           </div>
           
@@ -79,15 +79,15 @@ const SignUpSection = () => {
           <div className="relative">
             <div className="bg-white/95 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-2xl border border-white/20">
               <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Start Your Free Trial</h3>
-                <p className="text-gray-600 text-sm">No credit card required • Setup in 5 minutes</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Try It Free for 14 Days</h3>
+                <p className="text-gray-600 text-sm">No spreadsheets were harmed in the making of this form</p>
               </div>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <input
                   type="text"
                   name="name"
-                  placeholder="Your Full Name"
+                  placeholder="Your Name"
                   value={formData.name}
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
@@ -97,7 +97,7 @@ const SignUpSection = () => {
                 <input
                   type="email"
                   name="email"
-                  placeholder="Work Email Address"
+                  placeholder="Work Email"
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
@@ -107,7 +107,7 @@ const SignUpSection = () => {
                 <input
                   type="text"
                   name="company"
-                  placeholder="Company Name"
+                  placeholder="Studio/Agency Name"
                   value={formData.company}
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
@@ -121,19 +121,19 @@ const SignUpSection = () => {
                   className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                   required
                 >
-                  <option value="">Select Company Size</option>
-                  <option value="1-10">1-10 employees</option>
-                  <option value="11-50">11-50 employees</option>
-                  <option value="51-200">51-200 employees</option>
-                  <option value="201-1000">201-1000 employees</option>
-                  <option value="1000+">1000+ employees</option>
+                  <option value="">How big is your team?</option>
+                  <option value="2-5">2-5 people (freelancer + help)</option>
+                  <option value="6-10">6-10 people (small studio)</option>
+                  <option value="11-20">11-20 people (growing agency)</option>
+                  <option value="21-50">21-50 people (established agency)</option>
+                  <option value="50+">50+ people (we should talk!)</option>
                 </select>
                 
                 <button
                   type="submit"
                   className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
                 >
-                  Start Free Trial
+                  Escape Spreadsheet Hell
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </form>
@@ -150,13 +150,13 @@ const SignUpSection = () => {
             <div className="absolute -top-3 -left-3 bg-white rounded-xl p-2 shadow-lg">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-xs font-semibold text-gray-700">2,847 users</span>
+                <span className="text-xs font-semibold text-gray-700">500+ studios</span>
               </div>
             </div>
             
             <div className="absolute -bottom-3 -right-3 bg-white rounded-xl p-2 shadow-lg">
               <div className="text-xs">
-                <div className="font-semibold text-gray-700">🔒 SOC 2 Compliant</div>
+                <div className="font-semibold text-gray-700">💸 ROI: 300%</div>
               </div>
             </div>
           </div>

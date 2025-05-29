@@ -12,7 +12,7 @@ const Footer = () => {
           <div className="col-span-2 md:col-span-1 space-y-4">
             <h3 className="text-xl font-semibold mb-3">BareResource</h3>
             <p className="text-gray-400 text-sm">
-              Intuitive resource management for modern companies
+              The Excel replacement for design teams who want to focus on great work, not spreadsheets.
             </p>
             <div className="flex space-x-3 pt-2">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -34,10 +34,21 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-3">Product</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Features</Link></li>
+              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Excel vs BareResource</Link></li>
               <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Pricing</Link></li>
-              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Security</Link></li>
-              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Roadmap</Link></li>
+              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Import from Excel</Link></li>
+              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Case Studies</Link></li>
+            </ul>
+          </div>
+
+          {/* Support Column */}
+          <div>
+            <h4 className="font-semibold mb-3">Support</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Getting Started</Link></li>
+              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Help Center</Link></li>
+              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Video Tutorials</Link></li>
+              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Contact Support</Link></li>
             </ul>
           </div>
 
@@ -46,20 +57,9 @@ const Footer = () => {
             <h4 className="font-semibold mb-3">Company</h4>
             <ul className="space-y-2 text-sm">
               <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">About</Link></li>
-              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Careers</Link></li>
               <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Blog</Link></li>
+              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Careers</Link></li>
               <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Contact</Link></li>
-            </ul>
-          </div>
-
-          {/* Resources Column */}
-          <div>
-            <h4 className="font-semibold mb-3">Resources</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Documentation</Link></li>
-              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Support</Link></li>
-              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">FAQ</Link></li>
-              <li><Link to="#" className="text-gray-400 hover:text-white transition-colors">Community</Link></li>
             </ul>
           </div>
         </div>
@@ -67,7 +67,7 @@ const Footer = () => {
         {/* Footer Bottom */}
         <div className="border-t border-gray-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2023 BareResource. All rights reserved.
+            © 2023 BareResource. Built by designers, for designers.
           </p>
           <div className="flex space-x-4 mt-3 md:mt-0">
             <Link to="/privacy-policy" className="text-gray-400 hover:text-white text-sm transition-colors">

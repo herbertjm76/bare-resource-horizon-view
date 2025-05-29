@@ -4,50 +4,55 @@ import { Check, ArrowRight, Star } from 'lucide-react';
 const Pricing = () => {
   const plans = [
     {
-      name: "Standard",
-      price: "$29",
-      period: "per user/month",
-      description: "Perfect for small teams getting started",
+      name: "Starter",
+      price: "$1",
+      period: "per person/month",
+      description: "Perfect for small teams ditching spreadsheets",
       features: [
-        "Up to 10 team members",
-        "Basic resource allocation",
-        "Project timeline tracking",
-        "Standard reporting",
-        "Email support"
+        "Up to 15 team members",
+        "Visual resource planning",
+        "Project timeline tracking", 
+        "Basic reporting",
+        "Email support",
+        "No setup fees"
       ],
       cta: "Start Free Trial",
-      popular: false
+      popular: false,
+      note: "Billed annually ($12/person/year)"
     },
     {
-      name: "Pro",
-      price: "$49",
-      period: "per user/month",
-      description: "Advanced features for growing teams",
+      name: "Studio",
+      price: "$3",
+      period: "per person/month",
+      description: "For growing design teams that need more",
       features: [
         "Up to 50 team members",
-        "AI-powered planning",
-        "Advanced analytics",
-        "Custom reporting",
+        "Advanced capacity planning",
+        "Client-ready reports",
+        "Project profitability tracking",
         "Priority support",
-        "Workload balancing"
+        "Team utilization insights"
       ],
-      cta: "Start Free Trial",
-      popular: true
+      cta: "Start Free Trial", 
+      popular: true,
+      note: "Billed annually ($36/person/year)"
     },
     {
-      name: "Enterprise",
-      price: "Custom",
-      period: "contact sales",
-      description: "Tailored solutions for large organizations",
+      name: "Agency",
+      price: "$5",
+      period: "per person/month", 
+      description: "For agencies managing multiple studios",
       features: [
         "Unlimited team members",
-        "Custom integrations",
+        "Multi-office management",
+        "Custom client reporting",
+        "Advanced integrations", 
         "Dedicated account manager",
-        "Advanced security",
-        "24/7 phone support"
+        "Phone support"
       ],
-      cta: "Contact Sales",
-      popular: false
+      cta: "Start Free Trial",
+      popular: false,
+      note: "Billed annually ($60/person/year)"
     }
   ];
 
@@ -57,13 +62,13 @@ const Pricing = () => {
         {/* Section Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center px-3 py-1 bg-green-100 rounded-full text-green-600 font-semibold text-sm mb-4">
-            💰 Simple Pricing
+            💰 Honest, Simple Pricing
           </div>
           <h2 className="text-3xl lg:text-4xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            Choose Your Growth Plan
+            Less Than Your Daily Coffee Budget
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Start free, scale smart. All plans include 14-day free trial with no credit card required.
+            Stop paying enterprise prices for basic resource planning. All plans include 14-day free trial.
           </p>
         </div>
         
@@ -105,10 +110,15 @@ const Pricing = () => {
                     /{plan.period}
                   </span>
                 </div>
-                <p className={`text-sm ${
+                <p className={`text-sm mb-2 ${
                   plan.popular ? 'text-white/90' : 'text-gray-600'
                 }`}>
                   {plan.description}
+                </p>
+                <p className={`text-xs ${
+                  plan.popular ? 'text-white/70' : 'text-gray-500'
+                }`}>
+                  {plan.note}
                 </p>
               </div>
               
@@ -144,9 +154,12 @@ const Pricing = () => {
         </div>
         
         {/* Bottom Note */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-8 space-y-2">
+          <p className="text-gray-600 text-sm font-medium">
+            🎯 Perfect for 8-20 person design teams
+          </p>
           <p className="text-gray-500 text-sm">
-            All plans include SSL security, data backups, and 99.9% uptime guarantee.
+            All plans include SSL security, daily backups, and 99.9% uptime guarantee.
           </p>
         </div>
       </div>

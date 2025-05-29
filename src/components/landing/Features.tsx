@@ -1,5 +1,5 @@
 
-import { Users, Calendar, ChartBar, Bell, Zap, Shield, Target, Clock } from 'lucide-react';
+import { Users, Calendar, ChartBar, FileSpreadsheet, Zap, Shield, Target, Clock } from 'lucide-react';
 
 interface FeatureCardProps {
   icon: React.ReactNode;
@@ -37,35 +37,35 @@ const FeatureCard = ({ icon, title, description, highlight }: FeatureCardProps) 
 const Features = () => {
   const features = [
     {
-      icon: <Zap className="w-6 h-6 text-purple-600" />,
-      title: "AI-Powered Planning",
-      description: "Intelligent resource allocation that learns and predicts optimal staffing patterns.",
+      icon: <FileSpreadsheet className="w-6 h-6 text-purple-600" />,
+      title: "Visual Resource Grid",
+      description: "See your entire team's workload at a glance. No more scrolling through endless spreadsheet rows.",
       highlight: true
     },
     {
-      icon: <ChartBar className="w-6 h-6 text-purple-600" />,
-      title: "Real-Time Analytics",
-      description: "Live capacity tracking and performance insights that drive better decisions."
-    },
-    {
       icon: <Users className="w-6 h-6 text-purple-600" />,
-      title: "Smart Team Management",
-      description: "Automated workload balancing prevents burnout while maximizing productivity."
+      title: "Real-Time Collaboration",
+      description: "Everyone sees the same data instantly. No more 'wait, which version are we using?'"
     },
     {
       icon: <Calendar className="w-6 h-6 text-purple-600" />,
-      title: "Dynamic Scheduling",
-      description: "Adaptive project timelines that automatically adjust for constraints."
+      title: "Smart Scheduling",
+      description: "Drag and drop to allocate people to projects. See conflicts before they become problems."
     },
     {
-      icon: <Target className="w-6 h-6 text-purple-600" />,
-      title: "Predictive Insights",
-      description: "Forecast project bottlenecks weeks before they happen with ML predictions."
+      icon: <ChartBar className="w-6 h-6 text-purple-600" />,
+      title: "Instant Reports",
+      description: "Get utilization reports in seconds, not hours of Excel formula wrestling."
     },
     {
-      icon: <Bell className="w-6 h-6 text-purple-600" />,
-      title: "Proactive Alerts",
-      description: "Smart notifications for capacity issues and optimization opportunities."
+      icon: <Zap className="w-6 h-6 text-purple-600" />,
+      title: "Quick Setup",
+      description: "Import your team and projects in minutes. Start planning today, not next week."
+    },
+    {
+      icon: <Shield className="w-6 h-6 text-purple-600" />,
+      title: "Never Lose Data",
+      description: "Automatic backups and version history. Your planning data is always safe and recoverable."
     }
   ];
 
@@ -75,13 +75,13 @@ const Features = () => {
         {/* Section Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center px-3 py-1 bg-purple-100 rounded-full text-purple-600 font-semibold text-sm mb-4">
-            🚀 Powerful Features
+            🚀 Everything Excel Can't Do
           </div>
           <h2 className="text-3xl lg:text-4xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            Everything You Need to Scale Smart
+            Built for Design Teams Who Outgrew Spreadsheets
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            From AI-powered resource planning to real-time analytics, transform chaos into competitive advantage.
+            Stop fighting with formulas and start focusing on what matters: delivering great work on time and on budget.
           </p>
         </div>
         
