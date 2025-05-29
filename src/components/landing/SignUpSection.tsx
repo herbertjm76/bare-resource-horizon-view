@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Check, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight, Brain } from 'lucide-react';
 
 const SignUpSection = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +24,7 @@ const SignUpSection = () => {
   };
 
   const benefits = [
-    "14-day free trial",
+    "14-day free trial with full AI features",
     "No credit card required", 
     "Setup in 10 minutes",
     "Import from Excel instantly"
@@ -42,18 +42,19 @@ const SignUpSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Copy */}
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm rounded-full border border-white/20 text-white text-sm font-medium mb-4">
-              🎯 Join 500+ Design Teams
+            <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm rounded-full border border-white/20 text-white text-sm font-medium mb-4">
+              <Brain className="w-4 h-4 mr-2" />
+              🎯 Get AI Business Intelligence
             </div>
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight">
-              Break Free From
+              Stop Guessing When to
               <span className="block bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
-                Spreadsheet Hell
+                Hire & Prospect
               </span>
             </h2>
             <p className="text-lg text-white/80 mb-6">
-              Stop losing hours to Excel wrestling. Get back to doing what you love: 
-              creating amazing design work for happy clients.
+              Join 500+ design teams who get AI-powered hiring and pipeline recommendations. 
+              Never miss a growth opportunity or burn out your team again.
             </p>
             
             {/* Benefits List */}
@@ -68,10 +69,22 @@ const SignUpSection = () => {
               ))}
             </div>
             
+            {/* AI Feature Highlight */}
+            <div className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-xl p-4 mb-6 border border-white/20">
+              <div className="flex items-center gap-2 mb-2">
+                <Brain className="w-5 h-5 text-yellow-400" />
+                <span className="text-white font-semibold text-sm">AI Business Advisor Included</span>
+              </div>
+              <p className="text-white/80 text-sm">
+                "Your team is trending toward 95% utilization. Based on current pipeline, 
+                hire 1 senior designer within 45 days to prevent bottlenecks."
+              </p>
+            </div>
+            
             {/* Social Proof */}
             <div className="text-white/70 text-sm">
-              <p className="mb-1">⭐⭐⭐⭐⭐ "Finally ditched Excel!" - 47 reviews this month</p>
-              <p>"Set up our entire 12-person studio in one afternoon" - Design Director, Portland</p>
+              <p className="mb-1">⭐⭐⭐⭐⭐ "The AI hiring alerts saved us from a disaster!" - 47 reviews this month</p>
+              <p>"Spotted our pipeline gap 2 months early and landed 3 new clients" - Design Director, Portland</p>
             </div>
           </div>
           
@@ -79,8 +92,8 @@ const SignUpSection = () => {
           <div className="relative">
             <div className="bg-white/95 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-2xl border border-white/20">
               <div className="text-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Try It Free for 14 Days</h3>
-                <p className="text-gray-600 text-sm">No spreadsheets were harmed in the making of this form</p>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Get AI Business Intelligence Free</h3>
+                <p className="text-gray-600 text-sm">Your personal business advisor that never sleeps</p>
               </div>
               
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -133,7 +146,7 @@ const SignUpSection = () => {
                   type="submit"
                   className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
                 >
-                  Escape Spreadsheet Hell
+                  Start Getting AI Business Insights
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </form>
@@ -149,14 +162,14 @@ const SignUpSection = () => {
             {/* Floating trust indicators */}
             <div className="absolute -top-3 -left-3 bg-white rounded-xl p-2 shadow-lg">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-xs font-semibold text-gray-700">500+ studios</span>
+                <Brain className="w-4 h-4 text-purple-600" />
+                <span className="text-xs font-semibold text-gray-700">AI Included</span>
               </div>
             </div>
             
             <div className="absolute -bottom-3 -right-3 bg-white rounded-xl p-2 shadow-lg">
               <div className="text-xs">
-                <div className="font-semibold text-gray-700">💸 ROI: 300%</div>
+                <div className="font-semibold text-gray-700">💡 Smart Insights</div>
               </div>
             </div>
           </div>
