@@ -38,6 +38,13 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Centralized brand colors */
+    --brand-primary: 111 75 246;
+    --brand-violet: 111 75 246;
+    --brand-violet-light: 236 236 251;
+    --brand-gray: 142 145 150;
+    --brand-border: 240 240 244;
   }
 
   .dark {
@@ -88,4 +95,30 @@
 /* Add hero gradient class */
 .hero-gradient {
   background: linear-gradient(145deg, #895CF7 0%, #5669F7 55%, #E64FC4 100%);
+}
+
+/* Global utility classes for consistent styling */
+.table-header-gradient {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+.office-header-gradient {
+  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+}
+
+.project-hours-pill {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 20px;
+  color: white;
+}
+
+.weekend-pattern {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(156,163,175,0.1) 2px,
+    rgba(156,163,175,0.1) 4px
+  );
 }

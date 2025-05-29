@@ -1,18 +1,13 @@
 
-// Color palette for project areas
-export const projectAreaColors = [
-  // Row 1
-  '#F5A3B3', '#F48F8F', '#F47E63', '#F4A363', '#F4C463',
-  // Row 2
-  '#A8E6A8', '#89CFF0', '#6B8FF9', '#9B87F5', '#FFE082',
-  // Row 3
-  '#89E6CF', '#7ECFD6', '#FFF3D4', '#D2C0A7', '#FFE566'
-];
+// Import centralized color system
+import { colors, getProjectColor } from '@/styles/colors';
 
-export const defaultProjectAreaColor = '#E5DEFF';
+// Re-export for backward compatibility
+export const projectAreaColors = colors.projectColors;
+export const defaultProjectAreaColor = colors.defaults.projectArea;
 
 export const getDefaultColor = (color?: string): string => {
-  return color || defaultProjectAreaColor;
+  return color || colors.defaults.projectArea;
 };
 
 export const isValidColor = (color: string): boolean => {

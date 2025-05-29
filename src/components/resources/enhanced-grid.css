@@ -1,5 +1,5 @@
 
-/* Enhanced Resource Grid Styles */
+/* Enhanced Resource Grid Styles - Using Centralized Color System */
 .enhanced-grid-scroll {
   overflow-x: auto;
   overflow-y: visible;
@@ -49,7 +49,7 @@
   text-transform: uppercase;
   border-right: 1px solid rgba(255,255,255,0.2);
   position: relative;
-  color: #1f2937; /* Black text for table headers */
+  color: #1f2937;
 }
 
 .enhanced-resource-table thead th:last-child {
@@ -82,14 +82,14 @@
   border-right: 1px solid #e2e8f0;
   font-size: 13px;
   position: relative;
-  color: #1f2937; /* Black text for all cells */
+  color: #1f2937;
 }
 
 .enhanced-resource-table td:last-child {
   border-right: none;
 }
 
-/* Project Header Enhancements - Less white, more colored */
+/* Project Header Enhancements */
 .enhanced-resource-table .project-header-row {
   background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
   color: white;
@@ -105,10 +105,10 @@
 .enhanced-resource-table .project-header-row td {
   border-right: 1px solid rgba(255,255,255,0.2);
   padding: 12px 8px;
-  color: white; /* Keep white text for project headers */
+  color: white;
 }
 
-/* Resource Row Enhancements - Less white */
+/* Resource Row Enhancements */
 .enhanced-resource-table .resource-row {
   background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
   border-left: 3px solid transparent;
@@ -121,7 +121,7 @@
 }
 
 .enhanced-resource-table .resource-row td {
-  color: #1f2937; /* Black text for resource rows */
+  color: #1f2937;
 }
 
 /* Allocation Input Enhancements */
@@ -136,7 +136,7 @@
   transition: all 0.2s ease;
   width: 100%;
   height: 28px;
-  color: #1f2937; /* Black text for inputs */
+  color: #1f2937;
 }
 
 .enhanced-allocation-input:focus {
@@ -208,6 +208,23 @@
   left: 48px;
 }
 
+/* Enhanced Project Hours Badge - Black pill design */
+.enhanced-project-hours-badge {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-width: 40px;
+  justify-content: center;
+}
+
 /* Enhanced Scrollbar */
 .enhanced-grid-scroll::-webkit-scrollbar {
   height: 12px;
@@ -249,22 +266,6 @@
   }
 }
 
-/* Loading State Animations */
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-.enhanced-loading-shimmer {
-  background: linear-gradient(90deg, #f1f5f9 0px, #e2e8f0 40px, #f1f5f9 80px);
-  background-size: 200px 100%;
-  animation: shimmer 1.5s infinite;
-}
-
 /* Utilization Indicators */
 .utilization-indicator {
   display: inline-block;
@@ -300,21 +301,4 @@
 
 .enhanced-resource-table .project-header-row:hover .project-expand-icon {
   transform: scale(1.1);
-}
-
-/* Enhanced Project Hours Badge - Black pill design */
-.enhanced-project-hours-badge {
-  background: #1f2937;
-  border: 1px solid #374151;
-  border-radius: 20px;
-  padding: 6px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  color: white;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  min-width: 40px;
-  justify-content: center;
 }
