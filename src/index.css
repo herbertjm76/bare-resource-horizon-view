@@ -123,4 +123,42 @@
   }
 }
 
-/* ... keep existing code (hero gradient, utility classes, etc.) the same ... */
+/* Hero gradient background */
+.bg-hero {
+  background: linear-gradient(135deg, #6E59A5 0%, #895CF7 25%, #5669F7 75%, #E64FC4 100%);
+}
+
+/* Custom animations for landing page */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1s;
+}
+
+/* Utility classes */
+.text-gradient {
+  background: linear-gradient(135deg, #6E59A5, #895CF7, #5669F7, #E64FC4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(142, 101, 245, 0.3);
+}
+
+.border-gradient {
+  border: 1px solid;
+  border-image: linear-gradient(135deg, #6E59A5, #895CF7, #5669F7, #E64FC4) 1;
+}
