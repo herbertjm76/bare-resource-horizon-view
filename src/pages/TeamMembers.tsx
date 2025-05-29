@@ -7,6 +7,7 @@ import { useUserSession } from '@/hooks/useUserSession';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersRealtime } from '@/hooks/useTeamMembersRealtime';
 import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
+import { ModernTeamMembersHeader } from '@/components/team-members/ModernTeamMembersHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -130,6 +131,18 @@ const TeamMembersContent = () => {
     }
   }, [teamMembersError, profileError]);
 
+  // Calculate statistics for the header
+  const totalMembers = teamMembers.length;
+  const totalActiveMembers = teamMembers.filter(member => 
+    member.status === 'active' || !member.status
+  ).length;
+  const totalDepartments = new Set(
+    teamMembers.map(member => member.department).filter(Boolean)
+  ).size;
+  const totalLocations = new Set(
+    teamMembers.map(member => member.office_location).filter(Boolean)
+  ).size;
+
   const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || (isChecking && !permissionChecked);
 
   // Handle retry for permission errors
@@ -194,13 +207,21 @@ const TeamMembersContent = () => {
   }
 
   return (
-    <div className="flex-1 p-4 sm:p-8 bg-background">
-      <TeamMemberContent
-        userProfile={userProfile}
-        isProfileLoading={isLoading}
-        teamMembers={teamMembers || []}
-        onRefresh={triggerRefresh}
-      />
+    <div className="flex-1 p-4 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <ModernTeamMembersHeader
+          totalMembers={totalMembers}
+          totalActiveMembers={totalActiveMembers}
+          totalDepartments={totalDepartments}
+          totalLocations={totalLocations}
+        />
+        <TeamMemberContent
+          userProfile={userProfile}
+          isProfileLoading={isLoading}
+          teamMembers={teamMembers || []}
+          onRefresh={triggerRefresh}
+        />
+      </div>
     </div>
   );
 };
@@ -209,7 +230,7 @@ const TeamMembersPage = () => {
   return (
     <AuthGuard>
       <SidebarProvider>
-        <div className="w-full min-h-screen flex flex-row">
+        <div className="w-full min-h-screen flex flex-row bg-gradient-to-br from-gray-50 to-white">
           <div className="flex-shrink-0">
             <DashboardSidebar />
           </div>
