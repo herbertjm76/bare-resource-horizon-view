@@ -1,4 +1,3 @@
-
 const Hero = () => {
   return (
     <div className="relative pt-20 bg-gradient-to-br from-[#6E59A5] via-[#895CF7] to-[#E64FC4] overflow-hidden">
@@ -18,7 +17,7 @@ const Hero = () => {
               </div>
               <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight">
                 Smart Team Planning
-                <span className="block">for Design Studios</span>
+                <span className="block">for <span className="text-[#E64FC4]">Design Studios</span></span>
               </h1>
               <p className="text-lg text-white/90 leading-relaxed">
                 Stop wondering when to hire or worrying about burnout. Get AI-powered alerts that tell you exactly when your team needs help, when to find new projects, and how to prevent bottlenecks before they happen.
@@ -103,13 +102,6 @@ const Hero = () => {
             </div>
           </div>
         </div>
-      </div>
-      
-      {/* Bottom wave */}
-      <div className="absolute bottom-0 left-0 w-full">
-        <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
-        </svg>
       </div>
     </div>
   );
