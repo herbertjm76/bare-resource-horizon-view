@@ -5,7 +5,7 @@ const Pricing = () => {
   const plans = [
     {
       name: "Starter",
-      price: "$29",
+      price: "$59",
       period: "per month",
       description: "Perfect for small teams ditching spreadsheets",
       features: [
@@ -18,11 +18,11 @@ const Pricing = () => {
       ],
       cta: "Start Free Trial",
       popular: false,
-      note: "Billed annually ($290/year)"
+      note: "Billed annually ($590/year)"
     },
     {
       name: "Studio",
-      price: "$89",
+      price: "$99",
       period: "per month",
       description: "For growing design teams that need AI insights",
       features: [
@@ -37,11 +37,11 @@ const Pricing = () => {
       ],
       cta: "Start Free Trial", 
       popular: true,
-      note: "Billed annually ($890/year)"
+      note: "Billed annually ($990/year)"
     },
     {
       name: "Agency",
-      price: "$189",
+      price: "$200",
       period: "per month", 
       description: "For agencies managing multiple studios",
       features: [
@@ -57,7 +57,7 @@ const Pricing = () => {
       ],
       cta: "Start Free Trial",
       popular: false,
-      note: "Billed annually ($1,890/year)"
+      note: "Billed annually ($2,000/year)"
     }
   ];
 
