@@ -35,13 +35,7 @@ const Navbar = () => {
               onClick={() => scrollToSection('benefits')} 
               className="hover:text-purple-600 transition-colors cursor-pointer"
             >
-              Benefits
-            </button>
-            <button 
-              onClick={() => scrollToSection('testimonials')} 
-              className="hover:text-purple-600 transition-colors cursor-pointer"
-            >
-              Testimonials
+              What Sets Us Apart
             </button>
             <button 
               onClick={() => scrollToSection('pricing')} 
