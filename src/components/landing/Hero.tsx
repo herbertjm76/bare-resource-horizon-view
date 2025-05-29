@@ -18,10 +18,7 @@ const Hero = () => {
               </div>
               <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight">
                 Smart Team Planning
-                <span className="block">for </span>
-                <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                  Design Studios
-                </span>
+                <span className="block">for Design Studios</span>
               </h1>
               <p className="text-lg text-white/90 leading-relaxed">
                 Stop wondering when to hire or worrying about burnout. Get AI-powered alerts that tell you exactly when your team needs help, when to find new projects, and how to prevent bottlenecks before they happen.
@@ -58,7 +55,7 @@ const Hero = () => {
               </button>
             </div>
             
-            <div className="text-white/70 text-sm">
+            <div className="text-white text-sm font-medium">
               ✨ No credit card required • 🧠 AI insights included • 📈 Designed for small design teams
             </div>
           </div>
