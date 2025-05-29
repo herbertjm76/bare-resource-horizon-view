@@ -17,10 +17,10 @@ const Hero = () => {
                 🧠 AI-Powered Team Management
               </div>
               <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight">
-                Team Management
-                <span className="block">with AI That </span>
+                Smart Team Planning
+                <span className="block">for </span>
                 <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                  Warns You Before Problems Hit
+                  Design Studios
                 </span>
               </h1>
               <p className="text-lg text-white/90 leading-relaxed">
