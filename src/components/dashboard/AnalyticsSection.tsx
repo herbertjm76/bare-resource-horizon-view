@@ -20,81 +20,81 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
   const hasInvoiceData = mockData.projectInvoicesThisMonth && mockData.projectInvoicesThisMonth.length > 0;
   
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      <Card>
-        <CardHeader className="pb-1">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <Card className="h-64">
+        <CardHeader className="pb-2">
           <CardTitle className="text-sm">Project Status</CardTitle>
         </CardHeader>
-        <CardContent className="p-4">
+        <CardContent className="p-3 pt-0">
           {hasStatusData ? (
             <Donut 
               data={mockData.projectsByStatus} 
               title="" 
               colors={['#6F4BF6', '#5669F7', '#E64FC4']}
-              height={200}
+              height={140}
             />
           ) : (
-            <div className="flex items-center justify-center h-[200px] text-gray-500 text-sm">
+            <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
               No data available
             </div>
           )}
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-1">
+      <Card className="h-64">
+        <CardHeader className="pb-2">
           <CardTitle className="text-sm">Project Stages</CardTitle>
         </CardHeader>
-        <CardContent className="p-4">
+        <CardContent className="p-3 pt-0">
           {hasStageData ? (
             <Donut 
               data={mockData.projectsByStage} 
               title=""
               colors={['#6F4BF6', '#5669F7', '#E64FC4']}
-              height={200}
+              height={140}
             />
           ) : (
-            <div className="flex items-center justify-center h-[200px] text-gray-500 text-sm">
+            <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
               No data available
             </div>
           )}
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-1">
+      <Card className="h-64">
+        <CardHeader className="pb-2">
           <CardTitle className="text-sm">Regional Split</CardTitle>
         </CardHeader>
-        <CardContent className="p-4">
+        <CardContent className="p-3 pt-0">
           {hasRegionData ? (
             <Donut 
               data={mockData.projectsByRegion} 
               title=""
               colors={['#6F4BF6', '#5669F7', '#E64FC4']}
-              height={200}
+              height={140}
             />
           ) : (
-            <div className="flex items-center justify-center h-[200px] text-gray-500 text-sm">
+            <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
               No data available
             </div>
           )}
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="pb-1">
+      <Card className="h-64">
+        <CardHeader className="pb-2">
           <CardTitle className="text-sm">Project Invoices</CardTitle>
         </CardHeader>
-        <CardContent className="p-4">
+        <CardContent className="p-3 pt-0">
           {hasInvoiceData ? (
             <Donut 
               data={mockData.projectInvoicesThisMonth} 
               title=""
               colors={['#22C55E', '#F59E0B', '#EF4444']}
-              height={200}
+              height={140}
             />
           ) : (
-            <div className="flex items-center justify-center h-[200px] text-gray-500 text-sm">
+            <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
               No data available
             </div>
           )}

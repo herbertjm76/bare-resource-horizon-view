@@ -97,8 +97,8 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
     try {
       console.log('📊 Fetching metrics for time range:', selectedTimeRange, dateRange);
 
-      // Fetch projects within date range
-      const { data: projects, error: projectsError } = await supabase
+      // Fetch ALL projects (not filtered by creation date) - show current state of projects
+      const { data: allProjects, error: projectsError } = await supabase
         .from('projects')
         .select(`
           id,
@@ -110,8 +110,6 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
           office:offices(name, country)
         `)
         .eq('company_id', company.id)
-        .gte('created_at', dateRange.startDate)
-        .lte('created_at', dateRange.endDate)
         .abortSignal(signal);
 
       if (projectsError) {
@@ -122,7 +120,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       // Check if request was aborted
       if (signal.aborted) return;
 
-      // Fetch project stages/fees for revenue calculation
+      // Fetch project stages/fees within the time range
       const { data: projectStages, error: stagesError } = await supabase
         .from('project_stages')
         .select('fee, project_id, created_at')
@@ -138,10 +136,10 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
 
       if (signal.aborted) return;
 
-      // Fetch allocations for utilization trends
+      // Fetch allocations for utilization trends within the time range
       const { data: allocations, error: allocationsError } = await supabase
         .from('project_resource_allocations')
-        .select('hours, week_start_date, resource_id')
+        .select('hours, week_start_date, resource_id, project_id')
         .eq('company_id', company.id)
         .gte('week_start_date', dateRange.startDate)
         .lte('week_start_date', dateRange.endDate)
@@ -154,10 +152,23 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
 
       if (signal.aborted) return;
 
-      // Calculate metrics
-      const activeProjects = projects?.length || 0;
+      // Get projects that have activity in the selected time range (allocations or stages)
+      const projectsWithActivity = new Set([
+        ...(projectStages?.map(stage => stage.project_id) || []),
+        ...(allocations?.map(alloc => alloc.project_id) || [])
+      ]);
+
+      // Filter projects to only those with activity in the time range
+      const activeProjectsInRange = allProjects?.filter(project => 
+        projectsWithActivity.has(project.id)
+      ) || [];
+
+      console.log(`📈 Found ${activeProjectsInRange.length} projects with activity in ${selectedTimeRange}`);
+
+      // Calculate metrics based on projects with activity
+      const activeProjects = activeProjectsInRange.length;
       
-      // Calculate revenue
+      // Calculate revenue from stages in the time range
       const totalRevenue = projectStages?.reduce((sum, stage) => sum + (stage.fee || 0), 0) || 0;
       const avgProjectValue = activeProjects > 0 ? totalRevenue / activeProjects : 0;
 
@@ -166,36 +177,36 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       const uniqueResources = new Set(allocations?.map(alloc => alloc.resource_id) || []).size;
       const avgUtilization = uniqueResources > 0 ? Math.min((totalHours / (uniqueResources * 40)) * 100, 100) : 0;
 
-      // Group projects by status
-      const statusGroups = projects?.reduce((acc, project) => {
+      // Group active projects by status
+      const statusGroups = activeProjectsInRange.reduce((acc, project) => {
         const status = project.status || 'Unknown';
         acc[status] = (acc[status] || 0) + 1;
         return acc;
-      }, {} as Record<string, number>) || {};
+      }, {} as Record<string, number>);
 
       const projectsByStatus = Object.entries(statusGroups).map(([name, value]) => ({
         name,
         value
       }));
 
-      // Group projects by stage
-      const stageGroups = projects?.reduce((acc, project) => {
+      // Group active projects by stage
+      const stageGroups = activeProjectsInRange.reduce((acc, project) => {
         const stage = project.current_stage || 'Unknown';
         acc[stage] = (acc[stage] || 0) + 1;
         return acc;
-      }, {} as Record<string, number>) || {};
+      }, {} as Record<string, number>);
 
       const projectsByStage = Object.entries(stageGroups).map(([name, value]) => ({
         name,
         value
       }));
 
-      // Group projects by region/country
-      const regionGroups = projects?.reduce((acc, project) => {
+      // Group active projects by region/country
+      const regionGroups = activeProjectsInRange.reduce((acc, project) => {
         const region = project.country || 'Unknown';
         acc[region] = (acc[region] || 0) + 1;
         return acc;
-      }, {} as Record<string, number>) || {};
+      }, {} as Record<string, number>);
 
       const projectsByRegion = Object.entries(regionGroups).map(([name, value]) => ({
         name,

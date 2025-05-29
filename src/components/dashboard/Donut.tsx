@@ -64,24 +64,29 @@ export const Donut: React.FC<DonutProps> = ({
     };
   });
 
+  // Adjust sizes based on height
+  const isCompact = height <= 160;
+  const innerRadius = isCompact ? 35 : 60;
+  const outerRadius = isCompact ? 55 : 80;
+
   return (
-    <div className="h-full">
-      <div className="text-sm font-medium text-gray-700 mb-3">{title}</div>
+    <div className="h-full flex flex-col">
+      {title && <div className="text-sm font-medium text-gray-700 mb-2">{title}</div>}
       
-      <div className="flex flex-col items-center">
-        <div style={{ height: `${height}px`, width: '100%' }}>
+      <div className="flex-1 flex flex-col">
+        <div style={{ height: `${Math.min(height, 120)}px`, width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={safeData}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={2}
+                innerRadius={innerRadius}
+                outerRadius={outerRadius}
+                paddingAngle={1}
                 dataKey="value"
                 stroke="#fff"
-                strokeWidth={2}
+                strokeWidth={1}
               >
                 {safeData.map((_, index) => (
                   <Cell 
@@ -95,21 +100,28 @@ export const Donut: React.FC<DonutProps> = ({
           </ResponsiveContainer>
         </div>
         
-        {/* Separate legend below chart - solves text overlap */}
-        <div className="w-full mt-2">
-          <div className="flex flex-col items-start gap-2">
-            {formattedData.map((item, index) => (
-              <div key={index} className="flex items-center gap-2 text-xs">
+        {/* Compact legend */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="grid grid-cols-1 gap-1 text-xs">
+            {formattedData.slice(0, 4).map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
                 <div 
-                  className="w-3 h-3 rounded-sm" 
+                  className="w-2 h-2 rounded-sm flex-shrink-0" 
                   style={{ backgroundColor: item.color }} 
                 />
-                <div className="font-medium truncate max-w-[120px]">{item.name}</div>
-                <div className="text-gray-500">
+                <div className="truncate flex-1 min-w-0">
+                  <span className="font-medium">{item.name}</span>
+                </div>
+                <div className="text-gray-500 flex-shrink-0">
                   {item.percentage}%
                 </div>
               </div>
             ))}
+            {formattedData.length > 4 && (
+              <div className="text-gray-500 text-center">
+                +{formattedData.length - 4} more
+              </div>
+            )}
           </div>
         </div>
       </div>
