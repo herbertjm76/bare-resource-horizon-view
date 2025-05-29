@@ -1,4 +1,3 @@
-
 // Centralized color system for the entire application
 export const colors = {
   // Primary brand colors
@@ -87,11 +86,14 @@ export const colors = {
     },
   },
 
-  // Scrollbar colors
+  // Scrollbar colors - Updated to purple-gray theme
   scrollbar: {
-    track: 'linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%)',
-    thumb: 'linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%)',
-    thumbHover: 'linear-gradient(90deg, #5855eb 0%, #7c3aed 100%)',
+    track: '#f1f5f9',
+    trackGradient: 'linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%)',
+    thumb: '#94a3b8',
+    thumbGradient: 'linear-gradient(90deg, #94a3b8 0%, #6b7280 100%)',
+    thumbHover: '#64748b',
+    thumbHoverGradient: 'linear-gradient(90deg, #64748b 0%, #4b5563 100%)',
   },
 };
 
