@@ -16,7 +16,7 @@ const Projects = () => {
   // Calculate statistics
   const totalProjects = projects.length;
   const totalActiveProjects = projects.filter(project => 
-    project.status === 'in-progress' || project.status === 'In Progress'
+    project.status === 'In Progress'
   ).length;
   const totalOffices = new Set(projects.map(project => project.office?.name).filter(Boolean)).size;
 
