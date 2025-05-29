@@ -14,18 +14,17 @@ const Hero = () => {
           <div className="space-y-6">
             <div className="space-y-3">
               <div className="inline-flex items-center px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-white text-sm font-medium">
-                🧠 Excel + AI Business Intelligence
+                🧠 AI-Powered Team Management
               </div>
               <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight">
-                Excel Replacement
-                <span className="block">With </span>
+                Team Management
+                <span className="block">with AI That </span>
                 <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                  AI Business Advisor
+                  Warns You Before Problems Hit
                 </span>
               </h1>
               <p className="text-lg text-white/90 leading-relaxed">
-                Finally, resource planning that tells you what to do next. 
-                Know when to hire, when to find more projects, and when your team is heading for burnout.
+                Stop wondering when to hire or worrying about burnout. Get AI-powered alerts that tell you exactly when your team needs help, when to find new projects, and how to prevent bottlenecks before they happen.
               </p>
             </div>
             
@@ -49,7 +48,7 @@ const Hero = () => {
             
             <div className="flex flex-col sm:flex-row gap-3">
               <button className="bg-white text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-purple-50 transition-all duration-300 transform hover:scale-105 shadow-xl">
-                Try AI Insights Free for 14 Days
+                Get AI Team Insights Free for 14 Days
               </button>
               <button className="bg-white/15 backdrop-blur-sm text-white px-6 py-3 rounded-xl border border-white/30 hover:bg-white/25 transition-all duration-300 font-semibold flex items-center gap-2">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
