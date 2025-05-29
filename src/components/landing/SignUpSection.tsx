@@ -31,7 +31,7 @@ const SignUpSection = () => {
   ];
 
   return (
-    <div className="bg-gradient-to-br from-[#1A1F2C] via-[#2D1B69] to-[#1A1F2C] py-24 relative overflow-hidden">
+    <div className="bg-gradient-to-br from-[#1A1F2C] via-[#2D1B69] to-[#1A1F2C] py-16 relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-screen filter blur-3xl"></div>
@@ -39,134 +39,124 @@ const SignUpSection = () => {
       </div>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Copy */}
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-full border border-white/20 text-white text-sm font-medium mb-6">
+            <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-purple-500/20 to-blue-500/20 backdrop-blur-sm rounded-full border border-white/20 text-white text-sm font-medium mb-4">
               ⚡ Limited Time Offer
             </div>
-            <h2 className="text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight">
               Transform Your Business
               <span className="block bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
                 Starting Today
               </span>
             </h2>
-            <p className="text-xl text-white/80 mb-8 leading-relaxed">
+            <p className="text-lg text-white/80 mb-6">
               Join the resource management revolution. Get instant access to AI-powered 
               planning tools that leading companies use to boost efficiency by 40%.
             </p>
             
             {/* Benefits List */}
-            <div className="space-y-4 mb-8">
+            <div className="space-y-3 mb-6">
               {benefits.map((benefit, index) => (
                 <div key={index} className="flex items-center gap-3 text-white/90">
-                  <div className="w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Check className="w-4 h-4 text-white" />
+                  <div className="w-5 h-5 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-white" />
                   </div>
-                  <span className="text-lg font-medium">{benefit}</span>
+                  <span className="font-medium">{benefit}</span>
                 </div>
               ))}
             </div>
             
             {/* Social Proof */}
             <div className="text-white/70 text-sm">
-              <p className="mb-2">⭐⭐⭐⭐⭐ Rated 4.9/5 by 500+ teams</p>
+              <p className="mb-1">⭐⭐⭐⭐⭐ Rated 4.9/5 by 500+ teams</p>
               <p>"BareResource transformed our project delivery speed" - Sarah Chen, Operations Director</p>
             </div>
           </div>
           
           {/* Right Side - Form */}
           <div className="relative">
-            <div className="bg-white/95 backdrop-blur-sm p-8 lg:p-10 rounded-3xl shadow-2xl border border-white/20">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Start Your Free Trial</h3>
-                <p className="text-gray-600">No credit card required • Setup in 5 minutes</p>
+            <div className="bg-white/95 backdrop-blur-sm p-6 lg:p-8 rounded-3xl shadow-2xl border border-white/20">
+              <div className="text-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Start Your Free Trial</h3>
+                <p className="text-gray-600 text-sm">No credit card required • Setup in 5 minutes</p>
               </div>
               
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Your Full Name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                    required
-                  />
-                </div>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your Full Name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                  required
+                />
                 
-                <div>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="Work Email Address"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                    required
-                  />
-                </div>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Work Email Address"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                  required
+                />
                 
-                <div>
-                  <input
-                    type="text"
-                    name="company"
-                    placeholder="Company Name"
-                    value={formData.company}
-                    onChange={handleChange}
-                    className="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                    required
-                  />
-                </div>
+                <input
+                  type="text"
+                  name="company"
+                  placeholder="Company Name"
+                  value={formData.company}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                  required
+                />
                 
-                <div>
-                  <select
-                    name="size"
-                    value={formData.size}
-                    onChange={handleChange}
-                    className="w-full px-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
-                    required
-                  >
-                    <option value="">Select Company Size</option>
-                    <option value="1-10">1-10 employees</option>
-                    <option value="11-50">11-50 employees</option>
-                    <option value="51-200">51-200 employees</option>
-                    <option value="201-1000">201-1000 employees</option>
-                    <option value="1000+">1000+ employees</option>
-                  </select>
-                </div>
+                <select
+                  name="size"
+                  value={formData.size}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                  required
+                >
+                  <option value="">Select Company Size</option>
+                  <option value="1-10">1-10 employees</option>
+                  <option value="11-50">11-50 employees</option>
+                  <option value="51-200">51-200 employees</option>
+                  <option value="201-1000">201-1000 employees</option>
+                  <option value="1000+">1000+ employees</option>
+                </select>
                 
                 <button
                   type="submit"
-                  className="w-full py-4 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold text-lg hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+                  className="w-full py-3 px-6 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
                 >
                   Start Free Trial
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </form>
               
-              <div className="text-center mt-6 text-sm text-gray-500">
+              <div className="text-center mt-4 text-xs text-gray-500">
                 By signing up, you agree to our{' '}
                 <a href="/privacy-policy" className="text-purple-600 hover:text-purple-700 font-medium">
                   Privacy Policy
-                </a>{' '}
-                and Terms of Service
+                </a>
               </div>
             </div>
             
             {/* Floating trust indicators */}
-            <div className="absolute -top-4 -left-4 bg-white rounded-xl p-3 shadow-lg">
+            <div className="absolute -top-3 -left-3 bg-white rounded-xl p-2 shadow-lg">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-semibold text-gray-700">2,847 active users</span>
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs font-semibold text-gray-700">2,847 users</span>
               </div>
             </div>
             
-            <div className="absolute -bottom-4 -right-4 bg-white rounded-xl p-3 shadow-lg">
-              <div className="text-sm">
-                <div className="font-semibold text-gray-700">🔒 Enterprise Security</div>
-                <div className="text-gray-500">SOC 2 Compliant</div>
+            <div className="absolute -bottom-3 -right-3 bg-white rounded-xl p-2 shadow-lg">
+              <div className="text-xs">
+                <div className="font-semibold text-gray-700">🔒 SOC 2 Compliant</div>
               </div>
             </div>
           </div>
