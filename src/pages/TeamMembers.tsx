@@ -133,14 +133,14 @@ const TeamMembersContent = () => {
 
   // Calculate statistics for the header
   const totalMembers = teamMembers.length;
-  const totalActiveMembers = teamMembers.filter(member => 
-    member.status === 'active' || !member.status
-  ).length;
+  // Since Profile doesn't have a status field, we assume all members are active
+  const totalActiveMembers = teamMembers.length;
   const totalDepartments = new Set(
     teamMembers.map(member => member.department).filter(Boolean)
   ).size;
+  // Use 'location' instead of 'office_location' since that's what Profile has
   const totalLocations = new Set(
-    teamMembers.map(member => member.office_location).filter(Boolean)
+    teamMembers.map(member => member.location).filter(Boolean)
   ).size;
 
   const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || (isChecking && !permissionChecked);
