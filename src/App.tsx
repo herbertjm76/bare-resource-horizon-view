@@ -18,6 +18,7 @@ import ProjectResourcing from "./pages/ProjectResourcing";
 import Help from "./pages/Help";
 import FAQ from "./pages/FAQ";
 import Join from "./pages/Join";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ function App() {
               <Route path="/help" element={<Help />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/join" element={<Join />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
