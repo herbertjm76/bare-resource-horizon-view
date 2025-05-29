@@ -60,7 +60,7 @@ const Hero = () => {
             </div>
             
             <div className="text-white/70 text-sm">
-              ✨ No credit card required • 🧠 AI insights included • 📈 Used by 500+ design teams
+              ✨ No credit card required • 🧠 AI insights included • 📈 Designed for small design teams
             </div>
           </div>
           

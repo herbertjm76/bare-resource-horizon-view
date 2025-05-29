@@ -24,16 +24,16 @@ const Pricing = () => {
       name: "Studio",
       price: "$99",
       period: "per month",
-      description: "For growing design teams that need AI insights",
+      description: "Adds AI insights and dashboard analytics",
       features: [
+        "Everything in Starter",
         "Up to 25 team members",
         "🧠 AI hiring recommendations",
         "🧠 AI pipeline warnings",
-        "Advanced capacity planning",
-        "Client-ready reports",
-        "Project profitability tracking",
-        "Priority support",
-        "Team utilization insights"
+        "🧠 AI burnout prevention",
+        "Advanced dashboard analytics",
+        "Team utilization insights",
+        "Priority support"
       ],
       cta: "Start Free Trial", 
       popular: true,
@@ -43,16 +43,16 @@ const Pricing = () => {
       name: "Agency",
       price: "$200",
       period: "per month", 
-      description: "For agencies managing multiple studios",
+      description: "Adds financial management and multi-office support",
       features: [
+        "Everything in Studio",
         "Unlimited team members",
-        "🧠 All AI business intelligence",
-        "🧠 AI burnout prevention alerts",
+        "💰 Project profitability tracking",
+        "💰 Financial reporting",
+        "💰 Revenue forecasting",
         "Multi-office management",
         "Custom client reporting",
-        "Advanced integrations", 
         "Dedicated account manager",
-        "Phone support",
         "White-label options"
       ],
       cta: "Start Free Trial",
@@ -73,7 +73,7 @@ const Pricing = () => {
             One Price, No Per-Person Fees
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Predictable pricing that won't surprise you as your team grows. All plans include 14-day free trial with AI features.
+            Predictable pricing that won't surprise you as your team grows. All plans include 14-day free trial.
           </p>
         </div>
         
@@ -139,7 +139,7 @@ const Pricing = () => {
                     </div>
                     <span className={`text-sm ${
                       plan.popular ? 'text-white/90' : 'text-gray-600'
-                    } ${feature.includes('🧠') ? 'font-semibold' : ''}`}>
+                    } ${feature.includes('🧠') || feature.includes('💰') ? 'font-semibold' : ''}`}>
                       {feature}
                     </span>
                   </li>

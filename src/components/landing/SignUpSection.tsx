@@ -53,7 +53,7 @@ const SignUpSection = () => {
               </span>
             </h2>
             <p className="text-lg text-white/80 mb-6">
-              Join 500+ design teams who get AI-powered hiring and pipeline recommendations. 
+              Join the growing number of design teams who get AI-powered hiring and pipeline recommendations. 
               Never miss a growth opportunity or burn out your team again.
             </p>
             
@@ -83,7 +83,7 @@ const SignUpSection = () => {
             
             {/* Social Proof */}
             <div className="text-white/70 text-sm">
-              <p className="mb-1">⭐⭐⭐⭐⭐ "The AI hiring alerts saved us from a disaster!" - 47 reviews this month</p>
+              <p className="mb-1">⭐⭐⭐⭐⭐ "The AI hiring alerts saved us from a disaster!" - Early user feedback</p>
               <p>"Spotted our pipeline gap 2 months early and landed 3 new clients" - Design Director, Portland</p>
             </div>
           </div>
