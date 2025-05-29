@@ -5,28 +5,30 @@ const Pricing = () => {
   const plans = [
     {
       name: "Starter",
-      price: "$1",
-      period: "per person/month",
+      price: "$29",
+      period: "per month",
       description: "Perfect for small teams ditching spreadsheets",
       features: [
-        "Up to 15 team members",
+        "Up to 10 team members",
         "Visual resource planning",
         "Project timeline tracking", 
         "Basic reporting",
         "Email support",
-        "No setup fees"
+        "Excel import"
       ],
       cta: "Start Free Trial",
       popular: false,
-      note: "Billed annually ($12/person/year)"
+      note: "Billed annually ($290/year)"
     },
     {
       name: "Studio",
-      price: "$3",
-      period: "per person/month",
-      description: "For growing design teams that need more",
+      price: "$89",
+      period: "per month",
+      description: "For growing design teams that need AI insights",
       features: [
-        "Up to 50 team members",
+        "Up to 25 team members",
+        "🧠 AI hiring recommendations",
+        "🧠 AI pipeline warnings",
         "Advanced capacity planning",
         "Client-ready reports",
         "Project profitability tracking",
@@ -35,24 +37,27 @@ const Pricing = () => {
       ],
       cta: "Start Free Trial", 
       popular: true,
-      note: "Billed annually ($36/person/year)"
+      note: "Billed annually ($890/year)"
     },
     {
       name: "Agency",
-      price: "$5",
-      period: "per person/month", 
+      price: "$189",
+      period: "per month", 
       description: "For agencies managing multiple studios",
       features: [
         "Unlimited team members",
+        "🧠 All AI business intelligence",
+        "🧠 AI burnout prevention alerts",
         "Multi-office management",
         "Custom client reporting",
         "Advanced integrations", 
         "Dedicated account manager",
-        "Phone support"
+        "Phone support",
+        "White-label options"
       ],
       cta: "Start Free Trial",
       popular: false,
-      note: "Billed annually ($60/person/year)"
+      note: "Billed annually ($1,890/year)"
     }
   ];
 
@@ -62,13 +67,13 @@ const Pricing = () => {
         {/* Section Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center px-3 py-1 bg-green-100 rounded-full text-green-600 font-semibold text-sm mb-4">
-            💰 Honest, Simple Pricing
+            💰 Simple Flat Rate Pricing
           </div>
           <h2 className="text-3xl lg:text-4xl font-bold mb-4 bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            Less Than Your Daily Coffee Budget
+            One Price, No Per-Person Fees
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Stop paying enterprise prices for basic resource planning. All plans include 14-day free trial.
+            Predictable pricing that won't surprise you as your team grows. All plans include 14-day free trial with AI features.
           </p>
         </div>
         
@@ -134,7 +139,7 @@ const Pricing = () => {
                     </div>
                     <span className={`text-sm ${
                       plan.popular ? 'text-white/90' : 'text-gray-600'
-                    }`}>
+                    } ${feature.includes('🧠') ? 'font-semibold' : ''}`}>
                       {feature}
                     </span>
                   </li>
@@ -156,10 +161,10 @@ const Pricing = () => {
         {/* Bottom Note */}
         <div className="text-center mt-8 space-y-2">
           <p className="text-gray-600 text-sm font-medium">
-            🎯 Perfect for 8-20 person design teams
+            🎯 Perfect for 5-25 person design teams
           </p>
           <p className="text-gray-500 text-sm">
-            All plans include SSL security, daily backups, and 99.9% uptime guarantee.
+            All plans include SSL security, daily backups, and 99.9% uptime guarantee. Scale without per-person fees.
           </p>
         </div>
       </div>
