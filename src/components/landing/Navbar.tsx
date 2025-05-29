@@ -1,6 +1,17 @@
-import { Link } from 'react-router-dom';
+
 const Navbar = () => {
-  return <nav className="fixed w-full bg-white shadow-md z-50">
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  return (
+    <nav className="fixed w-full bg-white shadow-md z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
@@ -14,18 +25,43 @@ const Navbar = () => {
           
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8 text-gray-700">
-            <Link to="#features" className="hover:text-purple-600 transition-colors">Features</Link>
-            <Link to="#benefits" className="hover:text-purple-600 transition-colors">Benefits</Link>
-            <Link to="#testimonials" className="hover:text-purple-600 transition-colors">Testimonials</Link>
-            <Link to="#pricing" className="hover:text-purple-600 transition-colors">Pricing</Link>
+            <button 
+              onClick={() => scrollToSection('features')} 
+              className="hover:text-purple-600 transition-colors cursor-pointer"
+            >
+              Features
+            </button>
+            <button 
+              onClick={() => scrollToSection('benefits')} 
+              className="hover:text-purple-600 transition-colors cursor-pointer"
+            >
+              Benefits
+            </button>
+            <button 
+              onClick={() => scrollToSection('testimonials')} 
+              className="hover:text-purple-600 transition-colors cursor-pointer"
+            >
+              Testimonials
+            </button>
+            <button 
+              onClick={() => scrollToSection('pricing')} 
+              className="hover:text-purple-600 transition-colors cursor-pointer"
+            >
+              Pricing
+            </button>
           </div>
           
           {/* CTA Button */}
-          <Link to="/auth" className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg text-sm sm:text-base">
+          <button 
+            onClick={() => scrollToSection('signup')}
+            className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg text-sm sm:text-base"
+          >
             Get Started
-          </Link>
+          </button>
         </div>
       </div>
-    </nav>;
+    </nav>
+  );
 };
+
 export default Navbar;
