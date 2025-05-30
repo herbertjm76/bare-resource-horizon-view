@@ -35,8 +35,8 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   };
 
   const getGradientClass = (type: GradientType) => {
-    // Use the specified gradient with exact percentages: 40% violet, 25% blue, 35% pink
-    return 'bg-[linear-gradient(to_right,rgb(149,130,242)_0%_40%,rgb(113,124,240)_40%_65%,rgb(196,107,205)_65%_100%)]';
+    // Create a subtle gradient with smooth transitions using the specified colors
+    return 'bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400';
   };
 
   return (
