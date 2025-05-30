@@ -14,6 +14,8 @@ export const WeeklyExecutiveSummary: React.FC<WeeklyExecutiveSummaryProps> = ({
 }) => {
   const { metrics } = useWeeklyOverviewMetrics({ selectedWeek });
 
+  console.log('WeeklyExecutiveSummary render:', { summaryFormat, metricsLength: metrics.length });
+
   return (
     <div className="print:hidden">
       <StandardizedExecutiveSummary

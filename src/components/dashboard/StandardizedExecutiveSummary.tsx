@@ -36,13 +36,15 @@ interface StandardizedExecutiveSummaryProps {
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
   metrics,
   gradientType = 'purple',
-  cardFormat,
+  cardFormat = 'simple', // Default to simple
   useDetailedFormat = false,
   cardOpacity = 0.9
 }) => {
   // Determine the actual format to use
   // Priority: cardFormat prop > useDetailedFormat prop (for backward compatibility)
   const actualFormat: CardFormat = cardFormat || (useDetailedFormat ? 'detailed' : 'simple');
+
+  console.log('StandardizedExecutiveSummary render:', { cardFormat, useDetailedFormat, actualFormat });
 
   const getBadgeVariant = (color?: string) => {
     switch (color) {
@@ -63,6 +65,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   };
 
   if (actualFormat === 'detailed') {
+    console.log('Rendering detailed format');
     return (
       <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -129,6 +132,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   }
 
   // Simple format - centered cards
+  console.log('Rendering simple format');
   return (
     <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
