@@ -40,7 +40,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
         <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
           <DollarSign className="h-5 w-5" />
           {title}
-          <span className="text-sm font-normal ml-2 bg-white/20 px-2 py-0.5 rounded">
+          <span className="text-sm font-normal ml-2 bg-white/30 px-2 py-0.5 rounded">
             {timeRangeText}
           </span>
         </h2>
@@ -48,7 +48,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {metrics.map((metric, index) => (
-          <div key={index} className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
+          <div key={index} className="bg-white backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">
               {metric.title}
             </h3>
