@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { CompactInsightCard } from './CompactInsightCard';
-import { AlertTriangle, Users, Target, TrendingUp, Calendar, Briefcase } from 'lucide-react';
+import { AlertTriangle, Users, Target, TrendingUp, Calendar, Briefcase, Plane } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAnnualLeaveInsights } from '@/hooks/useAnnualLeaveInsights';
 
 interface TeamMember {
   id: string;
@@ -24,11 +25,51 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
   utilizationRate
 }) => {
   const navigate = useNavigate();
+  const { insights: leaveInsights } = useAnnualLeaveInsights(teamMembers);
   
   const generateInsights = () => {
     const insights = [];
     const teamSize = teamMembers.length;
     const averageCapacity = teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0) / teamSize;
+    
+    // Annual Leave Insights (prioritized)
+    if (leaveInsights.nextWeekCount > 0) {
+      const severity = leaveInsights.nextWeekCount > teamSize * 0.3 ? 'high' : 'medium';
+      insights.push({
+        title: "Upcoming Leave",
+        description: `${leaveInsights.nextWeekCount} team members on leave next week.`,
+        severity: severity as const,
+        actionLabel: "View Calendar",
+        onAction: () => navigate('/team-annual-leave'),
+        metric: `${leaveInsights.nextWeekCount} people`,
+        icon: <Plane className="h-4 w-4 text-blue-500" />
+      });
+    }
+
+    if (leaveInsights.nextMonthCount > 0) {
+      insights.push({
+        title: "Monthly Leave",
+        description: `${leaveInsights.nextMonthCount} team members on leave next month.`,
+        severity: 'low' as const,
+        actionLabel: "Plan Ahead",
+        onAction: () => navigate('/team-annual-leave'),
+        metric: `${leaveInsights.nextMonthCount} people`,
+        icon: <Calendar className="h-4 w-4 text-green-500" />
+      });
+    }
+
+    if (leaveInsights.peakWeek && leaveInsights.peakWeek.count > 1) {
+      const severity = leaveInsights.peakWeek.count > teamSize * 0.4 ? 'critical' : 'medium';
+      insights.push({
+        title: "Peak Leave Week",
+        description: `Week of ${leaveInsights.peakWeek.weekStart} has ${leaveInsights.peakWeek.count} people on leave.`,
+        severity: severity as const,
+        actionLabel: "Review Schedule",
+        onAction: () => navigate('/team-annual-leave'),
+        metric: `${leaveInsights.peakWeek.count} people`,
+        icon: <AlertTriangle className="h-4 w-4 text-orange-500" />
+      });
+    }
     
     // Utilization analysis
     if (utilizationRate < 60) {
