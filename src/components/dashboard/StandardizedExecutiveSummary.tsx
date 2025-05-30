@@ -48,7 +48,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {metrics.map((metric, index) => (
-          <div key={index} className="bg-white backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
+          <div key={index} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">
               {metric.title}
             </h3>
