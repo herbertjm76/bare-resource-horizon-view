@@ -61,67 +61,50 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   };
 
   const getGlassMorphismClass = () => {
-    return 'bg-white/15 backdrop-blur-xl border border-white/20 shadow-xl';
-  };
-
-  const getBreakdownColorClass = (color?: string) => {
-    switch (color) {
-      case 'green': return 'bg-emerald-400/90';
-      case 'orange': return 'bg-amber-400/90';
-      case 'red': return 'bg-red-400/90';
-      case 'blue': return 'bg-blue-400/90';
-      default: return 'bg-slate-400/90';
-    }
-  };
-
-  const getBadgeClass = (color?: string) => {
-    switch (color) {
-      case 'red': return 'bg-red-500/90 text-white border-red-400/30 shadow-lg';
-      case 'orange': return 'bg-amber-500/90 text-white border-amber-400/30 shadow-lg';
-      case 'green': return 'bg-emerald-500/90 text-white border-emerald-400/30 shadow-lg';
-      case 'blue': return 'bg-blue-500/90 text-white border-blue-400/30 shadow-lg';
-      default: return 'bg-slate-500/90 text-white border-slate-400/30 shadow-lg';
-    }
+    return 'bg-white/20 backdrop-blur-md border border-white/30 shadow-lg';
   };
 
   if (actualFormat === 'detailed') {
     console.log('Rendering detailed format');
     return (
       <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           {metrics.map((metric, index) => {
             const Icon = metric.icon;
             return (
-              <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/20 hover:shadow-2xl hover:scale-[1.02]`}>
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-4">
+              <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/25 hover:shadow-xl`}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-3">
                     {/* Left side: Icon and Title */}
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-1">
                       {Icon && (
-                        <div className="w-8 h-8 flex items-center justify-center bg-white/20 rounded-lg backdrop-blur-sm">
-                          <Icon className="w-4 h-4 text-white" />
+                        <div className="w-6 h-6 flex items-center justify-center">
+                          <Icon className="w-4 h-4 text-white/80" />
                         </div>
                       )}
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold text-white/95 leading-tight">{metric.title}</p>
-                      </div>
+                      <p className="text-xs font-medium text-white/80">{metric.title}</p>
                     </div>
                     
                     {/* Right side: Main value */}
-                    <div className="text-right ml-2">
-                      <p className="text-2xl font-bold text-white leading-none">{metric.value}</p>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-white">{metric.value}</p>
                     </div>
                   </div>
                   
                   {/* Bottom section: Breakdowns in horizontal layout */}
                   {metric.breakdowns && (
-                    <div className="flex items-center justify-between gap-3 mb-3">
+                    <div className="flex items-center justify-between gap-4">
                       {metric.breakdowns.map((breakdown, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-xs min-w-0 flex-1">
-                          <div className={`w-2.5 h-2.5 rounded-full ${getBreakdownColorClass(breakdown.color)} shadow-sm flex-shrink-0`} />
-                          <div className="min-w-0 flex-1">
-                            <div className="text-white/80 font-medium leading-tight truncate">{breakdown.label}</div>
-                            <div className="text-white font-semibold text-sm leading-tight">{breakdown.value}</div>
+                        <div key={idx} className="flex items-center gap-1 text-xs">
+                          <div className={`w-2 h-2 rounded-full ${
+                            breakdown.color === 'green' ? 'bg-green-400' :
+                            breakdown.color === 'orange' ? 'bg-orange-400' :
+                            breakdown.color === 'red' ? 'bg-red-400' :
+                            'bg-blue-400'
+                          }`} />
+                          <div className="flex flex-col">
+                            <span className="text-white/70">{breakdown.label}</span>
+                            <span className="text-white font-medium">{breakdown.value}</span>
                           </div>
                         </div>
                       ))}
@@ -130,10 +113,10 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                   
                   {/* Badge */}
                   {metric.badgeText && (
-                    <div className="flex justify-end">
+                    <div className="flex justify-end mt-2">
                       <Badge 
-                        variant="outline"
-                        className={`text-xs font-semibold border-0 backdrop-blur-sm ${getBadgeClass(metric.badgeColor)}`}
+                        variant={getBadgeVariant(metric.badgeColor)} 
+                        className="text-xs bg-red-500/80 text-white border-0 backdrop-blur-sm"
                       >
                         {metric.badgeText}
                       </Badge>
@@ -148,30 +131,30 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     );
   }
 
-  // Simple format - centered cards with improved styling
+  // Simple format - centered cards
   console.log('Rendering simple format');
   return (
     <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {metrics.map((metric, index) => (
-          <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/20 hover:shadow-2xl hover:scale-[1.02]`}>
-            <CardContent className="p-5">
-              <div className="text-center space-y-3">
-                <p className="text-sm font-semibold text-white/95">{metric.title}</p>
-                <p className={`text-3xl font-bold leading-none ${
-                  metric.isGood === true ? 'text-emerald-200' :
-                  metric.isGood === false ? 'text-red-200' :
+          <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/25 hover:shadow-xl`}>
+            <CardContent className="p-3">
+              <div className="text-center">
+                <p className="text-xs font-medium text-white/80 mb-1">{metric.title}</p>
+                <p className={`text-3xl font-bold mb-1 ${
+                  metric.isGood === true ? 'text-green-100' :
+                  metric.isGood === false ? 'text-red-100' :
                   'text-white'
                 }`}>
                   {metric.value}
                 </p>
                 {metric.subtitle && (
-                  <p className="text-sm text-white/80 font-medium">{metric.subtitle}</p>
+                  <p className="text-xs text-white/70 mb-1">{metric.subtitle}</p>
                 )}
                 {metric.badgeText && (
                   <Badge 
-                    variant="outline"
-                    className={`text-xs font-semibold border-0 backdrop-blur-sm ${getBadgeClass(metric.badgeColor)}`}
+                    variant={getBadgeVariant(metric.badgeColor)} 
+                    className="text-xs bg-white/20 text-white border border-white/30 backdrop-blur-sm"
                   >
                     {metric.badgeText}
                   </Badge>
