@@ -63,18 +63,18 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     return 'bg-white/20 backdrop-blur-md border border-white/30 shadow-lg';
   };
 
-  const getBadgeTextColor = (badgeColor?: string, isGood?: boolean) => {
+  const getBadgeBackgroundColor = (badgeColor?: string, isGood?: boolean) => {
     // Use indicator color for good/bad
-    if (isGood === true) return 'text-green-200';
-    if (isGood === false) return 'text-red-200';
+    if (isGood === true) return 'bg-green-500/80 border-green-400/40';
+    if (isGood === false) return 'bg-red-500/80 border-red-400/40';
     
     // Fallback to badge color
     switch (badgeColor) {
-      case 'green': return 'text-green-200';
-      case 'red': return 'text-red-200';
-      case 'orange': return 'text-orange-200';
-      case 'blue': return 'text-blue-200';
-      default: return 'text-white';
+      case 'green': return 'bg-green-500/80 border-green-400/40';
+      case 'red': return 'bg-red-500/80 border-red-400/40';
+      case 'orange': return 'bg-orange-500/80 border-orange-400/40';
+      case 'blue': return 'bg-blue-500/80 border-blue-400/40';
+      default: return 'bg-white/20 border-white/30';
     }
   };
 
@@ -130,12 +130,12 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                     </div>
                   )}
                   
-                  {/* Badge */}
+                  {/* Badge with colored background */}
                   {metric.badgeText && (
                     <div className="flex justify-end mt-3">
                       <Badge 
                         variant={getBadgeVariant(metric.badgeColor)} 
-                        className={`text-xs bg-white/20 border border-white/30 backdrop-blur-sm ${getBadgeTextColor(metric.badgeColor, metric.isGood)}`}
+                        className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(metric.badgeColor, metric.isGood)}`}
                       >
                         {metric.badgeText}
                       </Badge>
@@ -171,7 +171,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                 {metric.badgeText && (
                   <Badge 
                     variant={getBadgeVariant(metric.badgeColor)} 
-                    className={`text-xs bg-white/20 border border-white/30 backdrop-blur-sm ${getBadgeTextColor(metric.badgeColor, metric.isGood)}`}
+                    className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(metric.badgeColor, metric.isGood)}`}
                   >
                     {metric.badgeText}
                   </Badge>

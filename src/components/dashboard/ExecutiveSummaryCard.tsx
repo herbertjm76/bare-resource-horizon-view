@@ -92,6 +92,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       title="Executive Summary"
       timeRangeText={timeRangeText}
       metrics={metrics}
+      cardFormat="simple"
     />
   );
 };
