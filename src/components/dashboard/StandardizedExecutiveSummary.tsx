@@ -11,7 +11,7 @@ interface SummaryMetric {
   badgeColor?: string;
 }
 
-type GradientType = 'blue' | 'emerald' | 'violet';
+type GradientType = 'purple' | 'blue' | 'emerald' | 'violet';
 
 interface StandardizedExecutiveSummaryProps {
   title?: string;
@@ -22,7 +22,7 @@ interface StandardizedExecutiveSummaryProps {
 
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
   metrics,
-  gradientType = 'blue'
+  gradientType = 'purple'
 }) => {
   const getBadgeVariant = (color?: string) => {
     switch (color) {
@@ -36,6 +36,8 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
 
   const getGradientClass = (type: GradientType) => {
     switch (type) {
+      case 'purple':
+        return 'bg-gradient-to-r from-purple-400 via-purple-500 to-indigo-500';
       case 'blue':
         return 'bg-gradient-to-br from-blue-50 to-blue-100/50';
       case 'emerald':
@@ -43,7 +45,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
       case 'violet':
         return 'bg-gradient-to-br from-violet-50 to-violet-100/50';
       default:
-        return 'bg-gradient-to-br from-blue-50 to-blue-100/50';
+        return 'bg-gradient-to-r from-purple-400 via-purple-500 to-indigo-500';
     }
   };
 

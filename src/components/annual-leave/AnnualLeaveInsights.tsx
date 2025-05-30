@@ -17,7 +17,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl p-6 border border-brand-violet/10 shadow-lg bg-gradient-to-r from-blue-50 to-indigo-50">
+      <div className="rounded-2xl p-6 border border-brand-violet/10 shadow-lg bg-gradient-to-r from-purple-400 via-purple-500 to-indigo-500">
         <div className="animate-pulse">
           <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -59,7 +59,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
         ? (insights.peakWeek.count > teamMembers.length * 0.4 ? 'Critical' : 'Monitor')
         : 'Balanced',
       badgeColor: insights.peakWeek 
-        ? (insights.peakWeek.count > teamMembers.length * 0.4 ? 'red' : 'yellow')
+        ? (insights.peakWeek.count > teamMembers.length * 0.4 ? 'red' : 'orange')
         : 'green'
     },
     {
@@ -69,7 +69,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
       badgeText: insights.nextWeekCount / teamMembers.length > 0.5 ? 'Low Coverage' :
                  insights.nextWeekCount / teamMembers.length > 0.3 ? 'Moderate' : 'Good Coverage',
       badgeColor: insights.nextWeekCount / teamMembers.length > 0.5 ? 'red' :
-                  insights.nextWeekCount / teamMembers.length > 0.3 ? 'yellow' : 'green'
+                  insights.nextWeekCount / teamMembers.length > 0.3 ? 'orange' : 'green'
     }
   ];
 
@@ -78,6 +78,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
       title="Annual Leave Overview"
       timeRangeText={`${timeRangeText} insights and upcoming leave planning`}
       metrics={metrics}
+      gradientType="purple"
     />
   );
 };

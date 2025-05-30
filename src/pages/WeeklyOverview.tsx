@@ -7,10 +7,13 @@ import { WeeklyResourceTable } from '@/components/weekly-overview/WeeklyResource
 import { WeeklyResourceFilters } from '@/components/weekly-overview/WeeklyResourceFilters';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { WeeklyActionButtons } from '@/components/weekly-overview/components/WeeklyActionButtons';
+import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { format, startOfWeek, addWeeks, subWeeks, addDays } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
+import { useTeamMembersData } from '@/hooks/useTeamMembersData';
+import { useProjects } from '@/hooks/useProjects';
 import '@/components/weekly-overview/weekly-overview-print.css';
 
 const HEADER_HEIGHT = 56;
@@ -31,6 +34,10 @@ const WeeklyOverview = () => {
   const [filters, setFilters] = useState({
     office: "all",
   });
+
+  // Get data for summary
+  const { teamMembers } = useTeamMembersData(true);
+  const { projects } = useProjects();
 
   const handlePreviousWeek = () => {
     setSelectedWeek(prevDate => subWeeks(prevDate, 1));
@@ -54,6 +61,42 @@ const WeeklyOverview = () => {
   // Format the week label
   const weekLabel = `Week of ${format(weekStart, 'MMMM d, yyyy')}`;
 
+  // Calculate metrics for the weekly overview
+  const activeProjects = projects.filter(p => p.status === 'In Progress').length;
+  const totalCapacity = teamMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
+  const averageUtilization = 75; // This would come from actual allocation data
+
+  const metrics = [
+    {
+      title: "Active Projects",
+      value: activeProjects,
+      subtitle: "In progress this week",
+      badgeText: activeProjects > 5 ? 'High Load' : 'Normal',
+      badgeColor: activeProjects > 5 ? 'orange' : 'green'
+    },
+    {
+      title: "Team Members",
+      value: teamMembers.length,
+      subtitle: "Available resources",
+      badgeText: "Full Team",
+      badgeColor: "blue"
+    },
+    {
+      title: "Weekly Capacity",
+      value: `${totalCapacity}h`,
+      subtitle: "Total team hours",
+      badgeText: "Available",
+      badgeColor: "green"
+    },
+    {
+      title: "Utilization",
+      value: `${averageUtilization}%`,
+      subtitle: "Average team load",
+      badgeText: averageUtilization > 85 ? 'High' : averageUtilization > 65 ? 'Optimal' : 'Low',
+      badgeColor: averageUtilization > 85 ? 'red' : averageUtilization > 65 ? 'green' : 'orange'
+    }
+  ];
+
   return (
     <QueryClientProvider client={queryClient}>
       <SidebarProvider>
@@ -76,6 +119,14 @@ const WeeklyOverview = () => {
               <div className="max-w-full mx-auto space-y-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2 print:hidden">
                   <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Weekly Overview</h1>
+                </div>
+                
+                {/* Executive Summary */}
+                <div className="print:hidden">
+                  <StandardizedExecutiveSummary
+                    metrics={metrics}
+                    gradientType="purple"
+                  />
                 </div>
                 
                 {/* Control bar with filters */}

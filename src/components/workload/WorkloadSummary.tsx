@@ -1,12 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, TrendingUp, TrendingDown, Users, Calendar } from 'lucide-react';
+import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/useWorkloadData';
-import { addWeeks, format } from 'date-fns';
 
 interface WorkloadSummaryProps {
   members: TeamMember[];
@@ -59,13 +55,13 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   // Get hiring recommendation
   const getHiringRecommendation = (utilization: number, availableHours: number) => {
     if (utilization >= 90) {
-      return { status: 'urgent', message: 'Urgent hiring needed', color: 'destructive' };
+      return { status: 'urgent', message: 'Urgent hiring needed', color: 'red' };
     } else if (utilization >= 80) {
-      return { status: 'consider', message: 'Consider hiring soon', color: 'secondary' };
+      return { status: 'consider', message: 'Consider hiring soon', color: 'orange' };
     } else if (availableHours > (periodToShow * 120)) { // 3 people equivalent capacity
-      return { status: 'capacity', message: 'Good capacity available', color: 'default' };
+      return { status: 'capacity', message: 'Good capacity available', color: 'green' };
     } else {
-      return { status: 'monitor', message: 'Monitor capacity', color: 'default' };
+      return { status: 'monitor', message: 'Monitor capacity', color: 'blue' };
     }
   };
 
@@ -87,105 +83,46 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     return stats;
   }, { underutilized: 0, overallocated: 0, optimal: 0 });
 
+  const metrics = [
+    {
+      title: "Team Utilization",
+      value: `${overallUtilization}%`,
+      subtitle: overallUtilization < 70 ? 'More projects needed' : 
+               overallUtilization > 90 ? 'At capacity' : 'Good utilization',
+      badgeText: overallUtilization < 70 ? 'Low' : 
+                overallUtilization > 90 ? 'High' : 'Optimal',
+      badgeColor: overallUtilization < 70 ? 'orange' : 
+                 overallUtilization > 90 ? 'red' : 'green'
+    },
+    {
+      title: "Available Hours",
+      value: `${availableCapacity}h`,
+      subtitle: `Next ${periodToShow} weeks capacity`,
+      badgeText: "Plan Ahead",
+      badgeColor: "blue"
+    },
+    {
+      title: "Team Status",
+      value: `${memberStats.optimal}`,
+      subtitle: "Optimal allocation",
+      badgeText: memberStats.overallocated > 0 ? `${memberStats.overallocated} Over` :
+                memberStats.underutilized > 0 ? `${memberStats.underutilized} Under` : 'Balanced',
+      badgeColor: memberStats.overallocated > 0 ? 'red' :
+                 memberStats.underutilized > 0 ? 'orange' : 'green'
+    },
+    {
+      title: "Hiring Status",
+      value: hiringRec.message,
+      subtitle: `Based on ${periodToShow}-week projection`,
+      badgeText: hiringRec.status === 'urgent' ? 'Action Needed' : 'Monitor',
+      badgeColor: hiringRec.color
+    }
+  ];
+
   return (
-    <div className="hero-gradient rounded-2xl p-6 mb-4">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-white/80">Team Utilization</p>
-                <p className="text-3xl font-bold text-white">{overallUtilization}%</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-white" />
-              </div>
-            </div>
-            <Progress value={overallUtilization} className="mt-3 bg-white/20" />
-            <p className="text-xs text-white/70 mt-2">
-              {overallUtilization < 70 ? 'More projects needed' : 
-               overallUtilization > 90 ? 'At capacity' : 'Good utilization'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-white/80">Available Hours</p>
-                <p className="text-3xl font-bold text-white">{availableCapacity}h</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-white" />
-              </div>
-            </div>
-            <p className="text-xs text-white/70 mt-6">
-              Next {periodToShow} weeks capacity
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-white/80">Team Status</p>
-                <div className="flex gap-1 mt-1">
-                  <Badge variant="outline" className="text-xs px-2 py-0 bg-white/20 text-white border-white/30">
-                    {memberStats.optimal} Optimal
-                  </Badge>
-                </div>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                <Users className="h-5 w-5 text-white" />
-              </div>
-            </div>
-            <div className="flex gap-1 mt-2">
-              {memberStats.underutilized > 0 && (
-                <Badge variant="secondary" className="text-xs px-2 py-0 bg-white/30 text-white border-white/40">
-                  {memberStats.underutilized} Under
-                </Badge>
-              )}
-              {memberStats.overallocated > 0 && (
-                <Badge variant="destructive" className="text-xs px-2 py-0 bg-red-500/80 text-white border-red-400/50">
-                  {memberStats.overallocated} Over
-                </Badge>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-lg">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-white/80">Hiring Status</p>
-                <Badge 
-                  variant={hiringRec.color as any} 
-                  className={`mt-1 ${
-                    hiringRec.status === 'urgent' 
-                      ? 'bg-red-500/80 text-white border-red-400/50' 
-                      : 'bg-white/20 text-white border-white/30'
-                  }`}
-                >
-                  {hiringRec.message}
-                </Badge>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
-                {hiringRec.status === 'urgent' ? (
-                  <AlertTriangle className="h-5 w-5 text-white" />
-                ) : (
-                  <TrendingDown className="h-5 w-5 text-white" />
-                )}
-              </div>
-            </div>
-            <p className="text-xs text-white/70 mt-2">
-              Based on {periodToShow}-week projection
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+    <StandardizedExecutiveSummary
+      metrics={metrics}
+      gradientType="purple"
+    />
   );
 };
