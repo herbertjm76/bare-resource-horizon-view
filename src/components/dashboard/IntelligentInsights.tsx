@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CompactInsightCard } from './CompactInsightCard';
 import { AlertTriangle, Users, Target, TrendingUp, Calendar, Briefcase, Plane } from 'lucide-react';
@@ -34,11 +33,10 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
     
     // Annual Leave Insights (prioritized)
     if (leaveInsights.nextWeekCount > 0) {
-      const severity = leaveInsights.nextWeekCount > teamSize * 0.3 ? 'high' : 'medium';
       insights.push({
         title: "Upcoming Leave",
         description: `${leaveInsights.nextWeekCount} team members on leave next week.`,
-        severity: severity as const,
+        severity: (leaveInsights.nextWeekCount > teamSize * 0.3 ? 'high' : 'medium') as const,
         actionLabel: "View Calendar",
         onAction: () => navigate('/team-annual-leave'),
         metric: `${leaveInsights.nextWeekCount} people`,
@@ -59,11 +57,10 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
     }
 
     if (leaveInsights.peakWeek && leaveInsights.peakWeek.count > 1) {
-      const severity = leaveInsights.peakWeek.count > teamSize * 0.4 ? 'critical' : 'medium';
       insights.push({
         title: "Peak Leave Week",
         description: `Week of ${leaveInsights.peakWeek.weekStart} has ${leaveInsights.peakWeek.count} people on leave.`,
-        severity: severity as const,
+        severity: (leaveInsights.peakWeek.count > teamSize * 0.4 ? 'critical' : 'medium') as const,
         actionLabel: "Review Schedule",
         onAction: () => navigate('/team-annual-leave'),
         metric: `${leaveInsights.peakWeek.count} people`,
