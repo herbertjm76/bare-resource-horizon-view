@@ -139,6 +139,7 @@ const WeeklyOverview = () => {
                     metrics={metrics}
                     gradientType="purple"
                     useDetailedFormat={true}
+                    cardOpacity={0.33}
                   />
                 </div>
                 

@@ -27,12 +27,14 @@ interface StandardizedExecutiveSummaryProps {
   metrics: SummaryMetric[];
   gradientType?: GradientType;
   useDetailedFormat?: boolean;
+  cardOpacity?: number;
 }
 
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
   metrics,
   gradientType = 'purple',
-  useDetailedFormat = false
+  useDetailedFormat = false,
+  cardOpacity = 0.9
 }) => {
   const getBadgeVariant = (color?: string) => {
     switch (color) {
@@ -57,6 +59,11 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     return 'text-gray-900';
   };
 
+  const getCardOpacityClass = () => {
+    if (cardOpacity === 0.33) return 'bg-white/30';
+    return 'bg-white/90';
+  };
+
   if (useDetailedFormat) {
     return (
       <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
@@ -64,7 +71,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
           {metrics.map((metric, index) => {
             const Icon = metric.icon;
             return (
-              <Card key={index} className="bg-white/90 backdrop-blur-sm">
+              <Card key={index} className={`${getCardOpacityClass()} backdrop-blur-sm`}>
                 <CardContent className="p-4">
                   <div className="space-y-3">
                     {/* Header with icon and title */}
@@ -128,7 +135,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {metrics.map((metric, index) => (
-          <Card key={index} className="bg-white/90 backdrop-blur-sm">
+          <Card key={index} className={`${getCardOpacityClass()} backdrop-blur-sm`}>
             <CardContent className="p-3">
               <div className="text-center">
                 <p className="text-xs font-medium text-gray-600 mb-1">{metric.title}</p>
