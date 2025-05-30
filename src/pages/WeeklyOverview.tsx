@@ -33,7 +33,7 @@ const queryClient = new QueryClient({
 
 const WeeklyOverview = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
-  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('detailed');
+  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('simple');
   const [filters, setFilters] = useState({
     office: "all",
   });
