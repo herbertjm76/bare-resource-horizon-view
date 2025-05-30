@@ -4,6 +4,7 @@ import { ExecutiveSummaryCard } from './ExecutiveSummaryCard';
 import { StaffStatusCard } from './staff/StaffStatusCard';
 import { EnhancedInsights } from './EnhancedInsights';
 import { TeamMembersSummary } from './TeamMembersSummary';
+import { HolidayCard } from './HolidayCard';
 import { TimeRange } from './TimeRangeSelector';
 
 interface DesktopDashboardProps {
@@ -64,7 +65,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         standardizedUtilizationRate={standardizedUtilizationRate}
       />
       
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div>
           <StaffStatusCard 
             staffData={transformedStaffData} 
@@ -78,6 +79,9 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
             activeProjects={activeProjects}
             selectedTimeRange={selectedTimeRange}
           />
+        </div>
+        <div>
+          <HolidayCard />
         </div>
       </div>
       
