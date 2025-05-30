@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { MonthSelector } from '@/components/annual-leave/MonthSelector';
-import { TeamAnnualLeaveFilters } from '@/components/annual-leave/TeamAnnualLeaveFilters';
-import { LeaveCalendar } from '@/components/annual-leave/LeaveCalendar';
-import { AnnualLeaveInsights } from '@/components/annual-leave/AnnualLeaveInsights';
+import { MonthSelector } from './MonthSelector';
+import { TeamAnnualLeaveFilters } from './TeamAnnualLeaveFilters';
+import { LeaveCalendar } from './LeaveCalendar';
+import { AnnualLeaveInsights } from './AnnualLeaveInsights';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
 
@@ -12,7 +13,7 @@ interface TeamAnnualLeaveContentProps {
   onMonthChange: (month: Date) => void;
   isLoading: boolean;
   filteredMembers: TeamMember[];
-  leaveData: Record<string, Record<string, number>>;
+  leaveData: any;
   onLeaveChange: (memberId: string, date: string, hours: number) => void;
   departments: string[];
   locations: string[];
@@ -24,6 +25,8 @@ interface TeamAnnualLeaveContentProps {
   setSearchQuery: (query: string) => void;
   clearFilters: () => void;
   allMembers: TeamMember[];
+  summaryFormat: 'simple' | 'detailed';
+  setSummaryFormat: (format: 'simple' | 'detailed') => void;
 }
 
 export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
@@ -42,27 +45,44 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
   setFilterValue,
   setSearchQuery,
   clearFilters,
-  allMembers
+  allMembers,
+  summaryFormat,
+  setSummaryFormat
 }) => {
   return (
-    <div className="mx-auto space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Annual Leave</h1>
-      
-      {/* Executive Summary Row - Annual Leave Insights */}
+    <div className="mx-auto space-y-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Team Annual Leave</h1>
+        <div className="flex gap-2">
+          <Button
+            variant={summaryFormat === 'simple' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSummaryFormat('simple')}
+          >
+            Simple Cards
+          </Button>
+          <Button
+            variant={summaryFormat === 'detailed' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSummaryFormat('detailed')}
+          >
+            Detailed Cards
+          </Button>
+        </div>
+      </div>
+
+      {/* Annual Leave Insights */}
       <AnnualLeaveInsights 
         teamMembers={allMembers} 
-        selectedMonth={selectedMonth}
+        selectedMonth={selectedMonth} 
+        summaryFormat={summaryFormat}
       />
-      
-      <div className="text-sm text-muted-foreground">
-        <p>Enter the number of leave hours for each day. Empty cells count as 0 hours.</p>
-      </div>
       
       <div className="flex flex-row justify-between items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
           <MonthSelector 
-            selectedMonth={selectedMonth} 
-            onMonthChange={onMonthChange} 
+            selectedMonth={selectedMonth}
+            onMonthChange={onMonthChange}
           />
           
           <TeamAnnualLeaveFilters 
@@ -88,14 +108,12 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
             <Skeleton className="h-12 w-full" />
           </div>
         ) : (
-          <div className="annual-leave-grid-container">
-            <LeaveCalendar 
-              members={filteredMembers}
-              selectedMonth={selectedMonth}
-              leaveData={leaveData}
-              onLeaveChange={onLeaveChange}
-            />
-          </div>
+          <LeaveCalendar 
+            members={filteredMembers}
+            selectedMonth={selectedMonth}
+            leaveData={leaveData}
+            onLeaveChange={onLeaveChange}
+          />
         )}
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -7,6 +8,7 @@ import { WeeklyResourceFilters } from '@/components/weekly-overview/WeeklyResour
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { WeeklyActionButtons } from '@/components/weekly-overview/components/WeeklyActionButtons';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
+import { Button } from '@/components/ui/button';
 import { format, startOfWeek, addWeeks, subWeeks, addDays } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -31,6 +33,7 @@ const queryClient = new QueryClient({
 
 const WeeklyOverview = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
+  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('detailed');
   const [filters, setFilters] = useState({
     office: "all",
   });
@@ -135,6 +138,22 @@ const WeeklyOverview = () => {
               <div className="max-w-full mx-auto space-y-4">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2 print:hidden">
                   <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Weekly Overview</h1>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={summaryFormat === 'simple' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSummaryFormat('simple')}
+                    >
+                      Simple Cards
+                    </Button>
+                    <Button
+                      variant={summaryFormat === 'detailed' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSummaryFormat('detailed')}
+                    >
+                      Detailed Cards
+                    </Button>
+                  </div>
                 </div>
                 
                 {/* Executive Summary */}
@@ -142,7 +161,7 @@ const WeeklyOverview = () => {
                   <StandardizedExecutiveSummary
                     metrics={metrics}
                     gradientType="purple"
-                    cardFormat="detailed"
+                    cardFormat={summaryFormat}
                   />
                 </div>
                 

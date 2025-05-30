@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { ProjectsList } from '@/components/projects/ProjectsList';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
+import { Button } from '@/components/ui/button';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
 
@@ -12,6 +13,7 @@ const HEADER_HEIGHT = 56;
 
 const Projects = () => {
   const { projects } = useProjects();
+  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('simple');
 
   // Calculate statistics
   const totalProjects = projects.length;
@@ -69,11 +71,29 @@ const Projects = () => {
           <div className="flex-1 p-6 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
             <div className="max-w-6xl mx-auto space-y-8">
               <div>
-                <h1 className="text-3xl font-bold tracking-tight text-brand-primary mb-6">Projects Overview</h1>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                  <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Projects Overview</h1>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={summaryFormat === 'simple' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSummaryFormat('simple')}
+                    >
+                      Simple Cards
+                    </Button>
+                    <Button
+                      variant={summaryFormat === 'detailed' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSummaryFormat('detailed')}
+                    >
+                      Detailed Cards
+                    </Button>
+                  </div>
+                </div>
                 <StandardizedExecutiveSummary
                   metrics={metrics}
                   gradientType="purple"
-                  cardFormat="simple"
+                  cardFormat={summaryFormat}
                 />
               </div>
               <OfficeSettingsProvider>

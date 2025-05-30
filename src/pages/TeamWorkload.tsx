@@ -19,6 +19,7 @@ const TeamWorkload = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
+  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('simple');
   
   // Fetch team members data
   const { teamMembers, isLoading: isLoadingTeamMembers } = useTeamMembersData(true);
@@ -91,6 +92,8 @@ const TeamWorkload = () => {
               weekLabel={weekLabel}
               onPreviousWeek={handlePreviousWeek}
               onNextWeek={handleNextWeek}
+              summaryFormat={summaryFormat}
+              setSummaryFormat={setSummaryFormat}
             />
           </div>
         </div>

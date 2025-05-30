@@ -7,11 +7,13 @@ import { TeamMember } from '@/components/dashboard/types';
 interface AnnualLeaveInsightsProps {
   teamMembers: TeamMember[];
   selectedMonth: Date;
+  summaryFormat?: 'simple' | 'detailed';
 }
 
 export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
   teamMembers,
-  selectedMonth
+  selectedMonth,
+  summaryFormat = 'simple'
 }) => {
   const { insights, isLoading } = useAnnualLeaveInsights(teamMembers);
 
@@ -79,7 +81,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
       timeRangeText={`${timeRangeText} insights and upcoming leave planning`}
       metrics={metrics}
       gradientType="purple"
-      cardFormat="simple"
+      cardFormat={summaryFormat}
     />
   );
 };

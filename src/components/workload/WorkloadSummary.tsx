@@ -9,13 +9,15 @@ interface WorkloadSummaryProps {
   workloadData: Record<string, Record<string, WorkloadBreakdown>>;
   selectedWeek: Date;
   periodToShow?: number;
+  summaryFormat?: 'simple' | 'detailed';
 }
 
 export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   members,
   workloadData,
   selectedWeek,
-  periodToShow = 12
+  periodToShow = 12,
+  summaryFormat = 'simple'
 }) => {
   // Calculate overall team utilization for the specified period
   const calculateOverallUtilization = () => {
@@ -123,6 +125,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     <StandardizedExecutiveSummary
       metrics={metrics}
       gradientType="purple"
+      cardFormat={summaryFormat}
     />
   );
 };

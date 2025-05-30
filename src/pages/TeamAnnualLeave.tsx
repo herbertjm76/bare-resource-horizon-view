@@ -16,6 +16,7 @@ const HEADER_HEIGHT = 56;
 const TeamAnnualLeave = () => {
   // State for selected month
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('simple');
   
   // Fetch team members data
   const { teamMembers, isLoading: isLoadingTeamMembers } = useTeamMembersData(true);
@@ -85,6 +86,8 @@ const TeamAnnualLeave = () => {
               setSearchQuery={setSearchQuery}
               clearFilters={clearFilters}
               allMembers={allMembers}
+              summaryFormat={summaryFormat}
+              setSummaryFormat={setSummaryFormat}
             />
           </div>
         </div>
