@@ -36,7 +36,7 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
       insights.push({
         title: "Upcoming Leave",
         description: `${leaveInsights.nextWeekCount} team members on leave next week.`,
-        severity: (leaveInsights.nextWeekCount > teamSize * 0.3 ? 'high' : 'medium') as const,
+        severity: leaveInsights.nextWeekCount > teamSize * 0.3 ? 'high' : 'medium',
         actionLabel: "View Calendar",
         onAction: () => navigate('/team-annual-leave'),
         metric: `${leaveInsights.nextWeekCount} people`,
@@ -60,7 +60,7 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
       insights.push({
         title: "Peak Leave Week",
         description: `Week of ${leaveInsights.peakWeek.weekStart} has ${leaveInsights.peakWeek.count} people on leave.`,
-        severity: (leaveInsights.peakWeek.count > teamSize * 0.4 ? 'critical' : 'medium') as const,
+        severity: leaveInsights.peakWeek.count > teamSize * 0.4 ? 'critical' : 'medium',
         actionLabel: "Review Schedule",
         onAction: () => navigate('/team-annual-leave'),
         metric: `${leaveInsights.peakWeek.count} people`,
