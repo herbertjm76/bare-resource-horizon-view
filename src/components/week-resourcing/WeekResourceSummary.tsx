@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { format, addDays } from 'date-fns';
@@ -8,13 +9,15 @@ interface WeekResourceSummaryProps {
   members: any[];
   allocations: any[];
   weekStartDate: Date;
+  summaryFormat?: 'simple' | 'detailed';
 }
 
 export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
   projects,
   members,
   allocations,
-  weekStartDate
+  weekStartDate,
+  summaryFormat = 'simple'
 }) => {
   // Calculate total allocated hours for the week
   const totalAllocatedHours = allocations.reduce((total, allocation) => {
@@ -90,7 +93,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
       <StandardizedExecutiveSummary
         metrics={metrics}
         gradientType="purple"
-        cardFormat="detailed"
+        cardFormat={summaryFormat}
       />
     </div>
   );

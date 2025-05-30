@@ -14,11 +14,13 @@ interface WeekResourceViewProps {
     office: string;
     searchTerm?: string;
   };
+  summaryFormat?: 'simple' | 'detailed';
 }
 
 export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   selectedWeek,
-  filters
+  filters,
+  summaryFormat = 'simple'
 }) => {
   const {
     projects,
@@ -54,6 +56,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         members={members}
         allocations={weekAllocations}
         weekStartDate={weekStartDateAsDate}
+        summaryFormat={summaryFormat}
       />
       
       <ResourceTable 

@@ -5,14 +5,16 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
 import { WeekResourceControls } from '@/components/week-resourcing/WeekResourceControls';
+import { WeeklyOverviewHeader } from '@/components/weekly-overview/WeeklyOverviewHeader';
 import { startOfWeek, format } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { Toaster } from 'sonner';
 
 const HEADER_HEIGHT = 56;
 
-const WeekResourcing = () => {
+const WeeklyOverview = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
+  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('simple');
   const [filters, setFilters] = useState({
     office: "all",
     country: "all",
@@ -50,9 +52,10 @@ const WeekResourcing = () => {
           }} className="print:hidden" />
           <div className="flex-1 p-4 sm:p-6 bg-background">
             <div className="max-w-full mx-auto space-y-4">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
-                <h1 className="font-bold tracking-tight text-brand-primary text-3xl">Weekly Overview</h1>
-              </div>
+              <WeeklyOverviewHeader 
+                summaryFormat={summaryFormat}
+                setSummaryFormat={setSummaryFormat}
+              />
               
               <WeekResourceControls 
                 selectedWeek={selectedWeek} 
@@ -63,7 +66,11 @@ const WeekResourcing = () => {
               />
               
               <OfficeSettingsProvider>
-                <WeekResourceView selectedWeek={selectedWeek} filters={filters} />
+                <WeekResourceView 
+                  selectedWeek={selectedWeek} 
+                  filters={filters}
+                  summaryFormat={summaryFormat}
+                />
               </OfficeSettingsProvider>
             </div>
           </div>
@@ -74,4 +81,4 @@ const WeekResourcing = () => {
   );
 };
 
-export default WeekResourcing;
+export default WeeklyOverview;
