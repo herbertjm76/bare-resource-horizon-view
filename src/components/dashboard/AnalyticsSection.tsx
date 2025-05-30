@@ -8,7 +8,7 @@ interface AnalyticsSectionProps {
     projectsByStatus: { name: string; value: number; }[];
     projectsByStage: { name: string; value: number; }[];
     projectsByRegion: { name: string; value: number; }[];
-    projectInvoicesThisMonth: { name: string; value: number; }[];
+    projectsByPM: { name: string; value: number; }[];
   };
 }
 
@@ -17,7 +17,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
   const hasStatusData = mockData.projectsByStatus && mockData.projectsByStatus.length > 0;
   const hasStageData = mockData.projectsByStage && mockData.projectsByStage.length > 0;
   const hasRegionData = mockData.projectsByRegion && mockData.projectsByRegion.length > 0;
-  const hasInvoiceData = mockData.projectInvoicesThisMonth && mockData.projectInvoicesThisMonth.length > 0;
+  const hasPMData = mockData.projectsByPM && mockData.projectsByPM.length > 0;
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -83,12 +83,12 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
 
       <Card className="h-64">
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Project Invoices</CardTitle>
+          <CardTitle className="text-sm">Projects by PM</CardTitle>
         </CardHeader>
         <CardContent className="p-3 pt-0">
-          {hasInvoiceData ? (
+          {hasPMData ? (
             <Donut 
-              data={mockData.projectInvoicesThisMonth} 
+              data={mockData.projectsByPM} 
               title=""
               colors={['#22C55E', '#F59E0B', '#EF4444']}
               height={140}

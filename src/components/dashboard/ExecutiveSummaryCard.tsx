@@ -56,10 +56,10 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       { name: 'Europe', value: Math.max(1, Math.floor(activeProjects * 0.35)) },
       { name: 'Asia Pacific', value: Math.max(0, Math.floor(activeProjects * 0.2)) },
     ],
-    projectInvoicesThisMonth: [
-      { name: 'Paid', value: Math.max(1, Math.floor(activeProjects * 0.6)) },
-      { name: 'Pending', value: Math.max(1, Math.floor(activeProjects * 0.3)) },
-      { name: 'Overdue', value: Math.max(0, Math.floor(activeProjects * 0.1)) },
+    projectsByPM: [
+      { name: 'John Smith', value: Math.max(1, Math.floor(activeProjects * 0.4)) },
+      { name: 'Sarah Johnson', value: Math.max(1, Math.floor(activeProjects * 0.35)) },
+      { name: 'Mike Chen', value: Math.max(0, Math.floor(activeProjects * 0.25)) },
     ],
   };
 
