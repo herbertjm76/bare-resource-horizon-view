@@ -968,6 +968,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: string
       }
+      get_user_company_id_safe: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_user_profile_by_id: {
         Args: { user_id: string }
         Returns: {
@@ -988,6 +992,10 @@ export type Database = {
         Args: { user_id: string }
         Returns: string
       }
+      get_user_role_safe: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       is_company_role: {
         Args:
           | Record<PropertyKey, never>
@@ -1003,6 +1011,10 @@ export type Database = {
       }
       user_has_owner_role: {
         Args: { user_id: string }
+        Returns: boolean
+      }
+      user_is_admin_safe: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
       users_are_in_same_company: {
