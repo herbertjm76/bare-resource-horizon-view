@@ -2,24 +2,35 @@
 import React from 'react';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardExecutiveSummary } from './DashboardExecutiveSummary';
-import { TeamMemberSection } from './TeamMemberSection';
+import TeamMemberSection from './TeamMemberSection';
 import { HolidaysList } from './HolidaysList';
 import { EnhancedInsights } from './EnhancedInsights';
 import { TeamMember } from './types';
 import { Users, TrendingUp, Clock, Target } from 'lucide-react';
+import { TimeRange } from './TimeRangeSelector';
 
 interface DesktopDashboardProps {
   teamMembers: TeamMember[];
   invites: any[];
   projects: any[];
   executiveSummaryData: any;
+  selectedOffice: string;
+  setSelectedOffice: (office: string) => void;
+  selectedTimeRange: TimeRange;
+  setSelectedTimeRange: (range: TimeRange) => void;
+  officeOptions: string[];
 }
 
 export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   teamMembers,
   invites,
   projects,
-  executiveSummaryData
+  executiveSummaryData,
+  selectedOffice,
+  setSelectedOffice,
+  selectedTimeRange,
+  setSelectedTimeRange,
+  officeOptions
 }) => {
   // Transform executiveSummaryData to match DashboardExecutiveSummary format
   const dashboardMetrics = [
@@ -36,7 +47,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
       value: `${executiveSummaryData?.utilizationRate || 0}%`,
       subtitle: "Team utilization",
       icon: <TrendingUp className="h-4 w-4" />,
-      status: (executiveSummaryData?.utilizationRate || 0) > 80 ? "good" : "warning" as const,
+      status: (executiveSummaryData?.utilizationRate || 0) > 80 ? "good" as const : "warning" as const,
       trend: "up" as const
     },
     {
@@ -58,7 +69,13 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   return (
     <div className="space-y-8">
-      <DashboardHeader />
+      <DashboardHeader 
+        selectedOffice={selectedOffice}
+        setSelectedOffice={setSelectedOffice}
+        selectedTimeRange={selectedTimeRange}
+        setSelectedTimeRange={setSelectedTimeRange}
+        officeOptions={officeOptions}
+      />
       
       {/* Executive Summary */}
       <DashboardExecutiveSummary 
@@ -71,14 +88,27 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         <div className="xl:col-span-2 space-y-8">
           <TeamMemberSection 
             teamMembers={teamMembers}
-            invites={invites}
+            userRole="owner"
+            editMode={false}
+            setEditMode={() => {}}
+            selectedMembers={[]}
+            setSelectedMembers={() => {}}
+            onEditMember={() => {}}
+            onDeleteMember={() => {}}
+            onBulkDelete={() => {}}
+            onAdd={() => {}}
           />
-          <EnhancedInsights />
+          <EnhancedInsights 
+            utilizationRate={executiveSummaryData?.utilizationRate || 0}
+            teamSize={teamMembers.length}
+            activeProjects={projects.length}
+            selectedTimeRange={selectedTimeRange}
+          />
         </div>
         
         {/* Sidebar */}
         <div className="space-y-8">
-          <HolidaysList />
+          <HolidaysList holidays={[]} />
         </div>
       </div>
     </div>
