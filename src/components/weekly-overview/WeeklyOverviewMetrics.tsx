@@ -1,72 +1,86 @@
 
-import { useTeamMembersData } from '@/hooks/useTeamMembersData';
-import { useProjects } from '@/hooks/useProjects';
+import React from 'react';
 import { TrendingUp, Users, Clock, CheckCircle } from 'lucide-react';
-import { format, startOfWeek } from 'date-fns';
+import { useWeeklyResourceData } from './hooks/useWeeklyResourceData';
+import { startOfWeek } from 'date-fns';
 
 interface WeeklyOverviewMetricsProps {
   selectedWeek: Date;
 }
 
 export const useWeeklyOverviewMetrics = ({ selectedWeek }: WeeklyOverviewMetricsProps) => {
-  // Get data for summary
-  const { teamMembers } = useTeamMembersData(true);
-  const { projects } = useProjects();
-
-  // Get Monday of the current week
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
-
-  // Calculate metrics for the weekly overview
-  const activeProjects = projects.filter(p => p.status === 'In Progress').length;
-  const completedProjects = projects.filter(p => p.status === 'Complete').length;
-  const planningProjects = projects.filter(p => p.status === 'Planning').length;
-  const totalCapacity = teamMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
-  const averageUtilization = 75; // This would come from actual allocation data
   
-  // Calculate total allocated hours (estimated)
-  const estimatedAllocatedHours = Math.round(totalCapacity * (averageUtilization / 100));
-  const availableHours = Math.max(0, totalCapacity - estimatedAllocatedHours);
+  const {
+    projects,
+    members,
+    weekAllocations,
+    isLoading,
+    error
+  } = useWeeklyResourceData({ 
+    selectedWeek, 
+    filters: { office: "all", searchTerm: "" } 
+  });
+
+  // Calculate total allocated hours for the week
+  const totalAllocatedHours = weekAllocations?.reduce((total, allocation) => {
+    return total + (allocation.hours || 0);
+  }, 0) || 0;
+
+  // Calculate total capacity for the week
+  const totalCapacity = members?.reduce((total, member) => {
+    return total + (member.weekly_capacity || 40);
+  }, 0) || 0;
+
+  // Calculate utilization rate
+  const utilizationRate = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
+
+  // Calculate available hours
+  const availableHours = Math.max(0, totalCapacity - totalAllocatedHours);
+
+  // Count active projects for the week
+  const activeProjectsCount = projects?.filter(project => {
+    return weekAllocations?.some(allocation => allocation.project_id === project.id);
+  }).length || 0;
 
   const metrics = [
     {
-      title: "Team Utilization",
-      value: `${averageUtilization}%`,
-      icon: Clock,
-      breakdowns: [
-        { label: "Allocated", value: `${estimatedAllocatedHours}h`, color: "blue" },
-        { label: "Available", value: `${availableHours}h`, color: "green" }
-      ]
-    },
-    {
-      title: "Available Capacity", 
-      value: `${availableHours}h`,
-      icon: CheckCircle,
-      breakdowns: [
-        { label: "Total Capacity", value: `${totalCapacity}h`, color: "blue" },
-        { label: "Week", value: format(weekStart, 'MMM d'), color: "green" }
-      ]
-    },
-    {
-      title: "Active Projects",
-      value: activeProjects,
+      title: "Total Projects",
+      value: projects?.length || 0,
       icon: TrendingUp,
-      breakdowns: [
-        { label: "Planning", value: planningProjects, color: "orange" },
-        { label: "Completed", value: completedProjects, color: "green" }
-      ]
+      subtitle: `${activeProjectsCount} active this week`,
+      isGood: activeProjectsCount > 0
+    },
+    {
+      title: "Team Utilization",
+      value: `${utilizationRate}%`,
+      icon: Clock,
+      subtitle: `${totalAllocatedHours}h allocated`,
+      badgeText: utilizationRate > 90 ? "High Load" : utilizationRate < 50 ? "Available" : "Optimal",
+      badgeColor: utilizationRate > 90 ? "red" : utilizationRate < 50 ? "blue" : "green",
+      isGood: utilizationRate >= 70 && utilizationRate <= 85
     },
     {
       title: "Team Members",
-      value: teamMembers.length,
+      value: members?.length || 0,
       icon: Users,
-      breakdowns: [
-        { label: "Projects per person", value: teamMembers.length > 0 ? (activeProjects / teamMembers.length).toFixed(1) : "0", color: "blue" },
-        { label: "Avg load", value: `${averageUtilization}%`, color: averageUtilization > 85 ? "red" : "green" }
-      ],
-      badgeText: averageUtilization > 90 ? "High Load" : undefined,
-      badgeColor: "red"
+      subtitle: `${totalCapacity}h capacity`,
+      isGood: (members?.length || 0) > 0
+    },
+    {
+      title: "Available Hours",
+      value: `${availableHours}h`,
+      icon: CheckCircle,
+      subtitle: "This week",
+      badgeText: availableHours === 0 ? "Fully Booked" : undefined,
+      badgeColor: availableHours === 0 ? "orange" : undefined,
+      isGood: availableHours > 0
     }
   ];
 
-  return { metrics };
+  return {
+    metrics,
+    isLoading,
+    error
+  };
 };
