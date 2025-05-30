@@ -13,79 +13,88 @@ interface AnalyticsSectionProps {
 }
 
 export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) => {
-  // Check if chart data arrays have any entries
-  const hasStatusData = mockData.projectsByStatus && mockData.projectsByStatus.length > 0;
-  const hasStageData = mockData.projectsByStage && mockData.projectsByStage.length > 0;
-  const hasRegionData = mockData.projectsByRegion && mockData.projectsByRegion.length > 0;
-  const hasPMData = mockData.projectsByPM && mockData.projectsByPM.length > 0;
+  // Validate chart data arrays
+  const hasStatusData = mockData.projectsByStatus?.length > 0;
+  const hasStageData = mockData.projectsByStage?.length > 0;
+  const hasRegionData = mockData.projectsByRegion?.length > 0;
+  const hasPMData = mockData.projectsByPM?.length > 0;
+  
+  const EmptyState = ({ title }: { title: string }) => (
+    <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
+      <div className="text-center">
+        <div className="w-8 h-8 rounded-full bg-gray-100 mx-auto mb-2 flex items-center justify-center">
+          <span className="text-gray-400 text-xs">📊</span>
+        </div>
+        <p>No {title.toLowerCase()} data</p>
+      </div>
+    </div>
+  );
   
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-      <Card className="h-64">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Project Status</CardTitle>
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      {/* Project Status Chart */}
+      <Card className="h-72 shadow-sm hover:shadow-md transition-shadow">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold text-gray-800">Project Status</CardTitle>
         </CardHeader>
-        <CardContent className="p-3 pt-0">
+        <CardContent className="p-4 pt-0">
           {hasStatusData ? (
             <Donut 
               data={mockData.projectsByStatus} 
               title="" 
-              colors={['#6F4BF6', '#5669F7', '#E64FC4']}
+              colors={['#10B981', '#3B82F6', '#F59E0B']}
               height={140}
             />
           ) : (
-            <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
-              No data available
-            </div>
+            <EmptyState title="Project Status" />
           )}
         </CardContent>
       </Card>
 
-      <Card className="h-64">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Project Stages</CardTitle>
+      {/* Project Stages Chart */}
+      <Card className="h-72 shadow-sm hover:shadow-md transition-shadow">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold text-gray-800">Project Stages</CardTitle>
         </CardHeader>
-        <CardContent className="p-3 pt-0">
+        <CardContent className="p-4 pt-0">
           {hasStageData ? (
             <Donut 
               data={mockData.projectsByStage} 
               title=""
-              colors={['#6F4BF6', '#5669F7', '#E64FC4']}
+              colors={['#6F4BF6', '#5669F7', '#E64FC4', '#8B5CF6']}
               height={140}
             />
           ) : (
-            <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
-              No data available
-            </div>
+            <EmptyState title="Project Stages" />
           )}
         </CardContent>
       </Card>
 
-      <Card className="h-64">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Regional Split</CardTitle>
+      {/* Regional Distribution Chart */}
+      <Card className="h-72 shadow-sm hover:shadow-md transition-shadow">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold text-gray-800">Regional Distribution</CardTitle>
         </CardHeader>
-        <CardContent className="p-3 pt-0">
+        <CardContent className="p-4 pt-0">
           {hasRegionData ? (
             <Donut 
               data={mockData.projectsByRegion} 
               title=""
-              colors={['#6F4BF6', '#5669F7', '#E64FC4']}
+              colors={['#059669', '#0891B2', '#7C3AED']}
               height={140}
             />
           ) : (
-            <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
-              No data available
-            </div>
+            <EmptyState title="Regional Distribution" />
           )}
         </CardContent>
       </Card>
 
-      <Card className="h-64">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Projects by PM</CardTitle>
+      {/* Projects by PM Chart */}
+      <Card className="h-72 shadow-sm hover:shadow-md transition-shadow">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold text-gray-800">Projects by PM</CardTitle>
         </CardHeader>
-        <CardContent className="p-3 pt-0">
+        <CardContent className="p-4 pt-0">
           {hasPMData ? (
             <Donut 
               data={mockData.projectsByPM} 
@@ -94,9 +103,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
               height={140}
             />
           ) : (
-            <div className="flex items-center justify-center h-[140px] text-gray-500 text-sm">
-              No data available
-            </div>
+            <EmptyState title="Projects by PM" />
           )}
         </CardContent>
       </Card>

@@ -39,17 +39,18 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, utilizationRate, staffData);
   const isOverCapacity = capacityHours < 0;
 
-  // Mock analytics data for the bottom section
+  // Analytics data optimized for final dashboard state
   const analyticsData = {
     projectsByStatus: [
-      { name: 'Active', value: Math.max(1, Math.floor(activeProjects * 0.6)) },
+      { name: 'Active', value: Math.max(1, Math.floor(activeProjects * 0.65)) },
       { name: 'Planning', value: Math.max(1, Math.floor(activeProjects * 0.25)) },
-      { name: 'On Hold', value: Math.max(0, Math.floor(activeProjects * 0.15)) },
+      { name: 'On Hold', value: Math.max(0, Math.floor(activeProjects * 0.1)) },
     ],
     projectsByStage: [
       { name: 'Design', value: Math.max(1, Math.floor(activeProjects * 0.4)) },
       { name: 'Development', value: Math.max(1, Math.floor(activeProjects * 0.35)) },
-      { name: 'Review', value: Math.max(0, Math.floor(activeProjects * 0.25)) },
+      { name: 'Testing', value: Math.max(0, Math.floor(activeProjects * 0.15)) },
+      { name: 'Review', value: Math.max(0, Math.floor(activeProjects * 0.1)) },
     ],
     projectsByRegion: [
       { name: 'North America', value: Math.max(1, Math.floor(activeProjects * 0.45)) },
@@ -63,14 +64,12 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
     ],
   };
 
-  console.log('Executive Summary Card Data (Standardized):', {
+  console.log('Executive Summary Card - Final State:', {
     selectedTimeRange,
     activeProjects,
     activeResources,
     utilizationRate,
     standardizedUtilizationRate,
-    totalRevenue,
-    avgProjectValue,
     capacityHours,
     isOverCapacity,
     staffDataCount: staffData.length
@@ -78,19 +77,20 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Top Section - Executive Summary with Gauges */}
+      {/* Executive Summary with Gauges */}
       <div 
-        className="rounded-2xl p-4 border border-brand-violet/10"
+        className="rounded-2xl p-6 border border-brand-violet/10 shadow-lg"
         style={{
-          background: 'linear-gradient(45deg, #6F4BF6 0%, #5669F7 55%, #E64FC4 100%)'
+          background: 'linear-gradient(135deg, #6F4BF6 0%, #5669F7 50%, #E64FC4 100%)'
         }}
       >
         <SummaryHeader timeRangeText={timeRangeText} />
         
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-600 mb-2">Team Utilization</h3>
-            <div className="flex items-center justify-center">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Team Utilization */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-md">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Team Utilization</h3>
+            <div className="flex items-center justify-center mb-3">
               <Gauge 
                 value={Math.round(utilizationRate)} 
                 max={100} 
@@ -98,8 +98,8 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
                 size="lg"
               />
             </div>
-            <div className="text-center mt-2">
-              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+            <div className="text-center">
+              <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
                 utilizationStatus.color === 'destructive' ? 'bg-red-100 text-red-800' :
                 utilizationStatus.color === 'default' ? 'bg-green-100 text-green-800' :
                 'bg-blue-100 text-blue-800'
@@ -109,9 +109,10 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
             </div>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-600 mb-2">Available Capacity</h3>
-            <div className="flex items-center justify-center">
+          {/* Available Capacity */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-md">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Available Capacity</h3>
+            <div className="flex items-center justify-center mb-3">
               <Gauge 
                 value={isOverCapacity ? 0 : Math.min((capacityHours / (activeResources * 40)) * 100, 100)} 
                 max={100} 
@@ -119,17 +120,18 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
                 size="lg"
               />
             </div>
-            <div className="text-center mt-2">
-              <p className={`text-lg font-bold ${isOverCapacity ? 'text-red-600' : 'text-gray-900'}`}>
+            <div className="text-center">
+              <p className={`text-lg font-bold mb-1 ${isOverCapacity ? 'text-red-600' : 'text-gray-900'}`}>
                 {Math.abs(capacityHours).toLocaleString()}h
               </p>
               <p className="text-xs text-gray-500">{timeRangeText}</p>
             </div>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-600 mb-2">Active Projects</h3>
-            <div className="flex items-center justify-center">
+          {/* Active Projects */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-md">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Active Projects</h3>
+            <div className="flex items-center justify-center mb-3">
               <Gauge 
                 value={activeProjects} 
                 max={Math.max(activeProjects * 1.5, 10)} 
@@ -137,8 +139,8 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
                 size="lg"
               />
             </div>
-            <div className="text-center mt-2">
-              <p className="text-lg font-bold text-gray-900">{activeProjects}</p>
+            <div className="text-center">
+              <p className="text-lg font-bold text-gray-900 mb-1">{activeProjects}</p>
               <p className="text-xs text-gray-500">
                 {activeResources > 0 
                   ? `${(activeProjects / activeResources).toFixed(1)} per person` 
@@ -147,9 +149,10 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
             </div>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-600 mb-2">Team Size</h3>
-            <div className="flex items-center justify-center">
+          {/* Team Size */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-md">
+            <h3 className="text-sm font-semibold text-gray-700 mb-3">Team Size</h3>
+            <div className="flex items-center justify-center mb-3">
               <Gauge 
                 value={activeResources} 
                 max={Math.max(activeResources * 1.5, 10)} 
@@ -157,9 +160,9 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
                 size="lg"
               />
             </div>
-            <div className="text-center mt-2">
-              <p className="text-lg font-bold text-gray-900">{activeResources}</p>
-              <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+            <div className="text-center">
+              <p className="text-lg font-bold text-gray-900 mb-1">{activeResources}</p>
+              <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
                 utilizationRate > 85 ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'
               }`}>
                 {utilizationRate > 85 ? 'Consider Hiring' : 'Stable'}
@@ -169,7 +172,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
         </div>
       </div>
 
-      {/* Bottom Section - Analytics Charts */}
+      {/* Analytics Charts Section */}
       <AnalyticsSection mockData={analyticsData} />
     </div>
   );
