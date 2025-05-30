@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { DollarSign } from 'lucide-react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface SummaryMetric {
   title: string;
@@ -17,57 +18,38 @@ interface StandardizedExecutiveSummaryProps {
 }
 
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
-  title = "Executive Summary",
-  timeRangeText = "This Month",
   metrics
 }) => {
-  const getBadgeClasses = (color?: string) => {
+  const getBadgeVariant = (color?: string) => {
     switch (color) {
-      case 'green': return 'bg-green-100 text-green-800';
-      case 'red': return 'bg-red-100 text-red-800';
-      case 'orange': return 'bg-orange-100 text-orange-800';
-      case 'blue': return 'bg-blue-100 text-blue-800';
-      case 'yellow': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-blue-100 text-blue-800';
+      case 'red': return 'destructive';
+      case 'orange': return 'secondary';
+      case 'green': return 'default';
+      case 'blue': return 'outline';
+      default: return 'outline';
     }
   };
 
   return (
-    <div 
-      className="rounded-2xl p-6 border border-brand-violet/10 shadow-lg bg-[linear-gradient(180deg,#A188E8_0%,#6BA3E8_45%,#C088E8_100%)]"
-    >
-      <div className="text-white mb-6">
-        <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
-          <DollarSign className="h-5 w-5" />
-          {title}
-          <span className="text-sm font-normal ml-2 bg-white/30 px-2 py-0.5 rounded">
-            {timeRangeText}
-          </span>
-        </h2>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <div className="hero-gradient rounded-2xl p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {metrics.map((metric, index) => (
-          <div key={index} className="bg-white/60 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">
-              {metric.title}
-            </h3>
-            <div className="mb-4">
-              <div className="text-4xl font-bold text-gray-900 mb-2">
-                {metric.value}
+          <Card key={index} className="bg-white/90 backdrop-blur-sm">
+            <CardContent className="p-3">
+              <div className="text-center">
+                <p className="text-xs font-medium text-gray-600 mb-1">{metric.title}</p>
+                <p className="text-xl font-bold text-gray-900 mb-1">{metric.value}</p>
+                {metric.subtitle && (
+                  <p className="text-xs text-gray-500 mb-1">{metric.subtitle}</p>
+                )}
+                {metric.badgeText && (
+                  <Badge variant={getBadgeVariant(metric.badgeColor)} className="text-xs">
+                    {metric.badgeText}
+                  </Badge>
+                )}
               </div>
-              {metric.subtitle && (
-                <p className="text-xs text-gray-500">
-                  {metric.subtitle}
-                </p>
-              )}
-              {metric.badgeText && (
-                <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium mt-2 ${getBadgeClasses(metric.badgeColor)}`}>
-                  {metric.badgeText}
-                </span>
-              )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
     </div>
