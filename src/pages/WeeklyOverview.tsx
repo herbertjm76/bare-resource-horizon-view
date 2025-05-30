@@ -14,7 +14,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useProjects } from '@/hooks/useProjects';
-import { TrendingUp, Users, Clock, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Users, Clock, CheckCircle } from 'lucide-react';
 import '@/components/weekly-overview/weekly-overview-print.css';
 
 const HEADER_HEIGHT = 56;
@@ -68,44 +68,48 @@ const WeeklyOverview = () => {
   const planningProjects = projects.filter(p => p.status === 'Planning').length;
   const totalCapacity = teamMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
   const averageUtilization = 75; // This would come from actual allocation data
-  const highRiskProjects = Math.round(projects.length * 0.33); // Example calculation
+  
+  // Calculate total allocated hours (estimated)
+  const estimatedAllocatedHours = Math.round(totalCapacity * (averageUtilization / 100));
+  const availableHours = Math.max(0, totalCapacity - estimatedAllocatedHours);
 
   const metrics = [
     {
-      title: "Total Projects",
-      value: projects.length,
-      icon: TrendingUp,
-      breakdowns: [
-        { label: "Active", value: activeProjects, color: "green" },
-        { label: "Planning", value: planningProjects, color: "orange" }
-      ]
-    },
-    {
-      title: "Avg Target Profit",
+      title: "Team Utilization",
       value: `${averageUtilization}%`,
       icon: Clock,
       breakdowns: [
-        { label: "Completed", value: completedProjects, color: "green" },
-        { label: "On Hold", value: projects.filter(p => p.status === 'On Hold').length, color: "orange" }
+        { label: "Allocated", value: `${estimatedAllocatedHours}h`, color: "blue" },
+        { label: "Available", value: `${availableHours}h`, color: "green" }
       ]
     },
     {
-      title: "Countries",
-      value: 2,
+      title: "Available Capacity", 
+      value: `${availableHours}h`,
+      icon: CheckCircle,
+      breakdowns: [
+        { label: "Total Capacity", value: `${totalCapacity}h`, color: "blue" },
+        { label: "Week", value: format(weekStart, 'MMM d'), color: "green" }
+      ]
+    },
+    {
+      title: "Active Projects",
+      value: activeProjects,
+      icon: TrendingUp,
+      breakdowns: [
+        { label: "Planning", value: planningProjects, color: "orange" },
+        { label: "Completed", value: completedProjects, color: "green" }
+      ]
+    },
+    {
+      title: "Team Members",
+      value: teamMembers.length,
       icon: Users,
       breakdowns: [
-        { label: "Vietnam", value: 2, color: "blue" },
-        { label: "United Kingdom", value: 1, color: "green" }
-      ]
-    },
-    {
-      title: "Offices",
-      value: 2,
-      icon: AlertTriangle,
-      breakdowns: [
-        { label: "Risk Level", value: "High risk projects", color: "red" }
+        { label: "Projects per person", value: teamMembers.length > 0 ? (activeProjects / teamMembers.length).toFixed(1) : "0", color: "blue" },
+        { label: "Avg load", value: `${averageUtilization}%`, color: averageUtilization > 85 ? "red" : "green" }
       ],
-      badgeText: `${highRiskProjects}%`,
+      badgeText: averageUtilization > 90 ? "High Load" : undefined,
       badgeColor: "red"
     }
   ];
