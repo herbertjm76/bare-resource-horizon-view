@@ -43,27 +43,31 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       value: `${Math.round(utilizationRate)}%`,
       badgeText: utilizationStatus.label,
       badgeColor: utilizationStatus.color === 'destructive' ? 'red' : 
-                 utilizationStatus.color === 'default' ? 'green' : 'blue'
+                 utilizationStatus.color === 'default' ? 'green' : 'blue',
+      isGood: utilizationRate >= 70 && utilizationRate <= 85 // Good range: 70-85%
     },
     {
       title: isOverCapacity ? "Over Capacity" : "Available Capacity",
       value: `${Math.abs(capacityHours).toLocaleString()}h`,
       subtitle: timeRangeText,
       badgeText: isOverCapacity ? "Over Capacity" : undefined,
-      badgeColor: isOverCapacity ? "red" : undefined
+      badgeColor: isOverCapacity ? "red" : undefined,
+      isGood: !isOverCapacity // Good if not over capacity
     },
     {
       title: "Active Projects",
       value: activeProjects,
       subtitle: activeResources > 0 
         ? `${(activeProjects / activeResources).toFixed(1)} per person` 
-        : 'No team members'
+        : 'No team members',
+      isGood: activeResources > 0 ? (activeProjects / activeResources) <= 3 : undefined // Good if 3 or fewer projects per person
     },
     {
       title: "Team Size",
       value: activeResources,
       badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
-      badgeColor: utilizationRate > 85 ? 'orange' : 'green'
+      badgeColor: utilizationRate > 85 ? 'orange' : 'green',
+      isGood: activeResources > 0 // Good if there are team members
     }
   ];
 

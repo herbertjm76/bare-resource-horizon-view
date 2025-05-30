@@ -9,6 +9,7 @@ interface SummaryMetric {
   subtitle?: string;
   badgeText?: string;
   badgeColor?: string;
+  isGood?: boolean; // New prop to determine if the metric is good or bad
 }
 
 type GradientType = 'purple' | 'blue' | 'emerald' | 'violet';
@@ -39,6 +40,15 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     return 'bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400';
   };
 
+  const getNumberColorClass = (metric: SummaryMetric) => {
+    if (metric.isGood === true) {
+      return 'text-green-600';
+    } else if (metric.isGood === false) {
+      return 'text-red-600';
+    }
+    return 'text-gray-900'; // Default color
+  };
+
   return (
     <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -47,7 +57,9 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
             <CardContent className="p-3">
               <div className="text-center">
                 <p className="text-xs font-medium text-gray-600 mb-1">{metric.title}</p>
-                <p className="text-xl font-bold text-gray-900 mb-1">{metric.value}</p>
+                <p className={`text-3xl font-bold mb-1 ${getNumberColorClass(metric)}`}>
+                  {metric.value}
+                </p>
                 {metric.subtitle && (
                   <p className="text-xs text-gray-500 mb-1">{metric.subtitle}</p>
                 )}
