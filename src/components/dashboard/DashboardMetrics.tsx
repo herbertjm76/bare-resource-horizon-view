@@ -50,10 +50,11 @@ export const DashboardMetrics = () => {
   const totalTeamMembers = allTeamMembers?.length || 0;
   const totalActiveProjects = metrics.activeProjects || 0;
   const totalOffices = officeOptions?.length || 0;
-  const utilizationRate = Math.round(
-    utilizationTrends?.reduce((sum, trend) => sum + trend.utilization, 0) / 
-    (utilizationTrends?.length || 1) || 0
-  );
+  
+  // Fix: Calculate utilization rate from the object structure
+  const utilizationRate = utilizationTrends 
+    ? Math.round((utilizationTrends.days7 + utilizationTrends.days30 + utilizationTrends.days90) / 3)
+    : 0;
 
   return (
     <div className="min-h-screen bg-background">
