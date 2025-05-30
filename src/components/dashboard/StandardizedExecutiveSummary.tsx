@@ -60,7 +60,6 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   };
 
   const getCardOpacityClass = () => {
-    if (cardOpacity === 0.33) return 'bg-white/30';
     return 'bg-white/90';
   };
 
