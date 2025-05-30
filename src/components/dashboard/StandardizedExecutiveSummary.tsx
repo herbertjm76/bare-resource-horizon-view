@@ -35,8 +35,8 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   };
 
   const getGradientClass = (type: GradientType) => {
-    // Use the exact 45-degree gradient with the specified colors
-    return 'bg-gradient-to-br from-[rgb(149,130,242)] via-[rgb(113,124,240)] to-[rgb(196,107,205)]';
+    // Use linear left-to-right gradient with the specified colors
+    return 'bg-gradient-to-r from-[rgb(149,130,242)] via-[rgb(113,124,240)] to-[rgb(196,107,205)]';
   };
 
   return (
