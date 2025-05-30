@@ -22,6 +22,7 @@ interface ExecutiveSummaryCardProps {
     availability: number;
     weekly_capacity?: number;
   }>;
+  standardizedUtilizationRate?: number;
 }
 
 export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
@@ -31,7 +32,8 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
   selectedTimeRange,
   totalRevenue = 0,
   avgProjectValue = 0,
-  staffData = []
+  staffData = [],
+  standardizedUtilizationRate
 }) => {
   const getUtilizationStatus = (rate: number) => {
     if (rate > 90) return { color: 'destructive', label: 'Over Capacity' };
@@ -39,39 +41,23 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
     return { color: 'outline', label: 'Ready for Projects' };
   };
 
-  // Get the appropriate utilization value based on the time range
-  const getTimeRangeUtilization = () => {
-    switch (selectedTimeRange) {
-      case 'week': return utilizationTrends.days7;
-      case 'month': return utilizationTrends.days30;
-      case '3months': 
-      case '4months':
-      case '6months':
-      case 'year':
-        return utilizationTrends.days90;
-      default: return utilizationTrends.days30;
-    }
-  };
+  // Use standardized utilization rate if provided, otherwise fall back to legacy calculation
+  const utilizationRate = standardizedUtilizationRate !== undefined 
+    ? standardizedUtilizationRate 
+    : (() => {
+        // Legacy fallback calculation
+        switch (selectedTimeRange) {
+          case 'week': return utilizationTrends.days7;
+          case 'month': return utilizationTrends.days30;
+          case '3months': 
+          case '4months':
+          case '6months':
+          case 'year':
+            return utilizationTrends.days90;
+          default: return utilizationTrends.days30;
+        }
+      })();
 
-  // Calculate actual team utilization from individual staff data
-  const getActualTeamUtilization = () => {
-    if (staffData.length === 0) {
-      return getTimeRangeUtilization();
-    }
-
-    const totalCapacity = staffData.reduce((sum, member) => {
-      return sum + (member.weekly_capacity || 40);
-    }, 0);
-
-    const totalAllocated = staffData.reduce((sum, member) => {
-      const memberCapacity = member.weekly_capacity || 40;
-      return sum + (memberCapacity * member.availability / 100);
-    }, 0);
-
-    return totalCapacity > 0 ? (totalAllocated / totalCapacity) * 100 : 0;
-  };
-
-  const utilizationRate = getActualTeamUtilization();
   const utilizationStatus = getUtilizationStatus(utilizationRate);
 
   // Format time range for display
@@ -87,41 +73,8 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
     }
   };
 
-  // Calculate available capacity based on individual staff data
+  // Calculate available capacity based on standardized utilization
   const getCapacityHours = () => {
-    if (staffData.length === 0) {
-      // Fallback to original calculation if no staff data
-      const baseWeeklyHours = activeResources * 40;
-      let totalCapacity: number;
-      
-      switch (selectedTimeRange) {
-        case 'week': 
-          totalCapacity = baseWeeklyHours;
-          break;
-        case 'month': 
-          totalCapacity = baseWeeklyHours * 4;
-          break;
-        case '3months': 
-          totalCapacity = baseWeeklyHours * 12;
-          break;
-        case '4months': 
-          totalCapacity = baseWeeklyHours * 16;
-          break;
-        case '6months': 
-          totalCapacity = baseWeeklyHours * 24;
-          break;
-        case 'year': 
-          totalCapacity = baseWeeklyHours * 48;
-          break;
-        default: 
-          totalCapacity = baseWeeklyHours * 4;
-      }
-      
-      const availableCapacity = totalCapacity * (1 - utilizationRate / 100);
-      return Math.round(availableCapacity);
-    }
-
-    // Calculate based on actual staff data
     const multiplier = (() => {
       switch (selectedTimeRange) {
         case 'week': return 1;
@@ -134,33 +87,38 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryCardProps> = ({
       }
     })();
 
-    const totalCapacity = staffData.reduce((sum, member) => {
-      return sum + (member.weekly_capacity || 40) * multiplier;
-    }, 0);
+    let totalCapacity: number;
+    
+    if (staffData.length > 0) {
+      // Calculate based on actual staff data
+      totalCapacity = staffData.reduce((sum, member) => {
+        return sum + (member.weekly_capacity || 40) * multiplier;
+      }, 0);
+    } else {
+      // Fallback to basic calculation
+      totalCapacity = activeResources * 40 * multiplier;
+    }
 
-    const totalAllocated = staffData.reduce((sum, member) => {
-      const memberCapacity = (member.weekly_capacity || 40) * multiplier;
-      return sum + (memberCapacity * member.availability / 100);
-    }, 0);
-
+    const totalAllocated = totalCapacity * (utilizationRate / 100);
     const availableCapacity = totalCapacity - totalAllocated;
+    
     return Math.round(availableCapacity);
   };
 
   const capacityHours = getCapacityHours();
   const isOverCapacity = capacityHours < 0;
 
-  console.log('Executive Summary Card Data:', {
+  console.log('Executive Summary Card Data (Standardized):', {
     selectedTimeRange,
     activeProjects,
     activeResources,
     utilizationRate,
+    standardizedUtilizationRate,
     totalRevenue,
     avgProjectValue,
     capacityHours,
     isOverCapacity,
-    staffDataCount: staffData.length,
-    staffUtilizations: staffData.map(s => ({ name: s.name, util: s.availability }))
+    staffDataCount: staffData.length
   });
 
   return (

@@ -7,6 +7,7 @@ import { DashboardHeader } from './DashboardHeader';
 import { ModernDashboardHeader } from './ModernDashboardHeader';
 import { DashboardLoadingState } from './DashboardLoadingState';
 import { useDashboardData } from './hooks/useDashboardData';
+import { useStandardizedUtilization } from './hooks/useStandardizedUtilization';
 import { toast } from "sonner";
 
 export const DashboardMetrics = () => {
@@ -25,8 +26,14 @@ export const DashboardMetrics = () => {
     isLoading
   } = useDashboardData();
 
+  // Use standardized utilization calculation
+  const { utilizationRate, isLoading: isUtilizationLoading } = useStandardizedUtilization(
+    allTeamMembers || [],
+    selectedTimeRange
+  );
+
   // Show loading state with skeleton
-  if (isLoading) {
+  if (isLoading || isUtilizationLoading) {
     return <DashboardLoadingState />;
   }
 
@@ -50,11 +57,6 @@ export const DashboardMetrics = () => {
   const totalTeamMembers = allTeamMembers?.length || 0;
   const totalActiveProjects = metrics.activeProjects || 0;
   const totalOffices = officeOptions?.length || 0;
-  
-  // Fix: Calculate utilization rate from the object structure
-  const utilizationRate = utilizationTrends 
-    ? Math.round((utilizationTrends.days7 + utilizationTrends.days30 + utilizationTrends.days90) / 3)
-    : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,6 +102,7 @@ export const DashboardMetrics = () => {
               selectedTimeRange={selectedTimeRange}
               totalRevenue={metrics.totalRevenue}
               avgProjectValue={metrics.avgProjectValue}
+              standardizedUtilizationRate={utilizationRate}
             />
           </div>
         )}
