@@ -1,11 +1,8 @@
 
 import React from 'react';
-import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
-import { WeeklyResourceTable } from './WeeklyResourceTable';
 import { WeeklyOverviewHeader } from './WeeklyOverviewHeader';
-import { WeeklyOverviewControls } from './WeeklyOverviewControls';
-import { useWeeklyOverviewMetrics } from './WeeklyOverviewMetrics';
-import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
+import { WeeklyExecutiveSummary } from './WeeklyExecutiveSummary';
+import { WeeklyResourceSection } from './WeeklyResourceSection';
 
 interface WeeklyOverviewContentProps {
   selectedWeek: Date;
@@ -30,8 +27,6 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
   filters,
   handleFilterChange
 }) => {
-  const { metrics } = useWeeklyOverviewMetrics({ selectedWeek });
-
   return (
     <div className="flex-1 p-4 sm:p-6 bg-background">
       {/* Print only title - hidden in normal view */}
@@ -47,16 +42,13 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
         />
         
         {/* Executive Summary */}
-        <div className="print:hidden">
-          <StandardizedExecutiveSummary
-            metrics={metrics}
-            gradientType="purple"
-            cardFormat={summaryFormat}
-          />
-        </div>
+        <WeeklyExecutiveSummary
+          selectedWeek={selectedWeek}
+          summaryFormat={summaryFormat}
+        />
         
-        {/* Control bar with filters */}
-        <WeeklyOverviewControls
+        {/* Resource Table Section */}
+        <WeeklyResourceSection
           selectedWeek={selectedWeek}
           handlePreviousWeek={handlePreviousWeek}
           handleNextWeek={handleNextWeek}
@@ -64,13 +56,6 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
           filters={filters}
           handleFilterChange={handleFilterChange}
         />
-        
-        <OfficeSettingsProvider>
-          <WeeklyResourceTable 
-            selectedWeek={selectedWeek} 
-            filters={filters}
-          />
-        </OfficeSettingsProvider>
       </div>
     </div>
   );
