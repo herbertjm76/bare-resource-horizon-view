@@ -84,6 +84,7 @@ const TeamAnnualLeave = () => {
               setFilterValue={setFilterValue}
               setSearchQuery={setSearchQuery}
               clearFilters={clearFilters}
+              allMembers={allMembers}
             />
           </div>
         </div>

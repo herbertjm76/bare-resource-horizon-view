@@ -3,6 +3,7 @@ import React from 'react';
 import { MonthSelector } from '@/components/annual-leave/MonthSelector';
 import { TeamAnnualLeaveFilters } from '@/components/annual-leave/TeamAnnualLeaveFilters';
 import { LeaveCalendar } from '@/components/annual-leave/LeaveCalendar';
+import { AnnualLeaveInsights } from '@/components/annual-leave/AnnualLeaveInsights';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
 
@@ -22,6 +23,7 @@ interface TeamAnnualLeaveContentProps {
   setFilterValue: (value: string) => void;
   setSearchQuery: (query: string) => void;
   clearFilters: () => void;
+  allMembers: TeamMember[];
 }
 
 export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
@@ -39,11 +41,18 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
   setActiveFilter,
   setFilterValue,
   setSearchQuery,
-  clearFilters
+  clearFilters,
+  allMembers
 }) => {
   return (
     <div className="mx-auto space-y-6">
       <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Team Annual Leave</h1>
+      
+      {/* Executive Summary Row - Annual Leave Insights */}
+      <AnnualLeaveInsights 
+        teamMembers={allMembers} 
+        selectedMonth={selectedMonth}
+      />
       
       <div className="text-sm text-muted-foreground">
         <p>Enter the number of leave hours for each day. Empty cells count as 0 hours.</p>
