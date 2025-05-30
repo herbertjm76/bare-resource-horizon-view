@@ -4,6 +4,7 @@ import { StandardizedExecutiveSummary } from './StandardizedExecutiveSummary';
 import { getUtilizationStatus, getTimeRangeText } from './executiveSummary/utils/utilizationUtils';
 import { calculateCapacityHours } from './executiveSummary/utils/capacityUtils';
 import { ExecutiveSummaryProps } from './executiveSummary/types';
+import { TrendingUp, Clock, Briefcase, Users } from 'lucide-react';
 
 export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   activeProjects,
@@ -41,6 +42,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
     {
       title: "Team Utilization",
       value: `${Math.round(utilizationRate)}%`,
+      icon: TrendingUp,
       badgeText: utilizationStatus.label,
       badgeColor: utilizationStatus.color === 'destructive' ? 'red' : 
                  utilizationStatus.color === 'default' ? 'green' : 'blue',
@@ -50,6 +52,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       title: isOverCapacity ? "Over Capacity" : "Available Capacity",
       value: `${Math.abs(capacityHours).toLocaleString()}h`,
       subtitle: timeRangeText,
+      icon: Clock,
       badgeText: isOverCapacity ? "Over Capacity" : undefined,
       badgeColor: isOverCapacity ? "red" : undefined,
       isGood: !isOverCapacity // Good if not over capacity
@@ -60,11 +63,13 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       subtitle: activeResources > 0 
         ? `${(activeProjects / activeResources).toFixed(1)} per person` 
         : 'No team members',
+      icon: Briefcase,
       isGood: activeResources > 0 ? (activeProjects / activeResources) <= 3 : undefined // Good if 3 or fewer projects per person
     },
     {
       title: "Team Size",
       value: activeResources,
+      icon: Users,
       badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
       badgeColor: utilizationRate > 85 ? 'orange' : 'green',
       isGood: activeResources > 0 // Good if there are team members

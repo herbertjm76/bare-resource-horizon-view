@@ -36,12 +36,11 @@ interface StandardizedExecutiveSummaryProps {
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
   metrics,
   gradientType = 'purple',
-  cardFormat = 'simple', // Default to simple
+  cardFormat = 'simple',
   useDetailedFormat = false,
   cardOpacity = 0.9
 }) => {
   // Determine the actual format to use
-  // Priority: cardFormat prop > useDetailedFormat prop (for backward compatibility)
   const actualFormat: CardFormat = cardFormat || (useDetailedFormat ? 'detailed' : 'simple');
 
   console.log('StandardizedExecutiveSummary render:', { cardFormat, useDetailedFormat, actualFormat });
@@ -64,6 +63,31 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     return 'bg-white/20 backdrop-blur-md border border-white/30 shadow-lg';
   };
 
+  const getBadgeTextColor = (badgeColor?: string, isGood?: boolean) => {
+    // Use indicator color for good/bad
+    if (isGood === true) return 'text-green-200';
+    if (isGood === false) return 'text-red-200';
+    
+    // Fallback to badge color
+    switch (badgeColor) {
+      case 'green': return 'text-green-200';
+      case 'red': return 'text-red-200';
+      case 'orange': return 'text-orange-200';
+      case 'blue': return 'text-blue-200';
+      default: return 'text-white';
+    }
+  };
+
+  const getBreakdownBulletColor = (color?: string) => {
+    switch (color) {
+      case 'green': return 'bg-green-400';
+      case 'orange': return 'bg-orange-400';
+      case 'red': return 'bg-red-400';
+      case 'blue': return 'bg-blue-400';
+      default: return 'bg-white/60';
+    }
+  };
+
   if (actualFormat === 'detailed') {
     console.log('Rendering detailed format');
     return (
@@ -78,30 +102,25 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                     {/* Left side: Icon and Title */}
                     <div className="flex items-center gap-2 flex-1">
                       {Icon && (
-                        <div className="w-6 h-6 flex items-center justify-center">
-                          <Icon className="w-4 h-4 text-white/80" />
+                        <div className="w-7 h-7 flex items-center justify-center">
+                          <Icon className="w-5 h-5 text-white/90" />
                         </div>
                       )}
-                      <p className="text-xs font-medium text-white/80">{metric.title}</p>
+                      <p className="text-sm font-semibold text-white/90">{metric.title}</p>
                     </div>
                     
-                    {/* Right side: Main value */}
+                    {/* Right side: Main value - Always white */}
                     <div className="text-right">
                       <p className="text-2xl font-bold text-white">{metric.value}</p>
                     </div>
                   </div>
                   
-                  {/* Bottom section: Breakdowns in horizontal layout */}
+                  {/* Bottom section: Breakdowns with colored bullets */}
                   {metric.breakdowns && (
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center justify-between gap-3">
                       {metric.breakdowns.map((breakdown, idx) => (
-                        <div key={idx} className="flex items-center gap-1 text-xs">
-                          <div className={`w-2 h-2 rounded-full ${
-                            breakdown.color === 'green' ? 'bg-green-400' :
-                            breakdown.color === 'orange' ? 'bg-orange-400' :
-                            breakdown.color === 'red' ? 'bg-red-400' :
-                            'bg-blue-400'
-                          }`} />
+                        <div key={idx} className="flex items-center gap-2 text-xs">
+                          <div className={`w-2.5 h-2.5 rounded-full ${getBreakdownBulletColor(breakdown.color)}`} />
                           <div className="flex flex-col">
                             <span className="text-white/70">{breakdown.label}</span>
                             <span className="text-white font-medium">{breakdown.value}</span>
@@ -113,10 +132,10 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                   
                   {/* Badge */}
                   {metric.badgeText && (
-                    <div className="flex justify-end mt-2">
+                    <div className="flex justify-end mt-3">
                       <Badge 
                         variant={getBadgeVariant(metric.badgeColor)} 
-                        className="text-xs bg-red-500/80 text-white border-0 backdrop-blur-sm"
+                        className={`text-xs bg-white/20 border border-white/30 backdrop-blur-sm ${getBadgeTextColor(metric.badgeColor, metric.isGood)}`}
                       >
                         {metric.badgeText}
                       </Badge>
@@ -131,7 +150,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     );
   }
 
-  // Simple format - centered cards
+  // Simple format - centered cards with standardized styling
   console.log('Rendering simple format');
   return (
     <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
@@ -140,21 +159,19 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
           <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/25 hover:shadow-xl`}>
             <CardContent className="p-3">
               <div className="text-center">
-                <p className="text-xs font-medium text-white/80 mb-1">{metric.title}</p>
-                <p className={`text-3xl font-bold mb-1 ${
-                  metric.isGood === true ? 'text-green-100' :
-                  metric.isGood === false ? 'text-red-100' :
-                  'text-white'
-                }`}>
+                {/* Larger heading text */}
+                <p className="text-sm font-semibold text-white/90 mb-2">{metric.title}</p>
+                {/* Always white numbers */}
+                <p className="text-3xl font-bold text-white mb-2">
                   {metric.value}
                 </p>
                 {metric.subtitle && (
-                  <p className="text-xs text-white/70 mb-1">{metric.subtitle}</p>
+                  <p className="text-xs text-white/70 mb-2">{metric.subtitle}</p>
                 )}
                 {metric.badgeText && (
                   <Badge 
                     variant={getBadgeVariant(metric.badgeColor)} 
-                    className="text-xs bg-white/20 text-white border border-white/30 backdrop-blur-sm"
+                    className={`text-xs bg-white/20 border border-white/30 backdrop-blur-sm ${getBadgeTextColor(metric.badgeColor, metric.isGood)}`}
                   >
                     {metric.badgeText}
                   </Badge>
