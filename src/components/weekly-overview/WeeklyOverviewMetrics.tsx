@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { TrendingUp, Users, Clock, CheckCircle } from 'lucide-react';
-import { useWeeklyResourceData } from './hooks/useWeeklyResourceData';
+import { useWeekResourceData } from '../week-resourcing/hooks/useWeekResourceData';
 import { startOfWeek } from 'date-fns';
 
 interface WeeklyOverviewMetricsProps {
@@ -17,7 +17,7 @@ export const useWeeklyOverviewMetrics = ({ selectedWeek }: WeeklyOverviewMetrics
     weekAllocations,
     isLoading,
     error
-  } = useWeeklyResourceData({ 
+  } = useWeekResourceData({ 
     selectedWeek, 
     filters: { office: "all", searchTerm: "" } 
   });
