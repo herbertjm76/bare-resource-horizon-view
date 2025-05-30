@@ -59,8 +59,8 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     return 'text-gray-900';
   };
 
-  const getCardOpacityClass = () => {
-    return 'bg-white/90';
+  const getGlassMorphismClass = () => {
+    return 'bg-white/20 backdrop-blur-md border border-white/30 shadow-lg';
   };
 
   if (useDetailedFormat) {
@@ -70,7 +70,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
           {metrics.map((metric, index) => {
             const Icon = metric.icon;
             return (
-              <Card key={index} className={`${getCardOpacityClass()} backdrop-blur-sm`}>
+              <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/25 hover:shadow-xl`}>
                 <CardContent className="p-4">
                   <div className="space-y-3">
                     {/* Header with icon and title */}
@@ -113,7 +113,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                       <div className="flex justify-end">
                         <Badge 
                           variant={getBadgeVariant(metric.badgeColor)} 
-                          className="text-xs bg-red-500 text-white border-0"
+                          className="text-xs bg-red-500/80 text-white border-0 backdrop-blur-sm"
                         >
                           {metric.badgeText}
                         </Badge>
@@ -129,23 +129,30 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     );
   }
 
-  // Original format for dashboard
+  // Original format for dashboard with glass morphism
   return (
     <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {metrics.map((metric, index) => (
-          <Card key={index} className={`${getCardOpacityClass()} backdrop-blur-sm`}>
+          <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/25 hover:shadow-xl`}>
             <CardContent className="p-3">
               <div className="text-center">
-                <p className="text-xs font-medium text-gray-600 mb-1">{metric.title}</p>
-                <p className={`text-3xl font-bold mb-1 ${getNumberColorClass(metric)}`}>
+                <p className="text-xs font-medium text-white/80 mb-1">{metric.title}</p>
+                <p className={`text-3xl font-bold mb-1 ${
+                  metric.isGood === true ? 'text-green-100' :
+                  metric.isGood === false ? 'text-red-100' :
+                  'text-white'
+                }`}>
                   {metric.value}
                 </p>
                 {metric.subtitle && (
-                  <p className="text-xs text-gray-500 mb-1">{metric.subtitle}</p>
+                  <p className="text-xs text-white/70 mb-1">{metric.subtitle}</p>
                 )}
                 {metric.badgeText && (
-                  <Badge variant={getBadgeVariant(metric.badgeColor)} className="text-xs">
+                  <Badge 
+                    variant={getBadgeVariant(metric.badgeColor)} 
+                    className="text-xs bg-white/20 text-white border border-white/30 backdrop-blur-sm"
+                  >
                     {metric.badgeText}
                   </Badge>
                 )}
