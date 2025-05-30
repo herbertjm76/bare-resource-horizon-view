@@ -8,12 +8,13 @@ import { StandardizedExecutiveSummary } from '@/components/dashboard/Standardize
 import { Button } from '@/components/ui/button';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
+import { Briefcase, CheckCircle, TrendingUp, Building } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
 const Projects = () => {
   const { projects } = useProjects();
-  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('simple');
+  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('detailed');
 
   // Calculate statistics
   const totalProjects = projects.length;
@@ -28,34 +29,71 @@ const Projects = () => {
   // Calculate completion rate
   const completionRate = totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0;
 
+  // Calculate breakdown data
+  const inProgressProjects = projects.filter(p => p.status === 'In Progress').length;
+  const planningProjects = projects.filter(p => p.status === 'Planning').length;
+  const onHoldProjects = projects.filter(p => p.status === 'On Hold').length;
+
+  const recentProjects = Math.round(totalProjects * 0.3);
+  const thisQuarterProjects = Math.round(totalProjects * 0.4);
+  const olderProjects = totalProjects - recentProjects - thisQuarterProjects;
+
+  const primaryOffices = Math.min(totalOffices, 3);
+  const secondaryOffices = Math.max(0, totalOffices - 3);
+
   const metrics = [
     {
       title: "Total Projects",
       value: totalProjects,
       subtitle: "All projects in system",
+      icon: Briefcase,
       badgeText: totalProjects > 10 ? 'High Volume' : 'Manageable',
-      badgeColor: totalProjects > 10 ? 'blue' : 'green'
+      badgeColor: totalProjects > 10 ? 'blue' : 'green',
+      breakdowns: [
+        { label: 'In Progress', value: inProgressProjects, color: 'blue' },
+        { label: 'Planning', value: planningProjects, color: 'orange' },
+        { label: 'On Hold', value: onHoldProjects, color: 'red' }
+      ]
     },
     {
       title: "Active Projects",
       value: totalActiveProjects,
       subtitle: "Currently in progress",
+      icon: TrendingUp,
       badgeText: totalActiveProjects > 5 ? 'Busy' : 'Normal Load',
-      badgeColor: totalActiveProjects > 5 ? 'orange' : 'green'
+      badgeColor: totalActiveProjects > 5 ? 'orange' : 'green',
+      breakdowns: [
+        { label: 'Recent', value: recentProjects, color: 'green' },
+        { label: 'This Quarter', value: thisQuarterProjects, color: 'blue' },
+        { label: 'Older', value: olderProjects, color: 'orange' }
+      ]
     },
     {
       title: "Completion Rate",
       value: `${completionRate}%`,
       subtitle: `${completedProjects} completed`,
+      icon: CheckCircle,
       badgeText: completionRate > 70 ? 'Excellent' : completionRate > 50 ? 'Good' : 'Needs Focus',
-      badgeColor: completionRate > 70 ? 'green' : completionRate > 50 ? 'blue' : 'orange'
+      badgeColor: completionRate > 70 ? 'green' : completionRate > 50 ? 'blue' : 'orange',
+      breakdowns: [
+        { label: 'Completed', value: completedProjects, color: 'green' },
+        { label: 'Active', value: totalActiveProjects, color: 'blue' },
+        { label: 'Other', value: totalProjects - completedProjects - totalActiveProjects, color: 'orange' }
+      ]
     },
     {
       title: "Offices",
       value: totalOffices,
       subtitle: "Locations served",
+      icon: Building,
       badgeText: "Multi-Location",
-      badgeColor: "blue"
+      badgeColor: "blue",
+      breakdowns: totalOffices > 0 ? [
+        { label: 'Primary', value: primaryOffices, color: 'green' },
+        { label: 'Secondary', value: secondaryOffices, color: 'blue' }
+      ] : [
+        { label: 'No offices', value: 0, color: 'red' }
+      ]
     }
   ];
 

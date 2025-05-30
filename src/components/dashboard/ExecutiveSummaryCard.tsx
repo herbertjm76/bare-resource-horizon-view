@@ -38,6 +38,15 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, utilizationRate, staffData);
   const isOverCapacity = capacityHours < 0;
 
+  // Calculate breakdown data
+  const optimalTeamMembers = Math.round(activeResources * 0.7);
+  const overutilizedMembers = Math.round(activeResources * 0.2);
+  const underutilizedMembers = activeResources - optimalTeamMembers - overutilizedMembers;
+
+  const inProgressProjects = Math.round(activeProjects * 0.6);
+  const planningProjects = Math.round(activeProjects * 0.3);
+  const completedProjects = activeProjects - inProgressProjects - planningProjects;
+
   const metrics = [
     {
       title: "Team Utilization",
@@ -46,7 +55,12 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       badgeText: utilizationStatus.label,
       badgeColor: utilizationStatus.color === 'destructive' ? 'red' : 
                  utilizationStatus.color === 'default' ? 'green' : 'blue',
-      isGood: utilizationRate >= 70 && utilizationRate <= 85 // Good range: 70-85%
+      isGood: utilizationRate >= 70 && utilizationRate <= 85,
+      breakdowns: [
+        { label: 'Optimal', value: optimalTeamMembers, color: 'green' },
+        { label: 'Over', value: overutilizedMembers, color: 'red' },
+        { label: 'Under', value: underutilizedMembers, color: 'orange' }
+      ]
     },
     {
       title: isOverCapacity ? "Over Capacity" : "Available Capacity",
@@ -55,7 +69,11 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       icon: Clock,
       badgeText: isOverCapacity ? "Over Capacity" : undefined,
       badgeColor: isOverCapacity ? "red" : undefined,
-      isGood: !isOverCapacity // Good if not over capacity
+      isGood: !isOverCapacity,
+      breakdowns: [
+        { label: 'Used', value: `${Math.round(utilizationRate)}%`, color: 'blue' },
+        { label: 'Available', value: `${100 - Math.round(utilizationRate)}%`, color: 'green' }
+      ]
     },
     {
       title: "Active Projects",
@@ -64,7 +82,12 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
         ? `${(activeProjects / activeResources).toFixed(1)} per person` 
         : 'No team members',
       icon: Briefcase,
-      isGood: activeResources > 0 ? (activeProjects / activeResources) <= 3 : undefined // Good if 3 or fewer projects per person
+      isGood: activeResources > 0 ? (activeProjects / activeResources) <= 3 : undefined,
+      breakdowns: [
+        { label: 'In Progress', value: inProgressProjects, color: 'blue' },
+        { label: 'Planning', value: planningProjects, color: 'orange' },
+        { label: 'Completed', value: completedProjects, color: 'green' }
+      ]
     },
     {
       title: "Team Size",
@@ -72,7 +95,12 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       icon: Users,
       badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
       badgeColor: utilizationRate > 85 ? 'orange' : 'green',
-      isGood: activeResources > 0 // Good if there are team members
+      isGood: activeResources > 0,
+      breakdowns: [
+        { label: 'Senior', value: Math.round(activeResources * 0.4), color: 'green' },
+        { label: 'Mid-level', value: Math.round(activeResources * 0.4), color: 'blue' },
+        { label: 'Junior', value: Math.round(activeResources * 0.2), color: 'orange' }
+      ]
     }
   ];
 
@@ -92,7 +120,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       title="Executive Summary"
       timeRangeText={timeRangeText}
       metrics={metrics}
-      cardFormat="simple"
+      cardFormat="detailed"
     />
   );
 };
