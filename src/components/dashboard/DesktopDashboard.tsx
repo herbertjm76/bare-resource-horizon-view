@@ -2,9 +2,9 @@
 import React from 'react';
 import { ExecutiveSummaryCard } from './ExecutiveSummaryCard';
 import { StaffStatusCard } from './staff/StaffStatusCard';
-import { EnhancedInsights } from './EnhancedInsights';
-import { TeamMembersSummary } from './TeamMembersSummary';
+import { IntelligentInsights } from './IntelligentInsights';
 import { HolidayCard } from './HolidayCard';
+import { AnalyticsSection } from './AnalyticsSection';
 import { TimeRange } from './TimeRangeSelector';
 
 interface DesktopDashboardProps {
@@ -52,8 +52,17 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
     role: member.role || 'Member'
   }));
 
+  // Prepare analytics data for separate section
+  const analyticsData = {
+    projectsByStatus: mockData.projectsByStatus || [],
+    projectsByStage: mockData.projectsByStage || [],
+    projectsByRegion: mockData.projectsByRegion || [],
+    projectsByPM: mockData.projectsByPM || []
+  };
+
   return (
     <div className="space-y-6">
+      {/* Executive Summary - First */}
       <ExecutiveSummaryCard
         activeProjects={activeProjects}
         activeResources={activeResources}
@@ -65,6 +74,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         standardizedUtilizationRate={standardizedUtilizationRate}
       />
       
+      {/* Second Row: Staff Status, Smart Insights, Upcoming Holidays */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div>
           <StaffStatusCard 
@@ -73,11 +83,10 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           />
         </div>
         <div>
-          <EnhancedInsights 
-            utilizationRate={standardizedUtilizationRate || 0}
-            teamSize={activeResources}
+          <IntelligentInsights 
+            teamMembers={transformedStaffData}
             activeProjects={activeProjects}
-            selectedTimeRange={selectedTimeRange}
+            utilizationRate={standardizedUtilizationRate || 0}
           />
         </div>
         <div>
@@ -85,7 +94,8 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         </div>
       </div>
       
-      <TeamMembersSummary teamMembers={teamMembers} />
+      {/* Third Row: Analytics Charts - Project Status, Project Stages, Regional Distribution, Projects by PM */}
+      <AnalyticsSection mockData={analyticsData} />
     </div>
   );
 };

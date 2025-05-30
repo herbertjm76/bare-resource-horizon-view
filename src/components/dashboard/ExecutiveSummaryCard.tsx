@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { SummaryHeader } from './executiveSummary/components/SummaryHeader';
-import { Gauge } from './Gauge';
 import { AnalyticsSection } from './AnalyticsSection';
 import { getUtilizationStatus, getTimeRangeText } from './executiveSummary/utils/utilizationUtils';
 import { calculateCapacityHours } from './executiveSummary/utils/capacityUtils';
@@ -77,7 +76,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Executive Summary with Gauges */}
+      {/* Executive Summary with Large Numbers */}
       <div 
         className="rounded-2xl p-6 border border-brand-violet/10 shadow-lg"
         style={{
@@ -88,17 +87,12 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Team Utilization */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-md">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Team Utilization</h3>
-            <div className="flex items-center justify-center mb-3">
-              <Gauge 
-                value={Math.round(utilizationRate)} 
-                max={100} 
-                title="Utilization Rate"
-                size="lg"
-              />
-            </div>
-            <div className="text-center">
+            <div className="mb-4">
+              <div className="text-4xl font-bold text-gray-900 mb-2">
+                {Math.round(utilizationRate)}%
+              </div>
               <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
                 utilizationStatus.color === 'destructive' ? 'bg-red-100 text-red-800' :
                 utilizationStatus.color === 'default' ? 'bg-green-100 text-green-800' :
@@ -110,37 +104,26 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
           </div>
 
           {/* Available Capacity */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-md">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Available Capacity</h3>
-            <div className="flex items-center justify-center mb-3">
-              <Gauge 
-                value={isOverCapacity ? 0 : Math.min((capacityHours / (activeResources * 40)) * 100, 100)} 
-                max={100} 
-                title={isOverCapacity ? "Over Capacity" : "Available Hours"}
-                size="lg"
-              />
-            </div>
-            <div className="text-center">
-              <p className={`text-lg font-bold mb-1 ${isOverCapacity ? 'text-red-600' : 'text-gray-900'}`}>
+            <div className="mb-4">
+              <div className={`text-4xl font-bold mb-2 ${isOverCapacity ? 'text-red-600' : 'text-gray-900'}`}>
                 {Math.abs(capacityHours).toLocaleString()}h
-              </p>
+              </div>
               <p className="text-xs text-gray-500">{timeRangeText}</p>
+              {isOverCapacity && (
+                <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-2">
+                  Over Capacity
+                </span>
+              )}
             </div>
           </div>
 
           {/* Active Projects */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-md">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Active Projects</h3>
-            <div className="flex items-center justify-center mb-3">
-              <Gauge 
-                value={activeProjects} 
-                max={Math.max(activeProjects * 1.5, 10)} 
-                title="Projects Count"
-                size="lg"
-              />
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-gray-900 mb-1">{activeProjects}</p>
+            <div className="mb-4">
+              <div className="text-4xl font-bold text-gray-900 mb-2">{activeProjects}</div>
               <p className="text-xs text-gray-500">
                 {activeResources > 0 
                   ? `${(activeProjects / activeResources).toFixed(1)} per person` 
@@ -150,18 +133,10 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
           </div>
 
           {/* Team Size */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-5 shadow-md">
+          <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
             <h3 className="text-sm font-semibold text-gray-700 mb-3">Team Size</h3>
-            <div className="flex items-center justify-center mb-3">
-              <Gauge 
-                value={activeResources} 
-                max={Math.max(activeResources * 1.5, 10)} 
-                title="Team Members"
-                size="lg"
-              />
-            </div>
-            <div className="text-center">
-              <p className="text-lg font-bold text-gray-900 mb-1">{activeResources}</p>
+            <div className="mb-4">
+              <div className="text-4xl font-bold text-gray-900 mb-2">{activeResources}</div>
               <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
                 utilizationRate > 85 ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'
               }`}>
