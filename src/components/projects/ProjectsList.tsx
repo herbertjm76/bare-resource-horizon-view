@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProjectsToolbar from './ProjectsToolbar';
 import ProjectsTable from './ProjectsTable';
-import { ProjectsSummary } from './ProjectsSummary';
 import { useProjects } from '@/hooks/useProjects';
 import { ProjectFilters } from './ProjectFilters';
 import { supabase } from '@/integrations/supabase/client';
@@ -127,9 +126,7 @@ export const ProjectsList = () => {
   };
 
   return (
-    <>
-      <ProjectsSummary projects={filteredProjects} />
-      
+    <>      
       <Card className="border shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
           <div>
