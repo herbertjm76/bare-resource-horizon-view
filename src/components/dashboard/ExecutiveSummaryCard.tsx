@@ -1,10 +1,7 @@
 
 import React from 'react';
 import { SummaryHeader } from './executiveSummary/components/SummaryHeader';
-import { UtilizationCard } from './executiveSummary/components/UtilizationCard';
-import { CapacityCard } from './executiveSummary/components/CapacityCard';
-import { ProjectsCard } from './executiveSummary/components/ProjectsCard';
-import { TeamSizeCard } from './executiveSummary/components/TeamSizeCard';
+import { Gauge } from './Gauge';
 import { getUtilizationStatus, getTimeRangeText } from './executiveSummary/utils/utilizationUtils';
 import { calculateCapacityHours } from './executiveSummary/utils/capacityUtils';
 import { ExecutiveSummaryProps } from './executiveSummary/types';
@@ -64,26 +61,84 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       <SummaryHeader timeRangeText={timeRangeText} />
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <UtilizationCard 
-          utilizationRate={utilizationRate}
-          utilizationStatus={utilizationStatus}
-        />
+        <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-600 mb-2">Team Utilization</h3>
+          <div className="flex items-center justify-center">
+            <Gauge 
+              value={Math.round(utilizationRate)} 
+              max={100} 
+              title="Utilization Rate"
+              size="lg"
+            />
+          </div>
+          <div className="text-center mt-2">
+            <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+              utilizationStatus.color === 'destructive' ? 'bg-red-100 text-red-800' :
+              utilizationStatus.color === 'default' ? 'bg-green-100 text-green-800' :
+              'bg-blue-100 text-blue-800'
+            }`}>
+              {utilizationStatus.label}
+            </span>
+          </div>
+        </div>
 
-        <CapacityCard 
-          capacityHours={capacityHours}
-          isOverCapacity={isOverCapacity}
-          timeRangeText={timeRangeText}
-        />
+        <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-600 mb-2">Available Capacity</h3>
+          <div className="flex items-center justify-center">
+            <Gauge 
+              value={isOverCapacity ? 0 : Math.min((capacityHours / (activeResources * 40)) * 100, 100)} 
+              max={100} 
+              title={isOverCapacity ? "Over Capacity" : "Available Hours"}
+              size="lg"
+            />
+          </div>
+          <div className="text-center mt-2">
+            <p className={`text-lg font-bold ${isOverCapacity ? 'text-red-600' : 'text-gray-900'}`}>
+              {Math.abs(capacityHours).toLocaleString()}h
+            </p>
+            <p className="text-xs text-gray-500">{timeRangeText}</p>
+          </div>
+        </div>
 
-        <ProjectsCard 
-          activeProjects={activeProjects}
-          activeResources={activeResources}
-        />
+        <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-600 mb-2">Active Projects</h3>
+          <div className="flex items-center justify-center">
+            <Gauge 
+              value={activeProjects} 
+              max={Math.max(activeProjects * 1.5, 10)} 
+              title="Projects Count"
+              size="lg"
+            />
+          </div>
+          <div className="text-center mt-2">
+            <p className="text-lg font-bold text-gray-900">{activeProjects}</p>
+            <p className="text-xs text-gray-500">
+              {activeResources > 0 
+                ? `${(activeProjects / activeResources).toFixed(1)} per person` 
+                : 'No team members'}
+            </p>
+          </div>
+        </div>
 
-        <TeamSizeCard 
-          activeResources={activeResources}
-          utilizationRate={utilizationRate}
-        />
+        <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4">
+          <h3 className="text-sm font-medium text-gray-600 mb-2">Team Size</h3>
+          <div className="flex items-center justify-center">
+            <Gauge 
+              value={activeResources} 
+              max={Math.max(activeResources * 1.5, 10)} 
+              title="Team Members"
+              size="lg"
+            />
+          </div>
+          <div className="text-center mt-2">
+            <p className="text-lg font-bold text-gray-900">{activeResources}</p>
+            <span className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+              utilizationRate > 85 ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'
+            }`}>
+              {utilizationRate > 85 ? 'Consider Hiring' : 'Stable'}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
