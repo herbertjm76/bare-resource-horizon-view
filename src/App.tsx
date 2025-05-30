@@ -11,7 +11,7 @@ import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
 import TeamMembers from "./pages/TeamMembers";
 import OfficeSettings from "./pages/OfficeSettings";
-import WeekResourcing from "./pages/WeekResourcing";
+import WeeklyOverview from "./pages/weeklyoverview";
 import TeamWorkload from "./pages/TeamWorkload";
 import TeamAnnualLeave from "./pages/TeamAnnualLeave";
 import ProjectResourcing from "./pages/ProjectResourcing";
@@ -38,7 +38,7 @@ function App() {
               <Route path="/projects" element={<Projects />} />
               <Route path="/team-members" element={<TeamMembers />} />
               <Route path="/office-settings" element={<OfficeSettings />} />
-              <Route path="/weekly-overview" element={<WeekResourcing />} />
+              <Route path="/weekly-overview" element={<WeeklyOverview />} />
               <Route path="/team-workload" element={<TeamWorkload />} />
               <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
               <Route path="/project-resourcing" element={<ProjectResourcing />} />
