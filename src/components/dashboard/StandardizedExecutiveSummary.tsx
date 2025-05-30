@@ -35,18 +35,8 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   };
 
   const getGradientClass = (type: GradientType) => {
-    switch (type) {
-      case 'purple':
-        return 'bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600';
-      case 'blue':
-        return 'bg-gradient-to-br from-blue-50 to-blue-100/50';
-      case 'emerald':
-        return 'bg-gradient-to-br from-emerald-50 to-emerald-100/50';
-      case 'violet':
-        return 'bg-gradient-to-br from-violet-50 to-violet-100/50';
-      default:
-        return 'bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600';
-    }
+    // Use the beautiful purple gradient from the image for all types
+    return 'bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700';
   };
 
   return (
