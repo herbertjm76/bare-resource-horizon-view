@@ -44,13 +44,16 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     return <EmptyResourceState />;
   }
 
+  // Convert weekStartDate string to Date object for WeekResourceSummary
+  const weekStartDateAsDate = new Date(weekStartDate);
+
   return (
     <>
       <WeekResourceSummary 
         projects={projects}
         members={members}
         allocations={weekAllocations}
-        weekStartDate={weekStartDate}
+        weekStartDate={weekStartDateAsDate}
       />
       
       <ResourceTable 
