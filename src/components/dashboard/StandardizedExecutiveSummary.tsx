@@ -35,8 +35,8 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   };
 
   const getGradientClass = (type: GradientType) => {
-    // Use the exact subtle 45-degree gradient from the image
-    return 'bg-gradient-to-br from-[#9D7AEA] via-[#A78BFA] to-[#C4B5FD]';
+    // Use the exact 45-degree gradient with the specified colors
+    return 'bg-gradient-to-br from-[rgb(149,130,242)] via-[rgb(113,124,240)] to-[rgb(196,107,205)]';
   };
 
   return (
