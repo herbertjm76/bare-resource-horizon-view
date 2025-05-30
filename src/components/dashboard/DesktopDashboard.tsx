@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ExecutiveSummaryCard } from './ExecutiveSummaryCard';
-import { StaffSection } from './staff/StaffSection';
+import { StaffStatusCard } from './staff/StaffStatusCard';
 import { EnhancedInsights } from './EnhancedInsights';
 import { TeamMembersSummary } from './TeamMembersSummary';
 import { TimeRange } from './TimeRangeSelector';
@@ -55,7 +55,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
-          <StaffSection staffData={staffData} />
+          <StaffStatusCard staffData={staffData} />
         </div>
         <div>
           <EnhancedInsights 

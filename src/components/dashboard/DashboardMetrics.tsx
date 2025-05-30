@@ -89,6 +89,8 @@ export const DashboardMetrics = () => {
             utilizationTrends={utilizationTrends}
             staffData={staffData}
             mockData={mockData}
+            selectedTimeRange={selectedTimeRange}
+            standardizedUtilizationRate={utilizationRate}
           />
         ) : (
           <div className="p-4">

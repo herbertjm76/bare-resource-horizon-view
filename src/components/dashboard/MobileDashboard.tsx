@@ -6,6 +6,7 @@ import { Activity, Users, DollarSign } from 'lucide-react';
 import { EnhancedInsights } from './EnhancedInsights';
 import { ResourcePlanningChat } from './ResourcePlanningChat';
 import { HolidayCard } from './HolidayCard';
+import { TimeRange } from './TimeRangeSelector';
 
 interface MobileDashboardProps {
   teamMembers: any[];
@@ -18,6 +19,8 @@ interface MobileDashboardProps {
   };
   staffData: any[];
   mockData: any;
+  selectedTimeRange?: TimeRange;
+  standardizedUtilizationRate?: number;
 }
 
 export const MobileDashboard: React.FC<MobileDashboardProps> = ({
@@ -26,8 +29,15 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   activeResources,
   utilizationTrends,
   staffData,
-  mockData
+  mockData,
+  selectedTimeRange = 'week',
+  standardizedUtilizationRate
 }) => {
+  // Use standardized utilization rate if available, otherwise fall back to trends
+  const currentUtilizationRate = standardizedUtilizationRate !== undefined 
+    ? standardizedUtilizationRate 
+    : utilizationTrends.days7;
+
   return (
     <div className="space-y-6 p-4">
       {/* CEO Priority 1: Business Health Overview */}
@@ -41,10 +51,10 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <p className="text-2xl font-bold text-brand-violet">{utilizationTrends.days7}%</p>
+              <p className="text-2xl font-bold text-brand-violet">{currentUtilizationRate}%</p>
               <p className="text-sm text-gray-600">Team Utilization</p>
-              <Badge variant={utilizationTrends.days7 > 85 ? "destructive" : utilizationTrends.days7 > 70 ? "default" : "secondary"} className="text-xs mt-1">
-                {utilizationTrends.days7 > 85 ? "At Capacity" : utilizationTrends.days7 > 70 ? "Healthy" : "Available"}
+              <Badge variant={currentUtilizationRate > 85 ? "destructive" : currentUtilizationRate > 70 ? "default" : "secondary"} className="text-xs mt-1">
+                {currentUtilizationRate > 85 ? "At Capacity" : currentUtilizationRate > 70 ? "Healthy" : "Available"}
               </Badge>
             </div>
             <div className="text-center">
@@ -84,18 +94,17 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
 
       {/* CEO Priority 4: Smart Insights */}
       <EnhancedInsights 
-        teamMembers={teamMembers}
+        utilizationRate={currentUtilizationRate}
+        teamSize={activeResources}
         activeProjects={activeProjects}
-        utilizationRate={utilizationTrends.days7}
-        utilizationTrends={utilizationTrends}
-        staffMembers={staffData}
+        selectedTimeRange={selectedTimeRange}
       />
 
       {/* CEO Priority 5: AI Planning Assistant */}
       <ResourcePlanningChat 
         teamSize={teamMembers.length}
         activeProjects={activeProjects}
-        utilizationRate={utilizationTrends.days7}
+        utilizationRate={currentUtilizationRate}
       />
     </div>
   );
