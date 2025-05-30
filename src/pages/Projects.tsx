@@ -73,6 +73,7 @@ const Projects = () => {
                 <StandardizedExecutiveSummary
                   metrics={metrics}
                   gradientType="purple"
+                  cardFormat="simple"
                 />
               </div>
               <OfficeSettingsProvider>

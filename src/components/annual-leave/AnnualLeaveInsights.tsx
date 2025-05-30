@@ -79,6 +79,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
       timeRangeText={`${timeRangeText} insights and upcoming leave planning`}
       metrics={metrics}
       gradientType="purple"
+      cardFormat="simple"
     />
   );
 };

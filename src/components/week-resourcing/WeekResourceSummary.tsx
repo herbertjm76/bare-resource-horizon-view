@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { format, addDays } from 'date-fns';
@@ -91,7 +90,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
       <StandardizedExecutiveSummary
         metrics={metrics}
         gradientType="purple"
-        useDetailedFormat={true}
+        cardFormat="detailed"
       />
     </div>
   );

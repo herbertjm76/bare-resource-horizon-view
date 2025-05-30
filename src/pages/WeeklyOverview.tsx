@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -143,7 +142,7 @@ const WeeklyOverview = () => {
                   <StandardizedExecutiveSummary
                     metrics={metrics}
                     gradientType="purple"
-                    useDetailedFormat={true}
+                    cardFormat="detailed"
                   />
                 </div>
                 

@@ -20,12 +20,15 @@ interface SummaryMetric {
 }
 
 type GradientType = 'purple' | 'blue' | 'emerald' | 'violet';
+type CardFormat = 'simple' | 'detailed';
 
 interface StandardizedExecutiveSummaryProps {
   title?: string;
   timeRangeText?: string;
   metrics: SummaryMetric[];
   gradientType?: GradientType;
+  cardFormat?: CardFormat;
+  /** @deprecated Use cardFormat instead. Will be removed in future versions. */
   useDetailedFormat?: boolean;
   cardOpacity?: number;
 }
@@ -33,9 +36,14 @@ interface StandardizedExecutiveSummaryProps {
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
   metrics,
   gradientType = 'purple',
+  cardFormat,
   useDetailedFormat = false,
   cardOpacity = 0.9
 }) => {
+  // Determine the actual format to use
+  // Priority: cardFormat prop > useDetailedFormat prop (for backward compatibility)
+  const actualFormat: CardFormat = cardFormat || (useDetailedFormat ? 'detailed' : 'simple');
+
   const getBadgeVariant = (color?: string) => {
     switch (color) {
       case 'red': return 'destructive';
@@ -50,20 +58,11 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     return 'bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400';
   };
 
-  const getNumberColorClass = (metric: SummaryMetric) => {
-    if (metric.isGood === true) {
-      return 'text-green-600';
-    } else if (metric.isGood === false) {
-      return 'text-red-600';
-    }
-    return 'text-gray-900';
-  };
-
   const getGlassMorphismClass = () => {
     return 'bg-white/20 backdrop-blur-md border border-white/30 shadow-lg';
   };
 
-  if (useDetailedFormat) {
+  if (actualFormat === 'detailed') {
     return (
       <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -129,7 +128,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     );
   }
 
-  // Original format for dashboard with glass morphism
+  // Simple format - centered cards
   return (
     <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
