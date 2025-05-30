@@ -38,26 +38,6 @@ const Pricing = () => {
       cta: "Start Free Trial", 
       popular: true,
       note: "Billed annually ($990/year)"
-    },
-    {
-      name: "Agency",
-      price: "$200",
-      period: "per month", 
-      description: "Adds financial management and multi-office support",
-      features: [
-        "Everything in Studio",
-        "Unlimited team members",
-        "💰 Project profitability tracking",
-        "💰 Financial reporting",
-        "💰 Revenue forecasting",
-        "Multi-office management",
-        "Custom client reporting",
-        "Dedicated account manager",
-        "White-label options"
-      ],
-      cta: "Start Free Trial",
-      popular: false,
-      note: "Billed annually ($2,000/year)"
     }
   ];
 
@@ -78,7 +58,7 @@ const Pricing = () => {
         </div>
         
         {/* Pricing Cards */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {plans.map((plan, index) => (
             <div 
               key={index} 
