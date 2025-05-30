@@ -20,7 +20,7 @@ const Projects = () => {
   ).length;
   const totalOffices = new Set(projects.map(project => project.office?.name).filter(Boolean)).size;
   const completedProjects = projects.filter(project => 
-    project.status === 'Completed'
+    project.status === 'Complete'
   ).length;
 
   // Calculate completion rate
