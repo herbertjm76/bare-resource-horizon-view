@@ -11,14 +11,18 @@ interface SummaryMetric {
   badgeColor?: string;
 }
 
+type GradientType = 'blue' | 'emerald' | 'violet';
+
 interface StandardizedExecutiveSummaryProps {
   title?: string;
   timeRangeText?: string;
   metrics: SummaryMetric[];
+  gradientType?: GradientType;
 }
 
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
-  metrics
+  metrics,
+  gradientType = 'blue'
 }) => {
   const getBadgeVariant = (color?: string) => {
     switch (color) {
@@ -30,8 +34,21 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     }
   };
 
+  const getGradientClass = (type: GradientType) => {
+    switch (type) {
+      case 'blue':
+        return 'bg-gradient-to-br from-blue-50 to-blue-100/50';
+      case 'emerald':
+        return 'bg-gradient-to-br from-emerald-50 to-emerald-100/50';
+      case 'violet':
+        return 'bg-gradient-to-br from-violet-50 to-violet-100/50';
+      default:
+        return 'bg-gradient-to-br from-blue-50 to-blue-100/50';
+    }
+  };
+
   return (
-    <div className="hero-gradient rounded-2xl p-4">
+    <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {metrics.map((metric, index) => (
           <Card key={index} className="bg-white/90 backdrop-blur-sm">
