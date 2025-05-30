@@ -15,30 +15,16 @@ const HEADER_HEIGHT = 56;
 export const DashboardLayout = () => {
   const { company } = useCompany();
   const { 
-    allTeamMembers,
-    selectedOffice,
-    setSelectedOffice,
-    selectedTimeRange,
-    setSelectedTimeRange,
-    officeOptions,
-    metrics,
+    teamMembers, 
+    invites, 
+    projects, 
+    executiveSummaryData,
     isLoading 
   } = useDashboardData();
 
   if (isLoading) {
     return <DashboardLoadingState />;
   }
-
-  // Mock data for invites and projects since they're not in the hook yet
-  const invites: any[] = [];
-  const projects = Array.from({ length: metrics.activeProjects }, (_, i) => ({ id: i }));
-  
-  // Create executive summary data from available metrics
-  const executiveSummaryData = {
-    teamSize: allTeamMembers.length,
-    utilizationRate: 75, // Default value, should come from standardized utilization
-    totalCapacity: allTeamMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0)
-  };
 
   return (
     <SidebarProvider>
@@ -53,30 +39,20 @@ export const DashboardLayout = () => {
             {/* Desktop Layout */}
             <div className="hidden lg:block">
               <DesktopDashboard 
-                teamMembers={allTeamMembers}
+                teamMembers={teamMembers}
                 invites={invites}
                 projects={projects}
                 executiveSummaryData={executiveSummaryData}
-                selectedOffice={selectedOffice}
-                setSelectedOffice={setSelectedOffice}
-                selectedTimeRange={selectedTimeRange}
-                setSelectedTimeRange={setSelectedTimeRange}
-                officeOptions={officeOptions}
               />
             </div>
             
             {/* Mobile Layout */}
             <div className="lg:hidden">
               <MobileDashboard 
-                teamMembers={allTeamMembers}
+                teamMembers={teamMembers}
                 invites={invites}
                 projects={projects}
                 executiveSummaryData={executiveSummaryData}
-                selectedOffice={selectedOffice}
-                setSelectedOffice={setSelectedOffice}
-                selectedTimeRange={selectedTimeRange}
-                setSelectedTimeRange={setSelectedTimeRange}
-                officeOptions={officeOptions}
               />
             </div>
           </div>

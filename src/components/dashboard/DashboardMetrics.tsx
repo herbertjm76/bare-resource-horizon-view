@@ -58,16 +58,6 @@ export const DashboardMetrics = () => {
   const totalActiveProjects = metrics.activeProjects || 0;
   const totalOffices = officeOptions?.length || 0;
 
-  // Prepare data for Mobile and Desktop Dashboard components
-  const invites: any[] = [];
-  const projects = Array.from({ length: metrics.activeProjects }, (_, i) => ({ id: i }));
-  
-  const executiveSummaryData = {
-    teamSize: allTeamMembers.length,
-    utilizationRate: utilizationRate,
-    totalCapacity: allTeamMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0)
-  };
-
   return (
     <div className="min-h-screen bg-background">
       {/* Modern Header */}
@@ -94,27 +84,27 @@ export const DashboardMetrics = () => {
         {isMobile ? (
           <MobileDashboard
             teamMembers={allTeamMembers}
-            invites={invites}
-            projects={projects}
-            executiveSummaryData={executiveSummaryData}
-            selectedOffice={selectedOffice}
-            setSelectedOffice={setSelectedOffice}
+            activeProjects={metrics.activeProjects}
+            activeResources={metrics.activeResources}
+            utilizationTrends={utilizationTrends}
+            staffData={staffData}
+            mockData={mockData}
             selectedTimeRange={selectedTimeRange}
-            setSelectedTimeRange={setSelectedTimeRange}
-            officeOptions={officeOptions}
+            standardizedUtilizationRate={utilizationRate}
           />
         ) : (
           <div className="p-4">
             <DesktopDashboard
               teamMembers={allTeamMembers}
-              invites={invites}
-              projects={projects}
-              executiveSummaryData={executiveSummaryData}
-              selectedOffice={selectedOffice}
-              setSelectedOffice={setSelectedOffice}
+              activeProjects={metrics.activeProjects}
+              activeResources={metrics.activeResources}
+              utilizationTrends={utilizationTrends}
+              staffData={staffData}
+              mockData={mockData}
               selectedTimeRange={selectedTimeRange}
-              setSelectedTimeRange={setSelectedTimeRange}
-              officeOptions={officeOptions}
+              totalRevenue={metrics.totalRevenue}
+              avgProjectValue={metrics.avgProjectValue}
+              standardizedUtilizationRate={utilizationRate}
             />
           </div>
         )}
