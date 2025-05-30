@@ -35,8 +35,8 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   };
 
   const getGradientClass = (type: GradientType) => {
-    // Use linear left-to-right gradient with more emphasis on the pink/purple color
-    return 'bg-gradient-to-r from-[rgb(149,130,242)] via-[rgb(196,107,205)] to-[rgb(196,107,205)]';
+    // Use a much more subtle gradient covering only 1/4 of the background
+    return 'bg-gradient-to-r from-[rgb(196,107,205)] via-gray-50 to-gray-50';
   };
 
   return (
