@@ -74,9 +74,9 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
             return (
               <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/25 hover:shadow-xl`}>
                 <CardContent className="p-4">
-                  <div className="space-y-3">
-                    {/* Header with icon and title */}
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between mb-3">
+                    {/* Left side: Icon and Title */}
+                    <div className="flex items-center gap-2 flex-1">
                       {Icon && (
                         <div className="w-6 h-6 flex items-center justify-center">
                           <Icon className="w-4 h-4 text-white/80" />
@@ -85,43 +85,43 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                       <p className="text-xs font-medium text-white/80">{metric.title}</p>
                     </div>
                     
-                    {/* Main value */}
-                    <div>
-                      <p className="text-2xl font-bold text-white mb-1">{metric.value}</p>
+                    {/* Right side: Main value */}
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-white">{metric.value}</p>
                     </div>
-                    
-                    {/* Breakdowns */}
-                    {metric.breakdowns && (
-                      <div className="space-y-1">
-                        {metric.breakdowns.map((breakdown, idx) => (
-                          <div key={idx} className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-2 h-2 rounded-full ${
-                                breakdown.color === 'green' ? 'bg-green-400' :
-                                breakdown.color === 'orange' ? 'bg-orange-400' :
-                                breakdown.color === 'red' ? 'bg-red-400' :
-                                'bg-blue-400'
-                              }`} />
-                              <span className="text-white/70">{breakdown.label}</span>
-                            </div>
+                  </div>
+                  
+                  {/* Bottom section: Breakdowns in horizontal layout */}
+                  {metric.breakdowns && (
+                    <div className="flex items-center justify-between gap-4">
+                      {metric.breakdowns.map((breakdown, idx) => (
+                        <div key={idx} className="flex items-center gap-1 text-xs">
+                          <div className={`w-2 h-2 rounded-full ${
+                            breakdown.color === 'green' ? 'bg-green-400' :
+                            breakdown.color === 'orange' ? 'bg-orange-400' :
+                            breakdown.color === 'red' ? 'bg-red-400' :
+                            'bg-blue-400'
+                          }`} />
+                          <div className="flex flex-col">
+                            <span className="text-white/70">{breakdown.label}</span>
                             <span className="text-white font-medium">{breakdown.value}</span>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {/* Badge */}
-                    {metric.badgeText && (
-                      <div className="flex justify-end">
-                        <Badge 
-                          variant={getBadgeVariant(metric.badgeColor)} 
-                          className="text-xs bg-red-500/80 text-white border-0 backdrop-blur-sm"
-                        >
-                          {metric.badgeText}
-                        </Badge>
-                      </div>
-                    )}
-                  </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Badge */}
+                  {metric.badgeText && (
+                    <div className="flex justify-end mt-2">
+                      <Badge 
+                        variant={getBadgeVariant(metric.badgeColor)} 
+                        className="text-xs bg-red-500/80 text-white border-0 backdrop-blur-sm"
+                      >
+                        {metric.badgeText}
+                      </Badge>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );
