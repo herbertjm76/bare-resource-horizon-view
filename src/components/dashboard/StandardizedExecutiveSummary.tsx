@@ -34,7 +34,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
 
   return (
     <div 
-      className="rounded-2xl p-6 border border-brand-violet/10 shadow-lg bg-[linear-gradient(180deg,#7B5FC7_0%,#4A7BC8_45%,#9B5FC7_100%)]"
+      className="rounded-2xl p-6 border border-brand-violet/10 shadow-lg bg-[linear-gradient(180deg,#A188E8_0%,#6BA3E8_45%,#C088E8_100%)]"
     >
       <div className="text-white mb-6">
         <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
