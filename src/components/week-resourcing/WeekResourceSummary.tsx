@@ -2,6 +2,7 @@
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { format, addDays } from 'date-fns';
+import { TrendingUp, Users, Clock, CheckCircle } from 'lucide-react';
 
 interface WeekResourceSummaryProps {
   projects: any[];
@@ -37,37 +38,51 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     return allocations.some(allocation => allocation.project_id === project.id);
   }).length;
 
+  // Count completed and planning projects
+  const completedProjects = projects.filter(p => p.status === 'Completed').length;
+  const planningProjects = projects.filter(p => p.status === 'Planning').length;
+
   const weekEnd = addDays(weekStartDate, 6);
   const weekLabel = `${format(weekStartDate, 'MMM d')} - ${format(weekEnd, 'MMM d, yyyy')}`;
 
   const metrics = [
     {
-      title: "Active Projects",
-      value: activeProjectsCount,
-      subtitle: `Week of ${weekLabel}`,
-      badgeText: activeProjectsCount > 10 ? 'High Load' : 'Manageable',
-      badgeColor: activeProjectsCount > 10 ? 'orange' : 'green'
+      title: "Total Projects",
+      value: projects.length,
+      icon: TrendingUp,
+      breakdowns: [
+        { label: "Active", value: activeProjectsCount, color: "green" },
+        { label: "Planning", value: planningProjects, color: "orange" }
+      ]
     },
     {
       title: "Team Utilization",
       value: `${utilizationRate}%`,
-      subtitle: `${totalAllocatedHours}h of ${totalCapacity}h`,
-      badgeText: utilizationRate > 90 ? 'At Capacity' : utilizationRate > 70 ? 'Good' : 'Available',
-      badgeColor: utilizationRate > 90 ? 'red' : utilizationRate > 70 ? 'green' : 'blue'
+      icon: Clock,
+      breakdowns: [
+        { label: "Allocated", value: `${totalAllocatedHours}h`, color: "blue" },
+        { label: "Available", value: `${availableHours}h`, color: "green" }
+      ]
     },
     {
-      title: "Available Hours",
-      value: `${availableHours}h`,
-      subtitle: `${members.length} team members`,
-      badgeText: availableHours > 100 ? 'High Capacity' : 'Limited',
-      badgeColor: availableHours > 100 ? 'green' : 'orange'
+      title: "Team Members",
+      value: members.length,
+      icon: Users,
+      breakdowns: [
+        { label: "Capacity", value: `${totalCapacity}h`, color: "blue" },
+        { label: "Week", value: weekLabel.split(' - ')[0], color: "green" }
+      ]
     },
     {
       title: "Resource Status",
-      value: members.length,
-      subtitle: "Team members",
-      badgeText: utilizationRate > 85 ? 'Fully Loaded' : 'Capacity Available',
-      badgeColor: utilizationRate > 85 ? 'red' : 'green'
+      value: utilizationRate > 85 ? "High Load" : "Available",
+      icon: CheckCircle,
+      breakdowns: [
+        { label: "Utilization", value: `${utilizationRate}%`, color: utilizationRate > 85 ? "red" : "green" },
+        { label: "Projects per person", value: members.length > 0 ? (activeProjectsCount / members.length).toFixed(1) : "0", color: "blue" }
+      ],
+      badgeText: utilizationRate > 90 ? `${utilizationRate}%` : undefined,
+      badgeColor: "red"
     }
   ];
 
@@ -76,6 +91,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
       <StandardizedExecutiveSummary
         metrics={metrics}
         gradientType="purple"
+        useDetailedFormat={true}
       />
     </div>
   );

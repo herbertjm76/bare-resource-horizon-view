@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LucideIcon } from 'lucide-react';
 
 interface SummaryMetric {
   title: string;
@@ -9,7 +10,13 @@ interface SummaryMetric {
   subtitle?: string;
   badgeText?: string;
   badgeColor?: string;
-  isGood?: boolean; // New prop to determine if the metric is good or bad
+  isGood?: boolean;
+  icon?: LucideIcon;
+  breakdowns?: Array<{
+    label: string;
+    value: string | number;
+    color?: string;
+  }>;
 }
 
 type GradientType = 'purple' | 'blue' | 'emerald' | 'violet';
@@ -19,11 +26,13 @@ interface StandardizedExecutiveSummaryProps {
   timeRangeText?: string;
   metrics: SummaryMetric[];
   gradientType?: GradientType;
+  useDetailedFormat?: boolean;
 }
 
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
   metrics,
-  gradientType = 'purple'
+  gradientType = 'purple',
+  useDetailedFormat = false
 }) => {
   const getBadgeVariant = (color?: string) => {
     switch (color) {
@@ -36,7 +45,6 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   };
 
   const getGradientClass = (type: GradientType) => {
-    // Create a subtle gradient with smooth transitions using the specified colors
     return 'bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400';
   };
 
@@ -46,9 +54,76 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     } else if (metric.isGood === false) {
       return 'text-red-600';
     }
-    return 'text-gray-900'; // Default color
+    return 'text-gray-900';
   };
 
+  if (useDetailedFormat) {
+    return (
+      <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          {metrics.map((metric, index) => {
+            const Icon = metric.icon;
+            return (
+              <Card key={index} className="bg-white/90 backdrop-blur-sm">
+                <CardContent className="p-4">
+                  <div className="space-y-3">
+                    {/* Header with icon and title */}
+                    <div className="flex items-center gap-2">
+                      {Icon && (
+                        <div className="w-6 h-6 flex items-center justify-center">
+                          <Icon className="w-4 h-4 text-white/80" />
+                        </div>
+                      )}
+                      <p className="text-xs font-medium text-white/80">{metric.title}</p>
+                    </div>
+                    
+                    {/* Main value */}
+                    <div>
+                      <p className="text-2xl font-bold text-white mb-1">{metric.value}</p>
+                    </div>
+                    
+                    {/* Breakdowns */}
+                    {metric.breakdowns && (
+                      <div className="space-y-1">
+                        {metric.breakdowns.map((breakdown, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${
+                                breakdown.color === 'green' ? 'bg-green-400' :
+                                breakdown.color === 'orange' ? 'bg-orange-400' :
+                                breakdown.color === 'red' ? 'bg-red-400' :
+                                'bg-blue-400'
+                              }`} />
+                              <span className="text-white/70">{breakdown.label}</span>
+                            </div>
+                            <span className="text-white font-medium">{breakdown.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Badge */}
+                    {metric.badgeText && (
+                      <div className="flex justify-end">
+                        <Badge 
+                          variant={getBadgeVariant(metric.badgeColor)} 
+                          className="text-xs bg-red-500 text-white border-0"
+                        >
+                          {metric.badgeText}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // Original format for dashboard
   return (
     <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">

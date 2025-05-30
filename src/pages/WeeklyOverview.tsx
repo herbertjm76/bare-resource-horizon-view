@@ -14,6 +14,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useProjects } from '@/hooks/useProjects';
+import { TrendingUp, Users, Clock, AlertTriangle } from 'lucide-react';
 import '@/components/weekly-overview/weekly-overview-print.css';
 
 const HEADER_HEIGHT = 56;
@@ -63,37 +64,49 @@ const WeeklyOverview = () => {
 
   // Calculate metrics for the weekly overview
   const activeProjects = projects.filter(p => p.status === 'In Progress').length;
+  const completedProjects = projects.filter(p => p.status === 'Completed').length;
+  const planningProjects = projects.filter(p => p.status === 'Planning').length;
   const totalCapacity = teamMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
   const averageUtilization = 75; // This would come from actual allocation data
+  const highRiskProjects = Math.round(projects.length * 0.33); // Example calculation
 
   const metrics = [
     {
-      title: "Active Projects",
-      value: activeProjects,
-      subtitle: "In progress this week",
-      badgeText: activeProjects > 5 ? 'High Load' : 'Normal',
-      badgeColor: activeProjects > 5 ? 'orange' : 'green'
+      title: "Total Projects",
+      value: projects.length,
+      icon: TrendingUp,
+      breakdowns: [
+        { label: "Active", value: activeProjects, color: "green" },
+        { label: "Planning", value: planningProjects, color: "orange" }
+      ]
     },
     {
-      title: "Team Members",
-      value: teamMembers.length,
-      subtitle: "Available resources",
-      badgeText: "Full Team",
-      badgeColor: "blue"
-    },
-    {
-      title: "Weekly Capacity",
-      value: `${totalCapacity}h`,
-      subtitle: "Total team hours",
-      badgeText: "Available",
-      badgeColor: "green"
-    },
-    {
-      title: "Utilization",
+      title: "Avg Target Profit",
       value: `${averageUtilization}%`,
-      subtitle: "Average team load",
-      badgeText: averageUtilization > 85 ? 'High' : averageUtilization > 65 ? 'Optimal' : 'Low',
-      badgeColor: averageUtilization > 85 ? 'red' : averageUtilization > 65 ? 'green' : 'orange'
+      icon: Clock,
+      breakdowns: [
+        { label: "Completed", value: completedProjects, color: "green" },
+        { label: "On Hold", value: projects.filter(p => p.status === 'On Hold').length, color: "orange" }
+      ]
+    },
+    {
+      title: "Countries",
+      value: 2,
+      icon: Users,
+      breakdowns: [
+        { label: "Vietnam", value: 2, color: "blue" },
+        { label: "United Kingdom", value: 1, color: "green" }
+      ]
+    },
+    {
+      title: "Offices",
+      value: 2,
+      icon: AlertTriangle,
+      breakdowns: [
+        { label: "Risk Level", value: "High risk projects", color: "red" }
+      ],
+      badgeText: `${highRiskProjects}%`,
+      badgeColor: "red"
     }
   ];
 
@@ -126,6 +139,7 @@ const WeeklyOverview = () => {
                   <StandardizedExecutiveSummary
                     metrics={metrics}
                     gradientType="purple"
+                    useDetailedFormat={true}
                   />
                 </div>
                 
