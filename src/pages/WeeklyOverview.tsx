@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -64,7 +63,7 @@ const WeeklyOverview = () => {
 
   // Calculate metrics for the weekly overview
   const activeProjects = projects.filter(p => p.status === 'In Progress').length;
-  const completedProjects = projects.filter(p => p.status === 'Completed').length;
+  const completedProjects = projects.filter(p => p.status === 'Complete').length;
   const planningProjects = projects.filter(p => p.status === 'Planning').length;
   const totalCapacity = teamMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
   const averageUtilization = 75; // This would come from actual allocation data
