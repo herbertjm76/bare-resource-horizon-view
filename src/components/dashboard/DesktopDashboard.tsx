@@ -20,6 +20,9 @@ interface DesktopDashboardProps {
     name: string;
     availability: number;
     weekly_capacity?: number;
+    first_name?: string;
+    last_name?: string;
+    role?: string;
   }>;
   mockData: any;
   selectedTimeRange: TimeRange;
@@ -40,6 +43,14 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   avgProjectValue,
   standardizedUtilizationRate
 }) => {
+  // Transform staffData to match StaffMember interface
+  const transformedStaffData = staffData.map(member => ({
+    ...member,
+    first_name: member.first_name || member.name.split(' ')[0] || '',
+    last_name: member.last_name || member.name.split(' ').slice(1).join(' ') || '',
+    role: member.role || 'Member'
+  }));
+
   return (
     <div className="space-y-6">
       <ExecutiveSummaryCard
@@ -55,7 +66,10 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div>
-          <StaffStatusCard staffData={staffData} />
+          <StaffStatusCard 
+            staffData={transformedStaffData} 
+            selectedTimeRange={selectedTimeRange}
+          />
         </div>
         <div>
           <EnhancedInsights 
