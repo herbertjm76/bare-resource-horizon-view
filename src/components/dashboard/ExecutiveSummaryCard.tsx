@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { SummaryHeader } from './executiveSummary/components/SummaryHeader';
+import { StandardizedExecutiveSummary } from './StandardizedExecutiveSummary';
 import { getUtilizationStatus, getTimeRangeText } from './executiveSummary/utils/utilizationUtils';
 import { calculateCapacityHours } from './executiveSummary/utils/capacityUtils';
 import { ExecutiveSummaryProps } from './executiveSummary/types';
@@ -37,6 +37,36 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, utilizationRate, staffData);
   const isOverCapacity = capacityHours < 0;
 
+  const metrics = [
+    {
+      title: "Team Utilization",
+      value: `${Math.round(utilizationRate)}%`,
+      badgeText: utilizationStatus.label,
+      badgeColor: utilizationStatus.color === 'destructive' ? 'red' : 
+                 utilizationStatus.color === 'default' ? 'green' : 'blue'
+    },
+    {
+      title: isOverCapacity ? "Over Capacity" : "Available Capacity",
+      value: `${Math.abs(capacityHours).toLocaleString()}h`,
+      subtitle: timeRangeText,
+      badgeText: isOverCapacity ? "Over Capacity" : undefined,
+      badgeColor: isOverCapacity ? "red" : undefined
+    },
+    {
+      title: "Active Projects",
+      value: activeProjects,
+      subtitle: activeResources > 0 
+        ? `${(activeProjects / activeResources).toFixed(1)} per person` 
+        : 'No team members'
+    },
+    {
+      title: "Team Size",
+      value: activeResources,
+      badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
+      badgeColor: utilizationRate > 85 ? 'orange' : 'green'
+    }
+  ];
+
   console.log('Executive Summary Card - Final State:', {
     selectedTimeRange,
     activeProjects,
@@ -49,74 +79,10 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   });
 
   return (
-    <div 
-      className="rounded-2xl p-6 border border-brand-violet/10 shadow-lg"
-      style={{
-        background: 'linear-gradient(135deg, #6F4BF6 0%, #5669F7 50%, #E64FC4 100%)'
-      }}
-    >
-      <SummaryHeader timeRangeText={timeRangeText} />
-      
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Team Utilization */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Team Utilization</h3>
-          <div className="mb-4">
-            <div className="text-4xl font-bold text-gray-900 mb-2">
-              {Math.round(utilizationRate)}%
-            </div>
-            <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-              utilizationStatus.color === 'destructive' ? 'bg-red-100 text-red-800' :
-              utilizationStatus.color === 'default' ? 'bg-green-100 text-green-800' :
-              'bg-blue-100 text-blue-800'
-            }`}>
-              {utilizationStatus.label}
-            </span>
-          </div>
-        </div>
-
-        {/* Available Capacity */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Available Capacity</h3>
-          <div className="mb-4">
-            <div className={`text-4xl font-bold mb-2 ${isOverCapacity ? 'text-red-600' : 'text-gray-900'}`}>
-              {Math.abs(capacityHours).toLocaleString()}h
-            </div>
-            <p className="text-xs text-gray-500">{timeRangeText}</p>
-            {isOverCapacity && (
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-2">
-                Over Capacity
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Active Projects */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Active Projects</h3>
-          <div className="mb-4">
-            <div className="text-4xl font-bold text-gray-900 mb-2">{activeProjects}</div>
-            <p className="text-xs text-gray-500">
-              {activeResources > 0 
-                ? `${(activeProjects / activeResources).toFixed(1)} per person` 
-                : 'No team members'}
-            </p>
-          </div>
-        </div>
-
-        {/* Team Size */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-xl p-6 shadow-md text-center">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Team Size</h3>
-          <div className="mb-4">
-            <div className="text-4xl font-bold text-gray-900 mb-2">{activeResources}</div>
-            <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-              utilizationRate > 85 ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'
-            }`}>
-              {utilizationRate > 85 ? 'Consider Hiring' : 'Stable'}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <StandardizedExecutiveSummary
+      title="Executive Summary"
+      timeRangeText={timeRangeText}
+      metrics={metrics}
+    />
   );
 };
