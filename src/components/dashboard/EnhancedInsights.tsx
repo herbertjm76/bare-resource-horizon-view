@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, AlertTriangle, CheckCircle, Clock, Target, Briefcase, Calendar } from 'lucide-react';
 import { TimeRange } from './TimeRangeSelector';
@@ -186,8 +187,8 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
   const insights = getInsights();
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="h-full flex flex-col">
+      <CardHeader className="pb-3 flex-shrink-0">
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-brand-violet" />
           Smart Insights
@@ -196,60 +197,64 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {insights.length > 0 ? (
-          insights.map((insight, index) => {
-            const Icon = insight.icon;
-            return (
-              <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50/50">
-                <div className={`p-1.5 rounded-full flex-shrink-0 ${
-                  insight.type === 'critical' ? 'bg-red-100' :
-                  insight.type === 'warning' ? 'bg-orange-100' :
-                  insight.type === 'success' ? 'bg-green-100' : 'bg-blue-100'
-                }`}>
-                  <Icon className={`h-4 w-4 ${
-                    insight.type === 'critical' ? 'text-red-600' :
-                    insight.type === 'warning' ? 'text-orange-600' :
-                    insight.type === 'success' ? 'text-green-600' : 'text-blue-600'
-                  }`} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-sm text-gray-900">
-                      {insight.title}
-                    </h4>
-                    <Badge variant="outline" className="text-xs px-1.5 py-0.5">
-                      {insight.category}
-                    </Badge>
+      <CardContent className="flex-1 overflow-hidden p-0">
+        <ScrollArea className="h-full">
+          <div className="space-y-4 px-6 pb-6">
+            {insights.length > 0 ? (
+              insights.map((insight, index) => {
+                const Icon = insight.icon;
+                return (
+                  <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-gray-50/50">
+                    <div className={`p-1.5 rounded-full flex-shrink-0 ${
+                      insight.type === 'critical' ? 'bg-red-100' :
+                      insight.type === 'warning' ? 'bg-orange-100' :
+                      insight.type === 'success' ? 'bg-green-100' : 'bg-blue-100'
+                    }`}>
+                      <Icon className={`h-4 w-4 ${
+                        insight.type === 'critical' ? 'text-red-600' :
+                        insight.type === 'warning' ? 'text-orange-600' :
+                        insight.type === 'success' ? 'text-green-600' : 'text-blue-600'
+                      }`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-medium text-sm text-gray-900">
+                          {insight.title}
+                        </h4>
+                        <Badge variant="outline" className="text-xs px-1.5 py-0.5">
+                          {insight.category}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        {insight.description}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-600 leading-relaxed">
-                    {insight.description}
-                  </p>
+                );
+              })
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-300" />
+                <p className="text-sm font-medium mb-1">All Systems Optimal</p>
+                <p className="text-xs">Your team metrics are well-balanced with no immediate concerns.</p>
+              </div>
+            )}
+            
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="text-xs text-gray-500 space-y-1">
+                <p><strong>Current Metrics ({getTimeRangeText()}):</strong></p>
+                <div className="flex justify-between">
+                  <span>Utilization: {utilizationRate}%</span>
+                  <span>Team: {teamSize} members</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Projects: {activeProjects}</span>
+                  <span>Load: {teamSize > 0 ? (activeProjects / teamSize).toFixed(1) : '0'} proj/person</span>
                 </div>
               </div>
-            );
-          })
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-300" />
-            <p className="text-sm font-medium mb-1">All Systems Optimal</p>
-            <p className="text-xs">Your team metrics are well-balanced with no immediate concerns.</p>
-          </div>
-        )}
-        
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <div className="text-xs text-gray-500 space-y-1">
-            <p><strong>Current Metrics ({getTimeRangeText()}):</strong></p>
-            <div className="flex justify-between">
-              <span>Utilization: {utilizationRate}%</span>
-              <span>Team: {teamSize} members</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Projects: {activeProjects}</span>
-              <span>Load: {teamSize > 0 ? (activeProjects / teamSize).toFixed(1) : '0'} proj/person</span>
             </div>
           </div>
-        </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   );

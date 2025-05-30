@@ -1,158 +1,152 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin } from 'lucide-react';
-import { useCompany } from "@/context/CompanyContext";
-import { useOfficeSettings } from "@/context/officeSettings";
-import { supabase } from '@/integrations/supabase/client';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Calendar, MapPin } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
 
 interface Holiday {
   id: string;
   name: string;
-  date: Date;
-  end_date?: Date;
-  offices: string[];
+  date: string;
+  office: string;
+  type: 'public' | 'company';
 }
 
 export const HolidayCard: React.FC = () => {
-  const [holidays, setHolidays] = useState<Holiday[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { company } = useCompany();
-  const { locations } = useOfficeSettings();
+  // Mock holiday data - this would typically come from props or a hook
+  const upcomingHolidays: Holiday[] = [
+    {
+      id: '1',
+      name: 'Memorial Day',
+      date: '2024-05-27',
+      office: 'US Office',
+      type: 'public'
+    },
+    {
+      id: '2',
+      name: 'Independence Day',
+      date: '2024-07-04',
+      office: 'US Office',
+      type: 'public'
+    },
+    {
+      id: '3',
+      name: 'Summer Break',
+      date: '2024-08-15',
+      office: 'All Offices',
+      type: 'company'
+    },
+    {
+      id: '4',
+      name: 'Labor Day',
+      date: '2024-09-02',
+      office: 'US Office',
+      type: 'public'
+    },
+    {
+      id: '5',
+      name: 'Thanksgiving',
+      date: '2024-11-28',
+      office: 'US Office',
+      type: 'public'
+    },
+    {
+      id: '6',
+      name: 'Christmas Day',
+      date: '2024-12-25',
+      office: 'All Offices',
+      type: 'public'
+    },
+    {
+      id: '7',
+      name: 'New Year\'s Day',
+      date: '2025-01-01',
+      office: 'All Offices',
+      type: 'public'
+    }
+  ];
 
-  useEffect(() => {
-    const loadHolidays = async () => {
-      if (!company) {
-        setLoading(false);
-        return;
-      }
-      
-      setLoading(true);
-      
-      try {
-        const { data: holidaysData, error } = await supabase
-          .from('office_holidays')
-          .select('*')
-          .eq('company_id', company.id);
-        
-        if (error) {
-          console.error('Error fetching holidays:', error);
-          setHolidays([]);
-        } else if (holidaysData) {
-          // Group holidays by name and date to combine multiple location entries
-          const holidayMap = new Map<string, Holiday>();
-          
-          holidaysData.forEach(holiday => {
-            const holidayKey = `${holiday.name}-${holiday.date}`;
-            const location = locations.find(loc => loc.id === holiday.location_id);
-            const locationName = location ? `${location.emoji} ${location.city}` : 'Unknown Location';
-            
-            if (holidayMap.has(holidayKey)) {
-              // Add location to existing holiday
-              const existingHoliday = holidayMap.get(holidayKey)!;
-              if (!existingHoliday.offices.includes(locationName)) {
-                existingHoliday.offices.push(locationName);
-              }
-            } else {
-              // Create new holiday entry
-              holidayMap.set(holidayKey, {
-                id: holiday.id,
-                name: holiday.name,
-                date: new Date(holiday.date),
-                end_date: holiday.end_date ? new Date(holiday.end_date) : undefined,
-                offices: [locationName]
-              });
-            }
-          });
-          
-          // Convert map to array and sort by date
-          const transformedHolidays = Array.from(holidayMap.values()).sort((a, b) => 
-            a.date.getTime() - b.date.getTime()
-          );
-          
-          setHolidays(transformedHolidays);
-        }
-      } catch (error) {
-        console.error('Error loading holidays:', error);
-        setHolidays([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadHolidays();
-  }, [company, locations]);
-
-  const formatDate = (date: Date) => {
-    return {
-      day: date.getDate(),
-      month: date.toLocaleDateString('en-US', { month: 'short' }),
-      weekday: date.toLocaleDateString('en-US', { weekday: 'short' })
-    };
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
-  // Filter to only show upcoming holidays (today and future)
-  const upcomingHolidays = holidays.filter(holiday => {
-    const holidayDate = new Date(holiday.date);
+  const getDaysUntil = (dateString: string) => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
-    return holidayDate >= today;
-  });
+    const holidayDate = new Date(dateString);
+    const diffTime = holidayDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
 
   return (
     <Card className="h-[400px] flex flex-col">
-      <CardHeader className="pb-3 flex-shrink-0">
+      <CardHeader className="flex-shrink-0">
         <CardTitle className="text-lg flex items-center gap-2">
           <Calendar className="h-5 w-5 text-brand-violet" />
           Upcoming Holidays
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
-        {loading ? (
-          <div className="text-center py-8 text-gray-500">
-            <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50 animate-pulse" />
-            <p className="text-sm">Loading holidays...</p>
-          </div>
-        ) : upcomingHolidays.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No upcoming holidays</p>
-          </div>
-        ) : (
-          <ScrollArea className="flex-1">
-            <div className="space-y-3 px-6 pb-6">
-              {upcomingHolidays.map((holiday, index) => {
-                const dateInfo = formatDate(holiday.date);
-                
-                return (
-                  <div key={`${holiday.name}-${holiday.date.toISOString()}`} className="flex items-center gap-3 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
-                    <div className="flex-shrink-0 text-center min-w-[50px]">
-                      <div className="text-xl font-bold text-brand-violet">{dateInfo.day}</div>
-                      <div className="text-xs font-medium text-gray-600 uppercase">{dateInfo.month}</div>
-                      <div className="text-xs text-gray-500">{dateInfo.weekday}</div>
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-gray-900 truncate mb-2">{holiday.name}</div>
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3 text-gray-500 flex-shrink-0" />
-                        <div className="flex gap-1 flex-wrap">
-                          {holiday.offices.map((office, idx) => (
-                            <Badge key={idx} variant="secondary" className="text-xs py-0 px-1.5">
-                              {office}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
+      <CardContent className="flex-1 overflow-hidden p-0">
+        <ScrollArea className="h-full">
+          <div className="space-y-3 px-6 pb-6">
+            {upcomingHolidays.map((holiday) => {
+              const daysUntil = getDaysUntil(holiday.date);
+              
+              return (
+                <div key={holiday.id} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-lg bg-brand-violet/10 flex items-center justify-center">
+                      <Calendar className="h-4 w-4 text-brand-violet" />
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </ScrollArea>
-        )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium text-sm text-gray-900 truncate">
+                        {holiday.name}
+                      </h4>
+                      <Badge 
+                        variant={holiday.type === 'public' ? 'default' : 'secondary'} 
+                        className="text-xs"
+                      >
+                        {holiday.type === 'public' ? 'Public' : 'Company'}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-gray-600">
+                      <span>{formatDate(holiday.date)}</span>
+                      <span>•</span>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
+                        <span className="truncate">{holiday.office}</span>
+                      </div>
+                    </div>
+                    {daysUntil >= 0 && (
+                      <div className="mt-1">
+                        <span className="text-xs text-brand-violet font-medium">
+                          {daysUntil === 0 ? 'Today' : 
+                           daysUntil === 1 ? 'Tomorrow' : 
+                           `${daysUntil} days away`}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            
+            {upcomingHolidays.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                <p className="text-sm font-medium mb-1">No Upcoming Holidays</p>
+                <p className="text-xs">All clear for the next few months!</p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   );
