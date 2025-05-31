@@ -11,6 +11,7 @@ import { RolesTab } from '@/components/settings/RolesTab';
 import { RatesTab } from '@/components/settings/RatesTab';
 import { HolidaysTab } from '@/components/settings/HolidaysTab';
 import { DepartmentsTab } from '@/components/settings/DepartmentsTab';
+import { OfficeOverviewCard } from '@/components/settings/OfficeOverviewCard';
 import { OfficeSettingsProvider } from '@/context/officeSettings';
 import { useNavigate } from 'react-router-dom';
 import { useCompany } from '@/context/CompanyContext';
@@ -133,6 +134,9 @@ const OfficeSettings = () => {
                   </Button>
                 </div>
               </div>
+
+              {/* Office Overview Card */}
+              <OfficeOverviewCard />
               
               <OfficeSettingsProvider>
                 <Tabs defaultValue="areas" className="w-full">
