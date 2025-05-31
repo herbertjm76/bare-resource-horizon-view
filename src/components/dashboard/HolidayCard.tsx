@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, MapPin } from 'lucide-react';
+import { useHolidays } from './hooks/useHolidays';
 
 interface Holiday {
   id: string;
@@ -13,58 +14,7 @@ interface Holiday {
 }
 
 export const HolidayCard: React.FC = () => {
-  // Mock holiday data - this would typically come from props or a hook
-  const upcomingHolidays: Holiday[] = [
-    {
-      id: '1',
-      name: 'Memorial Day',
-      date: '2024-05-27',
-      office: 'US Office',
-      type: 'public'
-    },
-    {
-      id: '2',
-      name: 'Independence Day',
-      date: '2024-07-04',
-      office: 'US Office',
-      type: 'public'
-    },
-    {
-      id: '3',
-      name: 'Summer Break',
-      date: '2024-08-15',
-      office: 'All Offices',
-      type: 'company'
-    },
-    {
-      id: '4',
-      name: 'Labor Day',
-      date: '2024-09-02',
-      office: 'US Office',
-      type: 'public'
-    },
-    {
-      id: '5',
-      name: 'Thanksgiving',
-      date: '2024-11-28',
-      office: 'US Office',
-      type: 'public'
-    },
-    {
-      id: '6',
-      name: 'Christmas Day',
-      date: '2024-12-25',
-      office: 'All Offices',
-      type: 'public'
-    },
-    {
-      id: '7',
-      name: 'New Year\'s Day',
-      date: '2025-01-01',
-      office: 'All Offices',
-      type: 'public'
-    }
-  ];
+  const { holidays: upcomingHolidays, isLoading, error } = useHolidays();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -81,6 +31,45 @@ export const HolidayCard: React.FC = () => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
+
+  if (isLoading) {
+    return (
+      <Card className="h-[400px] flex flex-col">
+        <CardHeader className="flex-shrink-0">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-brand-violet" />
+            Upcoming Holidays
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300 animate-pulse" />
+            <p className="text-sm">Loading holidays...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="h-[400px] flex flex-col">
+        <CardHeader className="flex-shrink-0">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-brand-violet" />
+            Upcoming Holidays
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 flex items-center justify-center">
+          <div className="text-center text-gray-500">
+            <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+            <p className="text-sm font-medium mb-1">Unable to Load Holidays</p>
+            <p className="text-xs">{error}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="h-[400px] flex flex-col">
