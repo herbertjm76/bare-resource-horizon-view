@@ -4,7 +4,6 @@ import { MonthSelector } from './MonthSelector';
 import { TeamAnnualLeaveFilters } from './TeamAnnualLeaveFilters';
 import { LeaveCalendar } from './LeaveCalendar';
 import { AnnualLeaveInsights } from './AnnualLeaveInsights';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
 
@@ -25,8 +24,6 @@ interface TeamAnnualLeaveContentProps {
   setSearchQuery: (query: string) => void;
   clearFilters: () => void;
   allMembers: TeamMember[];
-  summaryFormat: 'simple' | 'detailed';
-  setSummaryFormat: (format: 'simple' | 'detailed') => void;
 }
 
 export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
@@ -45,37 +42,18 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
   setFilterValue,
   setSearchQuery,
   clearFilters,
-  allMembers,
-  summaryFormat,
-  setSummaryFormat
+  allMembers
 }) => {
   return (
     <div className="mx-auto space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Team Annual Leave</h1>
-        <div className="flex gap-2">
-          <Button
-            variant={summaryFormat === 'simple' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSummaryFormat('simple')}
-          >
-            Simple Cards
-          </Button>
-          <Button
-            variant={summaryFormat === 'detailed' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSummaryFormat('detailed')}
-          >
-            Detailed Cards
-          </Button>
-        </div>
       </div>
 
       {/* Annual Leave Insights */}
       <AnnualLeaveInsights 
         teamMembers={allMembers} 
         selectedMonth={selectedMonth} 
-        summaryFormat={summaryFormat}
       />
       
       <div className="flex flex-row justify-between items-center gap-4 flex-wrap">

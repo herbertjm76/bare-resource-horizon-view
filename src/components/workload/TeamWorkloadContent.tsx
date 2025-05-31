@@ -5,7 +5,6 @@ import { TeamAnnualLeaveFilters } from '@/components/annual-leave/TeamAnnualLeav
 import { WorkloadCalendar } from '@/components/workload/WorkloadCalendar';
 import { WorkloadSummary } from '@/components/workload/WorkloadSummary';
 import { TeamWorkloadHeader } from '@/components/workload/TeamWorkloadHeader';
-import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
 import { useWorkloadData, WorkloadBreakdown } from '@/components/workload/hooks/useWorkloadData';
@@ -27,8 +26,6 @@ interface TeamWorkloadContentProps {
   weekLabel: string;
   onPreviousWeek: () => void;
   onNextWeek: () => void;
-  summaryFormat: 'simple' | 'detailed';
-  setSummaryFormat: (format: 'simple' | 'detailed') => void;
 }
 
 export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
@@ -47,9 +44,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   clearFilters,
   weekLabel,
   onPreviousWeek,
-  onNextWeek,
-  summaryFormat,
-  setSummaryFormat
+  onNextWeek
 }) => {
   // State for period selector
   const [periodToShow, setPeriodToShow] = useState(12);
@@ -87,22 +82,6 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
     <div className="mx-auto space-y-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Team Workload</h1>
-        <div className="flex gap-2">
-          <Button
-            variant={summaryFormat === 'simple' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSummaryFormat('simple')}
-          >
-            Simple Cards
-          </Button>
-          <Button
-            variant={summaryFormat === 'detailed' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSummaryFormat('detailed')}
-          >
-            Detailed Cards
-          </Button>
-        </div>
       </div>
 
       <TeamWorkloadHeader
@@ -119,7 +98,6 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
           workloadData={workloadData}
           selectedWeek={selectedWeek}
           periodToShow={periodToShow}
-          summaryFormat={summaryFormat}
         />
       )}
       

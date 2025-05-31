@@ -8,13 +8,11 @@ import { Calendar, Users, AlertTriangle, Shield } from 'lucide-react';
 interface AnnualLeaveInsightsProps {
   teamMembers: TeamMember[];
   selectedMonth: Date;
-  summaryFormat?: 'simple' | 'detailed';
 }
 
 export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
   teamMembers,
-  selectedMonth,
-  summaryFormat = 'detailed'
+  selectedMonth
 }) => {
   const { insights, isLoading } = useAnnualLeaveInsights(teamMembers);
 
@@ -44,59 +42,35 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
       title: "Next Week",
       value: insights.nextWeekCount,
       subtitle: insights.nextWeekCount === 1 ? 'person on leave' : 'people on leave',
-      icon: Calendar,
       badgeText: insights.nextWeekCount > teamMembers.length * 0.3 ? 'High Impact' : 'Manageable',
-      badgeColor: insights.nextWeekCount > teamMembers.length * 0.3 ? 'orange' : 'blue',
-      breakdowns: [
-        { label: 'Annual Leave', value: Math.round(insights.nextWeekCount * 0.7), color: 'blue' },
-        { label: 'Sick Leave', value: Math.round(insights.nextWeekCount * 0.2), color: 'orange' },
-        { label: 'Other', value: Math.round(insights.nextWeekCount * 0.1), color: 'red' }
-      ]
+      badgeColor: insights.nextWeekCount > teamMembers.length * 0.3 ? 'orange' : 'blue'
     },
     {
       title: "Next Month",
       value: insights.nextMonthCount,
       subtitle: insights.nextMonthCount === 1 ? 'person scheduled' : 'people scheduled',
-      icon: Users,
       badgeText: "Plan Ahead",
-      badgeColor: "green",
-      breakdowns: [
-        { label: 'Week 1', value: Math.round(insights.nextMonthCount * 0.3), color: 'green' },
-        { label: 'Week 2', value: Math.round(insights.nextMonthCount * 0.2), color: 'blue' },
-        { label: 'Week 3+', value: Math.round(insights.nextMonthCount * 0.5), color: 'orange' }
-      ]
+      badgeColor: "green"
     },
     {
       title: "Peak Week",
       value: insights.peakWeek ? insights.peakWeek.count : 0,
       subtitle: insights.peakWeek ? `Week of ${insights.peakWeek.weekStart}` : 'No peak identified',
-      icon: AlertTriangle,
       badgeText: insights.peakWeek 
         ? (insights.peakWeek.count > teamMembers.length * 0.4 ? 'Critical' : 'Monitor')
         : 'Balanced',
       badgeColor: insights.peakWeek 
         ? (insights.peakWeek.count > teamMembers.length * 0.4 ? 'red' : 'orange')
-        : 'green',
-      breakdowns: insights.peakWeek ? [
-        { label: 'Critical Days', value: Math.round(insights.peakWeek.count * 0.6), color: 'red' },
-        { label: 'Moderate Days', value: Math.round(insights.peakWeek.count * 0.4), color: 'orange' }
-      ] : [
-        { label: 'Balanced', value: teamMembers.length, color: 'green' }
-      ]
+        : 'green'
     },
     {
       title: "Team Coverage",
       value: `${Math.round((1 - (insights.nextWeekCount / teamMembers.length)) * 100)}%`,
       subtitle: "Available next week",
-      icon: Shield,
       badgeText: insights.nextWeekCount / teamMembers.length > 0.5 ? 'Low Coverage' :
                  insights.nextWeekCount / teamMembers.length > 0.3 ? 'Moderate' : 'Good Coverage',
       badgeColor: insights.nextWeekCount / teamMembers.length > 0.5 ? 'red' :
-                  insights.nextWeekCount / teamMembers.length > 0.3 ? 'orange' : 'green',
-      breakdowns: [
-        { label: 'Available', value: teamMembers.length - insights.nextWeekCount, color: 'green' },
-        { label: 'On Leave', value: insights.nextWeekCount, color: 'red' }
-      ]
+                  insights.nextWeekCount / teamMembers.length > 0.3 ? 'orange' : 'green'
     }
   ];
 
@@ -106,7 +80,6 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
       timeRangeText={`${timeRangeText} insights and upcoming leave planning`}
       metrics={metrics}
       gradientType="purple"
-      cardFormat={summaryFormat}
     />
   );
 };

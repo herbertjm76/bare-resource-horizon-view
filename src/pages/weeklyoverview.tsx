@@ -14,7 +14,6 @@ const HEADER_HEIGHT = 56;
 
 const WeeklyOverview = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
-  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('simple');
   const [filters, setFilters] = useState({
     office: "all",
     country: "all",
@@ -52,10 +51,7 @@ const WeeklyOverview = () => {
           }} className="print:hidden" />
           <div className="flex-1 p-4 sm:p-6 bg-background">
             <div className="max-w-full mx-auto space-y-4">
-              <WeeklyOverviewHeader 
-                summaryFormat={summaryFormat}
-                setSummaryFormat={setSummaryFormat}
-              />
+              <WeeklyOverviewHeader />
               
               <WeekResourceControls 
                 selectedWeek={selectedWeek} 
@@ -69,7 +65,6 @@ const WeeklyOverview = () => {
                 <WeekResourceView 
                   selectedWeek={selectedWeek} 
                   filters={filters}
-                  summaryFormat={summaryFormat}
                 />
               </OfficeSettingsProvider>
             </div>

@@ -38,69 +38,35 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, utilizationRate, staffData);
   const isOverCapacity = capacityHours < 0;
 
-  // Calculate breakdown data
-  const optimalTeamMembers = Math.round(activeResources * 0.7);
-  const overutilizedMembers = Math.round(activeResources * 0.2);
-  const underutilizedMembers = activeResources - optimalTeamMembers - overutilizedMembers;
-
-  const inProgressProjects = Math.round(activeProjects * 0.6);
-  const planningProjects = Math.round(activeProjects * 0.3);
-  const completedProjects = activeProjects - inProgressProjects - planningProjects;
-
   const metrics = [
     {
       title: "Team Utilization",
       value: `${Math.round(utilizationRate)}%`,
-      icon: TrendingUp,
+      subtitle: timeRangeText,
       badgeText: utilizationStatus.label,
       badgeColor: utilizationStatus.color === 'destructive' ? 'red' : 
-                 utilizationStatus.color === 'default' ? 'green' : 'blue',
-      isGood: utilizationRate >= 70 && utilizationRate <= 85,
-      breakdowns: [
-        { label: 'Optimal', value: optimalTeamMembers, color: 'green' },
-        { label: 'Over', value: overutilizedMembers, color: 'red' },
-        { label: 'Under', value: underutilizedMembers, color: 'orange' }
-      ]
+                 utilizationStatus.color === 'default' ? 'green' : 'blue'
     },
     {
       title: isOverCapacity ? "Over Capacity" : "Available Capacity",
       value: `${Math.abs(capacityHours).toLocaleString()}h`,
       subtitle: timeRangeText,
-      icon: Clock,
       badgeText: isOverCapacity ? "Over Capacity" : undefined,
-      badgeColor: isOverCapacity ? "red" : undefined,
-      isGood: !isOverCapacity,
-      breakdowns: [
-        { label: 'Used', value: `${Math.round(utilizationRate)}%`, color: 'blue' },
-        { label: 'Available', value: `${100 - Math.round(utilizationRate)}%`, color: 'green' }
-      ]
+      badgeColor: isOverCapacity ? "red" : undefined
     },
     {
       title: "Active Projects",
       value: activeProjects,
       subtitle: activeResources > 0 
         ? `${(activeProjects / activeResources).toFixed(1)} per person` 
-        : 'No team members',
-      icon: Briefcase,
-      isGood: activeResources > 0 ? (activeProjects / activeResources) <= 3 : undefined,
-      breakdowns: [
-        { label: 'In Progress', value: inProgressProjects, color: 'blue' },
-        { label: 'Planning', value: planningProjects, color: 'orange' },
-        { label: 'Completed', value: completedProjects, color: 'green' }
-      ]
+        : 'No team members'
     },
     {
       title: "Team Size",
       value: activeResources,
-      icon: Users,
+      subtitle: "Active resources",
       badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
-      badgeColor: utilizationRate > 85 ? 'orange' : 'green',
-      isGood: activeResources > 0,
-      breakdowns: [
-        { label: 'Senior', value: Math.round(activeResources * 0.4), color: 'green' },
-        { label: 'Mid-level', value: Math.round(activeResources * 0.4), color: 'blue' },
-        { label: 'Junior', value: Math.round(activeResources * 0.2), color: 'orange' }
-      ]
+      badgeColor: utilizationRate > 85 ? 'orange' : 'green'
     }
   ];
 
@@ -120,7 +86,6 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       title="Executive Summary"
       timeRangeText={timeRangeText}
       metrics={metrics}
-      cardFormat="detailed"
     />
   );
 };

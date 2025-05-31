@@ -5,23 +5,20 @@ import { useWeeklyOverviewMetrics } from './WeeklyOverviewMetrics';
 
 interface WeeklyExecutiveSummaryProps {
   selectedWeek: Date;
-  summaryFormat: 'simple' | 'detailed';
 }
 
 export const WeeklyExecutiveSummary: React.FC<WeeklyExecutiveSummaryProps> = ({
-  selectedWeek,
-  summaryFormat
+  selectedWeek
 }) => {
   const { metrics } = useWeeklyOverviewMetrics({ selectedWeek });
 
-  console.log('WeeklyExecutiveSummary render:', { summaryFormat, metricsLength: metrics.length });
+  console.log('WeeklyExecutiveSummary render:', { metricsLength: metrics.length });
 
   return (
     <div className="print:hidden">
       <StandardizedExecutiveSummary
         metrics={metrics}
         gradientType="purple"
-        cardFormat={summaryFormat}
       />
     </div>
   );
