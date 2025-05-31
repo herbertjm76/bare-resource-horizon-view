@@ -11,15 +11,15 @@ export const FeaturesHeader = () => (
       </div>
       <div className="ml-4">
         <div className="inline-flex items-center px-3 py-1 bg-purple-100 rounded-full text-purple-600 font-semibold text-sm mb-1">
-          AI-Powered Excel Replacement
+          Smart Resource Management
         </div>
         <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
-          Excel + AI Intelligence
+          Excel Alternative with Intelligence
         </h2>
       </div>
     </div>
     <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-      The familiar resource planning you know, enhanced with AI that guides your business decisions.
+      The familiar resource planning you know, enhanced with insights that guide your business decisions.
     </p>
   </AnimatedSection>
 );

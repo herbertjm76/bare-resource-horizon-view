@@ -1,15 +1,26 @@
 
 import React from 'react';
-import { AlertTriangle, Brain, ArrowRight, Clock, CheckCircle, Zap } from 'lucide-react';
+import { CheckCircle, X, ArrowRight, BarChart3, Calendar, Users } from 'lucide-react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
-import { VisualCard, GradientOrbs, StatsVisualization } from '@/components/common/VisualElements';
+import { GradientOrbs } from '@/components/common/VisualElements';
 
 export const BenefitsComparison = () => {
-  const comparisonStats = [
-    { value: "5hrs", label: "Weekly Planning", icon: Clock },
-    { value: "0", label: "Hiring Mistakes", icon: CheckCircle },
-    { value: "10x", label: "Faster Insights", icon: Zap },
-    { value: "24/7", label: "AI Monitoring", icon: Brain }
+  const comparisons = [
+    {
+      traditional: "Spreadsheet chaos across multiple files",
+      bareresource: "Centralized resource planning dashboard",
+      icon: <BarChart3 className="w-5 h-5" />
+    },
+    {
+      traditional: "Manual capacity calculations",
+      bareresource: "Automated utilization tracking",
+      icon: <Calendar className="w-5 h-5" />
+    },
+    {
+      traditional: "Email updates about team changes",
+      bareresource: "Real-time team workload visibility",
+      icon: <Users className="w-5 h-5" />
+    }
   ];
 
   return (
@@ -18,71 +29,64 @@ export const BenefitsComparison = () => {
         <GradientOrbs />
         
         <div className="relative">
-          <div className="text-center mb-6">
+          <div className="text-center mb-8">
             <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
-              From Reactive to Proactive
+              Why Teams Choose BareResource
             </h3>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Move from reactive spreadsheet management to proactive resource planning
+            </p>
           </div>
           
-          <div className="grid lg:grid-cols-3 gap-6 items-center">
-            <AnimatedSection animation="fadeInLeft" delay={200}>
-              <VisualCard className="border-red-200 p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center">
-                    <AlertTriangle className="w-5 h-5 text-white" />
-                  </div>
-                  <h4 className="font-bold text-gray-900">With Excel</h4>
-                </div>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                    "We're overwhelmed!"
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                    "Why did we lose that client?"
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                    "Is the team burning out?"
-                  </li>
-                </ul>
-              </VisualCard>
-            </AnimatedSection>
-
-            <div className="flex justify-center">
-              <ArrowRight className="w-8 h-8 text-purple-600 animate-pulse" />
+          <div className="max-w-4xl mx-auto">
+            <div className="grid lg:grid-cols-3 gap-4 mb-6 text-center">
+              <div className="text-red-600 font-semibold">Traditional Methods</div>
+              <div></div>
+              <div className="text-green-600 font-semibold">With BareResource</div>
             </div>
-
-            <AnimatedSection animation="fadeInRight" delay={400}>
-              <VisualCard className="border-green-200 p-4">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
-                    <Brain className="w-5 h-5 text-white" />
+            
+            <div className="space-y-4">
+              {comparisons.map((item, index) => (
+                <AnimatedSection key={index} animation="fadeInUp" delay={index * 200}>
+                  <div className="grid lg:grid-cols-3 gap-4 items-center bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-white/50">
+                    <div className="flex items-center gap-3">
+                      <X className="w-5 h-5 text-red-500 flex-shrink-0" />
+                      <span className="text-gray-700 text-sm">{item.traditional}</span>
+                    </div>
+                    
+                    <div className="flex justify-center">
+                      <div className="hidden lg:flex items-center justify-center w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full">
+                        <ArrowRight className="w-4 h-4 text-white" />
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-gray-700 text-sm font-medium">{item.bareresource}</span>
+                    </div>
                   </div>
-                  <h4 className="font-bold text-gray-900">With BareResource AI</h4>
+                </AnimatedSection>
+              ))}
+            </div>
+            
+            <div className="mt-8 text-center">
+              <div className="inline-flex items-center gap-4 bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
+                <div className="flex gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">5hrs</div>
+                    <div className="text-xs text-gray-600">Saved Weekly</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">10x</div>
+                    <div className="text-xs text-gray-600">Faster Planning</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">100%</div>
+                    <div className="text-xs text-gray-600">Team Visibility</div>
+                  </div>
                 </div>
-                <ul className="space-y-2 text-sm text-gray-600">
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    "Need to hire more designers"
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    "Need more projects in pipeline"
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    "Team at high capacity"
-                  </li>
-                </ul>
-              </VisualCard>
-            </AnimatedSection>
-          </div>
-          
-          <div className="mt-8">
-            <h4 className="text-xl font-bold text-gray-900 mb-4 text-center">The Numbers Don't Lie</h4>
-            <StatsVisualization stats={comparisonStats} />
+              </div>
+            </div>
           </div>
         </div>
       </div>

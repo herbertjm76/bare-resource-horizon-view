@@ -3,7 +3,7 @@ import React from 'react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { GradientOrbs } from '@/components/common/VisualElements';
-import { Brain, TrendingUp, Zap, PlayCircle } from 'lucide-react';
+import { BarChart3, TrendingUp, Zap, PlayCircle } from 'lucide-react';
 
 const Hero = () => {
   const { elementRef: floatingRef, isVisible: floatingVisible } = useScrollAnimation();
@@ -21,7 +21,7 @@ const Hero = () => {
   const heroStats = [
     { value: "95%", label: "Time Saved", icon: Zap },
     { value: "10x", label: "Faster Planning", icon: TrendingUp },
-    { value: "100%", label: "AI Accuracy", icon: Brain }
+    { value: "100%", label: "Team Visibility", icon: BarChart3 }
   ];
 
   return (
@@ -35,8 +35,8 @@ const Hero = () => {
             <div className="space-y-6">
               <AnimatedSection animation="fadeInUp" delay={200}>
                 <div className="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 text-white text-sm font-medium">
-                  <Brain className="w-4 h-4 mr-2" />
-                  AI-Powered Team Management
+                  <BarChart3 className="w-4 h-4 mr-2" />
+                  Smart Team Management
                 </div>
               </AnimatedSection>
               
@@ -55,7 +55,7 @@ const Hero = () => {
               <AnimatedSection animation="fadeInUp" delay={600}>
                 <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
                   <p className="text-xl text-white/90 leading-relaxed">
-                    Stop wondering when to hire. Get AI alerts that tell you exactly when your team needs help.
+                    Replace spreadsheet chaos with visual resource planning. Get insights that tell you exactly when your team needs help.
                   </p>
                 </div>
               </AnimatedSection>
@@ -68,11 +68,11 @@ const Hero = () => {
                   onClick={() => scrollToSection('signup')}
                   className="bg-white text-purple-600 px-8 py-4 rounded-2xl font-semibold hover:bg-purple-50 transition-all duration-300 transform hover:scale-105 hover:-translate-y-1 shadow-xl hover:shadow-2xl"
                 >
-                  Get AI Team Insights Free
+                  Get Smart Team Insights Free
                 </button>
                 <button className="bg-white/15 backdrop-blur-sm text-white px-8 py-4 rounded-2xl border border-white/30 hover:bg-white/25 transition-all duration-300 font-semibold flex items-center justify-center gap-3">
                   <PlayCircle className="w-5 h-5" />
-                  See AI in Action
+                  See Dashboard Demo
                 </button>
               </div>
             </AnimatedSection>
@@ -82,7 +82,7 @@ const Hero = () => {
           <AnimatedSection animation="fadeInRight" delay={600}>
             <div className="relative flex justify-center">
               <div className="relative">
-                {/* Generic AI insight cards */}
+                {/* Insight cards showing actual dashboard features */}
                 <div 
                   ref={floatingRef}
                   className={`absolute -top-8 -left-8 bg-gradient-to-br from-white/95 to-white/90 backdrop-blur-sm p-4 rounded-2xl shadow-2xl z-10 transition-all duration-700 ${
@@ -91,10 +91,10 @@ const Hero = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">AI</span>
+                      <TrendingUp className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-green-600">Hire more designers</div>
+                      <div className="text-lg font-bold text-green-600">85% Utilization</div>
                       <div className="text-xs text-gray-600">Team capacity alert</div>
                     </div>
                   </div>
@@ -105,11 +105,11 @@ const Hero = () => {
                 }`}>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-xl flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">AI</span>
+                      <BarChart3 className="w-4 h-4 text-white" />
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-blue-600">Need more projects</div>
-                      <div className="text-xs text-gray-600">Pipeline warning</div>
+                      <div className="text-lg font-bold text-blue-600">Q2 Pipeline Low</div>
+                      <div className="text-xs text-gray-600">Project capacity warning</div>
                     </div>
                   </div>
                 </div>
@@ -122,7 +122,7 @@ const Hero = () => {
                       <span className="text-white text-xs font-bold">!</span>
                     </div>
                     <div>
-                      <div className="text-sm font-semibold text-orange-600">High capacity</div>
+                      <div className="text-sm font-semibold text-orange-600">Workload Alert</div>
                     </div>
                   </div>
                 </div>
@@ -131,7 +131,7 @@ const Hero = () => {
                 <div className="bg-white/20 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/30">
                   <img 
                     src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
-                    alt="BareResource Dashboard with AI Insights" 
+                    alt="BareResource Dashboard with Smart Insights" 
                     className="w-full rounded-2xl shadow-2xl max-w-md mx-auto"
                   />
                 </div>

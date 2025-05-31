@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { GradientOrbs } from '@/components/common/VisualElements';
-import { FeaturesHeader, FeaturesGrid, PremiumFeatures } from './features';
+import { FeaturesHeader, FeaturesGrid } from './features';
 
 const Features = () => {
   return (
@@ -11,7 +11,6 @@ const Features = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <FeaturesHeader />
         <FeaturesGrid />
-        <PremiumFeatures />
       </div>
     </section>
   );

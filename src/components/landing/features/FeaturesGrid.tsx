@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Brain, TrendingUp, FileSpreadsheet, Calendar } from 'lucide-react';
+import { Calendar, TrendingUp, FileSpreadsheet, Users } from 'lucide-react';
 import { useStaggeredAnimation } from '@/hooks/useScrollAnimation';
 import { FeatureCard } from './FeatureCard';
 
@@ -9,27 +9,25 @@ export const FeaturesGrid = () => {
 
   const features = [
     {
-      icon: <Brain className="w-8 h-8 text-purple-600" />,
-      title: "AI Business Insights",
-      description: "Get alerts when your team needs expansion or when utilization drops below optimal levels.",
-      highlight: true,
-      premium: true
+      icon: <Calendar className="w-8 h-8 text-purple-600" />,
+      title: "Resource Planning Grid",
+      description: "Visual team planning with clear project allocation across weeks and months.",
+      highlight: true
     },
     {
       icon: <TrendingUp className="w-8 h-8 text-purple-600" />,
-      title: "Smart Hiring Alerts",
-      description: "AI analyzes trends and tells you when your team needs expansion.",
-      premium: true
+      title: "Smart Insights",
+      description: "Dashboard analytics that help you understand team utilization and capacity trends."
     },
     {
       icon: <FileSpreadsheet className="w-8 h-8 text-purple-600" />,
-      title: "Visual Resource Grid",
-      description: "See your team's workload at a glance with intuitive planning."
+      title: "Project Management",
+      description: "Track projects, stages, and fees with integrated resource allocation."
     },
     {
-      icon: <Calendar className="w-8 h-8 text-purple-600" />,
-      title: "Smart Scheduling",
-      description: "Drag and drop to allocate people to projects."
+      icon: <Users className="w-8 h-8 text-purple-600" />,
+      title: "Team Overview",
+      description: "Monitor team workload, annual leave, and availability at a glance."
     }
   ];
 
@@ -42,7 +40,6 @@ export const FeaturesGrid = () => {
           title={feature.title} 
           description={feature.description}
           highlight={feature.highlight}
-          premium={feature.premium}
           index={index}
           isVisible={visibleItems.includes(index)}
         />

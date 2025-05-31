@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Brain } from 'lucide-react';
 import { VisualCard } from '@/components/common/VisualElements';
 
 interface BenefitsCardProps {
@@ -9,7 +8,6 @@ interface BenefitsCardProps {
   description: string;
   example: string;
   color: string;
-  premium?: boolean;
   stats: string;
   index: number;
   isVisible: boolean;
@@ -21,7 +19,6 @@ export const BenefitsCard = ({
   description, 
   example, 
   color, 
-  premium, 
   stats, 
   index, 
   isVisible 
@@ -33,15 +30,6 @@ export const BenefitsCard = ({
     style={{ transitionDelay: `${index * 150}ms` }}
   >
     <VisualCard className="h-full group-hover:scale-105 p-4">
-      {premium && (
-        <div className="absolute -top-2 -right-2">
-          <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 px-2 py-1 rounded-full font-bold text-xs flex items-center gap-1">
-            <Brain className="w-3 h-3" />
-            AI
-          </div>
-        </div>
-      )}
-      
       <div className="relative">
         <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${color} flex items-center justify-center mb-3 group-hover:scale-110 transition-all duration-300`}>
           <div className="text-white">
