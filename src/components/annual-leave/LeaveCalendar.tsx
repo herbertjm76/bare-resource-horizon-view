@@ -81,8 +81,8 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
   };
   
   return (
-    <div className="overflow-x-auto annual-leave-calendar">
-      <Table>
+    <div className="annual-leave-grid-container">
+      <Table className="annual-leave-calendar">
         <TableHeader className="sticky top-0 bg-background z-10">
           <TableRow>
             <TableHead className="sticky left-0 bg-background z-10 min-w-[180px] border-r">Member</TableHead>
