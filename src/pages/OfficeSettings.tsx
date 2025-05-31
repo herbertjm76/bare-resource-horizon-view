@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Folder, Layers, MapPin, Briefcase, Currency, Calendar, AlertCircle, RefreshCw, Loader2, Building } from 'lucide-react';
+import { Folder, Layers, MapPin, Briefcase, Currency, Calendar, AlertCircle, RefreshCw, Loader2, Building, Settings, Cog } from 'lucide-react';
 import { CountriesTab } from '@/components/settings/CountriesTab';
 import { StagesTab } from '@/components/settings/StagesTab';
 import { LocationsTab } from '@/components/settings/LocationsTab';
@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCompany } from '@/context/CompanyContext';
 import { AppHeader } from '@/components/AppHeader';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuthorization } from '@/hooks/useAuthorization';
@@ -112,17 +113,52 @@ const OfficeSettings = () => {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold tracking-tight text-[#6E59A5]">Office Settings</h1>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleRefresh}
-                  className="gap-2 h-9"
-                >
-                  <RefreshCw className="h-4 w-4" /> 
-                  Refresh Data
-                </Button>
+              {/* Modern Header Section */}
+              <div className="space-y-6 mb-6">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                  <div className="space-y-2">
+                    <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                      <Settings className="h-8 w-8 text-brand-violet" />
+                      Office Settings
+                    </h1>
+                    <p className="text-muted-foreground text-lg">
+                      Configure and manage your office settings and preferences
+                    </p>
+                  </div>
+                  
+                  {/* Quick Stats Cards */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
+                      <div className="flex items-center gap-2">
+                        <Cog className="h-4 w-4 text-brand-violet" />
+                        <div className="text-sm">
+                          <span className="font-semibold text-brand-violet">7</span>
+                          <span className="text-muted-foreground ml-1">Categories</span>
+                        </div>
+                      </div>
+                    </Card>
+                    
+                    <Card className="px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
+                      <div className="flex items-center gap-2">
+                        <Building className="h-4 w-4 text-emerald-600" />
+                        <div className="text-sm">
+                          <span className="font-semibold text-emerald-600">{company?.name || 'Company'}</span>
+                          <span className="text-muted-foreground ml-1">Active</span>
+                        </div>
+                      </div>
+                    </Card>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={handleRefresh}
+                      className="gap-2 h-9"
+                    >
+                      <RefreshCw className="h-4 w-4" /> 
+                      Refresh
+                    </Button>
+                  </div>
+                </div>
               </div>
               
               <OfficeSettingsProvider>

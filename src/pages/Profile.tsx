@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { toast } from "sonner";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
+import { User, Shield, Mail, Building2 } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
@@ -133,9 +135,54 @@ export default function Profile() {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold tracking-tight text-brand-primary">My Profile</h1>
+              {/* Modern Header Section */}
+              <div className="space-y-6 mb-6">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                  <div className="space-y-2">
+                    <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                      <User className="h-8 w-8 text-brand-violet" />
+                      My Profile
+                    </h1>
+                    <p className="text-muted-foreground text-lg">
+                      Manage your personal information and account settings
+                    </p>
+                  </div>
+                  
+                  {/* Quick Stats Cards */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-brand-violet" />
+                        <div className="text-sm">
+                          <span className="font-semibold text-brand-violet">Verified</span>
+                          <span className="text-muted-foreground ml-1">Email</span>
+                        </div>
+                      </div>
+                    </Card>
+                    
+                    <Card className="px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
+                      <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-emerald-600" />
+                        <div className="text-sm">
+                          <span className="font-semibold text-emerald-600">Secure</span>
+                          <span className="text-muted-foreground ml-1">Account</span>
+                        </div>
+                      </div>
+                    </Card>
+                    
+                    <Card className="px-4 py-2 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border-blue-500/20">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-blue-600" />
+                        <div className="text-sm">
+                          <span className="font-semibold text-blue-600">{company?.name || 'Company'}</span>
+                          <span className="text-muted-foreground ml-1">Member</span>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                </div>
               </div>
+
               <Card className="w-full">
                 <CardHeader className="pb-2">
                   <CardTitle>Edit Profile</CardTitle>
