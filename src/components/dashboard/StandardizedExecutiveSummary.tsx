@@ -111,23 +111,17 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
           
           return (
             <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/25 hover:shadow-elevation-3`}>
-              <CardContent className="p-3">
+              <CardContent className="p-2">
                 <div className="text-center">
                   {/* Title using standardized typography */}
-                  <Typography variant="body-sm" className="font-semibold text-white/90 mb-2">
+                  <Typography variant="body-sm" className="font-semibold text-white/90">
                     {metric.title}
                   </Typography>
                   
                   {/* Value - now bold and extra large */}
-                  <div className="text-4xl font-bold text-white mb-2">
+                  <div className="text-4xl font-bold text-white">
                     {metric.value}
                   </div>
-                  
-                  {metric.subtitle && (
-                    <Typography variant="body-xs" className="text-white/70 mb-2">
-                      {metric.subtitle}
-                    </Typography>
-                  )}
                   
                   {/* Always show a badge */}
                   <Badge 
