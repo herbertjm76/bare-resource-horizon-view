@@ -19,7 +19,6 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuthorization } from '@/hooks/useAuthorization';
-import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
 
 const tabBarClass =
   "w-full mb-6 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-7 gap-2 flex-nowrap rounded-none bg-transparent p-0";
@@ -111,15 +110,15 @@ const OfficeSettings = () => {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
+          <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
-              <div className="flex justify-between items-start">
-                <ModernDashboardHeader />
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold tracking-tight text-[#6E59A5]">Office Settings</h1>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={handleRefresh}
-                  className="gap-2 h-9 mt-2"
+                  className="gap-2 h-9"
                 >
                   <RefreshCw className="h-4 w-4" /> 
                   Refresh Data

@@ -5,6 +5,7 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { ProjectsList } from '@/components/projects/ProjectsList';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
+import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
 import { Button } from '@/components/ui/button';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
@@ -27,18 +28,6 @@ const Projects = () => {
 
   // Calculate completion rate
   const completionRate = totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0;
-
-  // Calculate breakdown data
-  const inProgressProjects = projects.filter(p => p.status === 'In Progress').length;
-  const planningProjects = projects.filter(p => p.status === 'Planning').length;
-  const onHoldProjects = projects.filter(p => p.status === 'On Hold').length;
-
-  const recentProjects = Math.round(totalProjects * 0.3);
-  const thisQuarterProjects = Math.round(totalProjects * 0.4);
-  const olderProjects = totalProjects - recentProjects - thisQuarterProjects;
-
-  const primaryOffices = Math.min(totalOffices, 3);
-  const secondaryOffices = Math.max(0, totalOffices - 3);
 
   const metrics = [
     {
@@ -83,9 +72,11 @@ const Projects = () => {
           <div className="flex-1 p-6 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
             <div className="max-w-6xl mx-auto space-y-8">
               <div>
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                  <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Projects Overview</h1>
-                </div>
+                <ModernDashboardHeader
+                  totalTeamMembers={0}
+                  totalActiveProjects={totalActiveProjects}
+                  totalOffices={totalOffices}
+                />
                 <StandardizedExecutiveSummary
                   metrics={metrics}
                   gradientType="purple"

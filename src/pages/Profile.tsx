@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,6 @@ import { toast } from "sonner";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
-import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
 
 const HEADER_HEIGHT = 56;
 
@@ -133,10 +131,11 @@ export default function Profile() {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
+          <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
-              <ModernDashboardHeader />
-              
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold tracking-tight text-brand-primary">My Profile</h1>
+              </div>
               <Card className="w-full">
                 <CardHeader className="pb-2">
                   <CardTitle>Edit Profile</CardTitle>

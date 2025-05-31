@@ -5,7 +5,7 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
 import { WeekResourceControls } from '@/components/week-resourcing/WeekResourceControls';
-import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
+import { WeeklyOverviewHeader } from '@/components/weekly-overview/WeeklyOverviewHeader';
 import { startOfWeek, format } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { Toaster } from 'sonner';
@@ -49,9 +49,9 @@ const WeeklyOverview = () => {
           <div style={{
             height: HEADER_HEIGHT
           }} className="print:hidden" />
-          <div className="flex-1 p-4 sm:p-6 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
+          <div className="flex-1 p-4 sm:p-6 bg-background">
             <div className="max-w-full mx-auto space-y-4">
-              <ModernDashboardHeader />
+              <WeeklyOverviewHeader />
               
               <WeekResourceControls 
                 selectedWeek={selectedWeek} 
