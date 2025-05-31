@@ -1,17 +1,6 @@
-
 import React from 'react';
 import { format, isSunday, isFirstDayOfMonth } from 'date-fns';
-
-interface DayInfo {
-  date: Date;
-  label: string;
-  dayName: string;
-  monthLabel: string;
-  isWeekend: boolean;
-  isSunday: boolean;
-  isFirstOfMonth: boolean;
-  isEndOfWeek: boolean; // Added for week separators
-}
+import { DayInfo } from './types';
 
 interface GridDaysHeaderProps {
   days: DayInfo[];

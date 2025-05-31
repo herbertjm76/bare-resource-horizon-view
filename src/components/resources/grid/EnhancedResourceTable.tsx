@@ -2,17 +2,7 @@
 import React from 'react';
 import { ProjectRow } from '@/components/resources/ProjectRow';
 import { GridDaysHeader } from './GridDaysHeader';
-
-interface DayInfo {
-  date: Date;
-  label: string;
-  dayName: string;
-  monthLabel: string;
-  isWeekend: boolean;
-  isSunday: boolean;
-  isFirstOfMonth: boolean;
-  isEndOfWeek?: boolean;
-}
+import { DayInfo } from './types';
 
 interface EnhancedResourceTableProps {
   projects: any[];

@@ -1,17 +1,6 @@
-
 import { useMemo } from 'react';
 import { format, addDays, isWeekend, isSunday, startOfMonth, eachDayOfInterval, addWeeks } from 'date-fns';
-
-interface DayInfo {
-  date: Date;
-  label: string;
-  dayName: string;
-  monthLabel: string;
-  isWeekend: boolean;
-  isSunday: boolean;
-  isFirstOfMonth: boolean;
-  isEndOfWeek: boolean; // Added to mark end of weeks
-}
+import { DayInfo } from '../grid/types';
 
 interface DisplayOptions {
   showWeekends: boolean;
