@@ -1,24 +1,26 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { MapPin, Building2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCompany } from '@/context/CompanyContext';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 
-// Fix for default markers in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// Lazy load the map component to avoid SSR issues
+const LazyMapComponent = React.lazy(() => import('./map/MapComponent'));
 
 export const OfficeOverviewCard = () => {
   const { company } = useCompany();
+  const [showMap, setShowMap] = useState(false);
+
+  // Initialize map after component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowMap(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   // Mock coordinates for demonstration - in a real app, these would come from the company data
   const officeCoordinates = {
@@ -86,34 +88,30 @@ export const OfficeOverviewCard = () => {
             {/* Map Section - 3/4 width */}
             <div className="col-span-3">
               <div className="h-full bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 overflow-hidden">
-                <MapContainer
-                  center={[officeCoordinates.lat, officeCoordinates.lng]}
-                  zoom={13}
-                  style={{ height: '100%', width: '100%' }}
-                  className="rounded-lg"
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  />
-                  <Marker position={[officeCoordinates.lat, officeCoordinates.lng]}>
-                    <Popup>
-                      <div className="text-center">
-                        <strong>{company?.name || 'Your Company'}</strong>
-                        <br />
-                        {company?.address && (
-                          <>
-                            {company.address}
-                            <br />
-                          </>
-                        )}
-                        {company?.city && company?.country && (
-                          <>{company.city}, {company.country}</>
-                        )}
+                {showMap ? (
+                  <React.Suspense 
+                    fallback={
+                      <div className="h-full w-full flex items-center justify-center">
+                        <div className="text-white/60 flex items-center gap-2">
+                          <MapPin className="h-5 w-5 animate-pulse" />
+                          <span>Loading map...</span>
+                        </div>
                       </div>
-                    </Popup>
-                  </Marker>
-                </MapContainer>
+                    }
+                  >
+                    <LazyMapComponent 
+                      coordinates={officeCoordinates}
+                      company={company}
+                    />
+                  </React.Suspense>
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center">
+                    <div className="text-white/60 flex items-center gap-2">
+                      <MapPin className="h-5 w-5" />
+                      <span>Initializing map...</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
