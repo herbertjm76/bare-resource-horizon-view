@@ -4,6 +4,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
+import { HerbieFloatingButton } from '@/components/dashboard/HerbieFloatingButton';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 import AuthGuard from '@/components/AuthGuard';
 
@@ -25,6 +26,7 @@ export const DashboardLayout: React.FC = () => {
                 </div>
               </div>
             </div>
+            <HerbieFloatingButton />
           </div>
         </SidebarProvider>
       </OfficeSettingsProvider>
