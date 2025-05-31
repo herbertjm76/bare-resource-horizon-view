@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ModernResourcesHeader } from '@/components/resources/ModernResourcesHeader';
-import { ModernResourceGridContainer } from '@/components/resources/ModernResourceGridContainer';
+import { EnhancedResourceGrid } from '@/components/resources/EnhancedResourceGrid';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 import { ProjectResourcingFilters } from './ProjectResourcingFilters';
 
@@ -66,15 +66,19 @@ export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> =
   return (
     <div className="flex flex-col max-w-full bg-gradient-to-br from-gray-50 to-white min-h-screen">
       <OfficeSettingsProvider>
-        <ModernResourceGridContainer
-          startDate={selectedMonth}
-          periodToShow={filters.periodToShow}
-          filters={{
-            ...filters,
-            searchTerm
-          }}
-          displayOptions={displayOptions}
-        />
+        <div className="mt-6 w-full max-w-full overflow-hidden">
+          <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
+            <EnhancedResourceGrid 
+              startDate={selectedMonth}
+              periodToShow={filters.periodToShow}
+              filters={{
+                ...filters,
+                searchTerm
+              }}
+              displayOptions={displayOptions}
+            />
+          </div>
+        </div>
       </OfficeSettingsProvider>
     </div>
   );
