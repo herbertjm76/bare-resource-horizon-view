@@ -13,10 +13,9 @@ export const OfficeSettingsContent: React.FC<OfficeSettingsContentProps> = ({ on
   return (
     <div className="flex-1 p-4 sm:p-8 bg-background">
       <div className="max-w-6xl mx-auto space-y-8">
-        <OfficeSettingsHeader onRefresh={onRefresh} />
-        <OfficeOverviewCard />
-        
         <OfficeSettingsProvider>
+          <OfficeSettingsHeader onRefresh={onRefresh} />
+          <OfficeOverviewCard />
           <OfficeSettingsTabs />
         </OfficeSettingsProvider>
       </div>
