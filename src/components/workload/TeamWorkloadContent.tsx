@@ -80,10 +80,6 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
 
   return (
     <div className="mx-auto space-y-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-        <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Team Workload</h1>
-      </div>
-
       <TeamWorkloadHeader
         totalMembers={headerStats.totalMembers}
         totalCapacity={headerStats.totalCapacity}
