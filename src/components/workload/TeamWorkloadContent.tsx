@@ -4,7 +4,6 @@ import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { TeamAnnualLeaveFilters } from '@/components/annual-leave/TeamAnnualLeaveFilters';
 import { WorkloadCalendar } from '@/components/workload/WorkloadCalendar';
 import { WorkloadSummary } from '@/components/workload/WorkloadSummary';
-import { TeamWorkloadHeader } from '@/components/workload/TeamWorkloadHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
 import { useWorkloadData, WorkloadBreakdown } from '@/components/workload/hooks/useWorkloadData';
@@ -52,41 +51,8 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   // Use the enhanced workload data hook with the selected week
   const { workloadData, isLoadingWorkload } = useWorkloadData(selectedWeek, filteredMembers);
 
-  // Calculate header statistics
-  const calculateHeaderStats = () => {
-    const totalMembers = filteredMembers.length;
-    const totalCapacity = filteredMembers.reduce((sum, member) => 
-      sum + ((member.weekly_capacity || 40) * periodToShow), 0
-    );
-    
-    let totalAllocated = 0;
-    filteredMembers.forEach(member => {
-      const memberData = workloadData[member.id] || {};
-      const memberTotal = Object.values(memberData).reduce((sum, breakdown) => sum + breakdown.total, 0);
-      totalAllocated += memberTotal;
-    });
-    
-    const utilizationRate = totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
-    
-    return {
-      totalMembers,
-      totalCapacity,
-      utilizationRate,
-      timeRange: `${periodToShow} weeks`
-    };
-  };
-
-  const headerStats = calculateHeaderStats();
-
   return (
     <div className="mx-auto space-y-4">
-      <TeamWorkloadHeader
-        totalMembers={headerStats.totalMembers}
-        totalCapacity={headerStats.totalCapacity}
-        timeRange={headerStats.timeRange}
-        utilizationRate={headerStats.utilizationRate}
-      />
-      
       {/* Enhanced Summary Section */}
       {!isLoading && !isLoadingWorkload && (
         <WorkloadSummary 
