@@ -46,10 +46,6 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
 }) => {
   return (
     <div className="mx-auto space-y-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
-        <h1 className="text-2xl font-bold tracking-tight text-brand-primary">Team Annual Leave</h1>
-      </div>
-
       {/* Annual Leave Insights */}
       <AnnualLeaveInsights 
         teamMembers={allMembers} 

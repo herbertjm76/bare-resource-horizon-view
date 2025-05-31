@@ -9,7 +9,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { useTeamFilters } from '@/hooks/useTeamFilters';
 import { TeamWorkloadContent } from '@/components/workload/TeamWorkloadContent';
 import { startOfWeek, format, addWeeks, subWeeks } from 'date-fns';
-import { BarChart3 } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
@@ -80,7 +80,7 @@ const TeamWorkload = () => {
               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                 <div className="space-y-2">
                   <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                    <BarChart3 className="h-8 w-8 text-brand-violet" />
+                    <Calendar className="h-8 w-8 text-brand-violet" />
                     Team Workload
                   </h1>
                 </div>
