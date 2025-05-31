@@ -1,5 +1,4 @@
 
-
 import React, { useEffect, useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -7,7 +6,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { useUserSession } from '@/hooks/useUserSession';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersRealtime } from '@/hooks/useTeamMembersRealtime';
-import { ModernTeamMembersHeader } from '@/components/team-members/ModernTeamMembersHeader';
+import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
 import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -210,11 +209,10 @@ const TeamMembersContent = () => {
   return (
     <div className="flex-1 p-4 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
       <div className="max-w-6xl mx-auto space-y-8">
-        <ModernTeamMembersHeader
-          totalMembers={totalMembers}
-          totalActiveMembers={totalActiveMembers}
-          totalDepartments={totalDepartments}
-          totalLocations={totalLocations}
+        <ModernDashboardHeader
+          totalTeamMembers={totalMembers}
+          totalActiveProjects={0}
+          totalOffices={totalLocations}
         />
         
         <TeamMemberContent
@@ -248,4 +246,3 @@ const TeamMembersPage = () => {
 };
 
 export default TeamMembersPage;
-

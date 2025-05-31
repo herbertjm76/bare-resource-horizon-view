@@ -3,6 +3,7 @@ import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
+import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
 
 const HEADER_HEIGHT = 56;
 
@@ -16,11 +17,10 @@ const Help = () => {
         <div className="flex-1 flex flex-col">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background">
+          <div className="flex-1 p-4 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
             <div className="max-w-6xl mx-auto space-y-8">
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Help & Support</h1>
-              </div>
+              <ModernDashboardHeader />
+              
               <div className="border rounded-lg p-6 bg-card shadow-sm">
                 <h2 className="text-xl font-semibold mb-4">Need assistance?</h2>
                 <p className="text-muted-foreground mb-4">
