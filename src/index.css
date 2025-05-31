@@ -39,12 +39,30 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    /* Centralized brand colors */
+    /* Enhanced brand colors with CSS custom properties */
     --brand-primary: 111 75 246;
     --brand-violet: 111 75 246;
     --brand-violet-light: 236 236 251;
     --brand-gray: 142 145 150;
     --brand-border: 240 240 244;
+    
+    /* Semantic color tokens */
+    --text-primary: 31 41 55;
+    --text-secondary: 107 114 128;
+    --text-tertiary: 156 163 175;
+    --text-inverse: 255 255 255;
+    --text-brand: 111 75 246;
+    
+    --bg-primary: 255 255 255;
+    --bg-secondary: 249 250 251;
+    --bg-tertiary: 243 244 246;
+    --bg-accent: 236 236 251;
+    --bg-inverse: 31 41 55;
+    
+    --border-primary: 229 231 235;
+    --border-secondary: 209 213 219;
+    --border-accent: 111 75 246;
+    --border-focus: 99 102 241;
   }
 
   .dark {
@@ -87,48 +105,138 @@
   * {
     @apply border-border;
   }
-  body {
-    @apply bg-background text-foreground;
+  
+  html {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-variation-settings: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
-  /* Global scrollbar styling - Purple-gray theme */
+  body {
+    @apply bg-background text-foreground;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+  
+  /* Enhanced typography base styles */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+  
+  p {
+    @apply leading-normal;
+  }
+  
+  /* Improved scrollbar styling with design tokens */
   ::-webkit-scrollbar {
     width: 12px;
     height: 12px;
   }
   
   ::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: rgb(var(--bg-secondary));
     border-radius: 6px;
   }
   
   ::-webkit-scrollbar-thumb {
-    background: #94a3b8;
+    background: rgb(var(--text-tertiary));
     border-radius: 6px;
-    border: 2px solid #f1f5f9;
+    border: 2px solid rgb(var(--bg-secondary));
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
+    background: rgb(var(--text-secondary));
   }
   
   ::-webkit-scrollbar-corner {
-    background: #f1f5f9;
+    background: rgb(var(--bg-secondary));
   }
   
   /* Firefox scrollbar styling */
   html {
     scrollbar-width: thin;
-    scrollbar-color: #94a3b8 #f1f5f9;
+    scrollbar-color: rgb(var(--text-tertiary)) rgb(var(--bg-secondary));
+  }
+  
+  /* Focus management for better accessibility */
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-border-focus;
+  }
+  
+  /* Selection styling */
+  ::selection {
+    background-color: rgb(var(--brand-violet) / 0.2);
+    color: rgb(var(--text-primary));
   }
 }
 
-/* Hero gradient background */
-.bg-hero {
-  background: linear-gradient(135deg, #6E59A5 0%, #895CF7 25%, #5669F7 75%, #E64FC4 100%);
+/* Enhanced utility classes with design tokens */
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, rgb(var(--brand-primary)), rgb(var(--brand-violet)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .shadow-glow {
+    box-shadow: 0 0 20px rgb(var(--brand-violet) / 0.3);
+  }
+
+  .border-gradient {
+    border: 1px solid;
+    border-image: linear-gradient(135deg, rgb(var(--brand-primary)), rgb(var(--brand-violet))) 1;
+  }
+  
+  /* Typography utilities */
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  
+  /* Animation utilities */
+  .animate-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .animate-out {
+    animation: fadeOut 0.3s ease-out;
+  }
 }
 
-/* Custom animations for landing page */
+/* Hero gradient background using design tokens */
+.bg-hero {
+  background: linear-gradient(135deg, rgb(var(--brand-primary)) 0%, rgb(var(--brand-violet)) 100%);
+}
+
+/* Enhanced animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
 @keyframes float {
   0%, 100% {
     transform: translateY(0px);
@@ -144,21 +252,4 @@
 
 .animation-delay-1000 {
   animation-delay: 1s;
-}
-
-/* Utility classes */
-.text-gradient {
-  background: linear-gradient(135deg, #6E59A5, #895CF7, #5669F7, #E64FC4);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.shadow-glow {
-  box-shadow: 0 0 20px rgba(142, 101, 245, 0.3);
-}
-
-.border-gradient {
-  border: 1px solid;
-  border-image: linear-gradient(135deg, #6E59A5, #895CF7, #5669F7, #E64FC4) 1;
 }
