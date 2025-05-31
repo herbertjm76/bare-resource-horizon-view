@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { MapPin, Building2, Upload } from 'lucide-react';
 import { useCompany } from '@/context/CompanyContext';
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -22,6 +23,7 @@ const MapComponent = React.lazy(() =>
 
 export const OfficeOverviewCard = () => {
   const { company, refreshCompany } = useCompany();
+  const { locations } = useOfficeSettings();
   const [showMap, setShowMap] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -158,6 +160,11 @@ export const OfficeOverviewCard = () => {
                       {company.city}, {company.country}
                     </p>
                   )}
+                  {locations && locations.length > 0 && (
+                    <p className="text-xs text-white/70 mt-2">
+                      {locations.length} office location{locations.length > 1 ? 's' : ''}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -177,7 +184,7 @@ export const OfficeOverviewCard = () => {
                     }
                   >
                     <MapComponent 
-                      coordinates={officeCoordinates}
+                      locations={locations || []}
                       company={company}
                     />
                   </React.Suspense>
