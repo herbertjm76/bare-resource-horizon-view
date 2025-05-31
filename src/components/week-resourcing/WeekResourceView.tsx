@@ -4,7 +4,7 @@ import { ResourceTableLoadingState } from '@/components/weekly-overview/componen
 import { ResourceTableErrorState } from '@/components/weekly-overview/components/ResourceTableErrorState';
 import { EmptyResourceState } from '@/components/weekly-overview/components/EmptyResourceState';
 import { ResourceTable } from '@/components/week-resourcing/ResourceTable';
-import { WeekResourceSummary } from '@/components/week-resourcing/WeekResourceSummary';
+import { WeeklyExecutiveSummary } from '@/components/weekly-overview/WeeklyExecutiveSummary';
 import { useWeekResourceData } from './hooks/useWeekResourceData';
 import './week-resourcing.css';
 
@@ -46,16 +46,10 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     return <EmptyResourceState />;
   }
 
-  // Convert weekStartDate string to Date object for WeekResourceSummary
-  const weekStartDateAsDate = new Date(weekStartDate);
-
   return (
     <>
-      <WeekResourceSummary 
-        projects={projects}
-        members={members}
-        allocations={weekAllocations}
-        weekStartDate={weekStartDateAsDate}
+      <WeeklyExecutiveSummary 
+        selectedWeek={selectedWeek}
         summaryFormat={summaryFormat}
       />
       
