@@ -5,12 +5,9 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
 import { WeekResourceControls } from '@/components/week-resourcing/WeekResourceControls';
-import { WeeklyExecutiveSummary } from '@/components/weekly-overview/WeeklyExecutiveSummary';
-import { StandardizedPageLayout } from '@/components/dashboard/StandardizedPageLayout';
-import { calculateWeeklyOverviewMetrics } from '@/components/dashboard/utils/metricsCalculations';
+import { WeeklyOverviewHeader } from '@/components/weekly-overview/WeeklyOverviewHeader';
 import { startOfWeek, format } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
-import { Calendar } from 'lucide-react';
 import { Toaster } from 'sonner';
 
 const HEADER_HEIGHT = 56;
@@ -38,9 +35,6 @@ const WeeklyOverview = () => {
       [key]: value
     }));
   };
-
-  // Calculate metrics for the page
-  const metrics = calculateWeeklyOverviewMetrics(selectedWeek);
   
   return (
     <SidebarProvider>
@@ -56,28 +50,24 @@ const WeeklyOverview = () => {
             height: HEADER_HEIGHT
           }} className="print:hidden" />
           <div className="flex-1 p-4 sm:p-6 bg-background">
-            <StandardizedPageLayout
-              title="Weekly Resource Overview"
-              icon={<Calendar className="h-8 w-8 text-brand-violet" />}
-              metrics={metrics}
-              cardTitle="Resource Planning"
-              actions={
-                <WeekResourceControls 
-                  selectedWeek={selectedWeek} 
-                  setSelectedWeek={setSelectedWeek} 
-                  weekLabel={weekLabel} 
-                  filters={filters} 
-                  onFilterChange={handleFilterChange} 
-                />
-              }
-            >
+            <div className="max-w-full mx-auto space-y-4">
+              <WeeklyOverviewHeader selectedWeek={selectedWeek} />
+              
+              <WeekResourceControls 
+                selectedWeek={selectedWeek} 
+                setSelectedWeek={setSelectedWeek} 
+                weekLabel={weekLabel} 
+                filters={filters} 
+                onFilterChange={handleFilterChange} 
+              />
+              
               <OfficeSettingsProvider>
                 <WeekResourceView 
                   selectedWeek={selectedWeek} 
                   filters={filters}
                 />
               </OfficeSettingsProvider>
-            </StandardizedPageLayout>
+            </div>
           </div>
         </div>
       </div>
