@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LayoutDashboard, Users, Building2 } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, BarChart3 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useCompany } from '@/context/CompanyContext';
 
