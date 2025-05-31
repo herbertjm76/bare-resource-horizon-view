@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart3, Users, Building2 } from 'lucide-react';
+import { LayoutDashboard, Users, Building2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useCompany } from '@/context/CompanyContext';
 
@@ -26,7 +26,7 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div className="space-y-2">
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-            <BarChart3 className="h-8 w-8 text-brand-violet" />
+            <LayoutDashboard className="h-8 w-8 text-brand-violet" />
             {companyName} Dashboard
           </h1>
         </div>
