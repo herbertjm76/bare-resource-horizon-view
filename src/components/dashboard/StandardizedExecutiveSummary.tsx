@@ -1,34 +1,39 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Typography } from "@/components/ui/typography";
 
-interface SummaryMetric {
+interface Metric {
   title: string;
   value: string | number;
   subtitle?: string;
   badgeText?: string;
   badgeColor?: string;
-  isGood?: boolean;
 }
-
-type GradientType = 'purple' | 'blue' | 'emerald' | 'violet';
 
 interface StandardizedExecutiveSummaryProps {
   title?: string;
   timeRangeText?: string;
-  metrics: SummaryMetric[];
-  gradientType?: GradientType;
-  cardOpacity?: number;
+  metrics: Metric[];
+  gradientType?: 'blue' | 'purple' | 'green';
 }
 
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
+  title = "Executive Summary",
+  timeRangeText,
   metrics,
-  gradientType = 'purple',
-  cardOpacity = 0.9
+  gradientType = 'blue'
 }) => {
-  console.log('StandardizedExecutiveSummary render (simple format only)');
+  const getGradient = () => {
+    switch (gradientType) {
+      case 'purple':
+        return 'linear-gradient(45deg, #895CF7 0%, #5669F7 55%, #E64FC4 100%)';
+      case 'green':
+        return 'linear-gradient(45deg, #10B981 0%, #059669 55%, #047857 100%)';
+      default:
+        return 'linear-gradient(45deg, #3B82F6 0%, #1D4ED8 55%, #1E40AF 100%)';
+    }
+  };
 
   const getBadgeVariant = (color?: string) => {
     switch (color) {
@@ -40,107 +45,50 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     }
   };
 
-  const getGradientClass = (type: GradientType) => {
-    return 'bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400';
-  };
-
-  const getGlassMorphismClass = () => {
-    return 'bg-white/20 backdrop-blur-md border border-white/30 shadow-elevation-2';
-  };
-
-  const getBadgeBackgroundColor = (badgeColor?: string, isGood?: boolean) => {
-    // Use indicator color for good/bad
-    if (isGood === true) return 'bg-green-500/80 border-green-400/40';
-    if (isGood === false) return 'bg-red-500/80 border-red-400/40';
-    
-    // Fallback to badge color
-    switch (badgeColor) {
-      case 'green': return 'bg-green-500/80 border-green-400/40';
-      case 'red': return 'bg-red-500/80 border-red-400/40';
-      case 'orange': return 'bg-orange-500/80 border-orange-400/40';
-      case 'blue': return 'bg-blue-500/80 border-blue-400/40';
-      default: return 'bg-white/20 border-white/30';
-    }
-  };
-
-  // Generate default badge for cards that don't have one
-  const getDefaultBadge = (metric: SummaryMetric, index: number) => {
-    if (metric.badgeText) return { text: metric.badgeText, color: metric.badgeColor };
-    
-    // Generate contextual badges based on metric title
-    const title = metric.title.toLowerCase();
-    
-    if (title.includes('utilization')) {
-      const value = typeof metric.value === 'string' ? parseInt(metric.value) : metric.value;
-      if (value > 85) return { text: 'High', color: 'orange' };
-      if (value > 70) return { text: 'Good', color: 'green' };
-      return { text: 'Low', color: 'blue' };
-    }
-    
-    if (title.includes('capacity')) {
-      return { text: 'Available', color: 'blue' };
-    }
-    
-    if (title.includes('projects')) {
-      return { text: 'Active', color: 'green' };
-    }
-    
-    if (title.includes('team') || title.includes('members') || title.includes('size')) {
-      return { text: 'Stable', color: 'green' };
-    }
-    
-    if (title.includes('offices') || title.includes('locations')) {
-      return { text: 'Multi-Site', color: 'blue' };
-    }
-    
-    if (title.includes('completion') || title.includes('rate')) {
-      return { text: 'On Track', color: 'green' };
-    }
-    
-    // Default fallback
-    return { text: 'Active', color: 'blue' };
-  };
-
-  // Simple format - centered cards with standardized styling
-  console.log('Rendering simple format');
   return (
-    <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-        {metrics.map((metric, index) => {
-          const badge = getDefaultBadge(metric, index);
+    <div className="mb-3 relative">
+      {/* Glass morphism background container with reduced height */}
+      <div className="relative overflow-hidden rounded-xl">
+        <div className="absolute inset-0" style={{ background: getGradient() }} />
+        <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
+        
+        {/* Top highlight gradient - reduced height */}
+        <div className="absolute inset-x-0 top-0 h-12 bg-[radial-gradient(120%_30%_at_50%_0%,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_70%)]" />
+        
+        <div className="relative z-10 p-3">
+          {/* Header with reduced padding */}
+          {timeRangeText && (
+            <div className="mb-2">
+              <h2 className="text-lg font-bold text-white">{title}</h2>
+              <p className="text-xs text-white/80">{timeRangeText}</p>
+            </div>
+          )}
           
-          return (
-            <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/25 hover:shadow-elevation-3`}>
-              <CardContent className="p-3">
-                <div className="text-center">
-                  {/* Title using standardized typography */}
-                  <Typography variant="body-sm" className="font-semibold text-white/90 mb-2">
-                    {metric.title}
-                  </Typography>
-                  
-                  {/* Value - now bold and extra large */}
-                  <div className="text-4xl font-bold text-white mb-2">
-                    {metric.value}
+          {/* Metrics grid with reduced gap and padding */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+            {metrics.map((metric, index) => (
+              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-white/80">{metric.title}</div>
+                    {metric.badgeText && (
+                      <Badge 
+                        variant={getBadgeVariant(metric.badgeColor)} 
+                        className="text-xs h-4 px-1.5"
+                      >
+                        {metric.badgeText}
+                      </Badge>
+                    )}
                   </div>
-                  
+                  <div className="text-xl font-bold text-white">{metric.value}</div>
                   {metric.subtitle && (
-                    <Typography variant="body-xs" className="text-white/70 mb-2">
-                      {metric.subtitle}
-                    </Typography>
+                    <div className="text-xs text-white/70">{metric.subtitle}</div>
                   )}
-                  
-                  {/* Always show a badge */}
-                  <Badge 
-                    variant={getBadgeVariant(badge.color)} 
-                    className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)}`}
-                  >
-                    {badge.text}
-                  </Badge>
                 </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

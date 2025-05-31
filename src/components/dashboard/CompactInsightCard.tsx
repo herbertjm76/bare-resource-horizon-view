@@ -36,17 +36,17 @@ export const CompactInsightCard: React.FC<CompactInsightCardProps> = ({
 
   const getSeverityBadge = (severity: string) => {
     switch (severity) {
-      case 'critical': return <Badge variant="destructive" className="text-xs">Critical</Badge>;
-      case 'high': return <Badge className="bg-orange-500 text-white text-xs">High</Badge>;
-      case 'medium': return <Badge className="bg-yellow-500 text-white text-xs">Medium</Badge>;
-      case 'low': return <Badge variant="secondary" className="text-xs">Low</Badge>;
+      case 'critical': return <Badge variant="destructive" className="text-xs h-4 px-1">Critical</Badge>;
+      case 'high': return <Badge className="bg-orange-500 text-white text-xs h-4 px-1">High</Badge>;
+      case 'medium': return <Badge className="bg-yellow-500 text-white text-xs h-4 px-1">Medium</Badge>;
+      case 'low': return <Badge variant="secondary" className="text-xs h-4 px-1">Low</Badge>;
       default: return null;
     }
   };
 
   return (
     <Card className={`${getSeverityColor(severity)} border-l-4 transition-all hover:shadow-sm`}>
-      <CardContent className="p-3">
+      <CardContent className="p-2">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-start gap-2 flex-1 min-w-0">
             {icon && (
@@ -59,16 +59,16 @@ export const CompactInsightCard: React.FC<CompactInsightCardProps> = ({
                 <h3 className="font-medium text-sm text-gray-900 truncate">{title}</h3>
                 {getSeverityBadge(severity)}
               </div>
-              <p className="text-xs text-gray-600 line-clamp-2 mb-2">{description}</p>
+              <p className="text-xs text-gray-600 line-clamp-2 mb-1">{description}</p>
               {metric && (
-                <div className="text-sm font-semibold text-gray-900 mb-2">{metric}</div>
+                <div className="text-sm font-semibold text-gray-900 mb-1">{metric}</div>
               )}
               {actionLabel && onAction && (
                 <Button 
                   size="sm" 
                   variant="outline"
                   onClick={onAction}
-                  className="text-xs h-6 px-2 flex items-center gap-1"
+                  className="text-xs h-5 px-2 flex items-center gap-1"
                 >
                   {actionLabel}
                   <ArrowRight className="h-2 w-2" />

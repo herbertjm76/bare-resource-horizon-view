@@ -44,19 +44,19 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
   };
 
   return (
-    <Card className="h-[400px] flex flex-col">
-      <CardHeader className="flex-shrink-0">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Users className="h-5 w-5 text-brand-violet" />
+    <Card className="h-[320px] flex flex-col">
+      <CardHeader className="flex-shrink-0 pb-2">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Users className="h-4 w-4 text-brand-violet" />
           Staff Status
-          <span className="text-sm font-normal ml-2 bg-gray-100 px-2 py-0.5 rounded">
+          <span className="text-xs font-normal ml-2 bg-gray-100 px-2 py-0.5 rounded">
             {getTimeRangeText()}
           </span>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden p-0">
         <ScrollArea className="h-full">
-          <div className="space-y-6 px-6 pb-6">
+          <div className="space-y-4 px-4 pb-4">
             {/* At Capacity Staff (>90%) */}
             <StaffSection
               title="At Capacity"
@@ -85,7 +85,7 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
 
             {/* Show message if no staff data */}
             {staffData.length === 0 && (
-              <div className="text-center text-gray-500 py-8">
+              <div className="text-center text-gray-500 py-6">
                 No staff data available
               </div>
             )}
