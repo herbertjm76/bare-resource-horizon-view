@@ -15,12 +15,13 @@ interface FeatureCardProps {
 }
 
 const FeatureCard = ({ icon, title, description, highlight, premium, index, isVisible }: FeatureCardProps) => (
-  <VisualCard className={`group transition-all duration-500 ${
-    highlight 
-      ? 'bg-gradient-to-br from-purple-600 to-blue-600 text-white scale-105' 
-      : 'bg-white'
-  } ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-  style={{ transitionDelay: `${index * 150}ms` }}
+  <VisualCard 
+    className={`group transition-all duration-500 ${
+      highlight 
+        ? 'bg-gradient-to-br from-purple-600 to-blue-600 text-white scale-105' 
+        : 'bg-white'
+    } ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+    style={{ transitionDelay: `${index * 150}ms` }}
   >
     {premium && (
       <div className="absolute -top-3 -right-3 animate-[bounce_2s_ease-in-out_infinite]">

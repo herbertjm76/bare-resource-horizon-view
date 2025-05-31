@@ -40,17 +40,22 @@ export const IconSeparator = ({ icon: Icon, color = "purple" }: { icon: any, col
 export const VisualCard = ({ 
   children, 
   className = "",
-  hoverEffect = true 
+  hoverEffect = true,
+  style
 }: { 
   children: React.ReactNode, 
   className?: string,
-  hoverEffect?: boolean 
+  hoverEffect?: boolean,
+  style?: React.CSSProperties
 }) => (
-  <div className={`
-    relative bg-white rounded-2xl p-6 shadow-lg border border-gray-100 
-    ${hoverEffect ? 'transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:scale-105' : ''}
-    ${className}
-  `}>
+  <div 
+    className={`
+      relative bg-white rounded-2xl p-6 shadow-lg border border-gray-100 
+      ${hoverEffect ? 'transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:scale-105' : ''}
+      ${className}
+    `}
+    style={style}
+  >
     {children}
   </div>
 );

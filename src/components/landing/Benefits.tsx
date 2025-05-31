@@ -1,5 +1,4 @@
-
-import { CheckCircle, Target, Zap, AlertTriangle, Brain, TrendingUp, Users, Calendar, ArrowRight, Lightbulb, Shield, Sparkles } from 'lucide-react';
+import { CheckCircle, Target, Zap, AlertTriangle, Brain, TrendingUp, Users, Calendar, ArrowRight, Lightbulb, Shield, Sparkles, Clock } from 'lucide-react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { useStaggeredAnimation } from '@/hooks/useScrollAnimation';
 import { VisualCard, IconSeparator, GradientOrbs, StatsVisualization } from '@/components/common/VisualElements';
