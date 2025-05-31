@@ -51,7 +51,7 @@ const WeeklyOverview = () => {
           }} className="print:hidden" />
           <div className="flex-1 p-4 sm:p-6 bg-background">
             <div className="max-w-full mx-auto space-y-4">
-              <WeeklyOverviewHeader />
+              <WeeklyOverviewHeader selectedWeek={selectedWeek} />
               
               <WeekResourceControls 
                 selectedWeek={selectedWeek} 
