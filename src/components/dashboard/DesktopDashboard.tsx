@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { ExecutiveSummaryCard } from './ExecutiveSummaryCard';
 import { StaffStatusCard } from './staff/StaffStatusCard';
 import { IntelligentInsights } from './IntelligentInsights';
 import { HolidayCard } from './HolidayCard';
@@ -62,19 +61,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Executive Summary - First */}
-      <ExecutiveSummaryCard
-        activeProjects={activeProjects}
-        activeResources={activeResources}
-        utilizationTrends={utilizationTrends}
-        selectedTimeRange={selectedTimeRange}
-        totalRevenue={totalRevenue}
-        avgProjectValue={avgProjectValue}
-        staffData={staffData}
-        standardizedUtilizationRate={standardizedUtilizationRate}
-      />
-      
-      {/* Second Row: Staff Status, Smart Insights, Upcoming Holidays */}
+      {/* Main Row: Staff Status, Smart Insights, Upcoming Holidays */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div>
           <StaffStatusCard 
@@ -94,7 +81,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         </div>
       </div>
       
-      {/* Third Row: Analytics Charts - Project Status, Project Stages, Regional Distribution, Projects by PM */}
+      {/* Analytics Charts - Project Status, Project Stages, Regional Distribution, Projects by PM */}
       <AnalyticsSection mockData={analyticsData} />
     </div>
   );

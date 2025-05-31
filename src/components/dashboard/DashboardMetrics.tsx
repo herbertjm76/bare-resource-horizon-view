@@ -5,6 +5,7 @@ import { MobileDashboard } from './MobileDashboard';
 import { DesktopDashboard } from './DesktopDashboard';
 import { DashboardHeader } from './DashboardHeader';
 import { ModernDashboardHeader } from './ModernDashboardHeader';
+import { ExecutiveSummaryCard } from './ExecutiveSummaryCard';
 import { DashboardLoadingState } from './DashboardLoadingState';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useStandardizedUtilization } from './hooks/useStandardizedUtilization';
@@ -70,7 +71,21 @@ export const DashboardMetrics = () => {
         />
       </div>
 
-      {/* Filters Header - simplified without date */}
+      {/* Executive Summary - positioned between header and filters */}
+      <div className="p-4">
+        <ExecutiveSummaryCard
+          activeProjects={metrics.activeProjects}
+          activeResources={metrics.activeResources}
+          utilizationTrends={utilizationTrends}
+          selectedTimeRange={selectedTimeRange}
+          totalRevenue={metrics.totalRevenue}
+          avgProjectValue={metrics.avgProjectValue}
+          staffData={staffData}
+          standardizedUtilizationRate={utilizationRate}
+        />
+      </div>
+
+      {/* Filters Header - now positioned after Executive Summary */}
       <DashboardHeader
         selectedOffice={selectedOffice}
         setSelectedOffice={setSelectedOffice}

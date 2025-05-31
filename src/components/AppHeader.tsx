@@ -53,7 +53,7 @@ export const AppHeader: React.FC = () => {
       {/* Left side - Date display */}
       <div className="flex flex-col">
         <h2 className="text-xs text-gray-600 mb-0.5">TODAY IS</h2>
-        <p className="text-lg font-bold">{today}</p>
+        <p className="text-lg font-bold text-gray-600">{today}</p>
       </div>
 
       {/* Right side - User actions */}
