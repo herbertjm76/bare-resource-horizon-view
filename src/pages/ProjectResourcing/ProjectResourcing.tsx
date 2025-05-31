@@ -7,7 +7,7 @@ import { ProjectResourcingContent } from './components/ProjectResourcingContent'
 import { useProjectResourcingState } from './hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './utils/filterUtils';
-import { CalendarDays } from 'lucide-react';
+import { List } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
@@ -62,7 +62,7 @@ const ProjectResourcing = () => {
               <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                 <div className="space-y-2">
                   <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                    <CalendarDays className="h-8 w-8 text-brand-violet" />
+                    <List className="h-8 w-8 text-brand-violet" />
                     Project Resourcing
                   </h1>
                 </div>
