@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { BarChart3, Users, Building2, TrendingUp } from 'lucide-react';
+import { BarChart3, Users, Building2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useCompany } from '@/context/CompanyContext';
 
 interface ModernDashboardHeaderProps {
   totalTeamMembers?: number;
@@ -16,6 +17,9 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
   totalOffices = 0,
   utilizationRate = 0
 }) => {
+  const { company } = useCompany();
+  const companyName = company?.name || 'Your Company';
+
   return (
     <div className="space-y-6 mb-6">
       {/* Main Header Section */}
@@ -23,11 +27,8 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
         <div className="space-y-2">
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
             <BarChart3 className="h-8 w-8 text-brand-violet" />
-            Dashboard
+            {companyName} Dashboard
           </h1>
-          <p className="text-muted-foreground text-lg">
-            Get an overview of your team, projects, and resource utilization
-          </p>
         </div>
         
         {/* Quick Stats Cards */}
@@ -58,16 +59,6 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
               <div className="text-sm">
                 <span className="font-semibold text-blue-600">{totalOffices}</span>
                 <span className="text-muted-foreground ml-1">Offices</span>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="px-4 py-2 bg-gradient-to-r from-purple-500/10 to-purple-500/5 border-purple-500/20">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-purple-600" />
-              <div className="text-sm">
-                <span className="font-semibold text-purple-600">{utilizationRate}%</span>
-                <span className="text-muted-foreground ml-1">Utilization</span>
               </div>
             </div>
           </Card>
