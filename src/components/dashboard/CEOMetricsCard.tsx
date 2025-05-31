@@ -44,16 +44,16 @@ export const CEOMetricsCard: React.FC<CEOMetricsCardProps> = ({
 
   return (
     <Card className={`${getStatusColors()} transition-all hover:shadow-md`}>
-      <CardContent className="p-6">
+      <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <p className="text-sm font-medium opacity-80">{title}</p>
-            <p className="text-3xl font-bold mt-1">{value}</p>
+            <p className="text-3xl font-bold mt-0.5">{value}</p>
             {subtitle && (
-              <p className="text-xs opacity-70 mt-1">{subtitle}</p>
+              <p className="text-xs opacity-70 mt-0.5">{subtitle}</p>
             )}
             {trend && (
-              <div className="flex items-center gap-1 mt-2">
+              <div className="flex items-center gap-1 mt-1">
                 <Badge variant="outline" className="text-xs">
                   {trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '→'}
                   {trend.percentage && ` ${trend.percentage}%`}
@@ -61,8 +61,8 @@ export const CEOMetricsCard: React.FC<CEOMetricsCardProps> = ({
               </div>
             )}
           </div>
-          <div className={`h-12 w-12 rounded-full flex items-center justify-center ${getIconColors()}`}>
-            <Icon className="h-6 w-6" />
+          <div className={`h-10 w-10 rounded-full flex items-center justify-center ${getIconColors()}`}>
+            <Icon className="h-5 w-5" />
           </div>
         </div>
       </CardContent>

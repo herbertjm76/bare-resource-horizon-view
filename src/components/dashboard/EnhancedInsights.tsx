@@ -39,7 +39,7 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 flex-shrink-0">
+      <CardHeader className="pb-2 flex-shrink-0">
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-brand-violet" />
           Smart Insights
@@ -50,7 +50,7 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden p-0">
         <ScrollArea className="h-full">
-          <div className="space-y-4 px-6 pb-6">
+          <div className="space-y-3 px-6 pb-4">
             {insights.length > 0 ? (
               insights.map((insight, index) => (
                 <InsightItem key={index} insight={insight} />

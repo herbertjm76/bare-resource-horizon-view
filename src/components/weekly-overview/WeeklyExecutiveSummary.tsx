@@ -15,7 +15,7 @@ export const WeeklyExecutiveSummary: React.FC<WeeklyExecutiveSummaryProps> = ({
   console.log('WeeklyExecutiveSummary render:', { metricsLength: metrics.length });
 
   return (
-    <div className="print:hidden">
+    <div className="print:hidden mb-4">
       <StandardizedExecutiveSummary
         metrics={metrics}
         gradientType="purple"

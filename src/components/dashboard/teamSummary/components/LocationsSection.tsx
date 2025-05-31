@@ -11,24 +11,24 @@ export const LocationsSection: React.FC<LocationsSectionProps> = ({ locationStat
   const topLocations = getTopLocations(locationStats, 3);
   
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-white/20 rounded-lg">
-          <MapPin className="h-5 w-5 text-white" />
+        <div className="p-1.5 bg-white/20 rounded-lg">
+          <MapPin className="h-4 w-4 text-white" />
         </div>
         <div>
-          <div className="text-sm text-white/80">Locations</div>
-          <div className="text-2xl font-bold text-white">{Object.keys(locationStats).length}</div>
+          <div className="text-xs text-white/80">Locations</div>
+          <div className="text-xl font-bold text-white">{Object.keys(locationStats).length}</div>
         </div>
       </div>
       
-      <div className="space-y-2">
+      <div className="space-y-1">
         {topLocations.length > 0 ? (
           <>
             {topLocations.slice(0, 2).map(([location, count]) => (
-              <div key={location} className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">{getLocationEmoji(location)}</span>
+              <div key={location} className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm">{getLocationEmoji(location)}</span>
                   <span className="text-white/90">
                     {location === 'Unknown' ? 'Not specified' : location}
                   </span>
@@ -38,13 +38,13 @@ export const LocationsSection: React.FC<LocationsSectionProps> = ({ locationStat
             ))}
             
             {Object.keys(locationStats).length > 2 && (
-              <div className="text-sm text-white/70">
+              <div className="text-xs text-white/70">
                 +{Object.keys(locationStats).length - 2} more
               </div>
             )}
           </>
         ) : (
-          <div className="text-sm text-white/70">No locations specified</div>
+          <div className="text-xs text-white/70">No locations specified</div>
         )}
       </div>
     </div>

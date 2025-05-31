@@ -28,8 +28,8 @@ export const MetricsSummary: React.FC<MetricsSummaryProps> = ({
   };
 
   return (
-    <div className="mt-4 pt-4 border-t border-gray-100">
-      <div className="text-xs text-gray-500 space-y-1">
+    <div className="mt-3 pt-3 border-t border-gray-100">
+      <div className="text-xs text-gray-500 space-y-0.5">
         <p><strong>Current Metrics ({getTimeRangeText()}):</strong></p>
         <div className="flex justify-between">
           <span>Utilization: {utilizationRate}%</span>

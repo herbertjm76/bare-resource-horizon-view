@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { TeamMember } from '@/components/dashboard/types';
