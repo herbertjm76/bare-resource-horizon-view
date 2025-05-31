@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
-import { User, Shield, Mail, Building2 } from 'lucide-react';
+import { User } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
@@ -143,42 +143,6 @@ export default function Profile() {
                       <User className="h-8 w-8 text-brand-violet" />
                       My Profile
                     </h1>
-                    <p className="text-muted-foreground text-lg">
-                      Manage your personal information and account settings
-                    </p>
-                  </div>
-                  
-                  {/* Quick Stats Cards */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-brand-violet" />
-                        <div className="text-sm">
-                          <span className="font-semibold text-brand-violet">Verified</span>
-                          <span className="text-muted-foreground ml-1">Email</span>
-                        </div>
-                      </div>
-                    </Card>
-                    
-                    <Card className="px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-emerald-600" />
-                        <div className="text-sm">
-                          <span className="font-semibold text-emerald-600">Secure</span>
-                          <span className="text-muted-foreground ml-1">Account</span>
-                        </div>
-                      </div>
-                    </Card>
-                    
-                    <Card className="px-4 py-2 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border-blue-500/20">
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-blue-600" />
-                        <div className="text-sm">
-                          <span className="font-semibold text-blue-600">{company?.name || 'Company'}</span>
-                          <span className="text-muted-foreground ml-1">Member</span>
-                        </div>
-                      </div>
-                    </Card>
                   </div>
                 </div>
               </div>

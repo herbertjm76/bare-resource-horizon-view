@@ -9,8 +9,7 @@ import { useCompany } from '@/context/CompanyContext';
 import { useAnnualLeave } from '@/hooks/useAnnualLeave';
 import { useTeamFilters } from '@/hooks/useTeamFilters';
 import { TeamAnnualLeaveContent } from '@/components/annual-leave/TeamAnnualLeaveContent';
-import { Calendar, Users, Building2, Clock } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Calendar } from 'lucide-react';
 import '@/components/annual-leave/annual-leave.css';
 
 const HEADER_HEIGHT = 56;
@@ -60,11 +59,6 @@ const TeamAnnualLeave = () => {
   
   const isLoading = isLoadingTeamMembers || isLoadingLeave;
 
-  // Calculate metrics
-  const currentMonthLeave = Object.values(leaveData || {}).reduce((total, memberLeave) => {
-    return total + Object.values(memberLeave || {}).reduce((sum, hours) => sum + (hours || 0), 0);
-  }, 0);
-
   return (
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
@@ -83,42 +77,6 @@ const TeamAnnualLeave = () => {
                     <Calendar className="h-8 w-8 text-brand-violet" />
                     Team Annual Leave
                   </h1>
-                  <p className="text-muted-foreground text-lg">
-                    Manage and track annual leave across your team
-                  </p>
-                </div>
-                
-                {/* Quick Stats Cards */}
-                <div className="flex flex-wrap items-center gap-3">
-                  <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-brand-violet" />
-                      <div className="text-sm">
-                        <span className="font-semibold text-brand-violet">{allMembers.length}</span>
-                        <span className="text-muted-foreground ml-1">Members</span>
-                      </div>
-                    </div>
-                  </Card>
-                  
-                  <Card className="px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-emerald-600" />
-                      <div className="text-sm">
-                        <span className="font-semibold text-emerald-600">{currentMonthLeave}h</span>
-                        <span className="text-muted-foreground ml-1">This Month</span>
-                      </div>
-                    </div>
-                  </Card>
-                  
-                  <Card className="px-4 py-2 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border-blue-500/20">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-blue-600" />
-                      <div className="text-sm">
-                        <span className="font-semibold text-blue-600">{locations.length}</span>
-                        <span className="text-muted-foreground ml-1">Offices</span>
-                      </div>
-                    </div>
-                  </Card>
                 </div>
               </div>
             </div>

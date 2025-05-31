@@ -21,7 +21,8 @@ import {
   AlertTriangle,
   TrendingUp,
   Clock,
-  Target
+  Target,
+  HelpCircle
 } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
@@ -229,19 +230,20 @@ const FAQ = () => {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">
-              {/* Header */}
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h1 className="text-3xl font-bold tracking-tight text-brand-primary">
-                    Frequently Asked Questions
-                  </h1>
-                  <p className="text-muted-foreground mt-2">
-                    Find answers to common questions about resource planning, team management, and dashboard features.
-                  </p>
+              {/* Modern Header Section */}
+              <div className="space-y-6 mb-6">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                  <div className="space-y-2">
+                    <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                      <HelpCircle className="h-8 w-8 text-brand-violet" />
+                      Frequently Asked Questions
+                    </h1>
+                  </div>
+                  
+                  <Badge variant="outline" className="text-sm">
+                    {filteredFAQs.length} {filteredFAQs.length === 1 ? 'Question' : 'Questions'}
+                  </Badge>
                 </div>
-                <Badge variant="outline" className="text-sm">
-                  {filteredFAQs.length} {filteredFAQs.length === 1 ? 'Question' : 'Questions'}
-                </Badge>
               </div>
 
               {/* Search */}

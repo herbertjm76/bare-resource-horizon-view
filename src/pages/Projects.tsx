@@ -5,11 +5,10 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { ProjectsList } from '@/components/projects/ProjectsList';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
-import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
 import { Button } from '@/components/ui/button';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
-import { Briefcase, CheckCircle, TrendingUp, Building } from 'lucide-react';
+import { FolderOpen } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
@@ -71,17 +70,23 @@ const Projects = () => {
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-6 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
             <div className="max-w-6xl mx-auto space-y-8">
-              <div>
-                <ModernDashboardHeader
-                  totalTeamMembers={0}
-                  totalActiveProjects={totalActiveProjects}
-                  totalOffices={totalOffices}
-                />
-                <StandardizedExecutiveSummary
-                  metrics={metrics}
-                  gradientType="purple"
-                />
+              {/* Modern Header Section */}
+              <div className="space-y-6 mb-6">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                  <div className="space-y-2">
+                    <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                      <FolderOpen className="h-8 w-8 text-brand-violet" />
+                      All Projects
+                    </h1>
+                  </div>
+                </div>
               </div>
+
+              <StandardizedExecutiveSummary
+                metrics={metrics}
+                gradientType="purple"
+              />
+              
               <OfficeSettingsProvider>
                 <ProjectsList />
               </OfficeSettingsProvider>

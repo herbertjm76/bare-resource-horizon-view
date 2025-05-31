@@ -1,5 +1,4 @@
 
-
 import React, { useEffect, useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -7,7 +6,6 @@ import { AppHeader } from '@/components/AppHeader';
 import { useUserSession } from '@/hooks/useUserSession';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersRealtime } from '@/hooks/useTeamMembersRealtime';
-import { ModernTeamMembersHeader } from '@/components/team-members/ModernTeamMembersHeader';
 import { TeamMemberContent } from '@/components/dashboard/TeamMemberContent';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -15,7 +13,7 @@ import { toast } from 'sonner';
 import { useCompany } from '@/context/CompanyContext';
 import { useMemberPermissions } from '@/hooks/team/useMemberPermissions';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, Shield, AlertCircle } from 'lucide-react';
+import { Loader2, Shield, AlertCircle, Users } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import AuthGuard from '@/components/AuthGuard';
@@ -132,18 +130,6 @@ const TeamMembersContent = () => {
     }
   }, [teamMembersError, profileError]);
 
-  // Calculate statistics for the header
-  const totalMembers = teamMembers.length;
-  // Since Profile doesn't have a status field, we assume all members are active
-  const totalActiveMembers = teamMembers.length;
-  const totalDepartments = new Set(
-    teamMembers.map(member => member.department).filter(Boolean)
-  ).size;
-  // Use 'location' instead of 'office_location' since that's what Profile has
-  const totalLocations = new Set(
-    teamMembers.map(member => member.location).filter(Boolean)
-  ).size;
-
   const isLoading = isTeamMembersLoading || isProfileLoading || companyLoading || (isChecking && !permissionChecked);
 
   // Handle retry for permission errors
@@ -210,12 +196,17 @@ const TeamMembersContent = () => {
   return (
     <div className="flex-1 p-4 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
       <div className="max-w-6xl mx-auto space-y-8">
-        <ModernTeamMembersHeader
-          totalMembers={totalMembers}
-          totalActiveMembers={totalActiveMembers}
-          totalDepartments={totalDepartments}
-          totalLocations={totalLocations}
-        />
+        {/* Modern Header Section */}
+        <div className="space-y-6 mb-6">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div className="space-y-2">
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                <Users className="h-8 w-8 text-brand-violet" />
+                Team Members
+              </h1>
+            </div>
+          </div>
+        </div>
         
         <TeamMemberContent
           userProfile={userProfile}
@@ -248,4 +239,3 @@ const TeamMembersPage = () => {
 };
 
 export default TeamMembersPage;
-

@@ -7,6 +7,7 @@ import { ProjectResourcingContent } from './components/ProjectResourcingContent'
 import { useProjectResourcingState } from './hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './utils/filterUtils';
+import { Calendar } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
@@ -56,6 +57,18 @@ const ProjectResourcing = () => {
             className="flex-1 p-6 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20 flex flex-col" 
             style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)`, overflowY: 'auto' }}
           >
+            {/* Modern Header Section */}
+            <div className="space-y-6 mb-6">
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+                <div className="space-y-2">
+                  <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                    <Calendar className="h-8 w-8 text-brand-violet" />
+                    Project Resourcing
+                  </h1>
+                </div>
+              </div>
+            </div>
+
             <ProjectResourcingContent
               selectedMonth={selectedMonth}
               searchTerm={searchTerm}
