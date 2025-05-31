@@ -17,13 +17,13 @@ const Projects = () => {
 
   // Calculate statistics
   const totalProjects = projects.length;
-  const totalActiveProjects = projects.filter(project => 
+  const activeProjects = projects.filter(project => 
     project.status === 'In Progress'
   ).length;
-  const totalOffices = new Set(projects.map(project => project.office?.name).filter(Boolean)).size;
   const completedProjects = projects.filter(project => 
     project.status === 'Complete'
   ).length;
+  const totalOffices = new Set(projects.map(project => project.office?.name).filter(Boolean)).size;
 
   // Calculate completion rate
   const completionRate = totalProjects > 0 ? Math.round((completedProjects / totalProjects) * 100) : 0;
@@ -33,29 +33,29 @@ const Projects = () => {
       title: "Total Projects",
       value: totalProjects,
       subtitle: "All projects in system",
-      badgeText: totalProjects > 10 ? 'High Volume' : 'Manageable',
-      badgeColor: totalProjects > 10 ? 'blue' : 'green'
+      badgeText: totalProjects > 15 ? 'High Volume' : totalProjects > 8 ? 'Active Portfolio' : 'Growing',
+      badgeColor: totalProjects > 15 ? 'blue' : totalProjects > 8 ? 'green' : 'orange'
     },
     {
       title: "Active Projects",
-      value: totalActiveProjects,
+      value: activeProjects,
       subtitle: "Currently in progress",
-      badgeText: totalActiveProjects > 5 ? 'Busy' : 'Normal Load',
-      badgeColor: totalActiveProjects > 5 ? 'orange' : 'green'
+      badgeText: activeProjects > 8 ? 'Very Busy' : activeProjects > 4 ? 'Busy' : activeProjects > 0 ? 'Normal Load' : 'Available',
+      badgeColor: activeProjects > 8 ? 'orange' : activeProjects > 4 ? 'blue' : activeProjects > 0 ? 'green' : 'gray'
     },
     {
       title: "Completion Rate",
       value: `${completionRate}%`,
-      subtitle: `${completedProjects} completed`,
-      badgeText: completionRate > 70 ? 'Excellent' : completionRate > 50 ? 'Good' : 'Needs Focus',
-      badgeColor: completionRate > 70 ? 'green' : completionRate > 50 ? 'blue' : 'orange'
+      subtitle: `${completedProjects} of ${totalProjects} completed`,
+      badgeText: completionRate >= 80 ? 'Excellent' : completionRate >= 60 ? 'Good' : completionRate >= 40 ? 'Average' : 'Needs Focus',
+      badgeColor: completionRate >= 80 ? 'green' : completionRate >= 60 ? 'blue' : completionRate >= 40 ? 'orange' : 'red'
     },
     {
-      title: "Offices",
+      title: "Office Locations",
       value: totalOffices,
-      subtitle: "Locations served",
-      badgeText: "Multi-Location",
-      badgeColor: "blue"
+      subtitle: totalOffices === 1 ? "Single location" : "Multi-location operations",
+      badgeText: totalOffices > 3 ? 'Global Reach' : totalOffices > 1 ? 'Multi-Location' : 'Single Office',
+      badgeColor: totalOffices > 3 ? 'blue' : totalOffices > 1 ? 'green' : 'gray'
     }
   ];
 
