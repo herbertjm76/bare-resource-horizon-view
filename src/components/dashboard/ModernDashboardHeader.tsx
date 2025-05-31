@@ -21,7 +21,7 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
   const companyName = company?.name || 'Your Company';
 
   return (
-    <div className="space-y-6 mb-6">
+    <div className="space-y-6 p-4 sm:p-8">
       {/* Main Header Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div className="space-y-2">
