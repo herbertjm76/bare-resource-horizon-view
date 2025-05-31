@@ -9,8 +9,6 @@ interface WeeklyOverviewContentProps {
   handlePreviousWeek: () => void;
   handleNextWeek: () => void;
   weekLabel: string;
-  summaryFormat: 'simple' | 'detailed';
-  setSummaryFormat: (format: 'simple' | 'detailed') => void;
   filters: {
     office: string;
   };
@@ -22,8 +20,6 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
   handlePreviousWeek,
   handleNextWeek,
   weekLabel,
-  summaryFormat,
-  setSummaryFormat,
   filters,
   handleFilterChange
 }) => {
@@ -36,15 +32,11 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
       </div>
       
       <div className="max-w-full mx-auto space-y-4">
-        <WeeklyOverviewHeader 
-          summaryFormat={summaryFormat}
-          setSummaryFormat={setSummaryFormat}
-        />
+        <WeeklyOverviewHeader />
         
         {/* Executive Summary */}
         <WeeklyExecutiveSummary
           selectedWeek={selectedWeek}
-          summaryFormat={summaryFormat}
         />
         
         {/* Resource Table Section */}

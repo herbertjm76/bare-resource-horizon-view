@@ -14,7 +14,6 @@ const HEADER_HEIGHT = 56;
 
 const Projects = () => {
   const { projects } = useProjects();
-  const [summaryFormat, setSummaryFormat] = useState<'simple' | 'detailed'>('detailed');
 
   // Calculate statistics
   const totalProjects = projects.length;
@@ -46,54 +45,29 @@ const Projects = () => {
       title: "Total Projects",
       value: totalProjects,
       subtitle: "All projects in system",
-      icon: Briefcase,
       badgeText: totalProjects > 10 ? 'High Volume' : 'Manageable',
-      badgeColor: totalProjects > 10 ? 'blue' : 'green',
-      breakdowns: [
-        { label: 'In Progress', value: inProgressProjects, color: 'blue' },
-        { label: 'Planning', value: planningProjects, color: 'orange' },
-        { label: 'On Hold', value: onHoldProjects, color: 'red' }
-      ]
+      badgeColor: totalProjects > 10 ? 'blue' : 'green'
     },
     {
       title: "Active Projects",
       value: totalActiveProjects,
       subtitle: "Currently in progress",
-      icon: TrendingUp,
       badgeText: totalActiveProjects > 5 ? 'Busy' : 'Normal Load',
-      badgeColor: totalActiveProjects > 5 ? 'orange' : 'green',
-      breakdowns: [
-        { label: 'Recent', value: recentProjects, color: 'green' },
-        { label: 'This Quarter', value: thisQuarterProjects, color: 'blue' },
-        { label: 'Older', value: olderProjects, color: 'orange' }
-      ]
+      badgeColor: totalActiveProjects > 5 ? 'orange' : 'green'
     },
     {
       title: "Completion Rate",
       value: `${completionRate}%`,
       subtitle: `${completedProjects} completed`,
-      icon: CheckCircle,
       badgeText: completionRate > 70 ? 'Excellent' : completionRate > 50 ? 'Good' : 'Needs Focus',
-      badgeColor: completionRate > 70 ? 'green' : completionRate > 50 ? 'blue' : 'orange',
-      breakdowns: [
-        { label: 'Completed', value: completedProjects, color: 'green' },
-        { label: 'Active', value: totalActiveProjects, color: 'blue' },
-        { label: 'Other', value: totalProjects - completedProjects - totalActiveProjects, color: 'orange' }
-      ]
+      badgeColor: completionRate > 70 ? 'green' : completionRate > 50 ? 'blue' : 'orange'
     },
     {
       title: "Offices",
       value: totalOffices,
       subtitle: "Locations served",
-      icon: Building,
       badgeText: "Multi-Location",
-      badgeColor: "blue",
-      breakdowns: totalOffices > 0 ? [
-        { label: 'Primary', value: primaryOffices, color: 'green' },
-        { label: 'Secondary', value: secondaryOffices, color: 'blue' }
-      ] : [
-        { label: 'No offices', value: 0, color: 'red' }
-      ]
+      badgeColor: "blue"
     }
   ];
 
@@ -111,27 +85,10 @@ const Projects = () => {
               <div>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                   <h1 className="text-3xl font-bold tracking-tight text-brand-primary">Projects Overview</h1>
-                  <div className="flex gap-2">
-                    <Button
-                      variant={summaryFormat === 'simple' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSummaryFormat('simple')}
-                    >
-                      Simple Cards
-                    </Button>
-                    <Button
-                      variant={summaryFormat === 'detailed' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSummaryFormat('detailed')}
-                    >
-                      Detailed Cards
-                    </Button>
-                  </div>
                 </div>
                 <StandardizedExecutiveSummary
                   metrics={metrics}
                   gradientType="purple"
-                  cardFormat={summaryFormat}
                 />
               </div>
               <OfficeSettingsProvider>
