@@ -17,6 +17,8 @@ import TeamAnnualLeave from "./pages/TeamAnnualLeave";
 import ProjectResourcing from "./pages/ProjectResourcing";
 import Help from "./pages/Help";
 import FAQ from "./pages/FAQ";
+import Documentation from "./pages/Documentation";
+import ContactSupport from "./pages/ContactSupport";
 import Join from "./pages/Join";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
@@ -42,8 +44,10 @@ function App() {
               <Route path="/team-workload" element={<TeamWorkload />} />
               <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
               <Route path="/project-resourcing" element={<ProjectResourcing />} />
+              <Route path="/documentation" element={<Documentation />} />
               <Route path="/help" element={<Help />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/contact-support" element={<ContactSupport />} />
               <Route path="/join" element={<Join />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />

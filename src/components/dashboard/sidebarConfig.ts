@@ -8,7 +8,10 @@ import {
   Briefcase,
   Flag,
   HelpCircle,
-  FileQuestion
+  FileQuestion,
+  User,
+  BookOpen,
+  MessageCircle
 } from "lucide-react"
 
 export const navigationItems = [
@@ -66,14 +69,34 @@ export const navigationItems = [
     label: "SETTINGS",
     items: [
       {
+        title: "My Profile",
+        url: "/profile",
+        icon: User,
+      },
+      {
         title: "Office Settings",
         url: "/office-settings",
         icon: Flag,
+      },
+    ],
+  },
+  {
+    label: "SUPPORT",
+    items: [
+      {
+        title: "Documentation",
+        url: "/documentation",
+        icon: BookOpen,
       },
       {
         title: "FAQ",
         url: "/faq",
         icon: FileQuestion,
+      },
+      {
+        title: "Contact Support",
+        url: "/contact-support",
+        icon: MessageCircle,
       },
       {
         title: "Help",
