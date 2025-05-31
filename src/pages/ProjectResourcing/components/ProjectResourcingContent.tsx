@@ -65,20 +65,6 @@ export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> =
 
   return (
     <div className="flex flex-col max-w-full bg-gradient-to-br from-gray-50 to-white min-h-screen">
-      <ModernResourcesHeader
-        title="Project Resourcing"
-        selectedMonth={selectedMonth}
-        onMonthChange={onMonthChange}
-        searchTerm={searchTerm}
-        onSearchChange={onSearchChange}
-        filterContent={filterContent}
-        activeFiltersCount={activeFiltersCount}
-        onClearFilters={onClearFilters}
-        totalProjects={0} // TODO: Calculate from data
-        totalResources={0} // TODO: Calculate from data
-        timeRange={`${filters.periodToShow} days`}
-      />
-      
       <OfficeSettingsProvider>
         <ModernResourceGridContainer
           startDate={selectedMonth}
