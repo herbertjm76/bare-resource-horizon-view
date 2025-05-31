@@ -34,40 +34,40 @@ export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
   }
 
   return (
-    <TableFooter className="bg-brand-primary text-white">
-      <TableRow className="bg-brand-primary hover:bg-brand-primary">
+    <TableFooter className="bg-gray-100/80 border-gray-200">
+      <TableRow className="bg-gray-100/80 hover:bg-gray-100 border-gray-200">
         {/* Resource Name Column */}
-        <TableCell className="font-medium text-white bg-brand-primary">
+        <TableCell className="font-medium text-gray-700 bg-gray-100/80 border-r border-gray-200">
           Total Hours
         </TableCell>
         
         {/* Project Count Column */}
-        <TableCell className="text-center font-medium text-white bg-brand-primary">
+        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
           —
         </TableCell>
         
         {/* Capacity Bar Column */}
-        <TableCell className="text-center font-medium text-white bg-brand-primary">
+        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
           —
         </TableCell>
         
         {/* Annual Leave Column */}
-        <TableCell className="text-center font-medium text-white bg-brand-primary">
+        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
           —
         </TableCell>
         
         {/* Holiday Column */}
-        <TableCell className="text-center font-medium text-white bg-brand-primary">
+        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
           —
         </TableCell>
         
         {/* Other Leave Column */}
-        <TableCell className="text-center font-medium text-white bg-brand-primary">
+        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
           —
         </TableCell>
         
         {/* Office Location Column */}
-        <TableCell className="text-center font-medium text-white bg-brand-primary">
+        <TableCell className="text-center font-medium text-gray-500 bg-gray-100/80 border-r border-gray-200">
           —
         </TableCell>
         
@@ -77,7 +77,7 @@ export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
             return (
               <TableCell 
                 key={`footer-empty-${project.id}`} 
-                className="text-center font-bold text-lg text-white bg-brand-primary w-[40px]"
+                className="text-center font-bold text-lg text-gray-500 bg-gray-100/80 w-[40px] border-r border-gray-200"
               >
                 —
               </TableCell>
@@ -89,7 +89,7 @@ export const ResourceTableFooter: React.FC<ResourceTableFooterProps> = ({
           return (
             <TableCell 
               key={`footer-${project.id}`} 
-              className="text-center font-bold text-lg text-white bg-brand-primary w-[40px]"
+              className="text-center font-bold text-lg text-gray-700 bg-gray-100/80 w-[40px] border-r border-gray-200"
             >
               {total > 0 ? total : '—'}
             </TableCell>

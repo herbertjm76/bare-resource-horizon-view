@@ -20,25 +20,25 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
   // Calculate total hours across all weeks
   const totalHours = Object.values(weeklyProjectHours).reduce((sum, hours) => sum + hours, 0);
   
-  // Base background color - now using purple theme
-  const rowBgClass = "bg-brand-primary text-white";
+  // Use subtle gray background for consistency
+  const rowBgClass = "bg-gray-100/80 border-gray-200 hover:bg-gray-100";
 
   return (
     <tr className={`border-b ${rowBgClass}`}>
       {/* Fixed counter column */}
-      <td className={`sticky left-0 z-10 p-2 w-12 ${rowBgClass}`}></td>
+      <td className={`sticky left-0 z-10 p-2 w-12 ${rowBgClass} border-r border-gray-200`}></td>
       
       {/* Project totals label */}
       <td 
-        className={`sticky left-12 z-10 p-2 ${rowBgClass}`} 
+        className={`sticky left-12 z-10 p-2 ${rowBgClass} border-r border-gray-200`} 
         style={{ width: '200px', minWidth: '200px' }}
       >
         <div className="flex items-center">
           <div className="ml-8">
-            <div className="font-medium text-sm text-white">
+            <div className="font-medium text-sm text-gray-700">
               Project Totals
             </div>
-            <div className="text-xs text-white/80">
+            <div className="text-xs text-gray-600">
               Total Hours: {totalHours}
             </div>
           </div>
@@ -51,9 +51,9 @@ export const ProjectTotalsRow: React.FC<ProjectTotalsRowProps> = ({
         const totalHoursForWeek = weeklyProjectHours[weekKey] || 0;
         
         return (
-          <td key={weekKey} className="p-0 text-center" style={{ width: '10px', minWidth: '10px' }}>
+          <td key={weekKey} className="p-0 text-center border-r border-gray-200" style={{ width: '10px', minWidth: '10px' }}>
             <div className="py-2 px-0">
-              <span className="text-lg font-bold text-white">
+              <span className="text-lg font-bold text-gray-700">
                 {totalHoursForWeek > 0 ? `${totalHoursForWeek}h` : '0h'}
               </span>
             </div>
