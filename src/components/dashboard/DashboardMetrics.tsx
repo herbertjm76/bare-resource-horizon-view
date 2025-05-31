@@ -60,7 +60,7 @@ export const DashboardMetrics = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Modern Header */}
+      {/* Modern Header with stats */}
       <div className="p-4 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
         <ModernDashboardHeader
           totalTeamMembers={totalTeamMembers}
@@ -70,7 +70,7 @@ export const DashboardMetrics = () => {
         />
       </div>
 
-      {/* Filters Header */}
+      {/* Filters Header - simplified without date */}
       <DashboardHeader
         selectedOffice={selectedOffice}
         setSelectedOffice={setSelectedOffice}

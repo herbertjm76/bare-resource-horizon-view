@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,16 @@ export const AppHeader: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Memoize today's date to prevent re-renders
+  const today = useMemo(() => {
+    return new Date().toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric' 
+    }).toUpperCase();
+  }, []);
 
   React.useEffect(() => {
     let authSubscription: { unsubscribe: () => void } | null = null;
@@ -39,9 +49,15 @@ export const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="w-full px-6 py-2 flex items-center justify-end bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[64px] pl-[280px] transition-all duration-300">
+    <header className="w-full px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[64px] pl-[280px] transition-all duration-300">
+      {/* Left side - Date display */}
+      <div className="flex flex-col">
+        <h2 className="text-xs text-gray-600 mb-0.5">TODAY IS</h2>
+        <p className="text-lg font-bold">{today}</p>
+      </div>
+
+      {/* Right side - User actions */}
       <div className="flex items-center gap-4">
-        {/* Removed "ADMIN" text */}
         <Button asChild variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100">
           <Link to="/profile">
             <UserIcon className="mr-2 h-4 w-4" /> My Profile
