@@ -1,6 +1,9 @@
+
 import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { CompactInsightCard } from './CompactInsightCard';
-import { AlertTriangle, Users, Target, TrendingUp, Calendar, Briefcase, Plane } from 'lucide-react';
+import { AlertTriangle, Users, Target, TrendingUp, Calendar, Briefcase, Plane, Brain } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAnnualLeaveInsights } from '@/hooks/useAnnualLeaveInsights';
 
@@ -152,25 +155,46 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
 
   if (insights.length === 0) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-        <Target className="h-6 w-6 text-green-600 mx-auto mb-2" />
-        <h3 className="text-sm font-semibold text-green-900 mb-1">All Systems Running Smoothly</h3>
-        <p className="text-xs text-green-700">Team utilization and project load are well-balanced.</p>
-      </div>
+      <Card className="h-[400px] flex flex-col">
+        <CardHeader className="flex-shrink-0">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Brain className="h-5 w-5 text-brand-violet" />
+            Smart Insights
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 overflow-hidden p-0">
+          <div className="flex items-center justify-center h-full bg-green-50 border border-green-200 rounded-lg m-6">
+            <div className="text-center">
+              <Target className="h-6 w-6 text-green-600 mx-auto mb-2" />
+              <h3 className="text-sm font-semibold text-green-900 mb-1">All Systems Running Smoothly</h3>
+              <p className="text-xs text-green-700">Team utilization and project load are well-balanced.</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <h2 className="text-lg font-bold text-gray-900 mb-3">🧠 Smart Insights</h2>
-      <div className="grid gap-2">
-        {insights.slice(0, 3).map((insight, index) => (
-          <CompactInsightCard
-            key={index}
-            {...insight}
-          />
-        ))}
-      </div>
-    </div>
+    <Card className="h-[400px] flex flex-col">
+      <CardHeader className="flex-shrink-0">
+        <CardTitle className="text-lg flex items-center gap-2">
+          <Brain className="h-5 w-5 text-brand-violet" />
+          Smart Insights
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="flex-1 overflow-hidden p-0">
+        <ScrollArea className="h-full">
+          <div className="space-y-3 px-6 pb-6">
+            {insights.slice(0, 3).map((insight, index) => (
+              <CompactInsightCard
+                key={index}
+                {...insight}
+              />
+            ))}
+          </div>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
 };
