@@ -15,7 +15,7 @@ export const AnimatedSection: React.FC<AnimatedSectionProps> = ({
   delay = 0,
   className = ''
 }) => {
-  const { elementRef, isVisible } = useScrollAnimation();
+  const { elementRef, isVisible } = useScrollAnimation<HTMLDivElement>();
 
   const animationClasses = {
     fadeIn: 'opacity-0 animate-[fadeIn_0.6s_ease-out_forwards]',

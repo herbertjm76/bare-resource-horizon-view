@@ -16,7 +16,7 @@ export const CountUpNumber: React.FC<CountUpNumberProps> = ({
   className = ''
 }) => {
   const [count, setCount] = useState(0);
-  const { elementRef, isVisible } = useScrollAnimation();
+  const { elementRef, isVisible } = useScrollAnimation<HTMLSpanElement>();
 
   useEffect(() => {
     if (!isVisible) return;
