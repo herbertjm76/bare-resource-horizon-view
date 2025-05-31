@@ -2,12 +2,21 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { MapPin, Building2, Upload } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useCompany } from '@/context/CompanyContext';
 
-// Lazy load the map component to avoid SSR issues
-const LazyMapComponent = React.lazy(() => import('./map/MapComponent'));
+// Simple dynamic import without lazy loading
+const MapComponent = React.lazy(() => 
+  import('./map/MapComponent').catch(() => ({
+    default: () => (
+      <div className="h-full w-full flex items-center justify-center text-white/60">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-5 w-5" />
+          <span>Map unavailable</span>
+        </div>
+      </div>
+    )
+  }))
+);
 
 export const OfficeOverviewCard = () => {
   const { company } = useCompany();
@@ -17,7 +26,7 @@ export const OfficeOverviewCard = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowMap(true);
-    }, 100);
+    }, 500);
     
     return () => clearTimeout(timer);
   }, []);
@@ -99,7 +108,7 @@ export const OfficeOverviewCard = () => {
                       </div>
                     }
                   >
-                    <LazyMapComponent 
+                    <MapComponent 
                       coordinates={officeCoordinates}
                       company={company}
                     />
