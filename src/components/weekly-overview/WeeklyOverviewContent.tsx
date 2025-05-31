@@ -3,7 +3,6 @@ import React from 'react';
 import { WeeklyOverviewHeader } from './WeeklyOverviewHeader';
 import { WeeklyExecutiveSummary } from './WeeklyExecutiveSummary';
 import { WeeklyResourceSection } from './WeeklyResourceSection';
-import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
 
 interface WeeklyOverviewContentProps {
   selectedWeek: Date;
@@ -33,11 +32,7 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
       </div>
       
       <div className="max-w-full mx-auto space-y-4">
-        <ModernDashboardHeader
-          totalTeamMembers={0}
-          totalActiveProjects={0}
-          totalOffices={0}
-        />
+        <WeeklyOverviewHeader />
         
         {/* Executive Summary */}
         <WeeklyExecutiveSummary

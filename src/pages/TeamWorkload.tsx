@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
-import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
@@ -75,11 +74,6 @@ const TeamWorkload = () => {
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
-            <ModernDashboardHeader
-              totalTeamMembers={allMembers.length}
-              totalActiveProjects={0}
-              totalOffices={locations.length}
-            />
             <TeamWorkloadContent
               selectedWeek={selectedWeek}
               onWeekChange={handleWeekChange}
