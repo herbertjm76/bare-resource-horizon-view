@@ -1,10 +1,12 @@
-import React, { useMemo } from "react";
+
+import React from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { User as UserIcon, LogOut } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { DateDisplay } from "@/components/ui/date-display";
 
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
@@ -12,15 +14,6 @@ export const AppHeader: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Memoize today's date to prevent re-renders - simplified format
-  const today = useMemo(() => {
-    return new Date().toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
-  }, []);
 
   React.useEffect(() => {
     let authSubscription: { unsubscribe: () => void } | null = null;
@@ -48,9 +41,15 @@ export const AppHeader: React.FC = () => {
 
   return (
     <header className="w-full px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[64px] pl-[280px] transition-all duration-300">
-      {/* Left side - Date display - single line minimal */}
+      {/* Left side - Enhanced Date display */}
       <div className="flex items-center">
-        <p className="text-sm text-gray-600">{today}</p>
+        <DateDisplay 
+          showIcon={true}
+          showTimezone={false}
+          allowFormatSelection={true}
+          defaultFormat="short"
+          className="text-gray-600"
+        />
       </div>
 
       {/* Right side - User actions */}
