@@ -71,19 +71,17 @@ export const DashboardMetrics = () => {
         />
       </div>
 
-      {/* Executive Summary - positioned between header and filters */}
-      <div className="p-4">
-        <ExecutiveSummaryCard
-          activeProjects={metrics.activeProjects}
-          activeResources={metrics.activeResources}
-          utilizationTrends={utilizationTrends}
-          selectedTimeRange={selectedTimeRange}
-          totalRevenue={metrics.totalRevenue}
-          avgProjectValue={metrics.avgProjectValue}
-          staffData={staffData}
-          standardizedUtilizationRate={utilizationRate}
-        />
-      </div>
+      {/* Executive Summary - positioned directly after header with no padding */}
+      <ExecutiveSummaryCard
+        activeProjects={metrics.activeProjects}
+        activeResources={metrics.activeResources}
+        utilizationTrends={utilizationTrends}
+        selectedTimeRange={selectedTimeRange}
+        totalRevenue={metrics.totalRevenue}
+        avgProjectValue={metrics.avgProjectValue}
+        staffData={staffData}
+        standardizedUtilizationRate={utilizationRate}
+      />
 
       {/* Filters Header - now positioned after Executive Summary */}
       <DashboardHeader

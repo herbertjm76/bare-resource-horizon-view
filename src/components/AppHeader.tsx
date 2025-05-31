@@ -1,4 +1,3 @@
-
 import React, { useMemo } from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
@@ -14,14 +13,13 @@ export const AppHeader: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Memoize today's date to prevent re-renders
+  // Memoize today's date to prevent re-renders - simplified format
   const today = useMemo(() => {
     return new Date().toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      month: 'long', 
+      month: 'short', 
       day: 'numeric', 
       year: 'numeric' 
-    }).toUpperCase();
+    });
   }, []);
 
   React.useEffect(() => {
@@ -50,10 +48,9 @@ export const AppHeader: React.FC = () => {
 
   return (
     <header className="w-full px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[64px] pl-[280px] transition-all duration-300">
-      {/* Left side - Date display */}
-      <div className="flex flex-col">
-        <h2 className="text-xs text-gray-600 mb-0.5">TODAY IS</h2>
-        <p className="text-lg font-bold text-gray-600">{today}</p>
+      {/* Left side - Date display - single line minimal */}
+      <div className="flex items-center">
+        <p className="text-sm text-gray-600">{today}</p>
       </div>
 
       {/* Right side - User actions */}
