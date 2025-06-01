@@ -3,7 +3,7 @@ import React from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import { TeamMember } from '@/components/dashboard/types';
 import { formatNumber } from '../weekly-overview/utils';
-import '../../ui/enhanced-table.css';
+import '../ui/enhanced-table.css';
 
 interface EnhancedTeamWorkloadTableProps {
   filteredMembers: TeamMember[];
@@ -71,7 +71,7 @@ export const EnhancedTeamWorkloadTable: React.FC<EnhancedTeamWorkloadTableProps>
                         {`${member.first_name || ''} ${member.last_name || ''}`.trim()}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {member.position || 'No position'}
+                        {member.role || 'No role'}
                       </div>
                     </div>
                   </TableCell>

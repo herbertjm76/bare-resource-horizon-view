@@ -69,12 +69,11 @@ export const EnhancedWeeklyResourceTable: React.FC<EnhancedWeeklyResourceTablePr
           </TableHeader>
           
           <TableBody>
-            {members.map((member, idx) => (
+            {members.map((member) => (
               <EnhancedMemberTableRow
                 key={member.id}
                 member={member}
                 projects={projects}
-                idx={idx}
                 memberTotals={memberTotals}
                 allocationMap={allocationMap}
                 weekStartDate={weekStartDate}
