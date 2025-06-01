@@ -7,6 +7,7 @@ import { WorkloadSummary } from '@/components/workload/WorkloadSummary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
 import { useWorkloadData, WorkloadBreakdown } from '@/components/workload/hooks/useWorkloadData';
+import '@/styles/enhanced-tables.css';
 
 interface TeamWorkloadContentProps {
   selectedWeek: Date;
@@ -97,12 +98,16 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
             <Skeleton className="h-12 w-full" />
           </div>
         ) : (
-          <WorkloadCalendar 
-            members={filteredMembers}
-            selectedWeek={selectedWeek}
-            workloadData={workloadData}
-            periodToShow={periodToShow}
-          />
+          <div className="enhanced-table-scroll">
+            <div className="enhanced-table-container">
+              <WorkloadCalendar 
+                members={filteredMembers}
+                selectedWeek={selectedWeek}
+                workloadData={workloadData}
+                periodToShow={periodToShow}
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>

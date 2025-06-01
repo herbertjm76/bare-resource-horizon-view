@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { EnhancedMemberTableRow } from './EnhancedMemberTableRow';
 import { TableRow, TableCell } from "@/components/ui/table";
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
 import { Project, MemberAllocation } from './types';
 
 interface EnhancedTeamMemberRowsProps {
@@ -23,35 +24,116 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
 }) => {
   return (
     <>
-      {filteredOffices.map((officeCode, officeIndex) => {
-        const members = membersByOffice[officeCode] || [];
-        const officeDisplay = getOfficeDisplay(officeCode);
-        
+      {filteredOffices.map((office) => {
+        const officeMembers = membersByOffice[office] || [];
+        if (officeMembers.length === 0) return null;
+
         return (
-          <React.Fragment key={officeCode}>
-            {/* Enhanced Office header row */}
-            <TableRow className="office-header-row">
-              <TableCell 
-                colSpan={9 + projects.length} 
-                className="py-3 px-4 font-semibold text-white"
-              >
-                {officeDisplay} ({members.length} {members.length === 1 ? 'member' : 'members'})
+          <React.Fragment key={office}>
+            {/* Office Header Row */}
+            <TableRow className="group-header-row">
+              <TableCell colSpan={5 + projects.length} className="font-semibold">
+                {getOfficeDisplay(office)} ({officeMembers.length} members)
               </TableCell>
             </TableRow>
-            
-            {/* Enhanced Member rows for this office */}
-            {members.map((member, index) => {
+
+            {/* Office Members */}
+            {officeMembers.map((member) => {
               const allocation = getMemberAllocation(member.id);
+              const totalHours = allocation.projectHours.reduce((sum, hours) => sum + hours, 0);
+              const weeklyCapacity = member.weekly_capacity || 40;
+              const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / weeklyCapacity) * 100) : 0;
+              
+              // Determine utilization color
+              const getUtilizationColor = (percent: number) => {
+                if (percent < 80) return 'bg-green-100 text-green-800 border-green-200';
+                if (percent <= 100) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                return 'bg-red-100 text-red-800 border-red-200';
+              };
+
               return (
-                <EnhancedMemberTableRow 
-                  key={member.id}
-                  member={member}
-                  allocation={allocation}
-                  isEven={index % 2 === 0}
-                  getOfficeDisplay={getOfficeDisplay}
-                  onInputChange={handleInputChange}
-                  projects={projects}
-                />
+                <TableRow key={member.id} className="member-row">
+                  {/* Member Name */}
+                  <TableCell className="sticky left-0 z-10 bg-inherit">
+                    <div className="flex flex-col">
+                      <span className="font-medium text-sm">
+                        {member.first_name} {member.last_name}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {member.department || 'N/A'}
+                      </span>
+                    </div>
+                  </TableCell>
+
+                  {/* Project Allocations */}
+                  {projects.map((project, projectIndex) => (
+                    <TableCell key={project.id} className="text-center">
+                      <input
+                        type="number"
+                        min="0"
+                        max="40"
+                        step="0.5"
+                        value={allocation.projectHours[projectIndex] || ''}
+                        onChange={(e) => {
+                          const newHours = [...allocation.projectHours];
+                          newHours[projectIndex] = parseFloat(e.target.value) || 0;
+                          handleInputChange(member.id, 'projectHours', newHours);
+                        }}
+                        className="enhanced-input"
+                        placeholder="0"
+                      />
+                    </TableCell>
+                  ))}
+
+                  {/* Total Hours */}
+                  <TableCell className="text-center">
+                    <div className="enhanced-pill">
+                      {totalHours}h
+                    </div>
+                  </TableCell>
+
+                  {/* Capacity */}
+                  <TableCell className="text-center">
+                    <div className="enhanced-capacity-display">
+                      {weeklyCapacity}h
+                    </div>
+                  </TableCell>
+
+                  {/* Utilization */}
+                  <TableCell className="text-center">
+                    <Badge 
+                      variant="outline" 
+                      className={`${getUtilizationColor(utilizationPercent)} text-xs font-medium`}
+                    >
+                      {utilizationPercent}%
+                    </Badge>
+                  </TableCell>
+
+                  {/* Leave */}
+                  <TableCell className="text-center">
+                    <input
+                      type="number"
+                      min="0"
+                      max="40"
+                      step="0.5"
+                      value={allocation.annualLeave || ''}
+                      onChange={(e) => handleInputChange(member.id, 'annualLeave', parseFloat(e.target.value) || 0)}
+                      className="enhanced-input"
+                      placeholder="0"
+                    />
+                  </TableCell>
+
+                  {/* Remarks */}
+                  <TableCell>
+                    <textarea
+                      value={allocation.remarks || ''}
+                      onChange={(e) => handleInputChange(member.id, 'remarks', e.target.value)}
+                      className="enhanced-textarea"
+                      placeholder="Notes..."
+                      rows={1}
+                    />
+                  </TableCell>
+                </TableRow>
               );
             })}
           </React.Fragment>

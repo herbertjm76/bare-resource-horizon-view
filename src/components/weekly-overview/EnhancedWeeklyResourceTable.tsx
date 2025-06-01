@@ -9,7 +9,7 @@ import { EnhancedWeeklyResourceHeader } from './EnhancedWeeklyResourceHeader';
 import { EnhancedTeamMemberRows } from './EnhancedTeamMemberRows';
 import { EnhancedProjectTotalsRow } from './EnhancedProjectTotalsRow';
 import { Project, MemberAllocation } from './types';
-import './enhanced-weekly.css';
+import '@/styles/enhanced-tables.css';
 
 interface EnhancedWeeklyResourceTableProps {
   projects: Project[];
@@ -62,9 +62,9 @@ export const EnhancedWeeklyResourceTable: React.FC<EnhancedWeeklyResourceTablePr
 
       {/* Enhanced Table Container */}
       <Card className="w-full overflow-hidden border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/30">
-        <div className="enhanced-weekly-scroll">
-          <div className="enhanced-weekly-container">
-            <Table className="enhanced-weekly-table">
+        <div className="enhanced-table-scroll">
+          <div className="enhanced-table-container">
+            <Table className="enhanced-table">
               <EnhancedWeeklyResourceHeader projects={projects} />
               <TableBody>
                 <EnhancedTeamMemberRows 
