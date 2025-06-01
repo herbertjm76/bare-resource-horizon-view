@@ -40,7 +40,8 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
             {/* Office Members */}
             {officeMembers.map((member) => {
               const allocation = getMemberAllocation(member.id);
-              const totalHours = allocation.projectHours.reduce((sum, hours) => sum + hours, 0);
+              // Calculate total hours from project allocations
+              const totalHours = allocation.projectAllocations.reduce((sum, project) => sum + project.hours, 0);
               const weeklyCapacity = member.weekly_capacity || 40;
               const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / weeklyCapacity) * 100) : 0;
               
@@ -66,24 +67,47 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                   </TableCell>
 
                   {/* Project Allocations */}
-                  {projects.map((project, projectIndex) => (
-                    <TableCell key={project.id} className="text-center">
-                      <input
-                        type="number"
-                        min="0"
-                        max="40"
-                        step="0.5"
-                        value={allocation.projectHours[projectIndex] || ''}
-                        onChange={(e) => {
-                          const newHours = [...allocation.projectHours];
-                          newHours[projectIndex] = parseFloat(e.target.value) || 0;
-                          handleInputChange(member.id, 'projectHours', newHours);
-                        }}
-                        className="enhanced-input"
-                        placeholder="0"
-                      />
-                    </TableCell>
-                  ))}
+                  {projects.map((project, projectIndex) => {
+                    // Find allocation for this project
+                    const projectAllocation = allocation.projectAllocations.find(pa => pa.projectId === project.id);
+                    const projectHours = projectAllocation?.hours || 0;
+                    
+                    return (
+                      <TableCell key={project.id} className="text-center">
+                        <input
+                          type="number"
+                          min="0"
+                          max="40"
+                          step="0.5"
+                          value={projectHours || ''}
+                          onChange={(e) => {
+                            const newHours = parseFloat(e.target.value) || 0;
+                            // Update the project allocations array
+                            const updatedProjectAllocations = [...allocation.projectAllocations];
+                            const existingIndex = updatedProjectAllocations.findIndex(pa => pa.projectId === project.id);
+                            
+                            if (existingIndex >= 0) {
+                              updatedProjectAllocations[existingIndex] = {
+                                ...updatedProjectAllocations[existingIndex],
+                                hours: newHours
+                              };
+                            } else {
+                              updatedProjectAllocations.push({
+                                projectId: project.id,
+                                projectName: project.name,
+                                projectCode: project.code,
+                                hours: newHours
+                              });
+                            }
+                            
+                            handleInputChange(member.id, 'projectAllocations', updatedProjectAllocations);
+                          }}
+                          className="enhanced-input"
+                          placeholder="0"
+                        />
+                      </TableCell>
+                    );
+                  })}
 
                   {/* Total Hours */}
                   <TableCell className="text-center">

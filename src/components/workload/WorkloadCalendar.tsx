@@ -3,13 +3,13 @@ import React, { useMemo } from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 import { format, addDays, startOfWeek, isSunday, isToday } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
-import { WorkloadBreakdown } from './hooks/useWorkloadData';
+import { MemberWorkloadData } from './hooks/types';
 import { Badge } from '@/components/ui/badge';
 
 interface WorkloadCalendarProps {
   members: TeamMember[];
   selectedWeek: Date;
-  workloadData: Record<string, WorkloadBreakdown>;
+  workloadData: Record<string, MemberWorkloadData>;
   periodToShow: number;
 }
 
