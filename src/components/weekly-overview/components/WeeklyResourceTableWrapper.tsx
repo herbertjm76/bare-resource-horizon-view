@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { EnhancedWeeklyResourceTable } from './EnhancedWeeklyResourceTable';
+import { EnhancedWeeklyResourceTable } from '../EnhancedWeeklyResourceTable';
 import { ResourceTableLoadingState } from './ResourceTableLoadingState';
 import { ResourceTableErrorState } from './ResourceTableErrorState';
 import { EmptyResourceState } from './EmptyResourceState';
@@ -18,27 +18,30 @@ export const WeeklyResourceTableWrapper: React.FC<WeeklyResourceTableWrapperProp
   selectedWeek,
   filters
 }) => {
-  // Extend filters to match the expected interface
-  const extendedFilters = {
-    office: filters.office,
-    country: 'all',
-    manager: 'all',
-    searchTerm: ''
-  };
-
   const {
     projects,
-    members,
-    memberTotals,
+    allMembers,
+    membersByOffice,
+    filteredOffices,
+    getMemberAllocation,
+    handleInputChange,
+    getOfficeDisplay,
     projectTotals,
-    allocationMap,
-    weekStartDate,
+    refreshAllocations,
     isLoading,
     error
-  } = useWeeklyResourceData(selectedWeek, extendedFilters);
+  } = useWeeklyResourceData(selectedWeek, filters);
+  
+  // Refresh allocations when week changes
+  useEffect(() => {
+    if (refreshAllocations) {
+      console.log("Refreshing allocations for week:", selectedWeek);
+      refreshAllocations();
+    }
+  }, [selectedWeek, refreshAllocations]);
   
   // Safety checks for data
-  const hasMembers = Array.isArray(members) && members.length > 0;
+  const hasMembers = Array.isArray(allMembers) && allMembers.length > 0;
   const hasProjects = Array.isArray(projects) && projects.length > 0;
 
   // Generate week label
@@ -63,12 +66,14 @@ export const WeeklyResourceTableWrapper: React.FC<WeeklyResourceTableWrapperProp
 
   return (
     <EnhancedWeeklyResourceTable
-      members={members}
       projects={projects}
-      memberTotals={memberTotals}
+      filteredOffices={filteredOffices}
+      membersByOffice={membersByOffice}
+      getMemberAllocation={getMemberAllocation}
+      getOfficeDisplay={getOfficeDisplay}
+      handleInputChange={handleInputChange}
       projectTotals={projectTotals}
-      allocationMap={allocationMap}
-      weekStartDate={weekStartDate}
+      weekLabel={weekLabel}
     />
   );
 };
