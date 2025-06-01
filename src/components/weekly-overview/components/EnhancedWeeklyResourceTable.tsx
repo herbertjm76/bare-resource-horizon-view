@@ -74,7 +74,6 @@ export const EnhancedWeeklyResourceTable: React.FC<EnhancedWeeklyResourceTablePr
                 key={member.id}
                 member={member}
                 projects={projects}
-                memberTotals={memberTotals}
                 allocationMap={allocationMap}
                 weekStartDate={weekStartDate}
               />

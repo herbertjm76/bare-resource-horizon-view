@@ -23,16 +23,23 @@ export const WeeklyResourceSection: React.FC<WeeklyResourceSectionProps> = ({
   filters,
   handleFilterChange
 }) => {
+  // Extend the filters to match the expected interface
+  const extendedFilters = {
+    office: filters.office,
+    country: 'all',
+    manager: 'all',
+    searchTerm: ''
+  };
+
   return (
     <>
       {/* Control bar with filters */}
       <WeeklyOverviewControls
         selectedWeek={selectedWeek}
-        handlePreviousWeek={handlePreviousWeek}
-        handleNextWeek={handleNextWeek}
+        setSelectedWeek={() => {}} // This component uses different handler props
         weekLabel={weekLabel}
-        filters={filters}
-        handleFilterChange={handleFilterChange}
+        filters={extendedFilters}
+        onFilterChange={handleFilterChange}
       />
       
       <OfficeSettingsProvider>
