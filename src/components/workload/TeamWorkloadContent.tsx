@@ -1,16 +1,17 @@
 
-import React, { useState } from 'react';
-import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
-import { TeamAnnualLeaveFilters } from '@/components/annual-leave/TeamAnnualLeaveFilters';
-import { WorkloadCalendar } from '@/components/workload/WorkloadCalendar';
-import { WorkloadSummary } from '@/components/workload/WorkloadSummary';
-import { Skeleton } from '@/components/ui/skeleton';
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight, Filter, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
-import { useWorkloadData, WorkloadBreakdown } from '@/components/workload/hooks/useWorkloadData';
+import { EnhancedTeamWorkloadTable } from './EnhancedTeamWorkloadTable';
 
 interface TeamWorkloadContentProps {
   selectedWeek: Date;
-  onWeekChange: (week: Date) => void;
+  onWeekChange: (date: Date) => void;
   isLoading: boolean;
   filteredMembers: TeamMember[];
   departments: string[];
@@ -29,7 +30,6 @@ interface TeamWorkloadContentProps {
 
 export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   selectedWeek,
-  onWeekChange,
   isLoading,
   filteredMembers,
   departments,
@@ -45,66 +45,114 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   onPreviousWeek,
   onNextWeek
 }) => {
-  // State for period selector
-  const [periodToShow, setPeriodToShow] = useState(12);
-  
-  // Use the enhanced workload data hook with the selected week
-  const { workloadData, isLoadingWorkload } = useWorkloadData(selectedWeek, filteredMembers);
+  const hasActiveFilters = activeFilter !== 'all' || searchQuery.trim() !== '';
 
   return (
-    <div className="mx-auto space-y-4">
-      {/* Enhanced Summary Section */}
-      {!isLoading && !isLoadingWorkload && (
-        <WorkloadSummary 
-          members={filteredMembers}
-          workloadData={workloadData}
-          selectedWeek={selectedWeek}
-          periodToShow={periodToShow}
-        />
-      )}
-      
-      <div className="flex flex-row justify-between items-center gap-4 flex-wrap">
-        <div className="flex items-center gap-2">
-          <WeekSelector 
-            selectedWeek={selectedWeek}
-            onPreviousWeek={onPreviousWeek}
-            onNextWeek={onNextWeek}
-            weekLabel={weekLabel}
-          />
-          
-          <TeamAnnualLeaveFilters 
-            departments={departments}
-            locations={locations}
-            activeFilter={activeFilter}
-            filterValue={filterValue}
-            searchQuery={searchQuery}
-            setActiveFilter={setActiveFilter}
-            setFilterValue={setFilterValue}
-            setSearchQuery={setSearchQuery}
-            clearFilters={clearFilters}
-            periodToShow={periodToShow}
-            onPeriodChange={setPeriodToShow}
-          />
-        </div>
-      </div>
-      
-      <div className="border rounded-lg bg-card shadow-sm">
-        {isLoading || isLoadingWorkload ? (
-          <div className="p-8 space-y-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
+    <div className="space-y-6">
+      {/* Week Navigation and Filters */}
+      <Card className="p-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          {/* Week Navigation */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={onPreviousWeek}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div className="text-lg font-semibold text-gray-900 min-w-[200px] text-center">
+                {weekLabel}
+              </div>
+              <Button variant="outline" size="sm" onClick={onNextWeek}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-        ) : (
-          <WorkloadCalendar 
-            members={filteredMembers}
-            selectedWeek={selectedWeek}
-            workloadData={workloadData}
-            periodToShow={periodToShow}
-          />
+
+          {/* Filters */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Input
+                placeholder="Search team members..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 w-64"
+              />
+            </div>
+
+            {/* Filter by Department */}
+            <Select value={activeFilter === 'department' ? filterValue : ''} onValueChange={(value) => {
+              setActiveFilter('department');
+              setFilterValue(value);
+            }}>
+              <SelectTrigger className="w-48">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Filter by department" />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map(dept => (
+                  <SelectItem key={dept} value={dept}>{dept}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Filter by Location */}
+            <Select value={activeFilter === 'location' ? filterValue : ''} onValueChange={(value) => {
+              setActiveFilter('location');
+              setFilterValue(value);
+            }}>
+              <SelectTrigger className="w-48">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Filter by location" />
+              </SelectTrigger>
+              <SelectContent>
+                {locations.map(location => (
+                  <SelectItem key={location} value={location}>{location}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Clear Filters */}
+            {hasActiveFilters && (
+              <Button variant="outline" size="sm" onClick={clearFilters}>
+                <X className="h-4 w-4 mr-2" />
+                Clear Filters
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Active Filter Badges */}
+        {hasActiveFilters && (
+          <div className="flex items-center gap-2 mt-4 pt-4 border-t">
+            <span className="text-sm text-gray-600">Active filters:</span>
+            {searchQuery && (
+              <Badge variant="secondary">
+                Search: {searchQuery}
+              </Badge>
+            )}
+            {activeFilter === 'department' && filterValue && (
+              <Badge variant="secondary">
+                Department: {filterValue}
+              </Badge>
+            )}
+            {activeFilter === 'location' && filterValue && (
+              <Badge variant="secondary">
+                Location: {filterValue}
+              </Badge>
+            )}
+          </div>
         )}
-      </div>
+      </Card>
+
+      {/* Enhanced Team Workload Table */}
+      <Card className="overflow-hidden">
+        <EnhancedTeamWorkloadTable
+          filteredMembers={filteredMembers}
+          selectedWeek={selectedWeek}
+          isLoading={isLoading}
+        />
+      </Card>
     </div>
   );
 };

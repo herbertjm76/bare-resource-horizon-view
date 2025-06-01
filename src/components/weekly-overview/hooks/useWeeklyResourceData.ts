@@ -1,158 +1,114 @@
 
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useTeamMembersData } from "@/hooks/useTeamMembersData";
-import { useCompany } from "@/context/CompanyContext";
-import { useResourceAllocations } from './useResourceAllocations';
-import { useOfficeMembers } from './useOfficeMembers';
-import { useOfficeDisplay } from './useOfficeDisplay';
-import { useCallback, useEffect, useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useProjects } from '@/hooks/useProjects';
+import { useTeamMembersData } from '@/hooks/useTeamMembersData';
+import { format, startOfWeek } from 'date-fns';
 
-export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: string }) => {
-  // Track loading state explicitly
-  const [isInitializing, setIsInitializing] = useState(true);
-  
-  // Get company context
-  const { company } = useCompany();
-  
-  // Get current user ID
-  const { data: session, isLoading: isLoadingSession } = useQuery({
-    queryKey: ['session'],
-    queryFn: async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      return data.session;
+interface WeeklyResourceDataHook {
+  members: any[];
+  projects: any[];
+  memberTotals: Record<string, number>;
+  projectTotals: Record<string, number>;
+  allocationMap: Map<string, number>;
+  weekStartDate: string;
+  isLoading: boolean;
+  error: string | null;
+}
+
+export const useWeeklyResourceData = (
+  selectedWeek: Date,
+  filters: {
+    office: string;
+    country: string;
+    manager: string;
+    searchTerm: string;
+  }
+): WeeklyResourceDataHook => {
+  const { projects, isLoading: projectsLoading } = useProjects();
+  const { teamMembers, isLoading: membersLoading } = useTeamMembersData(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Get week start date
+  const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+
+  // Filter members based on filters
+  const filteredMembers = useMemo(() => {
+    let filtered = teamMembers;
+
+    if (filters.office !== 'all') {
+      filtered = filtered.filter(member => member.location === filters.office);
     }
-  });
-  
-  // Fetch all projects for the company
-  const { data: projects = [], isLoading: isLoadingProjects } = useQuery({
-    queryKey: ['company-projects', company?.id],
-    queryFn: async () => {
-      if (!company?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('projects')
-        .select('id, code, name')
-        .eq('company_id', company.id)
-        .order('code');
-      
-      if (error) {
-        console.error("Error fetching projects:", error);
-        return [];
-      }
-      
-      console.log("Fetched projects:", data?.length || 0);
-      // Log the HERB project details if it exists
-      const herbProject = data?.find(p => p.name.includes('HERB'));
-      if (herbProject) {
-        console.log("Found HERB project:", herbProject);
-      }
-      return data || [];
-    },
-    enabled: !!company?.id
-  });
-  
-  // Get team members data - pass true to include inactive members
-  const { teamMembers, isLoading: isLoadingMembers, error: teamMembersError } = useTeamMembersData(true);
-  
-  // Get pending team members (pre-registered)
-  const { data: preRegisteredMembers = [], isLoading: isLoadingPending, error: pendingError } = useQuery({
-    queryKey: ['preRegisteredMembers', session?.user?.id, company?.id],
-    queryFn: async () => {
-      if (!session?.user?.id || !company?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('invites')
-        .select('id, first_name, last_name, email, department, location, job_title, role, weekly_capacity')
-        .eq('company_id', company.id)
-        .eq('invitation_type', 'pre_registered')
-        .eq('status', 'pending');
-        
-      if (error) {
-        console.error("Error fetching pre-registered members:", error);
-        return [];
-      }
-      
-      console.log("Fetched pre-registered members:", data?.length || 0);
-      
-      // Transform the pre-registered members to match team member structure
-      return data.map(member => ({
-        id: member.id,
-        first_name: member.first_name || '',
-        last_name: member.last_name || '',
-        email: member.email || '',
-        location: member.location || null,
-        weekly_capacity: member.weekly_capacity || 40
-      }));
-    },
-    enabled: !!session?.user?.id && !!company?.id
-  });
 
-  // Get all members combined (active + pre-registered)
-  const allMembers = useCallback(() => {
-    const combined = [...(teamMembers || []), ...(preRegisteredMembers || [])];
-    console.log("All members for resource table:", combined.length);
-    return combined;
-  }, [teamMembers, preRegisteredMembers])();
-
-  // Get allocations from custom hook
-  const { 
-    memberAllocations,
-    getMemberAllocation, 
-    handleInputChange, 
-    isLoading: isLoadingAllocations,
-    error: allocationsError,
-    refreshAllocations,
-    projectTotals
-  } = useResourceAllocations(allMembers, selectedWeek);
-  
-  // Get office display helper
-  const { getOfficeDisplay } = useOfficeDisplay();
-  
-  // Get members organized by office
-  const { membersByOffice, filteredOffices } = useOfficeMembers(allMembers, filters);
-
-  // Clear initialization state when data is loaded
-  useEffect(() => {
-    const dataIsReady = !isLoadingSession && !isLoadingMembers && 
-                        !isLoadingPending && !isLoadingProjects && 
-                        !isLoadingAllocations && Array.isArray(allMembers);
-                         
-    if (dataIsReady) {
-      // Use a short delay to ensure all data is properly initialized
-      const timer = setTimeout(() => {
-        setIsInitializing(false);
-      }, 300);
-      
-      return () => clearTimeout(timer);
+    if (filters.searchTerm) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      filtered = filtered.filter(member => 
+        `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase().includes(searchLower)
+      );
     }
-  }, [
-    isLoadingSession, 
-    isLoadingMembers, 
-    isLoadingPending, 
-    isLoadingProjects, 
-    isLoadingAllocations, 
-    allMembers
-  ]);
 
-  // Determine overall loading state
-  const isLoading = isInitializing || isLoadingSession || isLoadingMembers || 
-                    isLoadingPending || isLoadingAllocations || isLoadingProjects;
+    return filtered;
+  }, [teamMembers, filters]);
 
-  // Determine if there are any errors - handle both string and Error types
-  const error = teamMembersError || pendingError || allocationsError;
+  // Mock allocation data for now
+  const allocationMap = useMemo(() => {
+    const map = new Map<string, number>();
+    
+    // Generate some mock allocation data
+    filteredMembers.forEach(member => {
+      projects.forEach(project => {
+        const key = `${member.id}:${project.id}`;
+        // Random allocation between 0-20 hours
+        const allocation = Math.floor(Math.random() * 21);
+        if (allocation > 0) {
+          map.set(key, allocation);
+        }
+      });
+    });
+    
+    return map;
+  }, [filteredMembers, projects]);
+
+  // Calculate member totals
+  const memberTotals = useMemo(() => {
+    const totals: Record<string, number> = {};
+    
+    filteredMembers.forEach(member => {
+      let total = 0;
+      projects.forEach(project => {
+        const key = `${member.id}:${project.id}`;
+        total += allocationMap.get(key) || 0;
+      });
+      totals[member.id] = total;
+    });
+    
+    return totals;
+  }, [filteredMembers, projects, allocationMap]);
+
+  // Calculate project totals
+  const projectTotals = useMemo(() => {
+    const totals: Record<string, number> = {};
+    
+    projects.forEach(project => {
+      let total = 0;
+      filteredMembers.forEach(member => {
+        const key = `${member.id}:${project.id}`;
+        total += allocationMap.get(key) || 0;
+      });
+      totals[project.id] = total;
+    });
+    
+    return totals;
+  }, [filteredMembers, projects, allocationMap]);
+
+  const isLoading = projectsLoading || membersLoading;
 
   return {
+    members: filteredMembers,
     projects,
-    allMembers,
-    membersByOffice,
-    filteredOffices,
-    getMemberAllocation,
-    handleInputChange,
-    getOfficeDisplay,
+    memberTotals,
     projectTotals,
-    refreshAllocations,
+    allocationMap,
+    weekStartDate,
     isLoading,
     error
   };

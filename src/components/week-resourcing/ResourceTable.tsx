@@ -3,9 +3,10 @@ import React from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ResourceTableHeader } from './ResourceTableHeader';
-import { ResourceTableRow } from './row/ResourceTableRow';  // Updated import path
+import { ResourceTableRow } from './row/ResourceTableRow';
 import { useResourceTableData } from '@/hooks/useResourceTableData';
 import { ResourceTableFooter } from './ResourceTableFooter';
+import '../ui/enhanced-table.css';
 
 interface ResourceTableProps {
   projects: any[];
@@ -50,32 +51,17 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="w-full max-w-full overflow-hidden border rounded-md shadow-sm">
-        <div 
-          className="overflow-x-auto overflow-y-visible -webkit-overflow-scrolling-touch"
-          style={{
-            width: 'calc(100vw - 22rem)',
-            maxWidth: 'calc(100vw - 22rem)'
-          }}
-        >
-          <Table className="resource-allocation-table">
-            {/* Table Header Component - removed showRemarks prop to use default value */}
+      <div className="enhanced-table-scroll">
+        <div className="enhanced-table-container">
+          <Table className="enhanced-table">
             <ResourceTableHeader projects={projects} />
             
             <TableBody>
-              {/* Render each resource row */}
               {Array.from(membersMap.values()).map((member: any, idx: number) => {
-                // Get weekly capacity or default to 40
                 const weeklyCapacity = member.weekly_capacity || 40;
                 const totalHours = memberTotals.get(member.id) || 0;
-                
-                // Get project count for this member
                 const projectCount = projectCountByMember.get(member.id) || 0;
-                
-                // Calculate leave hours
                 const annualLeave = getTotalWeeklyLeaveHours(member.id) || 0;
-                
-                // Get leave days for tooltip
                 const leaveDays = getWeeklyLeave(member.id);
                 
                 return (
@@ -100,7 +86,6 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
               })}
             </TableBody>
             
-            {/* Add footer with project hour totals */}
             <ResourceTableFooter
               projects={projects}
               projectHourTotals={projectHourTotals}
