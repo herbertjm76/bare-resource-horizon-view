@@ -9,7 +9,38 @@ interface TeamMemberMetricsProps {
 }
 
 export const TeamMemberMetrics: React.FC<TeamMemberMetricsProps> = ({ memberId }) => {
-  const { getIndividualUtilization, isLoading } = useIndividualUtilization([{ id: memberId }]);
+  // Create a minimal team member object that matches the Profile interface structure
+  const teamMemberForUtilization = [{
+    id: memberId,
+    email: '', // Required by Profile interface
+    role: 'member' as const, // Required by Profile interface  
+    weekly_capacity: 40,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    company_id: null, // Will be handled by the hook
+    first_name: null,
+    last_name: null,
+    job_title: null,
+    bio: null,
+    city: null,
+    state: null,
+    phone: null,
+    postal_code: null,
+    address: null,
+    social_twitter: null,
+    social_linkedin: null,
+    emergency_contact_phone: null,
+    date_of_birth: null,
+    department: null,
+    location: null,
+    country: null,
+    emergency_contact_name: null,
+    start_date: null,
+    manager_id: null,
+    avatar_url: null
+  }];
+
+  const { getIndividualUtilization, isLoading } = useIndividualUtilization(teamMemberForUtilization);
   const utilization = getIndividualUtilization(memberId);
 
   const getUtilizationColor = (percentage: number) => {

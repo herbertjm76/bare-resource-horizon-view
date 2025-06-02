@@ -68,6 +68,11 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
     navigate(`/team-members/${memberId}`);
   };
 
+  const getAvatarUrl = (member: TeamMember): string | undefined => {
+    // Only access avatar_url if the member has this property (i.e., is a Profile, not PendingMember)
+    return 'avatar_url' in member ? member.avatar_url : undefined;
+  };
+
   if (teamMembers.length === 0) {
     return (
       <div className="text-center py-8">
@@ -110,7 +115,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
               <td className="px-4 py-3">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={member.avatar_url || undefined} />
+                    <AvatarImage src={getAvatarUrl(member)} />
                     <AvatarFallback className="bg-brand-violet text-white">
                       {getUserInitials(member)}
                     </AvatarFallback>
