@@ -53,7 +53,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   // Use the enhanced workload data hook with the selected week
   const { workloadData, isLoadingWorkload } = useWorkloadData(selectedWeek, filteredMembers);
 
-  // Transform workloadData to the format expected by WorkloadCalendar
+  // Transform workloadData to the format expected by WorkloadCalendar and WorkloadSummary
   const transformedWorkloadData = useMemo(() => {
     const transformed: Record<string, Record<string, WorkloadBreakdown>> = {};
     
@@ -73,7 +73,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
       {!isLoading && !isLoadingWorkload && (
         <WorkloadSummary 
           members={filteredMembers}
-          workloadData={workloadData}
+          workloadData={transformedWorkloadData}
           selectedWeek={selectedWeek}
           periodToShow={periodToShow}
         />
