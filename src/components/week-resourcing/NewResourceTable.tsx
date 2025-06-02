@@ -46,7 +46,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
         <div 
           className="overflow-x-auto overflow-y-visible"
           style={{
-            width: '100%',
+            width: 'calc(100vw - 22rem)',
             maxWidth: '100%'
           }}
         >
