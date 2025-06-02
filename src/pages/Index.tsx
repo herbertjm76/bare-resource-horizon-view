@@ -1,10 +1,15 @@
 
 import Navbar from '../components/landing/Navbar';
 import Hero from '../components/landing/Hero';
-import Features from '../components/landing/Features';
-import Benefits from '../components/landing/Benefits';
+import SocialProof from '../components/landing/SocialProof';
+import ProblemOutcome from '../components/landing/ProblemOutcome';
+import FeatureTrio from '../components/landing/FeatureTrio';
+import ExcelComparison from '../components/landing/ExcelComparison';
 import Pricing from '../components/landing/Pricing';
+import LeadMagnet from '../components/landing/LeadMagnet';
+import FAQ from '../components/landing/FAQ';
 import SignUpSection from '../components/landing/SignUpSection';
+import FooterCTA from '../components/landing/FooterCTA';
 import Footer from '../components/landing/Footer';
 
 const Index = () => {
@@ -12,14 +17,19 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <Hero />
-      <Features />
-      <Benefits />
+      <SocialProof />
+      <ProblemOutcome />
+      <FeatureTrio />
+      <ExcelComparison />
       <Pricing />
+      <LeadMagnet />
+      <FAQ />
       
       <div id="signup">
         <SignUpSection />
       </div>
       
+      <FooterCTA />
       <Footer />
     </div>
   );

@@ -29,13 +29,7 @@ const Navbar = () => {
               onClick={() => scrollToSection('features')} 
               className="hover:text-purple-600 transition-colors cursor-pointer"
             >
-              Why Not Excel?
-            </button>
-            <button 
-              onClick={() => scrollToSection('benefits')} 
-              className="hover:text-purple-600 transition-colors cursor-pointer"
-            >
-              Problems We Solve
+              Features
             </button>
             <button 
               onClick={() => scrollToSection('pricing')} 
@@ -50,7 +44,7 @@ const Navbar = () => {
             onClick={() => scrollToSection('signup')}
             className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg text-sm sm:text-base"
           >
-            Try Free
+            Start Free Trial
           </button>
         </div>
       </div>

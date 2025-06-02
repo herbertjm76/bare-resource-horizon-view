@@ -1,48 +1,46 @@
 
 import React from 'react';
-import { Users, Brain } from 'lucide-react';
+import { Users, Building } from 'lucide-react';
 import { PricingCard } from './PricingCard';
 
 export const PricingPlans = () => {
   const plans = [
     {
       name: "Starter",
-      price: "$59",
+      price: "S$59",
       period: "per month",
-      description: "Perfect for small teams ditching spreadsheets",
+      description: "Up to 10 people",
       features: [
-        "Up to 10 team members",
-        "Visual resource planning",
-        "Project timeline tracking", 
+        "Rolling Availability Calendar",
+        "Live Burn Meter", 
+        "Morning Heads-Up",
         "Basic reporting",
         "Email support"
       ],
-      cta: "Start Free Trial",
+      cta: "Start 14-Day Trial",
       popular: false,
-      note: "Billed annually ($590/year)",
+      note: "No setup fees • Cancel anytime",
       color: "from-gray-600 to-gray-700",
       icon: <Users className="w-5 h-5" />,
       badge: "Essential"
     },
     {
       name: "Studio",
-      price: "$99",
+      price: "S$99",
       period: "per month",
-      description: "Adds AI insights and dashboard analytics",
+      description: "Up to 25 people",
       features: [
         "Everything in Starter",
-        "Up to 25 team members",
-        "🧠 AI hiring recommendations",
-        "🧠 AI pipeline warnings",
-        "🧠 AI burnout prevention",
-        "Advanced dashboard analytics",
+        "Predictive alerts (AI-powered)",
+        "Advanced capacity planning",
+        "Team utilization dashboard",
         "Priority support"
       ],
-      cta: "Start Free Trial", 
+      cta: "Start 14-Day Trial", 
       popular: true,
-      note: "Billed annually ($990/year)",
+      note: "No setup fees • Cancel anytime",
       color: "from-purple-600 to-blue-600",
-      icon: <Brain className="w-5 h-5" />,
+      icon: <Building className="w-5 h-5" />,
       badge: "Most Popular"
     }
   ];
