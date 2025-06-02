@@ -80,7 +80,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
         </div>
         
         {/* Custom scrollbar styling */}
-        <style jsx>{`
+        <style>
+          {`
           .enhanced-grid-scroll::-webkit-scrollbar {
             height: 12px;
           }
@@ -130,7 +131,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
               background: #94a3b8;
             }
           }
-        `}</style>
+          `}
+        </style>
       </div>
     </TooltipProvider>
   );
