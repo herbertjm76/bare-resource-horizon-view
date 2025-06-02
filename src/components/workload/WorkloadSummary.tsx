@@ -1,5 +1,7 @@
+
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
+import { ResourceStatusCards } from './ResourceStatusCards';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/useWorkloadData';
 
@@ -51,23 +53,9 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     return Math.round(totalAvailable);
   };
 
-  // Get hiring recommendation
-  const getHiringRecommendation = (utilization: number, availableHours: number) => {
-    if (utilization >= 90) {
-      return { status: 'urgent', message: 'Urgent hiring needed', color: 'red' };
-    } else if (utilization >= 80) {
-      return { status: 'consider', message: 'Consider hiring soon', color: 'orange' };
-    } else if (availableHours > (periodToShow * 120)) { // 3 people equivalent capacity
-      return { status: 'capacity', message: 'Good capacity available', color: 'green' };
-    } else {
-      return { status: 'monitor', message: 'Monitor capacity', color: 'blue' };
-    }
-  };
-
   // Calculate metrics
   const overallUtilization = calculateOverallUtilization();
   const availableCapacity = calculateAvailableCapacity();
-  const hiringRec = getHiringRecommendation(overallUtilization, availableCapacity);
 
   const metrics = [
     {
@@ -86,27 +74,20 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
       subtitle: `Next ${periodToShow} weeks capacity`,
       badgeText: "Plan Ahead",
       badgeColor: "blue"
-    },
-    {
-      title: "Team Balance",
-      value: members.length > 0 ? "Balanced" : "No Team",
-      subtitle: `${members.length} team members`,
-      badgeText: members.length > 0 ? 'Active' : 'Setup Needed',
-      badgeColor: members.length > 0 ? 'green' : 'orange'
-    },
-    {
-      title: "Hiring Status",
-      value: hiringRec.message,
-      subtitle: `Based on ${periodToShow}-week projection`,
-      badgeText: hiringRec.status === 'urgent' ? 'Action Needed' : 'Monitor',
-      badgeColor: hiringRec.color
     }
   ];
 
   return (
-    <StandardizedExecutiveSummary
-      metrics={metrics}
-      gradientType="purple"
-    />
+    <div className="space-y-4">
+      <StandardizedExecutiveSummary
+        metrics={metrics}
+        gradientType="purple"
+      />
+      <ResourceStatusCards 
+        members={members}
+        workloadData={workloadData}
+        periodToShow={periodToShow}
+      />
+    </div>
   );
 };
