@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { format, startOfWeek, endOfMonth, addDays } from 'date-fns';
+import { format, startOfWeek, endOfMonth, addDays, isWeekend } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 
 export const useWeeklyOtherLeave = (
@@ -59,25 +59,33 @@ export const useWeeklyOtherLeave = (
             const weekStartDate = new Date(leave.week_start_date);
             const hours = Number(leave.hours) || 0;
             
-            // Distribute hours across the work week (Monday to Friday)
-            const dailyHours = hours / 5;
+            // Count actual working days (Monday to Friday) in this week that fall within the selected month
+            const workingDays = [];
+            for (let i = 0; i < 7; i++) {
+              const day = addDays(weekStartDate, i);
+              if (!isWeekend(day) && 
+                  day.getMonth() === selectedMonth.getMonth() && 
+                  day.getFullYear() === selectedMonth.getFullYear()) {
+                workingDays.push(day);
+              }
+            }
             
-            for (let i = 0; i < 5; i++) {
-              const workDay = addDays(weekStartDate, i);
-              const dateKey = format(workDay, 'yyyy-MM-dd');
+            // Only distribute hours if there are working days
+            if (workingDays.length > 0) {
+              const dailyHours = hours / workingDays.length;
               
-              if (workDay.getMonth() === selectedMonth.getMonth() && 
-                  workDay.getFullYear() === selectedMonth.getFullYear()) {
+              workingDays.forEach(workDay => {
+                const dateKey = format(workDay, 'yyyy-MM-dd');
                 
                 if (!otherLeaveHours[leave.member_id][dateKey]) {
                   otherLeaveHours[leave.member_id][dateKey] = 0;
                 }
                 otherLeaveHours[leave.member_id][dateKey] += dailyHours;
-              }
+              });
             }
           });
           
-          console.log('Processed weekly other leave data:', otherLeaveHours);
+          console.log('Processed weekly other leave data (per day):', otherLeaveHours);
           setData(otherLeaveHours);
         }
       } catch (error) {

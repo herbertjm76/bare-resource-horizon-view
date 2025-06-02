@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { format, addDays } from 'date-fns';
+import { format, addDays, isWeekend } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 
 export const useProjectAllocations = (
@@ -54,27 +54,33 @@ export const useProjectAllocations = (
             const weekStartDate = new Date(allocation.week_start_date);
             const weeklyHours = Number(allocation.hours) || 0;
             
-            // Distribute weekly hours across 5 workdays (Monday to Friday)
-            const dailyHours = weeklyHours / 5;
+            // Count actual working days (Monday to Friday) in this week that fall within the selected month
+            const workingDays = [];
+            for (let i = 0; i < 7; i++) {
+              const day = addDays(weekStartDate, i);
+              if (!isWeekend(day) && 
+                  day.getMonth() === selectedMonth.getMonth() && 
+                  day.getFullYear() === selectedMonth.getFullYear()) {
+                workingDays.push(day);
+              }
+            }
             
-            // Generate all 5 weekdays for this allocation
-            for (let i = 0; i < 5; i++) {
-              const workDay = addDays(weekStartDate, i);
-              const dateKey = format(workDay, 'yyyy-MM-dd');
+            // Only distribute hours if there are working days
+            if (workingDays.length > 0) {
+              const dailyHours = weeklyHours / workingDays.length;
               
-              // Only add hours for days that fall within the selected month
-              if (workDay.getMonth() === selectedMonth.getMonth() && 
-                  workDay.getFullYear() === selectedMonth.getFullYear()) {
+              workingDays.forEach(workDay => {
+                const dateKey = format(workDay, 'yyyy-MM-dd');
                 
                 if (!projectHours[allocation.resource_id][dateKey]) {
                   projectHours[allocation.resource_id][dateKey] = 0;
                 }
                 projectHours[allocation.resource_id][dateKey] += dailyHours;
-              }
+              });
             }
           });
           
-          console.log('Processed project allocations:', projectHours);
+          console.log('Processed project allocations (per day):', projectHours);
           setData(projectHours);
         }
       } catch (error) {

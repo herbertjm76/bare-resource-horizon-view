@@ -81,8 +81,8 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
     }
   }, [selectedView, selectedWeek]);
   
-  // Use the enhanced workload data hook with the calculated start date
-  const { workloadData, isLoadingWorkload } = useWorkloadData(startDate, filteredMembers);
+  // Use the enhanced workload data hook with the calculated start date and period
+  const { workloadData, isLoadingWorkload } = useWorkloadData(startDate, filteredMembers, calculatedPeriod);
 
   // Transform workloadData to the format expected by WorkloadCalendar and WorkloadSummary
   const transformedWorkloadData = useMemo(() => {

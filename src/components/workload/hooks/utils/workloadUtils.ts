@@ -1,20 +1,20 @@
 
-import { format, addDays, startOfMonth, endOfMonth } from 'date-fns';
+import { format, addDays, startOfWeek, endOfWeek } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown, DailyWorkloadBreakdown } from '../types';
 
-export const initializeWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]): Record<string, Record<string, DailyWorkloadBreakdown>> => {
-  const monthStart = startOfMonth(selectedMonth);
-  const monthEnd = endOfMonth(selectedMonth);
+export const initializeWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], periodWeeks: number = 1): Record<string, Record<string, DailyWorkloadBreakdown>> => {
+  const startDate = startOfWeek(selectedDate, { weekStartsOn: 1 });
+  const endDate = endOfWeek(addDays(startDate, (periodWeeks - 1) * 7), { weekStartsOn: 1 });
   
   const workloadData: Record<string, Record<string, DailyWorkloadBreakdown>> = {};
   
   teamMembers.forEach(member => {
     workloadData[member.id] = {};
     
-    // Generate all days in the month
-    let currentDate = monthStart;
-    while (currentDate <= monthEnd) {
+    // Generate all days in the period
+    let currentDate = startDate;
+    while (currentDate <= endDate) {
       const dateKey = format(currentDate, 'yyyy-MM-dd');
       workloadData[member.id][dateKey] = {
         projectHours: 0,

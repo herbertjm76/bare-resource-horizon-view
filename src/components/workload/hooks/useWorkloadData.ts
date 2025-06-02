@@ -11,7 +11,7 @@ import { initializeWorkloadData, calculateTotals } from './utils/workloadUtils';
 
 export type { WorkloadBreakdown } from './types';
 
-export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) => {
+export const useWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], periodWeeks: number = 1) => {
   const [workloadData, setWorkloadData] = useState<Record<string, MemberWorkloadData>>({});
   const [isLoadingWorkload, setIsLoadingWorkload] = useState<boolean>(true);
   const { company } = useCompany();
@@ -19,8 +19,8 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
   // Create a stable workload data structure that doesn't change on every render
   const initialWorkloadData = useMemo(() => {
     if (!company?.id || teamMembers.length === 0) return {};
-    return initializeWorkloadData(selectedMonth, teamMembers);
-  }, [company?.id, selectedMonth, teamMembers]);
+    return initializeWorkloadData(selectedDate, teamMembers, periodWeeks);
+  }, [company?.id, selectedDate, teamMembers, periodWeeks]);
 
   // Initialize workload data when dependencies change
   useEffect(() => {
@@ -30,7 +30,7 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
       return;
     }
 
-    console.log('Initializing comprehensive workload data for:', teamMembers.length, 'members');
+    console.log('Initializing comprehensive workload data for:', teamMembers.length, 'members', 'for', periodWeeks, 'weeks');
     
     // Convert the flat structure to MemberWorkloadData structure
     const convertedData: Record<string, MemberWorkloadData> = {};
@@ -42,13 +42,13 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
     
     setWorkloadData(convertedData);
     setIsLoadingWorkload(true);
-  }, [company?.id, selectedMonth, teamMembers, initialWorkloadData]);
+  }, [company?.id, selectedDate, teamMembers, periodWeeks, initialWorkloadData]);
 
   // Use individual hooks for each data source - pass callback functions instead of mutable objects
-  const { data: projectData, isLoading: isLoadingProjects } = useProjectAllocations(selectedMonth, teamMembers, company?.id);
-  const { data: annualLeaveData, isLoading: isLoadingAnnualLeave } = useAnnualLeaveData(selectedMonth, teamMembers, company?.id);
-  const { data: holidaysData, isLoading: isLoadingHolidays } = useOfficeHolidays(selectedMonth, teamMembers, company?.id);
-  const { data: otherLeaveData, isLoading: isLoadingOtherLeave } = useWeeklyOtherLeave(selectedMonth, teamMembers, company?.id);
+  const { data: projectData, isLoading: isLoadingProjects } = useProjectAllocations(selectedDate, teamMembers, company?.id);
+  const { data: annualLeaveData, isLoading: isLoadingAnnualLeave } = useAnnualLeaveData(selectedDate, teamMembers, company?.id);
+  const { data: holidaysData, isLoading: isLoadingHolidays } = useOfficeHolidays(selectedDate, teamMembers, company?.id);
+  const { data: otherLeaveData, isLoading: isLoadingOtherLeave } = useWeeklyOtherLeave(selectedDate, teamMembers, company?.id);
 
   // Combine all data when everything is loaded
   useEffect(() => {
@@ -115,7 +115,7 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
         };
       });
       
-      console.log('Final comprehensive workload data:', finalWorkloadData);
+      console.log('Final comprehensive workload data (per day):', finalWorkloadData);
       setWorkloadData(finalWorkloadData);
       setIsLoadingWorkload(false);
     }
