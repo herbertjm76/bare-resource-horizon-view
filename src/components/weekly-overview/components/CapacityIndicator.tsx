@@ -53,7 +53,7 @@ export const CapacityIndicator: React.FC<CapacityIndicatorProps> = ({
       <div className="flex items-center justify-center w-full">
         <div className="flex-1 flex justify-center items-center gap-1.5">
           {/* Capacity boxes - 5 squares representing utilization */}
-          <div className="flex gap-[0.5px]">
+          <div className="flex gap-0.5">
             {Array.from({ length: 5 }).map((_, index) => {
               // Each box represents 20% (index 0 = 0-20%, index 1 = 20-40%, etc.)
               const boxStartPercent = index * 20;
@@ -67,36 +67,36 @@ export const CapacityIndicator: React.FC<CapacityIndicatorProps> = ({
                 <Tooltip key={index}>
                   <TooltipTrigger asChild>
                     <div className={cn(
-                      "h-2.5 w-2.5 relative overflow-hidden border border-gray-300",
-                      !isFilled && !isPartiallyFilled && "bg-gray-100"
+                      "h-3 w-3 border border-gray-400 relative overflow-hidden",
+                      // Apply background color based on fill state
+                      isFilled ? boxColor : isPartiallyFilled ? "bg-gray-100" : "bg-gray-100"
                     )}>
-                      {/* For completely filled boxes */}
-                      {isFilled && (
-                        <div className={cn("absolute inset-0", boxColor)} />
-                      )}
-                      
-                      {/* For partially filled boxes */}
+                      {/* For partially filled boxes - show gradient or partial fill */}
                       {isPartiallyFilled && (
                         <div 
                           className={cn("absolute top-0 bottom-0 left-0", boxColor)} 
                           style={{
-                            width: `${(utilizationPercentage - boxStartPercent) / 20 * 100}%`
+                            width: `${Math.round((utilizationPercentage - boxStartPercent) / 20 * 100)}%`
                           }} 
                         />
                       )}
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-xs">
-                      {isFilled 
-                        ? `${boxStartPercent}-${boxEndPercent}% (Filled)` 
-                        : isPartiallyFilled 
-                          ? `${boxStartPercent}-${boxEndPercent}% (${Math.round((utilizationPercentage - boxStartPercent) / 20 * 100)}% filled)`
-                          : `${boxStartPercent}-${boxEndPercent}% (Empty)`
+                  <TooltipContent side="top" className="text-xs">
+                    <p>
+                      {boxStartPercent}-{boxEndPercent}%: {
+                        isFilled 
+                          ? 'Filled' 
+                          : isPartiallyFilled 
+                            ? `${Math.round((utilizationPercentage - boxStartPercent) / 20 * 100)}% filled`
+                            : 'Empty'
                       }
                     </p>
-                    <p className="text-xs font-medium">
+                    <p className="font-medium">
                       Total Utilization: {utilizationPercentage.toFixed(1)}%
+                    </p>
+                    <p className="text-gray-500">
+                      Available: {availableHours}h / {totalCapacity}h
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -105,7 +105,7 @@ export const CapacityIndicator: React.FC<CapacityIndicatorProps> = ({
           </div>
           
           {/* Available hours number with color coding */}
-          <span className={cn("text-xs font-medium", textColor)}>
+          <span className={cn("text-xs font-medium ml-1", textColor)}>
             {availableHours}
           </span>
         </div>
