@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
-import { Mail, MapPin, Calendar, Edit3, Check, X, Briefcase } from 'lucide-react';
+import { Mail, MapPin, Calendar, Edit3, Check, X, Briefcase, Clock } from 'lucide-react';
 
 interface ProfileOverviewCardProps {
   profile: any;
@@ -116,7 +116,7 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
                       name="bio"
                       value={editedProfile.bio}
                       onChange={handleEditChange}
-                      placeholder="About yourself..."
+                      placeholder="Tell us about yourself..."
                       rows={3}
                       className="bg-white/20 border-white/30 text-white placeholder:text-white/70 resize-none"
                     />
@@ -148,7 +148,7 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
                         <h2 className="text-3xl font-bold leading-tight">
                           {profile.first_name || profile.last_name 
                             ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
-                            : 'Name not set'
+                            : 'Welcome to your profile'
                           }
                         </h2>
                         {profile.job_title && (
@@ -200,24 +200,29 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
               {/* Bio Section - Only show when not editing */}
               {!isEditing && profile.bio && (
                 <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-white/80 uppercase tracking-wide">About</h3>
+                  <h3 className="text-sm font-medium text-white/80 uppercase tracking-wide">About Me</h3>
                   <p className="text-white/90 text-sm leading-relaxed max-w-2xl">
                     {profile.bio}
                   </p>
                 </div>
               )}
 
-              {/* Quick Stats - Only show when not editing */}
+              {/* Personal Info Summary - Only show when not editing */}
               {!isEditing && (
                 <div className="flex flex-wrap gap-6 pt-2">
                   <div className="text-center">
-                    <div className="text-2xl font-bold">{profile.weekly_capacity || 40}h</div>
+                    <div className="text-xl font-bold flex items-center gap-1">
+                      <Clock className="h-4 w-4" />
+                      {profile.weekly_capacity || 40}h
+                    </div>
                     <div className="text-xs text-white/70 uppercase tracking-wide">Weekly Capacity</div>
                   </div>
-                  {profile.department && (
+                  {profile.start_date && (
                     <div className="text-center">
-                      <div className="text-lg font-semibold text-white/90">{profile.department}</div>
-                      <div className="text-xs text-white/70 uppercase tracking-wide">Department</div>
+                      <div className="text-lg font-semibold text-white/90">
+                        {Math.floor((new Date().getTime() - new Date(profile.start_date).getTime()) / (1000 * 60 * 60 * 24 * 365))} years
+                      </div>
+                      <div className="text-xs text-white/70 uppercase tracking-wide">Experience Here</div>
                     </div>
                   )}
                 </div>
