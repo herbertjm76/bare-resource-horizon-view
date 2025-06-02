@@ -45,6 +45,9 @@ export const WeeklyResourceTableWrapper: React.FC<WeeklyResourceTableWrapperProp
   const hasMembers = Array.isArray(allMembers) && allMembers.length > 0;
   const hasProjects = Array.isArray(projects) && projects.length > 0;
 
+  console.log("WeeklyResourceTableWrapper - hasProjects:", hasProjects, "hasMembers:", hasMembers, "isLoading:", isLoading);
+  console.log("WeeklyResourceTableWrapper - projects:", projects);
+
   // Render loading state
   if (isLoading || !hasProjects) {
     return <ResourceTableLoadingState />;
@@ -60,20 +63,29 @@ export const WeeklyResourceTableWrapper: React.FC<WeeklyResourceTableWrapperProp
     return <EmptyResourceState />;
   }
 
+  console.log("WeeklyResourceTableWrapper - Rendering both tables");
+
   return (
-    <div>
-      <CleanWeeklyTable
-        projects={projects}
-        filteredOffices={filteredOffices}
-        membersByOffice={membersByOffice}
-        getMemberAllocation={getMemberAllocation}
-        getOfficeDisplay={getOfficeDisplay}
-        handleInputChange={handleInputChange}
-        projectTotals={projectTotals}
-      />
+    <div className="space-y-8">
+      {/* Main table */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Main Resource Table</h3>
+        <CleanWeeklyTable
+          projects={projects}
+          filteredOffices={filteredOffices}
+          membersByOffice={membersByOffice}
+          getMemberAllocation={getMemberAllocation}
+          getOfficeDisplay={getOfficeDisplay}
+          handleInputChange={handleInputChange}
+          projectTotals={projectTotals}
+        />
+      </div>
       
-      {/* Test table below */}
-      <TestPurpleTable projects={projects} />
+      {/* Test table with purple header */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4 text-purple-600">Test Purple Header Table</h3>
+        <TestPurpleTable projects={projects} />
+      </div>
     </div>
   );
 };

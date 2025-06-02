@@ -8,8 +8,16 @@ interface TestPurpleTableProps {
 }
 
 export const TestPurpleTable: React.FC<TestPurpleTableProps> = ({ projects }) => {
+  console.log("TestPurpleTable - Rendering with projects:", projects);
+  
   return (
     <div className="test-purple-wrapper">
+      <div className="mb-4 p-4 bg-purple-100 border border-purple-300 rounded">
+        <p className="text-purple-800 font-medium">
+          🟣 TEST TABLE: This table should have a purple header. Projects count: {projects?.length || 0}
+        </p>
+      </div>
+      
       <Table className="test-purple-table">
         <TableHeader className="test-purple-header">
           <TableRow className="test-purple-header-row">
