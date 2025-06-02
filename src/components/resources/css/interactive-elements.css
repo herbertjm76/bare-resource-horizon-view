@@ -1,0 +1,46 @@
+
+/* Enhanced Resource Grid - Interactive Elements */
+
+/* Allocation Input Enhancements */
+.enhanced-allocation-input {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 4px 6px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  background: white;
+  transition: all 0.2s ease;
+  width: 100%;
+  height: 28px;
+  color: #1f2937;
+}
+
+.enhanced-allocation-input:focus {
+  outline: none;
+  border-color: #6F4BF6;
+  box-shadow: 0 0 0 3px rgba(111,75,246,0.1);
+  background: #fafbff;
+}
+
+.enhanced-allocation-input:hover {
+  border-color: #a5b4fc;
+  background: #fafbff;
+}
+
+/* Enhanced Project Hours Badge - Black pill design */
+.enhanced-project-hours-badge {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-width: 40px;
+  justify-content: center;
+}

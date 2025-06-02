@@ -1,0 +1,66 @@
+
+/* Enhanced Resource Grid - Utility Classes & Indicators */
+
+/* Weekend Styling Enhancements */
+.enhanced-resource-table .weekend {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  position: relative;
+}
+
+.enhanced-resource-table .weekend::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(156,163,175,0.1) 2px,
+    rgba(156,163,175,0.1) 4px
+  );
+  pointer-events: none;
+}
+
+/* Month Separator Enhancements */
+.enhanced-resource-table .month-start {
+  border-left: 3px solid #6366f1;
+  position: relative;
+}
+
+.enhanced-resource-table .month-start::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -3px;
+  width: 3px;
+  height: calc(100% + 4px);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 2px;
+}
+
+/* Utilization Indicators */
+.utilization-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
+.utilization-low {
+  background: #10b981;
+  box-shadow: 0 0 4px rgba(16,185,129,0.4);
+}
+
+.utilization-medium {
+  background: #f59e0b;
+  box-shadow: 0 0 4px rgba(245,158,11,0.4);
+}
+
+.utilization-high {
+  background: #ef4444;
+  box-shadow: 0 0 4px rgba(239,68,68,0.4);
+}

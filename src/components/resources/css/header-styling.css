@@ -1,0 +1,47 @@
+
+/* Enhanced Resource Grid - Header Styling */
+.enhanced-resource-table thead {
+  background: #6F4BF6;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.enhanced-resource-table thead th {
+  padding: 12px 8px;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(255,255,255,0.2);
+  position: relative;
+  color: white;
+}
+
+.enhanced-resource-table thead th:last-child {
+  border-right: none;
+}
+
+/* Project Header Enhancements */
+.enhanced-resource-table .project-header-row {
+  background: linear-gradient(135deg, #6F4BF6 0%, #7c3aed 100%);
+  color: white;
+  font-weight: 600;
+  position: relative;
+}
+
+.enhanced-resource-table .project-header-row:hover {
+  background: linear-gradient(135deg, #5D3FD3 0%, #6b21a8 100%);
+  transform: none;
+}
+
+.enhanced-resource-table .project-header-row td {
+  border-right: 1px solid rgba(255,255,255,0.2);
+  padding: 12px 8px;
+  color: white;
+}
+
+.enhanced-resource-table .project-header-row:hover .project-expand-icon {
+  transform: scale(1.1);
+}

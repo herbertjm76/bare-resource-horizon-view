@@ -1,0 +1,50 @@
+
+/* Enhanced Resource Grid - Base Layout & Structure */
+.enhanced-grid-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  width: 100%;
+  background: linear-gradient(to right, rgba(255,255,255,0.95), rgba(248,250,252,0.95));
+  border-radius: 12px;
+  padding: 1px;
+}
+
+.enhanced-grid-container {
+  min-height: 400px;
+  position: relative;
+  width: 100%;
+  min-width: 100%;
+  background: white;
+  border-radius: 11px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.enhanced-resource-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  min-width: max-content;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Sticky Column Enhancements */
+.enhanced-resource-table .sticky-left-0,
+.enhanced-resource-table .sticky-left-12 {
+  position: sticky;
+  z-index: 5;
+  background: inherit;
+  border-right: 2px solid #e2e8f0;
+}
+
+.enhanced-resource-table .sticky-left-0 {
+  left: 0;
+}
+
+.enhanced-resource-table .sticky-left-12 {
+  left: 48px;
+}
