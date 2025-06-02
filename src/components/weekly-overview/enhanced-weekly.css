@@ -1,3 +1,4 @@
+
 /* Enhanced Weekly Overview Styles - Using Centralized Color System */
 .enhanced-weekly-scroll {
   overflow-x: auto;
@@ -31,9 +32,9 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* Enhanced Header Styling - standardized to #6F4BF6 */
+/* Enhanced Header Styling - updated to #6465F0 */
 .enhanced-weekly-table thead {
-  background: linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
   color: white;
   position: sticky;
   top: 0;
@@ -88,9 +89,9 @@
   border-right: none;
 }
 
-/* Office Header Enhancements - standardized to #6F4BF6 */
+/* Office Header Enhancements - updated to #6465F0 */
 .enhanced-weekly-table .office-header-row {
-  background: linear-gradient(135deg, #6F4BF6 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #6465F0 0%, #7c3aed 100%);
   color: white;
   font-weight: 600;
   position: relative;
@@ -115,7 +116,7 @@
 }
 
 .enhanced-weekly-table .member-row:hover {
-  border-left-color: #6F4BF6; /* Changed from #6366f1 */
+  border-left-color: #6465F0; /* Updated to match header */
   background: linear-gradient(90deg, #C4B5F7 0%, #B6A3F4 100%);
 }
 
@@ -136,8 +137,8 @@
 
 .enhanced-leave-input:focus {
   outline: none;
-  border-color: #6F4BF6; /* Changed from #6366f1 */
-  box-shadow: 0 0 0 3px rgba(111,75,246,0.1); /* Changed color */
+  border-color: #6465F0; /* Updated to match header */
+  box-shadow: 0 0 0 3px rgba(100,101,240,0.1); /* Updated shadow color */
   background: #fafbff;
 }
 
