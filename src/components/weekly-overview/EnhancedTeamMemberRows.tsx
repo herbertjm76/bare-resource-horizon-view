@@ -38,7 +38,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
             </TableRow>
 
             {/* Office Members */}
-            {officeMembers.map((member) => {
+            {officeMembers.map((member, memberIndex) => {
               const allocation = getMemberAllocation(member.id);
               // Calculate total hours from project allocations
               const totalHours = allocation.projectAllocations.reduce((sum, project) => sum + project.hours, 0);
@@ -53,7 +53,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
               };
 
               return (
-                <TableRow key={member.id} className="member-row">
+                <TableRow key={member.id} className={`member-row ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
                   {/* Member Name */}
                   <TableCell className="sticky left-0 z-10 bg-inherit">
                     <div className="flex flex-col">
@@ -109,16 +109,16 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                     );
                   })}
 
-                  {/* Total Hours */}
-                  <TableCell className="text-center">
-                    <div className="enhanced-pill">
+                  {/* Total Hours - Enhanced styling */}
+                  <TableCell className="text-center total-hours-column">
+                    <div className="enhanced-hours-pill">
                       {totalHours}h
                     </div>
                   </TableCell>
 
-                  {/* Capacity */}
-                  <TableCell className="text-center">
-                    <div className="enhanced-capacity-display">
+                  {/* Capacity - Enhanced styling with better spacing */}
+                  <TableCell className="text-center capacity-column">
+                    <div className="enhanced-capacity-pill">
                       {weeklyCapacity}h
                     </div>
                   </TableCell>

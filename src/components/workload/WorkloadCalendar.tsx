@@ -31,13 +31,13 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
     return dates;
   }, [selectedWeek, periodToShow]);
 
-  // Get workload intensity class
-  const getWorkloadClass = (hours: number, capacity: number) => {
-    if (!hours) return '';
+  // Get workload intensity class for pill styling
+  const getWorkloadPillClass = (hours: number, capacity: number) => {
+    if (!hours) return 'bg-gray-100 text-gray-600';
     const percentage = (hours / capacity) * 100;
-    if (percentage >= 100) return 'workload-high';
-    if (percentage >= 80) return 'workload-medium';
-    return 'workload-low';
+    if (percentage >= 100) return 'bg-red-500 text-white';
+    if (percentage >= 80) return 'bg-orange-500 text-white';
+    return 'bg-blue-500 text-white';
   };
 
   return (
@@ -71,7 +71,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
       </TableHeader>
       
       <TableBody>
-        {members.map((member) => {
+        {members.map((member, memberIndex) => {
           const memberWorkloadDays = workloadData[member.id] || {};
           const weeklyCapacity = member.weekly_capacity || 40;
           const dailyCapacity = weeklyCapacity / 5; // Assuming 5 working days
@@ -86,7 +86,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
           const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / (weeklyCapacity * periodToShow)) * 100) : 0;
           
           return (
-            <TableRow key={member.id} className="member-row">
+            <TableRow key={member.id} className={`member-row ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
               <TableCell className="sticky left-0 z-10 bg-inherit">
                 <div className="flex flex-col">
                   <span className="font-medium text-sm">
@@ -107,13 +107,13 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                 return (
                   <TableCell 
                     key={date.toISOString()}
-                    className={`text-center workload-cell ${getWorkloadClass(dayHours, dailyCapacity)} ${
+                    className={`text-center ${
                       isSunday(date) ? 'sunday-border' : ''
                     } ${isWeekend ? 'weekend' : ''} ${isToday(date) ? 'bg-blue-50' : ''}`}
                   >
                     {dayHours > 0 && (
-                      <div className="enhanced-pill text-xs">
-                        {dayHours}h
+                      <div className={`workload-pill text-xs font-medium px-2 py-1 rounded-full ${getWorkloadPillClass(dayHours, dailyCapacity)}`}>
+                        {dayHours}
                       </div>
                     )}
                   </TableCell>

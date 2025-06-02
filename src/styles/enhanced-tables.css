@@ -58,7 +58,7 @@
   border-right: none;
 }
 
-/* Enhanced Row Styling */
+/* Enhanced Row Styling with Consistent Colors */
 .enhanced-table tbody tr {
   transition: all 0.2s ease;
   border-bottom: 1px solid #f1f5f9;
@@ -70,12 +70,21 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.enhanced-table tbody tr:nth-child(even) {
-  background: rgba(248,250,252,0.3);
+/* Consistent row coloring */
+.enhanced-table tbody tr.even-row {
+  background: rgba(248,250,252,0.4);
 }
 
-.enhanced-table tbody tr:nth-child(even):hover {
+.enhanced-table tbody tr.odd-row {
+  background: white;
+}
+
+.enhanced-table tbody tr.even-row:hover {
   background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.enhanced-table tbody tr.odd-row:hover {
+  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 /* Enhanced Cell Styling */
@@ -112,14 +121,12 @@
 
 /* Member/Resource Row Enhancements */
 .enhanced-table .member-row {
-  background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
   border-left: 3px solid transparent;
   transition: all 0.2s ease;
 }
 
 .enhanced-table .member-row:hover {
   border-left-color: #6366f1;
-  background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 100%);
 }
 
 /* Enhanced Input Styling */
@@ -180,7 +187,52 @@
   justify-content: center;
 }
 
-/* Enhanced Capacity Display */
+/* New Enhanced Hours Pill for Total Hours Column */
+.enhanced-hours-pill {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: 1px solid #2563eb;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 4px rgba(59,130,246,0.2);
+  min-width: 40px;
+  justify-content: center;
+}
+
+/* New Enhanced Capacity Pill for Capacity Column */
+.enhanced-capacity-pill {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  border: 1px solid #64748b;
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 4px rgba(100,116,139,0.2);
+  min-width: 40px;
+  justify-content: center;
+}
+
+/* Column-specific styling */
+.total-hours-column {
+  background-color: rgba(59, 130, 246, 0.05);
+  border-left: 2px solid rgba(59, 130, 246, 0.2);
+}
+
+.capacity-column {
+  background-color: rgba(100, 116, 139, 0.05);
+  border-left: 2px solid rgba(100, 116, 139, 0.2);
+}
+
+/* Enhanced Capacity Display - Legacy support */
 .enhanced-capacity-display {
   font-weight: 600;
   font-size: 13px;
@@ -243,25 +295,16 @@
   background: #64748b;
 }
 
-/* Workload Specific Styling */
-.workload-high {
-  background-color: rgba(111, 75, 246, 0.9) !important;
-  color: white;
-}
-
-.workload-medium {
-  background-color: rgba(111, 75, 246, 0.6) !important;
-}
-
-.workload-low {
-  background-color: rgba(111, 75, 246, 0.3) !important;
-}
-
-.workload-cell:hover {
-  outline: 2px solid rgba(111, 75, 246, 0.5);
-  outline-offset: -2px;
-  z-index: 5;
-  position: relative;
+/* Workload Specific Styling - Updated for pill-only coloring */
+.workload-pill {
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 24px;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .total-column {
@@ -276,6 +319,10 @@
 .sunday-border {
   border-left-width: 2px !important;
   border-left-color: rgba(111, 75, 246, 0.3) !important;
+}
+
+.weekend {
+  background-color: rgba(0, 0, 0, 0.01);
 }
 
 /* Mobile Responsiveness */
@@ -296,5 +343,12 @@
   .enhanced-table td {
     padding: 6px 4px;
     font-size: 11px;
+  }
+  
+  .enhanced-hours-pill,
+  .enhanced-capacity-pill,
+  .workload-pill {
+    padding: 4px 8px;
+    font-size: 10px;
   }
 }
