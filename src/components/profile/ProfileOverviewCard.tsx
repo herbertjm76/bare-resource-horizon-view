@@ -65,7 +65,7 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
 
   return (
     <Card className="overflow-hidden">
-      <div className="bg-gradient-to-r from-[#6F4BF6] via-[#7c3aed] to-[#8b5cf6] p-8 text-white relative">
+      <div className="bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400 p-8 text-white relative">
         {/* Decorative background elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50"></div>
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
