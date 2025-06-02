@@ -56,10 +56,10 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                 className={`text-center min-w-[50px] px-1 py-1 ${isSunday(date) ? 'sunday-border' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
               >
                 <div className="flex flex-col items-center">
-                  <span className={`text-xs font-medium ${isToday(date) ? 'text-blue-900 font-bold' : 'text-gray-700'}`}>
+                  <span className={`text-xs font-medium ${isToday(date) ? 'text-black font-bold' : 'text-white'}`}>
                     {format(date, 'EEE')}
                   </span>
-                  <span className={`text-xs ${isToday(date) ? 'text-blue-900 font-bold' : 'text-gray-700'}`}>
+                  <span className={`text-xs ${isToday(date) ? 'text-black font-bold' : 'text-white'}`}>
                     {format(date, 'd')}
                   </span>
                 </div>
