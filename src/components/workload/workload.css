@@ -1,7 +1,6 @@
-
 /* Additional workload specific styles */
 .workload-header {
-  background-color: #f9f9fb;
+  background-color: #D2C6FB;
   border-bottom: 2px solid #e5e7eb;
 }
 
@@ -29,7 +28,7 @@
 
 /* Total column styling */
 .total-column {
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: #D2C6FB;
   font-weight: 500;
 }
 

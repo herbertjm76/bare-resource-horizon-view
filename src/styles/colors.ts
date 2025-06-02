@@ -117,12 +117,12 @@ export const colors = {
     },
   },
 
-  // Table and grid colors - standardized to #6F4BF6
+  // Table and grid colors - updated with #D2C6FB
   table: {
     headerBg: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)',
     headerText: '#ffffff',
-    rowEven: 'rgba(248,250,252,0.3)',
-    rowHover: 'linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%)',
+    rowEven: '#D2C6FB',
+    rowHover: 'linear-gradient(90deg, #D2C6FB 0%, #C4B5F7 100%)',
     border: '#e2e8f0',
     borderDark: 'rgba(156, 163, 175, 0.6)',
   },
