@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { TeamMember } from '@/components/dashboard/types';
-import { WorkloadBreakdown } from './types';
+import { WorkloadBreakdown, MemberWorkloadData } from './types';
 import { useProjectAllocations } from './useProjectAllocations';
 import { useAnnualLeaveData } from './useAnnualLeaveData';
 import { useOfficeHolidays } from './useOfficeHolidays';
@@ -12,7 +12,7 @@ import { initializeWorkloadData, calculateTotals } from './utils/workloadUtils';
 export type { WorkloadBreakdown } from './types';
 
 export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) => {
-  const [workloadData, setWorkloadData] = useState<Record<string, Record<string, WorkloadBreakdown>>>({});
+  const [workloadData, setWorkloadData] = useState<Record<string, MemberWorkloadData>>({});
   const [isLoadingWorkload, setIsLoadingWorkload] = useState<boolean>(true);
   const { company } = useCompany();
 
@@ -31,7 +31,16 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
     }
 
     console.log('Initializing comprehensive workload data for:', teamMembers.length, 'members');
-    setWorkloadData(JSON.parse(JSON.stringify(initialWorkloadData))); // Deep copy to avoid mutations
+    
+    // Convert the flat structure to MemberWorkloadData structure
+    const convertedData: Record<string, MemberWorkloadData> = {};
+    Object.keys(initialWorkloadData).forEach(memberId => {
+      convertedData[memberId] = {
+        daily: initialWorkloadData[memberId]
+      };
+    });
+    
+    setWorkloadData(convertedData);
     setIsLoadingWorkload(true);
   }, [company?.id, selectedMonth, teamMembers, initialWorkloadData]);
 
@@ -98,8 +107,16 @@ export const useWorkloadData = (selectedMonth: Date, teamMembers: TeamMember[]) 
       // Calculate totals for each day
       calculateTotals(combinedData);
       
-      console.log('Final comprehensive workload data:', combinedData);
-      setWorkloadData(combinedData);
+      // Convert the flat structure to MemberWorkloadData structure
+      const finalWorkloadData: Record<string, MemberWorkloadData> = {};
+      Object.keys(combinedData).forEach(memberId => {
+        finalWorkloadData[memberId] = {
+          daily: combinedData[memberId]
+        };
+      });
+      
+      console.log('Final comprehensive workload data:', finalWorkloadData);
+      setWorkloadData(finalWorkloadData);
       setIsLoadingWorkload(false);
     }
   }, [isLoadingProjects, isLoadingAnnualLeave, isLoadingHolidays, isLoadingOtherLeave, projectData, annualLeaveData, holidaysData, otherLeaveData, initialWorkloadData]);

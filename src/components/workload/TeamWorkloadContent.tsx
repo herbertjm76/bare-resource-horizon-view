@@ -59,7 +59,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
       {!isLoading && !isLoadingWorkload && (
         <WorkloadSummary 
           members={filteredMembers}
-          workloadData={workloadData as Record<string, MemberWorkloadData>}
+          workloadData={workloadData}
           selectedWeek={selectedWeek}
           periodToShow={periodToShow}
         />
@@ -104,7 +104,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
               <WorkloadCalendar 
                 members={filteredMembers}
                 selectedWeek={selectedWeek}
-                workloadData={workloadData as Record<string, MemberWorkloadData>}
+                workloadData={workloadData}
                 periodToShow={periodToShow}
               />
             </div>
