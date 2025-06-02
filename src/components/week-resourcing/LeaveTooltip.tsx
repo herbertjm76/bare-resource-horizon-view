@@ -1,42 +1,58 @@
 
 import React from 'react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { format } from 'date-fns';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
-interface LeaveDayInfo {
+interface LeaveDay {
   date: string;
   hours: number;
 }
 
 interface LeaveTooltipProps {
-  leaveDays: LeaveDayInfo[];
-  leaveType: string;
+  leaveDays: LeaveDay[];
   children: React.ReactNode;
+  leaveType?: string; // Added leaveType as an optional prop
 }
 
-export const LeaveTooltip: React.FC<LeaveTooltipProps> = ({ 
-  leaveDays, 
-  leaveType, 
-  children 
+export const LeaveTooltip: React.FC<LeaveTooltipProps> = ({
+  leaveDays,
+  children,
+  leaveType = 'Leave' // Default value if not provided
 }) => {
   if (!leaveDays || leaveDays.length === 0) {
     return <>{children}</>;
   }
 
+  // Sort leave days by date
+  const sortedLeaveDays = [...leaveDays].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        {children}
-      </TooltipTrigger>
-      <TooltipContent>
-        <div className="space-y-1">
-          <p className="font-medium">{leaveType}</p>
-          {leaveDays.map((day, index) => (
-            <p key={index} className="text-xs">
-              {day.date}: {day.hours}h
-            </p>
-          ))}
-        </div>
-      </TooltipContent>
-    </Tooltip>
+    <TooltipProvider>
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>
+          <div className="cursor-help">{children}</div>
+        </TooltipTrigger>
+        <TooltipContent className="p-2 max-w-xs" side="top">
+          <div className="space-y-1">
+            <p className="font-semibold text-sm">{leaveType} days this week:</p>
+            <ul className="space-y-1 text-xs">
+              {sortedLeaveDays.map((day) => (
+                <li key={day.date} className="flex justify-between gap-4">
+                  <span>{format(new Date(day.date), 'EEE, MMM d')}</span>
+                  <span className="font-medium">{day.hours} hrs</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
