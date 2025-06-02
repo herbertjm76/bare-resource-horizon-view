@@ -1,5 +1,3 @@
-
-
 /* Enhanced Weekly Overview Styles - Using Centralized Color System */
 .enhanced-weekly-scroll {
   overflow-x: auto;
@@ -51,15 +49,17 @@
   border-right: 1px solid rgba(255,255,255,0.2);
   position: relative;
   color: white;
+  text-align: center;
 }
 
-/* First column header styling - matches header background */
+/* First column header styling - matches header background and centered */
 .enhanced-weekly-table thead th:first-child {
   background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
   position: sticky;
   left: 0;
   z-index: 15;
   border-right: 2px solid rgba(255,255,255,0.3);
+  text-align: center;
 }
 
 .enhanced-weekly-table thead th:last-child {
@@ -93,15 +93,19 @@
   font-size: 13px;
   position: relative;
   color: #1f2937;
+  text-align: center;
 }
 
-/* First column cell styling - sticky positioning */
+/* First column cell styling - sticky positioning with header background */
 .enhanced-weekly-table td:first-child {
   position: sticky;
   left: 0;
   z-index: 5;
-  background: inherit;
-  border-right: 2px solid #e2e8f0;
+  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
+  border-right: 2px solid rgba(255,255,255,0.3);
+  color: white;
+  text-align: center;
+  font-weight: 600;
 }
 
 .enhanced-weekly-table td:last-child {
@@ -143,6 +147,12 @@
 .enhanced-weekly-table .member-row:hover {
   border-left-color: #6465F0; /* Updated to match header */
   background: linear-gradient(90deg, #C4B5F7 0%, #B6A3F4 100%);
+}
+
+/* Member row first column - maintain header background */
+.enhanced-weekly-table .member-row td:first-child {
+  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
+  color: white;
 }
 
 /* Enhanced Input Styling */
