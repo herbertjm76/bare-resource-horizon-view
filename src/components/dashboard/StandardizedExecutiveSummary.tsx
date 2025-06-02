@@ -71,10 +71,16 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     const title = metric.title.toLowerCase();
     
     if (title.includes('utilization')) {
-      const value = typeof metric.value === 'string' ? parseInt(metric.value) : metric.value;
-      if (value > 85) return { text: 'High', color: 'orange' };
-      if (value > 70) return { text: 'Good', color: 'green' };
-      return { text: 'Low', color: 'blue' };
+      // Only perform numeric comparison if value is a number or string that can be parsed
+      const numericValue = typeof metric.value === 'number' ? metric.value : 
+                          typeof metric.value === 'string' ? parseInt(metric.value) : null;
+      
+      if (numericValue !== null) {
+        if (numericValue > 85) return { text: 'High', color: 'orange' };
+        if (numericValue > 70) return { text: 'Good', color: 'green' };
+        return { text: 'Low', color: 'blue' };
+      }
+      return { text: 'Active', color: 'blue' };
     }
     
     if (title.includes('capacity')) {
