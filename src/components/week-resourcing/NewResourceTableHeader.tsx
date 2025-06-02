@@ -10,7 +10,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
   return (
     <TableHeader className="sticky top-0 z-10">
       <TableRow className="h-12" style={{ background: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)' }}>
-        <TableHead className="w-[200px] border-r sticky left-0 z-20 text-white font-semibold" style={{ background: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)' }}>Name</TableHead>
+        <TableHead className="w-[150px] border-r sticky left-0 z-20 text-white font-semibold" style={{ background: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)' }}>Name</TableHead>
         <TableHead className="w-16 text-center border-r text-white font-semibold">#</TableHead>
         <TableHead className="w-32 text-center border-r text-white font-semibold">Capacity</TableHead>
         <TableHead className="w-12 text-center border-r text-white font-semibold">AL</TableHead>
