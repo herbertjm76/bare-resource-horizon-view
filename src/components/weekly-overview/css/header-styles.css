@@ -34,6 +34,13 @@
   min-width: 150px;
 }
 
+/* Override any conflicting background styles for the first column header */
+.enhanced-weekly-table thead th:first-child,
+.enhanced-weekly-table thead th:first-child span {
+  background-color: #6465F0 !important;
+  background: #6465F0 !important;
+}
+
 .enhanced-weekly-table thead th:last-child {
   border-right: none;
 }
