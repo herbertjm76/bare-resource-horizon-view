@@ -13,6 +13,7 @@ import { PersonalInfoTab } from '@/components/profile/PersonalInfoTab';
 import { ProfessionalInfoTab } from '@/components/profile/ProfessionalInfoTab';
 import { EmergencyContactTab } from '@/components/profile/EmergencyContactTab';
 import { SecurityTab } from '@/components/profile/SecurityTab';
+import { ProfileOverviewCard } from '@/components/profile/ProfileOverviewCard';
 
 const HEADER_HEIGHT = 56;
 
@@ -219,6 +220,13 @@ export default function Profile() {
                 </h1>
                 <p className="text-lg text-gray-600">Manage your personal and professional information</p>
               </div>
+
+              {/* Profile Overview Card */}
+              <ProfileOverviewCard
+                profile={profile}
+                getUserInitials={getUserInitials}
+                handleAvatarUpdate={handleAvatarUpdate}
+              />
 
               {/* Tab System */}
               <Tabs defaultValue="personal" className="w-full">
