@@ -1,0 +1,155 @@
+
+/* Weekly Overview Table - Clean Implementation */
+
+/* Container */
+.enhanced-weekly-scroll {
+  overflow-x: auto;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.enhanced-weekly-container {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.enhanced-weekly-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: white;
+}
+
+/* Header Styling - Purple Background */
+.enhanced-weekly-table thead {
+  background: #6465F0;
+}
+
+.enhanced-weekly-table thead th {
+  background: #6465F0 !important;
+  color: white !important;
+  padding: 12px 8px;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.2);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* First column header - Name column */
+.enhanced-weekly-table thead th:first-child {
+  background: #6465F0 !important;
+  color: white !important;
+  position: sticky;
+  left: 0;
+  z-index: 15;
+  min-width: 150px;
+  text-align: center;
+}
+
+/* Project code headers - vertical text */
+.enhanced-project-code-header {
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  height: 60px;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 11px;
+  color: white;
+}
+
+/* Body Rows */
+.enhanced-weekly-table tbody tr {
+  background: white;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.enhanced-weekly-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.enhanced-weekly-table tbody td {
+  padding: 8px;
+  text-align: center;
+  border-right: 1px solid #e2e8f0;
+  font-size: 13px;
+}
+
+/* First column in body - sticky */
+.enhanced-weekly-table tbody td:first-child {
+  position: sticky;
+  left: 0;
+  background: white;
+  font-weight: 500;
+  z-index: 5;
+  border-right: 2px solid #e2e8f0;
+}
+
+.enhanced-weekly-table tbody tr:hover td:first-child {
+  background: #f8fafc;
+}
+
+/* Office header rows */
+.enhanced-weekly-table .office-header-row {
+  background: #6465F0 !important;
+}
+
+.enhanced-weekly-table .office-header-row td {
+  background: #6465F0 !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 12px 8px;
+}
+
+/* Footer/Totals */
+.enhanced-weekly-table tfoot tr {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.enhanced-weekly-table tfoot td {
+  padding: 12px 8px;
+  text-align: center;
+  border-right: 1px solid #e2e8f0;
+  border-top: 2px solid #e2e8f0;
+}
+
+.enhanced-weekly-table tfoot td:first-child {
+  position: sticky;
+  left: 0;
+  background: #f8fafc;
+  z-index: 5;
+}
+
+/* Remove last border */
+.enhanced-weekly-table th:last-child,
+.enhanced-weekly-table td:last-child {
+  border-right: none;
+}
+
+/* Scrollbar */
+.enhanced-weekly-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.enhanced-weekly-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.enhanced-weekly-scroll::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+}
+
+.enhanced-weekly-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}

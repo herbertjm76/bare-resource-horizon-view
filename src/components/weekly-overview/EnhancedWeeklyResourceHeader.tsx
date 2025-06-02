@@ -13,14 +13,14 @@ export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeader
   return (
     <TableHeader>
       <TableRow>
-        <TableHead className="sticky left-0 z-20 bg-inherit min-w-[200px]">
+        <TableHead>
           <span className="text-white font-bold text-center block">
             TEAM MEMBER
           </span>
         </TableHead>
         
         {projects.map((project) => (
-          <TableHead key={project.id} className="text-center min-w-[80px]">
+          <TableHead key={project.id}>
             <div className="enhanced-project-code-header">
               <span className="text-white font-bold">
                 {project.code}
@@ -29,19 +29,19 @@ export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeader
           </TableHead>
         ))}
         
-        <TableHead className="text-center min-w-[80px]">
+        <TableHead>
           <span className="text-white font-bold">TOTAL</span>
         </TableHead>
-        <TableHead className="text-center min-w-[80px]">
+        <TableHead>
           <span className="text-white font-bold">CAPACITY</span>
         </TableHead>
-        <TableHead className="text-center min-w-[100px]">
+        <TableHead>
           <span className="text-white font-bold">UTILIZATION</span>
         </TableHead>
-        <TableHead className="text-center min-w-[80px]">
+        <TableHead>
           <span className="text-white font-bold">LEAVE</span>
         </TableHead>
-        <TableHead className="text-center min-w-[150px]">
+        <TableHead>
           <span className="text-white font-bold">REMARKS</span>
         </TableHead>
       </TableRow>
