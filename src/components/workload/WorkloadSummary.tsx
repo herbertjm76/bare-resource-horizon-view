@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -84,8 +82,8 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
       <div className="flex items-center justify-center gap-2">
         <div className="flex -space-x-2">
           {membersToShow.map(({ member }) => (
-            <Avatar key={member.id} className="h-6 w-6 border-2 border-white">
-              <AvatarFallback className="text-xs bg-gray-500 text-white">
+            <Avatar key={member.id} className="h-6 w-6">
+              <AvatarFallback className="text-xs bg-gray-300 text-gray-700">
                 {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
               </AvatarFallback>
             </Avatar>
@@ -149,4 +147,3 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     />
   );
 };
-
