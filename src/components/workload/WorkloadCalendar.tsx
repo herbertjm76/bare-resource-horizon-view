@@ -45,14 +45,14 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
       <Table className="enhanced-table workload-calendar">
         <TableHeader>
           <TableRow>
-            <TableHead className="sticky left-0 z-20 bg-inherit min-w-[200px]">
+            <TableHead className="sticky left-0 z-20 bg-inherit min-w-[180px] px-2 py-1">
               Team Member
             </TableHead>
             
             {dateRange.map((date) => (
               <TableHead 
                 key={date.toISOString()} 
-                className={`text-center min-w-[60px] ${isSunday(date) ? 'sunday-border' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
+                className={`text-center min-w-[50px] px-1 py-1 ${isSunday(date) ? 'sunday-border' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
               >
                 <div className="flex flex-col items-center">
                   <span className={`text-xs font-medium ${isToday(date) ? 'text-blue-900 font-bold' : 'text-gray-700'}`}>
@@ -65,7 +65,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
               </TableHead>
             ))}
             
-            <TableHead className="text-center min-w-[80px] total-column">
+            <TableHead className="text-center min-w-[70px] total-column px-2 py-1">
               Total
             </TableHead>
           </TableRow>
@@ -88,7 +88,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
             
             return (
               <TableRow key={member.id} className={`member-row ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
-                <TableCell className="sticky left-0 z-10 bg-inherit">
+                <TableCell className="sticky left-0 z-10 bg-inherit px-2 py-1">
                   <div className="flex flex-col">
                     <span className="font-medium text-sm">
                       {member.first_name} {member.last_name}
@@ -108,7 +108,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                   return (
                     <TableCell 
                       key={date.toISOString()}
-                      className={`text-center ${
+                      className={`text-center px-1 py-1 ${
                         isSunday(date) ? 'sunday-border' : ''
                       } ${isWeekend ? 'weekend' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
                     >
@@ -121,7 +121,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                   );
                 })}
                 
-                <TableCell className="text-center total-column">
+                <TableCell className="text-center total-column px-2 py-1">
                   <div className="flex flex-col items-center gap-1">
                     <div className="enhanced-pill">
                       {totalHours}h
