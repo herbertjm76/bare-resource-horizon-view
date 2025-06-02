@@ -12,7 +12,20 @@ export const useTeamMemberDetail = (memberId: string | undefined) => {
 
   useEffect(() => {
     const fetchMemberDetail = async () => {
+      console.log('useTeamMemberDetail - memberId received:', memberId);
+      console.log('useTeamMemberDetail - company:', company?.id);
+      
       if (!memberId || !company?.id) {
+        console.log('Missing memberId or company.id, stopping fetch');
+        setIsLoading(false);
+        return;
+      }
+
+      // Validate that memberId is a valid UUID format
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(memberId)) {
+        console.error('Invalid UUID format for memberId:', memberId);
+        setError('Invalid member ID format');
         setIsLoading(false);
         return;
       }
@@ -21,6 +34,8 @@ export const useTeamMemberDetail = (memberId: string | undefined) => {
       setError(null);
 
       try {
+        console.log('Fetching member profile for ID:', memberId);
+        
         // Fetch the team member profile
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
@@ -36,10 +51,12 @@ export const useTeamMemberDetail = (memberId: string | undefined) => {
         }
 
         if (!profile) {
+          console.log('No profile found for member ID:', memberId);
           setError('Team member not found');
           return;
         }
 
+        console.log('Successfully fetched member profile:', profile);
         setMemberData(profile);
       } catch (fetchError) {
         console.error('Error in fetchMemberDetail:', fetchError);

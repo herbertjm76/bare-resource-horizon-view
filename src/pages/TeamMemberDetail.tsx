@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -15,6 +15,13 @@ const HEADER_HEIGHT = 56;
 const TeamMemberDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  
+  // Debug logging for URL parameters
+  useEffect(() => {
+    console.log('TeamMemberDetail - URL params:', { id });
+    console.log('TeamMemberDetail - Current URL:', window.location.href);
+  }, [id]);
+  
   const { memberData, isLoading, error } = useTeamMemberDetail(id);
 
   if (isLoading) {
@@ -55,7 +62,12 @@ const TeamMemberDetailPage = () => {
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center space-y-4">
                   <h2 className="text-2xl font-semibold text-gray-800">Team Member Not Found</h2>
-                  <p className="text-gray-600">The requested team member could not be found.</p>
+                  <p className="text-gray-600">
+                    {error || 'The requested team member could not be found.'}
+                  </p>
+                  <div className="text-sm text-gray-500">
+                    Requested ID: {id || 'No ID provided'}
+                  </div>
                   <Button onClick={() => navigate('/team-members')} className="bg-brand-primary">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     Back to Team Members
