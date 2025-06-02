@@ -1,7 +1,7 @@
 
 /* Enhanced Weekly Overview - Header Styling */
 .enhanced-weekly-table thead {
-  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
+  background: #6465F0;
   color: white;
   position: sticky;
   top: 0;
@@ -18,11 +18,12 @@
   position: relative;
   color: white;
   text-align: center;
+  background: #6465F0;
 }
 
 /* First column header styling - matches header background and centered */
 .enhanced-weekly-table thead th:first-child {
-  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
+  background: #6465F0;
   position: sticky;
   left: 0;
   z-index: 15;
