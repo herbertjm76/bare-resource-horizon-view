@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -43,13 +42,12 @@ export const ResourceStatusCards: React.FC<ResourceStatusCardsProps> = ({
     const remainingCount = memberList.length - maxShow;
 
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2">
         <div className="flex -space-x-2">
           {membersToShow.map(({ member }) => (
             <Avatar key={member.id} className="h-8 w-8 border-2 border-white">
-              <AvatarImage src={`https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=32&h=32&fit=crop&crop=face`} />
-              <AvatarFallback className="text-xs">
-                {member.first_name?.charAt(0)}{member.last_name?.charAt(0)}
+              <AvatarFallback className="text-xs bg-blue-500 text-white">
+                {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
               </AvatarFallback>
             </Avatar>
           ))}
@@ -64,10 +62,10 @@ export const ResourceStatusCards: React.FC<ResourceStatusCardsProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <Card>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-items-center">
+      <Card className="w-full max-w-sm">
         <CardContent className="p-4">
-          <div className="space-y-3">
+          <div className="space-y-3 text-center">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-medium text-gray-900">Needs Resourcing</h3>
@@ -86,9 +84,9 @@ export const ResourceStatusCards: React.FC<ResourceStatusCardsProps> = ({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="w-full max-w-sm">
         <CardContent className="p-4">
-          <div className="space-y-3">
+          <div className="space-y-3 text-center">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-medium text-gray-900">Overloaded Staff</h3>

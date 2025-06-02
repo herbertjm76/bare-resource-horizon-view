@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -80,13 +79,12 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     const remainingCount = memberList.length - maxShow;
 
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2">
         <div className="flex -space-x-2">
           {membersToShow.map(({ member }) => (
             <Avatar key={member.id} className="h-6 w-6 border-2 border-white">
-              <AvatarImage src={`https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=32&h=32&fit=crop&crop=face`} />
-              <AvatarFallback className="text-xs">
-                {member.first_name?.charAt(0)}{member.last_name?.charAt(0)}
+              <AvatarFallback className="text-xs bg-blue-500 text-white">
+                {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
               </AvatarFallback>
             </Avatar>
           ))}
@@ -124,18 +122,14 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     },
     {
       title: "Needs Resourcing",
-      value: needsResourcing.length > 0 ? renderMemberAvatars(needsResourcing) : (
-        <div className="text-xs text-white/70 italic">All well utilized</div>
-      ),
+      value: needsResourcing.length > 0 ? renderMemberAvatars(needsResourcing) : "All well utilized",
       subtitle: "Under 60% utilization",
       badgeText: `${needsResourcing.length}`,
       badgeColor: needsResourcing.length > 0 ? "blue" : "green"
     },
     {
       title: "Overloaded Staff",
-      value: overloaded.length > 0 ? renderMemberAvatars(overloaded) : (
-        <div className="text-xs text-white/70 italic">No one overloaded</div>
-      ),
+      value: overloaded.length > 0 ? renderMemberAvatars(overloaded) : "No one overloaded",
       subtitle: "Over 100% utilization",
       badgeText: `${overloaded.length}`,
       badgeColor: overloaded.length > 0 ? "red" : "green"
