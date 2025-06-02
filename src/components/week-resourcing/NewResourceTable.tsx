@@ -1,10 +1,7 @@
-
 import React from 'react';
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { CapacityBar } from './CapacityBar';
-import '@/styles/enhanced-tables.css';
-import './week-resourcing.css';
 
 interface NewResourceTableProps {
   projects: any[];
@@ -44,10 +41,10 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     <TooltipProvider>
       <div className="w-full max-w-full overflow-hidden border rounded-md shadow-sm mt-8">
         <div className="overflow-x-auto">
-          <Table className="enhanced-table w-full min-w-max">
-            <TableHeader className="sticky top-0 z-10">
+          <Table className="w-full min-w-max">
+            <TableHeader className="sticky top-0 z-10 bg-white border-b">
               <TableRow className="h-12">
-                <TableHead className="w-48 border-r sticky left-0 z-20 bg-white">Name</TableHead>
+                <TableHead className="w-48 border-r bg-white sticky left-0 z-20">Name</TableHead>
                 <TableHead className="w-16 text-center border-r">#</TableHead>
                 <TableHead className="w-32 text-center border-r">Capacity</TableHead>
                 <TableHead className="w-12 text-center border-r">AL</TableHead>
