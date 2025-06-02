@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -47,7 +48,7 @@ export const ResourceStatusCards: React.FC<ResourceStatusCardsProps> = ({
         <div className="flex -space-x-2">
           {membersToShow.map(({ member }) => (
             <Avatar key={member.id} className="h-8 w-8 border-2 border-white">
-              <AvatarFallback className="text-xs bg-blue-500 text-white">
+              <AvatarFallback className="text-xs bg-gray-500 text-white">
                 {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
               </AvatarFallback>
             </Avatar>
@@ -108,3 +109,4 @@ export const ResourceStatusCards: React.FC<ResourceStatusCardsProps> = ({
     </div>
   );
 };
+

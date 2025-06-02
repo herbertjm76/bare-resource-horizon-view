@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -94,7 +95,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                   <TableCell className="sticky left-0 z-10 bg-inherit p-0">
                     <div className="flex items-center gap-2 px-2 py-1">
                       <Avatar className="h-5 w-5">
-                        <AvatarFallback className="text-xs bg-blue-500 text-white">
+                        <AvatarFallback className="text-xs bg-gray-500 text-white">
                           {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
                         </AvatarFallback>
                       </Avatar>
@@ -159,3 +160,4 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
     </TooltipProvider>
   );
 };
+
