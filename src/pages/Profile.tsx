@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
-import { User } from 'lucide-react';
+import { User, Briefcase, Phone, Shield } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PersonalInfoTab } from '@/components/profile/PersonalInfoTab';
 import { ProfessionalInfoTab } from '@/components/profile/ProfessionalInfoTab';
@@ -62,7 +62,23 @@ export default function Profile() {
       }
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select(`
+          *,
+          phone,
+          bio,
+          date_of_birth,
+          start_date,
+          manager_id,
+          emergency_contact_name,
+          emergency_contact_phone,
+          social_linkedin,
+          social_twitter,
+          address,
+          city,
+          state,
+          postal_code,
+          country
+        `)
         .eq("id", session.user.id)
         .single();
       if (error) {
@@ -236,15 +252,15 @@ export default function Profile() {
                     <span className="hidden xs:inline">Personal</span>
                   </TabsTrigger>
                   <TabsTrigger value="professional" className="flex items-center gap-2 min-w-max px-4 h-10">
-                    <User className="h-4 w-4" />
+                    <Briefcase className="h-4 w-4" />
                     <span className="hidden xs:inline">Professional</span>
                   </TabsTrigger>
                   <TabsTrigger value="emergency" className="flex items-center gap-2 min-w-max px-4 h-10">
-                    <User className="h-4 w-4" />
+                    <Phone className="h-4 w-4" />
                     <span className="hidden xs:inline">Emergency</span>
                   </TabsTrigger>
                   <TabsTrigger value="security" className="flex items-center gap-2 min-w-max px-4 h-10">
-                    <User className="h-4 w-4" />
+                    <Shield className="h-4 w-4" />
                     <span className="hidden xs:inline">Security</span>
                   </TabsTrigger>
                 </TabsList>
