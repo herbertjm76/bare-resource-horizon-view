@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { WeeklyOverviewContent } from '@/components/weekly-overview/WeeklyOverviewContent';
 import { format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
@@ -30,17 +31,19 @@ const WeeklyOverview = () => {
   const weekLabel = format(weekStart, 'MMM d, yyyy');
 
   return (
-    <div className="flex h-screen">
-      <DashboardSidebar />
-      <WeeklyOverviewContent
-        selectedWeek={selectedWeek}
-        handlePreviousWeek={handlePreviousWeek}
-        handleNextWeek={handleNextWeek}
-        weekLabel={weekLabel}
-        filters={filters}
-        handleFilterChange={handleFilterChange}
-      />
-    </div>
+    <SidebarProvider>
+      <div className="flex h-screen w-full">
+        <DashboardSidebar />
+        <WeeklyOverviewContent
+          selectedWeek={selectedWeek}
+          handlePreviousWeek={handlePreviousWeek}
+          handleNextWeek={handleNextWeek}
+          weekLabel={weekLabel}
+          filters={filters}
+          handleFilterChange={handleFilterChange}
+        />
+      </div>
+    </SidebarProvider>
   );
 };
 
