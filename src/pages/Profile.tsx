@@ -11,6 +11,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { User } from 'lucide-react';
+import { AvatarUpload } from '@/components/profile/AvatarUpload';
 
 const HEADER_HEIGHT = 56;
 
@@ -19,6 +20,7 @@ type Profile = {
   email: string;
   first_name: string | null;
   last_name: string | null;
+  avatar_url: string | null;
 };
 
 export default function Profile() {
@@ -108,6 +110,22 @@ export default function Profile() {
     setPasswordLoading(false);
   };
 
+  const handleAvatarUpdate = (newAvatarUrl: string | null) => {
+    if (profile) {
+      setProfile({
+        ...profile,
+        avatar_url: newAvatarUrl
+      });
+    }
+  };
+
+  const getUserInitials = () => {
+    if (!profile) return '??';
+    const firstInitial = profile.first_name?.charAt(0) || '?';
+    const lastInitial = profile.last_name?.charAt(0) || '?';
+    return `${firstInitial}${lastInitial}`;
+  };
+
   if (loading || companyLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -152,6 +170,17 @@ export default function Profile() {
                   <CardTitle>Edit Profile</CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {/* Avatar Upload Section */}
+                  <div className="mb-8 pb-6 border-b">
+                    <h3 className="text-lg font-medium mb-4">Profile Picture</h3>
+                    <AvatarUpload
+                      currentAvatarUrl={profile.avatar_url}
+                      userId={profile.id}
+                      onAvatarUpdate={handleAvatarUpdate}
+                      userInitials={getUserInitials()}
+                    />
+                  </div>
+
                   <form onSubmit={handleSave} className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium mb-1" htmlFor="email">
