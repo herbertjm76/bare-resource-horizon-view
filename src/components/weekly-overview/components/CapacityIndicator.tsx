@@ -15,38 +15,22 @@ export const CapacityIndicator: React.FC<CapacityIndicatorProps> = ({
   // Calculate the percentage of capacity that is USED (not available)
   const utilizationPercentage = Math.min(100, Math.max(0, (totalCapacity - availableHours) / totalCapacity * 100));
 
-  // Calculate color based on utilization percentage
-  const getUtilizationColor = () => {
+  // Get color values for utilization
+  const getUtilizationColors = () => {
     if (utilizationPercentage >= 90) {
-      return 'bg-red-500'; // Red for very high utilization (90-100%)
+      return { bg: '#ef4444', text: 'text-red-600 font-semibold' }; // Red
     } else if (utilizationPercentage >= 80) {
-      return 'bg-orange-500'; // Orange for high utilization (80-90%)
+      return { bg: '#f97316', text: 'text-orange-600 font-semibold' }; // Orange
     } else if (utilizationPercentage >= 60) {
-      return 'bg-yellow-400'; // Yellow for medium-high utilization (60-80%)
+      return { bg: '#facc15', text: 'text-yellow-600 font-semibold' }; // Yellow
     } else if (utilizationPercentage >= 40) {
-      return 'bg-green-500'; // Green for medium utilization (40-60%)
+      return { bg: '#22c55e', text: 'text-green-600 font-semibold' }; // Green
     } else {
-      return 'bg-blue-500'; // Blue for low utilization (0-40%)
+      return { bg: '#3b82f6', text: 'text-blue-600 font-semibold' }; // Blue
     }
   };
 
-  // Get text color for the available hours number based on utilization
-  const getTextColor = () => {
-    if (utilizationPercentage >= 90) {
-      return 'text-red-600 font-semibold';
-    } else if (utilizationPercentage >= 80) {
-      return 'text-orange-600 font-semibold';
-    } else if (utilizationPercentage >= 60) {
-      return 'text-yellow-600 font-semibold';
-    } else if (utilizationPercentage >= 40) {
-      return 'text-green-600 font-semibold';
-    } else {
-      return 'text-blue-600 font-semibold';
-    }
-  };
-
-  const utilizationColor = getUtilizationColor();
-  const textColor = getTextColor();
+  const colors = getUtilizationColors();
 
   return (
     <TooltipProvider>
@@ -63,19 +47,23 @@ export const CapacityIndicator: React.FC<CapacityIndicatorProps> = ({
               const isFilled = utilizationPercentage >= boxEndPercent;
               const isPartiallyFilled = !isFilled && utilizationPercentage > boxStartPercent;
               
+              let boxBackgroundColor = '#f3f4f6'; // Default gray
+              
+              if (isFilled) {
+                boxBackgroundColor = colors.bg;
+              } else if (isPartiallyFilled) {
+                // For partially filled, we'll use a gradient effect
+                boxBackgroundColor = '#f3f4f6';
+              }
+              
               return (
                 <Tooltip key={index}>
                   <TooltipTrigger asChild>
                     <div 
-                      className="h-3 w-3 border border-gray-400 relative overflow-hidden"
+                      className="h-3 w-3 relative overflow-hidden"
                       style={{
-                        backgroundColor: isFilled 
-                          ? utilizationColor.includes('red') ? '#ef4444'
-                          : utilizationColor.includes('orange') ? '#f97316'
-                          : utilizationColor.includes('yellow') ? '#facc15'
-                          : utilizationColor.includes('green') ? '#22c55e'
-                          : '#3b82f6'
-                          : '#f3f4f6'
+                        backgroundColor: boxBackgroundColor,
+                        border: '1px solid #9ca3af'
                       }}
                     >
                       {/* For partially filled boxes - show gradient or partial fill */}
@@ -84,11 +72,7 @@ export const CapacityIndicator: React.FC<CapacityIndicatorProps> = ({
                           className="absolute top-0 bottom-0 left-0"
                           style={{
                             width: `${Math.round((utilizationPercentage - boxStartPercent) / 20 * 100)}%`,
-                            backgroundColor: utilizationColor.includes('red') ? '#ef4444'
-                              : utilizationColor.includes('orange') ? '#f97316'
-                              : utilizationColor.includes('yellow') ? '#facc15'
-                              : utilizationColor.includes('green') ? '#22c55e'
-                              : '#3b82f6'
+                            backgroundColor: colors.bg
                           }} 
                         />
                       )}
@@ -117,7 +101,7 @@ export const CapacityIndicator: React.FC<CapacityIndicatorProps> = ({
           </div>
           
           {/* Available hours number with color coding */}
-          <span className={cn("text-xs font-medium ml-1", textColor)}>
+          <span className={cn("text-xs font-medium ml-1", colors.text)}>
             {availableHours}
           </span>
         </div>
