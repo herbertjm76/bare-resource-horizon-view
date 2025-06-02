@@ -10,6 +10,7 @@ import { useAnnualLeave } from '@/hooks/useAnnualLeave';
 import { useTeamFilters } from '@/hooks/useTeamFilters';
 import { TeamAnnualLeaveContent } from '@/components/annual-leave/TeamAnnualLeaveContent';
 import { Calendar } from 'lucide-react';
+import '@/styles/enhanced-tables.css';
 import '@/components/annual-leave/annual-leave.css';
 
 const HEADER_HEIGHT = 56;

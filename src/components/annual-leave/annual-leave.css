@@ -1,160 +1,46 @@
 
-/* Annual Leave Calendar Styles */
-.annual-leave-calendar input::-webkit-outer-spin-button,
-.annual-leave-calendar input::-webkit-inner-spin-button {
+/* Annual Leave Calendar Styles - Enhanced to match other tables */
+
+/* Remove spinner buttons from number inputs */
+.enhanced-table input::-webkit-outer-spin-button,
+.enhanced-table input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.annual-leave-calendar input[type=number] {
+.enhanced-table input[type=number] {
   -moz-appearance: textfield;
 }
 
-/* Responsive grid container with horizontal scrollbar */
-.annual-leave-grid-container {
-  width: calc(100vw - 22rem);
-  max-width: calc(100vw - 22rem);
-  overflow-x: auto;
-  overflow-y: visible;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 1px;
-  border-radius: 0.5rem;
+/* Weekend styling that matches other tables */
+.enhanced-table .weekend {
+  background-color: rgba(0, 0, 0, 0.01);
 }
 
-.annual-leave-grid-container::-webkit-scrollbar {
-  height: 12px;
+/* Sunday border styling consistent with other tables */
+.enhanced-table .sunday-border {
+  border-left-width: 2px !important;
+  border-left-color: rgba(111, 75, 246, 0.3) !important;
 }
 
-.annual-leave-grid-container::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 6px;
+/* Focus and hover effects for annual leave inputs */
+.enhanced-table .enhanced-input:focus {
+  outline: none;
+  border-color: #6F4BF6;
+  box-shadow: 0 0 0 3px rgba(111,75,246,0.1);
+  background: #fafbff;
 }
 
-.annual-leave-grid-container::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border-radius: 6px;
-  border: 2px solid #f1f5f9;
-}
-
-.annual-leave-grid-container::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-/* Firefox scrollbar styling */
-.annual-leave-grid-container {
-  scrollbar-width: thin;
-  scrollbar-color: #94a3b8 #f1f5f9;
-}
-
-/* Mobile-specific scrollbar improvements */
-@media (max-width: 640px) {
-  .annual-leave-grid-container {
-    width: 100vw;
-    max-width: 100vw;
-    margin-left: calc(-1rem);
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  
-  .annual-leave-grid-container::-webkit-scrollbar {
-    height: 8px;
-  }
-  
-  .annual-leave-grid-container::-webkit-scrollbar-thumb {
-    background: #94a3b8;
-    border-radius: 4px;
-    border: 1px solid #f1f5f9;
-  }
-  
-  .annual-leave-grid-container::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
-  }
-}
-
-/* Highlight weekend cells */
-.weekend-cell {
-  background-color: rgba(0, 0, 0, 0.05);
-}
-
-/* Sticky header and first column */
-.annual-leave-calendar .sticky-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: white;
-}
-
-.annual-leave-calendar .sticky-column {
-  position: sticky;
-  left: 0;
-  z-index: 5;
-  background-color: white;
-}
-
-/* Add hover effect on cells */
-.annual-leave-calendar .leave-cell:hover {
-  background-color: rgba(0, 0, 0, 0.025);
-}
-
-/* Better styling for the table */
-.annual-leave-calendar table {
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-.annual-leave-calendar th,
-.annual-leave-calendar td {
-  border-right: 1px solid rgba(0, 0, 0, 0.06);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-/* Sunday-Monday separator (thick border) */
-.annual-leave-calendar th.sunday-border,
-.annual-leave-calendar td.sunday-border {
-  border-right: 2px solid rgba(0, 0, 0, 0.2);
-}
-
-/* Row hover effect */
-.annual-leave-calendar tbody tr:hover {
-  background-color: rgba(111, 75, 246, 0.05) !important;
-}
-
-/* Focus and hover effects */
-.annual-leave-calendar tbody td:focus-within {
-  background-color: rgba(111, 75, 246, 0.05);
-}
-
-.annual-leave-calendar input:focus {
-  box-shadow: none;
-  outline: 2px solid rgba(111, 75, 246, 0.5);
-  border-radius: 3px;
+.enhanced-table .enhanced-input:hover {
+  border-color: #a5b4fc;
+  background: #fafbff;
 }
 
 /* Cell with hours styling */
-.annual-leave-calendar td.leave-cell-filled input {
-  background-color: #ECECFB; /* Light purple background for filled cells */
+.enhanced-table .leave-cell-filled .enhanced-input {
+  background-color: #ECECFB;
   color: black;
   font-weight: 500;
-}
-
-/* Improved header styling */
-.annual-leave-calendar thead th {
-  border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-}
-
-/* Alternating row colors that work with sticky column - IMPROVED CONTRAST */
-.annual-leave-calendar tr:nth-child(even) {
-  background-color: rgba(0, 0, 0, 0.07);
-}
-
-/* Transition effect when adding hours */
-.annual-leave-calendar input {
-  transition: all 0.2s ease;
-}
-
-/* Enhanced input appearance */
-.annual-leave-calendar input::placeholder {
-  color: rgba(0, 0, 0, 0.3);
 }
 
 /* Pulse animation for newly entered values */
@@ -164,6 +50,50 @@
   100% { box-shadow: 0 0 0 0 rgba(111, 75, 246, 0); }
 }
 
-.annual-leave-calendar .leave-cell-filled input:focus {
+.enhanced-table .leave-cell-filled .enhanced-input:focus {
   animation: pulse-highlight 1.5s;
+}
+
+/* Enhanced input placeholder styling */
+.enhanced-table .enhanced-input::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* Transition effects */
+.enhanced-table .enhanced-input {
+  transition: all 0.2s ease;
+}
+
+/* Sticky column enhancements */
+.enhanced-table .sticky-left-0 {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: inherit;
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 640px) {
+  .enhanced-table-scroll {
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(-1rem);
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .enhanced-table {
+    min-width: 800px;
+  }
+  
+  .enhanced-table thead th,
+  .enhanced-table td {
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+  
+  .enhanced-input {
+    height: 24px;
+    font-size: 10px;
+  }
 }
