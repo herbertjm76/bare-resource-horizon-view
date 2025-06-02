@@ -6,7 +6,7 @@ import { Typography } from "@/components/ui/typography";
 
 interface SummaryMetric {
   title: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   subtitle?: string;
   badgeText?: string;
   badgeColor?: string;
