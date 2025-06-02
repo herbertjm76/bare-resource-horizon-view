@@ -45,7 +45,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           <Table className="w-full min-w-max">
             <TableHeader className="sticky top-0 z-10">
               <TableRow className="h-12" style={{ background: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)' }}>
-                <TableHead className="w-48 border-r sticky left-0 z-20 text-white font-semibold" style={{ background: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)' }}>Name</TableHead>
+                <TableHead className="w-[70%] border-r sticky left-0 z-20 text-white font-semibold" style={{ background: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)' }}>Name</TableHead>
                 <TableHead className="w-16 text-center border-r text-white font-semibold">#</TableHead>
                 <TableHead className="w-32 text-center border-r text-white font-semibold">Capacity</TableHead>
                 <TableHead className="w-12 text-center border-r text-white font-semibold">AL</TableHead>
@@ -99,7 +99,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                   >
                     {/* Name */}
                     <TableCell className="font-medium border-r bg-white sticky left-0 z-10">
-                      <div className="truncate max-w-[180px]" title={`${member.first_name} ${member.last_name}`}>
+                      <div className="truncate" title={`${member.first_name} ${member.last_name}`}>
                         {member.first_name} {member.last_name}
                       </div>
                     </TableCell>
