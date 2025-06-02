@@ -1,7 +1,6 @@
 
 import Navbar from '../components/landing/Navbar';
 import Hero from '../components/landing/Hero';
-import SocialProof from '../components/landing/SocialProof';
 import ProblemOutcome from '../components/landing/ProblemOutcome';
 import FeatureTrio from '../components/landing/FeatureTrio';
 import ExcelComparison from '../components/landing/ExcelComparison';
@@ -17,7 +16,6 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       <Hero />
-      <SocialProof />
       <ProblemOutcome />
       <FeatureTrio />
       <ExcelComparison />
