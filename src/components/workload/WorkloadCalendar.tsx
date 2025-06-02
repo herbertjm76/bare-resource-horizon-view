@@ -3,13 +3,13 @@ import React, { useMemo } from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 import { format, addDays, startOfWeek, isSunday, isToday } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
-import { MemberWorkloadData } from './hooks/types';
+import { WorkloadBreakdown } from './hooks/types';
 import { Badge } from '@/components/ui/badge';
 
 interface WorkloadCalendarProps {
   members: TeamMember[];
   selectedWeek: Date;
-  workloadData: Record<string, MemberWorkloadData>;
+  workloadData: Record<string, Record<string, WorkloadBreakdown>>;
   periodToShow: number;
 }
 
@@ -72,14 +72,15 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
       
       <TableBody>
         {members.map((member) => {
-          const memberWorkload = workloadData[member.id];
+          const memberWorkloadDays = workloadData[member.id] || {};
           const weeklyCapacity = member.weekly_capacity || 40;
           const dailyCapacity = weeklyCapacity / 5; // Assuming 5 working days
           
           // Calculate total hours for the period
           const totalHours = dateRange.reduce((sum, date) => {
             const dateStr = format(date, 'yyyy-MM-dd');
-            return sum + (memberWorkload?.daily[dateStr]?.totalHours || 0);
+            const dayData = memberWorkloadDays[dateStr];
+            return sum + (dayData?.total || 0);
           }, 0);
           
           const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / (weeklyCapacity * periodToShow)) * 100) : 0;
@@ -99,8 +100,8 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
               
               {dateRange.map((date) => {
                 const dateStr = format(date, 'yyyy-MM-dd');
-                const dayData = memberWorkload?.daily[dateStr];
-                const dayHours = dayData?.totalHours || 0;
+                const dayData = memberWorkloadDays[dateStr];
+                const dayHours = dayData?.total || 0;
                 const isWeekend = date.getDay() === 0 || date.getDay() === 6;
                 
                 return (

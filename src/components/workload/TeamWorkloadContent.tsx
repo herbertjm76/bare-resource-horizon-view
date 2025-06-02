@@ -6,8 +6,8 @@ import { WorkloadCalendar } from '@/components/workload/WorkloadCalendar';
 import { WorkloadSummary } from '@/components/workload/WorkloadSummary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
-import { useWorkloadData, WorkloadBreakdown } from '@/components/workload/hooks/useWorkloadData';
-import { MemberWorkloadData } from '@/components/workload/hooks/types';
+import { useWorkloadData } from '@/components/workload/hooks/useWorkloadData';
+import { WorkloadBreakdown } from '@/components/workload/hooks/types';
 import '@/styles/enhanced-tables.css';
 
 interface TeamWorkloadContentProps {
