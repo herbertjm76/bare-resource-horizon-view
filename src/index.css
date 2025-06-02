@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -39,7 +38,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    /* Enhanced brand colors with CSS custom properties */
+    /* Enhanced brand colors with CSS custom properties - standardized to #6F4BF6 */
     --brand-primary: 111 75 246;
     --brand-violet: 111 75 246;
     --brand-violet-light: 236 236 251;
@@ -62,7 +61,7 @@
     --border-primary: 229 231 235;
     --border-secondary: 209 213 219;
     --border-accent: 111 75 246;
-    --border-focus: 99 102 241;
+    --border-focus: 111 75 246; /* Changed from 99 102 241 */
   }
 
   .dark {

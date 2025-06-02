@@ -1,7 +1,7 @@
 
 // Enhanced Centralized Color System with Semantic Tokens
 export const colors = {
-  // Primary brand colors
+  // Primary brand colors - standardized to #6F4BF6
   brand: {
     primary: '#6F4BF6',
     violet: '#6F4BF6',
@@ -35,7 +35,7 @@ export const colors = {
       primary: '#E5E7EB',
       secondary: '#D1D5DB',
       accent: '#6F4BF6',
-      focus: '#6366F1',
+      focus: '#6F4BF6', // Changed from #6366F1
     },
     
     // State colors
@@ -70,10 +70,10 @@ export const colors = {
   // Status colors for projects and resources
   status: {
     inProgress: { bg: '#E2F8F0', text: '#0D9488' },
-    notStarted: { bg: '#E5DEFF', text: '#6E59A5' },
+    notStarted: { bg: '#E5DEFF', text: '#6F4BF6' }, // Changed from #6E59A5
     completed: { bg: '#E0F2FE', text: '#0EA5E9' },
     onHold: { bg: '#FEF3C7', text: '#D97706' },
-    planning: { bg: '#E5DEFF', text: '#6E59A5' },
+    planning: { bg: '#E5DEFF', text: '#6F4BF6' }, // Changed from #6E59A5
     default: { bg: '#F3F4F6', text: '#6B7280' },
   },
 
@@ -112,14 +112,14 @@ export const colors = {
       background: '#FFFFFF',
       border: '#D1D5DB',
       borderHover: '#6F4BF6',
-      borderFocus: '#6366F1',
+      borderFocus: '#6F4BF6', // Changed from #6366F1
       placeholder: '#9CA3AF',
     },
   },
 
-  // Table and grid colors
+  // Table and grid colors - standardized to #6F4BF6
   table: {
-    headerBg: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+    headerBg: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)',
     headerText: '#ffffff',
     rowEven: 'rgba(248,250,252,0.3)',
     rowHover: 'linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%)',
@@ -127,11 +127,11 @@ export const colors = {
     borderDark: 'rgba(156, 163, 175, 0.6)',
   },
 
-  // Office and section headers
+  // Office and section headers - standardized to #6F4BF6
   office: {
-    headerBg: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
+    headerBg: 'linear-gradient(135deg, #6F4BF6 0%, #7c3aed 100%)',
     headerText: '#ffffff',
-    hoverBg: 'linear-gradient(135deg, #4c1d95 0%, #6b21a8 100%)',
+    hoverBg: 'linear-gradient(135deg, #5D3FD3 0%, #6b21a8 100%)',
   },
 
   // Weekend and special day styling
@@ -143,7 +143,7 @@ export const colors = {
   // Project area and stage colors (consistent palette)
   projectColors: [
     '#F5A3B3', '#F48F8F', '#F47E63', '#F4A363', '#F4C463',
-    '#A8E6A8', '#89CFF0', '#6B8FF9', '#9B87F5', '#FFE082',
+    '#A8E6A8', '#89CFF0', '#6F4BF6', '#9B87F5', '#FFE082', // Updated one color to match brand
     '#89E6CF', '#7ECFD6', '#FFF3D4', '#D2C0A7', '#FFE566'
   ],
 

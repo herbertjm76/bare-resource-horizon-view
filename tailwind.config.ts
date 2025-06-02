@@ -20,7 +20,7 @@ export default {
     },
     extend: {
       backgroundImage: {
-        hero: 'linear-gradient(145deg, #895CF7 0%, #5669F7 55%, #E64FC4 100%)',
+        hero: 'linear-gradient(145deg, #6F4BF6 0%, #6F4BF6 55%, #E64FC4 100%)', // Standardized to #6F4BF6
       },
       colors: {
         border: "hsl(var(--border))",
@@ -35,7 +35,7 @@ export default {
         "brand-border": "#F0F0F4",
         "gray-250": "#e2e2e2",
         
-        // Semantic color tokens
+        // Semantic color tokens - standardized to #6F4BF6
         "text-primary": "#1F2937",
         "text-secondary": "#6B7280",
         "text-tertiary": "#9CA3AF",
@@ -51,7 +51,7 @@ export default {
         "border-primary": "#E5E7EB",
         "border-secondary": "#D1D5DB",
         "border-accent": "#6F4BF6",
-        "border-focus": "#6366F1",
+        "border-focus": "#6F4BF6", // Changed from #6366F1
         
         primary: {
           DEFAULT: "hsl(var(--primary))",
