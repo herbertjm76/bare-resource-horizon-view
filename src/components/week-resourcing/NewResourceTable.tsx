@@ -42,25 +42,95 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   return (
     <TooltipProvider>
       <div className="w-full max-w-full overflow-hidden border rounded-md shadow-sm mt-8">
-        <div className="overflow-x-auto">
-          <Table className="w-full min-w-max">
-            <NewResourceTableHeader projects={projects} />
-            
-            <TableBody>
-              {members.map((member, memberIndex) => (
-                <NewResourceTableRow
-                  key={member.id}
-                  member={member}
-                  memberIndex={memberIndex}
-                  projects={projects}
-                  allocationMap={allocationMap}
-                  getMemberTotal={getMemberTotal}
-                  getProjectCount={getProjectCount}
-                />
-              ))}
-            </TableBody>
-          </Table>
+        <div 
+          className="overflow-x-auto overflow-y-visible -webkit-overflow-scrolling-touch"
+          style={{
+            width: 'calc(100vw - 22rem)',
+            maxWidth: 'calc(100vw - 22rem)'
+          }}
+        >
+          <div 
+            className="enhanced-grid-scroll"
+            style={{
+              width: '100%',
+              overflowX: 'auto',
+              overflowY: 'visible',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: '1px'
+            }}
+          >
+            <Table className="w-full min-w-max">
+              <NewResourceTableHeader projects={projects} />
+              
+              <TableBody>
+                {members.map((member, memberIndex) => (
+                  <NewResourceTableRow
+                    key={member.id}
+                    member={member}
+                    memberIndex={memberIndex}
+                    projects={projects}
+                    allocationMap={allocationMap}
+                    getMemberTotal={getMemberTotal}
+                    getProjectCount={getProjectCount}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
+        
+        {/* Custom scrollbar styling */}
+        <style jsx>{`
+          .enhanced-grid-scroll::-webkit-scrollbar {
+            height: 12px;
+          }
+          
+          .enhanced-grid-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 6px;
+          }
+          
+          .enhanced-grid-scroll::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 6px;
+            border: 2px solid #f1f5f9;
+          }
+          
+          .enhanced-grid-scroll::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+          }
+          
+          /* Firefox scrollbar styling */
+          .enhanced-grid-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #94a3b8 #f1f5f9;
+          }
+          
+          /* Mobile-specific scrollbar improvements */
+          @media (max-width: 640px) {
+            .enhanced-grid-scroll {
+              width: 100vw !important;
+              max-width: 100vw !important;
+              margin-left: calc(-1rem);
+              padding-left: 1rem;
+              padding-right: 1rem;
+            }
+            
+            .enhanced-grid-scroll::-webkit-scrollbar {
+              height: 8px;
+            }
+            
+            .enhanced-grid-scroll::-webkit-scrollbar-thumb {
+              background: #cbd5e1;
+              border-radius: 4px;
+              border: 1px solid #f1f5f9;
+            }
+            
+            .enhanced-grid-scroll::-webkit-scrollbar-thumb:hover {
+              background: #94a3b8;
+            }
+          }
+        `}</style>
       </div>
     </TooltipProvider>
   );
