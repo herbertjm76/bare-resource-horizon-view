@@ -25,7 +25,7 @@ export const WorkloadTooltip: React.FC<WorkloadTooltipProps> = ({
       <TooltipTrigger asChild>
         {children}
       </TooltipTrigger>
-      <TooltipContent className="bg-white border shadow-lg p-3 max-w-xs">
+      <TooltipContent className="bg-white border shadow-lg p-3 max-w-xs z-[100]">
         <div className="space-y-2">
           <div className="font-medium text-sm text-gray-900">
             {memberName} - {date}
