@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -42,22 +43,22 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
       <div className="w-full max-w-full overflow-hidden border rounded-md shadow-sm mt-8">
         <div className="overflow-x-auto">
           <Table className="w-full min-w-max">
-            <TableHeader className="sticky top-0 z-10 bg-white border-b">
-              <TableRow className="h-12">
-                <TableHead className="w-48 border-r bg-white sticky left-0 z-20">Name</TableHead>
-                <TableHead className="w-16 text-center border-r">#</TableHead>
-                <TableHead className="w-32 text-center border-r">Capacity</TableHead>
-                <TableHead className="w-12 text-center border-r">AL</TableHead>
-                <TableHead className="w-12 text-center border-r">HO</TableHead>
-                <TableHead className="w-12 text-center border-r">OL</TableHead>
-                <TableHead className="w-16 text-center border-r">Off</TableHead>
+            <TableHeader className="sticky top-0 z-10">
+              <TableRow className="h-12" style={{ background: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)' }}>
+                <TableHead className="w-48 border-r sticky left-0 z-20 text-white font-semibold" style={{ background: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)' }}>Name</TableHead>
+                <TableHead className="w-16 text-center border-r text-white font-semibold">#</TableHead>
+                <TableHead className="w-32 text-center border-r text-white font-semibold">Capacity</TableHead>
+                <TableHead className="w-12 text-center border-r text-white font-semibold">AL</TableHead>
+                <TableHead className="w-12 text-center border-r text-white font-semibold">HO</TableHead>
+                <TableHead className="w-12 text-center border-r text-white font-semibold">OL</TableHead>
+                <TableHead className="w-16 text-center border-r text-white font-semibold">Off</TableHead>
                 
                 {/* Project headers */}
                 {projects.slice(0, 15).map((project, idx) => (
                   <TableHead key={project.id} className="w-10 text-center border-r">
                     <div className="flex items-center justify-center h-full">
                       <div 
-                        className="text-xs font-bold whitespace-nowrap"
+                        className="text-xs font-bold whitespace-nowrap text-white"
                         style={{
                           transform: 'rotate(-90deg)',
                           transformOrigin: 'center',
