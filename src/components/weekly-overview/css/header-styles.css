@@ -18,17 +18,20 @@
   position: relative;
   color: white;
   text-align: center;
-  background: #6465F0;
+  background: #6465F0 !important;
 }
 
-/* First column header styling - matches header background and centered */
+/* First column header styling - ensure NAME is visible and properly styled */
 .enhanced-weekly-table thead th:first-child {
-  background: #6465F0;
+  background: #6465F0 !important;
   position: sticky;
   left: 0;
   z-index: 15;
   border-right: 2px solid rgba(255,255,255,0.3);
   text-align: center;
+  color: white !important;
+  font-weight: 600;
+  min-width: 150px;
 }
 
 .enhanced-weekly-table thead th:last-child {
@@ -47,18 +50,19 @@
   font-weight: 600;
   font-size: 11px;
   padding: 0.25rem;
+  color: white;
 }
 
 /* Office Header Enhancements */
 .enhanced-weekly-table .office-header-row {
-  background: linear-gradient(135deg, #6465F0 0%, #7c3aed 100%);
+  background: #6465F0 !important;
   color: white;
   font-weight: 600;
   position: relative;
 }
 
 .enhanced-weekly-table .office-header-row:hover {
-  background: linear-gradient(135deg, #5D3FD3 0%, #6b21a8 100%);
+  background: #5D3FD3 !important;
   transform: none;
 }
 
@@ -66,10 +70,12 @@
   border-right: 1px solid rgba(255,255,255,0.2);
   padding: 12px 8px;
   color: white;
+  background: #6465F0 !important;
 }
 
 /* Office header first column styling */
 .enhanced-weekly-table .office-header-row td:first-child {
-  background: linear-gradient(135deg, #6465F0 0%, #7c3aed 100%);
+  background: #6465F0 !important;
   border-right: 2px solid rgba(255,255,255,0.3);
+  color: white !important;
 }
