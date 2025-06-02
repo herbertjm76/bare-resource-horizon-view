@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { CapacityBar } from './CapacityBar';
@@ -9,7 +10,7 @@ interface NameCellProps {
 export const NameCell: React.FC<NameCellProps> = ({ member }) => {
   return (
     <TableCell className="font-medium border-r bg-white sticky left-0 z-10 w-[150px]">
-      <div className="truncate pl-0.5" title={`${member.first_name} ${member.last_name}`}>
+      <div className="truncate px-6" title={`${member.first_name} ${member.last_name}`}>
         {member.first_name} {member.last_name}
       </div>
     </TableCell>
