@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
 import { TeamAnnualLeaveFilters } from '@/components/annual-leave/TeamAnnualLeaveFilters';
 import { WorkloadCalendar } from '@/components/workload/WorkloadCalendar';
@@ -53,6 +53,20 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   // Use the enhanced workload data hook with the selected week
   const { workloadData, isLoadingWorkload } = useWorkloadData(selectedWeek, filteredMembers);
 
+  // Transform workloadData to the format expected by WorkloadCalendar
+  const transformedWorkloadData = useMemo(() => {
+    const transformed: Record<string, Record<string, WorkloadBreakdown>> = {};
+    
+    Object.keys(workloadData).forEach(memberId => {
+      const memberData = workloadData[memberId];
+      if (memberData && memberData.daily) {
+        transformed[memberId] = memberData.daily;
+      }
+    });
+    
+    return transformed;
+  }, [workloadData]);
+
   return (
     <div className="mx-auto space-y-4">
       {/* Enhanced Summary Section */}
@@ -104,7 +118,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
               <WorkloadCalendar 
                 members={filteredMembers}
                 selectedWeek={selectedWeek}
-                workloadData={workloadData}
+                workloadData={transformedWorkloadData}
                 periodToShow={periodToShow}
               />
             </div>
