@@ -4,6 +4,7 @@ import { ResourceTableLoadingState } from '@/components/weekly-overview/componen
 import { ResourceTableErrorState } from '@/components/weekly-overview/components/ResourceTableErrorState';
 import { EmptyResourceState } from '@/components/weekly-overview/components/EmptyResourceState';
 import { ResourceTable } from '@/components/week-resourcing/ResourceTable';
+import { NewResourceTable } from '@/components/week-resourcing/NewResourceTable';
 import { useWeekResourceData } from './hooks/useWeekResourceData';
 import './week-resourcing.css';
 
@@ -44,11 +45,28 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   }
 
   return (
-    <ResourceTable 
-      projects={projects}
-      members={members}
-      allocations={weekAllocations}
-      weekStartDate={weekStartDate}
-    />
+    <div className="space-y-8">
+      {/* Original Table */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4 text-gray-700">Current Resource Table</h3>
+        <ResourceTable 
+          projects={projects}
+          members={members}
+          allocations={weekAllocations}
+          weekStartDate={weekStartDate}
+        />
+      </div>
+      
+      {/* New Table */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4 text-gray-700">New Resource Table (Clean Start)</h3>
+        <NewResourceTable 
+          projects={projects}
+          members={members}
+          allocations={weekAllocations}
+          weekStartDate={weekStartDate}
+        />
+      </div>
+    </div>
   );
 };
