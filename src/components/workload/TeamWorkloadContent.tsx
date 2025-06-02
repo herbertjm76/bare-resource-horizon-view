@@ -113,16 +113,12 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
             <Skeleton className="h-12 w-full" />
           </div>
         ) : (
-          <div className="enhanced-table-scroll">
-            <div className="enhanced-table-container">
-              <WorkloadCalendar 
-                members={filteredMembers}
-                selectedWeek={selectedWeek}
-                workloadData={transformedWorkloadData}
-                periodToShow={periodToShow}
-              />
-            </div>
-          </div>
+          <WorkloadCalendar 
+            members={filteredMembers}
+            selectedWeek={selectedWeek}
+            workloadData={transformedWorkloadData}
+            periodToShow={periodToShow}
+          />
         )}
       </div>
     </div>
