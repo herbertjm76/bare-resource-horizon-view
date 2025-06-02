@@ -25,28 +25,29 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     allocationMap.set(key, allocation.hours);
   });
 
-  // Calculate member totals
   const getMemberTotal = (memberId: string) => {
     return allocations
       .filter(a => a.resource_id === memberId)
       .reduce((sum, a) => sum + a.hours, 0);
   };
 
-  // Calculate project count for member
   const getProjectCount = (memberId: string) => {
     return allocations
       .filter(a => a.resource_id === memberId && a.hours > 0)
       .length;
   };
 
+  // Calculate minimum table width based on columns
+  const minTableWidth = 150 + 16 + 32 + 12 + 12 + 12 + 16 + (Math.max(15, projects.length) * 40);
+
   return (
     <TooltipProvider>
-      <div className="w-full max-w-full overflow-hidden border rounded-md shadow-sm mt-8">
+      <div className="w-full border rounded-md shadow-sm mt-8">
         <div 
-          className="overflow-x-auto overflow-y-visible -webkit-overflow-scrolling-touch"
+          className="overflow-x-auto overflow-y-visible"
           style={{
-            width: 'calc(100vw - 22rem)',
-            maxWidth: 'calc(100vw - 22rem)'
+            width: '100%',
+            maxWidth: '100%'
           }}
         >
           <div 
@@ -56,10 +57,11 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
               overflowX: 'auto',
               overflowY: 'visible',
               WebkitOverflowScrolling: 'touch',
-              paddingBottom: '1px'
+              paddingBottom: '1px',
+              minWidth: `${minTableWidth}px`
             }}
           >
-            <Table className="w-full min-w-max">
+            <Table className="w-full" style={{ minWidth: `${minTableWidth}px`, tableLayout: 'fixed' }}>
               <NewResourceTableHeader projects={projects} />
               
               <TableBody>

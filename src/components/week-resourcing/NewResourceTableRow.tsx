@@ -33,6 +33,9 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   const availableHours = Math.max(0, weeklyCapacity - totalHours);
   const isEvenRow = memberIndex % 2 === 0;
   
+  // Calculate the number of project columns to show (minimum 15)
+  const projectColumnsCount = Math.max(15, projects.length);
+  
   return (
     <TableRow 
       key={member.id}
@@ -46,28 +49,31 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       <LeaveCell />
       <OfficeCell location={member.location} />
       
-      {/* Project allocation cells */}
-      {projects.slice(0, 15).map((project) => {
-        const key = `${member.id}:${project.id}`;
-        const hours = allocationMap.get(key) || 0;
-        
-        return (
-          <ProjectAllocationCell 
-            key={project.id}
-            hours={hours}
-            readOnly
-          />
-        );
+      {/* Project allocation cells - show all projects or fill to minimum */}
+      {Array.from({ length: projectColumnsCount }).map((_, idx) => {
+        const project = projects[idx];
+        if (project) {
+          const key = `${member.id}:${project.id}`;
+          const hours = allocationMap.get(key) || 0;
+          
+          return (
+            <ProjectAllocationCell 
+              key={project.id}
+              hours={hours}
+              readOnly
+            />
+          );
+        } else {
+          // Empty cells for consistent column count
+          return (
+            <ProjectAllocationCell 
+              key={`empty-${idx}`}
+              hours={0}
+              disabled
+            />
+          );
+        }
       })}
-      
-      {/* Fill empty project columns if less than 15 */}
-      {Array.from({ length: Math.max(0, 15 - projects.length) }).map((_, idx) => (
-        <ProjectAllocationCell 
-          key={`empty-${idx}`}
-          hours={0}
-          disabled
-        />
-      ))}
     </TableRow>
   );
 };
