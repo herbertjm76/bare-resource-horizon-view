@@ -1,0 +1,74 @@
+
+/* Enhanced Weekly Overview - Header Styling */
+.enhanced-weekly-table thead {
+  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.enhanced-weekly-table thead th {
+  padding: 12px 8px;
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(255,255,255,0.2);
+  position: relative;
+  color: white;
+  text-align: center;
+}
+
+/* First column header styling - matches header background and centered */
+.enhanced-weekly-table thead th:first-child {
+  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
+  position: sticky;
+  left: 0;
+  z-index: 15;
+  border-right: 2px solid rgba(255,255,255,0.3);
+  text-align: center;
+}
+
+.enhanced-weekly-table thead th:last-child {
+  border-right: none;
+}
+
+/* Enhanced Project Code Header */
+.enhanced-project-code-header {
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  height: 80px;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 11px;
+  padding: 0.25rem;
+}
+
+/* Office Header Enhancements */
+.enhanced-weekly-table .office-header-row {
+  background: linear-gradient(135deg, #6465F0 0%, #7c3aed 100%);
+  color: white;
+  font-weight: 600;
+  position: relative;
+}
+
+.enhanced-weekly-table .office-header-row:hover {
+  background: linear-gradient(135deg, #5D3FD3 0%, #6b21a8 100%);
+  transform: none;
+}
+
+.enhanced-weekly-table .office-header-row td {
+  border-right: 1px solid rgba(255,255,255,0.2);
+  padding: 12px 8px;
+  color: white;
+}
+
+/* Office header first column styling */
+.enhanced-weekly-table .office-header-row td:first-child {
+  background: linear-gradient(135deg, #6465F0 0%, #7c3aed 100%);
+  border-right: 2px solid rgba(255,255,255,0.3);
+}

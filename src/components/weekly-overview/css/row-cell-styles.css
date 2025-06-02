@@ -1,0 +1,77 @@
+
+/* Enhanced Weekly Overview - Row & Cell Styling */
+.enhanced-weekly-table tbody tr {
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.enhanced-weekly-table tbody tr:hover {
+  background: linear-gradient(90deg, #D2C6FB 0%, #C4B5F7 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.enhanced-weekly-table tbody tr:nth-child(even) {
+  background: #D2C6FB;
+}
+
+.enhanced-weekly-table tbody tr:nth-child(even):hover {
+  background: linear-gradient(90deg, #C4B5F7 0%, #B6A3F4 100%);
+}
+
+/* Enhanced Cell Styling */
+.enhanced-weekly-table td {
+  padding: 8px 6px;
+  border-right: 1px solid #e2e8f0;
+  font-size: 13px;
+  position: relative;
+  color: #1f2937;
+  text-align: center;
+}
+
+/* First column cell styling - sticky positioning with header background */
+.enhanced-weekly-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
+  border-right: 2px solid rgba(255,255,255,0.3);
+  color: white;
+  text-align: center;
+  font-weight: 600;
+}
+
+.enhanced-weekly-table td:last-child {
+  border-right: none;
+}
+
+/* Member Row Enhancements */
+.enhanced-weekly-table .member-row {
+  background: #D2C6FB;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.enhanced-weekly-table .member-row:hover {
+  border-left-color: #6465F0;
+  background: linear-gradient(90deg, #C4B5F7 0%, #B6A3F4 100%);
+}
+
+/* Member row first column - maintain header background */
+.enhanced-weekly-table .member-row td:first-child {
+  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
+  color: white;
+}
+
+/* Enhanced Totals Row */
+.enhanced-totals-row {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  font-weight: 600;
+}
+
+.enhanced-totals-row td {
+  color: white;
+  border-right: 1px solid rgba(255,255,255,0.2);
+  padding: 12px 8px;
+}

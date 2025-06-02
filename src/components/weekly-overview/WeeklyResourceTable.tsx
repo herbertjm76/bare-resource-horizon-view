@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { WeeklyResourceTableWrapper } from './components/WeeklyResourceTableWrapper';
-import './weekly-overview.css';
+import './css/index.css';
 
 interface WeeklyResourceTableProps {
   selectedWeek: Date;
