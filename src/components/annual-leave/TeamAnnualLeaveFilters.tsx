@@ -36,7 +36,7 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
   setFilterValue,
   setSearchQuery,
   clearFilters,
-  periodToShow = 12,
+  periodToShow,
   onPeriodChange
 }) => {
   const activeFiltersCount = (activeFilter === 'all' ? 0 : 1) + (searchQuery ? 1 : 0);
@@ -57,7 +57,7 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
     return (
       <>
         <div className="space-y-4">
-          {onPeriodChange && (
+          {onPeriodChange && periodToShow !== undefined && (
             <>
               <PeriodSelector
                 selectedPeriod={periodToShow}
