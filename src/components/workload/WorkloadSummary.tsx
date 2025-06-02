@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -80,7 +81,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
 
     return (
       <div className="flex items-center justify-center gap-2">
-        <div className="flex -space-x-2">
+        <div className="flex gap-1">
           {membersToShow.map(({ member }) => (
             <Avatar key={member.id} className="h-6 w-6">
               <AvatarFallback className="text-xs bg-gray-300 text-gray-700">
