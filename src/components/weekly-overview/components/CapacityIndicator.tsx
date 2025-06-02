@@ -3,12 +3,12 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
-interface CapacityBarProps {
+interface CapacityIndicatorProps {
   availableHours: number;
   totalCapacity: number;
 }
 
-export const CapacityBar: React.FC<CapacityBarProps> = ({
+export const CapacityIndicator: React.FC<CapacityIndicatorProps> = ({
   availableHours,
   totalCapacity
 }) => {
