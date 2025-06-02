@@ -1,0 +1,157 @@
+
+/* Clean Weekly Overview Table Styles */
+
+.weekly-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.weekly-overview-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: white;
+  font-size: 12px;
+}
+
+/* Header Styling - Purple background for ALL header cells */
+.weekly-overview-table thead {
+  background: #6465F0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.weekly-overview-table thead th {
+  background: #6465F0 !important;
+  color: white !important;
+  padding: 12px 8px;
+  font-weight: 600;
+  font-size: 11px;
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* First column header - ensure it's also purple */
+.weekly-overview-table thead th:first-child {
+  background: #6465F0 !important;
+  color: white !important;
+  position: sticky;
+  left: 0;
+  z-index: 15;
+  min-width: 150px;
+  border-right: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Project code headers with vertical text */
+.weekly-project-header {
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  height: 60px;
+  transform: rotate(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 11px;
+  color: white !important;
+  background: #6465F0 !important;
+}
+
+/* Body rows */
+.weekly-overview-table tbody tr {
+  background: white;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.weekly-overview-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.weekly-overview-table tbody td {
+  padding: 8px;
+  text-align: center;
+  border-right: 1px solid #e2e8f0;
+  font-size: 12px;
+  background: white;
+}
+
+/* First column in body - sticky name column */
+.weekly-overview-table tbody td:first-child {
+  position: sticky;
+  left: 0;
+  background: white;
+  font-weight: 500;
+  z-index: 5;
+  border-right: 2px solid #e2e8f0;
+  text-align: left;
+}
+
+.weekly-overview-table tbody tr:hover td:first-child {
+  background: #f8fafc;
+}
+
+/* Footer/Totals */
+.weekly-overview-table tfoot tr {
+  background: #f8fafc;
+  font-weight: 600;
+  border-top: 2px solid #e2e8f0;
+}
+
+.weekly-overview-table tfoot td {
+  padding: 12px 8px;
+  text-align: center;
+  border-right: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.weekly-overview-table tfoot td:first-child {
+  position: sticky;
+  left: 0;
+  background: #f8fafc;
+  z-index: 5;
+  border-right: 2px solid #e2e8f0;
+}
+
+/* Remove last border */
+.weekly-overview-table th:last-child,
+.weekly-overview-table td:last-child {
+  border-right: none;
+}
+
+/* Office header rows */
+.weekly-office-header {
+  background: #6465F0 !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+.weekly-office-header td {
+  background: #6465F0 !important;
+  color: white !important;
+  padding: 12px 8px;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Scrollbar styling */
+.weekly-table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.weekly-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.weekly-table-wrapper::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+}
+
+.weekly-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
