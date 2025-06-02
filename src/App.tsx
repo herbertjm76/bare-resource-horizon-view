@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
 import TeamMembers from "./pages/TeamMembers";
+import TeamMemberDetail from "./pages/TeamMemberDetail";
 import OfficeSettings from "./pages/OfficeSettings";
 import WeeklyOverview from "./pages/weeklyoverview";
 import TeamWorkload from "./pages/TeamWorkload";
@@ -39,6 +40,7 @@ function App() {
               <Route path="/profile" element={<Profile />} />
               <Route path="/projects" element={<Projects />} />
               <Route path="/team-members" element={<TeamMembers />} />
+              <Route path="/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/office-settings" element={<OfficeSettings />} />
               <Route path="/weekly-overview" element={<WeeklyOverview />} />
               <Route path="/team-workload" element={<TeamWorkload />} />
