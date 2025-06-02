@@ -2,13 +2,10 @@
 import React from 'react';
 import { ResourceRow } from '@/components/resources/ResourceRow';
 import { AddResourceDialog } from '@/components/resources/dialogs/AddResourceDialog';
-import { useStageColorMap } from '@/components/projects/hooks/useProjectColors';
 import { ProjectHeader } from './components/ProjectHeader';
 import { AddResourceRow } from './components/AddResourceRow';
-import { useWeekMilestones } from './hooks/useWeekMilestones';
-import { useProjectResources } from './hooks/useProjectResources';
-import { useWeeklyProjectHours } from './hooks/useWeeklyProjectHours';
-import { format } from 'date-fns';
+import { DailyAllocationCell } from './components/DailyAllocationCell';
+import { useProjectRowData } from './hooks/useProjectRowData';
 
 interface DayInfo {
   date: Date;
@@ -38,48 +35,18 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
 }) => {
   const {
     resources,
-    projectAllocations,
     showAddResource,
     isLoading,
     isLoadingAllocations,
+    dailyProjectHours,
+    totalProjectHours,
+    getDayKey,
     setShowAddResource,
     handleAllocationChange,
     handleDeleteResource,
     handleAddResource,
-    checkResourceInOtherProjects,
-    getAllocationKey
-  } = useProjectResources(project.id);
-
-  const { 
-    weekMilestones, 
-    setWeekMilestone, 
-    hasContinuousStage 
-  } = useWeekMilestones();
-  
-  // Get stage colors from the project if available
-  const stageColorMap = useStageColorMap(project?.officeStages || []);
-  
-  // Helper to get day key for allocation lookup
-  const getDayKey = (date: Date): string => {
-    return format(date, 'yyyy-MM-dd');
-  };
-  
-  // Sum up all resource hours for each day
-  const dailyProjectHours: Record<string, number> = {};
-  days.forEach(day => {
-    const dayKey = getDayKey(day.date);
-    dailyProjectHours[dayKey] = 0;
-    
-    // Sum up hours for this day across all resources
-    resources.forEach(resource => {
-      const allocationKey = `${resource.id}:${dayKey}`;
-      const hours = projectAllocations[allocationKey] || 0;
-      dailyProjectHours[dayKey] += hours;
-    });
-  });
-  
-  // Calculate total project hours
-  const totalProjectHours = Object.values(dailyProjectHours).reduce((sum, hours) => sum + hours, 0);
+    checkResourceInOtherProjects
+  } = useProjectRowData(project, days);
   
   // Base background color for project rows
   const rowBgClass = isEven 
@@ -131,27 +98,13 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           const dayKey = getDayKey(day.date);
           const projectHours = dailyProjectHours[dayKey] || 0;
           
-          // Style classes - apply weekend class for consistent styling
-          const isWeekendClass = day.isWeekend ? 'weekend' : '';
-          const isSundayClass = day.isSunday ? 'sunday-border' : '';
-          const isFirstOfMonthClass = day.isFirstOfMonth ? 'border-l-2 border-l-brand-primary/40' : '';
-          const isEndOfWeekClass = day.isEndOfWeek ? 'border-r border-r-gray-300' : '';
-          
           return (
-            <td 
-              key={dayKey} 
-              className={`p-0 text-center w-[30px] ${isWeekendClass} ${isSundayClass} ${isFirstOfMonthClass} ${isEndOfWeekClass}`}
-            >
-              <div className="px-0.5 py-1 text-xs">
-                {projectHours > 0 ? (
-                  <span className="bg-white/80 rounded-lg px-1.5 py-0.5 font-medium text-sm inline-block min-w-[22px]">
-                    {projectHours}
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground"></span>
-                )}
-              </div>
-            </td>
+            <DailyAllocationCell
+              key={dayKey}
+              day={day}
+              dayKey={dayKey}
+              projectHours={projectHours}
+            />
           );
         })}
         
