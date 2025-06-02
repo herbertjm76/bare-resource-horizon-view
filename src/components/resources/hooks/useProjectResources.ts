@@ -1,13 +1,13 @@
 
-import { useState } from 'react';
 import { useFetchResources } from './useFetchResources';
-import { useResourceManagement } from './useResourceManagement';
-import { Resource } from './types/resourceTypes';
+import { useProjectResourcesState } from './useProjectResourcesState';
+import { useProjectResourcesData } from './useProjectResourcesData';
 
 export type { Resource } from './types/resourceTypes';
 
 export const useProjectResources = (projectId: string) => {
-  const [showAddResource, setShowAddResource] = useState(false);
+  // Get UI state
+  const { showAddResource, setShowAddResource } = useProjectResourcesState();
   
   // Get resources data
   const { resources, isLoading, setResources, refreshResources } = useFetchResources(projectId);
@@ -21,7 +21,7 @@ export const useProjectResources = (projectId: string) => {
     checkResourceInOtherProjects,
     getAllocationKey,
     isLoadingAllocations
-  } = useResourceManagement(projectId, resources, setResources);
+  } = useProjectResourcesData(projectId, resources, setResources);
 
   return {
     resources,
