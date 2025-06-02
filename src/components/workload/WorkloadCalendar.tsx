@@ -70,7 +70,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
               ))}
               
               <TableHead className="text-center min-w-[70px] total-column p-0">
-                <div className="px-2 py-1">Total</div>
+                <div className="px-2 py-1">Utilization</div>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -137,10 +137,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                   })}
                   
                   <TableCell className="text-center total-column p-0">
-                    <div className="flex flex-col items-center gap-1 px-2 py-1">
-                      <div className="enhanced-pill">
-                        {totalHours}h
-                      </div>
+                    <div className="flex justify-center px-2 py-1">
                       <Badge 
                         variant="outline" 
                         className={`text-xs ${

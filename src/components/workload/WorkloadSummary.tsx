@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
-import { ResourceStatusCards } from './ResourceStatusCards';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/useWorkloadData';
 
@@ -53,6 +54,52 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     return Math.round(totalAvailable);
   };
 
+  // Calculate which members need resourcing (low utilization) and are overloaded
+  const memberStatus = members.map(member => {
+    const weeklyCapacity = member.weekly_capacity || 40;
+    const totalCapacity = weeklyCapacity * periodToShow;
+    
+    const memberData = workloadData[member.id] || {};
+    const totalAllocated = Object.values(memberData).reduce((sum, breakdown) => sum + breakdown.total, 0);
+    
+    const utilization = totalCapacity > 0 ? (totalAllocated / totalCapacity) * 100 : 0;
+    
+    return {
+      member,
+      utilization,
+      totalAllocated,
+      totalCapacity
+    };
+  });
+
+  const needsResourcing = memberStatus.filter(m => m.utilization < 60);
+  const overloaded = memberStatus.filter(m => m.utilization > 100);
+
+  const renderMemberAvatars = (memberList: typeof memberStatus, maxShow: number = 6) => {
+    const membersToShow = memberList.slice(0, maxShow);
+    const remainingCount = memberList.length - maxShow;
+
+    return (
+      <div className="flex items-center gap-2">
+        <div className="flex -space-x-2">
+          {membersToShow.map(({ member }) => (
+            <Avatar key={member.id} className="h-6 w-6 border-2 border-white">
+              <AvatarImage src={`https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=32&h=32&fit=crop&crop=face`} />
+              <AvatarFallback className="text-xs">
+                {member.first_name?.charAt(0)}{member.last_name?.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
+          ))}
+        </div>
+        {remainingCount > 0 && (
+          <Badge variant="secondary" className="text-xs">
+            +{remainingCount}
+          </Badge>
+        )}
+      </div>
+    );
+  };
+
   // Calculate metrics
   const overallUtilization = calculateOverallUtilization();
   const availableCapacity = calculateAvailableCapacity();
@@ -74,20 +121,31 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
       subtitle: `Next ${periodToShow} weeks capacity`,
       badgeText: "Plan Ahead",
       badgeColor: "blue"
+    },
+    {
+      title: "Needs Resourcing",
+      value: needsResourcing.length > 0 ? renderMemberAvatars(needsResourcing) : (
+        <div className="text-xs text-white/70 italic">All well utilized</div>
+      ),
+      subtitle: "Under 60% utilization",
+      badgeText: `${needsResourcing.length}`,
+      badgeColor: needsResourcing.length > 0 ? "blue" : "green"
+    },
+    {
+      title: "Overloaded Staff",
+      value: overloaded.length > 0 ? renderMemberAvatars(overloaded) : (
+        <div className="text-xs text-white/70 italic">No one overloaded</div>
+      ),
+      subtitle: "Over 100% utilization",
+      badgeText: `${overloaded.length}`,
+      badgeColor: overloaded.length > 0 ? "red" : "green"
     }
   ];
 
   return (
-    <div className="space-y-4">
-      <StandardizedExecutiveSummary
-        metrics={metrics}
-        gradientType="purple"
-      />
-      <ResourceStatusCards 
-        members={members}
-        workloadData={workloadData}
-        periodToShow={periodToShow}
-      />
-    </div>
+    <StandardizedExecutiveSummary
+      metrics={metrics}
+      gradientType="purple"
+    />
   );
 };
