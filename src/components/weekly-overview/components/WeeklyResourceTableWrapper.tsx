@@ -1,6 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { CleanWeeklyTable } from '../CleanWeeklyTable';
+import { TestPurpleTable } from '../TestPurpleTable';
 import { ResourceTableLoadingState } from './ResourceTableLoadingState';
 import { ResourceTableErrorState } from './ResourceTableErrorState';
 import { EmptyResourceState } from './EmptyResourceState';
@@ -60,14 +61,19 @@ export const WeeklyResourceTableWrapper: React.FC<WeeklyResourceTableWrapperProp
   }
 
   return (
-    <CleanWeeklyTable
-      projects={projects}
-      filteredOffices={filteredOffices}
-      membersByOffice={membersByOffice}
-      getMemberAllocation={getMemberAllocation}
-      getOfficeDisplay={getOfficeDisplay}
-      handleInputChange={handleInputChange}
-      projectTotals={projectTotals}
-    />
+    <div>
+      <CleanWeeklyTable
+        projects={projects}
+        filteredOffices={filteredOffices}
+        membersByOffice={membersByOffice}
+        getMemberAllocation={getMemberAllocation}
+        getOfficeDisplay={getOfficeDisplay}
+        handleInputChange={handleInputChange}
+        projectTotals={projectTotals}
+      />
+      
+      {/* Test table below */}
+      <TestPurpleTable projects={projects} />
+    </div>
   );
 };
