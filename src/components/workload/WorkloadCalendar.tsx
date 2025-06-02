@@ -1,6 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { format, addDays, startOfWeek, isSunday, isToday } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { WorkloadBreakdown } from './hooks/types';
@@ -89,12 +90,15 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
             return (
               <TableRow key={member.id} className={`member-row ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
                 <TableCell className="sticky left-0 z-10 bg-inherit px-2 py-1">
-                  <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarImage src={`https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=32&h=32&fit=crop&crop=face`} />
+                      <AvatarFallback className="text-xs">
+                        {member.first_name?.charAt(0)}{member.last_name?.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
                     <span className="font-medium text-sm">
                       {member.first_name} {member.last_name}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {member.department || 'N/A'}
                     </span>
                   </div>
                 </TableCell>
