@@ -95,7 +95,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                           {member.first_name} {member.last_name}
                         </div>
                         <div className="text-xs text-gray-500 truncate">
-                          {member.office_location || 'No location'}
+                          {member.location || 'No location'}
                         </div>
                       </div>
                     </div>
