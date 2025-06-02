@@ -16,7 +16,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   const utilizationPercentage = Math.min(100, Math.max(0, (totalCapacity - availableHours) / totalCapacity * 100));
 
   // Calculate color based on utilization percentage
-  const getBoxColor = () => {
+  const getUtilizationColor = () => {
     if (utilizationPercentage >= 90) {
       return 'bg-red-500'; // Red for very high utilization (90-100%)
     } else if (utilizationPercentage >= 80) {
@@ -45,7 +45,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
     }
   };
 
-  const boxColor = getBoxColor();
+  const utilizationColor = getUtilizationColor();
   const textColor = getTextColor();
 
   return (
@@ -66,21 +66,29 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
               return (
                 <Tooltip key={index}>
                   <TooltipTrigger asChild>
-                    <div className={cn(
-                      "h-2.5 w-2.5 relative overflow-hidden border border-gray-300",
-                      !isFilled && !isPartiallyFilled && "bg-gray-100"
-                    )}>
-                      {/* For completely filled boxes */}
-                      {isFilled && (
-                        <div className={cn("absolute inset-0", boxColor)} />
-                      )}
-                      
-                      {/* For partially filled boxes */}
+                    <div 
+                      className="h-2.5 w-2.5 relative overflow-hidden border border-gray-300"
+                      style={{
+                        backgroundColor: isFilled 
+                          ? utilizationColor.includes('red') ? '#ef4444'
+                          : utilizationColor.includes('orange') ? '#f97316'
+                          : utilizationColor.includes('yellow') ? '#facc15'
+                          : utilizationColor.includes('green') ? '#22c55e'
+                          : '#3b82f6'
+                          : '#f3f4f6'
+                      }}
+                    >
+                      {/* For partially filled boxes - show gradient or partial fill */}
                       {isPartiallyFilled && (
                         <div 
-                          className={cn("absolute top-0 bottom-0 left-0", boxColor)} 
+                          className="absolute top-0 bottom-0 left-0"
                           style={{
-                            width: `${(utilizationPercentage - boxStartPercent) / 20 * 100}%`
+                            width: `${(utilizationPercentage - boxStartPercent) / 20 * 100}%`,
+                            backgroundColor: utilizationColor.includes('red') ? '#ef4444'
+                              : utilizationColor.includes('orange') ? '#f97316'
+                              : utilizationColor.includes('yellow') ? '#facc15'
+                              : utilizationColor.includes('green') ? '#22c55e'
+                              : '#3b82f6'
                           }} 
                         />
                       )}
