@@ -1,3 +1,4 @@
+
 /* Enhanced Resource Grid Styles - Using Centralized Color System */
 .enhanced-grid-scroll {
   overflow-x: auto;
@@ -31,9 +32,9 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* Enhanced Header Styling - standardized to #6F4BF6 */
+/* Enhanced Header Styling - standardized to #6F4BF6 to match team annual leave */
 .enhanced-resource-table thead {
-  background: linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%);
+  background: #6F4BF6;
   color: white;
   position: sticky;
   top: 0;
@@ -48,7 +49,7 @@
   text-transform: uppercase;
   border-right: 1px solid rgba(255,255,255,0.2);
   position: relative;
-  color: #1f2937;
+  color: white;
 }
 
 .enhanced-resource-table thead th:last-child {
