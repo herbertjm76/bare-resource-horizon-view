@@ -8,11 +8,11 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { User } from 'lucide-react';
-import { AvatarUpload } from '@/components/profile/AvatarUpload';
-import { PersonalInfoSection } from '@/components/profile/PersonalInfoSection';
-import { ProfessionalInfoSection } from '@/components/profile/ProfessionalInfoSection';
-import { EmergencyContactSection } from '@/components/profile/EmergencyContactSection';
-import { SecuritySection } from '@/components/profile/SecuritySection';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PersonalInfoTab } from '@/components/profile/PersonalInfoTab';
+import { ProfessionalInfoTab } from '@/components/profile/ProfessionalInfoTab';
+import { EmergencyContactTab } from '@/components/profile/EmergencyContactTab';
+import { SecurityTab } from '@/components/profile/SecurityTab';
 
 const HEADER_HEIGHT = 56;
 
@@ -29,8 +29,6 @@ type Profile = {
   manager_id: string | null;
   emergency_contact_name: string | null;
   emergency_contact_phone: string | null;
-  skills: string[] | null;
-  languages: string[] | null;
   social_linkedin: string | null;
   social_twitter: string | null;
   address: string | null;
@@ -69,7 +67,33 @@ export default function Profile() {
       if (error) {
         setError("Profile not found.");
       } else {
-        setProfile(data);
+        // Ensure all required fields are present with defaults
+        const profileData: Profile = {
+          id: data.id,
+          email: data.email,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          avatar_url: data.avatar_url,
+          phone: data.phone,
+          bio: data.bio,
+          date_of_birth: data.date_of_birth,
+          start_date: data.start_date,
+          manager_id: data.manager_id,
+          emergency_contact_name: data.emergency_contact_name,
+          emergency_contact_phone: data.emergency_contact_phone,
+          social_linkedin: data.social_linkedin,
+          social_twitter: data.social_twitter,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          postal_code: data.postal_code,
+          country: data.country,
+          job_title: data.job_title,
+          department: data.department,
+          location: data.location,
+          weekly_capacity: data.weekly_capacity || 40,
+        };
+        setProfile(profileData);
       }
       setLoading(false);
     };
@@ -102,24 +126,6 @@ export default function Profile() {
     });
   };
 
-  const handleArrayAdd = (field: string, value: string) => {
-    if (!profile) return;
-    const currentArray = profile[field as keyof Profile] as string[] || [];
-    setProfile({
-      ...profile,
-      [field]: [...currentArray, value],
-    });
-  };
-
-  const handleArrayRemove = (field: string, index: number) => {
-    if (!profile) return;
-    const currentArray = profile[field as keyof Profile] as string[] || [];
-    setProfile({
-      ...profile,
-      [field]: currentArray.filter((_, i) => i !== index),
-    });
-  };
-
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
@@ -134,8 +140,6 @@ export default function Profile() {
       start_date: profile.start_date,
       emergency_contact_name: profile.emergency_contact_name,
       emergency_contact_phone: profile.emergency_contact_phone,
-      skills: profile.skills,
-      languages: profile.languages,
       social_linkedin: profile.social_linkedin,
       social_twitter: profile.social_twitter,
       address: profile.address,
@@ -206,68 +210,74 @@ export default function Profile() {
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
-            <div className="max-w-7xl mx-auto space-y-8">
-              {/* Modern Header Section */}
-              <div className="space-y-6 mb-8">
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                  <div className="space-y-2">
-                    <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                      <User className="h-8 w-8 text-brand-violet" />
-                      My Profile
-                    </h1>
-                    <p className="text-lg text-gray-600">Manage your personal and professional information</p>
-                  </div>
-                </div>
-
-                {/* Avatar Section */}
-                <div className="flex justify-center lg:justify-start">
-                  <AvatarUpload
-                    currentAvatarUrl={profile.avatar_url}
-                    userId={profile.id}
-                    onAvatarUpdate={handleAvatarUpdate}
-                    userInitials={getUserInitials()}
-                  />
-                </div>
+            <div className="max-w-6xl mx-auto space-y-8">
+              {/* Header Section */}
+              <div className="space-y-2">
+                <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                  <User className="h-8 w-8 text-brand-violet" />
+                  My Profile
+                </h1>
+                <p className="text-lg text-gray-600">Manage your personal and professional information</p>
               </div>
 
-              {/* Two-Column Layout */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                {/* Left Column */}
-                <div className="space-y-8">
-                  <PersonalInfoSection
-                    profile={profile}
-                    handleChange={handleChange}
-                    handleDateChange={handleDateChange}
-                    saving={saving}
-                    onSave={handleSave}
-                    error={error}
-                  />
-                  
-                  <EmergencyContactSection
-                    profile={profile}
-                    handleChange={handleChange}
-                    saving={saving}
-                    onSave={handleSave}
-                    error={error}
-                  />
-                </div>
+              {/* Tab System */}
+              <Tabs defaultValue="personal" className="w-full">
+                <TabsList className="w-full mb-6 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-4 gap-2 flex-nowrap rounded-none bg-transparent p-0">
+                  <TabsTrigger value="personal" className="flex items-center gap-2 min-w-max px-4 h-10">
+                    <User className="h-4 w-4" />
+                    <span className="hidden xs:inline">Personal</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="professional" className="flex items-center gap-2 min-w-max px-4 h-10">
+                    <User className="h-4 w-4" />
+                    <span className="hidden xs:inline">Professional</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="emergency" className="flex items-center gap-2 min-w-max px-4 h-10">
+                    <User className="h-4 w-4" />
+                    <span className="hidden xs:inline">Emergency</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="security" className="flex items-center gap-2 min-w-max px-4 h-10">
+                    <User className="h-4 w-4" />
+                    <span className="hidden xs:inline">Security</span>
+                  </TabsTrigger>
+                </TabsList>
 
-                {/* Right Column */}
-                <div className="space-y-8">
-                  <ProfessionalInfoSection
-                    profile={profile}
-                    company={company}
-                    handleChange={handleChange}
-                    handleArrayAdd={handleArrayAdd}
-                    handleArrayRemove={handleArrayRemove}
-                    saving={saving}
-                    onSave={handleSave}
-                    error={error}
-                  />
-                  
-                  <SecuritySection />
+                <div className="mt-6">
+                  <TabsContent value="personal">
+                    <PersonalInfoTab
+                      profile={profile}
+                      handleChange={handleChange}
+                      handleDateChange={handleDateChange}
+                      handleAvatarUpdate={handleAvatarUpdate}
+                      getUserInitials={getUserInitials}
+                      saving={saving}
+                      onSave={handleSave}
+                      error={error}
+                    />
+                  </TabsContent>
+                  <TabsContent value="professional">
+                    <ProfessionalInfoTab
+                      profile={profile}
+                      company={company}
+                      handleChange={handleChange}
+                      saving={saving}
+                      onSave={handleSave}
+                      error={error}
+                    />
+                  </TabsContent>
+                  <TabsContent value="emergency">
+                    <EmergencyContactTab
+                      profile={profile}
+                      handleChange={handleChange}
+                      saving={saving}
+                      onSave={handleSave}
+                      error={error}
+                    />
+                  </TabsContent>
+                  <TabsContent value="security">
+                    <SecurityTab />
+                  </TabsContent>
                 </div>
-              </div>
+              </Tabs>
             </div>
           </div>
         </div>
