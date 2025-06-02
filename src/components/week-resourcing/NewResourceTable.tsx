@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { CapacityBar } from './CapacityBar';
+import { NewResourceTableHeader } from './NewResourceTableHeader';
+import { NewResourceTableRow } from './NewResourceTableRow';
 
 interface NewResourceTableProps {
   projects: any[];
@@ -43,159 +44,20 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
       <div className="w-full max-w-full overflow-hidden border rounded-md shadow-sm mt-8">
         <div className="overflow-x-auto">
           <Table className="w-full min-w-max">
-            <TableHeader className="sticky top-0 z-10">
-              <TableRow className="h-12" style={{ background: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)' }}>
-                <TableHead className="w-[70%] border-r sticky left-0 z-20 text-white font-semibold" style={{ background: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)' }}>Name</TableHead>
-                <TableHead className="w-16 text-center border-r text-white font-semibold">#</TableHead>
-                <TableHead className="w-32 text-center border-r text-white font-semibold">Capacity</TableHead>
-                <TableHead className="w-12 text-center border-r text-white font-semibold">AL</TableHead>
-                <TableHead className="w-12 text-center border-r text-white font-semibold">HO</TableHead>
-                <TableHead className="w-12 text-center border-r text-white font-semibold">OL</TableHead>
-                <TableHead className="w-16 text-center border-r text-white font-semibold">Off</TableHead>
-                
-                {/* Project headers */}
-                {projects.slice(0, 15).map((project, idx) => (
-                  <TableHead key={project.id} className="w-10 text-center border-r">
-                    <div className="flex items-center justify-center h-full">
-                      <div 
-                        className="text-xs font-bold whitespace-nowrap text-white"
-                        style={{
-                          transform: 'rotate(-90deg)',
-                          transformOrigin: 'center',
-                          width: '40px',
-                          height: '40px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        {project.code || `P${idx + 1}`}
-                      </div>
-                    </div>
-                  </TableHead>
-                ))}
-                
-                {/* Fill empty project columns if less than 15 */}
-                {Array.from({ length: Math.max(0, 15 - projects.length) }).map((_, idx) => (
-                  <TableHead key={`empty-${idx}`} className="w-10 text-center border-r">
-                    <div className="h-10"></div>
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
+            <NewResourceTableHeader projects={projects} />
             
             <TableBody>
-              {members.map((member, memberIndex) => {
-                const weeklyCapacity = member.weekly_capacity || 40;
-                const totalHours = getMemberTotal(member.id);
-                const projectCount = getProjectCount(member.id);
-                const availableHours = Math.max(0, weeklyCapacity - totalHours);
-                const isEvenRow = memberIndex % 2 === 0;
-                
-                return (
-                  <TableRow 
-                    key={member.id}
-                    className={`h-9 ${isEvenRow ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50`}
-                  >
-                    {/* Name */}
-                    <TableCell className="font-medium border-r bg-white sticky left-0 z-10">
-                      <div className="truncate" title={`${member.first_name} ${member.last_name}`}>
-                        {member.first_name} {member.last_name}
-                      </div>
-                    </TableCell>
-                    
-                    {/* Project Count */}
-                    <TableCell className="text-center border-r">
-                      <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-                        {projectCount}
-                      </span>
-                    </TableCell>
-                    
-                    {/* Capacity Bar */}
-                    <TableCell className="border-r p-2">
-                      <CapacityBar 
-                        availableHours={availableHours} 
-                        totalCapacity={weeklyCapacity} 
-                      />
-                    </TableCell>
-                    
-                    {/* Annual Leave */}
-                    <TableCell className="text-center border-r">
-                      <input
-                        type="number"
-                        min="0"
-                        max="40"
-                        defaultValue="0"
-                        className="w-8 h-6 text-xs text-center border border-gray-300 rounded"
-                        placeholder="0"
-                      />
-                    </TableCell>
-                    
-                    {/* Holiday */}
-                    <TableCell className="text-center border-r">
-                      <input
-                        type="number"
-                        min="0"
-                        max="40"
-                        defaultValue="0"
-                        className="w-8 h-6 text-xs text-center border border-gray-300 rounded"
-                        placeholder="0"
-                      />
-                    </TableCell>
-                    
-                    {/* Other Leave */}
-                    <TableCell className="text-center border-r">
-                      <input
-                        type="number"
-                        min="0"
-                        max="40"
-                        defaultValue="0"
-                        className="w-8 h-6 text-xs text-center border border-gray-300 rounded"
-                        placeholder="0"
-                      />
-                    </TableCell>
-                    
-                    {/* Office */}
-                    <TableCell className="text-center border-r text-xs text-gray-600">
-                      {member.location || 'N/A'}
-                    </TableCell>
-                    
-                    {/* Project allocation cells */}
-                    {projects.slice(0, 15).map((project) => {
-                      const key = `${member.id}:${project.id}`;
-                      const hours = allocationMap.get(key) || 0;
-                      
-                      return (
-                        <TableCell key={project.id} className="border-r p-1">
-                          <input
-                            type="number"
-                            min="0"
-                            max="40"
-                            value={hours || ''}
-                            className="w-8 h-6 text-xs text-center border border-gray-300 rounded"
-                            placeholder="0"
-                            readOnly
-                          />
-                        </TableCell>
-                      );
-                    })}
-                    
-                    {/* Fill empty project columns if less than 15 */}
-                    {Array.from({ length: Math.max(0, 15 - projects.length) }).map((_, idx) => (
-                      <TableCell key={`empty-${idx}`} className="border-r p-1">
-                        <input
-                          type="number"
-                          min="0"
-                          max="40"
-                          className="w-8 h-6 text-xs text-center border border-gray-300 rounded"
-                          placeholder="0"
-                          disabled
-                        />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                );
-              })}
+              {members.map((member, memberIndex) => (
+                <NewResourceTableRow
+                  key={member.id}
+                  member={member}
+                  memberIndex={memberIndex}
+                  projects={projects}
+                  allocationMap={allocationMap}
+                  getMemberTotal={getMemberTotal}
+                  getProjectCount={getProjectCount}
+                />
+              ))}
             </TableBody>
           </Table>
         </div>
