@@ -1,4 +1,5 @@
 
+
 /* Enhanced Weekly Overview Styles - Using Centralized Color System */
 .enhanced-weekly-scroll {
   overflow-x: auto;
@@ -52,6 +53,15 @@
   color: white;
 }
 
+/* First column header styling - matches header background */
+.enhanced-weekly-table thead th:first-child {
+  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%);
+  position: sticky;
+  left: 0;
+  z-index: 15;
+  border-right: 2px solid rgba(255,255,255,0.3);
+}
+
 .enhanced-weekly-table thead th:last-child {
   border-right: none;
 }
@@ -85,6 +95,15 @@
   color: #1f2937;
 }
 
+/* First column cell styling - sticky positioning */
+.enhanced-weekly-table td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: inherit;
+  border-right: 2px solid #e2e8f0;
+}
+
 .enhanced-weekly-table td:last-child {
   border-right: none;
 }
@@ -106,6 +125,12 @@
   border-right: 1px solid rgba(255,255,255,0.2);
   padding: 12px 8px;
   color: white;
+}
+
+/* Office header first column styling */
+.enhanced-weekly-table .office-header-row td:first-child {
+  background: linear-gradient(135deg, #6465F0 0%, #7c3aed 100%);
+  border-right: 2px solid rgba(255,255,255,0.3);
 }
 
 /* Member Row Enhancements - updated with #D2C6FB */
