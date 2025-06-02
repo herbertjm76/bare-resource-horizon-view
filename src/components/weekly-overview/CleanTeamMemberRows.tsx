@@ -30,13 +30,13 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
         const allocation = getMemberAllocation(member.id);
         const weeklyCapacity = member.weekly_capacity || 40;
         
-        // Calculate total project hours
-        const totalProjectHours = projects.reduce((sum, project) => {
-          return sum + (allocation.projects[project.id] || 0);
+        // Calculate total project hours from projectAllocations array
+        const totalProjectHours = allocation.projectAllocations.reduce((sum, project) => {
+          return sum + (project.hours || 0);
         }, 0);
         
         // Calculate available hours (capacity - total hours - leave)
-        const totalLeave = (allocation.annual_leave || 0) + (allocation.other_leave || 0);
+        const totalLeave = (allocation.annualLeave || 0) + (allocation.others || 0);
         const availableHours = Math.max(0, weeklyCapacity - totalProjectHours - totalLeave);
         
         const isEvenRow = memberIndex % 2 === 0;
@@ -57,7 +57,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
             <TableCell className="number-column p-2 border-r">
               <div className="flex justify-center">
                 <span className="project-pill">
-                  {Object.values(allocation.projects).filter(hours => hours > 0).length}
+                  {allocation.projectAllocations.filter(project => (project.hours || 0) > 0).length}
                 </span>
               </div>
             </TableCell>
@@ -76,8 +76,8 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
                 type="number"
                 min="0"
                 max="40"
-                value={allocation.annual_leave || ''}
-                onChange={(e) => handleInputChange(member.id, 'annual_leave', parseFloat(e.target.value) || 0)}
+                value={allocation.annualLeave || ''}
+                onChange={(e) => handleInputChange(member.id, 'annualLeave', parseFloat(e.target.value) || 0)}
                 className="leave-input"
                 placeholder="0"
               />
@@ -89,8 +89,8 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
                 type="number"
                 min="0"
                 max="40"
-                value={allocation.other_leave || ''}
-                onChange={(e) => handleInputChange(member.id, 'other_leave', parseFloat(e.target.value) || 0)}
+                value={allocation.others || ''}
+                onChange={(e) => handleInputChange(member.id, 'others', parseFloat(e.target.value) || 0)}
                 className="leave-input"
                 placeholder="0"
               />
@@ -104,22 +104,41 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
             </TableCell>
             
             {/* Project allocation columns */}
-            {projects.map((project) => (
-              <TableCell key={project.id} className="project-hours-column p-2 border-r">
-                <input
-                  type="number"
-                  min="0"
-                  max="40"
-                  value={allocation.projects[project.id] || ''}
-                  onChange={(e) => handleInputChange(member.id, 'projects', {
-                    ...allocation.projects,
-                    [project.id]: parseFloat(e.target.value) || 0
-                  })}
-                  className="w-full h-6 text-center text-xs border border-gray-300 rounded px-1"
-                  placeholder="0"
-                />
-              </TableCell>
-            ))}
+            {projects.map((project) => {
+              // Find the allocation for this specific project
+              const projectAllocation = allocation.projectAllocations.find(
+                pa => pa.projectId === project.id
+              );
+              const projectHours = projectAllocation?.hours || 0;
+              
+              return (
+                <TableCell key={project.id} className="project-hours-column p-2 border-r">
+                  <input
+                    type="number"
+                    min="0"
+                    max="40"
+                    value={projectHours || ''}
+                    onChange={(e) => {
+                      const newHours = parseFloat(e.target.value) || 0;
+                      const updatedAllocations = allocation.projectAllocations.filter(
+                        pa => pa.projectId !== project.id
+                      );
+                      if (newHours > 0) {
+                        updatedAllocations.push({
+                          projectId: project.id,
+                          projectName: project.name,
+                          projectCode: project.code,
+                          hours: newHours
+                        });
+                      }
+                      handleInputChange(member.id, 'projectAllocations', updatedAllocations);
+                    }}
+                    className="w-full h-6 text-center text-xs border border-gray-300 rounded px-1"
+                    placeholder="0"
+                  />
+                </TableCell>
+              );
+            })}
           </TableRow>
         );
       })}
