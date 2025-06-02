@@ -9,122 +9,52 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Force purple header background for ResourceTableHeader */
-.week-resource-table thead,
-.week-resource-table thead tr,
-.week-resource-table thead th,
-table thead,
-table thead tr,
-table thead th {
+/* Specific targeting for ResourceTable headers only */
+.enhanced-table thead,
+.enhanced-table thead tr,
+.enhanced-table thead th {
   background: #6465F0 !important;
-  background-color: #6465F0 !important;
   color: white !important;
 }
 
-/* Target the specific header cells with maximum specificity */
-[data-testid="table-header"] th,
-[data-testid="table-header"] th *,
-.sticky th,
-.sticky th *,
-thead th,
-thead th *,
-th[class*="border-r"],
-th[class*="border-r"] *,
-th[class*="sticky"],
-th[class*="sticky"] *,
-th[class*="left-0"],
-th[class*="left-0"] *,
-th[class*="z-"],
-th[class*="z-"] *,
-th[class*="bg-"],
-th[class*="bg-"] *,
-th[class*="w-"],
-th[class*="w-"] * {
+/* Target the Name column header specifically */
+.enhanced-table thead th:first-child {
   background: #6465F0 !important;
-  background-color: #6465F0 !important;
-  color: white !important;
-}
-
-/* Specifically target the Name column (first header cell) */
-thead th:first-child,
-thead th:first-child *,
-thead th:first-child span,
-thead th:first-child div,
-.sticky.left-0,
-.sticky.left-0 *,
-th.sticky.left-0,
-th.sticky.left-0 *,
-[class*="left-0"],
-[class*="left-0"] *,
-[class*="w-48"],
-[class*="w-48"] *,
-[class*="max-w-48"],
-[class*="max-w-48"] *,
-[class*="min-w-32"],
-[class*="min-w-32"] *,
-.non-project-column,
-.non-project-column * {
-  background: #6465F0 !important;
-  background-color: #6465F0 !important;
   color: white !important;
 }
 
 /* Project header cells with vertical text */
-.project-header,
-.project-header *,
-th[class*="project-header"],
-th[class*="project-header"] *,
-.project-code-text,
-.project-code-text * {
+.enhanced-table thead th.project-header,
+.enhanced-table thead th.project-header * {
   background: #6465F0 !important;
-  background-color: #6465F0 !important;
   color: white !important;
 }
 
-/* Override any Tailwind classes that might interfere */
-.bg-white,
-.bg-white *,
-.bg-gray-50,
-.bg-gray-50 *,
-.bg-muted,
-.bg-muted *,
-.bg-background,
-.bg-background * {
+/* Non-project column headers */
+.enhanced-table thead th.non-project-column,
+.enhanced-table thead th.non-project-column * {
   background: #6465F0 !important;
-  background-color: #6465F0 !important;
   color: white !important;
-}
-
-/* Table header row styling */
-.h-12 th,
-.h-12 th *,
-tbody tr:hover {
-  background: white;
-}
-
-tbody tr:hover th:first-child {
-  background: white;
 }
 
 /* Body cells should stay white */
-tbody td,
-tbody td * {
+.enhanced-table tbody td,
+.enhanced-table tbody td * {
   background: white !important;
   color: black !important;
 }
 
-tbody td:hover,
-tbody td:hover * {
+.enhanced-table tbody tr:hover td {
   background: #f8fafc !important;
   color: black !important;
 }
 
 /* Capacity gauge and other components inside body */
-tbody .capacity-gauge,
-tbody .capacity-gauge *,
-tbody .leave-tooltip,
-tbody .leave-tooltip *,
-tbody input,
-tbody input * {
+.enhanced-table tbody .capacity-gauge,
+.enhanced-table tbody .capacity-gauge *,
+.enhanced-table tbody .leave-tooltip,
+.enhanced-table tbody .leave-tooltip *,
+.enhanced-table tbody input,
+.enhanced-table tbody input * {
   background: transparent !important;
 }
