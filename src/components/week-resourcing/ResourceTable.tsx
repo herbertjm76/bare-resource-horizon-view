@@ -54,7 +54,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
       <div className="w-full max-w-full overflow-hidden border rounded-md shadow-sm">
         <div className="enhanced-table-scroll">
           <div className="enhanced-table-container">
-            <Table className="enhanced-table">
+            <Table className="enhanced-table" style={{ tableLayout: 'fixed' }}>
               <ResourceTableHeader projects={projects} />
               
               <TableBody>
