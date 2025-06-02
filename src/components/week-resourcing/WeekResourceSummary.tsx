@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -55,27 +56,23 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     return memberUtilization > 100;
   });
 
-  const renderMemberAvatars = (memberList: any[], maxShow: number = 4) => {
+  const renderMemberAvatars = (memberList: any[], maxShow: number = 6) => {
     const membersToShow = memberList.slice(0, maxShow);
     const remainingCount = memberList.length - maxShow;
 
-    if (memberList.length === 0) {
-      return <span className="text-sm text-white/80">All balanced</span>;
-    }
-
     return (
       <div className="flex items-center justify-center gap-2">
-        <div className="flex justify-center gap-1">
+        <div className="flex gap-1">
           {membersToShow.map((member) => (
             <Avatar key={member.id} className="h-6 w-6">
-              <AvatarFallback className="text-xs bg-white/20 text-white">
+              <AvatarFallback className="text-xs bg-gray-300 text-gray-700">
                 {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
               </AvatarFallback>
             </Avatar>
           ))}
         </div>
         {remainingCount > 0 && (
-          <Badge variant="secondary" className="text-xs bg-white/20 text-white">
+          <Badge variant="secondary" className="text-xs">
             +{remainingCount}
           </Badge>
         )}
@@ -108,13 +105,13 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
       badgeColor: availableHours === 0 ? "orange" : "blue"
     },
     {
-      title: "Needs Attention",
-      value: underUtilizedMembers.length + overloadedMembers.length > 0 ? 
-        renderMemberAvatars([...underUtilizedMembers, ...overloadedMembers]) : 
-        <span className="text-sm text-white/80">All balanced</span>,
-      subtitle: `${underUtilizedMembers.length} under-utilized, ${overloadedMembers.length} overloaded`,
-      badgeText: `${underUtilizedMembers.length + overloadedMembers.length}`,
-      badgeColor: underUtilizedMembers.length + overloadedMembers.length > 0 ? "red" : "green"
+      title: "Needs Resourcing",
+      value: underUtilizedMembers.length > 0 ? renderMemberAvatars(underUtilizedMembers) : (
+        <span className="text-sm text-white/80">All well utilized</span>
+      ),
+      subtitle: "Under 60% utilization",
+      badgeText: `${underUtilizedMembers.length}`,
+      badgeColor: underUtilizedMembers.length > 0 ? "blue" : "green"
     }
   ];
 
