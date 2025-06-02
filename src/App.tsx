@@ -11,7 +11,7 @@ import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
 import TeamMembers from "./pages/TeamMembers";
 import OfficeSettings from "./pages/OfficeSettings";
-import WeeklyOverview from "./pages/weeklyoverview";
+import WeeklyOverview from "./pages/WeeklyOverview";
 import TeamWorkload from "./pages/TeamWorkload";
 import TeamAnnualLeave from "./pages/TeamAnnualLeave";
 import ProjectResourcing from "./pages/ProjectResourcing";
