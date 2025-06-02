@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -122,14 +123,18 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     },
     {
       title: "Needs Resourcing",
-      value: needsResourcing.length > 0 ? renderMemberAvatars(needsResourcing) : "All well utilized",
+      value: needsResourcing.length > 0 ? renderMemberAvatars(needsResourcing) : (
+        <span className="text-sm text-white/80">All well utilized</span>
+      ),
       subtitle: "Under 60% utilization",
       badgeText: `${needsResourcing.length}`,
       badgeColor: needsResourcing.length > 0 ? "blue" : "green"
     },
     {
       title: "Overloaded Staff",
-      value: overloaded.length > 0 ? renderMemberAvatars(overloaded) : "No one overloaded",
+      value: overloaded.length > 0 ? renderMemberAvatars(overloaded) : (
+        <span className="text-sm text-white/80">No one overloaded</span>
+      ),
       subtitle: "Over 100% utilization",
       badgeText: `${overloaded.length}`,
       badgeColor: overloaded.length > 0 ? "red" : "green"
