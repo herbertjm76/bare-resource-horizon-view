@@ -474,47 +474,89 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
           avatar_url: string | null
+          bio: string | null
+          city: string | null
           company_id: string | null
+          country: string | null
           created_at: string
+          date_of_birth: string | null
           department: string | null
           email: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
           first_name: string | null
           id: string
           job_title: string | null
           last_name: string | null
           location: string | null
+          manager_id: string | null
+          phone: string | null
+          postal_code: string | null
           role: Database["public"]["Enums"]["user_role"]
+          social_linkedin: string | null
+          social_twitter: string | null
+          start_date: string | null
+          state: string | null
           updated_at: string
           weekly_capacity: number
         }
         Insert: {
+          address?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
           company_id?: string | null
+          country?: string | null
           created_at?: string
+          date_of_birth?: string | null
           department?: string | null
           email: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           first_name?: string | null
           id: string
           job_title?: string | null
           last_name?: string | null
           location?: string | null
+          manager_id?: string | null
+          phone?: string | null
+          postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          start_date?: string | null
+          state?: string | null
           updated_at?: string
           weekly_capacity?: number
         }
         Update: {
+          address?: string | null
           avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
           company_id?: string | null
+          country?: string | null
           created_at?: string
+          date_of_birth?: string | null
           department?: string | null
           email?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           first_name?: string | null
           id?: string
           job_title?: string | null
           last_name?: string | null
           location?: string | null
+          manager_id?: string | null
+          phone?: string | null
+          postal_code?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          start_date?: string | null
+          state?: string | null
           updated_at?: string
           weekly_capacity?: number
         }

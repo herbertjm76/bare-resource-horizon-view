@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,23 +61,7 @@ export default function Profile() {
       }
       const { data, error } = await supabase
         .from("profiles")
-        .select(`
-          *,
-          phone,
-          bio,
-          date_of_birth,
-          start_date,
-          manager_id,
-          emergency_contact_name,
-          emergency_contact_phone,
-          social_linkedin,
-          social_twitter,
-          address,
-          city,
-          state,
-          postal_code,
-          country
-        `)
+        .select("*")
         .eq("id", session.user.id)
         .single();
       if (error) {
