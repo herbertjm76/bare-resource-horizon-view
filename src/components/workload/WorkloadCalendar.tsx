@@ -45,17 +45,17 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
     <div className="workload-grid-container">
       <Table className="enhanced-table workload-calendar">
         <TableHeader>
-          <TableRow>
-            <TableHead className="sticky left-0 z-20 bg-inherit min-w-[180px] px-2 py-1">
-              Team Member
+          <TableRow className="h-8">
+            <TableHead className="sticky left-0 z-20 bg-inherit min-w-[180px] p-0">
+              <div className="px-2 py-1">Team Member</div>
             </TableHead>
             
             {dateRange.map((date) => (
               <TableHead 
                 key={date.toISOString()} 
-                className={`text-center min-w-[50px] px-1 py-1 ${isSunday(date) ? 'sunday-border' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
+                className={`text-center min-w-[50px] p-0 ${isSunday(date) ? 'sunday-border' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
               >
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center px-1 py-1">
                   <span className={`text-xs font-medium ${isToday(date) ? 'text-black font-bold' : 'text-white'}`}>
                     {format(date, 'EEE')}
                   </span>
@@ -66,8 +66,8 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
               </TableHead>
             ))}
             
-            <TableHead className="text-center min-w-[70px] total-column px-2 py-1">
-              Total
+            <TableHead className="text-center min-w-[70px] total-column p-0">
+              <div className="px-2 py-1">Total</div>
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -88,10 +88,10 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
             const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / (weeklyCapacity * periodToShow)) * 100) : 0;
             
             return (
-              <TableRow key={member.id} className={`member-row ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
-                <TableCell className="sticky left-0 z-10 bg-inherit px-2 py-1">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
+              <TableRow key={member.id} className={`member-row h-8 ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
+                <TableCell className="sticky left-0 z-10 bg-inherit p-0">
+                  <div className="flex items-center gap-2 px-2 py-1">
+                    <Avatar className="h-5 w-5">
                       <AvatarImage src={`https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=32&h=32&fit=crop&crop=face`} />
                       <AvatarFallback className="text-xs">
                         {member.first_name?.charAt(0)}{member.last_name?.charAt(0)}
@@ -112,21 +112,23 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                   return (
                     <TableCell 
                       key={date.toISOString()}
-                      className={`text-center px-1 py-1 ${
+                      className={`text-center p-0 ${
                         isSunday(date) ? 'sunday-border' : ''
                       } ${isWeekend ? 'weekend' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
                     >
-                      {dayHours > 0 && (
-                        <div className={`workload-pill text-xs font-medium px-2 py-1 rounded-full ${getWorkloadPillClass(dayHours, dailyCapacity)}`}>
-                          {dayHours}
-                        </div>
-                      )}
+                      <div className="px-1 py-1 flex justify-center">
+                        {dayHours > 0 && (
+                          <div className={`workload-pill text-xs font-medium px-2 py-0.5 rounded-full ${getWorkloadPillClass(dayHours, dailyCapacity)}`}>
+                            {dayHours}
+                          </div>
+                        )}
+                      </div>
                     </TableCell>
                   );
                 })}
                 
-                <TableCell className="text-center total-column px-2 py-1">
-                  <div className="flex flex-col items-center gap-1">
+                <TableCell className="text-center total-column p-0">
+                  <div className="flex flex-col items-center gap-1 px-2 py-1">
                     <div className="enhanced-pill">
                       {totalHours}h
                     </div>
