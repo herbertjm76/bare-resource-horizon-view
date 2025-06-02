@@ -52,13 +52,13 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
             {dateRange.map((date) => (
               <TableHead 
                 key={date.toISOString()} 
-                className={`text-center min-w-[60px] ${isSunday(date) ? 'sunday-border' : ''} ${isToday(date) ? 'bg-blue-50' : ''}`}
+                className={`text-center min-w-[60px] ${isSunday(date) ? 'sunday-border' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
               >
                 <div className="flex flex-col items-center">
-                  <span className="text-xs font-medium">
+                  <span className={`text-xs font-medium px-2 py-1 rounded ${isToday(date) ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}>
                     {format(date, 'EEE')}
                   </span>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs bg-white text-gray-700 px-2 py-1 rounded mt-1">
                     {format(date, 'd')}
                   </span>
                 </div>
@@ -110,7 +110,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                       key={date.toISOString()}
                       className={`text-center ${
                         isSunday(date) ? 'sunday-border' : ''
-                      } ${isWeekend ? 'weekend' : ''} ${isToday(date) ? 'bg-blue-50' : ''}`}
+                      } ${isWeekend ? 'weekend' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
                     >
                       {dayHours > 0 && (
                         <div className={`workload-pill text-xs font-medium px-2 py-1 rounded-full ${getWorkloadPillClass(dayHours, dailyCapacity)}`}>
