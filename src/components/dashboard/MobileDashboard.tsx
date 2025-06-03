@@ -60,36 +60,29 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   };
 
   return (
-    <div className="space-y-4 p-4">
-      {/* Single grid layout - all components stacked vertically in same structure */}
-      <div className="grid grid-cols-1 gap-4">
-        {/* Staff Status Card */}
-        <div className="w-full">
+    <div className="space-y-6 p-4">
+      {/* Main Row: Staff Status, Smart Insights, Upcoming Holidays - Stacked on mobile */}
+      <div className="grid grid-cols-1 gap-6">
+        <div>
           <StaffStatusCard 
             staffData={transformedStaffData} 
             selectedTimeRange={selectedTimeRange}
           />
         </div>
-        
-        {/* Intelligent Insights */}
-        <div className="w-full">
+        <div>
           <IntelligentInsights 
             teamMembers={transformedStaffData}
             activeProjects={activeProjects}
             utilizationRate={standardizedUtilizationRate || 0}
           />
         </div>
-        
-        {/* Holiday Card */}
-        <div className="w-full">
+        <div>
           <HolidayCard />
         </div>
       </div>
       
-      {/* Analytics Charts */}
-      <div className="w-full">
-        <AnalyticsSection mockData={analyticsData} />
-      </div>
+      {/* Analytics Charts - Project Status, Project Stages, Regional Distribution, Projects by PM */}
+      <AnalyticsSection mockData={analyticsData} />
     </div>
   );
 };
