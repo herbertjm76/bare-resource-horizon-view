@@ -22,60 +22,58 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
 
   return (
     <div className="mb-4 relative">
-      {/* Glass morphism background container */}
-      <div className="relative overflow-hidden rounded-2xl">
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(45deg, #895CF7 0%, #5669F7 55%, #E64FC4 100%)' }} />
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
-        
-        {/* Top highlight gradient */}
-        <div className="absolute inset-x-0 top-0 h-20 bg-[radial-gradient(120%_30%_at_50%_0%,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_70%)]" />
+      {/* Enhanced card with Team Member Insights Highlight design */}
+      <Card className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-purple-50/30 border-2 border-brand-violet/20 shadow-lg hover:shadow-xl transition-all duration-300">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-brand-violet/10 to-transparent rounded-full -translate-y-16 translate-x-16" />
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-blue-500/10 to-transparent rounded-full translate-y-12 -translate-x-12" />
         
         <div className="relative z-10 p-4">
           {/* Three rounded square cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Total Members Card */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border-2 border-white/40 hover:bg-white/95 transition-all duration-300">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-white/20 rounded-lg">
-                    <Users className="h-4 w-4 text-white" />
+                  <div className="p-1.5 bg-brand-violet/20 rounded-lg">
+                    <Users className="h-4 w-4 text-brand-violet" />
                   </div>
                   <div>
-                    <div className="text-xs text-white/80">Total Members</div>
-                    <div className="text-xl font-bold text-white">{stats.totalMembers}</div>
+                    <div className="text-xs text-gray-600">Total Members</div>
+                    <div className="text-xl font-bold text-gray-900">{stats.totalMembers}</div>
                   </div>
                 </div>
                 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5">
-                      <UserCheck className="h-3 w-3 text-green-300" />
-                      <span className="text-white/90">Active</span>
+                      <UserCheck className="h-3 w-3 text-green-600" />
+                      <span className="text-gray-700">Active</span>
                     </div>
-                    <span className="font-medium text-white">{stats.activeMembers.length}</span>
+                    <span className="font-medium text-gray-900">{stats.activeMembers.length}</span>
                   </div>
                   
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5">
-                      <UserPlus className="h-3 w-3 text-orange-300" />
-                      <span className="text-white/90">Pending</span>
+                      <UserPlus className="h-3 w-3 text-orange-600" />
+                      <span className="text-gray-700">Pending</span>
                     </div>
-                    <span className="font-medium text-white">{stats.preRegisteredMembers.length}</span>
+                    <span className="font-medium text-gray-900">{stats.preRegisteredMembers.length}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Departments Card */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border-2 border-white/40 hover:bg-white/95 transition-all duration-300">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-white/20 rounded-lg">
-                    <Building2 className="h-4 w-4 text-white" />
+                  <div className="p-1.5 bg-brand-violet/20 rounded-lg">
+                    <Building2 className="h-4 w-4 text-brand-violet" />
                   </div>
                   <div>
-                    <div className="text-xs text-white/80">Departments</div>
-                    <div className="text-xl font-bold text-white">{Object.keys(departmentStats).length}</div>
+                    <div className="text-xs text-gray-600">Departments</div>
+                    <div className="text-xl font-bold text-gray-900">{Object.keys(departmentStats).length}</div>
                   </div>
                 </div>
                 
@@ -87,29 +85,29 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
                       <div key={dept} className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-1.5">
                           <div className={`w-2 h-2 rounded-full ${DEPARTMENT_COLORS[dept as keyof typeof DEPARTMENT_COLORS]} opacity-80`}></div>
-                          <span className="text-white/90">{dept}</span>
+                          <span className="text-gray-700">{dept}</span>
                         </div>
-                        <span className="font-medium text-white">{count}</span>
+                        <span className="font-medium text-gray-900">{count}</span>
                       </div>
                     ))}
                   
                   {Object.keys(departmentStats).length === 0 && (
-                    <div className="text-xs text-white/70">No departments assigned</div>
+                    <div className="text-xs text-gray-500">No departments assigned</div>
                   )}
                 </div>
               </div>
             </div>
 
             {/* Locations Card */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+            <div className="bg-white/90 backdrop-blur-sm rounded-xl p-4 border-2 border-white/40 hover:bg-white/95 transition-all duration-300">
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-white/20 rounded-lg">
-                    <MapPin className="h-4 w-4 text-white" />
+                  <div className="p-1.5 bg-brand-violet/20 rounded-lg">
+                    <MapPin className="h-4 w-4 text-brand-violet" />
                   </div>
                   <div>
-                    <div className="text-xs text-white/80">Locations</div>
-                    <div className="text-xl font-bold text-white">{Object.keys(locationStats).length}</div>
+                    <div className="text-xs text-gray-600">Locations</div>
+                    <div className="text-xl font-bold text-gray-900">{Object.keys(locationStats).length}</div>
                   </div>
                 </div>
                 
@@ -120,29 +118,29 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
                         <div key={location} className="flex items-center justify-between text-xs">
                           <div className="flex items-center gap-1.5">
                             <span className="text-sm">{getLocationEmoji(location)}</span>
-                            <span className="text-white/90">
+                            <span className="text-gray-700">
                               {location === 'Unknown' ? 'Not specified' : location}
                             </span>
                           </div>
-                          <span className="font-medium text-white">{count}</span>
+                          <span className="font-medium text-gray-900">{count}</span>
                         </div>
                       ))}
                       
                       {Object.keys(locationStats).length > 2 && (
-                        <div className="text-xs text-white/70">
+                        <div className="text-xs text-gray-500">
                           +{Object.keys(locationStats).length - 2} more
                         </div>
                       )}
                     </>
                   ) : (
-                    <div className="text-xs text-white/70">No locations specified</div>
+                    <div className="text-xs text-gray-500">No locations specified</div>
                   )}
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
