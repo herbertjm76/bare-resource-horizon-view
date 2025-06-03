@@ -101,15 +101,15 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
 
   console.log('Rendering simple format');
   return (
-    <Card className="p-8">
+    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border border-[#d8d4ff] rounded-xl p-6 shadow-sm">
       <div className="flex flex-wrap gap-6">
         {metrics.map((metric, index) => {
           const badge = getDefaultBadge(metric, index);
           
           return (
             <div key={index} className="flex-1 min-w-0">
-              <Card className="bg-white border border-zinc-300 rounded-2xl transition-all duration-300 hover:shadow-lg">
-                <CardContent className="p-4">
+              <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border border-[#d8d4ff] rounded-xl transition-all duration-300 hover:shadow-lg">
+                <CardContent className="p-6">
                   <div className="text-center">
                     {/* Title - gray-800, medium weight */}
                     <Typography variant="body-sm" className="font-medium text-gray-800 mb-2">

@@ -54,7 +54,7 @@ export const CompactInsightCard: React.FC<CompactInsightCardProps> = ({
       return icon;
     }
     
-    if (typeof icon === 'object' && icon.name) {
+    if (typeof icon === 'object' && icon !== null && 'name' in icon) {
       const IconComponent = iconMap[icon.name as keyof typeof iconMap] || TrendingUp;
       return <IconComponent className={icon.className} />;
     }
@@ -63,8 +63,8 @@ export const CompactInsightCard: React.FC<CompactInsightCardProps> = ({
   };
 
   return (
-    <Card className={`border-l-4 ${getSeverityColor(severity)} transition-all hover:shadow-md`}>
-      <CardContent className="p-4">
+    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border border-[#d8d4ff] rounded-xl p-6 shadow-sm border-l-4 transition-all hover:shadow-md">
+      <CardContent className="p-0">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3 flex-1 min-w-0">
             <div className="flex-shrink-0 mt-0.5">

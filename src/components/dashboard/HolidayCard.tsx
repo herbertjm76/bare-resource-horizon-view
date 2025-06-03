@@ -34,14 +34,14 @@ export const HolidayCard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="h-[400px] flex flex-col">
-        <CardHeader className="flex-shrink-0">
+      <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
+        <CardHeader className="flex-shrink-0 p-6">
           <CardTitle className="text-lg flex items-center gap-2">
             <Calendar className="h-5 w-5 text-brand-violet" />
             Upcoming Holidays
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 flex items-center justify-center">
+        <CardContent className="flex-1 flex items-center justify-center p-6">
           <div className="text-center text-gray-500">
             <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300 animate-pulse" />
             <p className="text-sm">Loading holidays...</p>
@@ -53,14 +53,14 @@ export const HolidayCard: React.FC = () => {
 
   if (error) {
     return (
-      <Card className="h-[400px] flex flex-col">
-        <CardHeader className="flex-shrink-0">
+      <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
+        <CardHeader className="flex-shrink-0 p-6">
           <CardTitle className="text-lg flex items-center gap-2">
             <Calendar className="h-5 w-5 text-brand-violet" />
             Upcoming Holidays
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex-1 flex items-center justify-center">
+        <CardContent className="flex-1 flex items-center justify-center p-6">
           <div className="text-center text-gray-500">
             <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300" />
             <p className="text-sm font-medium mb-1">Unable to Load Holidays</p>
@@ -72,8 +72,8 @@ export const HolidayCard: React.FC = () => {
   }
 
   return (
-    <Card className="h-[400px] flex flex-col">
-      <CardHeader className="flex-shrink-0">
+    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
+      <CardHeader className="flex-shrink-0 p-6">
         <CardTitle className="text-lg flex items-center gap-2">
           <Calendar className="h-5 w-5 text-brand-violet" />
           Upcoming Holidays
