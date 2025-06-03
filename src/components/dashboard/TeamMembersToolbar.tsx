@@ -19,21 +19,24 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
   onAdd
 }) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
       {onAdd && (
         <Button 
           variant="default"
           size="sm"
           onClick={onAdd}
+          className="w-full sm:w-auto"
         >
           <UserPlus className="h-4 w-4 mr-1" />
-          Add Member
+          <span className="hidden sm:inline">Add Member</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       )}
       <Button 
         variant={editMode ? "secondary" : "outline"}
         size="sm"
         onClick={() => setEditMode(!editMode)}
+        className="w-full sm:w-auto"
       >
         <Edit className="h-4 w-4 mr-1" />
         {editMode ? "Done" : "Edit"}
@@ -43,6 +46,7 @@ const TeamMembersToolbar: React.FC<TeamMembersToolbarProps> = ({
           variant="destructive"
           size="sm"
           onClick={onBulkDelete}
+          className="w-full sm:w-auto"
         >
           <Trash2 className="h-4 w-4 mr-1" />
           Delete ({selectedCount})

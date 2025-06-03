@@ -82,107 +82,109 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full">
-        <thead>
-          <tr className="border-b border-gray-200">
-            {editMode && ['owner', 'admin'].includes(userRole) && (
-              <th className="px-4 py-3 text-left">
-                <Checkbox
-                  checked={selectedMembers.length === teamMembers.length && teamMembers.length > 0}
-                  onCheckedChange={handleSelectAll}
-                />
-              </th>
-            )}
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Member</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Role</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Department</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Location</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Insights</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {teamMembers.map((member) => (
-            <tr key={member.id} className="hover:bg-gray-50">
+    <div className="w-full overflow-x-auto">
+      <div className="min-w-full inline-block align-middle">
+        <table className="min-w-full">
+          <thead>
+            <tr className="border-b border-gray-200">
               {editMode && ['owner', 'admin'].includes(userRole) && (
-                <td className="px-4 py-3">
+                <th className="px-2 sm:px-4 py-3 text-left">
                   <Checkbox
-                    checked={selectedMembers.includes(member.id)}
-                    onCheckedChange={(checked) => handleSelectMember(member.id, checked as boolean)}
+                    checked={selectedMembers.length === teamMembers.length && teamMembers.length > 0}
+                    onCheckedChange={handleSelectAll}
                   />
-                </td>
+                </th>
               )}
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={getAvatarUrl(member)} />
-                    <AvatarFallback className="bg-brand-violet text-white">
-                      {getUserInitials(member)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium text-gray-900">
-                      {`${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed'}
-                    </div>
-                    <div className="text-sm text-gray-500 flex items-center gap-1">
-                      <Mail className="h-3 w-3" />
-                      {member.email}
+              <th className="px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-600">Member</th>
+              <th className="px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-600 hidden sm:table-cell">Role</th>
+              <th className="px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-600 hidden md:table-cell">Department</th>
+              <th className="px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-600 hidden lg:table-cell">Location</th>
+              <th className="px-2 sm:px-4 py-3 text-left text-xs sm:text-sm font-medium text-gray-600">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {teamMembers.map((member) => (
+              <tr key={member.id} className="hover:bg-gray-50">
+                {editMode && ['owner', 'admin'].includes(userRole) && (
+                  <td className="px-2 sm:px-4 py-3">
+                    <Checkbox
+                      checked={selectedMembers.includes(member.id)}
+                      onCheckedChange={(checked) => handleSelectMember(member.id, checked as boolean)}
+                    />
+                  </td>
+                )}
+                <td className="px-2 sm:px-4 py-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
+                      <AvatarImage src={getAvatarUrl(member)} />
+                      <AvatarFallback className="bg-brand-violet text-white text-xs">
+                        {getUserInitials(member)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-gray-900 text-sm sm:text-base truncate">
+                        {`${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed'}
+                      </div>
+                      <div className="text-xs sm:text-sm text-gray-500 flex items-center gap-1 truncate">
+                        <Mail className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{member.email}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </td>
-              <td className="px-4 py-3">
-                <Badge className={`${getRoleBadgeColor(member.role)} border`}>
-                  {member.role?.charAt(0).toUpperCase() + member.role?.slice(1) || 'Member'}
-                </Badge>
-              </td>
-              <td className="px-4 py-3">
-                <span className="text-sm text-gray-900">
-                  {member.department || '-'}
-                </span>
-              </td>
-              <td className="px-4 py-3">
-                <span className="text-sm text-gray-900">
-                  {member.location || '-'}
-                </span>
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  {/* Everyone can view insights now - this is the MVP feature */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleViewMember(member.id)}
-                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  {editMode && ['owner', 'admin'].includes(userRole) && (
-                    <>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEditMember(member)}
-                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onDeleteMember(member.id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                </td>
+                <td className="px-2 sm:px-4 py-3 hidden sm:table-cell">
+                  <Badge className={`${getRoleBadgeColor(member.role)} border text-xs`}>
+                    {member.role?.charAt(0).toUpperCase() + member.role?.slice(1) || 'Member'}
+                  </Badge>
+                </td>
+                <td className="px-2 sm:px-4 py-3 hidden md:table-cell">
+                  <span className="text-xs sm:text-sm text-gray-900 truncate">
+                    {member.department || '-'}
+                  </span>
+                </td>
+                <td className="px-2 sm:px-4 py-3 hidden lg:table-cell">
+                  <span className="text-xs sm:text-sm text-gray-900 truncate">
+                    {member.location || '-'}
+                  </span>
+                </td>
+                <td className="px-2 sm:px-4 py-3">
+                  <div className="flex items-center gap-1">
+                    {/* Everyone can view insights now - this is the MVP feature */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewMember(member.id)}
+                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 p-1 sm:p-2"
+                    >
+                      <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                    {editMode && ['owner', 'admin'].includes(userRole) && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onEditMember(member)}
+                          className="text-gray-600 hover:text-gray-700 hover:bg-gray-50 p-1 sm:p-2"
+                        >
+                          <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onDeleteMember(member.id)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 p-1 sm:p-2"
+                        >
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
