@@ -137,48 +137,37 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <div className="relative">
-        <Avatar className="h-24 w-24 rounded-lg">
-          <AvatarImage src={previewUrl || undefined} alt="Profile picture" className="rounded-lg" />
-          <AvatarFallback className="text-lg bg-brand-primary text-white rounded-lg">
-            {userInitials}
-          </AvatarFallback>
-        </Avatar>
-        
-        {previewUrl && (
-          <button
-            onClick={removeAvatar}
-            disabled={uploading}
-            className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg disabled:opacity-50"
-          >
-            <X className="h-3 w-3" />
-          </button>
+    <div className="relative inline-block">
+      <Avatar className="h-24 w-24 rounded-lg">
+        <AvatarImage src={previewUrl || undefined} alt="Profile picture" className="rounded-lg" />
+        <AvatarFallback className="text-lg bg-brand-primary text-white rounded-lg">
+          {userInitials}
+        </AvatarFallback>
+      </Avatar>
+      
+      {/* Edit/Camera overlay button */}
+      <button
+        onClick={() => fileInputRef.current?.click()}
+        disabled={uploading}
+        className="absolute bottom-0 right-0 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-full p-2 shadow-lg disabled:opacity-50 transition-colors"
+      >
+        {uploading ? (
+          <Upload className="h-3 w-3 animate-spin" />
+        ) : (
+          <Camera className="h-3 w-3" />
         )}
-      </div>
+      </button>
 
-      <div className="flex gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
+      {/* Remove button - only show if there's an image */}
+      {previewUrl && (
+        <button
+          onClick={removeAvatar}
           disabled={uploading}
-          className="flex items-center gap-2"
+          className="absolute top-0 right-0 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg disabled:opacity-50"
         >
-          {uploading ? (
-            <>
-              <Upload className="h-4 w-4 animate-spin" />
-              Uploading...
-            </>
-          ) : (
-            <>
-              <Camera className="h-4 w-4" />
-              {previewUrl ? 'Change Photo' : 'Upload Photo'}
-            </>
-          )}
-        </Button>
-      </div>
+          <X className="h-3 w-3" />
+        </button>
+      )}
 
       <Input
         ref={fileInputRef}
@@ -187,11 +176,6 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         onChange={handleFileSelect}
         className="hidden"
       />
-
-      <p className="text-xs text-gray-500 text-center">
-        Upload a photo (max 5MB)<br />
-        Supported formats: JPG, PNG, GIF
-      </p>
     </div>
   );
 };

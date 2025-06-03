@@ -88,17 +88,14 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
         {/* Combined Card: Profile Picture + Basic Info (2/5 width) */}
         <Card className="bg-white border-2 border-gray-200 rounded-xl p-4 shadow-sm lg:col-span-2">
           <div className="flex flex-col lg:flex-row gap-4">
-            {/* Profile Picture Section */}
-            <div className="flex-shrink-0 text-center lg:text-left">
-              <h3 className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-3">Profile Picture</h3>
-              <div className="flex justify-center lg:justify-start">
-                <AvatarUpload
-                  currentAvatarUrl={profile.avatar_url}
-                  userId={profile.id}
-                  onAvatarUpdate={handleAvatarUpdate}
-                  userInitials={getUserInitials()}
-                />
-              </div>
+            {/* Profile Picture Section - No label, no padding */}
+            <div className="flex-shrink-0">
+              <AvatarUpload
+                currentAvatarUrl={profile.avatar_url}
+                userId={profile.id}
+                onAvatarUpdate={handleAvatarUpdate}
+                userInitials={getUserInitials()}
+              />
             </div>
 
             {/* Basic Info Section */}
