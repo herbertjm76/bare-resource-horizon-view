@@ -7,7 +7,7 @@ import { ProjectResourcingContent } from './components/ProjectResourcingContent'
 import { useProjectResourcingState } from './hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './utils/filterUtils';
-import { List, Sparkles } from 'lucide-react';
+import { List } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
@@ -46,7 +46,7 @@ const ProjectResourcing = () => {
 
   return (
     <SidebarProvider>
-      <div className="w-full min-h-screen flex flex-row bg-gradient-to-br from-indigo-50 via-white to-purple-50/60">
+      <div className="w-full min-h-screen flex flex-row bg-gray-50">
         <div className="flex-shrink-0">
           <DashboardSidebar />
         </div>
@@ -54,29 +54,22 @@ const ProjectResourcing = () => {
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
           <div 
-            className="flex-1 p-8 sm:p-10 bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/40 flex flex-col" 
+            className="flex-1 p-6 bg-gray-50 flex flex-col" 
             style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)`, overflowY: 'auto' }}
           >
-            {/* Enhanced Modern Header Section */}
-            <div className="space-y-8 mb-8">
-              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3">
-                      <List className="h-8 w-8 text-white" />
-                    </div>
-                    <div>
-                      <h1 className="text-4xl lg:text-5xl font-bold tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        Project Resourcing
-                      </h1>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Sparkles className="h-5 w-5 text-indigo-500" />
-                        <p className="text-lg text-gray-600 font-medium">
-                          Intelligent resource allocation and project planning
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+            {/* Simple Header Section */}
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <List className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    Project Resourcing
+                  </h1>
+                  <p className="text-gray-600">
+                    Manage resource allocation and project planning
+                  </p>
                 </div>
               </div>
             </div>

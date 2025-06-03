@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { ModernResourcesHeader } from '@/components/resources/ModernResourcesHeader';
-import { EnhancedResourceGrid } from '@/components/resources/EnhancedResourceGrid';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 import { ProjectResourcingFilters } from './ProjectResourcingFilters';
 import { ProjectResourcingFilterRow } from './ProjectResourcingFilterRow';
@@ -114,11 +112,11 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   }
 
   return (
-    <div className="w-full max-w-full overflow-hidden space-y-8">
+    <div className="w-full max-w-full overflow-hidden space-y-6">
       
-      {/* Enhanced Grid Controls with modern gradient styling */}
+      {/* Grid Controls */}
       <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
-        <div className="bg-gradient-to-r from-indigo-50 via-white to-purple-50 p-6 rounded-2xl border border-indigo-100 shadow-lg">
+        <div className="bg-white p-4 rounded-lg border shadow-sm">
           <GridControls
             projectCount={filteredProjects.length}
             periodToShow={filters.periodToShow}
@@ -128,34 +126,30 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         </div>
       </div>
 
-      {/* Enhanced Filter Row with modern glass morphism effect */}
+      {/* Filter Row */}
       <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
-        <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl border border-gray-200/60 shadow-xl">
-          <ProjectResourcingFilterRow
-            selectedDate={selectedMonth}
-            onDateChange={onMonthChange}
-            periodToShow={filters.periodToShow}
-            onPeriodChange={onPeriodChange}
-            filterContent={filterContent}
-            activeFiltersCount={activeFiltersCount}
-            onClearFilters={onClearFilters}
-          />
-        </div>
+        <ProjectResourcingFilterRow
+          selectedDate={selectedMonth}
+          onDateChange={onMonthChange}
+          periodToShow={filters.periodToShow}
+          onPeriodChange={onPeriodChange}
+          filterContent={filterContent}
+          activeFiltersCount={activeFiltersCount}
+          onClearFilters={onClearFilters}
+        />
       </div>
       
-      {/* Enhanced Resource Grid Table with modern container styling */}
+      {/* Resource Grid Table */}
       <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
-        <div className="bg-gradient-to-br from-white via-gray-50/30 to-indigo-50/20 p-8 rounded-3xl border-2 border-indigo-100/60 shadow-2xl">
-          <GridTableWrapper>
-            <EnhancedResourceTable
-              projects={filteredProjects}
-              days={days}
-              expandedProjects={expandedProjects}
-              tableWidth={tableWidth}
-              onToggleProjectExpand={toggleProjectExpanded}
-            />
-          </GridTableWrapper>
-        </div>
+        <GridTableWrapper>
+          <EnhancedResourceTable
+            projects={filteredProjects}
+            days={days}
+            expandedProjects={expandedProjects}
+            tableWidth={tableWidth}
+            onToggleProjectExpand={toggleProjectExpanded}
+          />
+        </GridTableWrapper>
       </div>
     </div>
   );
@@ -163,7 +157,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
 
 export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> = (props) => {
   return (
-    <div className="flex flex-col max-w-full bg-gradient-to-br from-indigo-50 via-white to-purple-50/60 min-h-screen">
+    <div className="flex flex-col max-w-full bg-gray-50">
       <OfficeSettingsProvider>
         <ProjectResourcingInner {...props} />
       </OfficeSettingsProvider>
