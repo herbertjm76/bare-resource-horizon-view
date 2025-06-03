@@ -60,7 +60,7 @@ export const DashboardMetrics = () => {
   const totalOffices = officeOptions?.length || 0;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
       {/* Modern Header with stats - removed padding */}
       <div className="bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
         <ModernDashboardHeader

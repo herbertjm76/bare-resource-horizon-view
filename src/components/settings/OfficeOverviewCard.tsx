@@ -12,7 +12,7 @@ export const OfficeOverviewCard = () => {
   const { locations } = useOfficeSettings();
 
   return (
-    <Card className="p-4">
+    <Card className="p-8">
       <div className="grid grid-cols-4 gap-4 h-64">
         {/* Logo and Company Info Section - 1/4 width */}
         <div className="col-span-1 flex flex-col justify-center space-y-3">

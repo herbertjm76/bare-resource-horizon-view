@@ -107,7 +107,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     {
       title: "Needs Resourcing",
       value: underUtilizedMembers.length > 0 ? renderMemberAvatars(underUtilizedMembers) : (
-        <span className="text-sm text-white/80">All well utilized</span>
+        <span className="text-sm text-gray-600">All well utilized</span>
       ),
       subtitle: "Under 60% utilization",
       badgeText: `${underUtilizedMembers.length}`,
