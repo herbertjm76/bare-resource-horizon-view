@@ -34,9 +34,9 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* Enhanced Header Styling */
+/* Enhanced Header Styling - Standardized to #6465F0 */
 .enhanced-table thead {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: #6465F0;
   color: white;
   position: sticky;
   top: 0;
@@ -52,6 +52,7 @@
   border-right: 1px solid rgba(255,255,255,0.2);
   position: relative;
   color: white;
+  background: #6465F0;
 }
 
 .enhanced-table thead th:last-child {
@@ -100,16 +101,16 @@
   border-right: none;
 }
 
-/* Office/Group Header Enhancements */
+/* Office/Group Header Enhancements - Standardized to #6465F0 */
 .enhanced-table .group-header-row {
-  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%);
+  background: #6465F0;
   color: white;
   font-weight: 600;
   position: relative;
 }
 
 .enhanced-table .group-header-row:hover {
-  background: linear-gradient(135deg, #4c1d95 0%, #6b21a8 100%);
+  background: #5856E8;
   transform: none;
 }
 
@@ -126,7 +127,7 @@
 }
 
 .enhanced-table .member-row:hover {
-  border-left-color: #6366f1;
+  border-left-color: #6465F0;
 }
 
 /* Enhanced Input Styling */
@@ -146,8 +147,8 @@
 
 .enhanced-input:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  border-color: #6465F0;
+  box-shadow: 0 0 0 3px rgba(100,101,240,0.1);
   background: #fafbff;
 }
 
@@ -257,14 +258,14 @@
 
 .enhanced-textarea:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+  border-color: #6465F0;
+  box-shadow: 0 0 0 3px rgba(100,101,240,0.1);
   background: #fafbff;
 }
 
-/* Enhanced Totals Row */
+/* Enhanced Totals Row - Standardized to #6465F0 */
 .enhanced-totals-row {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: #6465F0;
   color: white;
   font-weight: 600;
 }

@@ -10,21 +10,21 @@ interface ResourceTableHeaderProps {
 export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projects, showRemarks = false }) => {
   return (
     <TableHeader className="sticky top-0 z-10 bg-white border-b">
-      <TableRow className="h-12">
+      <TableRow className="h-12" style={{ backgroundColor: '#6465F0' }}>
         {/* Member info cells */}
-        <TableHead className="w-48 max-w-48 min-w-32 border-r sticky left-0 z-20 bg-white non-project-column">Name</TableHead>
-        <TableHead className="w-16 text-center border-r non-project-column">#</TableHead>
+        <TableHead className="w-48 max-w-48 min-w-32 border-r sticky left-0 z-20 non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>Name</TableHead>
+        <TableHead className="w-16 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>#</TableHead>
         
         {/* Capacity bar header - increased width */}
-        <TableHead className="w-32 text-center border-r non-project-column">Capacity</TableHead>
+        <TableHead className="w-32 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>Capacity</TableHead>
         
         {/* Leave cells - rearranged order */}
-        <TableHead className="w-12 text-center border-r non-project-column">AL</TableHead>
-        <TableHead className="w-12 text-center border-r non-project-column">HO</TableHead>
-        <TableHead className="w-12 text-center border-r non-project-column">OL</TableHead>
+        <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>AL</TableHead>
+        <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>HO</TableHead>
+        <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>OL</TableHead>
         
         {/* Office Location Header */}
-        <TableHead className="w-16 text-center border-r non-project-column">Off</TableHead>
+        <TableHead className="w-16 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>Off</TableHead>
         
         {/* Project allocation headers - with enhanced styling and project codes */}
         {projects.map((project, idx) => {
@@ -32,6 +32,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
             <TableHead 
               key={project.id} 
               className="w-10 text-center project-header relative"
+              style={{ backgroundColor: '#6465F0', color: 'white' }}
             >
               {!project.isEmpty && (
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -57,7 +58,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
         
         {/* Add Remarks column if showRemarks is true */}
         {showRemarks && (
-          <TableHead className="w-40 text-center border-r non-project-column">Remarks</TableHead>
+          <TableHead className="w-40 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>Remarks</TableHead>
         )}
       </TableRow>
     </TableHeader>

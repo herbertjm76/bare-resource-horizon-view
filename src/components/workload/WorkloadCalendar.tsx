@@ -65,8 +65,8 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
       <div className="workload-grid-container">
         <Table className="enhanced-table workload-calendar">
           <TableHeader>
-            <TableRow className="h-6">
-              <TableHead className="sticky left-0 z-20 bg-inherit min-w-[180px] p-0">
+            <TableRow className="h-6" style={{ backgroundColor: '#6465F0' }}>
+              <TableHead className="sticky left-0 z-20 bg-inherit min-w-[180px] p-0" style={{ backgroundColor: '#6465F0', color: 'white' }}>
                 <div className="px-2 py-1">Team Member</div>
               </TableHead>
               
@@ -74,6 +74,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                 <TableHead 
                   key={date.toISOString()} 
                   className={`text-center min-w-[40px] max-w-[40px] p-0 ${isSunday(date) ? 'sunday-border' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
+                  style={{ backgroundColor: isToday(date) ? '#dbeafe' : '#6465F0', color: isToday(date) ? 'black' : 'white' }}
                 >
                   <div className="flex flex-col items-center px-1 py-1">
                     <span className={`text-xs font-medium ${isToday(date) ? 'text-black font-bold' : 'text-white'}`}>
@@ -86,7 +87,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                 </TableHead>
               ))}
               
-              <TableHead className="text-center min-w-[70px] total-column p-0">
+              <TableHead className="text-center min-w-[70px] total-column p-0" style={{ backgroundColor: '#6465F0', color: 'white' }}>
                 <div className="px-2 py-1">Utilization</div>
               </TableHead>
             </TableRow>

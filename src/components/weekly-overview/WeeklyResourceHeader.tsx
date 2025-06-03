@@ -15,14 +15,14 @@ interface WeeklyResourceHeaderProps {
 
 export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ projects }) => {
   return (
-    <TableHeader className="bg-muted/50 sticky top-0 z-10">
-      <TableRow>
-        <TableHead className="py-2 px-4 name-column">
+    <TableHeader style={{ backgroundColor: '#6465F0' }} className="sticky top-0 z-10">
+      <TableRow style={{ backgroundColor: '#6465F0' }}>
+        <TableHead className="py-2 px-4 name-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
           <div className="font-medium">Name</div>
         </TableHead>
         
         <TooltipProvider>
-          <TableHead className="header-cell number-column">
+          <TableHead className="header-cell number-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">PRJ</div>
@@ -33,7 +33,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ proj
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell capacity-column">
+          <TableHead className="header-cell capacity-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">CAP</div>
@@ -44,7 +44,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ proj
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column">
+          <TableHead className="header-cell number-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">UTL</div>
@@ -55,7 +55,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ proj
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column leave-column">
+          <TableHead className="header-cell number-column leave-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">AL</div>
@@ -66,7 +66,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ proj
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column">
+          <TableHead className="header-cell number-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">PH</div>
@@ -77,7 +77,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ proj
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column leave-column">
+          <TableHead className="header-cell number-column leave-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">VL</div>
@@ -88,7 +88,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ proj
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column leave-column">
+          <TableHead className="header-cell number-column leave-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">ML</div>
@@ -99,7 +99,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ proj
             </Tooltip>
           </TableHead>
           
-          <TableHead className="header-cell number-column leave-column">
+          <TableHead className="header-cell number-column leave-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <div className="font-medium">OL</div>
@@ -111,7 +111,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ proj
           </TableHead>
         </TooltipProvider>
         
-        <TableHead className="py-2 px-4 remarks-column">
+        <TableHead className="py-2 px-4 remarks-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
           <div className="font-medium">Remarks</div>
         </TableHead>
         
@@ -120,6 +120,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ proj
           <TableHead 
             key={project.id} 
             className="project-code-column relative"
+            style={{ backgroundColor: '#6465F0', color: 'white' }}
           >
             <TooltipProvider>
               <Tooltip>

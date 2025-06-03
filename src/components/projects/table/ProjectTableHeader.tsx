@@ -13,27 +13,27 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
 }) => {
   return (
     <TableHeader>
-      <TableRow>
-        {editMode && <TableHead className="w-10"><span className="sr-only">Select</span></TableHead>}
-        <TableHead className="w-20">Code</TableHead>
-        <TableHead>Project Name</TableHead>
-        <TableHead>PM</TableHead>
-        <TableHead>Status</TableHead>
-        <TableHead>Country</TableHead>
-        <TableHead>%Profit</TableHead>
-        <TableHead>Current Stage</TableHead>
+      <TableRow style={{ backgroundColor: '#6465F0' }}>
+        {editMode && <TableHead className="w-10" style={{ backgroundColor: '#6465F0', color: 'white' }}><span className="sr-only">Select</span></TableHead>}
+        <TableHead className="w-20" style={{ backgroundColor: '#6465F0', color: 'white' }}>Code</TableHead>
+        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Project Name</TableHead>
+        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>PM</TableHead>
+        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Status</TableHead>
+        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Country</TableHead>
+        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>%Profit</TableHead>
+        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Current Stage</TableHead>
         {office_stages.map((stage) => (
           <TableHead 
             key={stage.id}
             style={{
-              backgroundColor: stage.color || "#E5DEFF",
-              color: "#212172"
+              backgroundColor: '#6465F0',
+              color: 'white'
             }}
           >
             {stage.name}
           </TableHead>
         ))}
-        {editMode && <TableHead className="w-24">Actions</TableHead>}
+        {editMode && <TableHead className="w-24" style={{ backgroundColor: '#6465F0', color: 'white' }}>Actions</TableHead>}
       </TableRow>
     </TableHeader>
   );
