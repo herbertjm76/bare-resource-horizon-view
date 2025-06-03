@@ -142,7 +142,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     {
       title: "Needs Resourcing",
       value: needsResourcing.length > 0 ? renderMemberAvatars(needsResourcing) : (
-        <span className="text-sm text-gray-600">All well utilized</span>
+        <span className="text-sm text-white/80">All well utilized</span>
       ),
       subtitle: "Under 60% utilization",
       badgeText: `${needsResourcing.length}`,
@@ -151,7 +151,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     {
       title: "Overloaded Staff",
       value: overloaded.length > 0 ? renderMemberAvatars(overloaded) : (
-        <span className="text-sm text-gray-600">No one overloaded</span>
+        <span className="text-sm text-white/80">No one overloaded</span>
       ),
       subtitle: "Over 100% utilization",
       badgeText: `${overloaded.length}`,
