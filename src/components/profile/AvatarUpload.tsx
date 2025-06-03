@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera, Upload, X } from 'lucide-react';
+import { Camera, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -22,6 +22,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 }) => {
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentAvatarUrl);
+  const [isHovered, setIsHovered] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,42 +103,13 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
     }
   };
 
-  const removeAvatar = async () => {
-    try {
-      setUploading(true);
-
-      // Remove from storage if exists
-      if (currentAvatarUrl) {
-        const path = currentAvatarUrl.split('/').slice(-2).join('/');
-        await supabase.storage
-          .from('avatars')
-          .remove([path]);
-      }
-
-      // Update the profile in the database
-      const { error } = await supabase
-        .from('profiles')
-        .update({ avatar_url: null })
-        .eq('id', userId);
-
-      if (error) {
-        throw error;
-      }
-
-      setPreviewUrl(null);
-      onAvatarUpdate(null);
-      toast.success('Avatar removed successfully');
-
-    } catch (error) {
-      console.error('Error removing avatar:', error);
-      toast.error('Failed to remove avatar');
-    } finally {
-      setUploading(false);
-    }
-  };
-
   return (
-    <div className="relative inline-block">
+    <div 
+      className="relative inline-block cursor-pointer"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={() => fileInputRef.current?.click()}
+    >
       <Avatar className="h-24 w-24 rounded-lg">
         <AvatarImage src={previewUrl || undefined} alt="Profile picture" className="rounded-lg" />
         <AvatarFallback className="text-lg bg-brand-primary text-white rounded-lg">
@@ -145,28 +117,23 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         </AvatarFallback>
       </Avatar>
       
-      {/* Edit/Camera overlay button */}
-      <button
-        onClick={() => fileInputRef.current?.click()}
-        disabled={uploading}
-        className="absolute bottom-0 right-0 bg-brand-primary hover:bg-brand-primary/80 text-white rounded-full p-2 shadow-lg disabled:opacity-50 transition-colors"
-      >
-        {uploading ? (
-          <Upload className="h-3 w-3 animate-spin" />
-        ) : (
-          <Camera className="h-3 w-3" />
-        )}
-      </button>
-
-      {/* Remove button - only show if there's an image */}
-      {previewUrl && (
-        <button
-          onClick={removeAvatar}
-          disabled={uploading}
-          className="absolute top-0 right-0 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-lg disabled:opacity-50"
-        >
-          <X className="h-3 w-3" />
-        </button>
+      {/* Hover overlay */}
+      {(isHovered || uploading) && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center transition-opacity">
+          <div className="text-white text-center">
+            {uploading ? (
+              <>
+                <Upload className="h-5 w-5 animate-spin mx-auto mb-1" />
+                <span className="text-xs">Uploading...</span>
+              </>
+            ) : (
+              <>
+                <Camera className="h-5 w-5 mx-auto mb-1" />
+                <span className="text-xs">Edit Photo</span>
+              </>
+            )}
+          </div>
+        </div>
       )}
 
       <Input

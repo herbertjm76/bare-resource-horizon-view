@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { AvatarUpload } from './AvatarUpload';
 
 interface PersonalInfoTabProps {
   profile: any;
@@ -22,8 +21,6 @@ export const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
   profile,
   handleChange,
   handleDateChange,
-  handleAvatarUpdate,
-  getUserInitials,
   saving,
   onSave,
   error
@@ -45,19 +42,6 @@ export const PersonalInfoTab: React.FC<PersonalInfoTabProps> = ({
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Avatar Section */}
-          <div className="md:col-span-2 flex justify-center">
-            <div className="text-center space-y-2">
-              <AvatarUpload
-                currentAvatarUrl={profile.avatar_url}
-                userId={profile.id}
-                onAvatarUpdate={handleAvatarUpdate}
-                userInitials={getUserInitials()}
-              />
-              <p className="text-sm text-gray-500">Profile Picture</p>
-            </div>
-          </div>
-
           {/* Basic Information */}
           <div className="space-y-2">
             <Label htmlFor="first_name">First Name</Label>

@@ -26,39 +26,40 @@ export const BasicInfoCard: React.FC<BasicInfoCardProps> = ({
           userInitials={getUserInitials()}
         />
 
-        {/* Basic Info */}
-        <div className="w-full space-y-3">
-          <div className="space-y-3">
-            <div className="flex items-center justify-center">
-              <h3 className="text-xl font-bold text-gray-900">
-                {profile.first_name} {profile.last_name}
-              </h3>
-            </div>
+        {/* Basic Info with improved hierarchy */}
+        <div className="w-full space-y-2">
+          {/* Name - Larger and prominent */}
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+            {profile.first_name} {profile.last_name}
+          </h2>
 
-            <div className="flex items-center justify-center gap-2">
-              <Briefcase className="h-4 w-4 text-gray-500" />
-              <p className="text-lg font-medium text-gray-700">
-                {profile.job_title || 'Not specified'}
-              </p>
-            </div>
+          {/* Job Title - Secondary prominence */}
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Briefcase className="h-4 w-4 text-gray-500" />
+            <p className="text-base font-semibold text-gray-800">
+              {profile.job_title || 'Not specified'}
+            </p>
+          </div>
 
+          {/* Department, Email, Location - Supporting info with tighter spacing */}
+          <div className="space-y-1">
             <div className="flex items-center justify-center gap-2">
-              <User className="h-4 w-4 text-gray-500" />
-              <p className="text-lg font-medium text-gray-700">
+              <User className="h-3 w-3 text-gray-400" />
+              <p className="text-sm text-gray-600">
                 {profile.department || 'Not specified'}
               </p>
             </div>
 
             <div className="flex items-center justify-center gap-2">
-              <Mail className="h-4 w-4 text-gray-500" />
-              <p className="text-lg font-medium text-gray-700">
+              <Mail className="h-3 w-3 text-gray-400" />
+              <p className="text-sm text-gray-600">
                 {profile.email}
               </p>
             </div>
 
             <div className="flex items-center justify-center gap-2">
-              <MapPin className="h-4 w-4 text-gray-500" />
-              <p className="text-lg font-medium text-gray-700">
+              <MapPin className="h-3 w-3 text-gray-400" />
+              <p className="text-sm text-gray-600">
                 {profile.location || 'Not specified'}
               </p>
             </div>
