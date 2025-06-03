@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from '@/components/ui/table';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -32,6 +33,23 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
     
     return dates;
   }, [selectedWeek, periodToShow]);
+
+  // Helper to get user initials
+  const getUserInitials = (member: TeamMember): string => {
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (member: TeamMember): string | undefined => {
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
+  // Helper to get member display name
+  const getMemberDisplayName = (member: TeamMember): string => {
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim();
+  };
 
   // Get workload intensity class for pill styling
   const getWorkloadPillClass = (hours: number, capacity: number) => {
@@ -93,9 +111,10 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                 <TableRow key={member.id} className={`member-row h-8 ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
                   <TableCell className="sticky left-0 z-10 bg-inherit p-0">
                     <div className="flex items-center gap-2 px-2 py-1">
-                      <Avatar className="h-5 w-5">
-                        <AvatarFallback className="text-xs bg-gray-300 text-gray-700">
-                          {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
+                        <AvatarFallback className="bg-brand-violet text-white text-xs">
+                          {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>
                       <span className="font-medium text-sm">

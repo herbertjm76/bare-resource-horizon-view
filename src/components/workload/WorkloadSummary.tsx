@@ -19,6 +19,23 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   selectedWeek,
   periodToShow = 12
 }) => {
+  // Helper to get user initials
+  const getUserInitials = (member: TeamMember): string => {
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (member: TeamMember): string | undefined => {
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
+  // Helper to get member display name
+  const getMemberDisplayName = (member: TeamMember): string => {
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim();
+  };
+
   // Calculate overall team utilization for the specified period
   const calculateOverallUtilization = () => {
     if (members.length === 0) return 0;
@@ -84,8 +101,9 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
         <div className="flex gap-1">
           {membersToShow.map(({ member }) => (
             <Avatar key={member.id} className="h-6 w-6">
-              <AvatarFallback className="text-xs bg-gray-300 text-gray-700">
-                {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
+              <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
+              <AvatarFallback className="bg-brand-violet text-white text-xs">
+                {getUserInitials(member)}
               </AvatarFallback>
             </Avatar>
           ))}
