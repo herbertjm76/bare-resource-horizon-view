@@ -36,6 +36,8 @@ interface ProjectResourcingFilterRowProps {
   onClearFilters: () => void;
   onExpandAll: () => void;
   onCollapseAll: () => void;
+  expandedProjects: string[];
+  totalProjects: number;
 }
 
 export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProps> = ({
@@ -55,7 +57,9 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
   onDisplayOptionChange,
   onClearFilters,
   onExpandAll,
-  onCollapseAll
+  onCollapseAll,
+  expandedProjects,
+  totalProjects
 }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -78,6 +82,18 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
     { value: '8', label: '2 Months' },
     { value: '12', label: '3 Months' }
   ];
+
+  // Determine if all projects are expanded
+  const allExpanded = expandedProjects.length === totalProjects && totalProjects > 0;
+  
+  // Handle toggle between expand all and collapse all
+  const handleToggleExpand = () => {
+    if (allExpanded) {
+      onCollapseAll();
+    } else {
+      onExpandAll();
+    }
+  };
 
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-4">
@@ -151,25 +167,26 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
         </Select>
       </div>
       
-      {/* Expand/Collapse controls */}
-      <div className="flex items-center gap-2">
+      {/* Expand/Collapse toggle button */}
+      <div className="flex items-center">
         <Button
           variant="outline"
           size="sm"
-          onClick={onExpandAll}
+          onClick={handleToggleExpand}
           className="h-8 text-sm"
+          disabled={totalProjects === 0}
         >
-          <Expand className="h-3 w-3 mr-2" />
-          Expand All
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onCollapseAll}
-          className="h-8 text-sm"
-        >
-          <Shrink className="h-3 w-3 mr-2" />
-          Collapse All
+          {allExpanded ? (
+            <>
+              <Shrink className="h-3 w-3 mr-2" />
+              Collapse All
+            </>
+          ) : (
+            <>
+              <Expand className="h-3 w-3 mr-2" />
+              Expand All
+            </>
+          )}
         </Button>
       </div>
       

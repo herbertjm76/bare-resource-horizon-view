@@ -123,6 +123,8 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
           onClearFilters={onClearFilters}
           onExpandAll={expandAll}
           onCollapseAll={collapseAll}
+          expandedProjects={expandedProjects}
+          totalProjects={filteredProjects.length}
         />
       </div>
       
