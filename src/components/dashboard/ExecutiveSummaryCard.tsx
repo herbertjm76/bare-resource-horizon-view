@@ -44,15 +44,15 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       value: `${Math.round(utilizationRate)}%`,
       subtitle: timeRangeText,
       badgeText: utilizationStatus.label,
-      badgeColor: utilizationStatus.color === 'destructive' ? 'red' : 
-                 utilizationStatus.color === 'default' ? 'green' : 'blue'
+      badgeColor: (utilizationStatus.color === 'destructive' ? 'red' : 
+                 utilizationStatus.color === 'default' ? 'green' : 'blue') as const
     },
     {
       title: isOverCapacity ? "Over Capacity" : "Available Capacity",
       value: `${Math.abs(capacityHours).toLocaleString()}h`,
       subtitle: timeRangeText,
       badgeText: isOverCapacity ? "Over Capacity" : undefined,
-      badgeColor: isOverCapacity ? "red" : undefined
+      badgeColor: isOverCapacity ? "red" as const : undefined
     },
     {
       title: "Active Projects",
@@ -66,7 +66,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       value: activeResources,
       subtitle: "Active resources",
       badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
-      badgeColor: utilizationRate > 85 ? 'orange' : 'green'
+      badgeColor: (utilizationRate > 85 ? 'orange' : 'green') as const
     }
   ];
 

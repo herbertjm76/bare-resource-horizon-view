@@ -82,7 +82,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
       value: totalLeaveDays,
       subtitle: `${format(selectedMonth, 'MMMM yyyy')}`,
       badgeText: totalLeaveDays > 15 ? "High" : totalLeaveDays > 5 ? "Moderate" : "Low",
-      badgeColor: totalLeaveDays > 15 ? "red" : totalLeaveDays > 5 ? "orange" : "green"
+      badgeColor: (totalLeaveDays > 15 ? "red" : totalLeaveDays > 5 ? "orange" : "green") as const
     },
     {
       title: "Team Members on Leave",
@@ -91,7 +91,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
       ),
       subtitle: `${membersWithLeave.length} of ${teamMembers.length} members`,
       badgeText: `${membersWithLeave.length}`,
-      badgeColor: membersWithLeave.length > 5 ? "orange" : "blue"
+      badgeColor: (membersWithLeave.length > 5 ? "orange" : "blue") as const
     },
     {
       title: "Extended Leave",
@@ -100,14 +100,14 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
       ),
       subtitle: "3+ days this month",
       badgeText: `${membersWithHighLeave.length}`,
-      badgeColor: membersWithHighLeave.length > 0 ? "orange" : "green"
+      badgeColor: (membersWithHighLeave.length > 0 ? "orange" : "green") as const
     },
     {
       title: "Total Leave Hours",
       value: `${totalLeaveHours}h`,
       subtitle: "This month",
       badgeText: "Tracked",
-      badgeColor: "blue"
+      badgeColor: "blue" as const
     }
   ];
 

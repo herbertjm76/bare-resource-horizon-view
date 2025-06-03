@@ -12,12 +12,21 @@ export const WeeklyExecutiveSummary: React.FC<WeeklyExecutiveSummaryProps> = ({
 }) => {
   const { metrics } = useWeeklyOverviewMetrics({ selectedWeek });
 
-  console.log('WeeklyExecutiveSummary render:', { metricsLength: metrics.length });
+  // Transform metrics to match the Metric interface, removing any incompatible properties
+  const transformedMetrics = metrics.map(metric => ({
+    title: metric.title,
+    value: metric.value,
+    subtitle: metric.subtitle,
+    badgeText: metric.badgeText,
+    badgeColor: metric.badgeColor as 'green' | 'blue' | 'orange' | 'red' | 'gray' | 'purple' | undefined
+  }));
+
+  console.log('WeeklyExecutiveSummary render:', { metricsLength: transformedMetrics.length });
 
   return (
     <div className="print:hidden mb-4 w-full">
       <StandardizedExecutiveSummary
-        metrics={metrics}
+        metrics={transformedMetrics}
         gradientType="purple"
       />
     </div>

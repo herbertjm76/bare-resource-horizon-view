@@ -95,7 +95,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
       value: activeProjectsCount,
       subtitle: `${projects.length} total projects`,
       badgeText: activeProjectsCount > 0 ? "Active" : "No Activity",
-      badgeColor: activeProjectsCount > 0 ? "green" : "gray"
+      badgeColor: (activeProjectsCount > 0 ? "green" : "gray") as const
     },
     {
       title: "Team Utilization",
@@ -103,15 +103,15 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
       subtitle: `${totalAllocatedHours}h of ${totalCapacity}h`,
       badgeText: utilizationRate < 70 ? 'Low' : 
                 utilizationRate > 90 ? 'High' : 'Optimal',
-      badgeColor: utilizationRate < 70 ? 'orange' : 
-                 utilizationRate > 90 ? 'red' : 'green'
+      badgeColor: (utilizationRate < 70 ? 'orange' : 
+                 utilizationRate > 90 ? 'red' : 'green') as const
     },
     {
       title: "Available Capacity",
       value: `${availableHours}h`,
       subtitle: "This week",
       badgeText: availableHours === 0 ? "Fully Booked" : "Available",
-      badgeColor: availableHours === 0 ? "orange" : "blue"
+      badgeColor: (availableHours === 0 ? "orange" : "blue") as const
     },
     {
       title: "Needs Resourcing",
@@ -120,7 +120,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
       ),
       subtitle: "Under 60% utilization",
       badgeText: `${underUtilizedMembers.length}`,
-      badgeColor: underUtilizedMembers.length > 0 ? "blue" : "green"
+      badgeColor: (underUtilizedMembers.length > 0 ? "blue" : "green") as const
     }
   ];
 
