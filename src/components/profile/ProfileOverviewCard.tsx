@@ -63,7 +63,7 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-zinc-300 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+    <div className="rounded-2xl border bg-card text-card-foreground shadow-sm overflow-hidden">
       <div className="bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400 p-8 text-black relative rounded-2xl">
         {/* Decorative background elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50 rounded-2xl"></div>
