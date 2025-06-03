@@ -12,7 +12,7 @@ import { useGridDays } from '@/components/resources/hooks/useGridDays';
 import { useFilteredProjects } from '@/components/resources/hooks/useFilteredProjects';
 import { useGridTableWidth } from '@/components/resources/hooks/useGridTableWidth';
 import { useProjects } from '@/hooks/useProjects';
-import { useOfficeSettings } from '@/context/officeSettings/OfficeSettingsContext';
+import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { GridLoadingState } from '@/components/resources/grid/GridLoadingState';
 import { GridEmptyState } from '@/components/resources/grid/GridEmptyState';
 
