@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
-export type PeriodView = 'week' | 'month' | 'quarter';
+export type PeriodView = 'month' | 'quarter' | 'year';
 
 interface PeriodViewSelectorProps {
   selectedView: PeriodView;
@@ -14,9 +14,9 @@ export const PeriodViewSelector: React.FC<PeriodViewSelectorProps> = ({
   onViewChange
 }) => {
   const views = [
-    { key: 'week' as const, label: 'This Week' },
     { key: 'month' as const, label: 'This Month' },
-    { key: 'quarter' as const, label: 'This Quarter' }
+    { key: 'quarter' as const, label: 'This Quarter' },
+    { key: 'year' as const, label: 'This Year' }
   ];
 
   return (

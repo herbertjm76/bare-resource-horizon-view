@@ -16,7 +16,7 @@ import '@/components/workload/workload.css';
 const HEADER_HEIGHT = 56;
 
 const TeamWorkload = () => {
-  // State for selected week (starting Monday)
+  // State for selected week (starting Monday) - still used for calculations
   const [selectedWeek, setSelectedWeek] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
@@ -47,7 +47,7 @@ const TeamWorkload = () => {
     clearFilters
   } = useTeamFilters(allMembers);
   
-  // Handle week navigation
+  // Handle week navigation (still used for period calculations)
   const handleWeekChange = (newWeek: Date) => {
     setSelectedWeek(startOfWeek(newWeek, { weekStartsOn: 1 }));
   };
@@ -60,7 +60,7 @@ const TeamWorkload = () => {
     setSelectedWeek(prev => addWeeks(prev, 1));
   };
 
-  // Format week label
+  // Format week label (still used for internal calculations)
   const weekLabel = `Week of ${format(selectedWeek, 'MMMM d, yyyy')}`;
 
   const isLoading = isLoadingTeamMembers;

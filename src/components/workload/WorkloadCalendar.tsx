@@ -113,7 +113,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                     <div className="flex items-center gap-2 px-2 py-1">
                       <Avatar className="h-6 w-6">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                        <AvatarFallback className="bg-brand-violet text-white text-xs">
+                        <AvatarFallback style={{ backgroundColor: '#6F4BF6', color: 'white' }} className="text-xs">
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>

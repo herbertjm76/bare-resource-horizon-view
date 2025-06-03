@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { TeamMember } from '@/components/dashboard/types';
 import { useWorkloadData } from '@/components/workload/hooks/useWorkloadData';
 import { WorkloadBreakdown } from '@/components/workload/hooks/types';
-import { startOfWeek, startOfMonth, startOfQuarter } from 'date-fns';
+import { startOfWeek, startOfMonth, startOfQuarter, startOfYear } from 'date-fns';
 import '@/styles/enhanced-tables.css';
 
 interface TeamWorkloadContentProps {
@@ -49,19 +49,19 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   onPreviousWeek,
   onNextWeek
 }) => {
-  // State for period view and period selector
-  const [selectedView, setSelectedView] = useState<PeriodView>('week');
+  // State for period view - default to month instead of week
+  const [selectedView, setSelectedView] = useState<PeriodView>('month');
   const [periodToShow, setPeriodToShow] = useState(12);
   
   // Calculate the period based on the selected view
   const calculatedPeriod = useMemo(() => {
     switch (selectedView) {
-      case 'week':
-        return 1; // 1 week
       case 'month':
         return 4; // 4 weeks (roughly 1 month)
       case 'quarter':
         return 12; // 12 weeks (roughly 3 months)
+      case 'year':
+        return 52; // 52 weeks (1 year)
       default:
         return periodToShow;
     }
@@ -70,12 +70,12 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   // Calculate the start date based on the selected view
   const startDate = useMemo(() => {
     switch (selectedView) {
-      case 'week':
-        return startOfWeek(selectedWeek, { weekStartsOn: 1 });
       case 'month':
         return startOfWeek(startOfMonth(selectedWeek), { weekStartsOn: 1 });
       case 'quarter':
         return startOfWeek(startOfQuarter(selectedWeek), { weekStartsOn: 1 });
+      case 'year':
+        return startOfWeek(startOfYear(selectedWeek), { weekStartsOn: 1 });
       default:
         return selectedWeek;
     }
@@ -118,16 +118,6 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
             onViewChange={setSelectedView}
           />
           
-          {/* Week Selector - only show for week view */}
-          {selectedView === 'week' && (
-            <WeekSelector 
-              selectedWeek={selectedWeek}
-              onPreviousWeek={onPreviousWeek}
-              onNextWeek={onNextWeek}
-              weekLabel={weekLabel}
-            />
-          )}
-          
           <TeamAnnualLeaveFilters 
             departments={departments}
             locations={locations}
@@ -138,8 +128,8 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
             setFilterValue={setFilterValue}
             setSearchQuery={setSearchQuery}
             clearFilters={clearFilters}
-            periodToShow={selectedView === 'week' ? periodToShow : undefined}
-            onPeriodChange={selectedView === 'week' ? setPeriodToShow : undefined}
+            periodToShow={undefined}
+            onPeriodChange={undefined}
           />
         </div>
       </div>
