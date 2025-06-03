@@ -40,10 +40,6 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     }
   };
 
-  const getGlassMorphismClass = () => {
-    return 'bg-white/20 backdrop-blur-md border border-white/30 shadow-elevation-2';
-  };
-
   const getBadgeBackgroundColor = (badgeColor?: string, isGood?: boolean) => {
     // Use indicator color for good/bad
     if (isGood === true) return 'bg-green-500/80 border-green-400/40';
@@ -107,42 +103,43 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   console.log('Rendering simple format');
   return (
     <div 
-      className="rounded-xl p-6 border shadow-sm"
+      className="rounded-3xl p-5 border-2"
       style={{
-        background: 'linear-gradient(to right, #eef4ff, #fbf5ff)',
-        borderColor: '#d8d4ff',
-        borderWidth: '1px',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+        background: 'linear-gradient(to right, #eef2ff, #fdf2ff)',
+        borderImage: 'linear-gradient(to right, #eef2ff, #fdf2ff) 1',
+        borderColor: 'transparent'
       }}
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="flex flex-wrap gap-6">
         {metrics.map((metric, index) => {
           const badge = getDefaultBadge(metric, index);
           
           return (
-            <Card key={index} className={`${getGlassMorphismClass()} transition-all duration-300 hover:bg-white/25 hover:shadow-elevation-3`}>
-              <CardContent className="p-2">
-                <div className="text-center">
-                  {/* Title using standardized typography */}
-                  <Typography variant="body-sm" className="font-semibold text-black/90">
-                    {metric.title}
-                  </Typography>
-                  
-                  {/* Value - now bold and extra large */}
-                  <div className="text-4xl font-bold text-black">
-                    {metric.value}
+            <div key={index} className="flex-1 min-w-0">
+              <Card className="bg-white/90 border border-zinc-300 rounded-xl transition-all duration-300 hover:shadow-lg">
+                <CardContent className="p-4">
+                  <div className="text-center">
+                    {/* Title - gray-800, medium weight */}
+                    <Typography variant="body-sm" className="font-medium text-gray-800 mb-2">
+                      {metric.title}
+                    </Typography>
+                    
+                    {/* Value - bold, 4xl, gray-900 */}
+                    <div className="text-4xl font-bold text-gray-900 mb-3">
+                      {metric.value}
+                    </div>
+                    
+                    {/* Colored status pill */}
+                    <Badge 
+                      variant={getBadgeVariant(badge.color)} 
+                      className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)}`}
+                    >
+                      {badge.text}
+                    </Badge>
                   </div>
-                  
-                  {/* Always show a badge */}
-                  <Badge 
-                    variant={getBadgeVariant(badge.color)} 
-                    className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)}`}
-                  >
-                    {badge.text}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           );
         })}
       </div>
