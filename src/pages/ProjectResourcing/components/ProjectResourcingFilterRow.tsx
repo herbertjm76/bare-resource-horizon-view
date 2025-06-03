@@ -80,7 +80,7 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
   ];
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200 mx-4 mb-4">
+    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-4">
       {/* Left section: Month selector with navigation */}
       <div className="flex border rounded-lg p-2 items-center shadow-sm bg-gray-50/50">
         <Button 
@@ -174,7 +174,7 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
       </div>
       
       {/* Right section: Filter controls */}
-      <div className="flex items-center gap-3 ml-auto">
+      <div className="flex items-center gap-3 sm:ml-auto">
         <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
           <PopoverTrigger asChild>
             <Button 
