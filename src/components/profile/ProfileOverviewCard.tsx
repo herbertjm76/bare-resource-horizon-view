@@ -105,37 +105,25 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
             <div className="flex-1">
               <h3 className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-3">Basic Information</h3>
               
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <User className="h-3 w-3 text-gray-500 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-xs text-gray-500">Name</p>
-                    <p className="text-sm font-medium truncate">{profile.first_name} {profile.last_name}</p>
-                  </div>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <User className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <p className="text-lg font-medium truncate">{profile.first_name} {profile.last_name}</p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Briefcase className="h-3 w-3 text-gray-500 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-xs text-gray-500">Title</p>
-                    <p className="text-sm font-medium truncate">{profile.job_title || 'Not specified'}</p>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <Briefcase className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <p className="text-lg font-medium truncate">{profile.job_title || 'Not specified'}</p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Mail className="h-3 w-3 text-gray-500 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-xs text-gray-500">Email</p>
-                    <p className="text-sm font-medium truncate">{profile.email}</p>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <Mail className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <p className="text-lg font-medium truncate">{profile.email}</p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-3 w-3 text-gray-500 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-xs text-gray-500">Location</p>
-                    <p className="text-sm font-medium truncate">{profile.location || 'Not specified'}</p>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                  <p className="text-lg font-medium truncate">{profile.location || 'Not specified'}</p>
                 </div>
               </div>
             </div>

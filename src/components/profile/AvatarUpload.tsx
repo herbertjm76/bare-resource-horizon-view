@@ -139,9 +139,9 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   return (
     <div className="flex flex-col items-center space-y-4">
       <div className="relative">
-        <Avatar className="h-24 w-24">
-          <AvatarImage src={previewUrl || undefined} alt="Profile picture" />
-          <AvatarFallback className="text-lg bg-brand-primary text-white">
+        <Avatar className="h-24 w-24 rounded-lg">
+          <AvatarImage src={previewUrl || undefined} alt="Profile picture" className="rounded-lg" />
+          <AvatarFallback className="text-lg bg-brand-primary text-white rounded-lg">
             {userInitials}
           </AvatarFallback>
         </Avatar>
