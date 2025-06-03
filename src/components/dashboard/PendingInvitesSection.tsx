@@ -35,33 +35,36 @@ const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-lg font-medium">Pending Invites</CardTitle>
-        {showControls && (
-          <div className="flex items-center gap-2">
-            <Button onClick={onInviteMember}>
-              <Send className="h-4 w-4 mr-2" />
-              Invite Member
-            </Button>
-            
-            <Button variant="outline" onClick={onCopyInvite}>
-              <Copy className="h-4 w-4 mr-2" />
-              Copy Invite Link
-            </Button>
-            
-            {invites.length > 0 && (
-              <Button 
-                variant={editMode ? "default" : "outline"} 
-                onClick={onToggleEditMode}
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                {editMode ? "Done" : "Edit"}
+      <CardHeader className="pb-6">
+        <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+          <CardTitle className="text-lg font-medium">Pending Invites</CardTitle>
+          {showControls && (
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
+              <Button onClick={onInviteMember} className="w-full sm:w-auto">
+                <Send className="h-4 w-4 mr-2" />
+                Invite Member
               </Button>
-            )}
-          </div>
-        )}
+              
+              <Button variant="outline" onClick={onCopyInvite} className="w-full sm:w-auto">
+                <Copy className="h-4 w-4 mr-2" />
+                Copy Invite Link
+              </Button>
+              
+              {invites.length > 0 && (
+                <Button 
+                  variant={editMode ? "default" : "outline"} 
+                  onClick={onToggleEditMode}
+                  className="w-full sm:w-auto"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  {editMode ? "Done" : "Edit"}
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-0">
         {invites.length > 0 ? (
           <TeamInvitesTable 
             invitees={invites} 
@@ -71,7 +74,7 @@ const PendingInvitesSection: React.FC<PendingInvitesSectionProps> = ({
             onDeleteInvite={onDeleteInvite}
           />
         ) : (
-          <div className="text-center py-4 text-muted-foreground">
+          <div className="text-center py-8 text-muted-foreground">
             <p>No pending invites. Invite team members to get started.</p>
           </div>
         )}
