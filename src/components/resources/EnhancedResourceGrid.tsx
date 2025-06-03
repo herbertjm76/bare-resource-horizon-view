@@ -73,7 +73,10 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
   }
   
   return (
-    <div className="w-full max-w-full space-y-4">
+    <div className="w-full max-w-full space-y-6">
+      {/* Key Metrics and Summary Cards would go here if they exist */}
+      
+      {/* Grid Controls (Expand/Collapse buttons) */}
       <GridControls
         projectCount={filteredProjects.length}
         periodToShow={periodToShow}
@@ -81,6 +84,7 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
         onCollapseAll={collapseAll}
       />
 
+      {/* Resource Grid Table */}
       <GridTableWrapper>
         <EnhancedResourceTable
           projects={filteredProjects}
