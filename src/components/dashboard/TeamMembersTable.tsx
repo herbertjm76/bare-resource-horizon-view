@@ -73,9 +73,6 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
     return 'avatar_url' in member ? member.avatar_url : undefined;
   };
 
-  // Check if user can view insights (admin, owner, or PM roles)
-  const canViewInsights = ['owner', 'admin', 'pm'].includes(userRole.toLowerCase());
-
   if (teamMembers.length === 0) {
     return (
       <div className="text-center py-8">
@@ -151,16 +148,15 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
               </td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
-                  {canViewInsights && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleViewMember(member.id)}
-                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  )}
+                  {/* Everyone can view insights now - this is the MVP feature */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleViewMember(member.id)}
+                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
                   {editMode && ['owner', 'admin'].includes(userRole) && (
                     <>
                       <Button
