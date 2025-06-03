@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { MapPin, Building2, Upload } from 'lucide-react';
@@ -111,7 +110,14 @@ export const OfficeOverviewCard = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400 rounded-2xl p-3">
+    <div 
+      className="rounded-3xl p-5 border-2"
+      style={{
+        background: 'linear-gradient(to right, #eef2ff, #fdf2ff)',
+        borderImage: 'linear-gradient(to right, #eef2ff, #fdf2ff) 1',
+        borderColor: 'transparent'
+      }}
+    >
       <Card className="bg-white/20 backdrop-blur-md border border-white/30 shadow-elevation-2 transition-all duration-300 hover:bg-white/25 hover:shadow-elevation-3">
         <div className="p-4">
           <div className="grid grid-cols-4 gap-4 h-64">
