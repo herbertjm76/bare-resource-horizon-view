@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
+import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { CapacityIndicator } from './components/CapacityIndicator';
 import { Project, MemberAllocation } from './types';
 
 interface CleanTeamMemberRowsProps {
@@ -22,10 +22,6 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
   handleInputChange,
   projects
 }) => {
-  const allMembers = filteredOffices.flatMap(office => 
-    membersByOffice[office]?.map(member => ({ ...member, office })) || []
-  );
-
   // Helper to get user initials
   const getUserInitials = (member: any): string => {
     const firstName = member.first_name || '';
@@ -45,128 +41,152 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
 
   return (
     <>
-      {allMembers.map((member, memberIndex) => {
-        const allocation = getMemberAllocation(member.id);
-        const weeklyCapacity = member.weekly_capacity || 40;
-        
-        // Calculate total project hours from projectAllocations array
-        const totalProjectHours = allocation.projectAllocations.reduce((sum, project) => {
-          return sum + (project.hours || 0);
-        }, 0);
-        
-        // Calculate available hours (capacity - total hours - leave)
-        const totalLeave = (allocation.annualLeave || 0) + (allocation.others || 0);
-        const availableHours = Math.max(0, weeklyCapacity - totalProjectHours - totalLeave);
-        
-        const isEvenRow = memberIndex % 2 === 0;
-        
+      {filteredOffices.map((office) => {
+        const officeMembers = membersByOffice[office] || [];
+        if (officeMembers.length === 0) return null;
+
         return (
-          <TableRow 
-            key={`${member.id}-${member.office}`}
-            className={`text-xs border-b ${isEvenRow ? 'bg-white' : 'bg-gray-50/50'}`}
-          >
-            {/* Name column with avatar */}
-            <TableCell className="name-column font-medium text-left p-2 border-r">
-              <div className="flex items-center gap-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                  <AvatarFallback className="bg-brand-violet text-white text-xs">
-                    {getUserInitials(member)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="truncate" title={member.name}>
-                  {member.name}
-                </div>
-              </div>
-            </TableCell>
-            
-            {/* Number of Projects */}
-            <TableCell className="number-column p-2 border-r">
-              <div className="flex justify-center">
-                <span className="project-pill">
-                  {allocation.projectAllocations.filter(project => (project.hours || 0) > 0).length}
-                </span>
-              </div>
-            </TableCell>
-            
-            {/* Capacity with colored indicators */}
-            <TableCell className="capacity-column p-2 border-r">
-              <CapacityIndicator
-                availableHours={availableHours}
-                totalCapacity={weeklyCapacity}
-              />
-            </TableCell>
-            
-            {/* Annual Leave */}
-            <TableCell className="number-column leave-column p-2 border-r">
-              <input
-                type="number"
-                min="0"
-                max="40"
-                value={allocation.annualLeave || ''}
-                onChange={(e) => handleInputChange(member.id, 'annualLeave', parseFloat(e.target.value) || 0)}
-                className="leave-input"
-                placeholder="0"
-              />
-            </TableCell>
-            
-            {/* Other Leave */}
-            <TableCell className="number-column leave-column p-2 border-r">
-              <input
-                type="number"
-                min="0"
-                max="40"
-                value={allocation.others || ''}
-                onChange={(e) => handleInputChange(member.id, 'others', parseFloat(e.target.value) || 0)}
-                className="leave-input"
-                placeholder="0"
-              />
-            </TableCell>
-            
-            {/* Office */}
-            <TableCell className="remarks-column p-2 border-r text-center">
-              <span className="text-xs text-gray-600">
-                {getOfficeDisplay(member.location)}
-              </span>
-            </TableCell>
-            
-            {/* Project allocation columns */}
-            {projects.map((project) => {
-              // Find the allocation for this specific project
-              const projectAllocation = allocation.projectAllocations.find(
-                pa => pa.projectId === project.id
-              );
-              const projectHours = projectAllocation?.hours || 0;
+          <React.Fragment key={office}>
+            {/* Office Header Row */}
+            <TableRow className="bg-muted/30">
+              <TableCell 
+                colSpan={5 + projects.length} 
+                className="py-2 px-4 font-medium text-gray-700"
+              >
+                {getOfficeDisplay(office)} ({officeMembers.length} {officeMembers.length === 1 ? 'member' : 'members'})
+              </TableCell>
+            </TableRow>
+
+            {/* Office Members */}
+            {officeMembers.map((member, memberIndex) => {
+              const allocation = getMemberAllocation(member.id);
+              // Calculate total hours from project allocations
+              const totalHours = allocation.projectAllocations.reduce((sum, project) => sum + project.hours, 0);
+              const weeklyCapacity = member.weekly_capacity || 40;
+              const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / weeklyCapacity) * 100) : 0;
               
+              // Determine utilization color
+              const getUtilizationColor = (percent: number) => {
+                if (percent < 80) return 'bg-green-100 text-green-800 border-green-200';
+                if (percent <= 100) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                return 'bg-red-100 text-red-800 border-red-200';
+              };
+
               return (
-                <TableCell key={project.id} className="project-hours-column p-2 border-r">
-                  <input
-                    type="number"
-                    min="0"
-                    max="40"
-                    value={projectHours || ''}
-                    onChange={(e) => {
-                      const newHours = parseFloat(e.target.value) || 0;
-                      const updatedAllocations = allocation.projectAllocations.filter(
-                        pa => pa.projectId !== project.id
-                      );
-                      if (newHours > 0) {
-                        updatedAllocations.push({
-                          projectId: project.id,
-                          projectName: project.name,
-                          projectCode: project.code,
-                          hours: newHours
-                        });
-                      }
-                      handleInputChange(member.id, 'projectAllocations', updatedAllocations);
-                    }}
-                    className="w-full h-6 text-center text-xs border border-gray-300 rounded px-1"
-                    placeholder="0"
-                  />
-                </TableCell>
+                <TableRow key={member.id} className={`${memberIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-blue-50/30 transition-colors`}>
+                  {/* Member Name with Avatar */}
+                  <TableCell className="sticky left-0 z-10 bg-inherit border-r">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
+                        <AvatarFallback className="bg-brand-violet text-white text-xs">
+                          {getUserInitials(member)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm text-gray-900">
+                          {member.first_name} {member.last_name}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {member.department || 'N/A'}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+
+                  {/* Project Allocations */}
+                  {projects.map((project) => {
+                    const projectAllocation = allocation.projectAllocations.find(pa => pa.projectId === project.id);
+                    const projectHours = projectAllocation?.hours || 0;
+                    
+                    return (
+                      <TableCell key={project.id} className="text-center p-2">
+                        <input
+                          type="number"
+                          min="0"
+                          max="40"
+                          step="0.5"
+                          value={projectHours || ''}
+                          onChange={(e) => {
+                            const newHours = parseFloat(e.target.value) || 0;
+                            const updatedProjectAllocations = [...allocation.projectAllocations];
+                            const existingIndex = updatedProjectAllocations.findIndex(pa => pa.projectId === project.id);
+                            
+                            if (existingIndex >= 0) {
+                              updatedProjectAllocations[existingIndex] = {
+                                ...updatedProjectAllocations[existingIndex],
+                                hours: newHours
+                              };
+                            } else {
+                              updatedProjectAllocations.push({
+                                projectId: project.id,
+                                projectName: project.name,
+                                projectCode: project.code,
+                                hours: newHours
+                              });
+                            }
+                            
+                            handleInputChange(member.id, 'projectAllocations', updatedProjectAllocations);
+                          }}
+                          className="w-full max-w-[60px] px-2 py-1 text-center border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="0"
+                        />
+                      </TableCell>
+                    );
+                  })}
+
+                  {/* Total Hours */}
+                  <TableCell className="text-center p-2">
+                    <div className="inline-flex items-center justify-center px-2 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full min-w-[50px]">
+                      {totalHours}h
+                    </div>
+                  </TableCell>
+
+                  {/* Capacity */}
+                  <TableCell className="text-center p-2">
+                    <div className="inline-flex items-center justify-center px-2 py-1 bg-gray-100 text-gray-700 text-sm font-medium rounded-full min-w-[50px]">
+                      {weeklyCapacity}h
+                    </div>
+                  </TableCell>
+
+                  {/* Utilization */}
+                  <TableCell className="text-center p-2">
+                    <Badge 
+                      variant="outline" 
+                      className={`${getUtilizationColor(utilizationPercent)} text-xs font-medium`}
+                    >
+                      {utilizationPercent}%
+                    </Badge>
+                  </TableCell>
+
+                  {/* Leave */}
+                  <TableCell className="text-center p-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max="40"
+                      step="0.5"
+                      value={allocation.annualLeave || ''}
+                      onChange={(e) => handleInputChange(member.id, 'annualLeave', parseFloat(e.target.value) || 0)}
+                      className="w-full max-w-[60px] px-2 py-1 text-center border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="0"
+                    />
+                  </TableCell>
+
+                  {/* Remarks */}
+                  <TableCell className="p-2">
+                    <textarea
+                      value={allocation.remarks || ''}
+                      onChange={(e) => handleInputChange(member.id, 'remarks', e.target.value)}
+                      className="w-full px-2 py-1 text-sm border border-gray-200 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Notes..."
+                      rows={1}
+                    />
+                  </TableCell>
+                </TableRow>
               );
             })}
-          </TableRow>
+          </React.Fragment>
         );
       })}
     </>
