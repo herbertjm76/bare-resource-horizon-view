@@ -135,38 +135,40 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
           {emailInvites.map((invite) => (
             <div 
               key={invite.id} 
-              className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+              className="flex flex-col items-center p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
             >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-3">
                 <Avatar className="h-10 w-10 flex-shrink-0">
                   <AvatarFallback className="bg-brand-violet text-white text-sm">
                     {getInviteInitials(invite)}
                   </AvatarFallback>
                 </Avatar>
-                <div className="min-w-0 flex-1">
-                  <div className="font-medium text-gray-900 text-base truncate">
+                <div className="text-center">
+                  <div className="font-medium text-gray-900 text-base">
                     {getDisplayName(invite)}
                   </div>
                 </div>
               </div>
               
               {editMode && (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col items-center gap-2 w-full">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => onResendInvite && onResendInvite(invite)}
-                    className="text-gray-600 hover:text-gray-700 hover:bg-gray-50 px-2"
+                    className="text-gray-600 hover:text-gray-700 hover:bg-gray-50 w-full"
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className="h-4 w-4 mr-2" />
+                    Resend
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => onDeleteInvite && onDeleteInvite(invite.id)}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 px-2"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 w-full"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
                   </Button>
                 </div>
               )}
