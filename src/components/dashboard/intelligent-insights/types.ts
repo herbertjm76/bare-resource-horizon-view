@@ -14,5 +14,8 @@ export interface InsightItem {
   actionLabel?: string;
   onAction?: () => void;
   metric?: string;
-  icon: React.ReactNode;
+  icon: {
+    name: string;
+    className: string;
+  } | React.ReactNode;
 }

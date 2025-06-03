@@ -1,5 +1,4 @@
 
-import { AlertTriangle, Users, Target, TrendingUp, Calendar, Briefcase, Plane } from 'lucide-react';
 import { InsightItem, TeamMember } from '../types';
 
 export const generateUtilizationInsights = (
@@ -18,7 +17,7 @@ export const generateUtilizationInsights = (
       actionLabel: "View Capacity",
       onAction: () => navigate('/resources'),
       metric: `${utilizationRate}%`,
-      icon: <TrendingUp className="h-4 w-4 text-orange-500" />
+      icon: { name: 'trending-up', className: 'h-4 w-4 text-orange-500' }
     });
   } else if (utilizationRate > 90) {
     insights.push({
@@ -28,7 +27,7 @@ export const generateUtilizationInsights = (
       actionLabel: "Plan Hiring",
       onAction: () => navigate('/team-members'),
       metric: `${utilizationRate}%`,
-      icon: <AlertTriangle className="h-4 w-4 text-red-500" />
+      icon: { name: 'alert-triangle', className: 'h-4 w-4 text-red-500' }
     });
   }
 
@@ -44,7 +43,7 @@ export const generateUtilizationInsights = (
       actionLabel: "View Planning",
       onAction: () => navigate('/workload'),
       metric: `${Math.round(availableCapacity)}h available`,
-      icon: <Calendar className="h-4 w-4 text-red-400" />
+      icon: { name: 'calendar', className: 'h-4 w-4 text-red-400' }
     });
   }
 
@@ -67,7 +66,7 @@ export const generateProjectLoadInsights = (
       actionLabel: "Review Projects",
       onAction: () => navigate('/projects'),
       metric: `${projectsPerPerson.toFixed(1)} proj/person`,
-      icon: <Briefcase className="h-4 w-4 text-orange-600" />
+      icon: { name: 'briefcase', className: 'h-4 w-4 text-orange-600' }
     });
   }
 
@@ -89,7 +88,7 @@ export const generateTeamScalingInsights = (
       actionLabel: "Hiring Guide",
       onAction: () => navigate('/team-members'),
       metric: `${teamSize} members`,
-      icon: <Users className="h-4 w-4 text-blue-500" />
+      icon: { name: 'users', className: 'h-4 w-4 text-blue-500' }
     });
   }
 
@@ -105,7 +104,7 @@ export const generateOptimalInsights = (utilizationRate: number): InsightItem[] 
       description: "Team operating at ideal utilization rate.",
       severity: 'low',
       metric: `${utilizationRate}%`,
-      icon: <Target className="h-4 w-4 text-green-500" />
+      icon: { name: 'target', className: 'h-4 w-4 text-green-500' }
     });
   }
 

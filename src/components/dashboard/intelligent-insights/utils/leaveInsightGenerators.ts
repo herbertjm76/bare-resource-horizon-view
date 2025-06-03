@@ -1,5 +1,4 @@
 
-import { AlertTriangle, Calendar, Plane } from 'lucide-react';
 import { InsightItem, TeamMember } from '../types';
 
 interface LeaveInsights {
@@ -27,7 +26,7 @@ export const generateLeaveInsights = (
       actionLabel: "View Calendar",
       onAction: () => navigate('/team-annual-leave'),
       metric: `${leaveInsights.nextWeekCount} people`,
-      icon: <Plane className="h-4 w-4 text-blue-500" />
+      icon: { name: 'plane', className: 'h-4 w-4 text-blue-500' }
     });
   }
 
@@ -39,7 +38,7 @@ export const generateLeaveInsights = (
       actionLabel: "Plan Ahead",
       onAction: () => navigate('/team-annual-leave'),
       metric: `${leaveInsights.nextMonthCount} people`,
-      icon: <Calendar className="h-4 w-4 text-green-500" />
+      icon: { name: 'calendar', className: 'h-4 w-4 text-green-500' }
     });
   }
 
@@ -51,7 +50,7 @@ export const generateLeaveInsights = (
       actionLabel: "Review Schedule",
       onAction: () => navigate('/team-annual-leave'),
       metric: `${leaveInsights.peakWeek.count} people`,
-      icon: <AlertTriangle className="h-4 w-4 text-orange-500" />
+      icon: { name: 'alert-triangle', className: 'h-4 w-4 text-orange-500' }
     });
   }
 
