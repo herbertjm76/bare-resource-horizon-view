@@ -66,14 +66,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   return (
     <div className="sticky top-0 z-10 bg-background border-b border-gray-200 p-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        {/* Time period quick selection buttons */}
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-3">
+        {/* Time period quick selection buttons - Force single line with scroll */}
+        <div className="flex gap-2 overflow-x-auto pb-1 min-w-0">
           <Button
             variant={selectedTimeRange === 'week' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedTimeRange('week')}
-            className="text-xs"
+            className="text-xs whitespace-nowrap flex-shrink-0"
           >
             This Week
           </Button>
@@ -81,7 +81,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             variant={selectedTimeRange === 'month' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedTimeRange('month')}
-            className="text-xs"
+            className="text-xs whitespace-nowrap flex-shrink-0"
           >
             This Month
           </Button>
@@ -89,13 +89,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             variant={selectedTimeRange === '3months' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedTimeRange('3months')}
-            className="text-xs"
+            className="text-xs whitespace-nowrap flex-shrink-0"
           >
             This Quarter
           </Button>
         </div>
         
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        {/* Filter button - stays in single line */}
+        <div className="flex items-center justify-end">
           <FilterButton
             activeFiltersCount={activeFiltersCount}
             filterContent={filterContent}

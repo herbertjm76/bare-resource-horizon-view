@@ -1,139 +1,97 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Typography } from "@/components/ui/typography";
 
-interface SummaryMetric {
+interface Metric {
   title: string;
   value: string | number | React.ReactNode;
   subtitle?: string;
   badgeText?: string;
-  badgeColor?: string;
-  isGood?: boolean;
+  badgeColor?: 'green' | 'blue' | 'orange' | 'red' | 'gray' | 'purple';
 }
-
-type GradientType = 'purple' | 'blue' | 'emerald' | 'violet';
 
 interface StandardizedExecutiveSummaryProps {
   title?: string;
   timeRangeText?: string;
-  metrics: SummaryMetric[];
-  gradientType?: GradientType;
-  cardOpacity?: number;
+  metrics: Metric[];
+  gradientType?: 'default' | 'purple';
 }
 
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
+  title = "Executive Summary",
+  timeRangeText,
   metrics,
-  gradientType = 'purple',
-  cardOpacity = 0.9
+  gradientType = 'default'
 }) => {
-  console.log('StandardizedExecutiveSummary render (compact format)');
-
-  const getBadgeVariant = (color?: string) => {
+  const getBadgeStyle = (color?: string) => {
     switch (color) {
-      case 'red': return 'destructive';
-      case 'orange': return 'secondary';
-      case 'green': return 'default';
-      case 'blue': return 'outline';
-      default: return 'outline';
+      case 'green':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'blue':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'orange':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'red':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'gray':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'purple':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
-  const getBadgeBackgroundColor = (badgeColor?: string, isGood?: boolean) => {
-    // Use indicator color for good/bad
-    if (isGood === true) return 'bg-green-500/80 border-green-400/40';
-    if (isGood === false) return 'bg-red-500/80 border-red-400/40';
-    
-    // Fallback to badge color
-    switch (badgeColor) {
-      case 'green': return 'bg-green-500/80 border-green-400/40';
-      case 'red': return 'bg-red-500/80 border-red-400/40';
-      case 'orange': return 'bg-orange-500/80 border-orange-400/40';
-      case 'blue': return 'bg-blue-500/80 border-blue-400/40';
-      default: return 'bg-white/20 border-white/30';
-    }
-  };
+  const gradientClass = gradientType === 'purple' 
+    ? 'bg-gradient-to-br from-purple-50 via-white to-purple-50/30' 
+    : 'bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20';
 
-  // Generate default badge for cards that don't have one
-  const getDefaultBadge = (metric: SummaryMetric, index: number) => {
-    if (metric.badgeText) return { text: metric.badgeText, color: metric.badgeColor };
-    
-    // Generate contextual badges based on metric title
-    const title = metric.title.toLowerCase();
-    
-    if (title.includes('utilization')) {
-      const numericValue = typeof metric.value === 'number' ? metric.value : 
-                          typeof metric.value === 'string' ? parseInt(metric.value) : null;
-      
-      if (numericValue !== null) {
-        if (numericValue > 85) return { text: 'High', color: 'orange' };
-        if (numericValue > 70) return { text: 'Good', color: 'green' };
-        return { text: 'Low', color: 'blue' };
-      }
-      return { text: 'Active', color: 'blue' };
-    }
-    
-    if (title.includes('capacity')) {
-      return { text: 'Available', color: 'blue' };
-    }
-    
-    if (title.includes('projects')) {
-      return { text: 'Active', color: 'green' };
-    }
-    
-    if (title.includes('team') || title.includes('members') || title.includes('size')) {
-      return { text: 'Stable', color: 'green' };
-    }
-    
-    if (title.includes('offices') || title.includes('locations')) {
-      return { text: 'Multi-Site', color: 'blue' };
-    }
-    
-    if (title.includes('completion') || title.includes('rate')) {
-      return { text: 'On Track', color: 'green' };
-    }
-    
-    // Default fallback
-    return { text: 'Active', color: 'blue' };
-  };
-
-  console.log('Rendering compact mobile-responsive format');
   return (
-    <Card className="w-full bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[2px] border-[#d8d4ff] rounded-lg shadow-sm">
-      <CardContent className="p-3 sm:p-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {metrics.map((metric, index) => {
-            const badge = getDefaultBadge(metric, index);
-            
-            return (
-              <div key={index} className="min-w-0">
-                <Card className="bg-white border border-gray-200 rounded-lg transition-all duration-300 hover:shadow-md h-full">
-                  <CardContent className="p-3 sm:p-4">
-                    <div className="text-center space-y-2">
-                      {/* Title - compact size */}
-                      <Typography variant="body-sm" className="font-medium text-gray-800 text-xs sm:text-sm leading-tight">
-                        {metric.title}
-                      </Typography>
-                      
-                      {/* Value - compact but readable */}
-                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-none">
-                        {metric.value}
-                      </div>
-                      
-                      {/* Colored status pill */}
-                      <Badge 
-                        variant={getBadgeVariant(badge.color)} 
-                        className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-2 py-1`}
-                      >
-                        {badge.text}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
+    <Card className={`${gradientClass} border-0 shadow-sm`}>
+      <CardHeader className="pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <CardTitle className="text-lg font-semibold text-gray-900">
+            {title}
+          </CardTitle>
+          {timeRangeText && (
+            <span className="text-sm text-gray-600 whitespace-nowrap">
+              {timeRangeText}
+            </span>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        {/* Force single row layout on all screen sizes with horizontal scroll if needed */}
+        <div className="flex gap-3 overflow-x-auto pb-2 min-w-0">
+          {metrics.map((metric, index) => (
+            <div
+              key={index}
+              className="flex-shrink-0 bg-white/90 backdrop-blur-sm rounded-lg border border-gray-100 p-3 min-w-[140px] sm:min-w-[160px]"
+            >
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-gray-600 truncate">
+                  {metric.title}
+                </p>
+                <div className="text-lg sm:text-xl font-bold text-gray-900 truncate">
+                  {metric.value}
+                </div>
+                {metric.subtitle && (
+                  <p className="text-xs text-gray-500 truncate">
+                    {metric.subtitle}
+                  </p>
+                )}
+                {metric.badgeText && (
+                  <Badge 
+                    variant="outline" 
+                    className={`text-xs border ${getBadgeStyle(metric.badgeColor)}`}
+                  >
+                    {metric.badgeText}
+                  </Badge>
+                )}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>
