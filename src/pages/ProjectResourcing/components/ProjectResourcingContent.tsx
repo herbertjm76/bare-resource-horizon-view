@@ -104,7 +104,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
       />
 
       {/* Filter Row with expand/collapse controls */}
-      <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
+      <div className="w-full max-w-full overflow-hidden">
         <ProjectResourcingFilterRow
           selectedDate={selectedMonth}
           onDateChange={onMonthChange}
@@ -129,7 +129,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
       </div>
       
       {/* Resource Grid Table */}
-      <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
+      <div className="w-full max-w-full overflow-hidden">
         <GridTableWrapper>
           <EnhancedResourceTable
             projects={filteredProjects}
