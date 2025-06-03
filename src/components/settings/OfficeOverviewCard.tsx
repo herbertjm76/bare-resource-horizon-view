@@ -2,6 +2,7 @@
 import React from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+import { Card } from '@/components/ui/card';
 import { CompanyLogoSection } from './office-overview/CompanyLogoSection';
 import { CompanyInfoDisplay } from './office-overview/CompanyInfoDisplay';
 import { OfficeMapSection } from './office-overview/OfficeMapSection';
@@ -11,7 +12,7 @@ export const OfficeOverviewCard = () => {
   const { locations } = useOfficeSettings();
 
   return (
-    <div className="rounded-2xl border bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+    <Card className="hover:shadow-md transition-all duration-300 overflow-hidden">
       <div 
         className="p-4"
         style={{
@@ -40,6 +41,6 @@ export const OfficeOverviewCard = () => {
           />
         </div>
       </div>
-    </div>
+    </Card>
   );
 };

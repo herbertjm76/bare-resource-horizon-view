@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Card } from '@/components/ui/card';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { EditableProfileSection } from '@/components/profile/EditableProfileSection';
 import { ProfileDisplaySection } from '@/components/profile/ProfileDisplaySection';
@@ -63,7 +64,7 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
   };
 
   return (
-    <div className="rounded-2xl border bg-card text-card-foreground shadow-sm overflow-hidden">
+    <Card className="overflow-hidden">
       <div className="bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400 p-8 text-black relative rounded-2xl">
         {/* Decorative background elements */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50 rounded-2xl"></div>
@@ -125,6 +126,6 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
