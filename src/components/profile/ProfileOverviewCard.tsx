@@ -64,7 +64,7 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
 
   return (
     <div 
-      className="rounded-3xl p-5"
+      className="rounded-3xl p-5 bg-white/20 backdrop-blur-md border border-white/30 shadow-elevation-2 transition-all duration-300 hover:bg-white/25 hover:shadow-elevation-3"
       style={{
         background: 'linear-gradient(to right, #eef2ff, #fdf2ff)',
       }}
