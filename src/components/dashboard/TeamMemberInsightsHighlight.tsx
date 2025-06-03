@@ -14,23 +14,23 @@ export const TeamMemberInsightsHighlight: React.FC<TeamMemberInsightsHighlightPr
   onSearchChange
 }) => {
   return (
-    <Card className="bg-gradient-to-r from-brand-violet/10 via-blue-50 to-purple-50 border-2 border-brand-violet/20">
-      <CardContent className="p-6">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-6">
+    <Card className="w-full bg-gradient-to-r from-brand-violet/10 via-blue-50 to-purple-50 border-[2px] border-brand-violet/20 rounded-lg">
+      <CardContent className="p-3 sm:p-4 lg:p-6">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3 sm:gap-4 lg:gap-6">
           {/* Left side - Feature highlight */}
-          <div className="flex-1 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-brand-violet/10 rounded-lg">
-                <Eye className="h-5 w-5 text-brand-violet" />
+          <div className="flex-1 space-y-2 sm:space-y-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-brand-violet/10 rounded-lg">
+                <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-brand-violet" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800">
                 Team Member Insights
               </h3>
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 text-xs sm:text-sm">
               Search for any team member to view their utilization metrics, performance insights, and resource allocation details.
             </p>
-            <div className="flex items-center gap-4 text-xs text-gray-500">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500">
               <div className="flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" />
                 <span>Utilization Tracking</span>

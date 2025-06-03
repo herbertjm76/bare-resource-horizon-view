@@ -97,10 +97,10 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     const remainingCount = memberList.length - maxShow;
 
     return (
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-1 sm:gap-2">
         <div className="flex gap-1">
           {membersToShow.map(({ member }) => (
-            <Avatar key={member.id} className="h-6 w-6">
+            <Avatar key={member.id} className="h-5 w-5 sm:h-6 sm:w-6">
               <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
               <AvatarFallback className="bg-brand-violet text-white text-xs">
                 {getUserInitials(member)}
@@ -109,7 +109,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
           ))}
         </div>
         {remainingCount > 0 && (
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
             +{remainingCount}
           </Badge>
         )}
@@ -142,7 +142,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     {
       title: "Needs Resourcing",
       value: needsResourcing.length > 0 ? renderMemberAvatars(needsResourcing) : (
-        <span className="text-sm text-white/80">All well utilized</span>
+        <span className="text-xs sm:text-sm text-gray-600">All well utilized</span>
       ),
       subtitle: "Under 60% utilization",
       badgeText: `${needsResourcing.length}`,
@@ -151,7 +151,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     {
       title: "Overloaded Staff",
       value: overloaded.length > 0 ? renderMemberAvatars(overloaded) : (
-        <span className="text-sm text-white/80">No one overloaded</span>
+        <span className="text-xs sm:text-sm text-gray-600">No one overloaded</span>
       ),
       subtitle: "Over 100% utilization",
       badgeText: `${overloaded.length}`,

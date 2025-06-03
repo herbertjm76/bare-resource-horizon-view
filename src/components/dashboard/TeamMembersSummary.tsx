@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { TeamMember } from './types';
 import { calculateMemberStats, calculateDepartmentStats, calculateLocationStats } from './teamSummary/utils/teamSummaryUtils';
 import { Users, UserCheck, UserPlus, Building2, MapPin } from 'lucide-react';
@@ -21,128 +21,124 @@ export const TeamMembersSummary: React.FC<TeamMembersSummaryProps> = ({
   const topLocations = getTopLocations(locationStats, 3);
 
   return (
-    <div className="mb-4 relative">
-      {/* Glass morphism background container */}
-      <div className="relative overflow-hidden rounded-2xl">
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(45deg, #895CF7 0%, #5669F7 55%, #E64FC4 100%)' }} />
-        <div className="absolute inset-0 bg-white/10 backdrop-blur-md" />
-        
-        {/* Top highlight gradient */}
-        <div className="absolute inset-x-0 top-0 h-20 bg-[radial-gradient(120%_30%_at_50%_0%,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0)_70%)]" />
-        
-        <div className="relative z-10 p-4">
-          {/* Three rounded square cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Total Members Card */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-              <div className="space-y-3">
+    <Card className="w-full bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[2px] border-[#d8d4ff] rounded-lg shadow-sm mb-4">
+      <CardContent className="p-3 sm:p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          {/* Total Members Card */}
+          <Card className="bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 h-full">
+            <CardContent className="p-3 sm:p-4">
+              <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-white/20 rounded-lg">
-                    <Users className="h-4 w-4 text-white" />
+                  <div className="p-1.5 bg-brand-violet/10 rounded-lg">
+                    <Users className="h-4 w-4 text-brand-violet" />
                   </div>
-                  <div>
-                    <div className="text-xs text-white/80">Total Members</div>
-                    <div className="text-xl font-bold text-white">{stats.totalMembers}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs text-gray-600">Total Members</div>
+                    <div className="text-lg sm:text-xl font-bold text-gray-900">{stats.totalMembers}</div>
                   </div>
                 </div>
                 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5">
-                      <UserCheck className="h-3 w-3 text-green-300" />
-                      <span className="text-white/90">Active</span>
+                      <UserCheck className="h-3 w-3 text-green-600" />
+                      <span className="text-gray-700">Active</span>
                     </div>
-                    <span className="font-medium text-white">{stats.activeMembers.length}</span>
+                    <span className="font-medium text-gray-900">{stats.activeMembers.length}</span>
                   </div>
                   
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5">
-                      <UserPlus className="h-3 w-3 text-orange-300" />
-                      <span className="text-white/90">Pending</span>
+                      <UserPlus className="h-3 w-3 text-orange-600" />
+                      <span className="text-gray-700">Pending</span>
                     </div>
-                    <span className="font-medium text-white">{stats.preRegisteredMembers.length}</span>
+                    <span className="font-medium text-gray-900">{stats.preRegisteredMembers.length}</span>
                   </div>
                 </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Departments Card */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-              <div className="space-y-3">
+          {/* Departments Card */}
+          <Card className="bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 h-full">
+            <CardContent className="p-3 sm:p-4">
+              <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-white/20 rounded-lg">
-                    <Building2 className="h-4 w-4 text-white" />
+                  <div className="p-1.5 bg-brand-violet/10 rounded-lg">
+                    <Building2 className="h-4 w-4 text-brand-violet" />
                   </div>
-                  <div>
-                    <div className="text-xs text-white/80">Departments</div>
-                    <div className="text-xl font-bold text-white">{Object.keys(departmentStats).length}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs text-gray-600">Departments</div>
+                    <div className="text-lg sm:text-xl font-bold text-gray-900">{Object.keys(departmentStats).length}</div>
                   </div>
                 </div>
                 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {Object.entries(departmentStats)
                     .filter(([_, count]) => count > 0)
                     .slice(0, 2)
                     .map(([dept, count]) => (
                       <div key={dept} className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5">
-                          <div className={`w-2 h-2 rounded-full ${DEPARTMENT_COLORS[dept as keyof typeof DEPARTMENT_COLORS]} opacity-80`}></div>
-                          <span className="text-white/90">{dept}</span>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <div className={`w-2 h-2 rounded-full ${DEPARTMENT_COLORS[dept as keyof typeof DEPARTMENT_COLORS]} opacity-80 flex-shrink-0`}></div>
+                          <span className="text-gray-700 truncate">{dept}</span>
                         </div>
-                        <span className="font-medium text-white">{count}</span>
+                        <span className="font-medium text-gray-900 flex-shrink-0">{count}</span>
                       </div>
                     ))}
                   
                   {Object.keys(departmentStats).length === 0 && (
-                    <div className="text-xs text-white/70">No departments assigned</div>
+                    <div className="text-xs text-gray-500">No departments assigned</div>
                   )}
                 </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Locations Card */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-              <div className="space-y-3">
+          {/* Locations Card */}
+          <Card className="bg-white/95 backdrop-blur-sm rounded-lg border border-white/20 h-full">
+            <CardContent className="p-3 sm:p-4">
+              <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-white/20 rounded-lg">
-                    <MapPin className="h-4 w-4 text-white" />
+                  <div className="p-1.5 bg-brand-violet/10 rounded-lg">
+                    <MapPin className="h-4 w-4 text-brand-violet" />
                   </div>
-                  <div>
-                    <div className="text-xs text-white/80">Locations</div>
-                    <div className="text-xl font-bold text-white">{Object.keys(locationStats).length}</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-xs text-gray-600">Locations</div>
+                    <div className="text-lg sm:text-xl font-bold text-gray-900">{Object.keys(locationStats).length}</div>
                   </div>
                 </div>
                 
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   {topLocations.length > 0 ? (
                     <>
                       {topLocations.slice(0, 2).map(([location, count]) => (
                         <div key={location} className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-sm">{getLocationEmoji(location)}</span>
-                            <span className="text-white/90">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="text-sm flex-shrink-0">{getLocationEmoji(location)}</span>
+                            <span className="text-gray-700 truncate">
                               {location === 'Unknown' ? 'Not specified' : location}
                             </span>
                           </div>
-                          <span className="font-medium text-white">{count}</span>
+                          <span className="font-medium text-gray-900 flex-shrink-0">{count}</span>
                         </div>
                       ))}
                       
                       {Object.keys(locationStats).length > 2 && (
-                        <div className="text-xs text-white/70">
+                        <div className="text-xs text-gray-500">
                           +{Object.keys(locationStats).length - 2} more
                         </div>
                       )}
                     </>
                   ) : (
-                    <div className="text-xs text-white/70">No locations specified</div>
+                    <div className="text-xs text-gray-500">No locations specified</div>
                   )}
                 </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };

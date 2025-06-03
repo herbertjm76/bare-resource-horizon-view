@@ -45,36 +45,40 @@ export const SummaryDashboard: React.FC<SummaryDashboardProps> = ({
   };
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`w-full ${className}`}>
       {title && (
-        <h2 className="text-lg font-semibold text-muted-foreground">{title}</h2>
+        <h2 className="text-lg font-semibold text-muted-foreground mb-3">{title}</h2>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {metrics.map((metric, index) => (
-          <Card key={index}>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-muted-foreground">{metric.title}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <p className="text-2xl font-bold">{metric.value}</p>
-                    {metric.trend && getTrendIcon(metric.trend)}
+      <Card className="w-full bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[2px] border-[#d8d4ff] rounded-lg shadow-sm">
+        <CardContent className="p-3 sm:p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {metrics.map((metric, index) => (
+              <Card key={index} className="bg-white border border-gray-200 rounded-lg h-full">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center justify-between h-full">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">{metric.title}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900">{metric.value}</p>
+                        {metric.trend && getTrendIcon(metric.trend)}
+                      </div>
+                      {metric.subtitle && (
+                        <p className="text-xs text-gray-500 mt-1 truncate">{metric.subtitle}</p>
+                      )}
+                    </div>
+                    <div className={`h-6 w-6 sm:h-8 sm:w-8 rounded-full flex items-center justify-center flex-shrink-0 ml-2 ${getStatusColor(metric.status)}`}>
+                      <div className="scale-75 sm:scale-100">{metric.icon}</div>
+                    </div>
                   </div>
-                  {metric.subtitle && (
-                    <p className="text-xs text-muted-foreground mt-2">{metric.subtitle}</p>
+                  {metric.progress !== undefined && (
+                    <Progress value={metric.progress} className="mt-2" />
                   )}
-                </div>
-                <div className={`h-8 w-8 rounded-full flex items-center justify-center ${getStatusColor(metric.status)}`}>
-                  {metric.icon}
-                </div>
-              </div>
-              {metric.progress !== undefined && (
-                <Progress value={metric.progress} className="mt-3" />
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

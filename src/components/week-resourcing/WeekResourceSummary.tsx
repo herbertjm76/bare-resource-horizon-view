@@ -47,15 +47,6 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     return memberUtilization < 60;
   });
 
-  // Find overloaded members (more than 100% capacity)
-  const overloadedMembers = members.filter(member => {
-    const memberAllocations = allocations.filter(a => a.resource_id === member.id);
-    const memberTotal = memberAllocations.reduce((sum, a) => sum + a.hours, 0);
-    const memberCapacity = member.weekly_capacity || 40;
-    const memberUtilization = memberCapacity > 0 ? (memberTotal / memberCapacity) * 100 : 0;
-    return memberUtilization > 100;
-  });
-
   // Helper to get user initials
   const getUserInitials = (member: any): string => {
     const firstName = member.first_name || '';
@@ -78,10 +69,10 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     const remainingCount = memberList.length - maxShow;
 
     return (
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex items-center justify-center gap-1 sm:gap-2">
         <div className="flex gap-1">
           {membersToShow.map((member) => (
-            <Avatar key={member.id} className="h-6 w-6">
+            <Avatar key={member.id} className="h-5 w-5 sm:h-6 sm:w-6">
               <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
               <AvatarFallback className="bg-brand-violet text-white text-xs">
                 {getUserInitials(member)}
@@ -90,7 +81,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
           ))}
         </div>
         {remainingCount > 0 && (
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
             +{remainingCount}
           </Badge>
         )}
@@ -125,7 +116,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     {
       title: "Needs Resourcing",
       value: underUtilizedMembers.length > 0 ? renderMemberAvatars(underUtilizedMembers) : (
-        <span className="text-sm text-gray-600">All well utilized</span>
+        <span className="text-xs sm:text-sm text-gray-600">All well utilized</span>
       ),
       subtitle: "Under 60% utilization",
       badgeText: `${underUtilizedMembers.length}`,

@@ -28,7 +28,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   gradientType = 'purple',
   cardOpacity = 0.9
 }) => {
-  console.log('StandardizedExecutiveSummary render (simple format only)');
+  console.log('StandardizedExecutiveSummary render (compact format)');
 
   const getBadgeVariant = (color?: string) => {
     switch (color) {
@@ -63,7 +63,6 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     const title = metric.title.toLowerCase();
     
     if (title.includes('utilization')) {
-      // Only perform numeric comparison if value is a number or string that can be parsed
       const numericValue = typeof metric.value === 'number' ? metric.value : 
                           typeof metric.value === 'string' ? parseInt(metric.value) : null;
       
@@ -99,42 +98,44 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     return { text: 'Active', color: 'blue' };
   };
 
-  console.log('Rendering simple format');
+  console.log('Rendering compact mobile-responsive format');
   return (
-    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl p-6 shadow-sm">
-      <div className="flex flex-wrap gap-6">
-        {metrics.map((metric, index) => {
-          const badge = getDefaultBadge(metric, index);
-          
-          return (
-            <div key={index} className="flex-1 min-w-0">
-              <Card className="bg-white border-2 border-gray-200 rounded-xl transition-all duration-300 hover:shadow-lg">
-                <CardContent className="p-6">
-                  <div className="text-center">
-                    {/* Title - gray-800, medium weight */}
-                    <Typography variant="body-sm" className="font-medium text-gray-800 mb-2">
-                      {metric.title}
-                    </Typography>
-                    
-                    {/* Value - bold, 4xl, gray-900 */}
-                    <div className="text-4xl font-bold text-gray-900 mb-3">
-                      {metric.value}
+    <Card className="w-full bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[2px] border-[#d8d4ff] rounded-lg shadow-sm">
+      <CardContent className="p-3 sm:p-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {metrics.map((metric, index) => {
+            const badge = getDefaultBadge(metric, index);
+            
+            return (
+              <div key={index} className="min-w-0">
+                <Card className="bg-white border border-gray-200 rounded-lg transition-all duration-300 hover:shadow-md h-full">
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="text-center space-y-2">
+                      {/* Title - compact size */}
+                      <Typography variant="body-sm" className="font-medium text-gray-800 text-xs sm:text-sm leading-tight">
+                        {metric.title}
+                      </Typography>
+                      
+                      {/* Value - compact but readable */}
+                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-none">
+                        {metric.value}
+                      </div>
+                      
+                      {/* Colored status pill */}
+                      <Badge 
+                        variant={getBadgeVariant(badge.color)} 
+                        className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-2 py-1`}
+                      >
+                        {badge.text}
+                      </Badge>
                     </div>
-                    
-                    {/* Colored status pill */}
-                    <Badge 
-                      variant={getBadgeVariant(badge.color)} 
-                      className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)}`}
-                    >
-                      {badge.text}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          );
-        })}
-      </div>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
     </Card>
   );
 };
