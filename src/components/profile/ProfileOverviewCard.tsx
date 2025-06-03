@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
-import { Mail, MapPin, Calendar, Edit3, Check, X, Briefcase, Clock } from 'lucide-react';
+import { EditableProfileSection } from '@/components/profile/EditableProfileSection';
+import { ProfileDisplaySection } from '@/components/profile/ProfileDisplaySection';
+import { ProfileContactInfo } from '@/components/profile/ProfileContactInfo';
+import { ProfileStats } from '@/components/profile/ProfileStats';
 
 interface ProfileOverviewCardProps {
   profile: any;
@@ -95,112 +96,23 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
                 {/* Name and Title Section */}
                 <div className="space-y-3">
                   {isEditing ? (
-                    <div className="space-y-3">
-                      <div className="flex gap-3">
-                        <Input
-                          name="first_name"
-                          value={editedProfile.first_name}
-                          onChange={handleEditChange}
-                          placeholder="First Name"
-                          className="bg-white/20 border-white/30 text-white placeholder:text-white/70"
-                        />
-                        <Input
-                          name="last_name"
-                          value={editedProfile.last_name}
-                          onChange={handleEditChange}
-                          placeholder="Last Name"
-                          className="bg-white/20 border-white/30 text-white placeholder:text-white/70"
-                        />
-                      </div>
-                      <Input
-                        name="job_title"
-                        value={editedProfile.job_title}
-                        onChange={handleEditChange}
-                        placeholder="Job Title"
-                        className="bg-white/20 border-white/30 text-white placeholder:text-white/70"
-                      />
-                      <Textarea
-                        name="bio"
-                        value={editedProfile.bio}
-                        onChange={handleEditChange}
-                        placeholder="Tell us about yourself..."
-                        rows={3}
-                        className="bg-white/20 border-white/30 text-white placeholder:text-white/70 resize-none"
-                      />
-                      <div className="flex gap-2">
-                        <Button
-                          onClick={handleSave}
-                          disabled={saving}
-                          size="sm"
-                          className="bg-white text-[#6F4BF6] hover:bg-white/90"
-                        >
-                          <Check className="h-4 w-4 mr-1" />
-                          {saving ? 'Saving...' : 'Save'}
-                        </Button>
-                        <Button
-                          onClick={handleCancel}
-                          size="sm"
-                          variant="outline"
-                          className="border-white/30 text-white hover:bg-white/10"
-                        >
-                          <X className="h-4 w-4 mr-1" />
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
+                    <EditableProfileSection
+                      editedProfile={editedProfile}
+                      saving={saving}
+                      onEditChange={handleEditChange}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
+                    />
                   ) : (
-                    <div className="space-y-2">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h2 className="text-3xl font-bold leading-tight">
-                            {profile.first_name || profile.last_name 
-                              ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
-                              : 'Welcome to your profile'
-                            }
-                          </h2>
-                          {profile.job_title && (
-                            <p className="text-lg text-white/90 font-medium flex items-center gap-2 mt-1">
-                              <Briefcase className="h-4 w-4" />
-                              {profile.job_title}
-                            </p>
-                          )}
-                          {profile.department && (
-                            <p className="text-white/80 mt-1">{profile.department}</p>
-                          )}
-                        </div>
-                        <Button
-                          onClick={() => setIsEditing(true)}
-                          size="sm"
-                          variant="outline"
-                          className="border-white/30 text-white hover:bg-white/10"
-                        >
-                          <Edit3 className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                      </div>
-                    </div>
+                    <ProfileDisplaySection
+                      profile={profile}
+                      onEdit={() => setIsEditing(true)}
+                    />
                   )}
                   
                   {/* Contact Info - Only show when not editing */}
                   {!isEditing && (
-                    <div className="flex flex-col sm:flex-row gap-4 text-sm">
-                      <div className="flex items-center gap-2 text-white/90">
-                        <Mail className="h-4 w-4" />
-                        <span>{profile.email}</span>
-                      </div>
-                      {profile.location && (
-                        <div className="flex items-center gap-2 text-white/90">
-                          <MapPin className="h-4 w-4" />
-                          <span>{profile.location}</span>
-                        </div>
-                      )}
-                      {profile.start_date && (
-                        <div className="flex items-center gap-2 text-white/90">
-                          <Calendar className="h-4 w-4" />
-                          <span>Started {new Date(profile.start_date).toLocaleDateString()}</span>
-                        </div>
-                      )}
-                    </div>
+                    <ProfileContactInfo profile={profile} />
                   )}
                 </div>
 
@@ -216,23 +128,7 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
 
                 {/* Personal Info Summary - Only show when not editing */}
                 {!isEditing && (
-                  <div className="flex flex-wrap gap-6 pt-2">
-                    <div className="text-center">
-                      <div className="text-xl font-bold flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {profile.weekly_capacity || 40}h
-                      </div>
-                      <div className="text-xs text-white/70 uppercase tracking-wide">Weekly Capacity</div>
-                    </div>
-                    {profile.start_date && (
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-white/90">
-                          {Math.floor((new Date().getTime() - new Date(profile.start_date).getTime()) / (1000 * 60 * 60 * 24 * 365))} years
-                        </div>
-                        <div className="text-xs text-white/70 uppercase tracking-wide">Experience Here</div>
-                      </div>
-                    )}
-                  </div>
+                  <ProfileStats profile={profile} />
                 )}
               </div>
             </div>
