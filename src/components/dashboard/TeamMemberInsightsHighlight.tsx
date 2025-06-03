@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SearchInput } from '@/components/resources/filters/SearchInput';
-import { Eye, TrendingUp, Users, Target } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
 interface TeamMemberInsightsHighlightProps {
   searchQuery: string;
@@ -18,7 +18,7 @@ export const TeamMemberInsightsHighlight: React.FC<TeamMemberInsightsHighlightPr
       <CardContent className="p-3 sm:p-4 lg:p-6">
         <div className="flex flex-col lg:flex-row items-start lg:items-center gap-3 sm:gap-4 lg:gap-6">
           {/* Left side - Feature highlight */}
-          <div className="flex-1 space-y-2 sm:space-y-3">
+          <div className="flex-1">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="p-1.5 sm:p-2 bg-brand-violet/10 rounded-lg">
                 <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-brand-violet" />
@@ -26,23 +26,6 @@ export const TeamMemberInsightsHighlight: React.FC<TeamMemberInsightsHighlightPr
               <h3 className="text-base sm:text-lg font-semibold text-gray-800">
                 Team Member Insights
               </h3>
-            </div>
-            <p className="text-gray-600 text-xs sm:text-sm">
-              Search for any team member to view their utilization metrics, performance insights, and resource allocation details.
-            </p>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-gray-500">
-              <div className="flex items-center gap-1">
-                <TrendingUp className="h-3 w-3" />
-                <span>Utilization Tracking</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Target className="h-3 w-3" />
-                <span>Performance Metrics</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Users className="h-3 w-3" />
-                <span>Resource Planning</span>
-              </div>
             </div>
           </div>
 
