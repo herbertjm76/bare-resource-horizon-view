@@ -127,18 +127,16 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
       </div>
 
       {/* Filter Row positioned between grid controls and table - with consistent width */}
-      <div className="border-t border-gray-200 pt-4">
-        <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
-          <ProjectResourcingFilterRow
-            selectedDate={selectedMonth}
-            onDateChange={onMonthChange}
-            periodToShow={filters.periodToShow}
-            onPeriodChange={onPeriodChange}
-            filterContent={filterContent}
-            activeFiltersCount={activeFiltersCount}
-            onClearFilters={onClearFilters}
-          />
-        </div>
+      <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
+        <ProjectResourcingFilterRow
+          selectedDate={selectedMonth}
+          onDateChange={onMonthChange}
+          periodToShow={filters.periodToShow}
+          onPeriodChange={onPeriodChange}
+          filterContent={filterContent}
+          activeFiltersCount={activeFiltersCount}
+          onClearFilters={onClearFilters}
+        />
       </div>
       
       {/* Resource Grid Table - with consistent width */}
