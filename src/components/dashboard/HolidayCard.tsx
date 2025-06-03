@@ -34,7 +34,7 @@ export const HolidayCard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
+      <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
         <CardHeader className="flex-shrink-0 p-6">
           <CardTitle className="text-lg flex items-center gap-2">
             <Calendar className="h-5 w-5 text-brand-violet" />
@@ -53,7 +53,7 @@ export const HolidayCard: React.FC = () => {
 
   if (error) {
     return (
-      <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
+      <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
         <CardHeader className="flex-shrink-0 p-6">
           <CardTitle className="text-lg flex items-center gap-2">
             <Calendar className="h-5 w-5 text-brand-violet" />
@@ -72,7 +72,7 @@ export const HolidayCard: React.FC = () => {
   }
 
   return (
-    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
+    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
       <CardHeader className="flex-shrink-0 p-6">
         <CardTitle className="text-lg flex items-center gap-2">
           <Calendar className="h-5 w-5 text-brand-violet" />

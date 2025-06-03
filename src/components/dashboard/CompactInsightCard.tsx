@@ -63,7 +63,7 @@ export const CompactInsightCard: React.FC<CompactInsightCardProps> = ({
   };
 
   return (
-    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border border-[#d8d4ff] rounded-xl p-6 shadow-sm border-l-4 transition-all hover:shadow-md">
+    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl p-6 shadow-sm border-l-4 transition-all hover:shadow-md">
       <CardContent className="p-0">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3 flex-1 min-w-0">

@@ -64,7 +64,7 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
   };
 
   return (
-    <Card className="p-8">
+    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl shadow-sm p-8">
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         {/* Avatar Section */}
         <div className="flex-shrink-0">
