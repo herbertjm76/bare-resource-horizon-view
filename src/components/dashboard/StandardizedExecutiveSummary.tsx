@@ -124,12 +124,12 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
               <CardContent className="p-2">
                 <div className="text-center">
                   {/* Title using standardized typography */}
-                  <Typography variant="body-sm" className="font-semibold text-white/90">
+                  <Typography variant="body-sm" className="font-semibold text-black/90">
                     {metric.title}
                   </Typography>
                   
                   {/* Value - now bold and extra large */}
-                  <div className="text-4xl font-bold text-white">
+                  <div className="text-4xl font-bold text-black">
                     {metric.value}
                   </div>
                   
