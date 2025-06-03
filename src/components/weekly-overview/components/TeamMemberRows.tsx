@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MemberTableRow } from '../MemberTableRow';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Project, MemberAllocation } from '../types';

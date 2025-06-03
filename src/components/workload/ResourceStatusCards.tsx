@@ -38,6 +38,12 @@ export const ResourceStatusCards: React.FC<ResourceStatusCardsProps> = ({
   const needsResourcing = memberStatus.filter(m => m.utilization < 60);
   const overloaded = memberStatus.filter(m => m.utilization > 100);
 
+  const getUserInitials = (member: TeamMember) => {
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
   const renderMemberAvatars = (memberList: typeof memberStatus, maxShow: number = 6) => {
     const membersToShow = memberList.slice(0, maxShow);
     const remainingCount = memberList.length - maxShow;
@@ -47,8 +53,9 @@ export const ResourceStatusCards: React.FC<ResourceStatusCardsProps> = ({
         <div className="flex gap-1">
           {membersToShow.map(({ member }) => (
             <Avatar key={member.id} className="h-8 w-8">
-              <AvatarFallback className="text-xs bg-gray-300 text-gray-700">
-                {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
+              <AvatarImage src={member.avatar_url || undefined} alt={`${member.first_name} ${member.last_name}`} />
+              <AvatarFallback className="bg-brand-violet text-white text-xs">
+                {getUserInitials(member)}
               </AvatarFallback>
             </Avatar>
           ))}

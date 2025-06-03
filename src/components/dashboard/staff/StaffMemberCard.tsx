@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { StaffMemberCardProps } from './types';
 
 export const StaffMemberCard: React.FC<StaffMemberCardProps & { onClick?: () => void }> = ({ 
@@ -40,6 +41,13 @@ export const StaffMemberCard: React.FC<StaffMemberCardProps & { onClick?: () => 
     }
   };
 
+  // Helper to get user initials
+  const getUserInitials = (): string => {
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
   const colors = getColorClasses();
 
   return (
@@ -48,7 +56,12 @@ export const StaffMemberCard: React.FC<StaffMemberCardProps & { onClick?: () => 
       onClick={onClick}
     >
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0" />
+        <Avatar className="h-8 w-8">
+          <AvatarImage src={member.avatar_url || undefined} alt={member.name} />
+          <AvatarFallback className="bg-brand-violet text-white text-xs">
+            {getUserInitials()}
+          </AvatarFallback>
+        </Avatar>
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-center mb-1">
             <span className="font-medium text-sm text-gray-800 truncate">

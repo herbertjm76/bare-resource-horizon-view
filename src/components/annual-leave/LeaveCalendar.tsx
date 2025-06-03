@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TeamMember } from '@/components/dashboard/types';
 import { format, getDaysInMonth, startOfMonth, getDay } from 'date-fns';
 import { Input } from '@/components/ui/input';
@@ -39,6 +40,13 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
   const handleLeaveChange = (memberId: string, date: string, value: string) => {
     const hours = parseFloat(value) || 0;
     onLeaveChange(memberId, date, hours);
+  };
+
+  // Helper to get user initials
+  const getUserInitials = (member: TeamMember): string => {
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
   return (
@@ -87,9 +95,12 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 >
                   <td className="sticky-left-0 bg-inherit border-r-2 border-gray-200">
                     <div className="flex items-center gap-3 p-2">
-                      <div className="flex items-center justify-center h-8 w-8 rounded-full bg-gray-300 text-gray-700 text-xs font-semibold">
-                        {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
-                      </div>
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={member.avatar_url || undefined} alt={`${member.first_name} ${member.last_name}`} />
+                        <AvatarFallback className="bg-brand-violet text-white text-xs">
+                          {getUserInitials(member)}
+                        </AvatarFallback>
+                      </Avatar>
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium text-gray-900 truncate">
                           {member.first_name} {member.last_name}
