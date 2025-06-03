@@ -12,8 +12,8 @@ export const GridTableWrapper: React.FC<GridTableWrapperProps> = ({ children }) 
       <div 
         className="overflow-x-auto overflow-y-visible"
         style={{
-          width: 'calc(100vw - 20rem)',
-          maxWidth: 'calc(100vw - 20rem)'
+          width: 'calc(100vw - 19rem)',
+          maxWidth: 'calc(100vw - 19rem)'
         }}
       >
         <div className="enhanced-grid-container">
