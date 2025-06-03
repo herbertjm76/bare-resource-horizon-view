@@ -4,6 +4,7 @@ import { ModernResourcesHeader } from '@/components/resources/ModernResourcesHea
 import { EnhancedResourceGrid } from '@/components/resources/EnhancedResourceGrid';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 import { ProjectResourcingFilters } from './ProjectResourcingFilters';
+import { ProjectResourcingFilterRow } from './ProjectResourcingFilterRow';
 
 interface ProjectResourcingContentProps {
   selectedMonth: Date;
@@ -66,6 +67,17 @@ export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> =
   return (
     <div className="flex flex-col max-w-full bg-gradient-to-br from-gray-50 to-white min-h-screen">
       <OfficeSettingsProvider>
+        {/* Filter Row positioned below key metrics */}
+        <ProjectResourcingFilterRow
+          selectedDate={selectedMonth}
+          onDateChange={onMonthChange}
+          periodToShow={filters.periodToShow}
+          onPeriodChange={onPeriodChange}
+          filterContent={filterContent}
+          activeFiltersCount={activeFiltersCount}
+          onClearFilters={onClearFilters}
+        />
+        
         <div className="mt-6 w-full max-w-full overflow-hidden">
           <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
             <EnhancedResourceGrid 
