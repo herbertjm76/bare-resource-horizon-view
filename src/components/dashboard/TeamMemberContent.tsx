@@ -20,6 +20,11 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
 }) => {
   const { searchQuery, setSearchQuery, filteredMembers } = useTeamFilters(teamMembers);
 
+  // Filter to only include active members (Profile objects) for TeamManagement
+  const activeMembers = filteredMembers.filter((member): member is Profile => 
+    !('isPending' in member)
+  );
+
   if (isProfileLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -46,7 +51,7 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
 
       {/* Team Management */}
       <TeamManagement
-        teamMembers={filteredMembers}
+        teamMembers={activeMembers}
         inviteUrl="" // This will be handled internally by TeamManagement
         userRole={userProfile.role}
         onRefresh={onRefresh}
