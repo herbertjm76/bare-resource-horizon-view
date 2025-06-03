@@ -11,13 +11,13 @@ export const OfficeOverviewCard = () => {
   const { locations } = useOfficeSettings();
 
   return (
-    <div 
-      className="rounded-3xl p-5 bg-white/20 backdrop-blur-md border border-white/30 shadow-elevation-2 transition-all duration-300 hover:bg-white/25 hover:shadow-elevation-3"
-      style={{
-        background: 'linear-gradient(to right, #eef2ff, #fdf2ff)',
-      }}
-    >
-      <div className="p-4">
+    <div className="bg-white rounded-3xl border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+      <div 
+        className="p-4"
+        style={{
+          background: 'linear-gradient(to right, #eef2ff, #fdf2ff)',
+        }}
+      >
         <div className="grid grid-cols-4 gap-4 h-64">
           {/* Logo and Company Info Section - 1/4 width */}
           <div className="col-span-1 flex flex-col justify-center space-y-3">
