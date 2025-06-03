@@ -100,42 +100,40 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
 
   console.log('Rendering compact mobile-responsive format');
   return (
-    <Card className="w-full bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[2px] border-[#d8d4ff] rounded-lg shadow-sm">
-      <CardContent className="p-3 sm:p-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {metrics.map((metric, index) => {
-            const badge = getDefaultBadge(metric, index);
-            
-            return (
-              <div key={index} className="min-w-0">
-                <Card className="bg-white border border-gray-200 rounded-lg transition-all duration-300 hover:shadow-md h-full">
-                  <CardContent className="p-3 sm:p-4">
-                    <div className="text-center space-y-2">
-                      {/* Title - compact size */}
-                      <Typography variant="body-sm" className="font-medium text-gray-800 text-xs sm:text-sm leading-tight">
-                        {metric.title}
-                      </Typography>
-                      
-                      {/* Value - compact but readable */}
-                      <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-none">
-                        {metric.value}
-                      </div>
-                      
-                      {/* Colored status pill */}
-                      <Badge 
-                        variant={getBadgeVariant(badge.color)} 
-                        className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-2 py-1`}
-                      >
-                        {badge.text}
-                      </Badge>
+    <div className="w-full bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-purple-100/50 shadow-sm">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        {metrics.map((metric, index) => {
+          const badge = getDefaultBadge(metric, index);
+          
+          return (
+            <div key={index} className="min-w-0">
+              <Card className="bg-white border border-gray-100 rounded-xl transition-all duration-300 hover:shadow-md h-full shadow-sm">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="text-center space-y-2">
+                    {/* Title - compact size */}
+                    <Typography variant="body-sm" className="font-medium text-gray-700 text-xs sm:text-sm leading-tight">
+                      {metric.title}
+                    </Typography>
+                    
+                    {/* Value - compact but readable */}
+                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-none">
+                      {metric.value}
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
+                    
+                    {/* Colored status pill */}
+                    <Badge 
+                      variant={getBadgeVariant(badge.color)} 
+                      className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-2 py-1`}
+                    >
+                      {badge.text}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 };
