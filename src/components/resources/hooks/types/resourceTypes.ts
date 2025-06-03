@@ -9,3 +9,13 @@ export interface Resource {
   first_name?: string;
   last_name?: string;
 }
+
+export interface AllocationRecord {
+  resourceId: string;
+  weekKey: string;
+  hours: number;
+}
+
+// Use a flat structure with simple string keys to avoid excessive type nesting
+// The key format will be `${resourceId}:${weekKey}`
+export type ProjectAllocations = Record<string, number>;

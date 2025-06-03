@@ -43,7 +43,7 @@ export const useProjects = () => {
             current_stage,
             stages,
             currency,
-            project_manager:profiles(id, first_name, last_name),
+            project_manager:profiles(id, first_name, last_name, avatar_url),
             office:offices(id, name, country)
           `)
           .eq('company_id', company.id);
