@@ -102,7 +102,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   // Simple format with new styling
   console.log('Rendering simple format');
   return (
-    <div className="bg-white rounded-3xl border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+    <div className="bg-white rounded-3xl border border-gray-300 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
       <div 
         className="p-5"
         style={{

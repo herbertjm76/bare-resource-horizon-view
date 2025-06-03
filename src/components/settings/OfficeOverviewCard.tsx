@@ -11,7 +11,7 @@ export const OfficeOverviewCard = () => {
   const { locations } = useOfficeSettings();
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-200/60 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+    <div className="bg-white rounded-3xl border border-gray-300 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
       <div 
         className="p-4"
         style={{
