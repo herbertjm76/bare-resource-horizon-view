@@ -1,5 +1,7 @@
+
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CapacityIndicator } from './components/CapacityIndicator';
 import { Project, MemberAllocation } from './types';
 
@@ -24,6 +26,23 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
     membersByOffice[office]?.map(member => ({ ...member, office })) || []
   );
 
+  // Helper to get user initials
+  const getUserInitials = (member: any): string => {
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (member: any): string | undefined => {
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
+  // Helper to get member display name
+  const getMemberDisplayName = (member: any): string => {
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim();
+  };
+
   return (
     <>
       {allMembers.map((member, memberIndex) => {
@@ -46,10 +65,18 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
             key={`${member.id}-${member.office}`}
             className={`text-xs border-b ${isEvenRow ? 'bg-white' : 'bg-gray-50/50'}`}
           >
-            {/* Name column */}
+            {/* Name column with avatar */}
             <TableCell className="name-column font-medium text-left p-2 border-r">
-              <div className="truncate" title={member.name}>
-                {member.name}
+              <div className="flex items-center gap-2">
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
+                  <AvatarFallback className="bg-brand-violet text-white text-xs">
+                    {getUserInitials(member)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="truncate" title={member.name}>
+                  {member.name}
+                </div>
               </div>
             </TableCell>
             
