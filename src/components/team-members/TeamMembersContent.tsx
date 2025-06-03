@@ -138,14 +138,14 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
   }, []);
 
   return (
-    <div className="flex-1 p-2 sm:p-4 lg:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
-      <div className="max-w-full lg:max-w-6xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
+    <div className="flex-1 p-4 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
+      <div className="max-w-6xl mx-auto space-y-8">
         {/* Modern Header Section */}
-        <div className="space-y-4 sm:space-y-6 mb-4 sm:mb-6">
-          <div className="flex flex-col gap-4 sm:gap-6">
+        <div className="space-y-6 mb-6">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-2 sm:gap-3">
-                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-brand-violet" />
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                <Users className="h-8 w-8 text-brand-violet" />
                 Team Members
               </h1>
             </div>

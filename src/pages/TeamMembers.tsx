@@ -10,7 +10,7 @@ import { TeamMembersLoadingState } from '@/components/team-members/TeamMembersLo
 import { TeamMembersPermissionError } from '@/components/team-members/TeamMembersPermissionError';
 import AuthGuard from '@/components/AuthGuard';
 
-const HEADER_HEIGHT = 64;
+const HEADER_HEIGHT = 56;
 
 const TeamMembersPageContent = () => {
   const userId = useUserSession();
@@ -79,18 +79,13 @@ const TeamMembersPage = () => {
     <AuthGuard>
       <SidebarProvider>
         <div className="w-full min-h-screen flex flex-row bg-gradient-to-br from-gray-50 to-white">
-          {/* Desktop Sidebar */}
-          <div className="hidden sm:block flex-shrink-0">
+          <div className="flex-shrink-0">
             <DashboardSidebar />
           </div>
-          
-          {/* Main Content Area */}
-          <div className="flex-1 flex flex-col min-w-0">
+          <div className="flex-1 flex flex-col">
             <AppHeader />
             <div style={{ height: HEADER_HEIGHT }} />
-            <div className="flex-1 overflow-hidden">
-              <TeamMembersPageContent />
-            </div>
+            <TeamMembersPageContent />
           </div>
         </div>
       </SidebarProvider>
