@@ -44,7 +44,7 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
 
   // Helper to get avatar URL safely
   const getAvatarUrl = (): string | undefined => {
-    return 'avatar_url' in resource ? resource.avatar_url || undefined : undefined;
+    return resource.avatar_url || undefined;
   };
 
   return (

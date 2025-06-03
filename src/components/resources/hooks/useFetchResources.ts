@@ -22,14 +22,14 @@ export const useFetchResources = (projectId: string) => {
     try {
       console.log('Fetching resources for project:', projectId, 'company:', company.id);
       
-      // Fetch active members assigned to this project
+      // Fetch active members assigned to this project with avatar URLs
       const { data: activeMembers, error: activeError } = await supabase
         .from('project_resources')
         .select(`
           id, 
           hours,
           staff_id,
-          staff:profiles(id, first_name, last_name, job_title)
+          staff:profiles(id, first_name, last_name, job_title, avatar_url)
         `)
         .eq('project_id', projectId)
         .eq('company_id', company.id);
@@ -66,6 +66,9 @@ export const useFetchResources = (projectId: string) => {
         name: `${member.staff?.first_name || ''} ${member.staff?.last_name || ''}`.trim() || 'Unnamed',
         role: member.staff?.job_title || 'Team Member',
         isPending: false,
+        avatar_url: member.staff?.avatar_url,
+        first_name: member.staff?.first_name,
+        last_name: member.staff?.last_name,
       }));
       
       const pendingResources: Resource[] = (preRegisteredMembers || []).map(member => ({
@@ -73,6 +76,8 @@ export const useFetchResources = (projectId: string) => {
         name: `${member.invite?.first_name || ''} ${member.invite?.last_name || ''}`.trim() || 'Unnamed',
         role: member.invite?.job_title || 'Team Member',
         isPending: true,
+        first_name: member.invite?.first_name,
+        last_name: member.invite?.last_name,
       }));
       
       // Combine resources

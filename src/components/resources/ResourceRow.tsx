@@ -23,6 +23,9 @@ interface ResourceRowProps {
     role: string;
     allocations?: Record<string, number>;
     isPending?: boolean;
+    avatar_url?: string;
+    first_name?: string;
+    last_name?: string;
   };
   days: DayInfo[];
   projectId: string;
