@@ -67,7 +67,7 @@ export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> =
   return (
     <div className="flex flex-col max-w-full bg-gradient-to-br from-gray-50 to-white min-h-screen">
       <OfficeSettingsProvider>
-        <div className="w-full max-w-full overflow-hidden space-y-4">
+        <div className="w-full max-w-full overflow-hidden space-y-0">
           {/* Enhanced Resource Grid with built-in controls */}
           <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
             <EnhancedResourceGrid 
@@ -81,16 +81,18 @@ export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> =
             />
           </div>
           
-          {/* Filter Row positioned below the grid controls */}
-          <ProjectResourcingFilterRow
-            selectedDate={selectedMonth}
-            onDateChange={onMonthChange}
-            periodToShow={filters.periodToShow}
-            onPeriodChange={onPeriodChange}
-            filterContent={filterContent}
-            activeFiltersCount={activeFiltersCount}
-            onClearFilters={onClearFilters}
-          />
+          {/* Filter Row positioned between grid controls and table with visual separation */}
+          <div className="border-t border-gray-200 pt-4">
+            <ProjectResourcingFilterRow
+              selectedDate={selectedMonth}
+              onDateChange={onMonthChange}
+              periodToShow={filters.periodToShow}
+              onPeriodChange={onPeriodChange}
+              filterContent={filterContent}
+              activeFiltersCount={activeFiltersCount}
+              onClearFilters={onClearFilters}
+            />
+          </div>
         </div>
       </OfficeSettingsProvider>
     </div>

@@ -50,14 +50,14 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
   ];
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-6 items-start sm:items-center bg-white p-6 rounded-lg shadow-sm border">
+    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-white p-4 rounded-lg shadow-sm border border-gray-200 mx-4 mb-4">
       {/* Left section: Month selector with navigation */}
       <div className="flex border rounded-lg p-2 items-center shadow-sm bg-gray-50/50">
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={handlePreviousMonth} 
-          className="h-8 w-8 p-0 hover:bg-white"
+          className="h-7 w-7 p-0 hover:bg-white"
         >
           <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Previous month</span>
@@ -65,8 +65,8 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
         
         <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
           <PopoverTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2 px-4 hover:bg-white">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Button variant="ghost" className="flex items-center gap-2 px-3 py-1 h-7 hover:bg-white">
+              <Calendar className="h-3 w-3 text-muted-foreground" />
               <span className="text-sm font-medium min-w-[120px] text-left">{monthLabel}</span>
             </Button>
           </PopoverTrigger>
@@ -90,29 +90,29 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
           variant="ghost" 
           size="sm" 
           onClick={handleNextMonth}
-          className="h-8 w-8 p-0 hover:bg-white"
+          className="h-7 w-7 p-0 hover:bg-white"
         >
           <ChevronRight className="h-4 w-4" />
           <span className="sr-only">Next month</span>
         </Button>
       </div>
       
-      {/* Middle section: Period selector with improved spacing */}
+      {/* Middle section: Period selector with compact design */}
       <div className="flex items-center gap-3">
         <span className="text-sm text-muted-foreground font-medium">View:</span>
         <Select 
           value={periodToShow.toString()}
           onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
         >
-          <SelectTrigger className="w-[160px] bg-white border-gray-200 shadow-sm">
+          <SelectTrigger className="w-[140px] h-8 bg-white border-gray-200 shadow-sm text-sm">
             <SelectValue placeholder="Select period" />
           </SelectTrigger>
-          <SelectContent className="bg-white border border-gray-200 shadow-lg">
+          <SelectContent className="bg-white border border-gray-200 shadow-lg min-w-[140px]">
             {periodOptions.map((option) => (
               <SelectItem 
                 key={option.value} 
                 value={option.value}
-                className="hover:bg-gray-50 focus:bg-gray-50"
+                className="hover:bg-gray-50 focus:bg-gray-50 py-1.5 text-sm"
               >
                 {option.label}
               </SelectItem>
@@ -128,12 +128,12 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
             <Button 
               variant="outline" 
               size="sm"
-              className="flex items-center gap-2 bg-white border-gray-200 shadow-sm hover:bg-gray-50"
+              className="flex items-center gap-2 h-8 bg-white border-gray-200 shadow-sm hover:bg-gray-50 text-sm"
             >
-              <Filter className="h-4 w-4" />
+              <Filter className="h-3 w-3" />
               <span>Filters</span>
               {activeFiltersCount > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-brand-violet/10 text-brand-violet border-0">
+                <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs bg-brand-violet/10 text-brand-violet border-0">
                   {activeFiltersCount}
                 </Badge>
               )}
@@ -150,7 +150,7 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
             variant="ghost" 
             size="sm"
             onClick={onClearFilters}
-            className="text-muted-foreground hover:text-foreground hover:bg-gray-50"
+            className="h-8 text-sm text-muted-foreground hover:text-foreground hover:bg-gray-50"
           >
             Clear all
           </Button>
