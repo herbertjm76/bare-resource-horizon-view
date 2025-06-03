@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 
 interface WeekResourceSummaryProps {
@@ -56,6 +56,23 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     return memberUtilization > 100;
   });
 
+  // Helper to get user initials
+  const getUserInitials = (member: any): string => {
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (member: any): string | undefined => {
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
+  // Helper to get member display name
+  const getMemberDisplayName = (member: any): string => {
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim();
+  };
+
   const renderMemberAvatars = (memberList: any[], maxShow: number = 6) => {
     const membersToShow = memberList.slice(0, maxShow);
     const remainingCount = memberList.length - maxShow;
@@ -65,8 +82,9 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
         <div className="flex gap-1">
           {membersToShow.map((member) => (
             <Avatar key={member.id} className="h-6 w-6">
-              <AvatarFallback className="text-xs bg-gray-300 text-gray-700">
-                {member.first_name?.charAt(0) || '?'}{member.last_name?.charAt(0) || '?'}
+              <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
+              <AvatarFallback className="bg-brand-violet text-white text-xs">
+                {getUserInitials(member)}
               </AvatarFallback>
             </Avatar>
           ))}
