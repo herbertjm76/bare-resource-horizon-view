@@ -34,7 +34,7 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
 
   if (insights.length === 0) {
     return (
-      <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
+      <Card className="h-[400px] flex flex-col">
         <CardHeader className="flex-shrink-0 p-6">
           <CardTitle className="text-lg flex items-center gap-2">
             <Brain className="h-5 w-5 text-brand-violet" />
@@ -49,7 +49,7 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
   }
 
   return (
-    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl shadow-sm h-[400px] flex flex-col">
+    <Card className="h-[400px] flex flex-col">
       <CardHeader className="flex-shrink-0 p-6">
         <CardTitle className="text-lg flex items-center gap-2">
           <Brain className="h-5 w-5 text-brand-violet" />
