@@ -187,10 +187,10 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
         </div>
       </div>
 
-      {/* Mobile Card View */}
-      <div className="block sm:hidden space-y-3">
+      {/* Mobile Simple List View */}
+      <div className="block sm:hidden">
         {editMode && ['owner', 'admin'].includes(userRole) && (
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg mb-3">
             <label className="text-sm font-medium text-gray-700">Select All</label>
             <Checkbox
               checked={selectedMembers.length === teamMembers.length && teamMembers.length > 0}
@@ -199,12 +199,15 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
           </div>
         )}
         
-        {teamMembers.map((member) => (
-          <div key={member.id} className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
-            {/* Header with Avatar and Selection */}
-            <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          {teamMembers.map((member) => (
+            <div 
+              key={member.id} 
+              className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+              onClick={() => !editMode && handleViewMember(member.id)}
+            >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <Avatar className="h-12 w-12 flex-shrink-0">
+                <Avatar className="h-10 w-10 flex-shrink-0">
                   <AvatarImage src={getAvatarUrl(member)} />
                   <AvatarFallback className="bg-brand-violet text-white text-sm">
                     {getUserInitials(member)}
@@ -214,90 +217,43 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
                   <div className="font-medium text-gray-900 text-base truncate">
                     {`${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed'}
                   </div>
-                  <div className="text-sm text-gray-500 flex items-center gap-1">
-                    <Mail className="h-3 w-3 flex-shrink-0" />
-                    <span className="truncate">{member.email}</span>
-                  </div>
                 </div>
               </div>
               
               {editMode && ['owner', 'admin'].includes(userRole) && (
-                <Checkbox
-                  checked={selectedMembers.includes(member.id)}
-                  onCheckedChange={(checked) => handleSelectMember(member.id, checked as boolean)}
-                />
-              )}
-            </div>
-
-            {/* Member Details */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Role</span>
-                <Badge className={`${getRoleBadgeColor(member.role)} border text-xs`}>
-                  {member.role?.charAt(0).toUpperCase() + member.role?.slice(1) || 'Member'}
-                </Badge>
-              </div>
-              
-              {member.department && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 flex items-center gap-1">
-                    <Briefcase className="h-3 w-3" />
-                    Department
-                  </span>
-                  <span className="text-sm text-gray-900 truncate max-w-32">
-                    {member.department}
-                  </span>
-                </div>
-              )}
-              
-              {member.location && (
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600 flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    Location
-                  </span>
-                  <span className="text-sm text-gray-900 truncate max-w-32">
-                    {member.location}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleViewMember(member.id)}
-                className="flex-1 text-blue-600 border-blue-200 hover:bg-blue-50"
-              >
-                <Eye className="h-4 w-4 mr-1" />
-                View Details
-              </Button>
-              
-              {editMode && ['owner', 'admin'].includes(userRole) && (
-                <>
+                <div className="flex items-center gap-2">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    onClick={() => onEditMember(member)}
-                    className="text-gray-600 border-gray-200 hover:bg-gray-50 px-3"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditMember(member);
+                    }}
+                    className="text-gray-600 hover:text-gray-700 hover:bg-gray-50 px-2"
                   >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    onClick={() => onDeleteMember(member.id)}
-                    className="text-red-600 border-red-200 hover:bg-red-50 px-3"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteMember(member.id);
+                    }}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 px-2"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </>
+                  <Checkbox
+                    checked={selectedMembers.includes(member.id)}
+                    onCheckedChange={(checked) => handleSelectMember(member.id, checked as boolean)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
               )}
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
