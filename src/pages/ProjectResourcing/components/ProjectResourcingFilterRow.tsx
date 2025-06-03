@@ -173,8 +173,8 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
         </Button>
       </div>
       
-      {/* Right section: Filter controls */}
-      <div className="flex items-center gap-3 sm:ml-auto">
+      {/* Filter controls */}
+      <div className="flex items-center gap-3">
         <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
           <PopoverTrigger asChild>
             <Button 
