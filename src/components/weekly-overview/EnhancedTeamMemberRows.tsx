@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Project, MemberAllocation } from './types';
 
@@ -22,6 +22,23 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
   handleInputChange,
   projects
 }) => {
+  // Helper to get user initials
+  const getUserInitials = (member: any): string => {
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (member: any): string | undefined => {
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
+  // Helper to get member display name
+  const getMemberDisplayName = (member: any): string => {
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim();
+  };
+
   return (
     <>
       {filteredOffices.map((office) => {
@@ -56,13 +73,21 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                 <TableRow key={member.id} className={`member-row ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
                   {/* Member Name */}
                   <TableCell className="sticky left-0 z-10 bg-inherit">
-                    <div className="flex flex-col">
-                      <span className="font-medium text-sm">
-                        {member.first_name} {member.last_name}
-                      </span>
-                      <span className="text-xs text-gray-500">
-                        {member.department || 'N/A'}
-                      </span>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
+                        <AvatarFallback className="bg-brand-violet text-white text-xs">
+                          {getUserInitials(member)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-sm">
+                          {member.first_name} {member.last_name}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {member.department || 'N/A'}
+                        </span>
+                      </div>
                     </div>
                   </TableCell>
 
