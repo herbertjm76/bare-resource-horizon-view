@@ -64,66 +64,57 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
   };
 
   return (
-    <Card className="overflow-hidden">
-      <div className="bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400 p-8 text-black relative rounded-2xl">
-        {/* Decorative background elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50 rounded-2xl"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
-        
-        <div className="p-0 relative z-10">
-          <div className="flex flex-col lg:flex-row gap-8 items-start">
-            {/* Avatar Section */}
-            <div className="flex-shrink-0">
-              <AvatarUpload
-                currentAvatarUrl={profile.avatar_url}
-                userId={profile.id}
-                onAvatarUpdate={handleAvatarUpdate}
-                userInitials={getUserInitials()}
+    <Card className="p-8">
+      <div className="flex flex-col lg:flex-row gap-8 items-start">
+        {/* Avatar Section */}
+        <div className="flex-shrink-0">
+          <AvatarUpload
+            currentAvatarUrl={profile.avatar_url}
+            userId={profile.id}
+            onAvatarUpdate={handleAvatarUpdate}
+            userInitials={getUserInitials()}
+          />
+        </div>
+
+        {/* Profile Info Section */}
+        <div className="flex-1 space-y-6">
+          {/* Name and Title Section */}
+          <div className="space-y-3">
+            {isEditing ? (
+              <EditableProfileSection
+                editedProfile={editedProfile}
+                saving={saving}
+                onEditChange={handleEditChange}
+                onSave={handleSave}
+                onCancel={handleCancel}
               />
-            </div>
-
-            {/* Profile Info Section */}
-            <div className="flex-1 space-y-6">
-              {/* Name and Title Section */}
-              <div className="space-y-3">
-                {isEditing ? (
-                  <EditableProfileSection
-                    editedProfile={editedProfile}
-                    saving={saving}
-                    onEditChange={handleEditChange}
-                    onSave={handleSave}
-                    onCancel={handleCancel}
-                  />
-                ) : (
-                  <ProfileDisplaySection
-                    profile={profile}
-                    onEdit={() => setIsEditing(true)}
-                  />
-                )}
-                
-                {/* Contact Info - Only show when not editing */}
-                {!isEditing && (
-                  <ProfileContactInfo profile={profile} />
-                )}
-              </div>
-
-              {/* Bio Section - Only show when not editing */}
-              {!isEditing && profile.bio && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-black/80 uppercase tracking-wide">About Me</h3>
-                  <p className="text-black/90 text-sm leading-relaxed max-w-2xl">
-                    {profile.bio}
-                  </p>
-                </div>
-              )}
-
-              {/* Personal Info Summary - Only show when not editing */}
-              {!isEditing && (
-                <ProfileStats profile={profile} />
-              )}
-            </div>
+            ) : (
+              <ProfileDisplaySection
+                profile={profile}
+                onEdit={() => setIsEditing(true)}
+              />
+            )}
+            
+            {/* Contact Info - Only show when not editing */}
+            {!isEditing && (
+              <ProfileContactInfo profile={profile} />
+            )}
           </div>
+
+          {/* Bio Section - Only show when not editing */}
+          {!isEditing && profile.bio && (
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-gray-600 uppercase tracking-wide">About Me</h3>
+              <p className="text-gray-700 text-sm leading-relaxed max-w-2xl">
+                {profile.bio}
+              </p>
+            </div>
+          )}
+
+          {/* Personal Info Summary - Only show when not editing */}
+          {!isEditing && (
+            <ProfileStats profile={profile} />
+          )}
         </div>
       </div>
     </Card>

@@ -12,34 +12,27 @@ export const OfficeOverviewCard = () => {
   const { locations } = useOfficeSettings();
 
   return (
-    <Card className="hover:shadow-md transition-all duration-300 overflow-hidden">
-      <div 
-        className="p-4"
-        style={{
-          background: 'linear-gradient(to right, #eef2ff, #fdf2ff)',
-        }}
-      >
-        <div className="grid grid-cols-4 gap-4 h-64">
-          {/* Logo and Company Info Section - 1/4 width */}
-          <div className="col-span-1 flex flex-col justify-center space-y-3">
-            <div className="flex flex-col items-center space-y-3">
-              <CompanyLogoSection
-                company={company}
-                onLogoUpdate={refreshCompany}
-              />
-              <CompanyInfoDisplay
-                company={company}
-                locations={locations}
-              />
-            </div>
+    <Card className="p-4">
+      <div className="grid grid-cols-4 gap-4 h-64">
+        {/* Logo and Company Info Section - 1/4 width */}
+        <div className="col-span-1 flex flex-col justify-center space-y-3">
+          <div className="flex flex-col items-center space-y-3">
+            <CompanyLogoSection
+              company={company}
+              onLogoUpdate={refreshCompany}
+            />
+            <CompanyInfoDisplay
+              company={company}
+              locations={locations}
+            />
           </div>
-
-          {/* Map Section - 3/4 width */}
-          <OfficeMapSection
-            locations={locations}
-            company={company}
-          />
         </div>
+
+        {/* Map Section - 3/4 width */}
+        <OfficeMapSection
+          locations={locations}
+          company={company}
+        />
       </div>
     </Card>
   );
