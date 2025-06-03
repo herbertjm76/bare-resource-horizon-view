@@ -49,6 +49,16 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (member: TeamMember): string | undefined => {
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
+  // Helper to get member display name
+  const getMemberDisplayName = (member: TeamMember): string => {
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim();
+  };
+
   return (
     <div className="annual-leave-grid-container">
       <div className="enhanced-table-container">
@@ -96,7 +106,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                   <td className="sticky-left-0 bg-inherit border-r-2 border-gray-200">
                     <div className="flex items-center gap-3 p-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={member.avatar_url || undefined} alt={`${member.first_name} ${member.last_name}`} />
+                        <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
                         <AvatarFallback className="bg-brand-violet text-white text-xs">
                           {getUserInitials(member)}
                         </AvatarFallback>
