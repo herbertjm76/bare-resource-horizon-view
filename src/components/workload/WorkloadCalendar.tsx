@@ -65,7 +65,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
       <div className="workload-grid-container">
         <Table className="enhanced-table workload-calendar">
           <TableHeader>
-            <TableRow className="h-8">
+            <TableRow className="h-6">
               <TableHead className="sticky left-0 z-20 bg-inherit min-w-[180px] p-0">
                 <div className="px-2 py-1">Team Member</div>
               </TableHead>
@@ -73,7 +73,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
               {dateRange.map((date) => (
                 <TableHead 
                   key={date.toISOString()} 
-                  className={`text-center min-w-[50px] p-0 ${isSunday(date) ? 'sunday-border' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
+                  className={`text-center min-w-[40px] max-w-[40px] p-0 ${isSunday(date) ? 'sunday-border' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
                 >
                   <div className="flex flex-col items-center px-1 py-1">
                     <span className={`text-xs font-medium ${isToday(date) ? 'text-black font-bold' : 'text-white'}`}>
@@ -108,7 +108,7 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
               const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / (weeklyCapacity * periodToShow)) * 100) : 0;
               
               return (
-                <TableRow key={member.id} className={`member-row h-8 ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
+                <TableRow key={member.id} className={`member-row h-7 ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
                   <TableCell className="sticky left-0 z-10 bg-inherit p-0">
                     <div className="flex items-center gap-2 px-2 py-1">
                       <Avatar className="h-6 w-6">
@@ -135,15 +135,16 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                         className={`text-center p-0 ${
                           isSunday(date) ? 'sunday-border' : ''
                         } ${isWeekend ? 'weekend' : ''} ${isToday(date) ? 'bg-blue-100' : ''}`}
+                        style={{ maxWidth: '40px', width: '40px' }}
                       >
-                        <div className="px-1 py-1 flex justify-center">
+                        <div className="px-0.5 py-0.5 flex justify-center">
                           {dayHours > 0 && dayData && (
                             <WorkloadTooltip
                               breakdown={dayData}
                               memberName={`${member.first_name} ${member.last_name}`}
                               date={format(date, 'MMM d, yyyy')}
                             >
-                              <div className={`workload-pill text-xs font-medium px-2 py-0.5 rounded-full cursor-help ${getWorkloadPillClass(dayHours, dailyCapacity)}`}>
+                              <div className={`workload-pill text-xs font-semibold px-1.5 py-0.5 rounded-full cursor-help ${getWorkloadPillClass(dayHours, dailyCapacity)}`}>
                                 {dayHours}
                               </div>
                             </WorkloadTooltip>

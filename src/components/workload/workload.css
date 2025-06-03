@@ -1,3 +1,4 @@
+
 /* Additional workload specific styles */
 .workload-header {
   background-color: #D2C6FB;
@@ -16,6 +17,19 @@
 
 .workload-low {
   background-color: rgba(111, 75, 246, 0.3) !important;
+}
+
+/* Enhanced workload pill styling */
+.workload-pill {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  min-width: 24px;
+  transition: all 0.15s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.workload-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.25);
 }
 
 /* Cell hover effect for workload */
