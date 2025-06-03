@@ -1,21 +1,41 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Calendar, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, Filter, Expand, Shrink } from 'lucide-react';
 import { format, addMonths, subMonths, startOfMonth } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ProjectResourcingFilters } from './ProjectResourcingFilters';
 
 interface ProjectResourcingFilterRowProps {
   selectedDate: Date;
   onDateChange: (date: Date) => void;
   periodToShow: number;
   onPeriodChange: (period: number) => void;
-  filterContent: React.ReactNode;
+  filters: {
+    office: string;
+    country: string;
+    manager: string;
+    periodToShow: number;
+  };
+  searchTerm: string;
+  onFilterChange: (key: string, value: string) => void;
+  onSearchChange: (value: string) => void;
+  officeOptions: string[];
+  countryOptions: string[];
+  managers: Array<{id: string, name: string}>;
   activeFiltersCount: number;
+  displayOptions: {
+    showWeekends: boolean;
+    selectedDays: string[];
+    weekStartsOnSunday: boolean;
+  };
+  onDisplayOptionChange: (option: string, value: boolean | string[]) => void;
   onClearFilters: () => void;
+  onExpandAll: () => void;
+  onCollapseAll: () => void;
 }
 
 export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProps> = ({
@@ -23,9 +43,19 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
   onDateChange,
   periodToShow,
   onPeriodChange,
-  filterContent,
+  filters,
+  searchTerm,
+  onFilterChange,
+  onSearchChange,
+  officeOptions,
+  countryOptions,
+  managers,
   activeFiltersCount,
-  onClearFilters
+  displayOptions,
+  onDisplayOptionChange,
+  onClearFilters,
+  onExpandAll,
+  onCollapseAll
 }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -121,6 +151,28 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
         </Select>
       </div>
       
+      {/* Expand/Collapse controls */}
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onExpandAll}
+          className="h-8 text-sm"
+        >
+          <Expand className="h-3 w-3 mr-2" />
+          Expand All
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onCollapseAll}
+          className="h-8 text-sm"
+        >
+          <Shrink className="h-3 w-3 mr-2" />
+          Collapse All
+        </Button>
+      </div>
+      
       {/* Right section: Filter controls */}
       <div className="flex items-center gap-3 ml-auto">
         <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
@@ -140,7 +192,19 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80 bg-white border border-gray-200 shadow-lg" align="end">
-            {filterContent}
+            <ProjectResourcingFilters
+              filters={filters}
+              searchTerm={searchTerm}
+              onFilterChange={onFilterChange}
+              onPeriodChange={onPeriodChange}
+              onSearchChange={onSearchChange}
+              officeOptions={officeOptions}
+              countryOptions={countryOptions}
+              managers={managers}
+              activeFiltersCount={activeFiltersCount}
+              displayOptions={displayOptions}
+              onDisplayOptionChange={onDisplayOptionChange}
+            />
           </PopoverContent>
         </Popover>
         

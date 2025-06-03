@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
-import { ProjectResourcingFilters } from './ProjectResourcingFilters';
+import { ProjectResourcingHeader } from './ProjectResourcingHeader';
 import { ProjectResourcingFilterRow } from './ProjectResourcingFilterRow';
-import { GridControls } from '@/components/resources/grid/GridControls';
 import { GridTableWrapper } from '@/components/resources/grid/GridTableWrapper';
 import { EnhancedResourceTable } from '@/components/resources/grid/EnhancedResourceTable';
 import { useGridDays } from '@/components/resources/hooks/useGridDays';
@@ -87,22 +86,6 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
     setExpandedProjects([]);
   };
 
-  const filterContent = (
-    <ProjectResourcingFilters
-      filters={filters}
-      searchTerm={searchTerm}
-      onFilterChange={onFilterChange}
-      onPeriodChange={onPeriodChange}
-      onSearchChange={onSearchChange}
-      officeOptions={officeOptions}
-      countryOptions={countryOptions}
-      managers={managers}
-      activeFiltersCount={activeFiltersCount}
-      displayOptions={displayOptions}
-      onDisplayOptionChange={onDisplayOptionChange}
-    />
-  );
-
   if (isLoading) {
     return <GridLoadingState />;
   }
@@ -114,28 +97,32 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   return (
     <div className="w-full max-w-full overflow-hidden space-y-6">
       
-      {/* Grid Controls */}
-      <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
-        <div className="bg-white p-4 rounded-lg border shadow-sm">
-          <GridControls
-            projectCount={filteredProjects.length}
-            periodToShow={filters.periodToShow}
-            onExpandAll={expandAll}
-            onCollapseAll={collapseAll}
-          />
-        </div>
-      </div>
+      {/* Header with metrics */}
+      <ProjectResourcingHeader 
+        projectCount={filteredProjects.length}
+        periodToShow={filters.periodToShow}
+      />
 
-      {/* Filter Row */}
+      {/* Filter Row with expand/collapse controls */}
       <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
         <ProjectResourcingFilterRow
           selectedDate={selectedMonth}
           onDateChange={onMonthChange}
           periodToShow={filters.periodToShow}
           onPeriodChange={onPeriodChange}
-          filterContent={filterContent}
+          filters={filters}
+          searchTerm={searchTerm}
+          onFilterChange={onFilterChange}
+          onSearchChange={onSearchChange}
+          officeOptions={officeOptions}
+          countryOptions={countryOptions}
+          managers={managers}
           activeFiltersCount={activeFiltersCount}
+          displayOptions={displayOptions}
+          onDisplayOptionChange={onDisplayOptionChange}
           onClearFilters={onClearFilters}
+          onExpandAll={expandAll}
+          onCollapseAll={collapseAll}
         />
       </div>
       

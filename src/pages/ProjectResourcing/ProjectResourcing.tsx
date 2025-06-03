@@ -7,7 +7,6 @@ import { ProjectResourcingContent } from './components/ProjectResourcingContent'
 import { useProjectResourcingState } from './hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './utils/filterUtils';
-import { List } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
@@ -57,23 +56,6 @@ const ProjectResourcing = () => {
             className="flex-1 p-6 bg-gray-50 flex flex-col" 
             style={{ height: `calc(100vh - ${HEADER_HEIGHT}px)`, overflowY: 'auto' }}
           >
-            {/* Simple Header Section */}
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <List className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">
-                    Project Resourcing
-                  </h1>
-                  <p className="text-gray-600">
-                    Manage resource allocation and project planning
-                  </p>
-                </div>
-              </div>
-            </div>
-
             <ProjectResourcingContent
               selectedMonth={selectedMonth}
               searchTerm={searchTerm}
