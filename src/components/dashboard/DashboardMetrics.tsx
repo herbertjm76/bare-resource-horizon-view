@@ -92,7 +92,7 @@ export const DashboardMetrics = () => {
         officeOptions={officeOptions}
       />
 
-      {/* Main Content - Use consistent padding for both mobile and desktop */}
+      {/* Main Content */}
       <div className="pb-6">
         {isMobile ? (
           <MobileDashboard
@@ -103,8 +103,6 @@ export const DashboardMetrics = () => {
             staffData={staffData}
             mockData={mockData}
             selectedTimeRange={selectedTimeRange}
-            totalRevenue={metrics.totalRevenue}
-            avgProjectValue={metrics.avgProjectValue}
             standardizedUtilizationRate={utilizationRate}
           />
         ) : (
