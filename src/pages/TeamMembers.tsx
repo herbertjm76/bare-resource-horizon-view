@@ -58,10 +58,15 @@ const TeamMembersPageContent = () => {
 
   // Show permission error state
   if (!hasPermission && permissionChecked) {
+    // Create a wrapper function that matches the expected signature
+    const handleRetry = async () => {
+      await handleRetryPermission();
+    };
+
     return (
       <TeamMembersPermissionError
         permissionError={permissionError}
-        onRetry={handleRetryPermission}
+        onRetry={handleRetry}
       />
     );
   }
