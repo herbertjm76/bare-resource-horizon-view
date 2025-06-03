@@ -30,7 +30,9 @@ export const useWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], p
       return;
     }
 
-    console.log('Initializing comprehensive workload data for:', teamMembers.length, 'members', 'for', periodWeeks, 'weeks');
+    console.log('🔍 WORKLOAD INVESTIGATION: Initializing comprehensive workload data for:', teamMembers.length, 'members', 'for', periodWeeks, 'weeks');
+    console.log('🔍 WORKLOAD INVESTIGATION: Selected date:', selectedDate);
+    console.log('🔍 WORKLOAD INVESTIGATION: Period weeks:', periodWeeks);
     
     // Convert the flat structure to MemberWorkloadData structure
     const convertedData: Record<string, MemberWorkloadData> = {};
@@ -55,17 +57,20 @@ export const useWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], p
     const allLoaded = !isLoadingProjects && !isLoadingAnnualLeave && !isLoadingHolidays && !isLoadingOtherLeave;
     
     if (allLoaded && Object.keys(initialWorkloadData).length > 0) {
-      console.log('Combining all workload data sources...');
+      console.log('🔍 WORKLOAD INVESTIGATION: Combining all workload data sources...');
       
       // Start with a fresh copy of the initial data
       const combinedData = JSON.parse(JSON.stringify(initialWorkloadData));
       
       // Add project hours
       if (projectData) {
+        console.log('🔍 WORKLOAD INVESTIGATION: Project data received:', projectData);
         Object.keys(projectData).forEach(memberId => {
           Object.keys(projectData[memberId]).forEach(dateKey => {
             if (combinedData[memberId] && combinedData[memberId][dateKey]) {
-              combinedData[memberId][dateKey].projectHours = projectData[memberId][dateKey];
+              const projectHours = projectData[memberId][dateKey];
+              combinedData[memberId][dateKey].projectHours = projectHours;
+              console.log(`🔍 WORKLOAD INVESTIGATION: Added ${projectHours} project hours for member ${memberId} on ${dateKey}`);
             }
           });
         });
@@ -73,10 +78,13 @@ export const useWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], p
       
       // Add annual leave
       if (annualLeaveData) {
+        console.log('🔍 WORKLOAD INVESTIGATION: Annual leave data received:', annualLeaveData);
         Object.keys(annualLeaveData).forEach(memberId => {
           Object.keys(annualLeaveData[memberId]).forEach(dateKey => {
             if (combinedData[memberId] && combinedData[memberId][dateKey]) {
-              combinedData[memberId][dateKey].annualLeave = annualLeaveData[memberId][dateKey];
+              const leaveHours = annualLeaveData[memberId][dateKey];
+              combinedData[memberId][dateKey].annualLeave = leaveHours;
+              console.log(`🔍 WORKLOAD INVESTIGATION: Added ${leaveHours} annual leave hours for member ${memberId} on ${dateKey}`);
             }
           });
         });
@@ -84,10 +92,13 @@ export const useWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], p
       
       // Add office holidays
       if (holidaysData) {
+        console.log('🔍 WORKLOAD INVESTIGATION: Office holidays data received:', holidaysData);
         Object.keys(holidaysData).forEach(memberId => {
           Object.keys(holidaysData[memberId]).forEach(dateKey => {
             if (combinedData[memberId] && combinedData[memberId][dateKey]) {
-              combinedData[memberId][dateKey].officeHolidays = holidaysData[memberId][dateKey];
+              const holidayHours = holidaysData[memberId][dateKey];
+              combinedData[memberId][dateKey].officeHolidays = holidayHours;
+              console.log(`🔍 WORKLOAD INVESTIGATION: Added ${holidayHours} office holiday hours for member ${memberId} on ${dateKey}`);
             }
           });
         });
@@ -95,10 +106,13 @@ export const useWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], p
       
       // Add other leave
       if (otherLeaveData) {
+        console.log('🔍 WORKLOAD INVESTIGATION: Other leave data received:', otherLeaveData);
         Object.keys(otherLeaveData).forEach(memberId => {
           Object.keys(otherLeaveData[memberId]).forEach(dateKey => {
             if (combinedData[memberId] && combinedData[memberId][dateKey]) {
-              combinedData[memberId][dateKey].otherLeave = otherLeaveData[memberId][dateKey];
+              const otherLeaveHours = otherLeaveData[memberId][dateKey];
+              combinedData[memberId][dateKey].otherLeave = otherLeaveHours;
+              console.log(`🔍 WORKLOAD INVESTIGATION: Added ${otherLeaveHours} other leave hours for member ${memberId} on ${dateKey}`);
             }
           });
         });
@@ -106,6 +120,22 @@ export const useWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], p
       
       // Calculate totals for each day
       calculateTotals(combinedData);
+      
+      // Log detailed breakdown for Paul Julius on 2025-05-26 if he exists
+      const paulJuliusId = teamMembers.find(m => 
+        m.first_name === 'Paul' && m.last_name === 'Julius'
+      )?.id;
+      
+      if (paulJuliusId && combinedData[paulJuliusId] && combinedData[paulJuliusId]['2025-05-26']) {
+        const paulData = combinedData[paulJuliusId]['2025-05-26'];
+        console.log('🔍 WORKLOAD INVESTIGATION: PAUL JULIUS BREAKDOWN for 2025-05-26:');
+        console.log('🔍 Project Hours:', paulData.projectHours);
+        console.log('🔍 Annual Leave:', paulData.annualLeave);
+        console.log('🔍 Office Holidays:', paulData.officeHolidays);
+        console.log('🔍 Other Leave:', paulData.otherLeave);
+        console.log('🔍 CALCULATED TOTAL:', paulData.total);
+        console.log('🔍 Full Paul data for all dates:', combinedData[paulJuliusId]);
+      }
       
       // Convert the flat structure to MemberWorkloadData structure
       const finalWorkloadData: Record<string, MemberWorkloadData> = {};
@@ -115,11 +145,11 @@ export const useWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], p
         };
       });
       
-      console.log('Final comprehensive workload data (per day):', finalWorkloadData);
+      console.log('🔍 WORKLOAD INVESTIGATION: Final comprehensive workload data (per day):', finalWorkloadData);
       setWorkloadData(finalWorkloadData);
       setIsLoadingWorkload(false);
     }
-  }, [isLoadingProjects, isLoadingAnnualLeave, isLoadingHolidays, isLoadingOtherLeave, projectData, annualLeaveData, holidaysData, otherLeaveData, initialWorkloadData]);
+  }, [isLoadingProjects, isLoadingAnnualLeave, isLoadingHolidays, isLoadingOtherLeave, projectData, annualLeaveData, holidaysData, otherLeaveData, initialWorkloadData, teamMembers]);
 
   return { workloadData, isLoadingWorkload };
 };

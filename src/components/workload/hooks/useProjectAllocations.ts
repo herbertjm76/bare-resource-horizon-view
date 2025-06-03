@@ -27,7 +27,8 @@ export const useProjectAllocations = (
         const monthEnd = format(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0), 'yyyy-MM-dd');
         const memberIds = teamMembers.map(member => member.id);
 
-        console.log('Fetching project allocations for member IDs:', memberIds);
+        console.log('🔍 PROJECT ALLOCATIONS: Fetching project allocations for member IDs:', memberIds);
+        console.log('🔍 PROJECT ALLOCATIONS: Date range:', monthStart, 'to', monthEnd);
 
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
@@ -38,9 +39,11 @@ export const useProjectAllocations = (
           .lte('week_start_date', monthEnd);
         
         if (error) {
-          console.error('Error fetching project allocations:', error);
+          console.error('🔍 PROJECT ALLOCATIONS: Error fetching project allocations:', error);
           setData({});
         } else if (allocations) {
+          console.log('🔍 PROJECT ALLOCATIONS: Raw allocations data:', allocations);
+          
           const projectHours: Record<string, Record<string, number>> = {};
           
           // Initialize structure
@@ -54,6 +57,8 @@ export const useProjectAllocations = (
             const weekStartDate = new Date(allocation.week_start_date);
             const weeklyHours = Number(allocation.hours) || 0;
             
+            console.log(`🔍 PROJECT ALLOCATIONS: Processing allocation - Resource: ${allocation.resource_id}, Week: ${allocation.week_start_date}, Hours: ${weeklyHours}, Project: ${allocation.project?.name}`);
+            
             // Count actual working days (Monday to Friday) in this week that fall within the selected month
             const workingDays = [];
             for (let i = 0; i < 7; i++) {
@@ -65,9 +70,12 @@ export const useProjectAllocations = (
               }
             }
             
+            console.log(`🔍 PROJECT ALLOCATIONS: Working days for this week:`, workingDays.map(d => format(d, 'yyyy-MM-dd')));
+            
             // Only distribute hours if there are working days
             if (workingDays.length > 0) {
               const dailyHours = weeklyHours / workingDays.length;
+              console.log(`🔍 PROJECT ALLOCATIONS: Daily hours to distribute: ${dailyHours} (${weeklyHours} / ${workingDays.length})`);
               
               workingDays.forEach(workDay => {
                 const dateKey = format(workDay, 'yyyy-MM-dd');
@@ -76,15 +84,17 @@ export const useProjectAllocations = (
                   projectHours[allocation.resource_id][dateKey] = 0;
                 }
                 projectHours[allocation.resource_id][dateKey] += dailyHours;
+                
+                console.log(`🔍 PROJECT ALLOCATIONS: Added ${dailyHours} hours for ${allocation.resource_id} on ${dateKey}, total now: ${projectHours[allocation.resource_id][dateKey]}`);
               });
             }
           });
           
-          console.log('Processed project allocations (per day):', projectHours);
+          console.log('🔍 PROJECT ALLOCATIONS: Processed project allocations (per day):', projectHours);
           setData(projectHours);
         }
       } catch (error) {
-        console.error('Error in fetchProjectAllocations:', error);
+        console.error('🔍 PROJECT ALLOCATIONS: Error in fetchProjectAllocations:', error);
         setData({});
       } finally {
         setIsLoading(false);

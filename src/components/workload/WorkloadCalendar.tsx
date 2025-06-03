@@ -107,6 +107,18 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
               
               const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / (weeklyCapacity * periodToShow)) * 100) : 0;
               
+              // Debug logging for Paul Julius
+              if (member.first_name === 'Paul' && member.last_name === 'Julius') {
+                console.log('🔍 WORKLOAD CALENDAR: Paul Julius data:', {
+                  memberId: member.id,
+                  workloadDays: memberWorkloadDays,
+                  totalHours,
+                  weeklyCapacity,
+                  utilizationPercent,
+                  periodToShow
+                });
+              }
+              
               return (
                 <TableRow key={member.id} className={`member-row h-7 ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}`}>
                   <TableCell className="sticky left-0 z-10 bg-inherit p-0">
@@ -128,6 +140,15 @@ export const WorkloadCalendar: React.FC<WorkloadCalendarProps> = ({
                     const dayData = memberWorkloadDays[dateStr];
                     const dayHours = dayData?.total || 0;
                     const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                    
+                    // Debug logging for Paul Julius on specific date
+                    if (member.first_name === 'Paul' && member.last_name === 'Julius' && dateStr === '2025-05-26') {
+                      console.log(`🔍 WORKLOAD CALENDAR: Paul Julius on ${dateStr}:`, {
+                        dayData,
+                        dayHours,
+                        dateStr
+                      });
+                    }
                     
                     return (
                       <TableCell 
