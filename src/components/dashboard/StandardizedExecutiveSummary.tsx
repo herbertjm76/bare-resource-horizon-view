@@ -108,7 +108,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
           
           return (
             <div key={index} className="flex-1 min-w-0">
-              <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl transition-all duration-300 hover:shadow-lg">
+              <Card className="bg-white border-2 border-gray-200 rounded-xl transition-all duration-300 hover:shadow-lg">
                 <CardContent className="p-6">
                   <div className="text-center">
                     {/* Title - gray-800, medium weight */}

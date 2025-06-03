@@ -30,13 +30,13 @@ const iconMap = {
   'users': TrendingUp, // fallback
 };
 
-const getSeverityColor = (severity: string) => {
+const getSeverityCardStyle = (severity: string) => {
   switch (severity) {
-    case 'critical': return 'bg-red-50 border-red-200 text-red-800';
-    case 'high': return 'bg-orange-50 border-orange-200 text-orange-800';
-    case 'medium': return 'bg-yellow-50 border-yellow-200 text-yellow-800';
-    case 'low': return 'bg-green-50 border-green-200 text-green-800';
-    default: return 'bg-gray-50 border-gray-200 text-gray-800';
+    case 'critical': return 'bg-gradient-to-r from-red-50 to-red-100 border-[3px] border-red-200';
+    case 'high': return 'bg-gradient-to-r from-orange-50 to-orange-100 border-[3px] border-orange-200';
+    case 'medium': return 'bg-gradient-to-r from-yellow-50 to-yellow-100 border-[3px] border-yellow-200';
+    case 'low': return 'bg-gradient-to-r from-blue-50 to-blue-100 border-[3px] border-blue-200';
+    default: return 'bg-gradient-to-r from-gray-50 to-gray-100 border-[3px] border-gray-200';
   }
 };
 
@@ -63,7 +63,7 @@ export const CompactInsightCard: React.FC<CompactInsightCardProps> = ({
   };
 
   return (
-    <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[3px] border-[#d8d4ff] rounded-xl p-6 shadow-sm border-l-4 transition-all hover:shadow-md">
+    <Card className={`${getSeverityCardStyle(severity)} rounded-xl p-6 shadow-sm border-l-4 transition-all hover:shadow-md`}>
       <CardContent className="p-0">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3 flex-1 min-w-0">
