@@ -42,6 +42,11 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
     return resource.name.substring(0, 2).toUpperCase();
   };
 
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (): string | undefined => {
+    return 'avatar_url' in resource ? resource.avatar_url || undefined : undefined;
+  };
+
   return (
     <td 
       className={`sticky-left-12 ${rowBgClass} z-10 p-0.5 group-hover:bg-gray-50`} 
@@ -50,7 +55,7 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
-            <AvatarImage src={resource.avatar_url || undefined} alt={resource.name} />
+            <AvatarImage src={getAvatarUrl()} alt={resource.name} />
             <AvatarFallback className="bg-brand-violet text-white text-xs">
               {getUserInitials()}
             </AvatarFallback>

@@ -22,6 +22,23 @@ export const TeamMemberRows: React.FC<TeamMemberRowsProps> = ({
   handleInputChange,
   projects
 }) => {
+  // Helper to get user initials
+  const getUserInitials = (member: any): string => {
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (member: any): string | undefined => {
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
+  // Helper to get member display name
+  const getMemberDisplayName = (member: any): string => {
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim();
+  };
+
   return (
     <>
       {filteredOffices.map((officeCode, officeIndex) => {

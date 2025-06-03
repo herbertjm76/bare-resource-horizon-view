@@ -48,6 +48,11 @@ export const StaffMemberCard: React.FC<StaffMemberCardProps & { onClick?: () => 
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (): string | undefined => {
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
   const colors = getColorClasses();
 
   return (
@@ -57,7 +62,7 @@ export const StaffMemberCard: React.FC<StaffMemberCardProps & { onClick?: () => 
     >
       <div className="flex items-center gap-3">
         <Avatar className="h-8 w-8">
-          <AvatarImage src={member.avatar_url || undefined} alt={member.name} />
+          <AvatarImage src={getAvatarUrl()} alt={member.name} />
           <AvatarFallback className="bg-brand-violet text-white text-xs">
             {getUserInitials()}
           </AvatarFallback>

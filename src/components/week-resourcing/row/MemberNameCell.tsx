@@ -29,11 +29,17 @@ export const MemberNameCell: React.FC<MemberNameCellProps> = ({ member }) => {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (): string | undefined => {
+    if (!member) return undefined;
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
   return (
     <TableCell className="sticky-column sticky-left-0 border-r font-medium py-1 text-center w-[150px]">
       <div className="flex items-center gap-2 justify-center">
         <Avatar className="h-8 w-8">
-          <AvatarImage src={member?.avatar_url || undefined} alt={getMemberName()} />
+          <AvatarImage src={getAvatarUrl()} alt={getMemberName()} />
           <AvatarFallback className="bg-brand-violet text-white text-xs">
             {getUserInitials()}
           </AvatarFallback>
