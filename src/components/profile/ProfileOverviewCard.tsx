@@ -26,10 +26,10 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
 
     return [
       {
-        title: "Role",
-        value: profile.role || "Not Set",
-        badgeText: profile.role ? "Active" : "Pending",
-        badgeColor: profile.role ? "green" : "orange"
+        title: "Job Title",
+        value: profile.job_title || "Not Set",
+        badgeText: profile.job_title ? "Active" : "Pending",
+        badgeColor: profile.job_title ? "green" : "orange"
       },
       {
         title: "Department", 

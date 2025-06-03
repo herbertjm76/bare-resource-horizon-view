@@ -12,7 +12,7 @@ export const OfficeOverviewCard: React.FC = () => {
     departments = [], 
     roles = [], 
     locations = [], 
-    projectAreas = [] 
+    office_stages = [] 
   } = useOfficeSettings();
 
   const getMetrics = () => {
@@ -36,10 +36,10 @@ export const OfficeOverviewCard: React.FC = () => {
         badgeColor: locations.length > 1 ? "green" : locations.length === 1 ? "blue" : "orange"
       },
       {
-        title: "Project Areas",
-        value: projectAreas.length,
-        badgeText: projectAreas.length > 0 ? "Defined" : "Setup Needed",
-        badgeColor: projectAreas.length > 0 ? "green" : "orange"
+        title: "Project Stages",
+        value: office_stages.length,
+        badgeText: office_stages.length > 0 ? "Defined" : "Setup Needed",
+        badgeColor: office_stages.length > 0 ? "green" : "orange"
       }
     ];
   };
