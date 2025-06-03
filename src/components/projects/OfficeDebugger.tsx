@@ -38,7 +38,7 @@ const OfficeDebugger = () => {
   }, []);
 
   return (
-    <div className="mt-4 p-4 border rounded-md">
+    <div className="mt-4 p-4 border rounded-2xl">
       <div className="flex justify-between items-center mb-2">
         <h3 className="font-medium">Office Data Debugger</h3>
         <Button 

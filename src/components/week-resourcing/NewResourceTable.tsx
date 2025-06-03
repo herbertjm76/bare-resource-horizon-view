@@ -42,7 +42,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="w-full border rounded-md shadow-sm mt-8">
+      <div className="w-full border rounded-2xl shadow-sm mt-8">
         <div 
           className="overflow-x-auto overflow-y-visible"
           style={{
@@ -90,12 +90,12 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           
           .enhanced-grid-scroll::-webkit-scrollbar-track {
             background: #f1f5f9;
-            border-radius: 6px;
+            border-radius: 8px;
           }
           
           .enhanced-grid-scroll::-webkit-scrollbar-thumb {
             background: #94a3b8;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 2px solid #f1f5f9;
           }
           

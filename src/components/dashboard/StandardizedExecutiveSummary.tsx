@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -101,7 +102,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   // Simple format with new styling
   console.log('Rendering simple format');
   return (
-    <div className="bg-white rounded-3xl border border-zinc-300 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-zinc-300 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
       <div 
         className="p-5"
         style={{
@@ -114,7 +115,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
             
             return (
               <div key={index} className="flex-1 min-w-0">
-                <Card className="bg-white/90 border border-zinc-300 rounded-xl transition-all duration-300 hover:shadow-lg">
+                <Card className="bg-white/90 border border-zinc-300 rounded-2xl transition-all duration-300 hover:shadow-lg">
                   <CardContent className="p-4">
                     <div className="text-center">
                       {/* Title - gray-800, medium weight */}

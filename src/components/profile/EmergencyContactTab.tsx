@@ -21,7 +21,7 @@ export const EmergencyContactTab: React.FC<EmergencyContactTabProps> = ({
   error
 }) => {
   return (
-    <Card>
+    <Card className="rounded-2xl">
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2">
           <AlertCircle className="h-5 w-5 text-brand-violet" />

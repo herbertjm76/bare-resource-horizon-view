@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { AvatarUpload } from '@/components/profile/AvatarUpload';
 import { EditableProfileSection } from '@/components/profile/EditableProfileSection';
@@ -62,10 +63,10 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-zinc-300 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-      <div className="bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400 p-8 text-black relative rounded-3xl">
+    <div className="bg-white rounded-2xl border border-zinc-300 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+      <div className="bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400 p-8 text-black relative rounded-2xl">
         {/* Decorative background elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50 rounded-3xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-50 rounded-2xl"></div>
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-16 translate-x-16"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
         
