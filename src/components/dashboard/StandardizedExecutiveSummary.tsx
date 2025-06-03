@@ -40,10 +40,6 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     }
   };
 
-  const getGradientClass = (type: GradientType) => {
-    return 'bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400';
-  };
-
   const getGlassMorphismClass = () => {
     return 'bg-white/20 backdrop-blur-md border border-white/30 shadow-elevation-2';
   };
@@ -107,10 +103,18 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     return { text: 'Active', color: 'blue' };
   };
 
-  // Simple format - centered cards with standardized styling
+  // Simple format with new styling
   console.log('Rendering simple format');
   return (
-    <div className={`${getGradientClass(gradientType)} rounded-2xl p-4`}>
+    <div 
+      className="rounded-xl p-6 border shadow-sm"
+      style={{
+        background: 'linear-gradient(to right, #eef4ff, #fbf5ff)',
+        borderColor: '#d8d4ff',
+        borderWidth: '1px',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+      }}
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {metrics.map((metric, index) => {
           const badge = getDefaultBadge(metric, index);
