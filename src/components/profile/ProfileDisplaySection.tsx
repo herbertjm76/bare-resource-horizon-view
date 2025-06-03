@@ -1,7 +1,7 @@
 
 import React from 'react';
+import { Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Briefcase, Edit3 } from 'lucide-react';
 
 interface ProfileDisplaySectionProps {
   profile: any;
@@ -13,35 +13,28 @@ export const ProfileDisplaySection: React.FC<ProfileDisplaySectionProps> = ({
   onEdit
 }) => {
   return (
-    <div className="space-y-2">
-      <div className="flex items-start justify-between">
+    <>
+      <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold leading-tight">
-            {profile.first_name || profile.last_name 
-              ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim()
-              : 'Welcome to your profile'
-            }
-          </h2>
+          <h1 className="text-3xl font-bold text-black">
+            {profile.first_name} {profile.last_name}
+          </h1>
           {profile.job_title && (
-            <p className="text-lg text-white/90 font-medium flex items-center gap-2 mt-1">
-              <Briefcase className="h-4 w-4" />
+            <p className="text-lg text-black/80 mt-1">
               {profile.job_title}
             </p>
-          )}
-          {profile.department && (
-            <p className="text-white/80 mt-1">{profile.department}</p>
           )}
         </div>
         <Button
           onClick={onEdit}
-          size="sm"
           variant="outline"
-          className="border-white/30 text-white hover:bg-white/10"
+          size="sm"
+          className="bg-white/20 border-white/30 text-black hover:bg-white/30 hover:text-black"
         >
-          <Edit3 className="h-4 w-4 mr-1" />
+          <Edit2 className="h-4 w-4 mr-2" />
           Edit
         </Button>
       </div>
-    </div>
+    </>
   );
 };

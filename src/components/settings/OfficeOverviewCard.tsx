@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
 import { useCompany } from '@/context/CompanyContext';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { CompanyLogoSection } from './office-overview/CompanyLogoSection';
@@ -20,7 +19,7 @@ export const OfficeOverviewCard = () => {
         borderColor: 'transparent'
       }}
     >
-      <Card className="bg-white/20 backdrop-blur-md border border-white/30 shadow-elevation-2 transition-all duration-300 hover:bg-white/25 hover:shadow-elevation-3">
+      <div className="bg-white/20 backdrop-blur-md border border-white/30 shadow-elevation-2 transition-all duration-300 hover:bg-white/25 hover:shadow-elevation-3 rounded-3xl">
         <div className="p-4">
           <div className="grid grid-cols-4 gap-4 h-64">
             {/* Logo and Company Info Section - 1/4 width */}
@@ -44,7 +43,7 @@ export const OfficeOverviewCard = () => {
             />
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };
