@@ -41,9 +41,6 @@ export default function Profile() {
           profile={profile}
           getUserInitials={getUserInitials}
           handleAvatarUpdate={handleAvatarUpdate}
-          handleChange={handleChange}
-          onSave={handleSave}
-          saving={saving}
         />
 
         <ProfileTabs

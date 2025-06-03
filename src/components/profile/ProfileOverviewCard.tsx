@@ -10,18 +10,12 @@ interface ProfileOverviewCardProps {
   profile: any;
   getUserInitials: () => string;
   handleAvatarUpdate: (url: string | null) => void;
-  handleChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  onSave?: (e: React.FormEvent) => void;
-  saving?: boolean;
 }
 
 export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
   profile,
   getUserInitials,
-  handleAvatarUpdate,
-  handleChange,
-  onSave,
-  saving = false
+  handleAvatarUpdate
 }) => {
   return (
     <Card className="bg-gradient-to-r from-[#eef4ff] to-[#fbf5ff] border-[2px] border-[#d8d4ff] rounded-xl shadow-sm p-4">
@@ -31,9 +25,6 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
           profile={profile}
           getUserInitials={getUserInitials}
           handleAvatarUpdate={handleAvatarUpdate}
-          handleChange={handleChange}
-          onSave={onSave}
-          saving={saving}
         />
 
         {/* Card 2: Current Capacity */}
