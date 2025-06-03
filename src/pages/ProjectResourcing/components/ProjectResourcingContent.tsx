@@ -42,7 +42,8 @@ interface ProjectResourcingContentProps {
   onClearFilters: () => void;
 }
 
-export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> = ({
+// Inner component that uses office settings
+const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   selectedMonth,
   searchTerm,
   filters,
@@ -113,44 +114,50 @@ export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> =
   }
 
   return (
+    <div className="w-full max-w-full overflow-hidden space-y-0">
+      
+      {/* Grid Controls (Expand/Collapse buttons) */}
+      <GridControls
+        projectCount={filteredProjects.length}
+        periodToShow={filters.periodToShow}
+        onExpandAll={expandAll}
+        onCollapseAll={collapseAll}
+      />
+
+      {/* Filter Row positioned between grid controls and table */}
+      <div className="border-t border-gray-200 pt-4">
+        <ProjectResourcingFilterRow
+          selectedDate={selectedMonth}
+          onDateChange={onMonthChange}
+          periodToShow={filters.periodToShow}
+          onPeriodChange={onPeriodChange}
+          filterContent={filterContent}
+          activeFiltersCount={activeFiltersCount}
+          onClearFilters={onClearFilters}
+        />
+      </div>
+      
+      {/* Resource Grid Table */}
+      <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
+        <GridTableWrapper>
+          <EnhancedResourceTable
+            projects={filteredProjects}
+            days={days}
+            expandedProjects={expandedProjects}
+            tableWidth={tableWidth}
+            onToggleProjectExpand={toggleProjectExpanded}
+          />
+        </GridTableWrapper>
+      </div>
+    </div>
+  );
+};
+
+export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> = (props) => {
+  return (
     <div className="flex flex-col max-w-full bg-gradient-to-br from-gray-50 to-white min-h-screen">
       <OfficeSettingsProvider>
-        <div className="w-full max-w-full overflow-hidden space-y-0">
-          
-          {/* Grid Controls (Expand/Collapse buttons) */}
-          <GridControls
-            projectCount={filteredProjects.length}
-            periodToShow={filters.periodToShow}
-            onExpandAll={expandAll}
-            onCollapseAll={collapseAll}
-          />
-
-          {/* Filter Row positioned between grid controls and table */}
-          <div className="border-t border-gray-200 pt-4">
-            <ProjectResourcingFilterRow
-              selectedDate={selectedMonth}
-              onDateChange={onMonthChange}
-              periodToShow={filters.periodToShow}
-              onPeriodChange={onPeriodChange}
-              filterContent={filterContent}
-              activeFiltersCount={activeFiltersCount}
-              onClearFilters={onClearFilters}
-            />
-          </div>
-          
-          {/* Resource Grid Table */}
-          <div className="w-full max-w-full overflow-x-auto sm:w-[calc(100vw-22rem)] sm:max-w-[calc(100vw-22rem)]">
-            <GridTableWrapper>
-              <EnhancedResourceTable
-                projects={filteredProjects}
-                days={days}
-                expandedProjects={expandedProjects}
-                tableWidth={tableWidth}
-                onToggleProjectExpand={toggleProjectExpanded}
-              />
-            </GridTableWrapper>
-          </div>
-        </div>
+        <ProjectResourcingInner {...props} />
       </OfficeSettingsProvider>
     </div>
   );
