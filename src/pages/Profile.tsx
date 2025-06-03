@@ -1,6 +1,7 @@
 
 import React from "react";
 import { useCompany } from "@/context/CompanyContext";
+import { OfficeSettingsProvider } from '@/context/officeSettings';
 import { ProfileOverviewCard } from '@/components/profile/ProfileOverviewCard';
 import { ProfileLayout } from './Profile/components/ProfileLayout';
 import { ProfileHeader } from './Profile/components/ProfileHeader';
@@ -33,28 +34,30 @@ export default function Profile() {
 
   return (
     <ProfileLayout>
-      <ProfileHeader />
-      
-      <ProfileOverviewCard
-        profile={profile}
-        getUserInitials={getUserInitials}
-        handleAvatarUpdate={handleAvatarUpdate}
-        handleChange={handleChange}
-        onSave={handleSave}
-        saving={saving}
-      />
+      <OfficeSettingsProvider>
+        <ProfileHeader />
+        
+        <ProfileOverviewCard
+          profile={profile}
+          getUserInitials={getUserInitials}
+          handleAvatarUpdate={handleAvatarUpdate}
+          handleChange={handleChange}
+          onSave={handleSave}
+          saving={saving}
+        />
 
-      <ProfileTabs
-        profile={profile}
-        company={company}
-        handleChange={handleChange}
-        handleDateChange={handleDateChange}
-        handleAvatarUpdate={handleAvatarUpdate}
-        getUserInitials={getUserInitials}
-        saving={saving}
-        onSave={handleSave}
-        error={error}
-      />
+        <ProfileTabs
+          profile={profile}
+          company={company}
+          handleChange={handleChange}
+          handleDateChange={handleDateChange}
+          handleAvatarUpdate={handleAvatarUpdate}
+          getUserInitials={getUserInitials}
+          saving={saving}
+          onSave={handleSave}
+          error={error}
+        />
+      </OfficeSettingsProvider>
     </ProfileLayout>
   );
 }
