@@ -73,6 +73,9 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
     return 'avatar_url' in member ? member.avatar_url : undefined;
   };
 
+  // Check if user can view insights (admin, owner, or PM roles)
+  const canViewInsights = ['owner', 'admin', 'pm'].includes(userRole.toLowerCase());
+
   if (teamMembers.length === 0) {
     return (
       <div className="text-center py-8">
@@ -98,7 +101,7 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Role</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Department</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Location</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Insights</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
@@ -148,14 +151,16 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
               </td>
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleViewMember(member.id)}
-                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
+                  {canViewInsights && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewMember(member.id)}
+                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  )}
                   {editMode && ['owner', 'admin'].includes(userRole) && (
                     <>
                       <Button
