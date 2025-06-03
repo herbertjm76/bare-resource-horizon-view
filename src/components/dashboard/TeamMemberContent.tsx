@@ -2,7 +2,6 @@
 import React from 'react';
 import { Profile } from './types';
 import { TeamManagement } from './TeamManagement';
-import { useInviteUrl } from '@/hooks/useInviteUrl';
 import { TeamMemberInsightsHighlight } from './TeamMemberInsightsHighlight';
 import { useTeamFilters } from '@/hooks/useTeamFilters';
 
@@ -19,7 +18,6 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
   teamMembers,
   onRefresh
 }) => {
-  const { inviteUrl } = useInviteUrl();
   const { searchQuery, setSearchQuery, filteredMembers } = useTeamFilters(teamMembers);
 
   if (isProfileLoading) {
@@ -49,7 +47,7 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
       {/* Team Management */}
       <TeamManagement
         teamMembers={filteredMembers}
-        inviteUrl={inviteUrl}
+        inviteUrl="" // This will be handled internally by TeamManagement
         userRole={userProfile.role}
         onRefresh={onRefresh}
       />
