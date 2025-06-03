@@ -64,11 +64,9 @@ export const ProfileOverviewCard: React.FC<ProfileOverviewCardProps> = ({
 
   return (
     <div 
-      className="rounded-3xl p-5 border-2"
+      className="rounded-3xl p-5"
       style={{
         background: 'linear-gradient(to right, #eef2ff, #fdf2ff)',
-        borderImage: 'linear-gradient(to right, #eef2ff, #fdf2ff) 1',
-        borderColor: 'transparent'
       }}
     >
       <div className="bg-gradient-to-r from-violet-400 via-blue-400 to-pink-400 p-8 text-black relative rounded-3xl">

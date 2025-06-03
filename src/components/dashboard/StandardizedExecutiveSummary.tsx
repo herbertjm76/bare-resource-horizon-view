@@ -103,11 +103,9 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   console.log('Rendering simple format');
   return (
     <div 
-      className="rounded-3xl p-5 border-2"
+      className="rounded-3xl p-5"
       style={{
         background: 'linear-gradient(to right, #eef2ff, #fdf2ff)',
-        borderImage: 'linear-gradient(to right, #eef2ff, #fdf2ff) 1',
-        borderColor: 'transparent'
       }}
     >
       <div className="flex flex-wrap gap-6">
