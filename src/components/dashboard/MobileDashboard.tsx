@@ -51,25 +51,25 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
 
   return (
     <div className="space-y-6 p-4">
-      {/* Key Metrics - Single Line with smaller text */}
-      <div className="grid grid-cols-3 gap-1">
+      {/* Key Metrics - Single Line with tighter spacing */}
+      <div className="grid grid-cols-3 gap-2">
         <Card className="bg-white border-gray-200/50">
-          <CardContent className="p-2 text-center">
-            <p className="text-sm font-bold text-brand-violet">{activeResources}</p>
+          <CardContent className="p-3 text-center">
+            <p className="text-lg font-bold text-brand-violet">{activeResources}</p>
             <p className="text-xs text-gray-600">Members</p>
           </CardContent>
         </Card>
         
         <Card className="bg-white border-gray-200/50">
-          <CardContent className="p-2 text-center">
-            <p className="text-sm font-bold text-brand-violet">{activeProjects}</p>
+          <CardContent className="p-3 text-center">
+            <p className="text-lg font-bold text-brand-violet">{activeProjects}</p>
             <p className="text-xs text-gray-600">Projects</p>
           </CardContent>
         </Card>
         
         <Card className="bg-white border-gray-200/50">
-          <CardContent className="p-2 text-center">
-            <p className="text-sm font-bold text-brand-violet">3</p>
+          <CardContent className="p-3 text-center">
+            <p className="text-lg font-bold text-brand-violet">3</p>
             <p className="text-xs text-gray-600">Offices</p>
           </CardContent>
         </Card>
