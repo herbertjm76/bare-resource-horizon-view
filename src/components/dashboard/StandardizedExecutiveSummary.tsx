@@ -28,7 +28,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   gradientType = 'purple',
   cardOpacity = 0.9
 }) => {
-  console.log('StandardizedExecutiveSummary render (compact format)');
+  console.log('StandardizedExecutiveSummary render (new 4-line compact format)');
 
   const getBadgeVariant = (color?: string) => {
     switch (color) {
@@ -51,82 +51,139 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
       case 'red': return 'bg-red-500/80 border-red-400/40';
       case 'orange': return 'bg-orange-500/80 border-orange-400/40';
       case 'blue': return 'bg-blue-500/80 border-blue-400/40';
-      default: return 'bg-white/20 border-white/30';
+      default: return 'bg-gray-500/60 border-gray-400/30';
     }
   };
 
-  // Generate default badge for cards that don't have one
-  const getDefaultBadge = (metric: SummaryMetric, index: number) => {
-    if (metric.badgeText) return { text: metric.badgeText, color: metric.badgeColor };
-    
-    // Generate contextual badges based on metric title
+  // Generate default badge and subtitle for cards that don't have them
+  const getDefaultBadgeAndSubtitle = (metric: SummaryMetric, index: number) => {
     const title = metric.title.toLowerCase();
     
+    // Return existing badge/subtitle if provided
+    if (metric.badgeText && metric.subtitle) {
+      return { 
+        badge: { text: metric.badgeText, color: metric.badgeColor },
+        subtitle: metric.subtitle
+      };
+    }
+    
+    // Generate contextual badges and subtitles based on metric title
     if (title.includes('utilization')) {
       const numericValue = typeof metric.value === 'number' ? metric.value : 
                           typeof metric.value === 'string' ? parseInt(metric.value) : null;
       
       if (numericValue !== null) {
-        if (numericValue > 85) return { text: 'High', color: 'orange' };
-        if (numericValue > 70) return { text: 'Good', color: 'green' };
-        return { text: 'Low', color: 'blue' };
+        if (numericValue > 85) return { 
+          badge: { text: 'High', color: 'orange' },
+          subtitle: 'Above optimal range'
+        };
+        if (numericValue > 70) return { 
+          badge: { text: 'Optimal', color: 'green' },
+          subtitle: 'Healthy utilization'
+        };
+        return { 
+          badge: { text: 'Low', color: 'blue' },
+          subtitle: 'Room for more projects'
+        };
       }
-      return { text: 'Active', color: 'blue' };
+      return { 
+        badge: { text: 'Active', color: 'blue' },
+        subtitle: 'Team utilization tracking'
+      };
     }
     
-    if (title.includes('capacity')) {
-      return { text: 'Available', color: 'blue' };
+    if (title.includes('capacity') || title.includes('hours')) {
+      return { 
+        badge: { text: 'Available', color: 'blue' },
+        subtitle: metric.subtitle || 'Resource capacity'
+      };
     }
     
     if (title.includes('projects')) {
-      return { text: 'Active', color: 'green' };
+      return { 
+        badge: { text: 'Active', color: 'green' },
+        subtitle: metric.subtitle || 'Current portfolio'
+      };
     }
     
     if (title.includes('team') || title.includes('members') || title.includes('size')) {
-      return { text: 'Stable', color: 'green' };
+      return { 
+        badge: { text: 'Stable', color: 'green' },
+        subtitle: metric.subtitle || 'Team composition'
+      };
     }
     
     if (title.includes('offices') || title.includes('locations')) {
-      return { text: 'Multi-Site', color: 'blue' };
+      return { 
+        badge: { text: 'Multi-Site', color: 'blue' },
+        subtitle: metric.subtitle || 'Geographic presence'
+      };
     }
     
     if (title.includes('completion') || title.includes('rate')) {
-      return { text: 'On Track', color: 'green' };
+      return { 
+        badge: { text: 'On Track', color: 'green' },
+        subtitle: metric.subtitle || 'Progress tracking'
+      };
+    }
+
+    if (title.includes('resourcing')) {
+      return { 
+        badge: { text: 'Review', color: 'orange' },
+        subtitle: metric.subtitle || 'Needs attention'
+      };
+    }
+
+    if (title.includes('overloaded')) {
+      return { 
+        badge: { text: 'Alert', color: 'red' },
+        subtitle: metric.subtitle || 'Capacity exceeded'
+      };
     }
     
     // Default fallback
-    return { text: 'Active', color: 'blue' };
+    return { 
+      badge: { text: 'Active', color: 'blue' },
+      subtitle: metric.subtitle || 'Current status'
+    };
   };
 
-  console.log('Rendering compact mobile-responsive format');
+  console.log('Rendering new 4-line compact mobile-responsive format');
   return (
-    <div className="w-full bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-2xl p-4 sm:p-6 border border-purple-100/50 shadow-sm">
+    <div className="w-full bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-2xl p-3 sm:p-4 lg:p-5 border border-purple-100/50 shadow-sm">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {metrics.map((metric, index) => {
-          const badge = getDefaultBadge(metric, index);
+          const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
           
           return (
             <div key={index} className="min-w-0">
               <Card className="bg-white border border-gray-100 rounded-xl transition-all duration-300 hover:shadow-md h-full shadow-sm">
-                <CardContent className="p-3 sm:p-4">
-                  <div className="text-center space-y-2">
-                    {/* Title - compact size */}
+                <CardContent className="p-2.5 sm:p-3">
+                  <div className="text-center space-y-1.5">
+                    {/* Line 1: Small status indicator at top */}
+                    <div className="flex justify-center">
+                      <Badge 
+                        variant={getBadgeVariant(badge.color)} 
+                        className={`text-[10px] sm:text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-1.5 py-0.5 h-5`}
+                      >
+                        {badge.text}
+                      </Badge>
+                    </div>
+                    
+                    {/* Line 2: Clean title typography */}
                     <Typography variant="body-sm" className="font-medium text-gray-700 text-xs sm:text-sm leading-tight">
                       {metric.title}
                     </Typography>
                     
-                    {/* Value - compact but readable */}
-                    <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 leading-none">
+                    {/* Line 3: Prominent value display */}
+                    <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 leading-none py-0.5">
                       {metric.value}
                     </div>
                     
-                    {/* Colored status pill */}
-                    <Badge 
-                      variant={getBadgeVariant(badge.color)} 
-                      className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-2 py-1`}
-                    >
-                      {badge.text}
-                    </Badge>
+                    {/* Line 4: Subtle subtitle/context */}
+                    <p className="text-[10px] sm:text-xs text-gray-500 leading-tight">
+                      {subtitle}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
