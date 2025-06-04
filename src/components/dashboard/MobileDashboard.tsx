@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { MobileStatsOverview } from './mobile/MobileStatsOverview';
 import { MobileSmartInsights } from './mobile/MobileSmartInsights';
 import { MobileTeamStatus } from './mobile/MobileTeamStatus';
 import { MobilePerformanceGauge } from './mobile/MobilePerformanceGauge';
@@ -46,27 +45,9 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
     role: member.role || 'Member'
   }));
 
-  // Get utilization status and color
-  const getUtilizationStatus = (rate: number) => {
-    if (rate >= 85) return { status: 'High', color: 'bg-red-500', textColor: 'text-red-700' };
-    if (rate >= 70) return { status: 'Optimal', color: 'bg-green-500', textColor: 'text-green-700' };
-    if (rate >= 50) return { status: 'Moderate', color: 'bg-yellow-500', textColor: 'text-yellow-700' };
-    return { status: 'Low', color: 'bg-gray-400', textColor: 'text-gray-600' };
-  };
-
-  const utilizationStatus = getUtilizationStatus(currentUtilizationRate);
-
   return (
     <div className="w-full max-w-full overflow-x-hidden">
       <div className="space-y-4 p-4 pb-20 w-full max-w-full">
-        {/* Quick Stats Overview */}
-        <MobileStatsOverview
-          activeResources={activeResources}
-          activeProjects={activeProjects}
-          currentUtilizationRate={currentUtilizationRate}
-          utilizationStatus={utilizationStatus}
-        />
-
         {/* Smart Insights */}
         <MobileSmartInsights
           transformedStaffData={transformedStaffData}
