@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Activity, Users, DollarSign, TrendingUp } from 'lucide-react';
 import { EnhancedInsights } from './EnhancedInsights';
 import { IntelligentInsights } from './IntelligentInsights';
-import { ResourcePlanningChat } from './ResourcePlanningChat';
 import { HolidayCard } from './HolidayCard';
 import { StaffStatusCard } from './staff/StaffStatusCard';
 import { Gauge } from './Gauge';
 import { TimeRange } from './TimeRangeSelector';
+import { HerbieFloatingButton } from './HerbieFloatingButton';
 
 interface MobileDashboardProps {
   teamMembers: any[];
@@ -51,35 +51,52 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
 
   return (
     <div className="space-y-6 p-4">
-      {/* Business Health Overview - Full Width */}
-      <Card className="bg-gradient-to-br from-brand-violet/10 to-blue-50 border-brand-violet/20">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg text-brand-violet flex items-center gap-2">
-            <DollarSign className="h-5 w-5" />
-            Business Health
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-brand-violet">{currentUtilizationRate}%</p>
-              <p className="text-sm text-gray-600">Team Utilization</p>
-              <Badge variant={currentUtilizationRate > 85 ? "destructive" : currentUtilizationRate > 70 ? "default" : "secondary"} className="text-xs mt-1">
-                {currentUtilizationRate > 85 ? "At Capacity" : currentUtilizationRate > 70 ? "Healthy" : "Available"}
-              </Badge>
+      {/* Key Metrics - Single Line */}
+      <div className="grid grid-cols-4 gap-2">
+        <Card className="bg-white border-gray-200/50">
+          <CardContent className="p-3 text-center">
+            <div className="flex items-center justify-center mb-1">
+              <TrendingUp className="h-4 w-4 text-brand-violet/60" />
             </div>
-            <div className="text-center">
-              <p className="text-2xl font-bold text-brand-violet">2,340h</p>
-              <p className="text-sm text-gray-600">Available Capacity</p>
-              <Badge variant="outline" className="text-xs mt-1">Next 12 weeks</Badge>
+            <p className="text-lg font-bold text-brand-violet">{currentUtilizationRate}%</p>
+            <p className="text-xs text-gray-600">Utilization</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white border-gray-200/50">
+          <CardContent className="p-3 text-center">
+            <div className="flex items-center justify-center mb-1">
+              <Activity className="h-4 w-4 text-brand-violet/60" />
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <p className="text-lg font-bold text-brand-violet">{activeProjects}</p>
+            <p className="text-xs text-gray-600">Projects</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white border-gray-200/50">
+          <CardContent className="p-3 text-center">
+            <div className="flex items-center justify-center mb-1">
+              <Users className="h-4 w-4 text-brand-violet/60" />
+            </div>
+            <p className="text-lg font-bold text-brand-violet">{activeResources}</p>
+            <p className="text-xs text-gray-600">Team</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white border-gray-200/50">
+          <CardContent className="p-3 text-center">
+            <div className="flex items-center justify-center mb-1">
+              <DollarSign className="h-4 w-4 text-brand-violet/60" />
+            </div>
+            <p className="text-lg font-bold text-brand-violet">2,340h</p>
+            <p className="text-xs text-gray-600">Capacity</p>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Smart Insights and Staff Status - 2 Column Grid */}
+      {/* Main Dashboard Cards - 2 Column Grid */}
       <div className="grid grid-cols-1 gap-6">
-        {/* Smart Insights - Highlighted Priority */}
+        {/* Smart Insights */}
         <div>
           <IntelligentInsights 
             teamMembers={transformedStaffData}
@@ -95,12 +112,15 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
             selectedTimeRange={selectedTimeRange}
           />
         </div>
+
+        {/* Upcoming Holidays */}
+        <HolidayCard />
       </div>
 
       {/* Utilization Gauges - 2 Column Grid */}
       <Card className="bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg text-gray-700 flex items-center gap-2">
+          <CardTitle className="text-lg text-brand-violet flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
             Team Utilization Overview
           </CardTitle>
@@ -126,41 +146,11 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
               />
             </div>
           </div>
-          
-          {/* Additional metrics row */}
-          <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-gray-100">
-            <Card className="bg-white border border-gray-100">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <Activity className="h-5 w-5 text-brand-violet/60" />
-                </div>
-                <p className="text-xl font-bold text-brand-violet">{activeProjects}</p>
-                <p className="text-sm text-gray-600">Active Projects</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-white border border-gray-100">
-              <CardContent className="p-4 text-center">
-                <div className="flex items-center justify-center mb-2">
-                  <Users className="h-5 w-5 text-brand-violet/60" />
-                </div>
-                <p className="text-xl font-bold text-brand-violet">{activeResources}</p>
-                <p className="text-sm text-gray-600">Team Members</p>
-              </CardContent>
-            </Card>
-          </div>
         </CardContent>
       </Card>
 
-      {/* Upcoming Holidays - Full Width */}
-      <HolidayCard />
-
-      {/* AI Planning Assistant - Full Width */}
-      <ResourcePlanningChat 
-        teamSize={teamMembers.length}
-        activeProjects={activeProjects}
-        utilizationRate={currentUtilizationRate}
-      />
+      {/* Floating Herbie Button */}
+      <HerbieFloatingButton />
     </div>
   );
 };

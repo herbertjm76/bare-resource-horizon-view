@@ -80,24 +80,24 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
 
   if (insights.length === 0) {
     return (
-      <Card className="h-[400px] flex flex-col bg-gradient-to-br from-violet-50 via-blue-50 to-indigo-50 border-violet-200/50">
+      <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
         <CardHeader className="flex-shrink-0 pb-4">
           <CardTitle className="text-lg flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
               <Brain className="h-5 w-5 text-white" />
             </div>
-            <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent font-semibold">
+            <span className="text-brand-violet font-semibold">
               Smart Insights
             </span>
-            <Badge variant="outline" className="bg-white/80 text-violet-700 border-violet-200">
+            <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
               AI-Powered
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="flex-1 flex items-center justify-center">
           <div className="text-center space-y-4">
-            <div className="p-4 rounded-full bg-violet-100 mx-auto w-16 h-16 flex items-center justify-center">
-              <Brain className="h-8 w-8 text-violet-500" />
+            <div className="p-4 rounded-full bg-brand-violet/10 mx-auto w-16 h-16 flex items-center justify-center">
+              <Brain className="h-8 w-8 text-brand-violet" />
             </div>
             <div className="space-y-2">
               <h3 className="font-medium text-gray-900">Analyzing Your Team</h3>
@@ -112,16 +112,16 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
   }
 
   return (
-    <Card className="h-[400px] flex flex-col bg-gradient-to-br from-violet-50 via-blue-50 to-indigo-50 border-violet-200/50">
+    <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
       <CardHeader className="flex-shrink-0 pb-4">
         <CardTitle className="text-lg flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
             <Brain className="h-5 w-5 text-white" />
           </div>
-          <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent font-semibold">
+          <span className="text-brand-violet font-semibold">
             Smart Insights
           </span>
-          <Badge variant="outline" className="bg-white/80 text-violet-700 border-violet-200">
+          <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
             {insights.length} Active
           </Badge>
         </CardTitle>
@@ -185,7 +185,7 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
             {insights.length > 4 && (
               <Button 
                 variant="ghost" 
-                className="w-full mt-4 text-violet-600 hover:text-violet-700 hover:bg-violet-50"
+                className="w-full mt-4 text-brand-violet hover:text-brand-violet hover:bg-brand-violet/5"
               >
                 View {insights.length - 4} More Insights
                 <ChevronRight className="h-4 w-4 ml-1" />

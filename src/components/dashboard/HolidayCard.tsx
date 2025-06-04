@@ -34,7 +34,7 @@ export const HolidayCard: React.FC = () => {
     return diffDays;
   };
 
-  const getUrgencyStyle = (daysUntil: number) => {
+  const getCountdownBadgeStyle = (daysUntil: number) => {
     if (daysUntil === 0) return 'bg-red-500 text-white';
     if (daysUntil === 1) return 'bg-orange-500 text-white';
     if (daysUntil <= 7) return 'bg-yellow-500 text-white';
@@ -42,7 +42,7 @@ export const HolidayCard: React.FC = () => {
     return 'bg-gray-500 text-white';
   };
 
-  const getUrgencyText = (daysUntil: number) => {
+  const getCountdownText = (daysUntil: number) => {
     if (daysUntil === 0) return 'Today';
     if (daysUntil === 1) return 'Tomorrow';
     if (daysUntil <= 7) return `${daysUntil} days`;
@@ -52,13 +52,13 @@ export const HolidayCard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="h-[400px] flex flex-col">
+      <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
         <CardHeader className="flex-shrink-0 pb-4">
           <CardTitle className="text-lg flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
               <Calendar className="h-5 w-5 text-white" />
             </div>
-            <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent font-semibold">
+            <span className="text-brand-violet font-semibold">
               Upcoming Holidays
             </span>
           </CardTitle>
@@ -75,13 +75,13 @@ export const HolidayCard: React.FC = () => {
 
   if (error) {
     return (
-      <Card className="h-[400px] flex flex-col">
+      <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
         <CardHeader className="flex-shrink-0 pb-4">
           <CardTitle className="text-lg flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
               <Calendar className="h-5 w-5 text-white" />
             </div>
-            <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent font-semibold">
+            <span className="text-brand-violet font-semibold">
               Upcoming Holidays
             </span>
           </CardTitle>
@@ -98,17 +98,17 @@ export const HolidayCard: React.FC = () => {
   }
 
   return (
-    <Card className="h-[400px] flex flex-col bg-gradient-to-br from-blue-50 via-cyan-50 to-sky-50 border-blue-200/50">
+    <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
       <CardHeader className="flex-shrink-0 pb-4">
         <CardTitle className="text-lg flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-600">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
             <Calendar className="h-5 w-5 text-white" />
           </div>
-          <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent font-semibold">
+          <span className="text-brand-violet font-semibold">
             Upcoming Holidays
           </span>
           {upcomingHolidays.length > 0 && (
-            <Badge variant="outline" className="bg-white/80 text-blue-700 border-blue-200">
+            <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
               {upcomingHolidays.length} Coming Up
             </Badge>
           )}
@@ -123,12 +123,12 @@ export const HolidayCard: React.FC = () => {
               const dateInfo = formatDate(holiday.date);
               
               return (
-                <div key={holiday.id} className="group bg-white/70 hover:bg-white/90 rounded-xl p-4 border border-blue-100/50 hover:border-blue-200/80 transition-all duration-200 hover:shadow-md">
+                <div key={holiday.id} className="group bg-white/70 hover:bg-white/90 rounded-xl p-4 border border-gray-100/50 hover:border-gray-200/80 transition-all duration-200 hover:shadow-md">
                   <div className="flex items-center gap-4">
                     {/* Prominent Date Display */}
                     <div className="flex-shrink-0">
                       <div className="text-center">
-                        <div className="bg-gradient-to-br from-blue-500 to-cyan-600 text-white rounded-lg p-3 shadow-md">
+                        <div className="bg-gradient-to-br from-brand-violet to-purple-600 text-white rounded-lg p-3 shadow-md">
                           <div className="text-xs font-medium opacity-90 mb-1">
                             {dateInfo.month.toUpperCase()}
                           </div>
@@ -140,8 +140,8 @@ export const HolidayCard: React.FC = () => {
                           </div>
                         </div>
                         {daysUntil >= 0 && (
-                          <div className={`mt-2 px-2 py-1 rounded-md text-xs font-medium ${getUrgencyStyle(daysUntil)}`}>
-                            {getUrgencyText(daysUntil)}
+                          <div className={`mt-2 px-2 py-1 rounded-md text-xs font-medium ${getCountdownBadgeStyle(daysUntil)}`}>
+                            {getCountdownText(daysUntil)}
                           </div>
                         )}
                       </div>
@@ -150,21 +150,16 @@ export const HolidayCard: React.FC = () => {
                     {/* Holiday Information */}
                     <div className="flex-1 min-w-0">
                       <div className="mb-2">
-                        <h4 className="font-semibold text-gray-900 text-sm leading-tight group-hover:text-blue-700 transition-colors">
+                        <h4 className="font-semibold text-gray-900 text-sm leading-tight group-hover:text-brand-violet transition-colors">
                           {holiday.name}
                         </h4>
                       </div>
                       
                       <div className="flex items-center gap-3 text-xs text-gray-600">
                         <div className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3 text-blue-500" />
+                          <MapPin className="h-3 w-3 text-brand-violet" />
                           <span className="truncate">{holiday.office}</span>
                         </div>
-                        {holiday.type === 'company' && (
-                          <Badge variant="outline" className="text-xs px-1.5 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
-                            Company
-                          </Badge>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -174,8 +169,8 @@ export const HolidayCard: React.FC = () => {
             
             {upcomingHolidays.length === 0 && (
               <div className="text-center py-8">
-                <div className="p-4 rounded-full bg-blue-100 mx-auto w-16 h-16 flex items-center justify-center mb-4">
-                  <Calendar className="h-8 w-8 text-blue-500" />
+                <div className="p-4 rounded-full bg-brand-violet/10 mx-auto w-16 h-16 flex items-center justify-center mb-4">
+                  <Calendar className="h-8 w-8 text-brand-violet" />
                 </div>
                 <div className="space-y-2">
                   <h3 className="font-medium text-gray-900">No Upcoming Holidays</h3>

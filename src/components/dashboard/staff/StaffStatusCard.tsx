@@ -44,11 +44,11 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
   };
 
   return (
-    <Card className="h-[400px] flex flex-col">
+    <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
       <CardHeader className="flex-shrink-0">
         <CardTitle className="text-lg flex items-center gap-2">
           <Users className="h-5 w-5 text-brand-violet" />
-          Staff Status
+          <span className="text-brand-violet font-semibold">Staff Status</span>
           <span className="text-sm font-normal ml-2 bg-gray-100 px-2 py-0.5 rounded">
             {getTimeRangeText()}
           </span>
