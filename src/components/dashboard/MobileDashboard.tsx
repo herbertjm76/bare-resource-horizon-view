@@ -51,33 +51,33 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
 
   return (
     <div className="space-y-6 p-4">
-      {/* Key Metrics - Single row with flex layout */}
-      <div className="flex gap-2 overflow-x-auto">
-        <Card className="bg-white border-gray-200/50 flex-1 min-w-0">
-          <CardContent className="p-3 text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Users className="h-4 w-4 text-brand-violet" />
-              <p className="text-lg font-bold text-brand-violet">{activeResources}</p>
+      {/* Key Metrics - Single row with improved flex layout */}
+      <div className="flex gap-1 w-full">
+        <Card className="bg-white border-gray-200/50 flex-1 min-w-[90px]">
+          <CardContent className="p-2 text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Users className="h-3 w-3 text-brand-violet flex-shrink-0" />
+              <p className="text-sm font-bold text-brand-violet">{activeResources}</p>
             </div>
             <p className="text-xs text-gray-600">Members</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-white border-gray-200/50 flex-1 min-w-0">
-          <CardContent className="p-3 text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-brand-violet" />
-              <p className="text-lg font-bold text-brand-violet">{activeProjects}</p>
+        <Card className="bg-white border-gray-200/50 flex-1 min-w-[90px]">
+          <CardContent className="p-2 text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <TrendingUp className="h-3 w-3 text-brand-violet flex-shrink-0" />
+              <p className="text-sm font-bold text-brand-violet">{activeProjects}</p>
             </div>
             <p className="text-xs text-gray-600">Projects</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-white border-gray-200/50 flex-1 min-w-0">
-          <CardContent className="p-3 text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Building className="h-4 w-4 text-brand-violet" />
-              <p className="text-lg font-bold text-brand-violet">3</p>
+        <Card className="bg-white border-gray-200/50 flex-1 min-w-[90px]">
+          <CardContent className="p-2 text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Building className="h-3 w-3 text-brand-violet flex-shrink-0" />
+              <p className="text-sm font-bold text-brand-violet">3</p>
             </div>
             <p className="text-xs text-gray-600">Offices</p>
           </CardContent>
