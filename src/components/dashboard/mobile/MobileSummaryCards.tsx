@@ -34,7 +34,7 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
     <div className="grid grid-cols-2 gap-3 w-full">
       {/* Team Size Card */}
       <Card className="rounded-2xl border-0 shadow-sm bg-white">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-600 mb-1">Team Size</p>
@@ -52,7 +52,7 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
 
       {/* Active Projects Card */}
       <Card className="rounded-2xl border-0 shadow-sm bg-white">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-600 mb-1">Projects</p>
@@ -72,7 +72,7 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
 
       {/* Team Utilization Card */}
       <Card className="rounded-2xl border-0 shadow-sm bg-white">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-600 mb-1">Utilization</p>
@@ -90,7 +90,7 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
 
       {/* Capacity Card */}
       <Card className="rounded-2xl border-0 shadow-sm bg-white">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-600 mb-1">
