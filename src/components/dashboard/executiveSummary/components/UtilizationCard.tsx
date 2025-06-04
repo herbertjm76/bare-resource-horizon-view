@@ -17,17 +17,17 @@ export const UtilizationCard: React.FC<UtilizationCardProps> = ({
   utilizationStatus
 }) => {
   return (
-    <Card className="bg-white/90 backdrop-blur-sm">
-      <CardContent className="p-3">
+    <Card className="rounded-2xl border-0 shadow-sm bg-white">
+      <CardContent className="p-2">
         <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <p className="text-xs font-medium text-gray-600 mb-1">Team Utilization</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-gray-600 mb-1">Utilization</p>
             <p className="text-2xl font-bold text-gray-900 mb-1">{Math.round(utilizationRate)}%</p>
-            <Badge variant={utilizationStatus.color as any} className="text-xs">
+            <Badge className={`text-xs ${utilizationStatus.color}`}>
               {utilizationStatus.label}
             </Badge>
           </div>
-          <div className="h-8 w-8 rounded-full bg-brand-violet/10 flex items-center justify-center flex-shrink-0">
+          <div className="h-8 w-8 rounded-full bg-brand-violet/10 flex items-center justify-center flex-shrink-0 ml-2">
             <TrendingUp className="h-4 w-4 text-brand-violet" />
           </div>
         </div>

@@ -26,10 +26,10 @@ export const CEOMetricsCard: React.FC<CEOMetricsCardProps> = ({
 }) => {
   const getStatusColors = () => {
     switch (status) {
-      case 'good': return 'bg-green-50 border-green-200 text-green-800';
-      case 'warning': return 'bg-yellow-50 border-yellow-200 text-yellow-800';
-      case 'danger': return 'bg-red-50 border-red-200 text-red-800';
-      default: return 'bg-blue-50 border-blue-200 text-blue-800';
+      case 'good': return 'bg-white text-gray-900';
+      case 'warning': return 'bg-white text-gray-900';
+      case 'danger': return 'bg-white text-gray-900';
+      default: return 'bg-white text-gray-900';
     }
   };
 
@@ -43,26 +43,24 @@ export const CEOMetricsCard: React.FC<CEOMetricsCardProps> = ({
   };
 
   return (
-    <Card className={`${getStatusColors()} transition-all hover:shadow-md`}>
-      <CardContent className="p-4">
+    <Card className={`rounded-2xl border-0 shadow-sm ${getStatusColors()} transition-all hover:shadow-md`}>
+      <CardContent className="p-2">
         <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium opacity-80">{title}</p>
-            <p className="text-3xl font-bold mt-0.5">{value}</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-gray-600 mb-1">{title}</p>
+            <p className="text-2xl font-bold text-gray-900 mb-0.5">{value}</p>
             {subtitle && (
-              <p className="text-xs opacity-70 mt-0.5">{subtitle}</p>
+              <p className="text-xs font-medium text-gray-500 mb-1">{subtitle}</p>
             )}
             {trend && (
-              <div className="flex items-center gap-1 mt-1">
-                <Badge variant="outline" className="text-xs">
-                  {trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '→'}
-                  {trend.percentage && ` ${trend.percentage}%`}
-                </Badge>
-              </div>
+              <Badge variant="outline" className="text-xs">
+                {trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '→'}
+                {trend.percentage && ` ${trend.percentage}%`}
+              </Badge>
             )}
           </div>
-          <div className={`h-10 w-10 rounded-full flex items-center justify-center ${getIconColors()}`}>
-            <Icon className="h-5 w-5" />
+          <div className={`h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ml-2 ${getIconColors()}`}>
+            <Icon className="h-4 w-4" />
           </div>
         </div>
       </CardContent>
