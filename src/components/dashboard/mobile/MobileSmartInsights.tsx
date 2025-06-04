@@ -16,16 +16,16 @@ export const MobileSmartInsights: React.FC<MobileSmartInsightsProps> = ({
   currentUtilizationRate
 }) => {
   return (
-    <Card className="rounded-2xl border-0 shadow-sm w-full max-w-full overflow-hidden">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
+    <Card className="rounded-2xl border-0 shadow-sm bg-white">
+      <CardHeader className="pb-3 px-4">
+        <CardTitle className="text-base flex items-center gap-2">
           <div className="p-1.5 bg-brand-violet/10 rounded-lg flex-shrink-0">
             <Sparkles className="h-4 w-4 text-brand-violet" />
           </div>
-          <span className="truncate">Smart Insights</span>
+          <span className="truncate text-brand-violet font-medium">Smart Insights</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0 w-full max-w-full overflow-hidden">
+      <CardContent className="pt-0 px-4 pb-4">
         <IntelligentInsights 
           teamMembers={transformedStaffData}
           activeProjects={activeProjects}

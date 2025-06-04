@@ -46,32 +46,43 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   }));
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden">
-      <div className="space-y-4 p-4 pb-20 w-full max-w-full">
+    <div className="w-full min-h-screen bg-gray-50/30">
+      <div className="max-w-sm mx-auto px-3 py-4 space-y-4">
         {/* Smart Insights */}
-        <MobileSmartInsights
-          transformedStaffData={transformedStaffData}
-          activeProjects={activeProjects}
-          currentUtilizationRate={currentUtilizationRate}
-        />
+        <div className="w-full">
+          <MobileSmartInsights
+            transformedStaffData={transformedStaffData}
+            activeProjects={activeProjects}
+            currentUtilizationRate={currentUtilizationRate}
+          />
+        </div>
         
         {/* Team Status */}
-        <MobileTeamStatus
-          transformedStaffData={transformedStaffData}
-          selectedTimeRange={selectedTimeRange}
-        />
+        <div className="w-full">
+          <MobileTeamStatus
+            transformedStaffData={transformedStaffData}
+            selectedTimeRange={selectedTimeRange}
+          />
+        </div>
 
-        {/* Performance Gauge - Simplified */}
-        <MobilePerformanceGauge
-          currentUtilizationRate={currentUtilizationRate}
-        />
+        {/* Performance Gauge */}
+        <div className="w-full">
+          <MobilePerformanceGauge
+            currentUtilizationRate={currentUtilizationRate}
+          />
+        </div>
 
         {/* Upcoming Events */}
-        <MobileUpcomingEvents />
+        <div className="w-full">
+          <MobileUpcomingEvents />
+        </div>
 
-        {/* Floating Herbie Button */}
-        <HerbieFloatingButton />
+        {/* Bottom padding for floating button */}
+        <div className="h-20"></div>
       </div>
+      
+      {/* Floating Herbie Button */}
+      <HerbieFloatingButton />
     </div>
   );
 };

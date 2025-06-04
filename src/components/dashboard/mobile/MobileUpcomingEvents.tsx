@@ -6,16 +6,16 @@ import { HolidayCard } from '../HolidayCard';
 
 export const MobileUpcomingEvents: React.FC = () => {
   return (
-    <Card className="rounded-2xl border-0 shadow-sm w-full max-w-full overflow-hidden">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center gap-2">
+    <Card className="rounded-2xl border-0 shadow-sm bg-white">
+      <CardHeader className="pb-3 px-4">
+        <CardTitle className="text-base flex items-center gap-2">
           <div className="p-1.5 bg-orange-100 rounded-lg flex-shrink-0">
             <Calendar className="h-4 w-4 text-orange-600" />
           </div>
-          <span className="truncate">Upcoming Events</span>
+          <span className="truncate font-medium">Upcoming Events</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-0 w-full max-w-full overflow-hidden">
+      <CardContent className="pt-0 px-4 pb-4">
         <HolidayCard />
       </CardContent>
     </Card>
