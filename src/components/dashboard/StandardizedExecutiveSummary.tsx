@@ -28,7 +28,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   gradientType = 'purple',
   cardOpacity = 0.9
 }) => {
-  console.log('StandardizedExecutiveSummary render (new 4-line compact format)');
+  console.log('StandardizedExecutiveSummary render (mobile-responsive 4-line compact format)');
 
   const getBadgeVariant = (color?: string) => {
     switch (color) {
@@ -148,40 +148,40 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     };
   };
 
-  console.log('Rendering new 4-line compact mobile-responsive format');
+  console.log('Rendering mobile-responsive 4-line compact format');
   return (
-    <div className="w-full bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-2xl p-3 sm:p-4 lg:p-5 border border-purple-100/50 shadow-sm">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+    <div className="w-full bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-2 sm:p-3 lg:p-4 border border-purple-100/50 shadow-sm">
+      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {metrics.map((metric, index) => {
           const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
           
           return (
             <div key={index} className="min-w-0">
-              <Card className="bg-white border border-gray-100 rounded-xl transition-all duration-300 hover:shadow-md h-full shadow-sm">
-                <CardContent className="p-2.5 sm:p-3">
-                  <div className="text-center space-y-1.5">
+              <Card className="bg-white border border-gray-100 rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
+                <CardContent className="p-2 sm:p-2.5">
+                  <div className="text-center space-y-1">
                     {/* Line 1: Small status indicator at top */}
                     <div className="flex justify-center">
                       <Badge 
                         variant={getBadgeVariant(badge.color)} 
-                        className={`text-[10px] sm:text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-1.5 py-0.5 h-5`}
+                        className={`text-[9px] sm:text-[10px] text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-1 py-0.5 h-4 sm:h-5`}
                       >
                         {badge.text}
                       </Badge>
                     </div>
                     
                     {/* Line 2: Clean title typography */}
-                    <Typography variant="body-sm" className="font-medium text-gray-700 text-xs sm:text-sm leading-tight">
+                    <Typography variant="body-sm" className="font-medium text-gray-700 text-[10px] sm:text-xs leading-tight px-1">
                       {metric.title}
                     </Typography>
                     
                     {/* Line 3: Prominent value display */}
-                    <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 leading-none py-0.5">
+                    <div className="text-sm sm:text-lg lg:text-xl font-bold text-gray-900 leading-none py-0.5">
                       {metric.value}
                     </div>
                     
                     {/* Line 4: Subtle subtitle/context */}
-                    <p className="text-[10px] sm:text-xs text-gray-500 leading-tight">
+                    <p className="text-[8px] sm:text-[10px] text-gray-500 leading-tight px-1">
                       {subtitle}
                     </p>
                   </div>
