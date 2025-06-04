@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -149,38 +150,38 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
 
   console.log('Rendering unified desktop/mobile format');
   return (
-    <div className="w-full bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-4 border border-purple-100/50 shadow-sm">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="w-full bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-3 sm:p-4 border border-purple-100/50 shadow-sm">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {metrics.map((metric, index) => {
           const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
           
           return (
             <div key={index} className="min-w-0">
-              <Card className="bg-white border border-gray-100 rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
-                <CardContent className="p-3">
-                  <div className="text-center space-y-2">
+              <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
+                <CardContent className="p-2 sm:p-3">
+                  <div className="text-center space-y-1 sm:space-y-2">
                     {/* Line 1: Status badge at top */}
                     <div className="flex justify-center">
                       <Badge 
                         variant={getBadgeVariant(badge.color)} 
-                        className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-2 py-1 h-5`}
+                        className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-1.5 sm:px-2 py-0.5 sm:py-1 h-4 sm:h-5`}
                       >
                         {badge.text}
                       </Badge>
                     </div>
                     
                     {/* Line 2: Title */}
-                    <Typography variant="body-sm" className="font-medium text-gray-700 text-sm leading-tight px-1">
+                    <Typography variant="body-sm" className="font-medium text-gray-700 text-xs sm:text-sm leading-tight px-0.5 sm:px-1">
                       {metric.title}
                     </Typography>
                     
                     {/* Line 3: Value */}
-                    <div className="text-xl font-bold text-gray-900 leading-none py-1">
+                    <div className="text-lg sm:text-xl font-bold text-gray-900 leading-none py-0.5 sm:py-1">
                       {metric.value}
                     </div>
                     
                     {/* Line 4: Subtitle */}
-                    <p className="text-xs text-gray-500 leading-tight px-1">
+                    <p className="text-xs text-gray-500 leading-tight px-0.5 sm:px-1">
                       {subtitle}
                     </p>
                   </div>
