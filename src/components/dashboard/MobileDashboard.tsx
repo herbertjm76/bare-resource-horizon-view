@@ -7,6 +7,8 @@ import { MobileUpcomingEvents } from './mobile/MobileUpcomingEvents';
 import { MobileSummaryCards } from './mobile/MobileSummaryCards';
 import { HerbieFloatingButton } from './HerbieFloatingButton';
 import { TimeRange } from './TimeRangeSelector';
+import { calculateCapacityHours } from './executiveSummary/utils/capacityUtils';
+import { getTimeRangeText } from './executiveSummary/utils/utilizationUtils';
 
 interface MobileDashboardProps {
   teamMembers: any[];
@@ -46,25 +48,20 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
     role: member.role || 'Member'
   }));
 
-  // Calculate capacity data for summary cards
-  const getTimeRangeText = () => {
-    switch (selectedTimeRange) {
-      case 'week': return 'This Week';
-      case 'month': return 'This Month';
-      case '3months': return 'This Quarter';
-      case '4months': return '4 Months';
-      case '6months': return '6 Months';
-      case 'year': return 'This Year';
-      default: return 'Selected Period';
-    }
-  };
+  // Use the same capacity calculation as the desktop version
+  const timeRangeText = getTimeRangeText(selectedTimeRange);
+  const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, currentUtilizationRate, staffData);
+  const isOverCapacity = capacityHours < 0;
 
-  // Basic capacity calculation (can be enhanced with real data)
-  const averageWeeklyCapacity = 40;
-  const totalCapacity = activeResources * averageWeeklyCapacity;
-  const utilizationHours = (totalCapacity * currentUtilizationRate) / 100;
-  const availableCapacity = totalCapacity - utilizationHours;
-  const isOverCapacity = availableCapacity < 0;
+  console.log('Mobile Dashboard - Capacity Calculation:', {
+    selectedTimeRange,
+    activeResources,
+    currentUtilizationRate,
+    staffDataCount: staffData.length,
+    capacityHours,
+    isOverCapacity,
+    timeRangeText
+  });
 
   return (
     <div className="w-full min-h-screen bg-gray-50/30">
@@ -75,9 +72,9 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
             activeResources={activeResources}
             activeProjects={activeProjects}
             utilizationRate={currentUtilizationRate}
-            capacityHours={Math.abs(availableCapacity)}
+            capacityHours={Math.abs(capacityHours)}
             isOverCapacity={isOverCapacity}
-            timeRangeText={getTimeRangeText()}
+            timeRangeText={timeRangeText}
           />
         </div>
 
