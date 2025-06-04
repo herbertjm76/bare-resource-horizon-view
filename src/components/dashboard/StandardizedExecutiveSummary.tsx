@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,7 +27,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   gradientType = 'purple',
   cardOpacity = 0.9
 }) => {
-  console.log('StandardizedExecutiveSummary render (mobile-responsive 4-line compact format)');
+  console.log('StandardizedExecutiveSummary render (mobile 2-column grid format)');
 
   const getBadgeVariant = (color?: string) => {
     switch (color) {
@@ -148,10 +147,10 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     };
   };
 
-  console.log('Rendering mobile-responsive 4-line compact format');
+  console.log('Rendering mobile 2-column grid format');
   return (
     <div className="w-full bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-2 sm:p-3 lg:p-4 border border-purple-100/50 shadow-sm">
-      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {metrics.map((metric, index) => {
           const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
           
