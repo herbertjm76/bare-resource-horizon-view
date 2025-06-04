@@ -50,41 +50,41 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   }));
 
   return (
-    <div className="space-y-5 p-3">
-      {/* Key Metrics - 10% smaller with tighter spacing */}
-      <div className="flex gap-0.5 w-full">
-        <Card className="bg-white border-gray-200/50 flex-1 min-w-[80px]">
-          <CardContent className="p-1.5 text-center">
-            <div className="flex items-center justify-center gap-0.5 mb-0.5">
-              <Users className="h-2.5 w-2.5 text-brand-violet flex-shrink-0" />
-              <p className="text-xs font-bold text-brand-violet">{activeResources}</p>
+    <div className="space-y-6 p-4">
+      {/* Key Metrics - Single row with no wrapping */}
+      <div className="flex gap-2 w-full overflow-hidden">
+        <Card className="bg-white border-gray-200/50 flex-1">
+          <CardContent className="p-3 text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Users className="h-4 w-4 text-brand-violet flex-shrink-0" />
+              <p className="text-sm font-bold text-brand-violet">{activeResources}</p>
             </div>
-            <p className="text-[10px] text-gray-600">Members</p>
+            <p className="text-xs text-gray-600">Members</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-white border-gray-200/50 flex-1 min-w-[80px]">
-          <CardContent className="p-1.5 text-center">
-            <div className="flex items-center justify-center gap-0.5 mb-0.5">
-              <TrendingUp className="h-2.5 w-2.5 text-brand-violet flex-shrink-0" />
-              <p className="text-xs font-bold text-brand-violet">{activeProjects}</p>
+        <Card className="bg-white border-gray-200/50 flex-1">
+          <CardContent className="p-3 text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <TrendingUp className="h-4 w-4 text-brand-violet flex-shrink-0" />
+              <p className="text-sm font-bold text-brand-violet">{activeProjects}</p>
             </div>
-            <p className="text-[10px] text-gray-600">Projects</p>
+            <p className="text-xs text-gray-600">Projects</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-white border-gray-200/50 flex-1 min-w-[80px]">
-          <CardContent className="p-1.5 text-center">
-            <div className="flex items-center justify-center gap-0.5 mb-0.5">
-              <Building className="h-2.5 w-2.5 text-brand-violet flex-shrink-0" />
-              <p className="text-xs font-bold text-brand-violet">3</p>
+        <Card className="bg-white border-gray-200/50 flex-1">
+          <CardContent className="p-3 text-center">
+            <div className="flex items-center justify-center gap-1 mb-1">
+              <Building className="h-4 w-4 text-brand-violet flex-shrink-0" />
+              <p className="text-sm font-bold text-brand-violet">3</p>
             </div>
-            <p className="text-[10px] text-gray-600">Offices</p>
+            <p className="text-xs text-gray-600">Offices</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Dashboard Cards - 2 Column Grid */}
+      {/* Main Dashboard Cards */}
       <div className="grid grid-cols-1 gap-6">
         {/* Smart Insights */}
         <div>
