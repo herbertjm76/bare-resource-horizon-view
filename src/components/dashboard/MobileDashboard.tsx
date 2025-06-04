@@ -4,7 +4,6 @@ import { MobileSmartInsights } from './mobile/MobileSmartInsights';
 import { MobileTeamStatus } from './mobile/MobileTeamStatus';
 import { MobilePerformanceGauge } from './mobile/MobilePerformanceGauge';
 import { MobileUpcomingEvents } from './mobile/MobileUpcomingEvents';
-import { MobileSummaryCards } from './mobile/MobileSummaryCards';
 import { HerbieFloatingButton } from './HerbieFloatingButton';
 import { TimeRange } from './TimeRangeSelector';
 import { calculateCapacityHours } from './executiveSummary/utils/capacityUtils';
@@ -66,18 +65,6 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   return (
     <div className="w-full min-h-screen bg-gray-50/30">
       <div className="max-w-sm mx-auto px-3 py-4 space-y-4">
-        {/* Summary Cards */}
-        <div className="w-full">
-          <MobileSummaryCards
-            activeResources={activeResources}
-            activeProjects={activeProjects}
-            utilizationRate={currentUtilizationRate}
-            capacityHours={Math.abs(capacityHours)}
-            isOverCapacity={isOverCapacity}
-            timeRangeText={timeRangeText}
-          />
-        </div>
-
         {/* Smart Insights */}
         <div className="w-full">
           <MobileSmartInsights
