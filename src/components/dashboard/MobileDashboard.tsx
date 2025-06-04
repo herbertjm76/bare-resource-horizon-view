@@ -51,37 +51,37 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
 
   return (
     <div className="space-y-6 p-4">
-      {/* Key Metrics - Colorful cards in single row */}
+      {/* Key Metrics - Single row with flex layout */}
       <div className="flex gap-2 overflow-x-auto">
-        <div className="flex-1 min-w-0">
-          <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-4 border border-purple-200">
-            <div className="flex items-center gap-2 mb-1">
-              <Users className="h-4 w-4 text-purple-600" />
-              <span className="text-lg font-bold text-purple-800">{activeResources}</span>
+        <Card className="bg-white border-gray-200/50 flex-1 min-w-0">
+          <CardContent className="p-3 text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Users className="h-4 w-4 text-brand-violet" />
+              <p className="text-lg font-bold text-brand-violet">{activeResources}</p>
             </div>
-            <p className="text-sm text-purple-600 font-medium">Members</p>
-          </div>
-        </div>
+            <p className="text-xs text-gray-600">Members</p>
+          </CardContent>
+        </Card>
         
-        <div className="flex-1 min-w-0">
-          <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl p-4 border border-green-200">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-green-600" />
-              <span className="text-lg font-bold text-green-800">{activeProjects}</span>
+        <Card className="bg-white border-gray-200/50 flex-1 min-w-0">
+          <CardContent className="p-3 text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <TrendingUp className="h-4 w-4 text-brand-violet" />
+              <p className="text-lg font-bold text-brand-violet">{activeProjects}</p>
             </div>
-            <p className="text-sm text-green-600 font-medium">Projects</p>
-          </div>
-        </div>
+            <p className="text-xs text-gray-600">Projects</p>
+          </CardContent>
+        </Card>
         
-        <div className="flex-1 min-w-0">
-          <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl p-4 border border-blue-200">
-            <div className="flex items-center gap-2 mb-1">
-              <Building className="h-4 w-4 text-blue-600" />
-              <span className="text-lg font-bold text-blue-800">3</span>
+        <Card className="bg-white border-gray-200/50 flex-1 min-w-0">
+          <CardContent className="p-3 text-center">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Building className="h-4 w-4 text-brand-violet" />
+              <p className="text-lg font-bold text-brand-violet">3</p>
             </div>
-            <p className="text-sm text-blue-600 font-medium">Offices</p>
-          </div>
-        </div>
+            <p className="text-xs text-gray-600">Offices</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Main Dashboard Cards - 2 Column Grid */}
