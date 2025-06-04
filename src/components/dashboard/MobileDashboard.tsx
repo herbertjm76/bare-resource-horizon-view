@@ -2,8 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Users, Briefcase, Calendar, Sparkles } from 'lucide-react';
-import { EnhancedInsights } from './EnhancedInsights';
+import { TrendingUp, Users, Briefcase, Calendar, Sparkles, Target } from 'lucide-react';
 import { IntelligentInsights } from './IntelligentInsights';
 import { HolidayCard } from './HolidayCard';
 import { StaffStatusCard } from './staff/StaffStatusCard';
@@ -60,51 +59,66 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   const utilizationStatus = getUtilizationStatus(currentUtilizationRate);
 
   return (
-    <div className="space-y-4 p-4 pb-20">
-      {/* Header Stats - Quick Overview */}
+    <div className="space-y-6 p-4 pb-20">
+      {/* Quick Stats Overview */}
       <div className="bg-gradient-to-r from-brand-violet to-purple-600 rounded-2xl p-6 text-white">
-        <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
           <Sparkles className="h-5 w-5" />
-          Team Overview
+          Dashboard Overview
         </h2>
         
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Users className="h-4 w-4 mr-1" />
-              <span className="text-2xl font-bold">{activeResources}</span>
+        {/* Stats Grid - Vertical on mobile */}
+        <div className="space-y-4">
+          <div className="flex justify-between items-center p-4 bg-white/10 rounded-xl">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Users className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-white/80 text-sm">Team Members</p>
+                <p className="text-2xl font-bold">{activeResources}</p>
+              </div>
             </div>
-            <p className="text-white/80 text-sm">Team Members</p>
           </div>
           
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Briefcase className="h-4 w-4 mr-1" />
-              <span className="text-2xl font-bold">{activeProjects}</span>
+          <div className="flex justify-between items-center p-4 bg-white/10 rounded-xl">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Briefcase className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-white/80 text-sm">Active Projects</p>
+                <p className="text-2xl font-bold">{activeProjects}</p>
+              </div>
             </div>
-            <p className="text-white/80 text-sm">Active Projects</p>
           </div>
           
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-1">
-              <TrendingUp className="h-4 w-4 mr-1" />
-              <span className="text-2xl font-bold">{currentUtilizationRate}%</span>
+          <div className="flex justify-between items-center p-4 bg-white/10 rounded-xl">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <TrendingUp className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-white/80 text-sm">Team Utilization</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-2xl font-bold">{currentUtilizationRate}%</p>
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-white/20 text-white border-white/30 text-xs"
+                  >
+                    {utilizationStatus.status}
+                  </Badge>
+                </div>
+              </div>
             </div>
-            <p className="text-white/80 text-sm">Utilization</p>
-            <Badge 
-              variant="secondary" 
-              className="mt-1 bg-white/20 text-white border-white/30 text-xs"
-            >
-              {utilizationStatus.status}
-            </Badge>
           </div>
         </div>
       </div>
 
-      {/* Smart Insights - Primary Content */}
-      <Card className="rounded-2xl border-0 shadow-sm bg-white">
+      {/* Smart Insights */}
+      <Card className="rounded-2xl border-0 shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+          <CardTitle className="text-lg flex items-center gap-2">
             <div className="p-1.5 bg-brand-violet/10 rounded-lg">
               <Sparkles className="h-4 w-4 text-brand-violet" />
             </div>
@@ -120,10 +134,10 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         </CardContent>
       </Card>
       
-      {/* Team Status - Important Secondary Content */}
-      <Card className="rounded-2xl border-0 shadow-sm bg-white">
+      {/* Team Status */}
+      <Card className="rounded-2xl border-0 shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+          <CardTitle className="text-lg flex items-center gap-2">
             <div className="p-1.5 bg-blue-100 rounded-lg">
               <Users className="h-4 w-4 text-blue-600" />
             </div>
@@ -138,10 +152,34 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         </CardContent>
       </Card>
 
-      {/* Upcoming Events - Tertiary Content */}
-      <Card className="rounded-2xl border-0 shadow-sm bg-white">
+      {/* Performance Gauge - Simplified */}
+      <Card className="rounded-2xl border-0 shadow-sm bg-gradient-to-br from-gray-50 to-white">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <div className="p-1.5 bg-brand-violet/10 rounded-lg">
+              <Target className="h-4 w-4 text-brand-violet" />
+            </div>
+            Current Performance
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center">
+          <Gauge
+            value={currentUtilizationRate}
+            max={100}
+            title="Team Utilization"
+            size="lg"
+            thresholds={{ good: 60, warning: 80, critical: 90 }}
+          />
+          <p className="text-sm text-gray-600 mt-4 text-center">
+            Current week performance vs capacity
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Upcoming Events */}
+      <Card className="rounded-2xl border-0 shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
+          <CardTitle className="text-lg flex items-center gap-2">
             <div className="p-1.5 bg-orange-100 rounded-lg">
               <Calendar className="h-4 w-4 text-orange-600" />
             </div>
@@ -150,48 +188,6 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         </CardHeader>
         <CardContent className="pt-0">
           <HolidayCard />
-        </CardContent>
-      </Card>
-
-      {/* Utilization Trends - Detailed Analytics */}
-      <Card className="rounded-2xl border-0 shadow-sm bg-gradient-to-br from-gray-50 to-white">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg text-gray-900 flex items-center gap-2">
-            <div className="p-1.5 bg-brand-violet/10 rounded-lg">
-              <TrendingUp className="h-4 w-4 text-brand-violet" />
-            </div>
-            Utilization Trends
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            <div className="text-center">
-              <Gauge
-                value={utilizationTrends.days7}
-                max={100}
-                title="7-Day Average"
-                size="lg"
-                thresholds={{ good: 60, warning: 80, critical: 90 }}
-              />
-              <p className="text-sm text-gray-600 mt-2">Current week performance</p>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-white rounded-xl border border-gray-100">
-                <div className="text-2xl font-bold text-gray-900 mb-1">
-                  {utilizationTrends.days30}%
-                </div>
-                <div className="text-sm text-gray-600">30-Day Average</div>
-              </div>
-              
-              <div className="text-center p-4 bg-white rounded-xl border border-gray-100">
-                <div className="text-2xl font-bold text-gray-900 mb-1">
-                  {utilizationTrends.days90}%
-                </div>
-                <div className="text-sm text-gray-600">90-Day Average</div>
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
 
