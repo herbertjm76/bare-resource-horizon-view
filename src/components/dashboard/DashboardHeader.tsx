@@ -66,36 +66,36 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   return (
     <div className="sticky top-0 z-10 bg-background border-b border-gray-200 p-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        {/* Time period quick selection buttons */}
-        <div className="flex gap-2">
+      <div className="flex flex-row justify-between items-center gap-2">
+        {/* Time period quick selection buttons - horizontal on mobile */}
+        <div className="flex gap-1 flex-wrap">
           <Button
             variant={selectedTimeRange === 'week' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedTimeRange('week')}
-            className="text-xs"
+            className="text-xs px-2 py-1 h-7"
           >
-            This Week
+            Week
           </Button>
           <Button
             variant={selectedTimeRange === 'month' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedTimeRange('month')}
-            className="text-xs"
+            className="text-xs px-2 py-1 h-7"
           >
-            This Month
+            Month
           </Button>
           <Button
             variant={selectedTimeRange === '3months' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedTimeRange('3months')}
-            className="text-xs"
+            className="text-xs px-2 py-1 h-7"
           >
-            This Quarter
+            Quarter
           </Button>
         </div>
         
-        <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <FilterButton
             activeFiltersCount={activeFiltersCount}
             filterContent={filterContent}

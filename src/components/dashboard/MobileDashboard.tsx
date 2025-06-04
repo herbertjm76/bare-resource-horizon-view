@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, Users, DollarSign, TrendingUp } from 'lucide-react';
+import { Users, TrendingUp } from 'lucide-react';
 import { EnhancedInsights } from './EnhancedInsights';
 import { IntelligentInsights } from './IntelligentInsights';
 import { HolidayCard } from './HolidayCard';
@@ -51,45 +51,26 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
 
   return (
     <div className="space-y-6 p-4">
-      {/* Key Metrics - Single Line */}
-      <div className="grid grid-cols-4 gap-2">
+      {/* Key Metrics - Single Line with smaller text */}
+      <div className="grid grid-cols-3 gap-1">
         <Card className="bg-white border-gray-200/50">
-          <CardContent className="p-3 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <TrendingUp className="h-4 w-4 text-brand-violet/60" />
-            </div>
-            <p className="text-lg font-bold text-brand-violet">{currentUtilizationRate}%</p>
-            <p className="text-xs text-gray-600">Utilization</p>
+          <CardContent className="p-2 text-center">
+            <p className="text-sm font-bold text-brand-violet">{activeResources}</p>
+            <p className="text-xs text-gray-600">Members</p>
           </CardContent>
         </Card>
         
         <Card className="bg-white border-gray-200/50">
-          <CardContent className="p-3 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Activity className="h-4 w-4 text-brand-violet/60" />
-            </div>
-            <p className="text-lg font-bold text-brand-violet">{activeProjects}</p>
+          <CardContent className="p-2 text-center">
+            <p className="text-sm font-bold text-brand-violet">{activeProjects}</p>
             <p className="text-xs text-gray-600">Projects</p>
           </CardContent>
         </Card>
         
         <Card className="bg-white border-gray-200/50">
-          <CardContent className="p-3 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Users className="h-4 w-4 text-brand-violet/60" />
-            </div>
-            <p className="text-lg font-bold text-brand-violet">{activeResources}</p>
-            <p className="text-xs text-gray-600">Team</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-white border-gray-200/50">
-          <CardContent className="p-3 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <DollarSign className="h-4 w-4 text-brand-violet/60" />
-            </div>
-            <p className="text-lg font-bold text-brand-violet">2,340h</p>
-            <p className="text-xs text-gray-600">Capacity</p>
+          <CardContent className="p-2 text-center">
+            <p className="text-sm font-bold text-brand-violet">3</p>
+            <p className="text-xs text-gray-600">Offices</p>
           </CardContent>
         </Card>
       </div>
