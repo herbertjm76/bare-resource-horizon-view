@@ -57,38 +57,40 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   const utilizationStatus = getUtilizationStatus(currentUtilizationRate);
 
   return (
-    <div className="space-y-6 p-4 pb-20">
-      {/* Quick Stats Overview */}
-      <MobileStatsOverview
-        activeResources={activeResources}
-        activeProjects={activeProjects}
-        currentUtilizationRate={currentUtilizationRate}
-        utilizationStatus={utilizationStatus}
-      />
+    <div className="w-full max-w-full overflow-x-hidden">
+      <div className="space-y-4 p-4 pb-20 w-full max-w-full">
+        {/* Quick Stats Overview */}
+        <MobileStatsOverview
+          activeResources={activeResources}
+          activeProjects={activeProjects}
+          currentUtilizationRate={currentUtilizationRate}
+          utilizationStatus={utilizationStatus}
+        />
 
-      {/* Smart Insights */}
-      <MobileSmartInsights
-        transformedStaffData={transformedStaffData}
-        activeProjects={activeProjects}
-        currentUtilizationRate={currentUtilizationRate}
-      />
-      
-      {/* Team Status */}
-      <MobileTeamStatus
-        transformedStaffData={transformedStaffData}
-        selectedTimeRange={selectedTimeRange}
-      />
+        {/* Smart Insights */}
+        <MobileSmartInsights
+          transformedStaffData={transformedStaffData}
+          activeProjects={activeProjects}
+          currentUtilizationRate={currentUtilizationRate}
+        />
+        
+        {/* Team Status */}
+        <MobileTeamStatus
+          transformedStaffData={transformedStaffData}
+          selectedTimeRange={selectedTimeRange}
+        />
 
-      {/* Performance Gauge - Simplified */}
-      <MobilePerformanceGauge
-        currentUtilizationRate={currentUtilizationRate}
-      />
+        {/* Performance Gauge - Simplified */}
+        <MobilePerformanceGauge
+          currentUtilizationRate={currentUtilizationRate}
+        />
 
-      {/* Upcoming Events */}
-      <MobileUpcomingEvents />
+        {/* Upcoming Events */}
+        <MobileUpcomingEvents />
 
-      {/* Floating Herbie Button */}
-      <HerbieFloatingButton />
+        {/* Floating Herbie Button */}
+        <HerbieFloatingButton />
+      </div>
     </div>
   );
 };
