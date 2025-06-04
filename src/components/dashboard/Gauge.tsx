@@ -6,23 +6,46 @@ interface GaugeProps {
   max: number;
   title: string;
   size?: 'sm' | 'lg';
+  showPercentage?: boolean;
+  thresholds?: {
+    good: number;
+    warning: number;
+    critical: number;
+  };
 }
 
-export const Gauge: React.FC<GaugeProps> = ({ value, max, title, size = 'sm' }) => {
+export const Gauge: React.FC<GaugeProps> = ({ 
+  value, 
+  max, 
+  title, 
+  size = 'sm',
+  showPercentage = true,
+  thresholds = { good: 60, warning: 80, critical: 90 }
+}) => {
   const percentage = Math.min((value / max) * 100, 100);
-  const circumference = 2 * Math.PI * 40; // Reduced radius for better fit
+  const circumference = 2 * Math.PI * 40;
   const strokeDasharray = `${(percentage / 100) * circumference} ${circumference}`;
   
   const getColor = (value: number) => {
-    if (value < 60) return '#3B82F6'; // blue
-    if (value < 80) return '#10B981'; // green
-    if (value < 90) return '#F59E0B'; // yellow
-    return '#EF4444'; // red
+    if (value < thresholds.good) return '#3B82F6'; // blue - under-utilized
+    if (value < thresholds.warning) return '#10B981'; // green - optimal
+    if (value < thresholds.critical) return '#F59E0B'; // yellow - high
+    return '#EF4444'; // red - over-utilized
+  };
+
+  const getLabel = (value: number) => {
+    if (value < thresholds.good) return 'Available';
+    if (value < thresholds.warning) return 'Optimal';
+    if (value < thresholds.critical) return 'High';
+    return 'Critical';
   };
 
   const dimensions = size === 'lg' 
-    ? { size: 100, strokeWidth: 6, fontSize: 'text-lg', radius: 40 }
-    : { size: 70, strokeWidth: 4, fontSize: 'text-sm', radius: 30 };
+    ? { size: 120, strokeWidth: 8, fontSize: 'text-xl', radius: 45, centerFontSize: 'text-lg' }
+    : { size: 80, strokeWidth: 6, fontSize: 'text-sm', radius: 32, centerFontSize: 'text-sm' };
+
+  const color = getColor(value);
+  const label = getLabel(value);
 
   return (
     <div className="flex flex-col items-center justify-center p-2">
@@ -47,22 +70,39 @@ export const Gauge: React.FC<GaugeProps> = ({ value, max, title, size = 'sm' }) 
             cx={dimensions.size / 2}
             cy={dimensions.size / 2}
             r={dimensions.radius}
-            stroke={getColor(value)}
+            stroke={color}
             strokeWidth={dimensions.strokeWidth}
             fill="none"
             strokeDasharray={strokeDasharray}
             strokeLinecap="round"
-            className="transition-all duration-300 ease-in-out"
+            className="transition-all duration-500 ease-out"
+            style={{
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+            }}
           />
         </svg>
-        {/* Center text */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className={`font-bold ${dimensions.fontSize}`} style={{ color: getColor(value) }}>
-            {value}%
+        {/* Center content */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className={`font-bold ${dimensions.centerFontSize}`} style={{ color }}>
+            {showPercentage ? `${Math.round(value)}%` : value}
           </span>
+          {size === 'lg' && (
+            <span className="text-xs text-gray-500 mt-1 font-medium">
+              {label}
+            </span>
+          )}
         </div>
       </div>
-      <p className="mt-1 text-xs text-gray-600 text-center leading-tight">{title}</p>
+      <div className="mt-2 text-center">
+        <p className={`font-medium text-gray-700 ${dimensions.fontSize} leading-tight`}>
+          {title}
+        </p>
+        {size === 'sm' && (
+          <p className="text-xs text-gray-500 mt-1 font-medium">
+            {label}
+          </p>
+        )}
+      </div>
     </div>
   );
 };

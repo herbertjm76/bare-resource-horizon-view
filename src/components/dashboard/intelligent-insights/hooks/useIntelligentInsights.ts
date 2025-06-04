@@ -1,15 +1,17 @@
 
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAnnualLeaveInsights } from '@/hooks/useAnnualLeaveInsights';
-import { TeamMember, InsightItem } from '../types';
-import { 
-  generateUtilizationInsights,
-  generateProjectLoadInsights,
-  generateTeamScalingInsights,
-  generateOptimalInsights
-} from '../utils/insightGenerators';
-import { generateLeaveInsights } from '../utils/leaveInsightGenerators';
+import { generateCapacityInsights } from '../utils/insightGenerators';
+import { generateUtilizationInsights } from '../utils/insightGenerators';
+import { generateProjectLoadInsights } from '../utils/insightGenerators';
+import { generateTeamScalingInsights } from '../utils/insightGenerators';
+
+interface TeamMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+  weekly_capacity?: number;
+  job_title?: string;
+}
 
 interface UseIntelligentInsightsProps {
   teamMembers: TeamMember[];
@@ -22,30 +24,21 @@ export const useIntelligentInsights = ({
   activeProjects,
   utilizationRate
 }: UseIntelligentInsightsProps) => {
-  const navigate = useNavigate();
-  const { insights: leaveInsights } = useAnnualLeaveInsights(teamMembers);
-  
   const insights = useMemo(() => {
-    const allInsights: InsightItem[] = [];
-    const teamSize = teamMembers.length;
+    const allInsights = [
+      ...generateUtilizationInsights(utilizationRate, teamMembers.length),
+      ...generateCapacityInsights(teamMembers, utilizationRate),
+      ...generateProjectLoadInsights(activeProjects, teamMembers.length, utilizationRate),
+      ...generateTeamScalingInsights(teamMembers.length, utilizationRate, activeProjects)
+    ];
+
+    // Sort by severity and return top insights
+    const priorityOrder = { 'critical': 4, 'warning': 3, 'info': 2, 'success': 1 };
     
-    // Annual Leave Insights (prioritized)
-    allInsights.push(...generateLeaveInsights(leaveInsights, teamSize, navigate));
-    
-    // Utilization analysis
-    allInsights.push(...generateUtilizationInsights(utilizationRate, teamSize, navigate));
-
-    // Project to team ratio analysis
-    allInsights.push(...generateProjectLoadInsights(activeProjects, teamSize, navigate));
-
-    // Team size recommendations
-    allInsights.push(...generateTeamScalingInsights(teamSize, activeProjects, navigate));
-
-    // Optimal utilization
-    allInsights.push(...generateOptimalInsights(utilizationRate));
-
-    return allInsights;
-  }, [teamMembers, activeProjects, utilizationRate, leaveInsights, navigate]);
+    return allInsights
+      .sort((a, b) => (priorityOrder[b.severity as keyof typeof priorityOrder] || 0) - (priorityOrder[a.severity as keyof typeof priorityOrder] || 0))
+      .slice(0, 6); // Limit to 6 most important insights
+  }, [teamMembers, activeProjects, utilizationRate]);
 
   return { insights };
 };
