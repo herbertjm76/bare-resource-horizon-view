@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Users, TrendingUp } from 'lucide-react';
+import { Users, TrendingUp, Building } from 'lucide-react';
 import { EnhancedInsights } from './EnhancedInsights';
 import { IntelligentInsights } from './IntelligentInsights';
 import { HolidayCard } from './HolidayCard';
@@ -51,28 +51,37 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
 
   return (
     <div className="space-y-6 p-4">
-      {/* Key Metrics - Single Line with minimal spacing */}
-      <div className="grid grid-cols-3 gap-1">
-        <Card className="bg-white border-gray-200/50">
-          <CardContent className="p-2 text-center">
-            <p className="text-sm font-bold text-brand-violet">{activeResources}</p>
-            <p className="text-xs text-gray-600">Members</p>
-          </CardContent>
-        </Card>
+      {/* Key Metrics - Colorful cards in single row */}
+      <div className="flex gap-2 overflow-x-auto">
+        <div className="flex-1 min-w-0">
+          <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl p-4 border border-purple-200">
+            <div className="flex items-center gap-2 mb-1">
+              <Users className="h-4 w-4 text-purple-600" />
+              <span className="text-lg font-bold text-purple-800">{activeResources}</span>
+            </div>
+            <p className="text-sm text-purple-600 font-medium">Members</p>
+          </div>
+        </div>
         
-        <Card className="bg-white border-gray-200/50">
-          <CardContent className="p-2 text-center">
-            <p className="text-sm font-bold text-brand-violet">{activeProjects}</p>
-            <p className="text-xs text-gray-600">Projects</p>
-          </CardContent>
-        </Card>
+        <div className="flex-1 min-w-0">
+          <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl p-4 border border-green-200">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="h-4 w-4 text-green-600" />
+              <span className="text-lg font-bold text-green-800">{activeProjects}</span>
+            </div>
+            <p className="text-sm text-green-600 font-medium">Projects</p>
+          </div>
+        </div>
         
-        <Card className="bg-white border-gray-200/50">
-          <CardContent className="p-2 text-center">
-            <p className="text-sm font-bold text-brand-violet">3</p>
-            <p className="text-xs text-gray-600">Offices</p>
-          </CardContent>
-        </Card>
+        <div className="flex-1 min-w-0">
+          <div className="bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl p-4 border border-blue-200">
+            <div className="flex items-center gap-2 mb-1">
+              <Building className="h-4 w-4 text-blue-600" />
+              <span className="text-lg font-bold text-blue-800">3</span>
+            </div>
+            <p className="text-sm text-blue-600 font-medium">Offices</p>
+          </div>
+        </div>
       </div>
 
       {/* Main Dashboard Cards - 2 Column Grid */}
