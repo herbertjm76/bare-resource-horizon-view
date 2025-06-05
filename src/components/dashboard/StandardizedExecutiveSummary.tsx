@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,19 +31,9 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
 }) => {
   console.log('StandardizedExecutiveSummary render (unified desktop/mobile format)');
 
-  const getIconColor = (badgeColor?: string, isGood?: boolean) => {
-    // Use indicator color for good/bad
-    if (isGood === true) return 'text-green-600 bg-green-100';
-    if (isGood === false) return 'text-red-600 bg-red-100';
-    
-    // Fallback to badge color
-    switch (badgeColor) {
-      case 'green': return 'text-green-600 bg-green-100';
-      case 'red': return 'text-red-600 bg-red-100';
-      case 'orange': return 'text-orange-600 bg-orange-100';
-      case 'blue': return 'text-blue-600 bg-blue-100';
-      default: return 'text-brand-violet bg-brand-violet/10';
-    }
+  const getIconColor = () => {
+    // Always use brand-violet for consistency across all executive summary cards
+    return 'text-brand-violet bg-brand-violet/10';
   };
 
   const getBadgeStyle = (badgeColor?: string, isGood?: boolean) => {
@@ -186,7 +175,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                   <div className="text-center space-y-1 sm:space-y-2">
                     {/* Line 1: Icon at top */}
                     <div className="flex justify-center">
-                      <div className={`p-1.5 sm:p-2 rounded-full ${getIconColor(badge.color, metric.isGood)}`}>
+                      <div className={`p-1.5 sm:p-2 rounded-full ${getIconColor()}`}>
                         <IconComponent className="h-3 w-3 sm:h-4 sm:w-4" />
                       </div>
                     </div>
