@@ -47,7 +47,9 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
     <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
       <CardHeader className="flex-shrink-0">
         <CardTitle className="text-lg flex items-center gap-2">
-          <Users className="h-5 w-5 text-brand-violet" />
+          <div className="p-1.5 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
+            <Users className="h-5 w-5 text-white" />
+          </div>
           <span className="text-brand-violet font-semibold">Staff Status</span>
           <span className="text-sm font-normal ml-2 bg-gray-100 px-2 py-0.5 rounded">
             {getTimeRangeText()}
