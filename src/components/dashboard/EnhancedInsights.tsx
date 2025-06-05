@@ -8,7 +8,7 @@ import { getAllInsights } from './insights/utils/insightAggregator';
 import { InsightItem } from './insights/components/InsightItem';
 import { MetricsSummary } from './insights/components/MetricsSummary';
 import { EmptyInsightsState } from './insights/components/EmptyInsightsState';
-import { StandardizedHeaderBadge } from './mobile/components/StandardizedHeaderBadge';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface EnhancedInsightsProps {
   utilizationRate: number;
@@ -43,9 +43,9 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-brand-violet" />
           Smart Insights
-          <StandardizedHeaderBadge>
+          <StandardizedBadge variant="status" className="text-xs">
             {getTimeRangeText()}
-          </StandardizedHeaderBadge>
+          </StandardizedBadge>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden p-0">

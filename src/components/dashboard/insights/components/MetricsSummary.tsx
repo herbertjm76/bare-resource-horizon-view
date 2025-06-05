@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { TimeRange } from '../../TimeRangeSelector';
-import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface MetricsSummaryProps {
   utilizationRate: number;
@@ -32,29 +31,13 @@ export const MetricsSummary: React.FC<MetricsSummaryProps> = ({
     <div className="mt-3 pt-3 border-t border-gray-100">
       <div className="text-xs text-gray-500 space-y-0.5">
         <p><strong>Current Metrics ({getTimeRangeText()}):</strong></p>
-        <div className="flex justify-between items-center">
-          <span>Utilization:</span>
-          <StandardizedBadge variant="status" className="text-xs">
-            {utilizationRate}%
-          </StandardizedBadge>
+        <div className="flex justify-between">
+          <span>Utilization: {utilizationRate}%</span>
+          <span>Team: {teamSize} members</span>
         </div>
-        <div className="flex justify-between items-center">
-          <span>Team:</span>
-          <StandardizedBadge variant="status" className="text-xs">
-            {teamSize} members
-          </StandardizedBadge>
-        </div>
-        <div className="flex justify-between items-center">
-          <span>Projects:</span>
-          <StandardizedBadge variant="status" className="text-xs">
-            {activeProjects}
-          </StandardizedBadge>
-        </div>
-        <div className="flex justify-between items-center">
-          <span>Load:</span>
-          <StandardizedBadge variant="status" className="text-xs">
-            {teamSize > 0 ? (activeProjects / teamSize).toFixed(1) : '0'} proj/person
-          </StandardizedBadge>
+        <div className="flex justify-between">
+          <span>Projects: {activeProjects}</span>
+          <span>Load: {teamSize > 0 ? (activeProjects / teamSize).toFixed(1) : '0'} proj/person</span>
         </div>
       </div>
     </div>

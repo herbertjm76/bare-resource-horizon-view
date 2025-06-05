@@ -3,7 +3,6 @@ import React from 'react';
 import { LayoutDashboard, Users, Briefcase, Building2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useCompany } from '@/context/CompanyContext';
-import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface ModernDashboardHeaderProps {
   totalTeamMembers?: number;
@@ -32,13 +31,13 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
           </h1>
         </div>
         
-        {/* Quick Stats Cards - Using StandardizedBadge for numbers */}
+        {/* Quick Stats Cards - Standardized icons and colors */}
         <div className="flex flex-wrap items-center gap-3">
           <Card className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-brand-violet" strokeWidth={1.5} />
               <div className="text-xs sm:text-sm">
-                <StandardizedBadge variant="count" className="font-semibold text-brand-violet bg-transparent border-0 p-0">{totalTeamMembers}</StandardizedBadge>
+                <span className="font-semibold text-brand-violet">{totalTeamMembers}</span>
                 <span className="text-muted-foreground ml-1">Members</span>
               </div>
             </div>
@@ -48,7 +47,7 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
             <div className="flex items-center gap-1.5 sm:gap-2">
               <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" strokeWidth={1.5} />
               <div className="text-xs sm:text-sm">
-                <StandardizedBadge variant="count" className="font-semibold text-blue-600 bg-transparent border-0 p-0">{totalActiveProjects}</StandardizedBadge>
+                <span className="font-semibold text-blue-600">{totalActiveProjects}</span>
                 <span className="text-muted-foreground ml-1">Projects</span>
               </div>
             </div>
@@ -58,7 +57,7 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
             <div className="flex items-center gap-1.5 sm:gap-2">
               <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600" strokeWidth={1.5} />
               <div className="text-xs sm:text-sm">
-                <StandardizedBadge variant="count" className="font-semibold text-emerald-600 bg-transparent border-0 p-0">{totalOffices}</StandardizedBadge>
+                <span className="font-semibold text-emerald-600">{totalOffices}</span>
                 <span className="text-muted-foreground ml-1">Offices</span>
               </div>
             </div>
