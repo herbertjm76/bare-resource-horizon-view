@@ -68,12 +68,12 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
   ];
 
   return (
-    <div className="space-y-3 sm:space-y-0">
-      {/* Mobile-first layout */}
-      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 sm:items-center">
+    <div className="space-y-3">
+      {/* Single row layout - mobile optimized */}
+      <div className="flex items-center justify-between gap-2 sm:gap-4">
         
-        {/* Week navigation - priority item, always visible */}
-        <div className="flex items-center border rounded-lg p-1.5 sm:p-2 shadow-sm bg-white order-1">
+        {/* Week navigation - flex-shrink-0 to prevent compression */}
+        <div className="flex items-center border rounded-lg p-1.5 sm:p-2 shadow-sm bg-white flex-shrink-0">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -88,7 +88,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
             <PopoverTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-1 px-2 py-1 h-7 hover:bg-gray-100 min-w-0">
                 <Calendar className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                <span className="text-xs sm:text-sm font-medium truncate max-w-[120px] sm:max-w-none">
+                <span className="text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-none">
                   {format(selectedWeek, 'MMM d')}
                 </span>
               </Button>
@@ -147,17 +147,17 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
           </Button>
         </div>
         
-        {/* Filter controls - compact for mobile */}
-        <div className="flex items-center gap-2 order-2">
+        {/* Filter controls - compact and right-aligned */}
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex items-center gap-1.5 h-8 px-2.5 bg-white border-gray-200 shadow-sm hover:bg-gray-50 text-xs sm:text-sm"
+                className="flex items-center gap-1 h-8 px-2 sm:px-2.5 bg-white border-gray-200 shadow-sm hover:bg-gray-50 text-xs"
               >
                 <Filter className="h-3 w-3" />
-                <span className="hidden sm:inline">Filters</span>
+                <span className="hidden xs:inline">Filters</span>
                 {activeFilterCount > 0 && (
                   <Badge variant="secondary" className="h-4 px-1 text-xs bg-brand-violet/10 text-brand-violet border-0">
                     {activeFilterCount}
@@ -191,7 +191,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
                 onFilterChange('office', 'all');
                 onFilterChange('searchTerm', '');
               }}
-              className="h-8 text-xs sm:text-sm text-muted-foreground hover:text-foreground hover:bg-gray-50 px-2"
+              className="h-8 text-xs text-muted-foreground hover:text-foreground hover:bg-gray-50 px-1.5 sm:px-2"
             >
               Clear
             </Button>
