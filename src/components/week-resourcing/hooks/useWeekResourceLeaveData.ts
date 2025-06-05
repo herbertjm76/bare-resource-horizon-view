@@ -82,13 +82,15 @@ export const useWeekResourceLeaveData = ({ weekStartDate, memberIds }: UseWeekRe
         
         // Calculate days that fall within the week
         let holidayHours = 0;
-        for (let d = new Date(Math.max(startDate.getTime(), weekStart.getTime())); 
-             d <= Math.min(endDate.getTime(), weekEnd.getTime()); 
-             d.setDate(d.getDate() + 1)) {
+        const currentDate = new Date(Math.max(startDate.getTime(), weekStart.getTime()));
+        const endLimit = new Date(Math.min(endDate.getTime(), weekEnd.getTime()));
+        
+        while (currentDate <= endLimit) {
           // Skip weekends (Saturday = 6, Sunday = 0)
-          if (d.getDay() !== 0 && d.getDay() !== 6) {
+          if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {
             holidayHours += 8; // Standard 8-hour holiday
           }
+          currentDate.setDate(currentDate.getDate() + 1);
         }
         
         // Apply to all members
