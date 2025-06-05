@@ -125,7 +125,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
   ];
 
   return (
-    <div className="scale-90 origin-top">
+    <div className="scale-75 origin-top">
       <StandardizedExecutiveSummary
         metrics={metrics}
         gradientType="purple"
