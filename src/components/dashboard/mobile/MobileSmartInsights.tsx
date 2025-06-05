@@ -24,7 +24,7 @@ export const MobileSmartInsights: React.FC<MobileSmartInsightsProps> = ({
           <span className="text-brand-violet font-semibold">
             Smart Insights
           </span>
-          <Badge className="bg-gray-100 px-2 py-0.5 rounded text-gray-500 border-gray-300 ml-auto text-xs">
+          <Badge className="bg-gray-100 text-gray-500 border-gray-200 ml-auto text-xs px-2 py-0.5 rounded-md">
             2 Active
           </Badge>
         </CardTitle>
