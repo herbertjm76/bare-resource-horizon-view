@@ -1,12 +1,10 @@
 
 import React from 'react';
-import { MobileSmartInsights } from './mobile/MobileSmartInsights';
-import { MobileTeamStatus } from './mobile/MobileTeamStatus';
-import { MobileUpcomingEvents } from './mobile/MobileUpcomingEvents';
+import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
+import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
+import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { HerbieFloatingButton } from './HerbieFloatingButton';
 import { TimeRange } from './TimeRangeSelector';
-import { calculateCapacityHours } from './executiveSummary/utils/capacityUtils';
-import { getTimeRangeText } from './executiveSummary/utils/utilizationUtils';
 
 interface MobileDashboardProps {
   teamMembers: any[];
@@ -46,19 +44,11 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
     role: member.role || 'Member'
   }));
 
-  // Use the same capacity calculation as the desktop version
-  const timeRangeText = getTimeRangeText(selectedTimeRange);
-  const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, currentUtilizationRate, staffData);
-  const isOverCapacity = capacityHours < 0;
-
-  console.log('Mobile Dashboard - Capacity Calculation:', {
+  console.log('Mobile Dashboard - Using unified cards:', {
     selectedTimeRange,
     activeResources,
     currentUtilizationRate,
-    staffDataCount: staffData.length,
-    capacityHours,
-    isOverCapacity,
-    timeRangeText
+    staffDataCount: staffData.length
   });
 
   return (
@@ -66,24 +56,24 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
       <div className="max-w-sm mx-auto px-3 py-4 space-y-4">
         {/* Smart Insights */}
         <div className="w-full">
-          <MobileSmartInsights
-            transformedStaffData={transformedStaffData}
+          <UnifiedSmartInsightsCard
+            teamMembers={transformedStaffData}
             activeProjects={activeProjects}
-            currentUtilizationRate={currentUtilizationRate}
+            utilizationRate={currentUtilizationRate}
           />
         </div>
         
         {/* Team Status */}
         <div className="w-full">
-          <MobileTeamStatus
-            transformedStaffData={transformedStaffData}
+          <UnifiedStaffStatusCard
+            staffData={transformedStaffData}
             selectedTimeRange={selectedTimeRange}
           />
         </div>
 
         {/* Upcoming Events */}
         <div className="w-full">
-          <MobileUpcomingEvents />
+          <UnifiedHolidayCard />
         </div>
 
         {/* Bottom padding for floating button */}

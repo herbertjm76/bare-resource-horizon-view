@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { StaffStatusCard } from './staff/StaffStatusCard';
-import { IntelligentInsights } from './IntelligentInsights';
-import { HolidayCard } from './HolidayCard';
+import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
+import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
+import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { TimeRange } from './TimeRangeSelector';
 
@@ -64,20 +64,20 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
       {/* Main Row: Staff Status, Smart Insights, Upcoming Holidays */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div>
-          <StaffStatusCard 
+          <UnifiedStaffStatusCard 
             staffData={transformedStaffData} 
             selectedTimeRange={selectedTimeRange}
           />
         </div>
         <div>
-          <IntelligentInsights 
+          <UnifiedSmartInsightsCard 
             teamMembers={transformedStaffData}
             activeProjects={activeProjects}
             utilizationRate={standardizedUtilizationRate || 0}
           />
         </div>
         <div>
-          <HolidayCard />
+          <UnifiedHolidayCard />
         </div>
       </div>
       
