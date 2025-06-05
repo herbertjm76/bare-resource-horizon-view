@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from 'lucide-react';
 import { HolidayCard } from '../HolidayCard';
 import { StandardizedHeaderBadge } from './components/StandardizedHeaderBadge';
-import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 export const MobileUpcomingEvents: React.FC = () => {
   return (
@@ -21,7 +20,10 @@ export const MobileUpcomingEvents: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0 px-4 pb-4">
-        <HolidayCard />
+        {/* Hide the header of HolidayCard to prevent duplication */}
+        <div className="[&_.card]:border-0 [&_.card]:shadow-none [&_.card]:bg-transparent [&_h3]:hidden [&_.flex.items-center.gap-3]:hidden">
+          <HolidayCard />
+        </div>
       </CardContent>
     </Card>
   );

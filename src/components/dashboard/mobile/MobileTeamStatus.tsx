@@ -5,7 +5,6 @@ import { Users } from 'lucide-react';
 import { StaffStatusCard } from '../staff/StaffStatusCard';
 import { TimeRange } from '../TimeRangeSelector';
 import { StandardizedHeaderBadge } from './components/StandardizedHeaderBadge';
-import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface MobileTeamStatusProps {
   transformedStaffData: any[];
@@ -42,10 +41,13 @@ export const MobileTeamStatus: React.FC<MobileTeamStatusProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0 px-4 pb-4">
-        <StaffStatusCard 
-          staffData={transformedStaffData} 
-          selectedTimeRange={selectedTimeRange}
-        />
+        {/* Hide the header of StaffStatusCard to prevent duplication */}
+        <div className="[&_.card]:border-0 [&_.card]:shadow-none [&_.card]:bg-transparent [&_h3]:hidden [&_.flex.items-center.gap-2]:hidden">
+          <StaffStatusCard 
+            staffData={transformedStaffData} 
+            selectedTimeRange={selectedTimeRange}
+          />
+        </div>
       </CardContent>
     </Card>
   );
