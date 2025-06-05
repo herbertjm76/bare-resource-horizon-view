@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -42,7 +43,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="w-full border rounded-2xl shadow-sm mt-8">
+      <div className="w-full border rounded-2xl shadow-sm mt-8 week-resource-table-wrapper">
         <div 
           className="overflow-x-auto overflow-y-visible"
           style={{
@@ -61,7 +62,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
               minWidth: `${minTableWidth}px`
             }}
           >
-            <Table className="w-full" style={{ minWidth: `${minTableWidth}px`, tableLayout: 'fixed' }}>
+            <Table className="w-full enhanced-table" style={{ minWidth: `${minTableWidth}px`, tableLayout: 'fixed' }}>
               <NewResourceTableHeader projects={projects} />
               
               <TableBody>
@@ -139,3 +140,4 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     </TooltipProvider>
   );
 };
+

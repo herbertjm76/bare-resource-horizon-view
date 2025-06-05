@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { TableCell } from '@/components/ui/table';
 import { CapacityBar } from './CapacityBar';
@@ -24,7 +25,7 @@ interface ProjectCountCellProps {
 export const ProjectCountCell: React.FC<ProjectCountCellProps> = ({ projectCount }) => {
   return (
     <TableCell className="text-center border-r">
-      <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+      <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium bg-gray-100 text-gray-700 rounded-full border border-gray-300">
         {projectCount}
       </span>
     </TableCell>
@@ -59,7 +60,7 @@ export const LeaveCell: React.FC<LeaveCellProps> = ({ defaultValue = "0" }) => {
         min="0"
         max="40"
         defaultValue={defaultValue}
-        className="w-8 h-6 text-xs text-center border border-gray-300 rounded"
+        className="w-8 h-6 text-xs text-center border-2 border-purple-300 rounded bg-purple-50 focus:border-purple-500 focus:bg-purple-100"
         placeholder="0"
       />
     </TableCell>
@@ -73,7 +74,9 @@ interface OfficeCellProps {
 export const OfficeCell: React.FC<OfficeCellProps> = ({ location }) => {
   return (
     <TableCell className="text-center border-r text-xs text-gray-600">
-      {location || 'N/A'}
+      <span className="inline-flex items-center justify-center px-2 py-1 bg-gray-100 text-gray-700 rounded-full border border-gray-300 text-xs font-medium">
+        {location || 'N/A'}
+      </span>
     </TableCell>
   );
 };
@@ -91,16 +94,23 @@ export const ProjectAllocationCell: React.FC<ProjectAllocationCellProps> = ({
 }) => {
   return (
     <TableCell className="border-r p-1">
-      <input
-        type="number"
-        min="0"
-        max="40"
-        value={hours || ''}
-        className="w-8 h-6 text-xs text-center border border-gray-300 rounded"
-        placeholder="0"
-        readOnly={readOnly}
-        disabled={disabled}
-      />
+      {readOnly || disabled ? (
+        <span className="inline-flex items-center justify-center w-8 h-6 text-xs bg-gray-100 text-gray-700 rounded border border-gray-300 font-medium">
+          {hours || ''}
+        </span>
+      ) : (
+        <input
+          type="number"
+          min="0"
+          max="40"
+          value={hours || ''}
+          className="w-8 h-6 text-xs text-center border border-gray-300 rounded"
+          placeholder="0"
+          readOnly={readOnly}
+          disabled={disabled}
+        />
+      )}
     </TableCell>
   );
 };
+

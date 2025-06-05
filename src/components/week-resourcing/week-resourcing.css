@@ -1,10 +1,11 @@
 
+
 /* Week Resourcing Table Styles */
 
 .week-resource-table-wrapper {
   width: 100%;
   overflow-x: auto;
-  border-radius: 8px;
+  border-radius: 12px;
   background: white;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
@@ -21,6 +22,12 @@
 .enhanced-table thead th:first-child {
   background: #6465F0 !important;
   color: white !important;
+  border-top-left-radius: 12px;
+}
+
+/* Last header column rounded corner */
+.enhanced-table thead th:last-child {
+  border-top-right-radius: 12px;
 }
 
 /* Project header cells with vertical text */
@@ -49,6 +56,15 @@
   color: black !important;
 }
 
+/* Last row rounded bottom corners */
+.enhanced-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 12px;
+}
+
+.enhanced-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 12px;
+}
+
 /* Capacity gauge and other components inside body */
 .enhanced-table tbody .capacity-gauge,
 .enhanced-table tbody .capacity-gauge *,
@@ -58,3 +74,24 @@
 .enhanced-table tbody input * {
   background: transparent !important;
 }
+
+/* Default light gray styling for display pills */
+.enhanced-table .inline-flex.items-center.justify-center.rounded-full {
+  background: #f3f4f6 !important;
+  border: 1px solid #d1d5db !important;
+  color: #374151 !important;
+}
+
+/* Light purple styling specifically for Other Leave (OL) manual inputs */
+.enhanced-table input[type="number"] {
+  background: #f3e8ff !important;
+  border: 2px solid #d8b4fe !important;
+  color: #6b21a8 !important;
+}
+
+.enhanced-table input[type="number"]:focus {
+  background: #ede9fe !important;
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
+}
+
