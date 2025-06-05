@@ -44,21 +44,11 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
     }
   };
 
-  const cardStyles = isMobile 
-    ? "rounded-2xl border-0 shadow-sm bg-white"
-    : "h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50";
-
-  const headerStyles = isMobile 
-    ? "pb-3 px-4"
-    : "flex-shrink-0";
-
-  const titleStyles = isMobile 
-    ? "text-lg flex items-center gap-3"
-    : "text-lg flex items-center gap-2";
-
-  const contentStyles = isMobile 
-    ? "pt-0 px-4 pb-4"
-    : "flex-1 overflow-hidden p-0";
+  // Use consistent mobile-style card design for both mobile and desktop
+  const cardStyles = "rounded-2xl border-0 shadow-sm bg-white";
+  const headerStyles = "pb-3 px-4";
+  const titleStyles = "text-lg flex items-center gap-3";
+  const contentStyles = "pt-0 px-4 pb-4";
 
   return (
     <Card className={cardStyles}>
@@ -66,20 +56,14 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
         <CardTitle className={titleStyles}>
           <Users className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
           <span className="text-brand-violet font-semibold">Staff Status</span>
-          {isMobile ? (
-            <StandardizedHeaderBadge>
-              {getTimeRangeText()}
-            </StandardizedHeaderBadge>
-          ) : (
-            <span className="text-sm font-normal ml-2 bg-gray-100 px-2 py-0.5 rounded">
-              {getTimeRangeText()}
-            </span>
-          )}
+          <StandardizedHeaderBadge>
+            {getTimeRangeText()}
+          </StandardizedHeaderBadge>
         </CardTitle>
       </CardHeader>
       <CardContent className={contentStyles}>
-        <ScrollArea className="h-full">
-          <div className={`space-y-6 ${isMobile ? '' : 'px-6 pb-6'}`}>
+        <ScrollArea className={isMobile ? "h-full" : "h-[320px]"}>
+          <div className="space-y-6">
             {/* At Capacity Staff (>90%) */}
             <StaffSection
               title="At Capacity"

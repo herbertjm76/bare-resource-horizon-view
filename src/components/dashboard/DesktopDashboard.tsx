@@ -61,7 +61,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Main Row: Staff Status, Smart Insights, Upcoming Holidays */}
+      {/* Main Row: Staff Status, Smart Insights, Upcoming Holidays - Using mobile-style cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div>
           <UnifiedStaffStatusCard 

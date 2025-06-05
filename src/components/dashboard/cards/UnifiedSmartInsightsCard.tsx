@@ -81,44 +81,20 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
     utilizationRate
   });
 
-  const cardStyles = isMobile 
-    ? "rounded-2xl border-0 shadow-sm bg-white"
-    : "h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50";
-
-  const headerStyles = isMobile 
-    ? "pb-3 px-4"
-    : "flex-shrink-0 pb-4";
-
-  const titleStyles = isMobile 
-    ? "text-lg flex items-center gap-3"
-    : "text-lg flex items-center gap-3";
-
-  const contentStyles = isMobile 
-    ? "pt-0 px-4 pb-4"
-    : "flex-1 overflow-hidden p-0";
+  // Use consistent mobile-style card design for both mobile and desktop
+  const cardStyles = "rounded-2xl border-0 shadow-sm bg-white";
+  const headerStyles = "pb-3 px-4";
+  const titleStyles = "text-lg flex items-center gap-3";
+  const contentStyles = "pt-0 px-4 pb-4";
 
   if (insights.length === 0) {
     return (
       <Card className={cardStyles}>
         <CardHeader className={headerStyles}>
           <CardTitle className={titleStyles}>
-            {isMobile ? (
-              <>
-                <Brain className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
-                <span className="text-brand-violet font-semibold">Smart Insights</span>
-                <StandardizedHeaderBadge>AI-Powered</StandardizedHeaderBadge>
-              </>
-            ) : (
-              <>
-                <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
-                  <Brain className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-brand-violet font-semibold">Smart Insights</span>
-                <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
-                  AI-Powered
-                </Badge>
-              </>
-            )}
+            <Brain className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
+            <span className="text-brand-violet font-semibold">Smart Insights</span>
+            <StandardizedHeaderBadge>AI-Powered</StandardizedHeaderBadge>
           </CardTitle>
         </CardHeader>
         <CardContent className={contentStyles}>
@@ -144,29 +120,15 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
     <Card className={cardStyles}>
       <CardHeader className={headerStyles}>
         <CardTitle className={titleStyles}>
-          {isMobile ? (
-            <>
-              <Brain className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
-              <span className="text-brand-violet font-semibold">Smart Insights</span>
-              <StandardizedHeaderBadge>{insights.length} Active</StandardizedHeaderBadge>
-            </>
-          ) : (
-            <>
-              <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
-                <Brain className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-brand-violet font-semibold">Smart Insights</span>
-              <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
-                {insights.length} Active
-              </Badge>
-            </>
-          )}
+          <Brain className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
+          <span className="text-brand-violet font-semibold">Smart Insights</span>
+          <StandardizedHeaderBadge>{insights.length} Active</StandardizedHeaderBadge>
         </CardTitle>
       </CardHeader>
       
       <CardContent className={contentStyles}>
-        <ScrollArea className="h-full">
-          <div className={`space-y-3 ${isMobile ? '' : 'px-6 pb-6'}`}>
+        <ScrollArea className={isMobile ? "h-full" : "h-[320px]"}>
+          <div className="space-y-3">
             {insights.slice(0, 4).map((insight, index) => {
               const styles = getSeverityStyles(insight.severity);
               const IconComponent = getIconComponent(insight.icon?.name || 'brain');

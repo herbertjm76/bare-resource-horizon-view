@@ -53,21 +53,11 @@ export const UnifiedHolidayCard: React.FC = () => {
     return `${daysUntil}d`;
   };
 
-  const cardStyles = isMobile 
-    ? "rounded-2xl border-0 shadow-sm bg-white"
-    : "h-[320px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50";
-
-  const headerStyles = isMobile 
-    ? "pb-3 px-4"
-    : "flex-shrink-0 pb-2";
-
-  const titleStyles = isMobile 
-    ? "text-lg flex items-center gap-3"
-    : "text-lg flex items-center gap-3";
-
-  const contentStyles = isMobile 
-    ? "pt-0 px-4 pb-4"
-    : "flex-1 overflow-hidden p-0";
+  // Use consistent mobile-style card design for both mobile and desktop
+  const cardStyles = "rounded-2xl border-0 shadow-sm bg-white";
+  const headerStyles = "pb-3 px-4";
+  const titleStyles = "text-lg flex items-center gap-3";
+  const contentStyles = "pt-0 px-4 pb-4";
 
   if (isLoading) {
     return (
@@ -121,22 +111,16 @@ export const UnifiedHolidayCard: React.FC = () => {
             Upcoming Holidays
           </span>
           {upcomingHolidays.length > 0 && (
-            isMobile ? (
-              <StandardizedHeaderBadge>
-                {upcomingHolidays.length}
-              </StandardizedHeaderBadge>
-            ) : (
-              <StandardizedHeaderBadge>
-                {upcomingHolidays.length}
-              </StandardizedHeaderBadge>
-            )
+            <StandardizedHeaderBadge>
+              {upcomingHolidays.length}
+            </StandardizedHeaderBadge>
           )}
         </CardTitle>
       </CardHeader>
       
       <CardContent className={contentStyles}>
-        <ScrollArea className="h-full">
-          <div className={`space-y-1 ${isMobile ? '' : 'px-4 pb-3'}`}>
+        <ScrollArea className={isMobile ? "h-full" : "h-[240px]"}>
+          <div className="space-y-1">
             {upcomingHolidays.map((holiday) => {
               const daysUntil = getDaysUntil(holiday.date);
               const dateInfo = formatDate(holiday.date);
