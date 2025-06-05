@@ -28,6 +28,7 @@ interface ResourceTableRowProps {
   weeklyCapacity: number;
   totalHours: number;
   annualLeave: number;
+  holidayHours: number;
   onLeaveInputChange: (memberId: string, leaveType: string, value: string) => void;
   onRemarksUpdate: (memberId: string, remarks: string) => void;
 }
@@ -44,6 +45,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   weeklyCapacity,
   totalHours,
   annualLeave,
+  holidayHours,
   onLeaveInputChange
 }) => {
   // Combine sick and other leave into a single "other" leave
@@ -59,12 +61,6 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
     : secondLeaveValue;
 
   const otherLeave = otherLeaveNum + secondLeaveNum;
-  
-  // Get holiday values (defaulting to 0)
-  const holidayValue = manualLeaveData[member.id]?.['holiday'] || 0;
-  const holidayHours = typeof holidayValue === 'string'
-    ? parseFloat(holidayValue) || 0
-    : holidayValue;
   
   // Get notes for this member
   const memberNotes = manualLeaveData[member.id]?.['notes'] || '';
@@ -102,15 +98,16 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       {/* Annual Leave Cell with hours value */}
       <AnnualLeaveCell annualLeave={annualLeave} leaveDays={leaveDays} />
       
-      {/* Holiday Cell moved between AL and OL */}
+      {/* Holiday Cell - now shows as display pill */}
       <HolidayCell 
         memberId={member.id}
         memberOffice={member.location}
         weekStartDate={weekStartDate}
+        holidayHours={holidayHours}
         onLeaveInputChange={onLeaveInputChange}
       />
       
-      {/* Combined Other Leave Cell with Notes */}
+      {/* Combined Other Leave Cell with Notes - purple for manual input */}
       <OtherLeaveCell 
         leaveValue={otherLeave} 
         memberId={member.id}
