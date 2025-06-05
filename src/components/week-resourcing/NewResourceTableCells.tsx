@@ -24,8 +24,8 @@ interface ProjectCountCellProps {
 
 export const ProjectCountCell: React.FC<ProjectCountCellProps> = ({ projectCount }) => {
   return (
-    <TableCell className="text-center border-r mobile-count-cell">
-      <span className="inline-flex items-center justify-center w-4 h-4 sm:w-6 sm:h-6 text-xs font-medium bg-gray-100 text-gray-700 rounded-full border border-gray-300">
+    <TableCell className="text-center border-r mobile-count-cell bg-gradient-to-br from-blue-50 to-indigo-50">
+      <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 text-xs font-bold bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-full shadow-sm border border-blue-200">
         {projectCount}
       </span>
     </TableCell>
@@ -39,7 +39,7 @@ interface CapacityCellProps {
 
 export const CapacityCell: React.FC<CapacityCellProps> = ({ availableHours, totalCapacity }) => {
   return (
-    <TableCell className="border-r p-1 sm:p-2 mobile-capacity-cell">
+    <TableCell className="border-r p-1 sm:p-2 mobile-capacity-cell bg-gradient-to-br from-emerald-50 to-green-50">
       <div className="hidden sm:block">
         <CapacityBar 
           availableHours={availableHours} 
@@ -47,9 +47,9 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({ availableHours, tota
         />
       </div>
       <div className="sm:hidden text-xs text-center">
-        <span className="text-green-600 font-medium">{availableHours}</span>
-        <span className="text-gray-500">/</span>
-        <span className="text-gray-700">{totalCapacity}</span>
+        <span className="text-emerald-600 font-bold">{availableHours}</span>
+        <span className="text-gray-400 mx-1">/</span>
+        <span className="text-gray-600 font-medium">{totalCapacity}</span>
       </div>
     </TableCell>
   );
@@ -61,13 +61,13 @@ interface LeaveCellProps {
 
 export const LeaveCell: React.FC<LeaveCellProps> = ({ defaultValue = "0" }) => {
   return (
-    <TableCell className="text-center border-r mobile-leave-cell">
+    <TableCell className="text-center border-r mobile-leave-cell bg-gradient-to-br from-purple-50 to-violet-50">
       <input
         type="number"
         min="0"
         max="40"
         defaultValue={defaultValue}
-        className="w-6 h-5 sm:w-8 sm:h-6 text-xs text-center border-2 border-purple-300 rounded bg-purple-50 focus:border-purple-500 focus:bg-purple-100"
+        className="w-6 h-5 sm:w-8 sm:h-6 text-xs text-center border-2 border-purple-300 rounded-md bg-white/80 focus:border-purple-500 focus:bg-white focus:ring-2 focus:ring-purple-200 transition-all"
         placeholder="0"
       />
     </TableCell>
@@ -82,8 +82,8 @@ export const OfficeCell: React.FC<OfficeCellProps> = ({ location }) => {
   const displayLocation = location ? (location.length > 3 ? location.substring(0, 3) : location) : 'N/A';
   
   return (
-    <TableCell className="text-center border-r text-xs text-gray-600 mobile-office-cell">
-      <span className="inline-flex items-center justify-center px-1 sm:px-2 py-1 bg-gray-100 text-gray-700 rounded-full border border-gray-300 text-xs font-medium">
+    <TableCell className="text-center border-r text-xs text-gray-600 mobile-office-cell bg-gradient-to-br from-slate-50 to-gray-50">
+      <span className="inline-flex items-center justify-center px-2 py-1 bg-gradient-to-r from-slate-100 to-gray-100 text-slate-700 rounded-full border border-slate-200 text-xs font-medium shadow-sm">
         <span className="hidden sm:inline">{location || 'N/A'}</span>
         <span className="sm:hidden">{displayLocation}</span>
       </span>
@@ -103,9 +103,9 @@ export const ProjectAllocationCell: React.FC<ProjectAllocationCellProps> = ({
   disabled = false 
 }) => {
   return (
-    <TableCell className="border-r p-0.5 sm:p-1 mobile-project-cell">
+    <TableCell className="border-r p-0.5 sm:p-1 mobile-project-cell bg-gradient-to-br from-gray-50 to-slate-50">
       {readOnly || disabled ? (
-        <span className="inline-flex items-center justify-center w-6 h-5 sm:w-8 sm:h-6 text-xs bg-gray-100 text-gray-700 rounded border border-gray-300 font-medium">
+        <span className="inline-flex items-center justify-center w-6 h-5 sm:w-8 sm:h-6 text-xs bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 rounded border border-gray-200 font-medium shadow-sm">
           {hours || ''}
         </span>
       ) : (
@@ -114,7 +114,7 @@ export const ProjectAllocationCell: React.FC<ProjectAllocationCellProps> = ({
           min="0"
           max="40"
           value={hours || ''}
-          className="w-6 h-5 sm:w-8 sm:h-6 text-xs text-center border border-gray-300 rounded"
+          className="w-6 h-5 sm:w-8 sm:h-6 text-xs text-center border border-gray-300 rounded bg-white/90 hover:bg-white focus:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-200 transition-all"
           placeholder="0"
           readOnly={readOnly}
           disabled={disabled}

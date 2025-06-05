@@ -44,7 +44,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="w-full border rounded-2xl shadow-sm mt-8 week-resource-table-wrapper mobile-optimized-table">
+      <div className="w-full border rounded-2xl shadow-lg mt-8 week-resource-table-wrapper mobile-optimized-table bg-gradient-to-br from-white to-gray-50">
         {/* Mobile-first responsive container */}
         <div className="mobile-table-scroll-container">
           <div 
@@ -73,12 +73,14 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           </div>
         </div>
         
-        {/* Mobile-optimized scrollbar styling */}
+        {/* Enhanced mobile-optimized scrollbar styling */}
         <style>
           {`
           .mobile-optimized-table {
             max-width: 100%;
             overflow: hidden;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
           }
           
           .mobile-table-scroll-container {
@@ -98,22 +100,22 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           }
           
           .mobile-enhanced-scroll::-webkit-scrollbar {
-            height: 8px;
+            height: 10px;
           }
           
           .mobile-enhanced-scroll::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 4px;
+            background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 5px;
           }
           
           .mobile-enhanced-scroll::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 4px;
+            background: linear-gradient(90deg, #94a3b8 0%, #64748b 100%);
+            border-radius: 5px;
             border: 1px solid #f1f5f9;
           }
           
           .mobile-enhanced-scroll::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
+            background: linear-gradient(90deg, #64748b 0%, #475569 100%);
           }
           
           /* Firefox scrollbar styling */
@@ -143,12 +145,12 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
             }
             
             .mobile-enhanced-scroll::-webkit-scrollbar {
-              height: 6px;
+              height: 8px;
             }
             
             .mobile-enhanced-scroll::-webkit-scrollbar-thumb {
-              background: #cbd5e1;
-              border-radius: 3px;
+              background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
+              border-radius: 4px;
             }
           }
           
