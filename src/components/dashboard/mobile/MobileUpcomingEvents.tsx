@@ -14,7 +14,10 @@ export const MobileUpcomingEvents: React.FC = () => {
           <span className="text-brand-violet font-semibold">
             Upcoming Holidays
           </span>
-          <Badge className="ml-auto bg-gray-100 text-gray-500 border border-gray-200 text-xs font-medium px-2.5 py-1 rounded-full">
+          <Badge 
+            variant="outline" 
+            className="ml-auto !bg-gray-100 !text-gray-500 !border-gray-200 !text-xs !font-medium !px-2.5 !py-1 !rounded-full"
+          >
             5
           </Badge>
         </CardTitle>
