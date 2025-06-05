@@ -38,19 +38,19 @@ const WeeklyOverview = () => {
   
   return (
     <SidebarProvider>
-      <div className="w-full min-h-screen flex flex-row">
+      <div className="w-full min-h-screen flex flex-row bg-gray-50">
         <div className="flex-shrink-0 print:hidden">
           <DashboardSidebar />
         </div>
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0">
           <div className="print:hidden">
             <AppHeader />
           </div>
           <div style={{
             height: HEADER_HEIGHT
           }} className="print:hidden" />
-          <div className="flex-1 p-4 sm:p-6 bg-background">
-            <div className="max-w-full mx-auto space-y-4">
+          <div className="flex-1 p-3 sm:p-4 lg:p-6 bg-gray-50 min-w-0">
+            <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
               <WeeklyOverviewHeader selectedWeek={selectedWeek} />
               
               <WeekResourceControls 

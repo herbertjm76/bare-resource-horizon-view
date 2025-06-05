@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { Calendar, Users, Building2, BarChart3, TrendingUp } from 'lucide-react';
+import { format, startOfWeek } from 'date-fns';
+import { Calendar, Users, TrendingUp } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { useCompany } from '@/context/CompanyContext';
-import { useWeeklyOverviewMetrics } from './WeeklyOverviewMetrics';
 
 interface WeeklyOverviewHeaderProps {
   selectedWeek: Date;
@@ -12,74 +11,63 @@ interface WeeklyOverviewHeaderProps {
 export const WeeklyOverviewHeader: React.FC<WeeklyOverviewHeaderProps> = ({
   selectedWeek
 }) => {
-  const { company } = useCompany();
-  const companyName = company?.name || 'Your Company';
-  
-  const { metrics, isLoading } = useWeeklyOverviewMetrics({ selectedWeek });
+  const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const weekLabel = format(weekStart, 'MMMM d, yyyy');
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4 sm:space-y-6 mb-4 sm:mb-6">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6">
-          <div className="space-y-2">
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      {/* Mobile-first header */}
+      <div className="flex flex-col space-y-3 sm:space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-6">
+          <div className="space-y-1 sm:space-y-2">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-2 sm:gap-3">
-              <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-brand-violet" strokeWidth={1.5} />
-              Weekly Overview
+              <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-brand-violet flex-shrink-0" />
+              <span className="break-words">Weekly Overview</span>
             </h1>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <div className="h-10 sm:h-12 w-20 sm:w-24 bg-muted animate-pulse rounded"></div>
-            <div className="h-10 sm:h-12 w-20 sm:w-24 bg-muted animate-pulse rounded"></div>
-            <div className="h-10 sm:h-12 w-20 sm:w-24 bg-muted animate-pulse rounded"></div>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Resource allocation for the week of {weekLabel}
+            </p>
           </div>
         </div>
       </div>
-    );
-  }
 
-  return (
-    <div className="space-y-4 sm:space-y-6 mb-4 sm:mb-6 print:hidden">
-      {/* Main Header Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6">
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-2 sm:gap-3">
-            <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-brand-violet" strokeWidth={1.5} />
-            Weekly Overview
-          </h1>
-        </div>
-        
-        {/* Quick Stats Cards */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <Card className="px-3 py-2 sm:px-4 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-brand-violet" strokeWidth={1.5} />
-              <div className="text-xs sm:text-sm">
-                <span className="font-semibold text-brand-violet">{metrics[0]?.value || 0}</span>
-                <span className="text-muted-foreground ml-1">Projects</span>
-              </div>
+      {/* Mobile-optimized stats cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <Card className="p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-blue-500 rounded-lg">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
             </div>
-          </Card>
-          
-          <Card className="px-3 py-2 sm:px-4 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
-            <div className="flex items-center gap-2">
-              <BarChart3 className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-600" strokeWidth={1.5} />
-              <div className="text-xs sm:text-sm">
-                <span className="font-semibold text-emerald-600">{metrics[1]?.value || '0%'}</span>
-                <span className="text-muted-foreground ml-1">Utilization</span>
-              </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm text-blue-700 font-medium truncate">Team Resources</p>
+              <p className="text-sm sm:text-base font-bold text-blue-900">Active</p>
             </div>
-          </Card>
-          
-          <Card className="px-3 py-2 sm:px-4 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border-blue-500/20">
-            <div className="flex items-center gap-2">
-              <Users className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-600" strokeWidth={1.5} />
-              <div className="text-xs sm:text-sm">
-                <span className="font-semibold text-blue-600">{metrics[2]?.value || 0}</span>
-                <span className="text-muted-foreground ml-1">Members</span>
-              </div>
+          </div>
+        </Card>
+
+        <Card className="p-3 sm:p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-green-500 rounded-lg">
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
             </div>
-          </Card>
-        </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm text-green-700 font-medium truncate">Utilization</p>
+              <p className="text-sm sm:text-base font-bold text-green-900">Optimal</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="p-3 sm:p-4 bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-purple-500 rounded-lg">
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm text-purple-700 font-medium truncate">Planning</p>
+              <p className="text-sm sm:text-base font-bold text-purple-900">Current Week</p>
+            </div>
+          </div>
+        </Card>
       </div>
     </div>
   );
