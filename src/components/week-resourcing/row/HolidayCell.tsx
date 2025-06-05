@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { ManualInputCell } from './ManualInputCell';
+import { TableCell } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
 
 interface HolidayCellProps {
   memberId: string;
@@ -16,13 +17,18 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
   onLeaveInputChange
 }) => {
   return (
-    <ManualInputCell
-      value={0}
-      memberId={memberId}
-      field="holiday"
-      placeholder="0"
-      onInputChange={onLeaveInputChange}
-      className="leave-column"
-    />
+    <TableCell className="text-center border-r p-1">
+      <div className="flex items-center justify-center">
+        <Input
+          type="number"
+          min="0"
+          max="40"
+          defaultValue={0}
+          onChange={(e) => onLeaveInputChange(memberId, 'holiday', e.target.value)}
+          className="w-12 h-8 text-xs text-center border-2 border-gray-300 rounded-lg bg-gray-50 focus:border-gray-500 focus:bg-white transition-all"
+          placeholder="0"
+        />
+      </div>
+    </TableCell>
   );
 };

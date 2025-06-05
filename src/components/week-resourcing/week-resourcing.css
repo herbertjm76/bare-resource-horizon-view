@@ -1,5 +1,4 @@
 
-
 /* Week Resourcing Table Styles */
 
 .week-resource-table-wrapper {
@@ -69,9 +68,7 @@
 .enhanced-table tbody .capacity-gauge,
 .enhanced-table tbody .capacity-gauge *,
 .enhanced-table tbody .leave-tooltip,
-.enhanced-table tbody .leave-tooltip *,
-.enhanced-table tbody input,
-.enhanced-table tbody input * {
+.enhanced-table tbody .leave-tooltip * {
   background: transparent !important;
 }
 
@@ -82,16 +79,15 @@
   color: #374151 !important;
 }
 
-/* Light purple styling specifically for Other Leave (OL) manual inputs */
+/* Gray styling for Holiday inputs */
 .enhanced-table input[type="number"] {
-  background: #f3e8ff !important;
-  border: 2px solid #d8b4fe !important;
-  color: #6b21a8 !important;
+  background: #f9fafb !important;
+  border: 2px solid #d1d5db !important;
+  color: #374151 !important;
 }
 
 .enhanced-table input[type="number"]:focus {
-  background: #ede9fe !important;
-  border-color: #8b5cf6 !important;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1) !important;
+  background: #ffffff !important;
+  border-color: #6b7280 !important;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1) !important;
 }
-

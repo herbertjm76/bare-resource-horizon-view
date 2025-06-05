@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
 import { TableCell } from '@/components/ui/table';
-import { ManualInputCell } from './ManualInputCell';
 import { Button } from '@/components/ui/button';
 import { MessageSquare } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface OtherLeaveCellProps {
   leaveValue: number;
@@ -22,58 +23,81 @@ export const OtherLeaveCell: React.FC<OtherLeaveCellProps> = ({
   onLeaveInputChange,
   onNotesChange
 }) => {
-  const [isNotesOpen, setIsNotesOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [tempHours, setTempHours] = useState(leaveValue.toString());
+  const [tempNotes, setTempNotes] = useState(notes);
 
-  const handleNotesSubmit = (newNotes: string) => {
-    onNotesChange(memberId, newNotes);
-    setIsNotesOpen(false);
+  const handleDialogOpen = () => {
+    setTempHours(leaveValue.toString());
+    setTempNotes(notes);
+    setIsDialogOpen(true);
+  };
+
+  const handleSave = () => {
+    onLeaveInputChange(memberId, 'sick', tempHours);
+    onNotesChange(memberId, tempNotes);
+    setIsDialogOpen(false);
+  };
+
+  const handleCancel = () => {
+    setTempHours(leaveValue.toString());
+    setTempNotes(notes);
+    setIsDialogOpen(false);
   };
 
   return (
-    <TableCell className="text-center border-r p-1 relative">
-      <div className="flex items-center justify-center gap-1">
-        <div className="flex items-center justify-center">
-          <input
-            type="number"
-            min="0"
-            max="40"
-            value={leaveValue || ''}
-            onChange={(e) => onLeaveInputChange(memberId, 'sick', e.target.value)}
-            className="w-12 h-8 text-xs text-center border-2 border-gray-300 rounded-lg bg-gray-50 focus:border-brand-violet focus:bg-white transition-all"
-            placeholder="0"
-          />
-        </div>
-        
-        <Popover open={isNotesOpen} onOpenChange={setIsNotesOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={`h-6 w-6 p-0 ${notes ? 'text-brand-violet' : 'text-gray-400'}`}
-            >
-              <MessageSquare className="h-3 w-3" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64 p-3">
+    <TableCell className="text-center border-r p-1">
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button
+            variant="ghost"
+            className="w-full h-8 p-1 bg-gradient-to-r from-purple-100 to-purple-200 border border-purple-300 text-purple-800 hover:from-purple-200 hover:to-purple-300 hover:border-purple-400 rounded-lg font-medium text-xs"
+            onClick={handleDialogOpen}
+          >
+            <div className="flex items-center justify-center gap-1">
+              <span>{leaveValue || 0}h</span>
+              {notes && <MessageSquare className="h-3 w-3" />}
+            </div>
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Other Leave Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
             <div className="space-y-2">
-              <h4 className="text-sm font-medium">Notes</h4>
-              <Textarea
-                value={notes}
-                onChange={(e) => onNotesChange(memberId, e.target.value)}
-                placeholder="Add notes about leave..."
-                className="min-h-20 text-xs"
+              <Label htmlFor="hours">Hours</Label>
+              <Input
+                id="hours"
+                type="number"
+                min="0"
+                max="40"
+                value={tempHours}
+                onChange={(e) => setTempHours(e.target.value)}
+                placeholder="0"
               />
-              <Button
-                size="sm"
-                onClick={() => setIsNotesOpen(false)}
-                className="w-full"
-              >
-                Close
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="notes">Notes</Label>
+              <Textarea
+                id="notes"
+                value={tempNotes}
+                onChange={(e) => setTempNotes(e.target.value)}
+                placeholder="Add notes about leave..."
+                className="min-h-20"
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave}>
+                Save
               </Button>
             </div>
-          </PopoverContent>
-        </Popover>
-      </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </TableCell>
   );
 };
