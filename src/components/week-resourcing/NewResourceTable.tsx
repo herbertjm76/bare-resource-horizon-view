@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { Table, TableBody } from '@/components/ui/table';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -38,31 +37,23 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
       .length;
   };
 
-  // Calculate minimum table width based on columns
-  const minTableWidth = 150 + 16 + 32 + 12 + 12 + 12 + 16 + (Math.max(15, projects.length) * 40);
+  // Calculate minimum table width based on columns - mobile optimized
+  const fixedColumnsWidth = 150 + 16 + 32 + 12 + 12 + 12 + 16; // Name + non-project columns
+  const projectColumnsWidth = Math.max(15, projects.length) * 40; // Project columns
+  const minTableWidth = fixedColumnsWidth + projectColumnsWidth;
 
   return (
     <TooltipProvider>
-      <div className="w-full border rounded-2xl shadow-sm mt-8 week-resource-table-wrapper">
-        <div 
-          className="overflow-x-auto overflow-y-visible"
-          style={{
-            width: 'calc(100vw - 18rem)',
-            maxWidth: '100%'
-          }}
-        >
+      <div className="w-full border rounded-2xl shadow-sm mt-8 week-resource-table-wrapper mobile-optimized-table">
+        {/* Mobile-first responsive container */}
+        <div className="mobile-table-scroll-container">
           <div 
-            className="enhanced-grid-scroll"
+            className="mobile-enhanced-scroll"
             style={{
-              width: '100%',
-              overflowX: 'auto',
-              overflowY: 'visible',
-              WebkitOverflowScrolling: 'touch',
-              paddingBottom: '1px',
               minWidth: `${minTableWidth}px`
             }}
           >
-            <Table className="w-full enhanced-table" style={{ minWidth: `${minTableWidth}px`, tableLayout: 'fixed' }}>
+            <Table className="w-full mobile-resource-table" style={{ minWidth: `${minTableWidth}px`, tableLayout: 'fixed' }}>
               <NewResourceTableHeader projects={projects} />
               
               <TableBody>
@@ -82,56 +73,103 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           </div>
         </div>
         
-        {/* Custom scrollbar styling */}
+        {/* Mobile-optimized scrollbar styling */}
         <style>
           {`
-          .enhanced-grid-scroll::-webkit-scrollbar {
-            height: 12px;
+          .mobile-optimized-table {
+            max-width: 100%;
+            overflow: hidden;
           }
           
-          .enhanced-grid-scroll::-webkit-scrollbar-track {
+          .mobile-table-scroll-container {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+          }
+          
+          .mobile-enhanced-scroll {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 1px;
+          }
+          
+          .mobile-enhanced-scroll::-webkit-scrollbar {
+            height: 8px;
+          }
+          
+          .mobile-enhanced-scroll::-webkit-scrollbar-track {
             background: #f1f5f9;
-            border-radius: 8px;
+            border-radius: 4px;
           }
           
-          .enhanced-grid-scroll::-webkit-scrollbar-thumb {
+          .mobile-enhanced-scroll::-webkit-scrollbar-thumb {
             background: #94a3b8;
-            border-radius: 8px;
-            border: 2px solid #f1f5f9;
+            border-radius: 4px;
+            border: 1px solid #f1f5f9;
           }
           
-          .enhanced-grid-scroll::-webkit-scrollbar-thumb:hover {
+          .mobile-enhanced-scroll::-webkit-scrollbar-thumb:hover {
             background: #64748b;
           }
           
           /* Firefox scrollbar styling */
-          .enhanced-grid-scroll {
+          .mobile-enhanced-scroll {
             scrollbar-width: thin;
             scrollbar-color: #94a3b8 #f1f5f9;
           }
           
-          /* Mobile-specific scrollbar improvements */
-          @media (max-width: 640px) {
-            .enhanced-grid-scroll {
-              width: 100vw !important;
-              max-width: 100vw !important;
-              margin-left: calc(-1rem);
+          /* Mobile-specific optimizations */
+          @media (max-width: 768px) {
+            .mobile-table-scroll-container {
+              width: calc(100vw - 2rem);
+              max-width: calc(100vw - 2rem);
+              margin-left: -1rem;
+              margin-right: -1rem;
               padding-left: 1rem;
               padding-right: 1rem;
             }
             
-            .enhanced-grid-scroll::-webkit-scrollbar {
-              height: 8px;
+            .mobile-resource-table {
+              font-size: 12px;
             }
             
-            .enhanced-grid-scroll::-webkit-scrollbar-thumb {
+            .mobile-resource-table th,
+            .mobile-resource-table td {
+              padding: 4px 2px;
+            }
+            
+            .mobile-enhanced-scroll::-webkit-scrollbar {
+              height: 6px;
+            }
+            
+            .mobile-enhanced-scroll::-webkit-scrollbar-thumb {
               background: #cbd5e1;
-              border-radius: 4px;
-              border: 1px solid #f1f5f9;
+              border-radius: 3px;
+            }
+          }
+          
+          /* Extra small mobile devices */
+          @media (max-width: 480px) {
+            .mobile-table-scroll-container {
+              width: calc(100vw - 1rem);
+              max-width: calc(100vw - 1rem);
+              margin-left: -0.5rem;
+              margin-right: -0.5rem;
+              padding-left: 0.5rem;
+              padding-right: 0.5rem;
             }
             
-            .enhanced-grid-scroll::-webkit-scrollbar-thumb:hover {
-              background: #94a3b8;
+            .mobile-resource-table {
+              font-size: 11px;
+            }
+            
+            .mobile-resource-table th,
+            .mobile-resource-table td {
+              padding: 3px 1px;
             }
           }
           `}
@@ -140,4 +178,3 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     </TooltipProvider>
   );
 };
-
