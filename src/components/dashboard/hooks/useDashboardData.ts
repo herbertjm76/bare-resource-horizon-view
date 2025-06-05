@@ -50,7 +50,9 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
       setProjects(projectsData || []);
 
       // Calculate utilization (simplified calculation)
-      const activeMembers = membersData?.filter(member => member.role && member.role !== 'pending') || [];
+      const activeMembers = membersData?.filter(member => 
+        member.role && ['owner', 'admin', 'member'].includes(member.role)
+      ) || [];
       const totalCapacity = activeMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
       
       // Mock utilization calculation - replace with actual logic
