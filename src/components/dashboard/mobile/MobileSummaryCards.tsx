@@ -43,8 +43,8 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
                 {utilizationRate > 85 ? 'Consider Hiring' : 'Stable'}
               </Badge>
             </div>
-            <div className="h-8 w-8 rounded-full bg-brand-violet/10 flex items-center justify-center flex-shrink-0 ml-2">
-              <Users className="h-4 w-4 text-brand-violet" />
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600 flex items-center justify-center flex-shrink-0 ml-2">
+              <Users className="h-4 w-4 text-white" />
             </div>
           </div>
         </CardContent>
@@ -63,8 +63,8 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
                   : 'No team'}
               </p>
             </div>
-            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 ml-2">
-              <Briefcase className="h-4 w-4 text-blue-600" />
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 ml-2">
+              <Briefcase className="h-4 w-4 text-white" />
             </div>
           </div>
         </CardContent>
@@ -81,8 +81,8 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
                 {utilizationStatus.label}
               </Badge>
             </div>
-            <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 ml-2">
-              <TrendingUp className="h-4 w-4 text-green-600" />
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center flex-shrink-0 ml-2">
+              <TrendingUp className="h-4 w-4 text-white" />
             </div>
           </div>
         </CardContent>
@@ -101,10 +101,10 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
               </p>
               <p className="text-xs font-medium text-gray-500">{timeRangeText}</p>
             </div>
-            <div className={`h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ml-2 ${
-              isOverCapacity ? 'bg-red-100' : 'bg-orange-100'
+            <div className={`h-8 w-8 rounded-lg bg-gradient-to-br flex items-center justify-center flex-shrink-0 ml-2 ${
+              isOverCapacity ? 'from-red-500 to-red-600' : 'from-orange-500 to-orange-600'
             }`}>
-              <Clock className={`h-4 w-4 ${isOverCapacity ? 'text-red-600' : 'text-orange-600'}`} />
+              <Clock className={`h-4 w-4 text-white`} />
             </div>
           </div>
         </CardContent>
