@@ -2,9 +2,9 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin } from 'lucide-react';
 import { useHolidays } from './hooks/useHolidays';
+import { StandardizedHeaderBadge } from './mobile/components/StandardizedHeaderBadge';
 
 interface Holiday {
   id: string;
@@ -102,9 +102,9 @@ export const HolidayCard: React.FC = () => {
             Upcoming Holidays
           </span>
           {upcomingHolidays.length > 0 && (
-            <Badge variant="brand" className="bg-gray-100 px-2 py-0.5 rounded text-gray-500 border-gray-300">
+            <StandardizedHeaderBadge>
               {upcomingHolidays.length}
-            </Badge>
+            </StandardizedHeaderBadge>
           )}
         </CardTitle>
       </CardHeader>
@@ -144,9 +144,9 @@ export const HolidayCard: React.FC = () => {
 
                     {/* Countdown Badge */}
                     {daysUntil >= 0 && (
-                      <Badge className={`text-xs px-1.5 py-0.5 ${getCountdownBadgeStyle(daysUntil)}`}>
+                      <div className={`ml-auto bg-gray-100 text-gray-500 border border-gray-200 text-xs font-medium px-2.5 py-1 rounded-full ${getCountdownBadgeStyle(daysUntil)}`}>
                         {getCountdownText(daysUntil)}
-                      </Badge>
+                      </div>
                     )}
                   </div>
                 </div>

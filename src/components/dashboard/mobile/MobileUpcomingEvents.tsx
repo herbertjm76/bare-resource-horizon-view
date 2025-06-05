@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Calendar } from 'lucide-react';
 import { HolidayCard } from '../HolidayCard';
+import { StandardizedHeaderBadge } from './components/StandardizedHeaderBadge';
 
 export const MobileUpcomingEvents: React.FC = () => {
   return (
@@ -14,12 +14,9 @@ export const MobileUpcomingEvents: React.FC = () => {
           <span className="text-brand-violet font-semibold">
             Upcoming Holidays
           </span>
-          <Badge 
-            variant="outline" 
-            className="ml-auto !bg-gray-100 !text-gray-500 !border-gray-200 !text-xs !font-medium !px-2.5 !py-1 !rounded-full"
-          >
+          <StandardizedHeaderBadge>
             5
-          </Badge>
+          </StandardizedHeaderBadge>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0 px-4 pb-4">

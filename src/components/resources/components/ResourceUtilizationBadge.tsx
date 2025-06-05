@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 // Helper function to get color based on utilization percentage
 const getUtilizationColor = (utilization: number) => {
@@ -40,15 +40,16 @@ export const ResourceUtilizationBadge: React.FC<ResourceUtilizationBadgeProps> =
   }
   
   return (
-    <Badge
-      variant="outline"
-      className={`${sizeClasses} font-medium`}
+    <StandardizedBadge
+      variant="status"
+      className={sizeClasses}
       style={{
         backgroundColor: colors.bg,
-        color: colors.text
+        color: colors.text,
+        marginLeft: '0'
       }}
     >
       {roundedUtilization}%
-    </Badge>
+    </StandardizedBadge>
   );
 };

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Badge } from "@/components/ui/badge";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface NoFeeBadgeProps {
   hours: number;
@@ -28,15 +28,16 @@ export const NoFeeBadge: React.FC<NoFeeBadgeProps> = ({
   }
   
   return (
-    <Badge
-      variant="outline"
-      className={`${sizeClasses} font-medium`}
+    <StandardizedBadge
+      variant="status"
+      className={sizeClasses}
       style={{
         backgroundColor: '#F1F0FB',
-        color: '#6E59A5'
+        color: '#6E59A5',
+        marginLeft: '0'
       }}
     >
       No fee
-    </Badge>
+    </StandardizedBadge>
   );
 };
