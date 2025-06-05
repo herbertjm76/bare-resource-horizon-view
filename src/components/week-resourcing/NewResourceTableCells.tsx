@@ -23,10 +23,12 @@ interface ProjectCountCellProps {
 
 export const ProjectCountCell: React.FC<ProjectCountCellProps> = ({ projectCount }) => {
   return (
-    <TableCell className="text-center border-r">
-      <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
-        {projectCount}
-      </span>
+    <TableCell className="text-center border-r p-3 bg-gray-50/50">
+      <div className="flex items-center justify-center">
+        <div className="inline-flex items-center justify-center px-3 py-1.5 bg-gradient-to-r from-purple-100 to-purple-200 border border-purple-300 rounded-xl text-xs font-semibold text-purple-800 shadow-sm min-w-10 display-pill">
+          {projectCount}
+        </div>
+      </div>
     </TableCell>
   );
 };
@@ -38,30 +40,59 @@ interface CapacityCellProps {
 
 export const CapacityCell: React.FC<CapacityCellProps> = ({ availableHours, totalCapacity }) => {
   return (
-    <TableCell className="border-r p-2">
-      <CapacityBar 
-        availableHours={availableHours} 
-        totalCapacity={totalCapacity} 
-      />
+    <TableCell className="border-r p-2 bg-gray-50/50">
+      <div className="flex items-center justify-center">
+        <div className="inline-flex items-center justify-center px-3 py-1.5 bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-300 rounded-xl text-xs font-semibold text-gray-700 shadow-sm min-w-10 display-pill">
+          {availableHours}h
+        </div>
+      </div>
     </TableCell>
   );
 };
 
 interface LeaveCellProps {
   defaultValue?: string;
+  type?: 'annual' | 'holiday' | 'other';
 }
 
-export const LeaveCell: React.FC<LeaveCellProps> = ({ defaultValue = "0" }) => {
+export const LeaveCell: React.FC<LeaveCellProps> = ({ defaultValue = "0", type = 'other' }) => {
+  const getLeaveClasses = () => {
+    switch (type) {
+      case 'annual':
+        return 'bg-gradient-to-r from-blue-100 to-blue-200 border-blue-300 text-blue-800';
+      case 'holiday':
+        return 'bg-gradient-to-r from-yellow-100 to-yellow-200 border-yellow-300 text-yellow-800';
+      case 'other':
+        return 'manual-input border-2 border-purple-300 bg-purple-50 focus:border-purple-500 focus:bg-purple-100';
+      default:
+        return 'bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300 text-gray-700';
+    }
+  };
+
+  if (type === 'other') {
+    return (
+      <TableCell className="text-center border-r p-3">
+        <div className="flex items-center justify-center">
+          <input
+            type="number"
+            min="0"
+            max="40"
+            defaultValue={defaultValue}
+            className={`w-16 h-9 text-xs text-center rounded-xl transition-all font-medium ${getLeaveClasses()}`}
+            placeholder="0"
+          />
+        </div>
+      </TableCell>
+    );
+  }
+
   return (
-    <TableCell className="text-center border-r">
-      <input
-        type="number"
-        min="0"
-        max="40"
-        defaultValue={defaultValue}
-        className="w-8 h-6 text-xs text-center border border-gray-300 rounded"
-        placeholder="0"
-      />
+    <TableCell className="text-center border-r p-3 bg-gray-50/50">
+      <div className="flex items-center justify-center">
+        <div className={`inline-flex items-center justify-center px-3 py-1.5 rounded-xl text-xs font-semibold shadow-sm min-w-10 border display-pill ${getLeaveClasses()}`}>
+          {defaultValue}h
+        </div>
+      </div>
     </TableCell>
   );
 };
@@ -72,8 +103,12 @@ interface OfficeCellProps {
 
 export const OfficeCell: React.FC<OfficeCellProps> = ({ location }) => {
   return (
-    <TableCell className="text-center border-r text-xs text-gray-600">
-      {location || 'N/A'}
+    <TableCell className="text-center border-r p-3 bg-gray-50/50">
+      <div className="flex items-center justify-center">
+        <div className="inline-flex items-center justify-center px-3 py-1.5 bg-gradient-to-r from-green-100 to-green-200 border border-green-300 rounded-xl text-xs font-semibold text-green-800 shadow-sm min-w-10 display-pill">
+          {location || 'N/A'}
+        </div>
+      </div>
     </TableCell>
   );
 };
@@ -89,6 +124,22 @@ export const ProjectAllocationCell: React.FC<ProjectAllocationCellProps> = ({
   readOnly = false, 
   disabled = false 
 }) => {
+  if (readOnly || disabled) {
+    return (
+      <TableCell className="border-r p-3 bg-gray-50/50">
+        <div className="flex items-center justify-center">
+          {hours > 0 ? (
+            <div className="inline-flex items-center justify-center px-3 py-1.5 bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-300 rounded-xl text-xs font-semibold text-gray-700 shadow-sm min-w-10 display-pill">
+              {hours}h
+            </div>
+          ) : (
+            <div className="w-16 h-9"></div>
+          )}
+        </div>
+      </TableCell>
+    );
+  }
+
   return (
     <TableCell className="border-r p-1">
       <input

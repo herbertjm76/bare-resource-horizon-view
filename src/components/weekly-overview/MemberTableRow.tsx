@@ -54,6 +54,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       shadow-sm
       min-w-10
       border
+      display-pill
     `}>
       {value}
     </div>
@@ -71,7 +72,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       max="40"
       value={value}
       onChange={(e) => onInputChange(member.id, field, e.target.value)}
-      className="w-16 h-9 text-xs text-center rounded-xl border-2 border-purple-300 bg-purple-50 focus:border-purple-500 focus:bg-purple-100 transition-all font-medium"
+      className="w-16 h-9 text-xs text-center manual-input rounded-xl border-2 border-purple-300 bg-purple-50 focus:border-purple-500 focus:bg-purple-100 transition-all font-medium"
       placeholder={placeholder}
     />
   );
@@ -79,7 +80,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   return (
     <TableRow className={`${isEven ? 'bg-white' : 'bg-gray-50/30'} hover:bg-gray-100/40 transition-colors`}>
       {/* Member Name */}
-      <TableCell className="text-left border-r p-3 rounded-l-xl">
+      <TableCell className="text-left border-r p-3">
         <div className="flex items-center gap-3">
           <Avatar className="h-7 w-7 flex-shrink-0">
             <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
@@ -193,7 +194,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
 
       {/* Project allocation cells - Default gray gradient pills */}
       {projects.map((project) => (
-        <TableCell key={project.id} className="text-center border-r p-3 bg-gray-50/50 rounded-r-xl last:rounded-r-xl">
+        <TableCell key={project.id} className="text-center border-r p-3 bg-gray-50/50">
           <div className="flex items-center justify-center">
             <DisplayPill 
               value="0"

@@ -32,6 +32,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   const projectCount = getProjectCount(member.id);
   const availableHours = Math.max(0, weeklyCapacity - totalHours);
   const isEvenRow = memberIndex % 2 === 0;
+  const isLastRow = memberIndex === projects.length - 1;
   
   // Calculate the number of project columns to show (minimum 15)
   const projectColumnsCount = Math.max(15, projects.length);
@@ -39,19 +40,21 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   return (
     <TableRow 
       key={member.id}
-      className={`h-9 ${isEvenRow ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50`}
+      className={`h-9 ${isEvenRow ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50 ${isLastRow ? 'last-row' : ''}`}
     >
       <NameCell member={member} />
       <ProjectCountCell projectCount={projectCount} />
       <CapacityCell availableHours={availableHours} totalCapacity={weeklyCapacity} />
-      <LeaveCell />
-      <LeaveCell />
-      <LeaveCell />
+      <LeaveCell defaultValue="0" type="annual" />
+      <LeaveCell defaultValue="0" type="holiday" />
+      <LeaveCell defaultValue="0" type="other" />
       <OfficeCell location={member.location} />
       
       {/* Project allocation cells - show all projects or fill to minimum */}
       {Array.from({ length: projectColumnsCount }).map((_, idx) => {
         const project = projects[idx];
+        const isLastColumn = idx === projectColumnsCount - 1;
+        
         if (project) {
           const key = `${member.id}:${project.id}`;
           const hours = allocationMap.get(key) || 0;

@@ -1,60 +1,49 @@
 
-/* Week Resourcing Table Styles */
+/* Week Resourcing - Extends Weekly Overview Styling */
+@import '../weekly-overview/css/weekly-table-clean.css';
 
-.week-resource-table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  border-radius: 8px;
-  background: white;
+/* Additional styling for week resourcing specific elements */
+.week-resource-table {
+  @extend .weekly-overview-table;
+}
+
+.week-resource-wrapper {
+  @extend .weekly-table-wrapper;
+}
+
+/* Enhanced last row styling for proper border radius */
+.week-resource-table tbody tr.last-row td:first-child {
+  border-bottom-left-radius: 16px;
+}
+
+.week-resource-table tbody tr.last-row td:last-child {
+  border-bottom-right-radius: 16px;
+}
+
+/* Manual input cells with light purple styling */
+.manual-input {
+  border-radius: 12px;
+  border: 2px solid #d8b4fe;
+  background: #f3e8ff;
+  transition: all 0.2s ease;
+}
+
+.manual-input:focus {
+  border-color: #8b5cf6;
+  background: #ede9fe;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+/* Display pills for consistent appearance */
+.display-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 40px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-/* Specific targeting for ResourceTable headers only */
-.enhanced-table thead,
-.enhanced-table thead tr,
-.enhanced-table thead th {
-  background: #6465F0 !important;
-  color: white !important;
-}
-
-/* Target the Name column header specifically */
-.enhanced-table thead th:first-child {
-  background: #6465F0 !important;
-  color: white !important;
-}
-
-/* Project header cells with vertical text */
-.enhanced-table thead th.project-header,
-.enhanced-table thead th.project-header * {
-  background: #6465F0 !important;
-  color: white !important;
-}
-
-/* Non-project column headers */
-.enhanced-table thead th.non-project-column,
-.enhanced-table thead th.non-project-column * {
-  background: #6465F0 !important;
-  color: white !important;
-}
-
-/* Body cells should stay white */
-.enhanced-table tbody td,
-.enhanced-table tbody td * {
-  background: white !important;
-  color: black !important;
-}
-
-.enhanced-table tbody tr:hover td {
-  background: #f8fafc !important;
-  color: black !important;
-}
-
-/* Capacity gauge and other components inside body */
-.enhanced-table tbody .capacity-gauge,
-.enhanced-table tbody .capacity-gauge *,
-.enhanced-table tbody .leave-tooltip,
-.enhanced-table tbody .leave-tooltip *,
-.enhanced-table tbody input,
-.enhanced-table tbody input * {
-  background: transparent !important;
+  border: 1px solid;
 }
