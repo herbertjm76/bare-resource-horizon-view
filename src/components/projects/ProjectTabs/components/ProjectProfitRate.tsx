@@ -3,7 +3,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Calculator, DollarSign } from 'lucide-react';
+import { Percent, Calculator } from 'lucide-react';
 
 interface ProjectProfitRateProps {
   profit: string;
@@ -24,40 +24,32 @@ export const ProjectProfitRate: React.FC<ProjectProfitRateProps> = ({
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div>
         <Label htmlFor="profit" className="flex items-center gap-1">
-          <DollarSign className="w-4 h-4" />Target Profit (%)
+          <Percent className="w-4 h-4" />Target Profit %<span className="text-red-500">*</span>
         </Label>
         <Input
           id="profit"
           type="number"
-          min="0"
-          max="100"
-          placeholder="Enter target profit percentage"
+          placeholder="Enter profit percentage"
           value={profit}
           onChange={(e) => onProfitChange(e.target.value)}
           required
+          className="mt-1"
         />
       </div>
-
       <div>
         <Label htmlFor="avgRate" className="flex items-center gap-1">
-          <Calculator className="w-4 h-4" />Average Rate ($/hr)
+          <Calculator className="w-4 h-4" />Average Rate
         </Label>
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-1">
           <Input
             id="avgRate"
             type="number"
-            placeholder="Enter hourly rate"
+            placeholder="Enter average rate"
             value={avgRate}
             onChange={(e) => onAvgRateChange(e.target.value)}
           />
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCalculatorOpen}
-            title="Calculate Average Rate"
-          >
-            <Calculator className="w-4 h-4 mr-1" />
-            Calculate
+          <Button type="button" variant="outline" onClick={onCalculatorOpen} className="flex-shrink-0">
+            <Calculator className="w-4 h-4" />
           </Button>
         </div>
       </div>

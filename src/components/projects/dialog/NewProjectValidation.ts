@@ -3,7 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { type FormState } from '../hooks/types/projectTypes';
 
 export const isProjectInfoValid = (form: FormState) => {
-  return (
+  console.log('Validating form:', form);
+  
+  const isValid = (
     !!form.code &&
     !!form.name &&
     form.country && form.country !== 'none' &&
@@ -11,6 +13,18 @@ export const isProjectInfoValid = (form: FormState) => {
     form.status && form.status !== 'none' &&
     form.office && form.office !== 'none'
   );
+  
+  console.log('Form validation result:', {
+    code: !!form.code,
+    name: !!form.name,
+    country: form.country && form.country !== 'none',
+    profit: !!form.profit,
+    status: form.status && form.status !== 'none',
+    office: form.office && form.office !== 'none',
+    isValid
+  });
+  
+  return isValid;
 };
 
 export const checkProjectCodeUnique = async (code: string, companyId: string) => {

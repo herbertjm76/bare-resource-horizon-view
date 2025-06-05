@@ -11,8 +11,11 @@ export const submitNewProject = async (
   officeStages: Array<{ id: string; name: string }>,
   onSuccess?: () => void
 ) => {
+  console.log('Submitting new project with form:', form);
+  
   if (!isProjectInfoValid(form)) {
-    toast.error("Please complete all required fields.");
+    console.log('Form validation failed');
+    toast.error("Please complete all required fields: Project Code, Name, Country, Target Profit %, Status, and Office.");
     return false;
   }
 
@@ -37,6 +40,19 @@ export const submitNewProject = async (
     // Map the status to the correct database enum value
     const mappedStatus = mapStatusToDb(projectStatus);
 
+    console.log('Creating project with data:', {
+      code: form.code,
+      name: form.name,
+      company_id: companyId,
+      project_manager_id: manager,
+      office_id: office,
+      status: mappedStatus,
+      country: country,
+      current_stage: currentStage,
+      target_profit_percentage: form.profit ? Number(form.profit) : null,
+      stages: selectedStageNames
+    });
+
     const { data, error } = await supabase.from('projects').insert({
       code: form.code,
       name: form.name,
@@ -50,10 +66,14 @@ export const submitNewProject = async (
       stages: selectedStageNames
     }).select();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Database error creating project:', error);
+      throw error;
+    }
     
     const projectId = data?.[0]?.id;
     if (projectId && form.stages.length) {
+      console.log('Creating stage fees for project:', projectId);
       const stageFeesPromises = form.stages.map(stageId => {
         const feeObj = form.stageFees[stageId];
         const stage = officeStages.find(s => s.id === stageId);
@@ -74,6 +94,7 @@ export const submitNewProject = async (
     }
     return true;
   } catch (error: any) {
+    console.error('Error creating project:', error);
     toast.error("Failed to create project: " + (error.message || "Unknown error"));
     return false;
   }
