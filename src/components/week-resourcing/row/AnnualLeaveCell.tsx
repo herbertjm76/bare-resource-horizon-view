@@ -21,7 +21,7 @@ export const AnnualLeaveCell: React.FC<AnnualLeaveCellProps> = ({
       value={annualLeave}
       label="h"
       className="leave-column"
-      pillClassName="bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300 text-gray-700"
+      pillClassName="bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300 text-gray-700 cursor-default"
     />
   );
 };

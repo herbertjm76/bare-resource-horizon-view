@@ -96,10 +96,10 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       
       <CapacityBarCell availableHours={Math.max(0, weeklyCapacity - totalHours - annualLeave - otherLeave - holidayHours)} totalCapacity={weeklyCapacity} />
       
-      {/* Annual Leave Cell with hours value */}
+      {/* Annual Leave Cell - READ-ONLY display from database */}
       <AnnualLeaveCell annualLeave={annualLeave} leaveDays={leaveDays} />
       
-      {/* Holiday Cell - now shows as display pill */}
+      {/* Holiday Cell - READ-ONLY display from database */}
       <HolidayCell 
         memberId={member.id}
         memberOffice={member.location}
