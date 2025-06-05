@@ -14,7 +14,7 @@ interface TimeRangeMetrics {
   };
   projectsByStatus: { name: string; value: number; }[];
   projectsByStage: { name: string; value: number; }[];
-  projectsByRegion: { name: string; value: number; }[];
+  projectsByLocation: { name: string; value: number; color?: string; }[];
   totalRevenue: number;
   avgProjectValue: number;
 }
@@ -24,7 +24,7 @@ const defaultMetrics: TimeRangeMetrics = {
   utilizationTrends: { days7: 0, days30: 0, days90: 0 },
   projectsByStatus: [],
   projectsByStage: [],
-  projectsByRegion: [],
+  projectsByLocation: [],
   totalRevenue: 0,
   avgProjectValue: 0
 };
@@ -97,7 +97,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
     try {
       console.log('📊 Fetching metrics for time range:', selectedTimeRange, dateRange);
 
-      // Fetch ALL projects (not filtered by creation date) - show current state of projects
+      // Fetch ALL projects with their office location details
       const { data: allProjects, error: projectsError } = await supabase
         .from('projects')
         .select(`
@@ -107,7 +107,14 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
           current_stage,
           country,
           created_at,
-          office:offices(name, country)
+          temp_office_location_id,
+          office:offices(name, country),
+          office_location:office_locations!temp_office_location_id(
+            id,
+            city,
+            country,
+            emoji
+          )
         `)
         .eq('company_id', company.id)
         .abortSignal(signal);
@@ -118,6 +125,20 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       }
 
       // Check if request was aborted
+      if (signal.aborted) return;
+
+      // Fetch office locations with colors
+      const { data: officeLocations, error: locationsError } = await supabase
+        .from('office_locations')
+        .select('id, city, country, emoji')
+        .eq('company_id', company.id)
+        .abortSignal(signal);
+
+      if (locationsError) {
+        console.error('Error fetching office locations:', locationsError);
+        throw locationsError;
+      }
+
       if (signal.aborted) return;
 
       // Fetch project stages/fees within the time range
@@ -201,16 +222,28 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         value
       }));
 
-      // Group active projects by region/country
-      const regionGroups = activeProjectsInRange.reduce((acc, project) => {
-        const region = project.country || 'Unknown';
-        acc[region] = (acc[region] || 0) + 1;
+      // Group active projects by location using office_location data
+      const locationGroups = activeProjectsInRange.reduce((acc, project) => {
+        let locationKey = 'Unknown';
+        
+        // Try to get location from office_location first
+        if (project.office_location) {
+          locationKey = project.office_location.country || project.office_location.city || 'Unknown';
+        } else if (project.country) {
+          // Fallback to project country
+          locationKey = project.country;
+        }
+        
+        acc[locationKey] = (acc[locationKey] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
 
-      const projectsByRegion = Object.entries(regionGroups).map(([name, value]) => ({
+      // Create location data with colors (using default colors for now since office_locations doesn't have color field)
+      const locationColors = ['#059669', '#0891B2', '#7C3AED', '#F59E0B', '#EF4444'];
+      const projectsByLocation = Object.entries(locationGroups).map(([name, value], index) => ({
         name,
-        value
+        value,
+        color: locationColors[index % locationColors.length]
       }));
 
       console.log('📈 Calculated metrics for ' + selectedTimeRange + ':', {
@@ -220,7 +253,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         avgUtilization,
         statusGroups,
         stageGroups,
-        regionGroups
+        locationGroups
       });
 
       // Only update state if request wasn't aborted
@@ -234,7 +267,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
           },
           projectsByStatus,
           projectsByStage,
-          projectsByRegion,
+          projectsByLocation,
           totalRevenue,
           avgProjectValue
         });

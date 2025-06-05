@@ -7,7 +7,7 @@ interface AnalyticsSectionProps {
   mockData: {
     projectsByStatus: { name: string; value: number; }[];
     projectsByStage: { name: string; value: number; }[];
-    projectsByRegion: { name: string; value: number; }[];
+    projectsByLocation: { name: string; value: number; color?: string; }[];
     projectsByPM: { name: string; value: number; }[];
   };
 }
@@ -16,7 +16,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
   // Validate chart data arrays
   const hasStatusData = mockData.projectsByStatus?.length > 0;
   const hasStageData = mockData.projectsByStage?.length > 0;
-  const hasRegionData = mockData.projectsByRegion?.length > 0;
+  const hasLocationData = mockData.projectsByLocation?.length > 0;
   const hasPMData = mockData.projectsByPM?.length > 0;
   
   const EmptyState = ({ title }: { title: string }) => (
@@ -29,6 +29,11 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
       </div>
     </div>
   );
+  
+  // Extract colors for location chart
+  const locationColors = hasLocationData 
+    ? mockData.projectsByLocation.map(item => item.color || '#6F4BF6')
+    : ['#059669', '#0891B2', '#7C3AED'];
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -70,21 +75,21 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
         </CardContent>
       </Card>
 
-      {/* Regional Distribution Chart */}
+      {/* Project Locations Chart */}
       <Card className="h-72 shadow-sm hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-gray-800">Regional Distribution</CardTitle>
+          <CardTitle className="text-base font-semibold text-gray-800">Project Locations</CardTitle>
         </CardHeader>
         <CardContent className="p-4 pt-0">
-          {hasRegionData ? (
+          {hasLocationData ? (
             <Donut 
-              data={mockData.projectsByRegion} 
+              data={mockData.projectsByLocation} 
               title=""
-              colors={['#059669', '#0891B2', '#7C3AED']}
+              colors={locationColors}
               height={140}
             />
           ) : (
-            <EmptyState title="Regional Distribution" />
+            <EmptyState title="Project Locations" />
           )}
         </CardContent>
       </Card>

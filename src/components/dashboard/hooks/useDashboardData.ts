@@ -1,173 +1,112 @@
 
-import { useState, useEffect, useMemo } from 'react';
-import { useTeamMembersData } from '@/hooks/useTeamMembersData';
-import { useTeamMembersState } from '@/hooks/useTeamMembersState';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { useIndividualUtilization } from './useIndividualUtilization';
-import { useTimeRangeMetrics } from './useTimeRangeMetrics';
+import { toast } from 'sonner';
 import { TimeRange } from '../TimeRangeSelector';
+import { useTimeRangeMetrics } from './useTimeRangeMetrics';
 
-export const useDashboardData = () => {
-  const [selectedOffice, setSelectedOffice] = useState('All Offices');
-  const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('month');
+export const useDashboardData = (selectedTimeRange: TimeRange) => {
+  const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [currentUtilizationRate, setCurrentUtilizationRate] = useState(0);
+  const [utilizationStatus, setUtilizationStatus] = useState({
+    status: 'Optimal',
+    color: '#10B981',
+    textColor: 'text-green-700'
+  });
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Get active team members
-  const { teamMembers: activeTeamMembers, isLoading: isLoadingActive } = useTeamMembersData(true);
-  
-  // Get company context
   const { company } = useCompany();
-  
-  // Get pre-registered members
-  const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
-  
-  // Get time-range specific metrics - THIS IS THE KEY DATA SOURCE
-  const { metrics: timeRangeMetrics, isLoading: isLoadingMetrics } = useTimeRangeMetrics(selectedTimeRange);
-  
-  // Combine all team members (active + pre-registered)
-  const allTeamMembers = useMemo(() => {
-    console.log('=== DASHBOARD DATA HOOK ===');
-    console.log('Active team members:', activeTeamMembers?.length || 0);
-    console.log('Pre-registered members:', preRegisteredMembers?.length || 0);
-    console.log('Selected time range:', selectedTimeRange);
-    console.log('Time range metrics:', timeRangeMetrics);
-    
-    const combined = [...(activeTeamMembers || []), ...(preRegisteredMembers || [])];
-    console.log('Total combined members:', combined.length);
-    
-    return combined;
-  }, [activeTeamMembers, preRegisteredMembers, selectedTimeRange, timeRangeMetrics]);
+  const { metrics: timeRangeMetrics, isLoading: metricsLoading } = useTimeRangeMetrics(selectedTimeRange);
 
-  // Filter team members by selected office
-  const filteredTeamMembers = useMemo(() => {
-    if (selectedOffice === 'All Offices') {
-      return allTeamMembers;
+  const fetchDashboardData = useCallback(async () => {
+    if (!company?.id) {
+      setIsLoading(false);
+      return;
     }
-    return allTeamMembers.filter(member => member.location === selectedOffice);
-  }, [allTeamMembers, selectedOffice]);
 
-  // Get utilization data for filtered members - NOW INCLUDES TIME RANGE
-  const { memberUtilizations, isLoading: isLoadingUtilization } = useIndividualUtilization(filteredTeamMembers, selectedTimeRange);
+    try {
+      setIsLoading(true);
 
-  // Calculate staff data with proper utilization and all member properties
-  const staffData = useMemo(() => {
-    console.log('=== CALCULATING STAFF DATA ===');
-    console.log('Filtered team members for staff data:', filteredTeamMembers.length);
-    console.log('Member utilizations:', memberUtilizations);
-    console.log('Selected time range for staff data:', selectedTimeRange);
-    
-    const staffMembers = filteredTeamMembers.map(member => {
-      const memberName = `${member.first_name || ''} ${member.last_name || ''}`.trim();
-      const utilization = memberUtilizations[member.id] || 0;
+      // Fetch team members
+      const { data: membersData, error: membersError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('company_id', company.id);
+
+      if (membersError) throw membersError;
+
+      // Fetch projects
+      const { data: projectsData, error: projectsError } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('company_id', company.id);
+
+      if (projectsError) throw projectsError;
+
+      setTeamMembers(membersData || []);
+      setProjects(projectsData || []);
+
+      // Calculate utilization (simplified calculation)
+      const activeMembers = membersData?.filter(member => member.role !== 'pending') || [];
+      const totalCapacity = activeMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
       
-      return {
-        id: member.id,
-        first_name: member.first_name || '',
-        last_name: member.last_name || '',
-        name: memberName,
-        role: member.job_title || 'Team Member',
-        availability: utilization,
-        avatar_url: 'avatar_url' in member ? member.avatar_url : undefined,
-        email: 'email' in member ? member.email : undefined,
-        department: 'department' in member ? member.department : undefined,
-        location: 'location' in member ? member.location : undefined,
-        weekly_capacity: 'weekly_capacity' in member ? member.weekly_capacity : 40,
-        isPending: 'isPending' in member ? member.isPending : false
-      };
-    });
-
-    console.log('Final staff data for', selectedTimeRange, ':', staffMembers.map(s => ({ 
-      id: s.id,
-      name: s.name, 
-      availability: s.availability,
-      isPending: s.isPending
-    })));
-    console.log('=== END STAFF DATA CALCULATION ===');
-
-    return staffMembers;
-  }, [filteredTeamMembers, memberUtilizations, selectedTimeRange]);
-
-  // Generate office options from team members
-  const officeOptions = useMemo(() => {
-    const offices = new Set(['All Offices']);
-    allTeamMembers.forEach(member => {
-      if (member.location) {
-        offices.add(member.location);
+      // Mock utilization calculation - replace with actual logic
+      const utilizationRate = Math.min(Math.round((activeMembers.length * 30) / Math.max(totalCapacity, 1) * 100), 100);
+      
+      setCurrentUtilizationRate(utilizationRate);
+      
+      // Set utilization status
+      if (utilizationRate >= 90) {
+        setUtilizationStatus({
+          status: 'High Load',
+          color: '#ef4444',
+          textColor: 'text-red-700'
+        });
+      } else if (utilizationRate >= 75) {
+        setUtilizationStatus({
+          status: 'Optimal',
+          color: '#22c55e',
+          textColor: 'text-green-700'
+        });
+      } else {
+        setUtilizationStatus({
+          status: 'Available',
+          color: '#3b82f6',
+          textColor: 'text-blue-700'
+        });
       }
-    });
-    return Array.from(offices);
-  }, [allTeamMembers]);
 
-  // Use utilization trends from time range metrics - ALWAYS from time range data
-  const utilizationTrends = useMemo(() => {
-    console.log('Using utilization trends from time range metrics:', timeRangeMetrics.utilizationTrends);
-    return timeRangeMetrics.utilizationTrends;
-  }, [timeRangeMetrics.utilizationTrends]);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      toast.error('Failed to load dashboard data');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [company?.id]);
 
-  // Use metrics from time range metrics hook - ALWAYS from time range data
-  const metrics = useMemo(() => {
-    console.log('Using metrics from time range:', {
-      activeProjects: timeRangeMetrics.activeProjects,
-      activeResources: filteredTeamMembers.length,
-      totalRevenue: timeRangeMetrics.totalRevenue,
-      avgProjectValue: timeRangeMetrics.avgProjectValue
-    });
-    
-    return {
-      activeProjects: timeRangeMetrics.activeProjects,
-      activeResources: filteredTeamMembers.length,
-      totalRevenue: timeRangeMetrics.totalRevenue,
-      avgProjectValue: timeRangeMetrics.avgProjectValue
-    };
-  }, [timeRangeMetrics.activeProjects, timeRangeMetrics.totalRevenue, timeRangeMetrics.avgProjectValue, filteredTeamMembers.length]);
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
-  // Chart data - USE TIME RANGE METRICS instead of mock data
-  const chartData = useMemo(() => {
-    console.log('Creating chart data from time range metrics:', {
-      projectsByStatus: timeRangeMetrics.projectsByStatus,
-      projectsByStage: timeRangeMetrics.projectsByStage,
-      projectsByRegion: timeRangeMetrics.projectsByRegion
-    });
-
-    return {
-      weeklyData: [
-        { name: 'Mon', utilization: utilizationTrends.days7, capacity: 100 },
-        { name: 'Tue', utilization: utilizationTrends.days7 * 0.95, capacity: 100 },
-        { name: 'Wed', utilization: utilizationTrends.days7 * 0.88, capacity: 100 },
-        { name: 'Thu', utilization: utilizationTrends.days7 * 0.92, capacity: 100 },
-        { name: 'Fri', utilization: utilizationTrends.days7 * 0.98, capacity: 100 },
-      ],
-      projectTypes: [
-        { name: 'Architecture', value: 35, color: '#8B5CF6' },
-        { name: 'Interior Design', value: 28, color: '#06B6D4' },
-        { name: 'Planning', value: 22, color: '#10B981' },
-        { name: 'Consulting', value: 15, color: '#F59E0B' },
-      ],
-      // Use REAL time range data instead of fallbacks
-      projectsByStatus: timeRangeMetrics.projectsByStatus,
-      projectsByStage: timeRangeMetrics.projectsByStage,
-      projectsByRegion: timeRangeMetrics.projectsByRegion,
-      // Keep this as mock since it's not part of time range metrics yet
-      projectInvoicesThisMonth: [
-        { name: 'Paid', value: Math.max(1, Math.floor(timeRangeMetrics.activeProjects * 0.6)) },
-        { name: 'Pending', value: Math.max(1, Math.floor(timeRangeMetrics.activeProjects * 0.3)) },
-        { name: 'Overdue', value: Math.max(0, Math.floor(timeRangeMetrics.activeProjects * 0.1)) },
-      ],
-    };
-  }, [timeRangeMetrics, utilizationTrends]);
-
-  const isLoading = isLoadingActive || isLoadingUtilization || isLoadingMetrics;
+  // Create mock data structure with proper location data
+  const mockData = {
+    projectsByStatus: timeRangeMetrics.projectsByStatus,
+    projectsByStage: timeRangeMetrics.projectsByStage,
+    projectsByLocation: timeRangeMetrics.projectsByLocation, // This now includes colors
+    projectsByPM: timeRangeMetrics.projectsByPM || []
+  };
 
   return {
-    selectedOffice,
-    setSelectedOffice,
-    selectedTimeRange,
-    setSelectedTimeRange,
-    allTeamMembers: filteredTeamMembers,
-    utilizationTrends,
-    metrics,
-    staffData,
-    officeOptions,
-    mockData: chartData, // Renamed for clarity but now contains real time-range data
-    isLoading
+    teamMembers,
+    projects,
+    currentUtilizationRate,
+    utilizationStatus,
+    isLoading: isLoading || metricsLoading,
+    mockData,
+    activeResources: teamMembers.filter(member => member.role !== 'pending').length,
+    activeProjects: timeRangeMetrics.activeProjects,
+    refetch: fetchDashboardData
   };
 };
