@@ -3,6 +3,7 @@ import { format, startOfWeek } from 'date-fns';
 import { useWeekResourceTeamMembers } from './useWeekResourceTeamMembers';
 import { useWeekResourceProjects } from './useWeekResourceProjects';
 import { useWeekResourceAllocations } from './useWeekResourceAllocations';
+import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
 
 interface UseWeekResourceDataProps {
   selectedWeek: Date;
@@ -38,8 +39,16 @@ export const useWeekResourceData = ({ selectedWeek, filters }: UseWeekResourceDa
     isLoading: isLoadingAllocations
   } = useWeekResourceAllocations({ weekStartDate });
 
+  // Get leave data (annual leave and holidays)
+  const memberIds = members.map(m => m.id);
+  const {
+    annualLeaveData,
+    holidaysData,
+    isLoading: isLoadingLeaveData
+  } = useWeekResourceLeaveData({ weekStartDate, memberIds });
+
   // Determine overall loading state
-  const isLoading = isLoadingProjects || loadingMembers || isLoadingAllocations;
+  const isLoading = isLoadingProjects || loadingMembers || isLoadingAllocations || isLoadingLeaveData;
   
   // Handle errors
   const error = projectsError || membersError;
@@ -48,6 +57,8 @@ export const useWeekResourceData = ({ selectedWeek, filters }: UseWeekResourceDa
     projects: projects || [],
     members,
     weekAllocations: weekAllocations || [],
+    annualLeaveData,
+    holidaysData,
     weekStartDate,
     isLoading,
     error

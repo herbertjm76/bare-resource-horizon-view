@@ -9,6 +9,8 @@ interface NewResourceTableProps {
   projects: any[];
   members: any[];
   allocations: any[];
+  annualLeaveData: Record<string, number>;
+  holidaysData: Record<string, number>;
   weekStartDate: string;
 }
 
@@ -16,6 +18,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   projects,
   members,
   allocations,
+  annualLeaveData,
+  holidaysData,
   weekStartDate
 }) => {
   // Create allocation map for quick lookups
@@ -64,6 +68,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                     memberIndex={memberIndex}
                     projects={projects}
                     allocationMap={allocationMap}
+                    annualLeaveData={annualLeaveData}
+                    holidaysData={holidaysData}
                     getMemberTotal={getMemberTotal}
                     getProjectCount={getProjectCount}
                   />

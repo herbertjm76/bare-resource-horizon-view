@@ -24,6 +24,8 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     projects,
     members,
     weekAllocations,
+    annualLeaveData,
+    holidaysData,
     weekStartDate,
     isLoading,
     error
@@ -59,6 +61,8 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         projects={projects}
         members={members}
         allocations={weekAllocations}
+        annualLeaveData={annualLeaveData}
+        holidaysData={holidaysData}
         weekStartDate={weekStartDate}
       />
     </div>

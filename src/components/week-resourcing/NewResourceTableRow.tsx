@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { 
@@ -15,6 +14,8 @@ interface NewResourceTableRowProps {
   memberIndex: number;
   projects: any[];
   allocationMap: Map<string, number>;
+  annualLeaveData: Record<string, number>;
+  holidaysData: Record<string, number>;
   getMemberTotal: (memberId: string) => number;
   getProjectCount: (memberId: string) => number;
 }
@@ -24,13 +25,22 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   memberIndex,
   projects,
   allocationMap,
+  annualLeaveData,
+  holidaysData,
   getMemberTotal,
   getProjectCount
 }) => {
   const weeklyCapacity = member.weekly_capacity || 40;
   const totalHours = getMemberTotal(member.id);
   const projectCount = getProjectCount(member.id);
-  const availableHours = Math.max(0, weeklyCapacity - totalHours);
+  
+  // Get leave data for this member
+  const annualLeave = annualLeaveData[member.id] || 0;
+  const holidayHours = holidaysData[member.id] || 0;
+  
+  // Calculate available hours after all allocations and leave
+  const availableHours = Math.max(0, weeklyCapacity - totalHours - annualLeave - holidayHours);
+  
   const isEvenRow = memberIndex % 2 === 0;
   
   // Calculate the number of project columns to show (minimum 15)
@@ -44,9 +54,16 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       <NameCell member={member} />
       <ProjectCountCell projectCount={projectCount} />
       <CapacityCell availableHours={availableHours} totalCapacity={weeklyCapacity} />
+      
+      {/* Annual Leave Cell - display actual data from database */}
+      <LeaveCell defaultValue={annualLeave.toString()} />
+      
+      {/* Holiday Cell - display actual data from database */}
+      <LeaveCell defaultValue={holidayHours.toString()} />
+      
+      {/* Other Leave Cell - manual input */}
       <LeaveCell />
-      <LeaveCell />
-      <LeaveCell />
+      
       <OfficeCell location={member.location} />
       
       {/* Project allocation cells - show all projects or fill to minimum */}

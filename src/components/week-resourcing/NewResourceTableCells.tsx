@@ -57,19 +57,31 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({ availableHours, tota
 
 interface LeaveCellProps {
   defaultValue?: string;
+  readOnly?: boolean;
 }
 
-export const LeaveCell: React.FC<LeaveCellProps> = ({ defaultValue = "0" }) => {
+export const LeaveCell: React.FC<LeaveCellProps> = ({ defaultValue = "0", readOnly = false }) => {
+  // Determine styling based on whether it's read-only or manual input
+  const bgColor = readOnly ? "bg-gradient-to-br from-gray-50 to-slate-50" : "bg-gradient-to-br from-purple-50 to-violet-50";
+  const borderColor = readOnly ? "border-gray-300" : "border-purple-300";
+  const focusColor = readOnly ? "" : "focus:border-purple-500 focus:bg-white focus:ring-2 focus:ring-purple-200";
+  
   return (
-    <TableCell className="text-center border-r mobile-leave-cell bg-gradient-to-br from-purple-50 to-violet-50">
-      <input
-        type="number"
-        min="0"
-        max="40"
-        defaultValue={defaultValue}
-        className="w-6 h-5 sm:w-8 sm:h-6 text-xs text-center border-2 border-purple-300 rounded-md bg-white/80 focus:border-purple-500 focus:bg-white focus:ring-2 focus:ring-purple-200 transition-all"
-        placeholder="0"
-      />
+    <TableCell className={`text-center border-r mobile-leave-cell ${bgColor}`}>
+      {readOnly ? (
+        <span className="inline-flex items-center justify-center w-6 h-5 sm:w-8 sm:h-6 text-xs bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 rounded border border-gray-200 font-medium shadow-sm">
+          {defaultValue === "0" ? "" : defaultValue}
+        </span>
+      ) : (
+        <input
+          type="number"
+          min="0"
+          max="40"
+          defaultValue={defaultValue}
+          className={`w-6 h-5 sm:w-8 sm:h-6 text-xs text-center border-2 ${borderColor} rounded-md bg-white/80 ${focusColor} transition-all`}
+          placeholder="0"
+        />
+      )}
     </TableCell>
   );
 };
