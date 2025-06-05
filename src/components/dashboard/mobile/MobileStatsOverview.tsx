@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Users, Briefcase, Sparkles } from 'lucide-react';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface MobileStatsOverviewProps {
   activeResources: number;
@@ -21,10 +21,10 @@ export const MobileStatsOverview: React.FC<MobileStatsOverviewProps> = ({
   utilizationStatus
 }) => {
   const getUtilizationBadgeStyle = () => {
-    if (currentUtilizationRate >= 90) return 'bg-red-500 text-white border-red-400';
-    if (currentUtilizationRate >= 75) return 'bg-orange-500 text-white border-orange-400';
-    if (currentUtilizationRate >= 50) return 'bg-green-500 text-white border-green-400';
-    return 'bg-blue-500 text-white border-blue-400';
+    if (currentUtilizationRate >= 90) return { backgroundColor: '#ef4444', color: 'white' };
+    if (currentUtilizationRate >= 75) return { backgroundColor: '#f97316', color: 'white' };
+    if (currentUtilizationRate >= 50) return { backgroundColor: '#22c55e', color: 'white' };
+    return { backgroundColor: '#3b82f6', color: 'white' };
   };
 
   return (
@@ -63,9 +63,13 @@ export const MobileStatsOverview: React.FC<MobileStatsOverviewProps> = ({
               <p className="text-white/80 text-xs">Team Utilization</p>
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-xl font-bold">{currentUtilizationRate}%</p>
-                <Badge className={`text-xs whitespace-nowrap ${getUtilizationBadgeStyle()}`}>
+                <StandardizedBadge
+                  variant="status"
+                  style={getUtilizationBadgeStyle()}
+                  className="text-xs whitespace-nowrap"
+                >
                   {utilizationStatus.status}
-                </Badge>
+                </StandardizedBadge>
               </div>
             </div>
           </div>

@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { LucideIcon } from 'lucide-react';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface CEOMetricsCardProps {
   title: string;
@@ -53,10 +53,10 @@ export const CEOMetricsCard: React.FC<CEOMetricsCardProps> = ({
               <p className="text-xs font-medium text-gray-500 mb-1">{subtitle}</p>
             )}
             {trend && (
-              <Badge variant="outline" className="text-xs">
+              <StandardizedBadge variant="status" className="text-xs">
                 {trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '→'}
                 {trend.percentage && ` ${trend.percentage}%`}
-              </Badge>
+              </StandardizedBadge>
             )}
           </div>
           <div className={`h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ml-2 ${getIconColors()}`}>

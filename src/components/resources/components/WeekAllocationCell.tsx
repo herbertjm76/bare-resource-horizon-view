@@ -6,6 +6,7 @@ import {
   getMilestoneAlignment 
 } from '../utils/milestoneUtils';
 import { MilestoneInfo, Continuity } from '../hooks/useWeekMilestones';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface WeekAllocationCellProps {
   weekKey: string;
@@ -51,11 +52,12 @@ export const WeekAllocationCell: React.FC<WeekAllocationCellProps> = ({
         {/* Hours display */}
         <div className="hours-display">
           {projectHours > 0 ? (
-            <div className="bg-gray-100 text-gray-500 border border-gray-200 text-xs font-medium rounded-md px-1 py-0.5 mx-1">
-              <span className="text-lg font-bold">
-                {projectHours}h
-              </span>
-            </div>
+            <StandardizedBadge
+              variant="count"
+              className="text-lg font-bold mx-1"
+            >
+              {projectHours}h
+            </StandardizedBadge>
           ) : (
             <span className="text-lg font-bold text-gray-250">
               0h

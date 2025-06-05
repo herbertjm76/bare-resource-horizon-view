@@ -5,6 +5,7 @@ import { Users } from 'lucide-react';
 import { StaffStatusCard } from '../staff/StaffStatusCard';
 import { TimeRange } from '../TimeRangeSelector';
 import { StandardizedHeaderBadge } from './components/StandardizedHeaderBadge';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface MobileTeamStatusProps {
   transformedStaffData: any[];

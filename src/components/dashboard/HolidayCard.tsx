@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, MapPin } from 'lucide-react';
 import { useHolidays } from './hooks/useHolidays';
 import { StandardizedHeaderBadge } from './mobile/components/StandardizedHeaderBadge';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface Holiday {
   id: string;
@@ -35,11 +36,11 @@ export const HolidayCard: React.FC = () => {
   };
 
   const getCountdownBadgeStyle = (daysUntil: number) => {
-    if (daysUntil === 0) return 'bg-red-500 text-white border-red-400';
-    if (daysUntil === 1) return 'bg-orange-500 text-white border-orange-400';
-    if (daysUntil <= 7) return 'bg-yellow-500 text-white border-yellow-400';
-    if (daysUntil <= 30) return 'bg-blue-500 text-white border-blue-400';
-    return 'bg-gray-500 text-white border-gray-400';
+    if (daysUntil === 0) return { backgroundColor: '#ef4444', color: 'white' };
+    if (daysUntil === 1) return { backgroundColor: '#f97316', color: 'white' };
+    if (daysUntil <= 7) return { backgroundColor: '#eab308', color: 'white' };
+    if (daysUntil <= 30) return { backgroundColor: '#3b82f6', color: 'white' };
+    return { backgroundColor: '#6b7280', color: 'white' };
   };
 
   const getCountdownText = (daysUntil: number) => {
@@ -142,11 +143,14 @@ export const HolidayCard: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Countdown Badge */}
+                    {/* Countdown Badge using StandardizedBadge */}
                     {daysUntil >= 0 && (
-                      <div className={`ml-auto bg-gray-100 text-gray-500 border border-gray-200 text-xs font-medium px-2.5 py-1 rounded-full ${getCountdownBadgeStyle(daysUntil)}`}>
+                      <StandardizedBadge
+                        variant="countdown"
+                        style={getCountdownBadgeStyle(daysUntil)}
+                      >
                         {getCountdownText(daysUntil)}
-                      </div>
+                      </StandardizedBadge>
                     )}
                   </div>
                 </div>

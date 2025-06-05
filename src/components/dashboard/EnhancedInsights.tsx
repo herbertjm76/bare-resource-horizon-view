@@ -2,13 +2,13 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { TrendingUp } from 'lucide-react';
 import { TimeRange } from './TimeRangeSelector';
 import { getAllInsights } from './insights/utils/insightAggregator';
 import { InsightItem } from './insights/components/InsightItem';
 import { MetricsSummary } from './insights/components/MetricsSummary';
 import { EmptyInsightsState } from './insights/components/EmptyInsightsState';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface EnhancedInsightsProps {
   utilizationRate: number;
@@ -43,9 +43,9 @@ export const EnhancedInsights: React.FC<EnhancedInsightsProps> = ({
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-brand-violet" />
           Smart Insights
-          <Badge variant="outline" className="text-xs">
+          <StandardizedBadge variant="status" className="text-xs">
             {getTimeRangeText()}
-          </Badge>
+          </StandardizedBadge>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden p-0">

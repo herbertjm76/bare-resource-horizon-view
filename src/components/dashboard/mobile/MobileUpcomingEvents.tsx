@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from 'lucide-react';
 import { HolidayCard } from '../HolidayCard';
 import { StandardizedHeaderBadge } from './components/StandardizedHeaderBadge';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 export const MobileUpcomingEvents: React.FC = () => {
   return (

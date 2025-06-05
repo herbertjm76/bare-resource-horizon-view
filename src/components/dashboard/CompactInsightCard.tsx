@@ -2,8 +2,8 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { TrendingUp, AlertTriangle, Calendar, Plane } from 'lucide-react';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface IconConfig {
   name: string;
@@ -73,9 +73,9 @@ export const CompactInsightCard: React.FC<CompactInsightCardProps> = ({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <h4 className="font-medium text-sm text-gray-900 truncate">{title}</h4>
-                <Badge variant="outline" className="text-xs px-1.5 py-0.5">
+                <StandardizedBadge variant="status" className="text-xs px-1.5 py-0.5">
                   {severity}
-                </Badge>
+                </StandardizedBadge>
               </div>
               <p className="text-xs text-gray-600 mb-2 line-clamp-2">{description}</p>
               {metric && (

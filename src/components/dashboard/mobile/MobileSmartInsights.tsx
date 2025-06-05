@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles } from 'lucide-react';
 import { IntelligentInsights } from '../IntelligentInsights';
 import { StandardizedHeaderBadge } from './components/StandardizedHeaderBadge';
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
 interface MobileSmartInsightsProps {
   transformedStaffData: any[];
