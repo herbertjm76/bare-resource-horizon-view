@@ -2,7 +2,6 @@
 import React from 'react';
 import { MobileSmartInsights } from './mobile/MobileSmartInsights';
 import { MobileTeamStatus } from './mobile/MobileTeamStatus';
-import { MobilePerformanceGauge } from './mobile/MobilePerformanceGauge';
 import { MobileUpcomingEvents } from './mobile/MobileUpcomingEvents';
 import { HerbieFloatingButton } from './HerbieFloatingButton';
 import { TimeRange } from './TimeRangeSelector';
@@ -79,13 +78,6 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
           <MobileTeamStatus
             transformedStaffData={transformedStaffData}
             selectedTimeRange={selectedTimeRange}
-          />
-        </div>
-
-        {/* Performance Gauge */}
-        <div className="w-full">
-          <MobilePerformanceGauge
-            currentUtilizationRate={currentUtilizationRate}
           />
         </div>
 
