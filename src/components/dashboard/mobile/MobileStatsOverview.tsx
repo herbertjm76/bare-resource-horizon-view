@@ -30,9 +30,7 @@ export const MobileStatsOverview: React.FC<MobileStatsOverviewProps> = ({
   return (
     <div className="bg-gradient-to-r from-brand-violet to-purple-600 rounded-2xl p-4 text-white w-full">
       <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-        <div className="p-1.5 bg-white/20 rounded-lg flex-shrink-0">
-          <Sparkles className="h-4 w-4 text-white" />
-        </div>
+        <Sparkles className="h-5 w-5 text-white" strokeWidth={1.5} />
         Dashboard Overview
       </h2>
       
@@ -40,9 +38,7 @@ export const MobileStatsOverview: React.FC<MobileStatsOverviewProps> = ({
       <div className="space-y-3 w-full">
         <div className="flex items-center justify-between p-3 bg-white/10 rounded-xl w-full">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="p-1.5 bg-white/20 rounded-lg flex-shrink-0">
-              <Users className="h-4 w-4 text-white" />
-            </div>
+            <Users className="h-5 w-5 text-white" strokeWidth={1.5} />
             <div className="min-w-0">
               <p className="text-white/80 text-xs">Team Members</p>
               <p className="text-xl font-bold">{activeResources}</p>
@@ -52,9 +48,7 @@ export const MobileStatsOverview: React.FC<MobileStatsOverviewProps> = ({
         
         <div className="flex items-center justify-between p-3 bg-white/10 rounded-xl w-full">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="p-1.5 bg-white/20 rounded-lg flex-shrink-0">
-              <Briefcase className="h-4 w-4 text-white" />
-            </div>
+            <Briefcase className="h-5 w-5 text-white" strokeWidth={1.5} />
             <div className="min-w-0">
               <p className="text-white/80 text-xs">Active Projects</p>
               <p className="text-xl font-bold">{activeProjects}</p>
@@ -64,9 +58,7 @@ export const MobileStatsOverview: React.FC<MobileStatsOverviewProps> = ({
         
         <div className="flex items-center justify-between p-3 bg-white/10 rounded-xl w-full">
           <div className="flex items-center gap-2 min-w-0">
-            <div className="p-1.5 bg-white/20 rounded-lg flex-shrink-0">
-              <TrendingUp className="h-4 w-4 text-white" />
-            </div>
+            <TrendingUp className="h-5 w-5 text-white" strokeWidth={1.5} />
             <div className="min-w-0 flex-1">
               <p className="text-white/80 text-xs">Team Utilization</p>
               <div className="flex items-center gap-2 flex-wrap">

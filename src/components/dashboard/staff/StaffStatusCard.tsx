@@ -47,9 +47,7 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
     <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
       <CardHeader className="flex-shrink-0">
         <CardTitle className="text-lg flex items-center gap-2">
-          <div className="p-1.5 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
-            <Users className="h-5 w-5 text-white" />
-          </div>
+          <Users className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
           <span className="text-brand-violet font-semibold">Staff Status</span>
           <span className="text-sm font-normal ml-2 bg-gray-100 px-2 py-0.5 rounded">
             {getTimeRangeText()}
@@ -62,7 +60,7 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
             {/* At Capacity Staff (>90%) */}
             <StaffSection
               title="At Capacity"
-              icon={<AlertTriangle className="h-4 w-4 text-red-500" />}
+              icon={<AlertTriangle className="h-4 w-4 text-red-500" strokeWidth={1.5} />}
               members={atCapacityStaff}
               colorScheme="red"
             />
@@ -70,7 +68,7 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
             {/* Optimally Allocated Staff (66-90%) */}
             <StaffSection
               title="Optimally Allocated"
-              icon={<Target className="h-4 w-4 text-blue-500" />}
+              icon={<Target className="h-4 w-4 text-blue-500" strokeWidth={1.5} />}
               members={optimalStaff}
               colorScheme="blue"
             />
@@ -78,7 +76,7 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
             {/* Ready for Projects Staff (≤65%) */}
             <StaffSection
               title="Ready for Projects"
-              icon={<Target className="h-4 w-4 text-green-500" />}
+              icon={<Target className="h-4 w-4 text-green-500" strokeWidth={1.5} />}
               members={readyStaff}
               colorScheme="green"
               showLimit={4}

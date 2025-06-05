@@ -20,13 +20,11 @@ export const MobileSmartInsights: React.FC<MobileSmartInsightsProps> = ({
     <Card className="rounded-2xl border-0 shadow-sm bg-white">
       <CardHeader className="pb-3 px-4">
         <CardTitle className="text-lg flex items-center gap-3">
-          <div className="p-1.5 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
-            <Sparkles className="h-4 w-4 text-white" />
-          </div>
+          <Sparkles className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
           <span className="text-brand-violet font-semibold">
             Smart Insights
           </span>
-          <Badge variant="brand" className="bg-brand-violet/20 text-brand-violet border-brand-violet/20 ml-auto">
+          <Badge variant="brand" className="bg-gray-100 px-2 py-0.5 rounded text-gray-500 border-gray-300 ml-auto">
             2 Active
           </Badge>
         </CardTitle>
