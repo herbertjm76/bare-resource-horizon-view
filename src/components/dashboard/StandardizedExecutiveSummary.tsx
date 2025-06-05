@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Typography } from "@/components/ui/typography";
-import { Users, Briefcase, TrendingUp, Clock } from 'lucide-react';
+import { Users, Briefcase, TrendingUp, Clock, UserSquare2, FolderKanban, Calendar, GanttChartSquare } from 'lucide-react';
 
 interface SummaryMetric {
   title: string;
@@ -51,24 +51,29 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     }
   };
 
-  // Standard icon mapping for consistency
+  // Consistent icon mapping based on sidebar icons and content relevance
   const getStandardIcon = (metric: SummaryMetric, index: number) => {
     if (metric.icon) return metric.icon;
     
     const title = metric.title.toLowerCase();
     
-    if (title.includes('utilization') || title.includes('performance')) return TrendingUp;
-    if (title.includes('capacity') || title.includes('hours') || title.includes('time')) return Clock;
-    if (title.includes('projects') || title.includes('project')) return Briefcase;
-    if (title.includes('team') || title.includes('members') || title.includes('size') || title.includes('resources')) return Users;
+    // Match icons to sidebar navigation and content
+    if (title.includes('utilization') || title.includes('performance') || title.includes('rate')) return TrendingUp;
+    if (title.includes('capacity') || title.includes('hours') || title.includes('time') || title.includes('available')) return Clock;
+    if (title.includes('projects') || title.includes('project') || title.includes('active projects')) return FolderKanban; // Match sidebar "All Projects"
+    if (title.includes('team') || title.includes('members') || title.includes('size') || title.includes('resources') || title.includes('staff')) return UserSquare2; // Match sidebar "Team Members"
+    if (title.includes('resourcing') || title.includes('allocation')) return GanttChartSquare; // Match sidebar "Project Resourcing"
+    if (title.includes('workload') || title.includes('overloaded') || title.includes('needs')) return Briefcase; // Match sidebar "Team Workload"
+    if (title.includes('leave') || title.includes('holiday') || title.includes('annual')) return Calendar; // Match sidebar "Team Annual Leave"
+    if (title.includes('completion') || title.includes('office') || title.includes('location')) return Users; // Generic fallback
     
-    // Default icons based on position if no match
-    const defaultIcons = [TrendingUp, Clock, Briefcase, Users];
+    // Default icons based on position if no match - prioritize most common metrics
+    const defaultIcons = [TrendingUp, Clock, FolderKanban, UserSquare2];
     return defaultIcons[index % defaultIcons.length];
   };
 
   // Generate default badge and subtitle for cards that don't have them
-  const getDefaultBadgeAndSubtitle = (metric: SummaryMetric, index: number) => {
+  function getDefaultBadgeAndSubtitle(metric: SummaryMetric, index: number) {
     const title = metric.title.toLowerCase();
     
     // Return existing badge/subtitle if provided
