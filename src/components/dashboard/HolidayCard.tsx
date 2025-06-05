@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Clock } from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
 import { useHolidays } from './hooks/useHolidays';
 
 interface Holiday {
@@ -45,9 +45,9 @@ export const HolidayCard: React.FC = () => {
   const getCountdownText = (daysUntil: number) => {
     if (daysUntil === 0) return 'Today';
     if (daysUntil === 1) return 'Tomorrow';
-    if (daysUntil <= 7) return `${daysUntil} days`;
-    if (daysUntil <= 30) return `${daysUntil} days`;
-    return `${daysUntil} days`;
+    if (daysUntil <= 7) return `${daysUntil}d`;
+    if (daysUntil <= 30) return `${daysUntil}d`;
+    return `${daysUntil}d`;
   };
 
   if (isLoading) {
@@ -99,7 +99,7 @@ export const HolidayCard: React.FC = () => {
 
   return (
     <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
-      <CardHeader className="flex-shrink-0 pb-4">
+      <CardHeader className="flex-shrink-0 pb-3">
         <CardTitle className="text-lg flex items-center gap-3">
           <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
             <Calendar className="h-5 w-5 text-white" />
@@ -109,7 +109,7 @@ export const HolidayCard: React.FC = () => {
           </span>
           {upcomingHolidays.length > 0 && (
             <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
-              {upcomingHolidays.length} Coming Up
+              {upcomingHolidays.length}
             </Badge>
           )}
         </CardTitle>
@@ -117,51 +117,45 @@ export const HolidayCard: React.FC = () => {
       
       <CardContent className="flex-1 overflow-hidden p-0">
         <ScrollArea className="h-full">
-          <div className="space-y-3 px-6 pb-6">
+          <div className="space-y-1 px-4 pb-4">
             {upcomingHolidays.map((holiday) => {
               const daysUntil = getDaysUntil(holiday.date);
               const dateInfo = formatDate(holiday.date);
               
               return (
-                <div key={holiday.id} className="group bg-white/70 hover:bg-white/90 rounded-xl p-4 border border-gray-100/50 hover:border-gray-200/80 transition-all duration-200 hover:shadow-md">
-                  <div className="flex items-center gap-4">
-                    {/* Prominent Date Display */}
+                <div key={holiday.id} className="group bg-white/70 hover:bg-white/90 rounded-lg p-2 border border-gray-100/50 hover:border-gray-200/80 transition-all duration-200">
+                  <div className="flex items-center gap-3">
+                    {/* Compact Date Display */}
                     <div className="flex-shrink-0">
-                      <div className="text-center">
-                        <div className="bg-gradient-to-br from-brand-violet to-purple-600 text-white rounded-lg p-3 shadow-md">
-                          <div className="text-xs font-medium opacity-90 mb-1">
-                            {dateInfo.month.toUpperCase()}
-                          </div>
-                          <div className="text-xl font-bold leading-none">
-                            {dateInfo.day}
-                          </div>
-                          <div className="text-xs font-medium opacity-90 mt-1">
-                            {dateInfo.weekday}
-                          </div>
+                      <div className="bg-gradient-to-br from-brand-violet to-purple-600 text-white rounded-md px-2 py-1">
+                        <div className="text-xs font-bold leading-none">
+                          {dateInfo.day}
                         </div>
-                        {daysUntil >= 0 && (
-                          <div className={`mt-2 px-2 py-1 rounded-md text-xs font-medium ${getCountdownBadgeStyle(daysUntil)}`}>
-                            {getCountdownText(daysUntil)}
-                          </div>
-                        )}
+                        <div className="text-xs opacity-90 leading-none mt-0.5">
+                          {dateInfo.month}
+                        </div>
                       </div>
                     </div>
                     
                     {/* Holiday Information */}
                     <div className="flex-1 min-w-0">
-                      <div className="mb-2">
-                        <h4 className="font-semibold text-gray-900 text-sm leading-tight group-hover:text-brand-violet transition-colors">
-                          {holiday.name}
-                        </h4>
-                      </div>
-                      
-                      <div className="flex items-center gap-3 text-xs text-gray-600">
-                        <div className="flex items-center gap-1">
+                      <h4 className="font-medium text-gray-900 text-sm leading-tight truncate group-hover:text-brand-violet transition-colors">
+                        {holiday.name}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <div className="flex items-center gap-1 text-xs text-gray-600">
                           <MapPin className="h-3 w-3 text-brand-violet" />
                           <span className="truncate">{holiday.office}</span>
                         </div>
                       </div>
                     </div>
+
+                    {/* Countdown Badge */}
+                    {daysUntil >= 0 && (
+                      <div className={`px-2 py-0.5 rounded text-xs font-medium ${getCountdownBadgeStyle(daysUntil)}`}>
+                        {getCountdownText(daysUntil)}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
