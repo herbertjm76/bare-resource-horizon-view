@@ -65,8 +65,8 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   return (
     <div className="w-full min-h-screen bg-gray-50/30">
       <div className="max-w-sm mx-auto px-3 py-4 space-y-4">
-        {/* Smart Insights - made 10% smaller */}
-        <div className="w-[50%] mx-auto">
+        {/* Smart Insights */}
+        <div className="w-full">
           <MobileSmartInsights
             transformedStaffData={transformedStaffData}
             activeProjects={activeProjects}
@@ -74,8 +74,8 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
           />
         </div>
         
-        {/* Team Status - made 120% bigger */}
-        <div className="w-[102%] mx-auto">
+        {/* Team Status */}
+        <div className="w-full">
           <MobileTeamStatus
             transformedStaffData={transformedStaffData}
             selectedTimeRange={selectedTimeRange}
