@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -167,8 +168,8 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
 
   console.log('Rendering unified desktop/mobile format');
   return (
-    <div className="w-[90%] sm:w-full mx-auto bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-3 sm:p-4 border border-purple-100/50 shadow-sm">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
+    <div className="w-[90%] sm:w-full mx-auto bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-2 sm:p-3 border border-purple-100/50 shadow-sm">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2">
         {metrics.map((metric, index) => {
           const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
           const IconComponent = getStandardIcon(metric, index);
@@ -176,34 +177,34 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
           return (
             <div key={index} className="min-w-0">
               <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
-                <CardContent className="p-2 sm:p-3">
-                  <div className="text-center space-y-1 sm:space-y-2">
+                <CardContent className="p-1.5 sm:p-2">
+                  <div className="text-center space-y-0.5 sm:space-y-1">
                     {/* Line 1: Icon at top */}
                     <div className="flex justify-center">
-                      <div className={`p-1.5 sm:p-2 rounded-full ${getIconColor()}`}>
-                        <IconComponent className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <div className={`p-1 sm:p-1.5 rounded-full ${getIconColor()}`}>
+                        <IconComponent className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                       </div>
                     </div>
                     
                     {/* Line 2: Title */}
-                    <Typography variant="body-sm" className="font-medium text-gray-700 text-xs sm:text-sm leading-tight px-0.5 sm:px-1">
+                    <Typography variant="body-sm" className="font-medium text-gray-700 text-xs leading-tight px-0.5">
                       {metric.title}
                     </Typography>
                     
                     {/* Line 3: Value */}
-                    <div className="text-lg sm:text-xl font-bold text-gray-900 leading-none py-0.5 sm:py-1">
+                    <div className="text-base sm:text-lg font-bold text-gray-900 leading-none py-0.5">
                       {metric.value}
                     </div>
                     
                     {/* Line 4: Status badge */}
                     <div className="flex justify-center">
-                      <Badge className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 h-4 sm:h-5 ${getBadgeStyle(badge.color, metric.isGood)}`}>
+                      <Badge className={`text-xs px-1 sm:px-1.5 py-0.5 h-3.5 sm:h-4 ${getBadgeStyle(badge.color, metric.isGood)}`}>
                         {badge.text}
                       </Badge>
                     </div>
                     
                     {/* Line 5: Subtitle */}
-                    <p className="text-xs text-gray-500 leading-tight px-0.5 sm:px-1">
+                    <p className="text-xs text-gray-500 leading-tight px-0.5">
                       {subtitle}
                     </p>
                   </div>
