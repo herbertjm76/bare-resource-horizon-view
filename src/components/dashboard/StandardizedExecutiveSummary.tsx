@@ -1,7 +1,9 @@
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Typography } from "@/components/ui/typography";
+import { Users, Briefcase, TrendingUp, Clock } from 'lucide-react';
 
 interface SummaryMetric {
   title: string;
@@ -10,6 +12,7 @@ interface SummaryMetric {
   badgeText?: string;
   badgeColor?: string;
   isGood?: boolean;
+  icon?: React.ComponentType<{ className?: string }>;
 }
 
 type GradientType = 'purple' | 'blue' | 'emerald' | 'violet';
@@ -29,29 +32,50 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
 }) => {
   console.log('StandardizedExecutiveSummary render (unified desktop/mobile format)');
 
-  const getBadgeVariant = (color?: string) => {
-    switch (color) {
-      case 'red': return 'destructive';
-      case 'orange': return 'secondary';
-      case 'green': return 'default';
-      case 'blue': return 'outline';
-      default: return 'outline';
-    }
-  };
-
-  const getBadgeBackgroundColor = (badgeColor?: string, isGood?: boolean) => {
+  const getIconColor = (badgeColor?: string, isGood?: boolean) => {
     // Use indicator color for good/bad
-    if (isGood === true) return 'bg-green-500/80 border-green-400/40';
-    if (isGood === false) return 'bg-red-500/80 border-red-400/40';
+    if (isGood === true) return 'text-green-600 bg-green-100';
+    if (isGood === false) return 'text-red-600 bg-red-100';
     
     // Fallback to badge color
     switch (badgeColor) {
-      case 'green': return 'bg-green-500/80 border-green-400/40';
-      case 'red': return 'bg-red-500/80 border-red-400/40';
-      case 'orange': return 'bg-orange-500/80 border-orange-400/40';
-      case 'blue': return 'bg-blue-500/80 border-blue-400/40';
-      default: return 'bg-gray-500/60 border-gray-400/30';
+      case 'green': return 'text-green-600 bg-green-100';
+      case 'red': return 'text-red-600 bg-red-100';
+      case 'orange': return 'text-orange-600 bg-orange-100';
+      case 'blue': return 'text-blue-600 bg-blue-100';
+      default: return 'text-brand-violet bg-brand-violet/10';
     }
+  };
+
+  const getBadgeStyle = (badgeColor?: string, isGood?: boolean) => {
+    // Use indicator color for good/bad
+    if (isGood === true) return 'bg-green-500 text-white border-green-400';
+    if (isGood === false) return 'bg-red-500 text-white border-red-400';
+    
+    // Fallback to badge color
+    switch (badgeColor) {
+      case 'green': return 'bg-green-500 text-white border-green-400';
+      case 'red': return 'bg-red-500 text-white border-red-400';
+      case 'orange': return 'bg-orange-500 text-white border-orange-400';
+      case 'blue': return 'bg-blue-500 text-white border-blue-400';
+      default: return 'bg-brand-violet text-white border-brand-violet';
+    }
+  };
+
+  // Standard icon mapping for consistency
+  const getStandardIcon = (metric: SummaryMetric, index: number) => {
+    if (metric.icon) return metric.icon;
+    
+    const title = metric.title.toLowerCase();
+    
+    if (title.includes('utilization') || title.includes('performance')) return TrendingUp;
+    if (title.includes('capacity') || title.includes('hours') || title.includes('time')) return Clock;
+    if (title.includes('projects') || title.includes('project')) return Briefcase;
+    if (title.includes('team') || title.includes('members') || title.includes('size') || title.includes('resources')) return Users;
+    
+    // Default icons based on position if no match
+    const defaultIcons = [TrendingUp, Clock, Briefcase, Users];
+    return defaultIcons[index % defaultIcons.length];
   };
 
   // Generate default badge and subtitle for cards that don't have them
@@ -133,7 +157,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
       };
     }
 
-    if (title.includes('overloaded')) {
+    if (title.includes('overloaded') || title.includes('over capacity')) {
       return { 
         badge: { text: 'Alert', color: 'red' },
         subtitle: metric.subtitle || 'Capacity exceeded'
@@ -153,20 +177,18 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3">
         {metrics.map((metric, index) => {
           const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
+          const IconComponent = getStandardIcon(metric, index);
           
           return (
             <div key={index} className="min-w-0">
               <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
                 <CardContent className="p-2 sm:p-3">
                   <div className="text-center space-y-1 sm:space-y-2">
-                    {/* Line 1: Status badge at top */}
+                    {/* Line 1: Icon at top */}
                     <div className="flex justify-center">
-                      <Badge 
-                        variant={getBadgeVariant(badge.color)} 
-                        className={`text-xs text-white backdrop-blur-sm ${getBadgeBackgroundColor(badge.color, metric.isGood)} px-1.5 sm:px-2 py-0.5 sm:py-1 h-4 sm:h-5`}
-                      >
-                        {badge.text}
-                      </Badge>
+                      <div className={`p-1.5 sm:p-2 rounded-full ${getIconColor(badge.color, metric.isGood)}`}>
+                        <IconComponent className="h-3 w-3 sm:h-4 sm:w-4" />
+                      </div>
                     </div>
                     
                     {/* Line 2: Title */}
@@ -179,7 +201,14 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                       {metric.value}
                     </div>
                     
-                    {/* Line 4: Subtitle */}
+                    {/* Line 4: Status badge */}
+                    <div className="flex justify-center">
+                      <Badge className={`text-xs px-1.5 sm:px-2 py-0.5 sm:py-1 h-4 sm:h-5 ${getBadgeStyle(badge.color, metric.isGood)}`}>
+                        {badge.text}
+                      </Badge>
+                    </div>
+                    
+                    {/* Line 5: Subtitle */}
                     <p className="text-xs text-gray-500 leading-tight px-0.5 sm:px-1">
                       {subtitle}
                     </p>

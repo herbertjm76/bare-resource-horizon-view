@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LayoutDashboard, Users, Building2, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Users, Briefcase, Building2 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useCompany } from '@/context/CompanyContext';
 
@@ -31,7 +31,7 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
           </h1>
         </div>
         
-        {/* Quick Stats Cards - Made 10% smaller on mobile */}
+        {/* Quick Stats Cards - Standardized icons and colors */}
         <div className="flex flex-wrap items-center gap-3">
           <Card className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
             <div className="flex items-center gap-1.5 sm:gap-2">
@@ -43,21 +43,21 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
             </div>
           </Card>
           
-          <Card className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
+          <Card className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border-blue-500/20">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600" />
+              <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" />
               <div className="text-xs sm:text-sm">
-                <span className="font-semibold text-emerald-600">{totalActiveProjects}</span>
+                <span className="font-semibold text-blue-600">{totalActiveProjects}</span>
                 <span className="text-muted-foreground ml-1">Projects</span>
               </div>
             </div>
           </Card>
           
-          <Card className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border-blue-500/20">
+          <Card className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" />
+              <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600" />
               <div className="text-xs sm:text-sm">
-                <span className="font-semibold text-blue-600">{totalOffices}</span>
+                <span className="font-semibold text-emerald-600">{totalOffices}</span>
                 <span className="text-muted-foreground ml-1">Offices</span>
               </div>
             </div>

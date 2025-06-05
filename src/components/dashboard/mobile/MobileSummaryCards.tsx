@@ -22,10 +22,10 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
   timeRangeText = "This period"
 }) => {
   const getUtilizationStatus = () => {
-    if (utilizationRate >= 90) return { label: 'At Capacity', color: 'bg-red-100 text-red-800' };
-    if (utilizationRate >= 75) return { label: 'High', color: 'bg-orange-100 text-orange-800' };
-    if (utilizationRate >= 50) return { label: 'Optimal', color: 'bg-green-100 text-green-800' };
-    return { label: 'Low', color: 'bg-blue-100 text-blue-800' };
+    if (utilizationRate >= 90) return { label: 'At Capacity', color: 'bg-red-500 text-white border-red-400' };
+    if (utilizationRate >= 75) return { label: 'High', color: 'bg-orange-500 text-white border-orange-400' };
+    if (utilizationRate >= 50) return { label: 'Optimal', color: 'bg-green-500 text-white border-green-400' };
+    return { label: 'Low', color: 'bg-blue-500 text-white border-blue-400' };
   };
 
   const utilizationStatus = getUtilizationStatus();
@@ -39,12 +39,12 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium text-gray-600 mb-1">Team Size</p>
               <p className="text-2xl font-bold text-gray-900 mb-1">{activeResources}</p>
-              <Badge variant="outline" className="text-xs">
+              <Badge className={utilizationRate > 85 ? 'bg-orange-500 text-white border-orange-400' : 'bg-green-500 text-white border-green-400'}>
                 {utilizationRate > 85 ? 'Consider Hiring' : 'Stable'}
               </Badge>
             </div>
-            <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 ml-2">
-              <Users className="h-4 w-4 text-purple-600" />
+            <div className="h-8 w-8 rounded-full bg-brand-violet/10 flex items-center justify-center flex-shrink-0 ml-2">
+              <Users className="h-4 w-4 text-brand-violet" />
             </div>
           </div>
         </CardContent>
@@ -63,8 +63,8 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
                   : 'No team'}
               </p>
             </div>
-            <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 ml-2">
-              <Briefcase className="h-4 w-4 text-green-600" />
+            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 ml-2">
+              <Briefcase className="h-4 w-4 text-blue-600" />
             </div>
           </div>
         </CardContent>
@@ -81,8 +81,8 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
                 {utilizationStatus.label}
               </Badge>
             </div>
-            <div className="h-8 w-8 rounded-full bg-brand-violet/10 flex items-center justify-center flex-shrink-0 ml-2">
-              <TrendingUp className="h-4 w-4 text-brand-violet" />
+            <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 ml-2">
+              <TrendingUp className="h-4 w-4 text-green-600" />
             </div>
           </div>
         </CardContent>
@@ -102,9 +102,9 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
               <p className="text-xs font-medium text-gray-500">{timeRangeText}</p>
             </div>
             <div className={`h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ml-2 ${
-              isOverCapacity ? 'bg-red-100' : 'bg-blue-100'
+              isOverCapacity ? 'bg-red-100' : 'bg-orange-100'
             }`}>
-              <Clock className={`h-4 w-4 ${isOverCapacity ? 'text-red-600' : 'text-blue-600'}`} />
+              <Clock className={`h-4 w-4 ${isOverCapacity ? 'text-red-600' : 'text-orange-600'}`} />
             </div>
           </div>
         </CardContent>

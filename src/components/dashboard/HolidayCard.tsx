@@ -35,11 +35,11 @@ export const HolidayCard: React.FC = () => {
   };
 
   const getCountdownBadgeStyle = (daysUntil: number) => {
-    if (daysUntil === 0) return 'bg-red-500 text-white';
-    if (daysUntil === 1) return 'bg-orange-500 text-white';
-    if (daysUntil <= 7) return 'bg-yellow-500 text-white';
-    if (daysUntil <= 30) return 'bg-blue-500 text-white';
-    return 'bg-gray-500 text-white';
+    if (daysUntil === 0) return 'bg-red-500 text-white border-red-400';
+    if (daysUntil === 1) return 'bg-orange-500 text-white border-orange-400';
+    if (daysUntil <= 7) return 'bg-yellow-500 text-white border-yellow-400';
+    if (daysUntil <= 30) return 'bg-blue-500 text-white border-blue-400';
+    return 'bg-gray-500 text-white border-gray-400';
   };
 
   const getCountdownText = (daysUntil: number) => {
@@ -52,11 +52,11 @@ export const HolidayCard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
-        <CardHeader className="flex-shrink-0 pb-4">
+      <Card className="h-[320px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
+        <CardHeader className="flex-shrink-0 pb-3">
           <CardTitle className="text-lg flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
-              <Calendar className="h-5 w-5 text-white" />
+            <div className="p-1.5 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
+              <Calendar className="h-4 w-4 text-white" />
             </div>
             <span className="text-brand-violet font-semibold">
               Upcoming Holidays
@@ -65,7 +65,7 @@ export const HolidayCard: React.FC = () => {
         </CardHeader>
         <CardContent className="flex-1 flex items-center justify-center">
           <div className="text-center text-gray-500">
-            <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300 animate-pulse" />
+            <Calendar className="h-6 w-6 mx-auto mb-2 text-gray-300 animate-pulse" />
             <p className="text-sm">Loading holidays...</p>
           </div>
         </CardContent>
@@ -75,11 +75,11 @@ export const HolidayCard: React.FC = () => {
 
   if (error) {
     return (
-      <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
-        <CardHeader className="flex-shrink-0 pb-4">
+      <Card className="h-[320px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
+        <CardHeader className="flex-shrink-0 pb-3">
           <CardTitle className="text-lg flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
-              <Calendar className="h-5 w-5 text-white" />
+            <div className="p-1.5 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
+              <Calendar className="h-4 w-4 text-white" />
             </div>
             <span className="text-brand-violet font-semibold">
               Upcoming Holidays
@@ -88,7 +88,7 @@ export const HolidayCard: React.FC = () => {
         </CardHeader>
         <CardContent className="flex-1 flex items-center justify-center">
           <div className="text-center text-gray-500">
-            <Calendar className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+            <Calendar className="h-6 w-6 mx-auto mb-2 text-gray-300" />
             <p className="text-sm font-medium mb-1">Unable to Load Holidays</p>
             <p className="text-xs">{error}</p>
           </div>
@@ -98,17 +98,17 @@ export const HolidayCard: React.FC = () => {
   }
 
   return (
-    <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
-      <CardHeader className="flex-shrink-0 pb-3">
+    <Card className="h-[320px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
+      <CardHeader className="flex-shrink-0 pb-2">
         <CardTitle className="text-lg flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
-            <Calendar className="h-5 w-5 text-white" />
+          <div className="p-1.5 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
+            <Calendar className="h-4 w-4 text-white" />
           </div>
           <span className="text-brand-violet font-semibold">
             Upcoming Holidays
           </span>
           {upcomingHolidays.length > 0 && (
-            <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
+            <Badge variant="brand" className="bg-brand-violet/20 text-brand-violet border-brand-violet/20">
               {upcomingHolidays.length}
             </Badge>
           )}
@@ -117,17 +117,17 @@ export const HolidayCard: React.FC = () => {
       
       <CardContent className="flex-1 overflow-hidden p-0">
         <ScrollArea className="h-full">
-          <div className="space-y-1 px-4 pb-4">
+          <div className="space-y-1 px-4 pb-3">
             {upcomingHolidays.map((holiday) => {
               const daysUntil = getDaysUntil(holiday.date);
               const dateInfo = formatDate(holiday.date);
               
               return (
                 <div key={holiday.id} className="group bg-white/70 hover:bg-white/90 rounded-lg p-2 border border-gray-100/50 hover:border-gray-200/80 transition-all duration-200">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     {/* Compact Date Display */}
                     <div className="flex-shrink-0">
-                      <div className="bg-gradient-to-br from-brand-violet to-purple-600 text-white rounded-md px-2 py-1">
+                      <div className="bg-gradient-to-br from-brand-violet to-purple-600 text-white rounded-md px-1.5 py-1">
                         <div className="text-xs font-bold leading-none">
                           {dateInfo.day}
                         </div>
@@ -142,19 +142,17 @@ export const HolidayCard: React.FC = () => {
                       <h4 className="font-medium text-gray-900 text-sm leading-tight truncate group-hover:text-brand-violet transition-colors">
                         {holiday.name}
                       </h4>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
-                          <MapPin className="h-3 w-3 text-brand-violet" />
-                          <span className="truncate">{holiday.office}</span>
-                        </div>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <MapPin className="h-3 w-3 text-brand-violet" />
+                        <span className="text-xs text-gray-600 truncate">{holiday.office}</span>
                       </div>
                     </div>
 
                     {/* Countdown Badge */}
                     {daysUntil >= 0 && (
-                      <div className={`px-2 py-0.5 rounded text-xs font-medium ${getCountdownBadgeStyle(daysUntil)}`}>
+                      <Badge className={`text-xs px-1.5 py-0.5 ${getCountdownBadgeStyle(daysUntil)}`}>
                         {getCountdownText(daysUntil)}
-                      </div>
+                      </Badge>
                     )}
                   </div>
                 </div>
@@ -162,13 +160,13 @@ export const HolidayCard: React.FC = () => {
             })}
             
             {upcomingHolidays.length === 0 && (
-              <div className="text-center py-8">
-                <div className="p-4 rounded-full bg-brand-violet/10 mx-auto w-16 h-16 flex items-center justify-center mb-4">
-                  <Calendar className="h-8 w-8 text-brand-violet" />
+              <div className="text-center py-6">
+                <div className="p-3 rounded-full bg-brand-violet/10 mx-auto w-12 h-12 flex items-center justify-center mb-3">
+                  <Calendar className="h-6 w-6 text-brand-violet" />
                 </div>
-                <div className="space-y-2">
-                  <h3 className="font-medium text-gray-900">No Upcoming Holidays</h3>
-                  <p className="text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
+                <div className="space-y-1">
+                  <h3 className="font-medium text-gray-900 text-sm">No Upcoming Holidays</h3>
+                  <p className="text-xs text-gray-600 max-w-xs mx-auto leading-relaxed">
                     All clear for the next few months! Your team can focus on upcoming projects.
                   </p>
                 </div>

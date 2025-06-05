@@ -20,6 +20,13 @@ export const MobileStatsOverview: React.FC<MobileStatsOverviewProps> = ({
   currentUtilizationRate,
   utilizationStatus
 }) => {
+  const getUtilizationBadgeStyle = () => {
+    if (currentUtilizationRate >= 90) return 'bg-red-500 text-white border-red-400';
+    if (currentUtilizationRate >= 75) return 'bg-orange-500 text-white border-orange-400';
+    if (currentUtilizationRate >= 50) return 'bg-green-500 text-white border-green-400';
+    return 'bg-blue-500 text-white border-blue-400';
+  };
+
   return (
     <div className="bg-gradient-to-r from-brand-violet to-purple-600 rounded-2xl p-4 text-white w-full">
       <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -62,10 +69,7 @@ export const MobileStatsOverview: React.FC<MobileStatsOverviewProps> = ({
               <p className="text-white/80 text-xs">Team Utilization</p>
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-xl font-bold">{currentUtilizationRate}%</p>
-                <Badge 
-                  variant="secondary" 
-                  className="bg-white/20 text-white border-white/30 text-xs whitespace-nowrap"
-                >
+                <Badge className={`text-xs whitespace-nowrap ${getUtilizationBadgeStyle()}`}>
                   {utilizationStatus.status}
                 </Badge>
               </div>
