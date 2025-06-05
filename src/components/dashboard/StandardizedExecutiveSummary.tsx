@@ -168,7 +168,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   console.log('Rendering unified desktop/mobile format');
   return (
     <div className="w-[90%] sm:w-full mx-auto bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-2 sm:p-3 border border-purple-100/50 shadow-sm">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2">
         {metrics.map((metric, index) => {
           const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
           const IconComponent = getStandardIcon(metric, index);
