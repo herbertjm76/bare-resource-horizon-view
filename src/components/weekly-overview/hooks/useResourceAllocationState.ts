@@ -10,16 +10,28 @@ export function useResourceAllocationState() {
   // Get allocation for a member, with defaults if not found
   const getMemberAllocation = useCallback((memberId: string): MemberAllocation => {
     return memberAllocations[memberId] || {
+      // Original properties
+      projectCount: 0,
+      projectHours: 0,
+      vacationHours: 0,
+      generalOfficeHours: 0,
+      marketingHours: 0,
+      publicHolidayHours: 0,
+      medicalLeaveHours: 0,
+      annualLeaveHours: 0,
+      otherLeaveHours: 0,
+      remarks: '',
+      
+      // Enhanced properties
       id: memberId,
       annualLeave: 0,
       publicHoliday: 0,
       vacationLeave: 0,
       medicalLeave: 0,
       others: 0,
-      remarks: '',
       projects: [],
-      resourcedHours: 0,
-      projectAllocations: []
+      projectAllocations: [],
+      resourcedHours: 0
     };
   }, [memberAllocations]);
   
@@ -30,7 +42,7 @@ export function useResourceAllocationState() {
       
       // Handle numeric conversions
       let newValue = value;
-      if (['annualLeave', 'publicHoliday', 'vacationLeave', 'medicalLeave', 'others'].includes(field)) {
+      if (['annualLeave', 'publicHoliday', 'vacationLeave', 'medicalLeave', 'others', 'projectCount', 'projectHours', 'vacationHours', 'generalOfficeHours', 'marketingHours', 'publicHolidayHours', 'medicalLeaveHours', 'annualLeaveHours', 'otherLeaveHours', 'resourcedHours'].includes(field)) {
         newValue = isNaN(parseFloat(value)) ? 0 : parseFloat(value);
       }
       

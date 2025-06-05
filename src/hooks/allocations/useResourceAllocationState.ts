@@ -29,15 +29,27 @@ export function useResourceAllocationState() {
   }, [isLoading]);
   
   // Function to get allocation for a specific member
-  const getMemberAllocation = useCallback((memberId: string) => {
+  const getMemberAllocation = useCallback((memberId: string): MemberAllocation => {
     return memberAllocations[memberId] || {
+      // Original properties
+      projectCount: 0,
+      projectHours: 0,
+      vacationHours: 0,
+      generalOfficeHours: 0,
+      marketingHours: 0,
+      publicHolidayHours: 0,
+      medicalLeaveHours: 0,
+      annualLeaveHours: 0,
+      otherLeaveHours: 0,
+      remarks: '',
+      
+      // Enhanced properties
       id: memberId,
       annualLeave: 0,
       publicHoliday: 0,
       vacationLeave: 0,
       medicalLeave: 0,
       others: 0,
-      remarks: '',
       projects: [],
       projectAllocations: [],
       resourcedHours: 0
@@ -49,18 +61,7 @@ export function useResourceAllocationState() {
     console.log(`Updating ${field} for member ${memberId} to:`, value);
     
     setMemberAllocations(prev => {
-      const allocation = prev[memberId] || {
-        id: memberId,
-        annualLeave: 0,
-        publicHoliday: 0,
-        vacationLeave: 0,
-        medicalLeave: 0,
-        others: 0,
-        remarks: '',
-        projects: [],
-        projectAllocations: [],
-        resourcedHours: 0
-      };
+      const allocation = getMemberAllocation(memberId);
       
       return {
         ...prev,
@@ -70,7 +71,7 @@ export function useResourceAllocationState() {
         }
       };
     });
-  }, []);
+  }, [getMemberAllocation]);
   
   return {
     memberAllocations,

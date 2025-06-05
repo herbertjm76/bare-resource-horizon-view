@@ -70,13 +70,25 @@ export function processMemberAllocations(
     const others = Math.floor(Math.random() * 2);
     
     initialAllocations[member.id] = {
+      // Original properties
+      projectCount: detailedProjectAllocations.length,
+      projectHours: resourcedHours,
+      vacationHours: vacationLeave,
+      generalOfficeHours: Math.floor(Math.random() * 5),
+      marketingHours: Math.floor(Math.random() * 3),
+      publicHolidayHours: Math.floor(Math.random() * 2) * 8,
+      medicalLeaveHours: medicalLeave,
+      annualLeaveHours: annualLeave,
+      otherLeaveHours: others,
+      remarks: '',
+      
+      // Enhanced properties
       id: member.id,
       annualLeave,
       publicHoliday: Math.floor(Math.random() * 2) * 8, // Either 0 or 8 hours
       vacationLeave,
       medicalLeave,
       others,
-      remarks: '',
       projects: [...new Set(projectNames)], // Remove duplicates
       projectAllocations: detailedProjectAllocations,
       resourcedHours,
