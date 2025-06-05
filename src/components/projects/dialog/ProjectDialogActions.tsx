@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { DialogFooter } from "@/components/ui/dialog";
 
 interface ProjectDialogActionsProps {
   isLoading: boolean;
@@ -12,13 +13,13 @@ export const ProjectDialogActions: React.FC<ProjectDialogActionsProps> = ({
   onClose,
 }) => {
   return (
-    <div className="flex justify-end gap-4 p-6 border-t sticky bottom-0 bg-background">
+    <DialogFooter className="px-6 py-4 border-t mt-6">
       <Button type="button" variant="outline" onClick={onClose}>
         Cancel
       </Button>
       <Button type="submit" disabled={isLoading}>
         {isLoading ? "Saving..." : "Save Changes"}
       </Button>
-    </div>
+    </DialogFooter>
   );
 };

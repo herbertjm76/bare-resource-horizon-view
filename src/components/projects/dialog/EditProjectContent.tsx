@@ -53,12 +53,12 @@ export const EditProjectContent: React.FC<EditProjectContentProps> = ({
       className={cn(
         "max-w-2xl",
         isMobile 
-          ? "w-[95vw] max-h-[95vh] overflow-hidden" 
+          ? "w-[95vw] max-h-[95vh]" 
           : "w-full max-h-[90vh]",
         "flex flex-col p-0"
       )}
     >
-      <DialogHeader className="p-6 pb-2">
+      <DialogHeader className="px-6 py-4 border-b">
         <DialogTitle className="text-xl">Edit Project</DialogTitle>
       </DialogHeader>
       
@@ -71,10 +71,12 @@ export const EditProjectContent: React.FC<EditProjectContentProps> = ({
             onValueChange={setActiveTab}
             className="flex flex-col flex-1 overflow-hidden"
           >
-            <ProjectDialogTabs 
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+            <div className="px-6 pt-4">
+              <ProjectDialogTabs 
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+              />
+            </div>
             
             <ProjectDialogContent 
               form={form}
@@ -87,12 +89,12 @@ export const EditProjectContent: React.FC<EditProjectContentProps> = ({
               handleChange={handleChange}
               isDataLoaded={isDataLoaded}
             />
+            
+            <ProjectDialogActions 
+              isLoading={isLoading}
+              onClose={onClose}
+            />
           </Tabs>
-          
-          <ProjectDialogActions 
-            isLoading={isLoading}
-            onClose={onClose}
-          />
         </form>
       )}
     </DialogContent>

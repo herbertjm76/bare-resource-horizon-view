@@ -86,13 +86,17 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
           New Project
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 py-4 border-b">
           <DialogTitle className="text-xl">Add New Project</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <Tabs value={activeTab} onValueChange={handleTabChange}>
-            <ProjectDialogTabs activeTab={activeTab} onTabChange={handleTabChange} />
+        
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-col flex-1 overflow-hidden">
+            <div className="px-6 pt-4">
+              <ProjectDialogTabs activeTab={activeTab} onTabChange={handleTabChange} />
+            </div>
+            
             <ProjectDialogContent
               form={form}
               managers={managers}
@@ -123,6 +127,7 @@ export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ 
                 }));
               }}
             />
+            
             <ProjectDialogActions
               isLoading={isLoading}
               onClose={() => setOpen(false)}

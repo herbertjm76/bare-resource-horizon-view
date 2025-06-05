@@ -1,6 +1,7 @@
 
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { TabsContent } from "@/components/ui/tabs";
 import { ProjectInfoTabContent } from "./tabs/ProjectInfoTabContent";
 import { ProjectStageFeesTabContent } from "./tabs/ProjectStageFeesTabContent";
 import { ProjectFinancialTabContent } from "./tabs/ProjectFinancialTabContent";
@@ -29,27 +30,37 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
   isDataLoaded,
 }) => {
   return (
-    <ScrollArea className="flex-1 overflow-y-auto max-h-[calc(90vh-200px)] p-6">
-      <div className="space-y-6">
-        <ProjectInfoTabContent 
-          form={form}
-          managers={managers}
-          countries={countries}
-          offices={offices}
-          officeStages={officeStages}
-          updateStageApplicability={updateStageApplicability}
-          handleChange={handleChange}
-        />
+    <div className="flex-1 overflow-hidden">
+      <TabsContent value="info" className="mt-0">
+        <ScrollArea className="h-[400px] px-6">
+          <ProjectInfoTabContent 
+            form={form}
+            managers={managers}
+            countries={countries}
+            offices={offices}
+            officeStages={officeStages}
+            updateStageApplicability={updateStageApplicability}
+            handleChange={handleChange}
+          />
+        </ScrollArea>
+      </TabsContent>
 
-        <ProjectStageFeesTabContent 
-          form={form}
-          officeStages={officeStages}
-          updateStageFee={updateStageFee}
-          isDataLoaded={isDataLoaded}
-        />
+      <TabsContent value="stageFees" className="mt-0">
+        <ScrollArea className="h-[400px] px-6">
+          <ProjectStageFeesTabContent 
+            form={form}
+            officeStages={officeStages}
+            updateStageFee={updateStageFee}
+            isDataLoaded={isDataLoaded}
+          />
+        </ScrollArea>
+      </TabsContent>
 
-        <ProjectFinancialTabContent />
-      </div>
-    </ScrollArea>
+      <TabsContent value="financial" className="mt-0">
+        <ScrollArea className="h-[400px] px-6">
+          <ProjectFinancialTabContent />
+        </ScrollArea>
+      </TabsContent>
+    </div>
   );
 };
