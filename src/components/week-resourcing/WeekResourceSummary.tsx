@@ -64,15 +64,15 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
 
-  const renderMemberAvatars = (memberList: any[], maxShow: number = 6) => {
+  const renderMemberAvatars = (memberList: any[], maxShow: number = 5) => {
     const membersToShow = memberList.slice(0, maxShow);
     const remainingCount = memberList.length - maxShow;
 
     return (
-      <div className="flex items-center justify-center gap-1 sm:gap-2">
-        <div className="flex gap-1">
+      <div className="flex items-center justify-center gap-1">
+        <div className="flex gap-0.5">
           {membersToShow.map((member) => (
-            <Avatar key={member.id} className="h-5 w-5 sm:h-6 sm:w-6">
+            <Avatar key={member.id} className="h-4 w-4 sm:h-5 sm:w-5">
               <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
               <AvatarFallback className="bg-brand-violet text-white text-xs">
                 {getUserInitials(member)}
@@ -81,7 +81,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
           ))}
         </div>
         {remainingCount > 0 && (
-          <Badge variant="secondary" className="text-xs px-1.5 py-0.5">
+          <Badge variant="secondary" className="text-xs px-1 py-0">
             +{remainingCount}
           </Badge>
         )}
@@ -116,7 +116,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     {
       title: "Needs Resourcing",
       value: underUtilizedMembers.length > 0 ? renderMemberAvatars(underUtilizedMembers) : (
-        <span className="text-xs sm:text-sm text-gray-600">All well utilized</span>
+        <span className="text-xs text-gray-600">All well utilized</span>
       ),
       subtitle: "Under 60% utilization",
       badgeText: `${underUtilizedMembers.length}`,
@@ -125,9 +125,11 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
   ];
 
   return (
-    <StandardizedExecutiveSummary
-      metrics={metrics}
-      gradientType="purple"
-    />
+    <div className="scale-90 origin-top">
+      <StandardizedExecutiveSummary
+        metrics={metrics}
+        gradientType="purple"
+      />
+    </div>
   );
 };
