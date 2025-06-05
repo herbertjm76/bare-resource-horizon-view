@@ -119,7 +119,7 @@ export const UnifiedHolidayCard: React.FC = () => {
       </CardHeader>
       
       <CardContent className={contentStyles}>
-        <ScrollArea className={isMobile ? "h-full" : "h-[240px]"}>
+        <ScrollArea className="h-[320px]">
           <div className="space-y-1">
             {upcomingHolidays.map((holiday) => {
               const daysUntil = getDaysUntil(holiday.date);
