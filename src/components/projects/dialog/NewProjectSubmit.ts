@@ -29,7 +29,7 @@ export const submitNewProject = async (
     const projectStatus = form.status === 'none' ? "Planning" : (form.status || "Planning");
     const manager = form.manager === 'none' ? null : (form.manager === "not_assigned" ? null : (form.manager || null));
     const country = form.country === 'none' ? null : form.country;
-    const office = form.office === 'none' ? null : form.office;
+    const officeLocationId = form.office === 'none' ? null : form.office;
     
     // Set current_stage to the first selected stage name, or the first available stage name if no stages selected
     let currentStage = null;
@@ -57,12 +57,48 @@ export const submitNewProject = async (
     // Map the status to the correct database enum value
     const mappedStatus = mapStatusToDb(projectStatus);
 
+    // We need to find or create a default office in the offices table
+    // First, let's try to get an existing office or create a default one
+    let { data: offices, error: officesError } = await supabase
+      .from('offices')
+      .select('id')
+      .limit(1);
+
+    if (officesError) {
+      console.error('Error fetching offices:', officesError);
+      throw new Error('Failed to fetch office data');
+    }
+
+    let defaultOfficeId: string;
+    
+    if (!offices || offices.length === 0) {
+      // Create a default office if none exists
+      const { data: newOffice, error: createOfficeError } = await supabase
+        .from('offices')
+        .insert({
+          name: 'Default Office',
+          country: country || 'Unknown'
+        })
+        .select('id')
+        .single();
+
+      if (createOfficeError) {
+        console.error('Error creating default office:', createOfficeError);
+        throw new Error('Failed to create default office');
+      }
+      
+      defaultOfficeId = newOffice.id;
+    } else {
+      defaultOfficeId = offices[0].id;
+    }
+
     console.log('Creating project with data:', {
       code: form.code,
       name: form.name,
       company_id: companyId,
       project_manager_id: manager,
-      office_id: office,
+      office_id: defaultOfficeId,
+      temp_office_location_id: officeLocationId,
       status: mappedStatus,
       country: country,
       current_stage: currentStage,
@@ -75,7 +111,8 @@ export const submitNewProject = async (
       name: form.name,
       company_id: companyId,
       project_manager_id: manager,
-      office_id: office,
+      office_id: defaultOfficeId,
+      temp_office_location_id: officeLocationId,
       status: mappedStatus,
       country: country,
       current_stage: currentStage,
