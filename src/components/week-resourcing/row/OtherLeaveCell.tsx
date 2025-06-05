@@ -34,7 +34,9 @@ export const OtherLeaveCell: React.FC<OtherLeaveCellProps> = ({
   };
 
   const handleSave = () => {
+    // Save the hours value to the 'sick' field (which represents other leave in the system)
     onLeaveInputChange(memberId, 'sick', tempHours);
+    // Save notes separately
     onNotesChange(memberId, tempNotes);
     setIsDialogOpen(false);
   };
@@ -51,7 +53,7 @@ export const OtherLeaveCell: React.FC<OtherLeaveCellProps> = ({
         <DialogTrigger asChild>
           <Button
             variant="ghost"
-            className="w-full h-8 p-1 bg-gradient-to-r from-purple-100 to-purple-200 border border-purple-300 text-purple-800 hover:from-purple-200 hover:to-purple-300 hover:border-purple-400 rounded-lg font-medium text-xs"
+            className="w-full h-8 p-1 bg-gradient-to-r from-purple-100 to-purple-200 border border-purple-300 text-purple-800 hover:from-purple-200 hover:to-purple-300 hover:border-purple-400 rounded-lg font-medium text-xs cursor-pointer"
             onClick={handleDialogOpen}
           >
             <div className="flex items-center justify-center gap-1">
@@ -72,6 +74,7 @@ export const OtherLeaveCell: React.FC<OtherLeaveCellProps> = ({
                 type="number"
                 min="0"
                 max="40"
+                step="0.5"
                 value={tempHours}
                 onChange={(e) => setTempHours(e.target.value)}
                 placeholder="0"

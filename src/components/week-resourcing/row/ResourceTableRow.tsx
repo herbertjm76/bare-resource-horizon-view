@@ -46,7 +46,8 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   totalHours,
   annualLeave,
   holidayHours,
-  onLeaveInputChange
+  onLeaveInputChange,
+  onRemarksUpdate
 }) => {
   // Combine sick and other leave into a single "other" leave
   // Make sure to safely convert to number for calculations
@@ -68,7 +69,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   // Alternating row background
   const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-muted/10';
 
-  // Handler for notes
+  // Handler for notes - use the onLeaveInputChange function to store notes
   const handleNotesChange = (memberId: string, notes: string) => {
     onLeaveInputChange(memberId, 'notes', notes);
   };
