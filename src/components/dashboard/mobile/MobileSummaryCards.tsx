@@ -31,7 +31,7 @@ export const MobileSummaryCards: React.FC<MobileSummaryCardsProps> = ({
   const utilizationStatus = getUtilizationStatus();
 
   return (
-    <div className="w-[85%] mx-auto">
+    <div className="w-[102%] mx-auto">
       <div className="grid grid-cols-2 gap-3 w-full">
         {/* Team Size Card */}
         <Card className="rounded-2xl border-0 shadow-sm bg-white">
