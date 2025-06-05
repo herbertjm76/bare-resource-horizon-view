@@ -1,11 +1,9 @@
 
-import React, { useState, useMemo } from 'react';
-import { Card } from '@/components/ui/card';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import React from 'react';
+import { Table, TableBody } from '@/components/ui/table';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { NewResourceTableHeader } from './NewResourceTableHeader';
 import { NewResourceTableRow } from './NewResourceTableRow';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Users, Calendar, Target, Download, Upload } from 'lucide-react';
 
 interface NewResourceTableProps {
   projects: any[];
@@ -20,111 +18,58 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   allocations,
   weekStartDate
 }) => {
-  // Create allocation map for quick lookup
-  const allocationMap = useMemo(() => {
-    const map = new Map<string, number>();
-    allocations.forEach(allocation => {
-      const key = `${allocation.resource_id}:${allocation.project_id}`;
-      map.set(key, allocation.hours || 0);
-    });
-    return map;
-  }, [allocations]);
+  // Create allocation map for quick lookups
+  const allocationMap = new Map();
+  allocations.forEach(allocation => {
+    const key = `${allocation.resource_id}:${allocation.project_id}`;
+    allocationMap.set(key, allocation.hours);
+  });
 
-  // Calculate member totals
   const getMemberTotal = (memberId: string) => {
     return allocations
       .filter(a => a.resource_id === memberId)
-      .reduce((sum, a) => sum + (a.hours || 0), 0);
+      .reduce((sum, a) => sum + a.hours, 0);
   };
 
-  // Calculate project count per member
   const getProjectCount = (memberId: string) => {
     return allocations
       .filter(a => a.resource_id === memberId && a.hours > 0)
       .length;
   };
 
-  return (
-    <div className="space-y-4">
-      {/* Enhanced Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white rounded-lg border shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-brand-violet" />
-            <span className="text-sm font-medium">Weekly Resource Allocation</span>
-          </div>
-          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-            {members.length} Team Members
-          </Badge>
-          <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
-            {projects.length} Projects
-          </Badge>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2">
-            <Upload className="h-4 w-4" />
-            Import
-          </Button>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Download className="h-4 w-4" />
-            Export
-          </Button>
-        </div>
-      </div>
+  // Calculate minimum table width based on columns
+  const minTableWidth = 150 + 16 + 32 + 12 + 12 + 12 + 16 + (Math.max(15, projects.length) * 40);
 
-      {/* Table Container with rounded corners */}
-      <Card className="w-full overflow-hidden border-0 shadow-lg bg-gradient-to-br from-white to-gray-50/30">
-        <div className="weekly-table-wrapper">
-          <div className="weekly-table-container">
-            <Table className="weekly-overview-table">
-              <TableHeader>
-                <TableRow className="border-b">
-                  <TableHead className="font-semibold text-center border-r bg-brand-violet text-white sticky left-0 z-15 min-w-[150px] rounded-tl-xl">
-                    Name
-                  </TableHead>
-                  <TableHead className="text-center border-r bg-brand-violet text-white">
-                    <div className="weekly-project-header">Projects</div>
-                  </TableHead>
-                  <TableHead className="text-center border-r bg-brand-violet text-white">
-                    <div className="weekly-project-header">Capacity</div>
-                  </TableHead>
-                  <TableHead className="text-center border-r bg-brand-violet text-white">
-                    <div className="weekly-project-header">AL</div>
-                  </TableHead>
-                  <TableHead className="text-center border-r bg-brand-violet text-white">
-                    <div className="weekly-project-header">Holiday</div>
-                  </TableHead>
-                  <TableHead className="text-center border-r bg-brand-violet text-white">
-                    <div className="weekly-project-header">OL</div>
-                  </TableHead>
-                  <TableHead className="text-center border-r bg-brand-violet text-white">
-                    <div className="weekly-project-header">Office</div>
-                  </TableHead>
-                  
-                  {/* Project columns - minimum 15 */}
-                  {Array.from({ length: Math.max(15, projects.length) }).map((_, idx) => {
-                    const project = projects[idx];
-                    return (
-                      <TableHead 
-                        key={project?.id || `empty-${idx}`} 
-                        className={`text-center border-r bg-brand-violet text-white ${idx === Math.max(15, projects.length) - 1 ? 'rounded-tr-xl border-r-0' : ''}`}
-                      >
-                        <div className="weekly-project-header">
-                          {project ? project.code || project.name?.substring(0, 6) : ''}
-                        </div>
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              </TableHeader>
+  return (
+    <TooltipProvider>
+      <div className="w-full border rounded-2xl shadow-sm mt-8">
+        <div 
+          className="overflow-x-auto overflow-y-visible"
+          style={{
+            width: 'calc(100vw - 18rem)',
+            maxWidth: '100%'
+          }}
+        >
+          <div 
+            className="enhanced-grid-scroll"
+            style={{
+              width: '100%',
+              overflowX: 'auto',
+              overflowY: 'visible',
+              WebkitOverflowScrolling: 'touch',
+              paddingBottom: '1px',
+              minWidth: `${minTableWidth}px`
+            }}
+          >
+            <Table className="w-full" style={{ minWidth: `${minTableWidth}px`, tableLayout: 'fixed' }}>
+              <NewResourceTableHeader projects={projects} />
               
               <TableBody>
-                {members.map((member, idx) => (
+                {members.map((member, memberIndex) => (
                   <NewResourceTableRow
                     key={member.id}
                     member={member}
-                    memberIndex={idx}
+                    memberIndex={memberIndex}
                     projects={projects}
                     allocationMap={allocationMap}
                     getMemberTotal={getMemberTotal}
@@ -135,7 +80,62 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
             </Table>
           </div>
         </div>
-      </Card>
-    </div>
+        
+        {/* Custom scrollbar styling */}
+        <style>
+          {`
+          .enhanced-grid-scroll::-webkit-scrollbar {
+            height: 12px;
+          }
+          
+          .enhanced-grid-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 8px;
+          }
+          
+          .enhanced-grid-scroll::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 8px;
+            border: 2px solid #f1f5f9;
+          }
+          
+          .enhanced-grid-scroll::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+          }
+          
+          /* Firefox scrollbar styling */
+          .enhanced-grid-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #94a3b8 #f1f5f9;
+          }
+          
+          /* Mobile-specific scrollbar improvements */
+          @media (max-width: 640px) {
+            .enhanced-grid-scroll {
+              width: 100vw !important;
+              max-width: 100vw !important;
+              margin-left: calc(-1rem);
+              padding-left: 1rem;
+              padding-right: 1rem;
+            }
+            
+            .enhanced-grid-scroll::-webkit-scrollbar {
+              height: 8px;
+            }
+            
+            .enhanced-grid-scroll::-webkit-scrollbar-thumb {
+              background: #cbd5e1;
+              border-radius: 4px;
+              border: 1px solid #f1f5f9;
+            }
+            
+            .enhanced-grid-scroll::-webkit-scrollbar-thumb:hover {
+              background: #94a3b8;
+            }
+          }
+          `}
+        </style>
+      </div>
+    </TooltipProvider>
   );
 };
