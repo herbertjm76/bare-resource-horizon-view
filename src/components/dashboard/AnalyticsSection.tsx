@@ -6,7 +6,7 @@ import { Donut } from './Donut';
 interface AnalyticsSectionProps {
   mockData: {
     projectsByStatus: { name: string; value: number; }[];
-    projectsByStage: { name: string; value: number; }[];
+    projectsByStage: { name: string; value: number; color?: string; }[];
     projectsByLocation: { name: string; value: number; color?: string; }[];
     projectsByPM: { name: string; value: number; }[];
   };
@@ -30,10 +30,15 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
     </div>
   );
   
-  // Extract colors for location chart
+  // Extract colors for location chart from the data itself
   const locationColors = hasLocationData 
     ? mockData.projectsByLocation.map(item => item.color || '#6F4BF6')
     : ['#059669', '#0891B2', '#7C3AED'];
+
+  // Extract colors for stage chart from the data itself
+  const stageColors = hasStageData
+    ? mockData.projectsByStage.map(item => item.color || '#6F4BF6')
+    : ['#6F4BF6', '#5669F7', '#E64FC4', '#8B5CF6'];
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -66,7 +71,7 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
             <Donut 
               data={mockData.projectsByStage} 
               title=""
-              colors={['#6F4BF6', '#5669F7', '#E64FC4', '#8B5CF6']}
+              colors={stageColors}
               height={140}
             />
           ) : (

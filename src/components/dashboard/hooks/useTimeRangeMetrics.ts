@@ -14,7 +14,7 @@ interface TimeRangeMetrics {
     days90: number;
   };
   projectsByStatus: { name: string; value: number; }[];
-  projectsByStage: { name: string; value: number; }[];
+  projectsByStage: { name: string; value: number; color?: string; }[];
   projectsByLocation: { name: string; value: number; color?: string; }[];
   projectsByPM: { name: string; value: number; }[];
   totalRevenue: number;
@@ -135,6 +135,20 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
 
       if (signal.aborted) return;
 
+      // Fetch office stages with colors
+      const { data: officeStages, error: stagesError } = await supabase
+        .from('office_stages')
+        .select('id, name, color')
+        .eq('company_id', company.id)
+        .abortSignal(signal);
+
+      if (stagesError) {
+        console.error('Error fetching office stages:', stagesError);
+        throw stagesError;
+      }
+
+      if (signal.aborted) return;
+
       // Fetch team members for active resources count
       const { data: teamMembers, error: teamError } = await supabase
         .from('profiles')
@@ -150,7 +164,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       if (signal.aborted) return;
 
       // Fetch project stages/fees within the time range
-      const { data: projectStages, error: stagesError } = await supabase
+      const { data: projectStages, error: stagesProjectError } = await supabase
         .from('project_stages')
         .select('fee, project_id, created_at')
         .eq('company_id', company.id)
@@ -158,9 +172,9 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         .lte('created_at', dateRange.endDate)
         .abortSignal(signal);
 
-      if (stagesError) {
-        console.error('Error fetching project stages:', stagesError);
-        throw stagesError;
+      if (stagesProjectError) {
+        console.error('Error fetching project stages:', stagesProjectError);
+        throw stagesProjectError;
       }
 
       if (signal.aborted) return;
@@ -215,17 +229,22 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         value
       }));
 
-      // Group ALL projects by stage
+      // Group ALL projects by stage with colors from office stages
       const stageGroups = (allProjects || []).reduce((acc, project) => {
         const stage = project.current_stage || 'Unknown';
         acc[stage] = (acc[stage] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
 
-      const projectsByStage = Object.entries(stageGroups).map(([name, value]) => ({
-        name,
-        value
-      }));
+      const projectsByStage = Object.entries(stageGroups).map(([name, value]) => {
+        // Find the color for this stage from office settings
+        const stageColor = officeStages?.find(stage => stage.name === name)?.color || '#E5DEFF';
+        return {
+          name,
+          value,
+          color: stageColor
+        };
+      });
 
       // Group ALL projects by location using country or office location
       const locationGroups = (allProjects || []).reduce((acc, project) => {
@@ -249,7 +268,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
 
       console.log('🗺️ Location groups result:', locationGroups);
 
-      // Create location data with colors
+      // Create location data with colors from office settings or fallback colors
       const locationColors = ['#059669', '#0891B2', '#7C3AED', '#F59E0B', '#EF4444'];
       const projectsByLocation = Object.entries(locationGroups).map(([name, value], index) => ({
         name,
