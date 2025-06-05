@@ -30,7 +30,24 @@ export const submitNewProject = async (
     const manager = form.manager === 'none' ? null : (form.manager === "not_assigned" ? null : (form.manager || null));
     const country = form.country === 'none' ? null : form.country;
     const office = form.office === 'none' ? null : form.office;
-    const currentStage = (form.current_stage === 'none' || !form.current_stage) ? null : form.current_stage;
+    
+    // Set current_stage to the first selected stage name, or the first available stage name if no stages selected
+    let currentStage = null;
+    if (form.stages.length > 0) {
+      const firstSelectedStageId = form.stages[0];
+      const firstSelectedStage = officeStages.find(os => os.id === firstSelectedStageId);
+      currentStage = firstSelectedStage ? firstSelectedStage.name : null;
+    }
+    
+    // If no stages selected, use the first available stage from officeStages
+    if (!currentStage && officeStages.length > 0) {
+      currentStage = officeStages[0].name;
+    }
+    
+    // If still no current stage, use a default value
+    if (!currentStage) {
+      currentStage = "Planning";
+    }
 
     const selectedStageNames = form.stages.map(stageId => {
       const stage = officeStages.find(os => os.id === stageId);
