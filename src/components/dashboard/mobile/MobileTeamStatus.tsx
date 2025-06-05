@@ -15,6 +15,18 @@ export const MobileTeamStatus: React.FC<MobileTeamStatusProps> = ({
   transformedStaffData,
   selectedTimeRange
 }) => {
+  const getTimeRangeText = () => {
+    switch (selectedTimeRange) {
+      case 'week': return 'This Week';
+      case 'month': return 'This Month';
+      case '3months': return 'This Quarter';
+      case '4months': return '4 Months';
+      case '6months': return '6 Months';
+      case 'year': return 'This Year';
+      default: return 'This Month';
+    }
+  };
+
   return (
     <Card className="rounded-2xl border-0 shadow-sm bg-white">
       <CardHeader className="pb-3 px-4">
@@ -23,8 +35,8 @@ export const MobileTeamStatus: React.FC<MobileTeamStatusProps> = ({
           <span className="text-brand-violet font-semibold">
             Staff Status
           </span>
-          <Badge variant="brand" className="bg-gray-100 px-2 py-0.5 rounded text-gray-500 border-gray-300 ml-auto">
-            This Month
+          <Badge className="bg-gray-100 px-2 py-0.5 rounded text-gray-500 border-gray-300 ml-auto text-xs">
+            {getTimeRangeText()}
           </Badge>
         </CardTitle>
       </CardHeader>
