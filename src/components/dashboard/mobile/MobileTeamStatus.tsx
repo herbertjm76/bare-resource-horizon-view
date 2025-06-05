@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Users } from 'lucide-react';
 import { StaffStatusCard } from '../staff/StaffStatusCard';
 import { TimeRange } from '../TimeRangeSelector';
+import { StandardizedHeaderBadge } from './components/StandardizedHeaderBadge';
 
 interface MobileTeamStatusProps {
   transformedStaffData: any[];
@@ -35,12 +35,9 @@ export const MobileTeamStatus: React.FC<MobileTeamStatusProps> = ({
           <span className="text-brand-violet font-semibold">
             Staff Status
           </span>
-          <Badge 
-            variant="outline" 
-            className="ml-auto !bg-gray-100 !text-gray-500 !border-gray-200 !text-xs !font-medium !px-2.5 !py-1 !rounded-full"
-          >
+          <StandardizedHeaderBadge>
             {getTimeRangeText()}
-          </Badge>
+          </StandardizedHeaderBadge>
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0 px-4 pb-4">
