@@ -16,6 +16,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
     textColor: 'text-green-700'
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedOffice, setSelectedOffice] = useState('All Offices');
   
   const { company } = useCompany();
   const { metrics: timeRangeMetrics, isLoading: metricsLoading } = useTimeRangeMetrics(selectedTimeRange);
@@ -49,7 +50,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
       setProjects(projectsData || []);
 
       // Calculate utilization (simplified calculation)
-      const activeMembers = membersData?.filter(member => member.role !== 'pending') || [];
+      const activeMembers = membersData?.filter(member => member.role && member.role !== 'pending') || [];
       const totalCapacity = activeMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
       
       // Mock utilization calculation - replace with actual logic
@@ -94,9 +95,29 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
   const mockData = {
     projectsByStatus: timeRangeMetrics.projectsByStatus,
     projectsByStage: timeRangeMetrics.projectsByStage,
-    projectsByLocation: timeRangeMetrics.projectsByLocation, // This now includes colors
+    projectsByLocation: timeRangeMetrics.projectsByLocation,
     projectsByPM: timeRangeMetrics.projectsByPM || []
   };
+
+  // Mock utilization trends
+  const utilizationTrends = {
+    days7: currentUtilizationRate,
+    days30: Math.round(currentUtilizationRate * 0.9),
+    days90: Math.round(currentUtilizationRate * 0.85)
+  };
+
+  // Transform team members to staff data format
+  const staffData = teamMembers.map(member => ({
+    id: member.id,
+    name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unknown',
+    availability: Math.round(Math.random() * 100), // Mock availability
+    weekly_capacity: member.weekly_capacity || 40,
+    first_name: member.first_name,
+    last_name: member.last_name,
+    role: member.role
+  }));
+
+  const officeOptions = ['All Offices'];
 
   return {
     teamMembers,
@@ -105,8 +126,17 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
     utilizationStatus,
     isLoading: isLoading || metricsLoading,
     mockData,
-    activeResources: teamMembers.filter(member => member.role !== 'pending').length,
+    activeResources: teamMembers.filter(member => member.role && member.role !== 'pending').length,
     activeProjects: timeRangeMetrics.activeProjects,
-    refetch: fetchDashboardData
+    refetch: fetchDashboardData,
+    selectedOffice,
+    setSelectedOffice,
+    selectedTimeRange,
+    setSelectedTimeRange: () => {}, // Will be overridden in DashboardMetrics
+    allTeamMembers: teamMembers,
+    utilizationTrends,
+    metrics: timeRangeMetrics,
+    staffData,
+    officeOptions
   };
 };

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MobileDashboard } from './MobileDashboard';
 import { DesktopDashboard } from './DesktopDashboard';
@@ -10,14 +10,16 @@ import { DashboardLoadingState } from './DashboardLoadingState';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useStandardizedUtilization } from './hooks/useStandardizedUtilization';
 import { toast } from "sonner";
+import { TimeRange } from './TimeRangeSelector';
 
 export const DashboardMetrics = () => {
   const isMobile = useIsMobile();
+  const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('month');
+  
+  const dashboardData = useDashboardData(selectedTimeRange);
   const {
     selectedOffice,
     setSelectedOffice,
-    selectedTimeRange,
-    setSelectedTimeRange,
     allTeamMembers,
     utilizationTrends,
     metrics,
@@ -25,7 +27,7 @@ export const DashboardMetrics = () => {
     officeOptions,
     mockData,
     isLoading
-  } = useDashboardData();
+  } = dashboardData;
 
   // Use standardized utilization calculation
   const { utilizationRate, isLoading: isUtilizationLoading } = useStandardizedUtilization(
@@ -39,7 +41,7 @@ export const DashboardMetrics = () => {
   }
 
   // Show toast when time range changes
-  const handleTimeRangeChange = (newRange: typeof selectedTimeRange) => {
+  const handleTimeRangeChange = (newRange: TimeRange) => {
     setSelectedTimeRange(newRange);
     
     const rangeText = {

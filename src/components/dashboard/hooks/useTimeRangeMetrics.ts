@@ -15,6 +15,7 @@ interface TimeRangeMetrics {
   projectsByStatus: { name: string; value: number; }[];
   projectsByStage: { name: string; value: number; }[];
   projectsByLocation: { name: string; value: number; color?: string; }[];
+  projectsByPM: { name: string; value: number; }[];
   totalRevenue: number;
   avgProjectValue: number;
 }
@@ -25,6 +26,7 @@ const defaultMetrics: TimeRangeMetrics = {
   projectsByStatus: [],
   projectsByStage: [],
   projectsByLocation: [],
+  projectsByPM: [],
   totalRevenue: 0,
   avgProjectValue: 0
 };
@@ -34,7 +36,6 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
   const abortControllerRef = useRef<AbortController | null>(null);
-  // Track previous time range for logging
   const prevTimeRangeRef = useRef<TimeRange>(selectedTimeRange);
 
   // Calculate date range based on selected time range
@@ -42,7 +43,6 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
     const now = new Date();
     let startDate: Date;
     
-    // Log time range change
     if (prevTimeRangeRef.current !== selectedTimeRange) {
       console.log(`🕒 TIME RANGE CHANGED: ${prevTimeRangeRef.current} → ${selectedTimeRange}`);
       prevTimeRangeRef.current = selectedTimeRange;
@@ -83,12 +83,10 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       return;
     }
 
-    // Cancel previous request if it exists
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
 
-    // Create new abort controller for this request
     abortControllerRef.current = new AbortController();
     const signal = abortControllerRef.current.signal;
 
@@ -97,7 +95,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
     try {
       console.log('📊 Fetching metrics for time range:', selectedTimeRange, dateRange);
 
-      // Fetch ALL projects with their office location details
+      // Fetch ALL projects with basic information and manager details
       const { data: allProjects, error: projectsError } = await supabase
         .from('projects')
         .select(`
@@ -108,13 +106,8 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
           country,
           created_at,
           temp_office_location_id,
-          office:offices(name, country),
-          office_location:office_locations!temp_office_location_id(
-            id,
-            city,
-            country,
-            emoji
-          )
+          project_manager_id,
+          project_manager:profiles!project_manager_id(first_name, last_name)
         `)
         .eq('company_id', company.id)
         .abortSignal(signal);
@@ -124,10 +117,9 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         throw projectsError;
       }
 
-      // Check if request was aborted
       if (signal.aborted) return;
 
-      // Fetch office locations with colors
+      // Fetch office locations
       const { data: officeLocations, error: locationsError } = await supabase
         .from('office_locations')
         .select('id, city, country, emoji')
@@ -173,7 +165,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
 
       if (signal.aborted) return;
 
-      // Get projects that have activity in the selected time range (allocations or stages)
+      // Get projects that have activity in the selected time range
       const projectsWithActivity = new Set([
         ...(projectStages?.map(stage => stage.project_id) || []),
         ...(allocations?.map(alloc => alloc.project_id) || [])
@@ -222,15 +214,17 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         value
       }));
 
-      // Group active projects by location using office_location data
+      // Group active projects by location using country or office location
       const locationGroups = activeProjectsInRange.reduce((acc, project) => {
         let locationKey = 'Unknown';
         
-        // Try to get location from office_location first
-        if (project.office_location) {
-          locationKey = project.office_location.country || project.office_location.city || 'Unknown';
+        // Try to get location from office location first, then fallback to country
+        if (project.temp_office_location_id && officeLocations) {
+          const officeLocation = officeLocations.find(loc => loc.id === project.temp_office_location_id);
+          if (officeLocation) {
+            locationKey = officeLocation.country || officeLocation.city || 'Unknown';
+          }
         } else if (project.country) {
-          // Fallback to project country
           locationKey = project.country;
         }
         
@@ -238,12 +232,33 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         return acc;
       }, {} as Record<string, number>);
 
-      // Create location data with colors (using default colors for now since office_locations doesn't have color field)
+      // Create location data with colors
       const locationColors = ['#059669', '#0891B2', '#7C3AED', '#F59E0B', '#EF4444'];
       const projectsByLocation = Object.entries(locationGroups).map(([name, value], index) => ({
         name,
         value,
         color: locationColors[index % locationColors.length]
+      }));
+
+      // Group active projects by project manager
+      const pmGroups = activeProjectsInRange.reduce((acc, project) => {
+        let pmName = 'Unassigned';
+        
+        if (project.project_manager && Array.isArray(project.project_manager) && project.project_manager.length > 0) {
+          const pm = project.project_manager[0];
+          pmName = `${pm.first_name || ''} ${pm.last_name || ''}`.trim() || 'Unknown';
+        } else if (project.project_manager && typeof project.project_manager === 'object') {
+          const pm = project.project_manager;
+          pmName = `${pm.first_name || ''} ${pm.last_name || ''}`.trim() || 'Unknown';
+        }
+        
+        acc[pmName] = (acc[pmName] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      const projectsByPM = Object.entries(pmGroups).map(([name, value]) => ({
+        name,
+        value
       }));
 
       console.log('📈 Calculated metrics for ' + selectedTimeRange + ':', {
@@ -253,7 +268,8 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         avgUtilization,
         statusGroups,
         stageGroups,
-        locationGroups
+        locationGroups,
+        pmGroups
       });
 
       // Only update state if request wasn't aborted
@@ -268,6 +284,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
           projectsByStatus,
           projectsByStage,
           projectsByLocation,
+          projectsByPM,
           totalRevenue,
           avgProjectValue
         });
@@ -276,7 +293,6 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
     } catch (error) {
       if (!signal.aborted) {
         console.error('Error calculating time range metrics:', error);
-        // Keep default metrics on error
         setMetrics(defaultMetrics);
       }
     } finally {
@@ -290,7 +306,6 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
     console.log(`🔄 useTimeRangeMetrics effect running for: ${selectedTimeRange}`);
     fetchTimeRangeMetrics();
     
-    // Cleanup function to abort any pending requests
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();

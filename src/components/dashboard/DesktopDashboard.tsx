@@ -51,11 +51,11 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
     role: member.role || 'Member'
   }));
 
-  // Prepare analytics data for separate section
+  // Prepare analytics data for separate section - using the correct property names
   const analyticsData = {
     projectsByStatus: mockData.projectsByStatus || [],
     projectsByStage: mockData.projectsByStage || [],
-    projectsByRegion: mockData.projectsByRegion || [],
+    projectsByLocation: mockData.projectsByLocation || [],
     projectsByPM: mockData.projectsByPM || []
   };
 
@@ -81,7 +81,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         </div>
       </div>
       
-      {/* Analytics Charts - Project Status, Project Stages, Regional Distribution, Projects by PM */}
+      {/* Analytics Charts - Project Status, Project Stages, Project Locations, Projects by PM */}
       <AnalyticsSection mockData={analyticsData} />
     </div>
   );
