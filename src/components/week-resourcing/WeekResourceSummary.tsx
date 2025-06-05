@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -125,7 +124,7 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
   ];
 
   return (
-    <div className="scale-90 origin-top">
+    <div className="scale-110 origin-top">
       <StandardizedExecutiveSummary
         metrics={metrics}
         gradientType="purple"
