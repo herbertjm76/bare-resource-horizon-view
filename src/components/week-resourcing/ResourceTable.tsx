@@ -65,6 +65,12 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                   const annualLeave = getTotalWeeklyLeaveHours(member.id) || 0;
                   const leaveDays = getWeeklyLeave(member.id);
                   
+                  // Calculate holiday hours from manual leave data
+                  const holidayValue = manualLeaveData[member.id]?.['holiday'] || 0;
+                  const holidayHours = typeof holidayValue === 'string'
+                    ? parseFloat(holidayValue) || 0
+                    : holidayValue;
+                  
                   return (
                     <ResourceTableRow 
                       key={member.id}
@@ -80,6 +86,7 @@ export const ResourceTable: React.FC<ResourceTableProps> = ({
                       weeklyCapacity={weeklyCapacity}
                       totalHours={totalHours}
                       annualLeave={annualLeave}
+                      holidayHours={holidayHours}
                       onLeaveInputChange={handleLeaveInputChange}
                       onRemarksUpdate={handleRemarksUpdate}
                     />
