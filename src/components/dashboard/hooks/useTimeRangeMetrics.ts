@@ -181,29 +181,20 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
 
       if (signal.aborted) return;
 
-      // Get projects that have activity in the selected time range
-      const projectsWithActivity = new Set([
-        ...(projectStages?.map(stage => stage.project_id) || []),
-        ...(allocations?.map(alloc => alloc.project_id) || [])
-      ]);
+      // For analytics, show ALL projects regardless of time range activity
+      // But for metrics like revenue, use time-range filtered data
+      console.log(`📈 Found ${allProjects?.length || 0} total projects`);
+      console.log('🗺️ All projects by location:', allProjects?.map(p => ({ name: p.name, country: p.country, temp_office_location_id: p.temp_office_location_id })));
 
-      // Filter projects to only those with activity in the time range
-      const activeProjectsInRange = allProjects?.filter(project => 
-        projectsWithActivity.has(project.id)
-      ) || [];
-
-      console.log(`📈 Found ${activeProjectsInRange.length} projects with activity in ${selectedTimeRange}`);
-      console.log('🗺️ Projects by location:', activeProjectsInRange.map(p => ({ name: p.name, country: p.country, temp_office_location_id: p.temp_office_location_id })));
-
-      // Calculate metrics based on projects with activity
-      const activeProjects = activeProjectsInRange.length;
+      // Calculate metrics based on ALL projects for analytics
+      const activeProjects = allProjects?.length || 0;
       
-      // Calculate active resources (exclude pending role)
+      // Calculate active resources (exclude non-standard roles)
       const activeResources = teamMembers?.filter(member => 
-        member.role && member.role !== 'pending'
+        member.role && ['owner', 'admin', 'member'].includes(member.role)
       ).length || 0;
       
-      // Calculate revenue from stages in the time range
+      // Calculate revenue from stages in the time range (time-filtered)
       const totalRevenue = projectStages?.reduce((sum, stage) => sum + (stage.fee || 0), 0) || 0;
       const avgProjectValue = activeProjects > 0 ? totalRevenue / activeProjects : 0;
 
@@ -212,8 +203,8 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       const uniqueResources = new Set(allocations?.map(alloc => alloc.resource_id) || []).size;
       const avgUtilization = uniqueResources > 0 ? Math.min((totalHours / (uniqueResources * 40)) * 100, 100) : 0;
 
-      // Group active projects by status
-      const statusGroups = activeProjectsInRange.reduce((acc, project) => {
+      // Group ALL projects by status
+      const statusGroups = (allProjects || []).reduce((acc, project) => {
         const status = project.status || 'Unknown';
         acc[status] = (acc[status] || 0) + 1;
         return acc;
@@ -224,8 +215,8 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         value
       }));
 
-      // Group active projects by stage
-      const stageGroups = activeProjectsInRange.reduce((acc, project) => {
+      // Group ALL projects by stage
+      const stageGroups = (allProjects || []).reduce((acc, project) => {
         const stage = project.current_stage || 'Unknown';
         acc[stage] = (acc[stage] || 0) + 1;
         return acc;
@@ -236,8 +227,8 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         value
       }));
 
-      // Group active projects by location using country or office location
-      const locationGroups = activeProjectsInRange.reduce((acc, project) => {
+      // Group ALL projects by location using country or office location
+      const locationGroups = (allProjects || []).reduce((acc, project) => {
         let locationKey = 'Unknown';
         
         // Try to get location from office location first, then fallback to country
@@ -266,8 +257,8 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
         color: locationColors[index % locationColors.length]
       }));
 
-      // Group active projects by project manager
-      const pmGroups = activeProjectsInRange.reduce((acc, project) => {
+      // Group ALL projects by project manager
+      const pmGroups = (allProjects || []).reduce((acc, project) => {
         let pmName = 'Unassigned';
         
         if (project.project_manager && Array.isArray(project.project_manager) && project.project_manager.length > 0) {
