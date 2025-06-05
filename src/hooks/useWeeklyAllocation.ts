@@ -12,6 +12,7 @@ interface WeeklyAllocation {
   publicHolidayHours: number;
   medicalLeaveHours: number;
   annualLeaveHours: number;
+  otherLeaveHours: number;
   remarks: string;
 }
 
@@ -40,6 +41,7 @@ export const useWeeklyAllocation = (selectedWeek: Date, memberId?: string) => {
             publicHolidayHours: 0,
             medicalLeaveHours: 0,
             annualLeaveHours: Math.floor(Math.random() * 8),
+            otherLeaveHours: 0,
             remarks: '',
           });
           setIsLoading(false);

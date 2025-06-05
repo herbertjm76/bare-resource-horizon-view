@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { Project, MemberAllocation } from './types';
 
 interface MemberTableRowProps {
@@ -23,145 +22,163 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   projects
 }) => {
   // Helper to get user initials
-  const getUserInitials = (): string => {
+  const getUserInitials = (member: any): string => {
     const firstName = member.first_name || '';
     const lastName = member.last_name || '';
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
   // Helper to get avatar URL safely
-  const getAvatarUrl = (): string | undefined => {
+  const getAvatarUrl = (member: any): string | undefined => {
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
   // Helper to get member display name
-  const getMemberDisplayName = (): string => {
+  const getMemberDisplayName = (member: any): string => {
     return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
 
-  // Calculate total hours from project allocations
-  const totalHours = allocation.projectAllocations.reduce((sum, project) => sum + project.hours, 0);
-  const weeklyCapacity = member.weekly_capacity || 40;
-  const utilizationPercent = weeklyCapacity > 0 ? Math.round((totalHours / weeklyCapacity) * 100) : 0;
-  
-  // Determine utilization color
-  const getUtilizationColor = (percent: number) => {
-    if (percent < 80) return 'bg-green-100 text-green-800 border-green-200';
-    if (percent <= 100) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    return 'bg-red-100 text-red-800 border-red-200';
-  };
+  // Display pill component for read-only data
+  const DisplayPill: React.FC<{ value: string | number; className?: string }> = ({ value, className = "" }) => (
+    <div className={`
+      inline-flex items-center justify-center
+      px-3 py-1 
+      bg-gradient-to-r from-gray-100 to-gray-200 
+      border border-gray-300
+      rounded-full 
+      text-xs font-medium 
+      text-gray-700
+      shadow-sm
+      min-w-8
+      ${className}
+    `}>
+      {value}
+    </div>
+  );
+
+  // Manual input component for editable fields
+  const ManualInputCell: React.FC<{ 
+    value: string | number; 
+    field: keyof MemberAllocation;
+    placeholder?: string;
+  }> = ({ value, field, placeholder = "0" }) => (
+    <Input
+      type="number"
+      min="0"
+      max="40"
+      value={value}
+      onChange={(e) => onInputChange(member.id, field, e.target.value)}
+      className="w-12 h-8 text-xs text-center border-2 border-purple-200 rounded-lg bg-purple-50 focus:border-purple-400 focus:bg-purple-100 transition-all"
+      placeholder={placeholder}
+    />
+  );
 
   return (
-    <TableRow className={`member-row ${isEven ? 'even-row' : 'odd-row'}`}>
-      {/* Member Name with Avatar */}
-      <TableCell className="sticky left-0 z-10 bg-inherit">
+    <TableRow className={`${isEven ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50`}>
+      {/* Member Name */}
+      <TableCell className="text-left border-r p-2">
         <div className="flex items-center gap-2">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={getAvatarUrl()} alt={getMemberDisplayName()} />
-            <AvatarFallback className="bg-brand-violet text-white text-xs">
-              {getUserInitials()}
+          <Avatar className="h-6 w-6 flex-shrink-0">
+            <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
+            <AvatarFallback className="text-xs bg-brand-violet text-white">
+              {getUserInitials(member)}
             </AvatarFallback>
           </Avatar>
-          <div className="flex flex-col">
-            <span className="font-medium text-sm">
-              {member.first_name} {member.last_name}
-            </span>
-            <span className="text-xs text-gray-500">
-              {member.department || 'N/A'}
-            </span>
+          <span className="text-xs font-medium text-gray-900 truncate">
+            {getMemberDisplayName(member)}
+          </span>
+        </div>
+      </TableCell>
+
+      {/* Project Count - Display Pill */}
+      <TableCell className="text-center border-r p-2 bg-gray-50">
+        <div className="flex items-center justify-center">
+          <DisplayPill 
+            value={allocation.projectCount} 
+            className="bg-gradient-to-r from-purple-100 to-purple-200 border-purple-300 text-purple-800"
+          />
+        </div>
+      </TableCell>
+
+      {/* Project Hours - Display Pill */}
+      <TableCell className="text-center border-r p-2 bg-gray-50">
+        <div className="flex items-center justify-center">
+          <DisplayPill value={`${allocation.projectHours}h`} />
+        </div>
+      </TableCell>
+
+      {/* Vacation Hours - Display Pill */}
+      <TableCell className="text-center border-r p-2 bg-gray-50">
+        <div className="flex items-center justify-center">
+          <DisplayPill 
+            value={`${allocation.vacationHours}h`}
+            className="bg-gradient-to-r from-blue-100 to-blue-200 border-blue-300 text-blue-800"
+          />
+        </div>
+      </TableCell>
+
+      {/* General Office Hours - Display Pill */}
+      <TableCell className="text-center border-r p-2 bg-gray-50">
+        <div className="flex items-center justify-center">
+          <DisplayPill value={`${allocation.generalOfficeHours}h`} />
+        </div>
+      </TableCell>
+
+      {/* Marketing Hours - Display Pill */}
+      <TableCell className="text-center border-r p-2 bg-gray-50">
+        <div className="flex items-center justify-center">
+          <DisplayPill value={`${allocation.marketingHours}h`} />
+        </div>
+      </TableCell>
+
+      {/* Public Holiday Hours - Display Pill */}
+      <TableCell className="text-center border-r p-2 bg-gray-50">
+        <div className="flex items-center justify-center">
+          <DisplayPill 
+            value={`${allocation.publicHolidayHours}h`}
+            className="bg-gradient-to-r from-yellow-100 to-yellow-200 border-yellow-300 text-yellow-800"
+          />
+        </div>
+      </TableCell>
+
+      {/* Medical Leave Hours - Display Pill */}
+      <TableCell className="text-center border-r p-2 bg-gray-50">
+        <div className="flex items-center justify-center">
+          <DisplayPill 
+            value={`${allocation.medicalLeaveHours}h`}
+            className="bg-gradient-to-r from-red-100 to-red-200 border-red-300 text-red-800"
+          />
+        </div>
+      </TableCell>
+
+      {/* Other Leave (OL) - Manual Input */}
+      <TableCell className="text-center border-r p-1">
+        <div className="flex items-center justify-center">
+          <ManualInputCell 
+            value={allocation.otherLeaveHours || 0}
+            field="otherLeaveHours"
+          />
+        </div>
+      </TableCell>
+
+      {/* Office Location - Display Pill */}
+      <TableCell className="text-center border-r p-2 bg-gray-50">
+        <div className="flex items-center justify-center">
+          <DisplayPill 
+            value={getOfficeDisplay(member.location)}
+            className="bg-gradient-to-r from-green-100 to-green-200 border-green-300 text-green-800"
+          />
+        </div>
+      </TableCell>
+
+      {/* Project allocation cells */}
+      {projects.map((project) => (
+        <TableCell key={project.id} className="text-center border-r p-2 bg-gray-50">
+          <div className="flex items-center justify-center">
+            <DisplayPill value="0" />
           </div>
-        </div>
-      </TableCell>
-
-      {/* Project Allocations */}
-      {projects.map((project) => {
-        const projectAllocation = allocation.projectAllocations.find(pa => pa.projectId === project.id);
-        const projectHours = projectAllocation?.hours || 0;
-        
-        return (
-          <TableCell key={project.id} className="text-center">
-            <input
-              type="number"
-              min="0"
-              max="40"
-              step="0.5"
-              value={projectHours || ''}
-              onChange={(e) => {
-                const newHours = parseFloat(e.target.value) || 0;
-                const updatedProjectAllocations = [...allocation.projectAllocations];
-                const existingIndex = updatedProjectAllocations.findIndex(pa => pa.projectId === project.id);
-                
-                if (existingIndex >= 0) {
-                  updatedProjectAllocations[existingIndex] = {
-                    ...updatedProjectAllocations[existingIndex],
-                    hours: newHours
-                  };
-                } else {
-                  updatedProjectAllocations.push({
-                    projectId: project.id,
-                    projectName: project.name,
-                    projectCode: project.code,
-                    hours: newHours
-                  });
-                }
-                
-                onInputChange(member.id, 'projectAllocations', updatedProjectAllocations);
-              }}
-              className="enhanced-input"
-              placeholder="0"
-            />
-          </TableCell>
-        );
-      })}
-
-      {/* Total Hours */}
-      <TableCell className="text-center total-hours-column">
-        <div className="enhanced-hours-pill">
-          {totalHours}h
-        </div>
-      </TableCell>
-
-      {/* Capacity */}
-      <TableCell className="text-center capacity-column">
-        <div className="enhanced-capacity-pill">
-          {weeklyCapacity}h
-        </div>
-      </TableCell>
-
-      {/* Utilization */}
-      <TableCell className="text-center">
-        <Badge 
-          variant="outline" 
-          className={`${getUtilizationColor(utilizationPercent)} text-xs font-medium`}
-        >
-          {utilizationPercent}%
-        </Badge>
-      </TableCell>
-
-      {/* Leave */}
-      <TableCell className="text-center">
-        <input
-          type="number"
-          min="0"
-          max="40"
-          step="0.5"
-          value={allocation.annualLeave || ''}
-          onChange={(e) => onInputChange(member.id, 'annualLeave', parseFloat(e.target.value) || 0)}
-          className="enhanced-input"
-          placeholder="0"
-        />
-      </TableCell>
-
-      {/* Remarks */}
-      <TableCell>
-        <textarea
-          value={allocation.remarks || ''}
-          onChange={(e) => onInputChange(member.id, 'remarks', e.target.value)}
-          className="enhanced-textarea"
-          placeholder="Notes..."
-          rows={1}
-        />
-      </TableCell>
+        </TableCell>
+      ))}
     </TableRow>
   );
 };

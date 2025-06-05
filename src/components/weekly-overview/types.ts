@@ -3,22 +3,26 @@ export interface Project {
   id: string;
   code: string;
   name: string;
+  color?: string;
 }
 
 export interface MemberAllocation {
-  id: string;
-  annualLeave: number;
-  publicHoliday: number;
-  vacationLeave: number;
-  medicalLeave: number;
-  others: number;
+  projectCount: number;
+  projectHours: number;
+  vacationHours: number;
+  generalOfficeHours: number;
+  marketingHours: number;
+  publicHolidayHours: number;
+  medicalLeaveHours: number;
+  annualLeaveHours: number;
+  otherLeaveHours: number;
   remarks: string;
-  projects: string[];
-  resourcedHours: number;
-  projectAllocations: Array<{
-    projectName: string;
-    projectId: string;
-    hours: number;
-    projectCode: string;
-  }>;
+}
+
+export interface TeamMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+  location: string;
+  avatar_url?: string;
 }
