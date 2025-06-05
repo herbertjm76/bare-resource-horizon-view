@@ -1,35 +1,27 @@
 
 import React from 'react';
-import { TableCell } from '@/components/ui/table';
-import { LeaveTooltip } from '../LeaveTooltip';
+import { DisplayPillCell } from './DisplayPillCell';
 
-interface LeaveDayInfo {
+interface LeaveDay {
   date: string;
   hours: number;
 }
 
 interface AnnualLeaveCellProps {
   annualLeave: number;
-  leaveDays: LeaveDayInfo[];
+  leaveDays: LeaveDay[];
 }
 
-export const AnnualLeaveCell: React.FC<AnnualLeaveCellProps> = ({ 
+export const AnnualLeaveCell: React.FC<AnnualLeaveCellProps> = ({
   annualLeave,
   leaveDays
 }) => {
   return (
-    <TableCell className="leave-cell text-center p-1 border-r">
-      <LeaveTooltip leaveDays={leaveDays} leaveType="Annual Leave">
-        <div className="w-full h-full flex justify-center items-center">
-          {annualLeave > 0 ? (
-            <div className="w-6 h-6 rounded-full bg-gray-250 flex items-center justify-center">
-              <span className="text-xs font-medium text-gray-600">{annualLeave}</span>
-            </div>
-          ) : (
-            <span className="text-muted-foreground">-</span>
-          )}
-        </div>
-      </LeaveTooltip>
-    </TableCell>
+    <DisplayPillCell
+      value={annualLeave}
+      label="h"
+      className="leave-column"
+      pillClassName="bg-gradient-to-r from-blue-100 to-blue-200 border-blue-300 text-blue-800"
+    />
   );
 };
