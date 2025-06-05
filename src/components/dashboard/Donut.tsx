@@ -47,7 +47,7 @@ export const Donut: React.FC<DonutProps> = ({
         <Card className="p-2 text-xs bg-white shadow-lg border">
           <div className="font-medium">{item.name}</div>
           <div className="text-gray-600 mt-1">
-            {item.value} ({percentage}%)
+            {item.value} project{item.value !== 1 ? 's' : ''} ({percentage}%)
           </div>
         </Card>
       );
@@ -100,7 +100,7 @@ export const Donut: React.FC<DonutProps> = ({
           </ResponsiveContainer>
         </div>
         
-        {/* Compact legend */}
+        {/* Compact legend with quantities */}
         <div className="flex-1 overflow-y-auto">
           <div className="grid grid-cols-1 gap-1 text-xs">
             {formattedData.slice(0, 4).map((item, index) => (
@@ -113,7 +113,7 @@ export const Donut: React.FC<DonutProps> = ({
                   <span className="font-medium">{item.name}</span>
                 </div>
                 <div className="text-gray-500 flex-shrink-0">
-                  {item.percentage}%
+                  {item.value} ({item.percentage}%)
                 </div>
               </div>
             ))}

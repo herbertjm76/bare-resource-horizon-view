@@ -7,6 +7,7 @@ import { startOfWeek, startOfMonth, subMonths, format } from 'date-fns';
 
 interface TimeRangeMetrics {
   activeProjects: number;
+  activeResources: number;
   utilizationTrends: {
     days7: number;
     days30: number;
@@ -22,6 +23,7 @@ interface TimeRangeMetrics {
 
 const defaultMetrics: TimeRangeMetrics = {
   activeProjects: 0,
+  activeResources: 0,
   utilizationTrends: { days7: 0, days30: 0, days90: 0 },
   projectsByStatus: [],
   projectsByStage: [],
@@ -133,6 +135,20 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
 
       if (signal.aborted) return;
 
+      // Fetch team members for active resources count
+      const { data: teamMembers, error: teamError } = await supabase
+        .from('profiles')
+        .select('id, role')
+        .eq('company_id', company.id)
+        .abortSignal(signal);
+
+      if (teamError) {
+        console.error('Error fetching team members:', teamError);
+        throw teamError;
+      }
+
+      if (signal.aborted) return;
+
       // Fetch project stages/fees within the time range
       const { data: projectStages, error: stagesError } = await supabase
         .from('project_stages')
@@ -177,9 +193,15 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       ) || [];
 
       console.log(`📈 Found ${activeProjectsInRange.length} projects with activity in ${selectedTimeRange}`);
+      console.log('🗺️ Projects by location:', activeProjectsInRange.map(p => ({ name: p.name, country: p.country, temp_office_location_id: p.temp_office_location_id })));
 
       // Calculate metrics based on projects with activity
       const activeProjects = activeProjectsInRange.length;
+      
+      // Calculate active resources (exclude pending role)
+      const activeResources = teamMembers?.filter(member => 
+        member.role && member.role !== 'pending'
+      ).length || 0;
       
       // Calculate revenue from stages in the time range
       const totalRevenue = projectStages?.reduce((sum, stage) => sum + (stage.fee || 0), 0) || 0;
@@ -228,9 +250,13 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
           locationKey = project.country;
         }
         
+        console.log(`📍 Project ${project.name}: ${locationKey} (office_id: ${project.temp_office_location_id}, country: ${project.country})`);
+        
         acc[locationKey] = (acc[locationKey] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
+
+      console.log('🗺️ Location groups result:', locationGroups);
 
       // Create location data with colors
       const locationColors = ['#059669', '#0891B2', '#7C3AED', '#F59E0B', '#EF4444'];
@@ -263,6 +289,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
 
       console.log('📈 Calculated metrics for ' + selectedTimeRange + ':', {
         activeProjects,
+        activeResources,
         totalRevenue,
         avgProjectValue,
         avgUtilization,
@@ -276,6 +303,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       if (!signal.aborted) {
         setMetrics({
           activeProjects,
+          activeResources,
           utilizationTrends: {
             days7: Math.round(avgUtilization),
             days30: Math.round(avgUtilization * 0.9),

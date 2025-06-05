@@ -126,7 +126,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
     utilizationStatus,
     isLoading: isLoading || metricsLoading,
     mockData,
-    activeResources: teamMembers.filter(member => member.role && member.role !== 'pending').length,
+    activeResources: timeRangeMetrics.activeResources,
     activeProjects: timeRangeMetrics.activeProjects,
     refetch: fetchDashboardData,
     selectedOffice,
