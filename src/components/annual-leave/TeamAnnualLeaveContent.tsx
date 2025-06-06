@@ -49,7 +49,8 @@ export const TeamAnnualLeaveContent: React.FC<TeamAnnualLeaveContentProps> = ({
       {/* Annual Leave Insights */}
       <AnnualLeaveInsights 
         teamMembers={allMembers} 
-        selectedMonth={selectedMonth} 
+        selectedMonth={selectedMonth}
+        leaveData={leaveData}
       />
       
       <div className="flex flex-row justify-between items-center gap-4 flex-wrap">

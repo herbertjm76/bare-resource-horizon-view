@@ -4,16 +4,18 @@ import { StandardizedExecutiveSummary } from '@/components/dashboard/Standardize
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
-import { format, getDaysInMonth } from 'date-fns';
+import { format, getDaysInMonth, startOfWeek, endOfWeek, addWeeks, eachWeekOfInterval, differenceInDays, addDays, isSameDay } from 'date-fns';
 
 interface AnnualLeaveInsightsProps {
   teamMembers: TeamMember[];
   selectedMonth: Date;
+  leaveData: Record<string, Record<string, number>>;
 }
 
 export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
   teamMembers,
-  selectedMonth
+  selectedMonth,
+  leaveData
 }) => {
   // Helper to get user initials
   const getUserInitials = (member: TeamMember): string => {
@@ -32,30 +34,128 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
     return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
 
-  // Calculate total working days in the month (excluding weekends)
-  const workingDaysInMonth = getDaysInMonth(selectedMonth) * (5/7); // Rough approximation
-  
-  // Sample data for demonstration - in real app this would come from props or hooks
-  const monthlyLeaveData = teamMembers.map(member => ({
-    member,
-    plannedLeaveDays: Math.floor(Math.random() * 5), // Mock data
-    totalLeaveHours: Math.floor(Math.random() * 40), // Mock data
-  }));
+  // Calculate people on leave this month
+  const calculatePeopleOnLeaveThisMonth = () => {
+    const membersOnLeave = teamMembers.filter(member => {
+      const memberLeaveData = leaveData[member.id] || {};
+      return Object.values(memberLeaveData).some(hours => hours > 0);
+    });
+    return membersOnLeave;
+  };
 
-  // Find members with significant leave this month
-  const membersWithLeave = monthlyLeaveData.filter(m => m.plannedLeaveDays > 0);
-  
-  // Find members with high leave (3+ days)
-  const membersWithHighLeave = monthlyLeaveData.filter(m => m.plannedLeaveDays >= 3);
+  // Calculate peak leave period (week with most people on leave)
+  const calculatePeakLeavePeriod = () => {
+    const monthStart = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1);
+    const monthEnd = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0);
+    
+    const weeks = eachWeekOfInterval({
+      start: monthStart,
+      end: monthEnd
+    }, { weekStartsOn: 1 });
+    
+    let peakWeek = null;
+    let maxCount = 0;
+    
+    weeks.forEach(weekStart => {
+      const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+      const peopleOnLeaveThisWeek = new Set();
+      
+      teamMembers.forEach(member => {
+        const memberLeaveData = leaveData[member.id] || {};
+        Object.entries(memberLeaveData).forEach(([date, hours]) => {
+          if (hours > 0) {
+            const leaveDate = new Date(date);
+            if (leaveDate >= weekStart && leaveDate <= weekEnd) {
+              peopleOnLeaveThisWeek.add(member.id);
+            }
+          }
+        });
+      });
+      
+      if (peopleOnLeaveThisWeek.size > maxCount) {
+        maxCount = peopleOnLeaveThisWeek.size;
+        peakWeek = {
+          weekStart: format(weekStart, 'MMM d'),
+          count: peopleOnLeaveThisWeek.size
+        };
+      }
+    });
+    
+    return peakWeek;
+  };
 
-  const renderMemberAvatars = (memberList: typeof monthlyLeaveData, maxShow: number = 6) => {
+  // Calculate upcoming leave alerts (next week)
+  const calculateUpcomingLeaveAlerts = () => {
+    const today = new Date();
+    const nextWeekStart = startOfWeek(addWeeks(today, 1), { weekStartsOn: 1 });
+    const nextWeekEnd = endOfWeek(addWeeks(today, 1), { weekStartsOn: 1 });
+    
+    const peopleOnLeaveNextWeek = new Set();
+    
+    teamMembers.forEach(member => {
+      const memberLeaveData = leaveData[member.id] || {};
+      Object.entries(memberLeaveData).forEach(([date, hours]) => {
+        if (hours > 0) {
+          const leaveDate = new Date(date);
+          if (leaveDate >= nextWeekStart && leaveDate <= nextWeekEnd) {
+            peopleOnLeaveNextWeek.add(member.id);
+          }
+        }
+      });
+    });
+    
+    return peopleOnLeaveNextWeek.size;
+  };
+
+  // Calculate average leave block size
+  const calculateAverageLeaveBlockSize = () => {
+    const allLeaveBlocks: number[] = [];
+    
+    teamMembers.forEach(member => {
+      const memberLeaveData = leaveData[member.id] || {};
+      const leaveDates = Object.entries(memberLeaveData)
+        .filter(([_, hours]) => hours > 0)
+        .map(([date, _]) => new Date(date))
+        .sort((a, b) => a.getTime() - b.getTime());
+      
+      if (leaveDates.length === 0) return;
+      
+      // Group consecutive dates into blocks
+      let currentBlockSize = 1;
+      
+      for (let i = 1; i < leaveDates.length; i++) {
+        const prevDate = leaveDates[i - 1];
+        const currentDate = leaveDates[i];
+        const daysDiff = differenceInDays(currentDate, prevDate);
+        
+        if (daysDiff === 1) {
+          // Consecutive day
+          currentBlockSize++;
+        } else {
+          // Gap found, save current block and start new one
+          allLeaveBlocks.push(currentBlockSize);
+          currentBlockSize = 1;
+        }
+      }
+      
+      // Don't forget the last block
+      allLeaveBlocks.push(currentBlockSize);
+    });
+    
+    if (allLeaveBlocks.length === 0) return 0;
+    
+    const averageBlockSize = allLeaveBlocks.reduce((sum, size) => sum + size, 0) / allLeaveBlocks.length;
+    return Math.round(averageBlockSize * 10) / 10; // Round to 1 decimal place
+  };
+
+  const renderMemberAvatars = (memberList: TeamMember[], maxShow: number = 6) => {
     const membersToShow = memberList.slice(0, maxShow);
     const remainingCount = memberList.length - maxShow;
 
     return (
       <div className="flex items-center justify-center gap-2">
         <div className="flex gap-1">
-          {membersToShow.map(({ member }) => (
+          {membersToShow.map((member) => (
             <Avatar key={member.id} className="h-6 w-6">
               <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
               <AvatarFallback className="bg-brand-violet text-white text-xs">
@@ -73,40 +173,41 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
     );
   };
 
-  const totalLeaveDays = monthlyLeaveData.reduce((sum, m) => sum + m.plannedLeaveDays, 0);
-  const totalLeaveHours = monthlyLeaveData.reduce((sum, m) => sum + m.totalLeaveHours, 0);
+  // Calculate all metrics
+  const peopleOnLeaveThisMonth = calculatePeopleOnLeaveThisMonth();
+  const peakLeavePeriod = calculatePeakLeavePeriod();
+  const upcomingLeaveCount = calculateUpcomingLeaveAlerts();
+  const averageBlockSize = calculateAverageLeaveBlockSize();
 
   const metrics = [
     {
-      title: "Total Leave Days",
-      value: totalLeaveDays,
-      subtitle: `${format(selectedMonth, 'MMMM yyyy')}`,
-      badgeText: totalLeaveDays > 15 ? "High" : totalLeaveDays > 5 ? "Moderate" : "Low",
-      badgeColor: totalLeaveDays > 15 ? "red" : totalLeaveDays > 5 ? "orange" : "green"
-    },
-    {
-      title: "Team Members on Leave",
-      value: membersWithLeave.length > 0 ? renderMemberAvatars(membersWithLeave) : (
+      title: "People on Leave",
+      value: peopleOnLeaveThisMonth.length > 0 ? renderMemberAvatars(peopleOnLeaveThisMonth) : (
         <span className="text-sm text-white/80">No one on leave</span>
       ),
-      subtitle: `${membersWithLeave.length} of ${teamMembers.length} members`,
-      badgeText: `${membersWithLeave.length}`,
-      badgeColor: membersWithLeave.length > 5 ? "orange" : "blue"
+      subtitle: `${peopleOnLeaveThisMonth.length} of ${teamMembers.length} team members`,
+      badgeText: `${peopleOnLeaveThisMonth.length} of ${teamMembers.length}`,
+      badgeColor: peopleOnLeaveThisMonth.length > 5 ? "orange" : "blue"
     },
     {
-      title: "Extended Leave",
-      value: membersWithHighLeave.length > 0 ? renderMemberAvatars(membersWithHighLeave) : (
-        <span className="text-sm text-white/80">No extended leave</span>
-      ),
-      subtitle: "3+ days this month",
-      badgeText: `${membersWithHighLeave.length}`,
-      badgeColor: membersWithHighLeave.length > 0 ? "orange" : "green"
+      title: "Peak Leave Period",
+      value: peakLeavePeriod ? `Week of ${peakLeavePeriod.weekStart}` : "No peak period",
+      subtitle: peakLeavePeriod ? `${peakLeavePeriod.count} people affected` : "Evenly distributed",
+      badgeText: peakLeavePeriod ? `${peakLeavePeriod.count} people` : "0",
+      badgeColor: peakLeavePeriod && peakLeavePeriod.count > 3 ? "red" : peakLeavePeriod && peakLeavePeriod.count > 1 ? "orange" : "green"
     },
     {
-      title: "Total Leave Hours",
-      value: `${totalLeaveHours}h`,
-      subtitle: "This month",
-      badgeText: "Tracked",
+      title: "Upcoming Leave Alerts",
+      value: upcomingLeaveCount > 0 ? `${upcomingLeaveCount} people` : "No upcoming leave",
+      subtitle: "Next week impact",
+      badgeText: upcomingLeaveCount > 3 ? "High Impact" : upcomingLeaveCount > 1 ? "Medium Impact" : "Low Impact",
+      badgeColor: upcomingLeaveCount > 3 ? "red" : upcomingLeaveCount > 1 ? "orange" : "green"
+    },
+    {
+      title: "Average Leave Block",
+      value: averageBlockSize > 0 ? `${averageBlockSize} days` : "No data",
+      subtitle: "Typical leave duration",
+      badgeText: `${averageBlockSize} days average`,
       badgeColor: "blue"
     }
   ];
