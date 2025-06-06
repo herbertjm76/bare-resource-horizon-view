@@ -65,26 +65,26 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
         <table className="enhanced-table">
           <thead>
             <tr>
-              <th className="sticky-left-0 min-w-48 bg-white">Team Member</th>
+              <th className="sticky-left-0 min-w-32 bg-white text-left px-2 py-1">Team Member</th>
               {days.map((day) => (
                 <th 
                   key={day.day} 
                   className={`
-                    min-w-16 text-center text-xs font-semibold
+                    min-w-12 text-center text-xs font-semibold px-1 py-1
                     ${day.isWeekend ? 'weekend' : ''}
                     ${day.isSunday ? 'sunday-border' : ''}
                   `}
                 >
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-[10px] opacity-75">
+                  <div className="flex flex-col items-center gap-0.5">
+                    <span className="text-[9px] opacity-75">
                       {format(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day.day), 'EEE')}
                     </span>
-                    <span className="text-sm font-bold">{day.day}</span>
+                    <span className="text-xs font-bold">{day.day}</span>
                   </div>
                 </th>
               ))}
-              <th className="min-w-20 text-center total-hours-column">
-                <div className="enhanced-hours-pill">
+              <th className="min-w-16 text-center total-hours-column px-1 py-1">
+                <div className="enhanced-hours-pill text-xs">
                   Total
                 </div>
               </th>
@@ -99,24 +99,21 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 <tr 
                   key={member.id} 
                   className={`
-                    member-row
+                    member-row h-10
                     ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}
                   `}
                 >
-                  <td className="sticky-left-0 bg-inherit border-r-2 border-gray-200">
-                    <div className="flex items-center gap-3 p-2">
-                      <Avatar className="h-8 w-8">
+                  <td className="sticky-left-0 bg-inherit border-r-2 border-gray-200 px-2 py-1">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-6 w-6">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
                         <AvatarFallback className="bg-brand-violet text-white text-xs">
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
-                        <div className="text-sm font-medium text-gray-900 truncate">
+                        <div className="text-xs font-medium text-gray-900 truncate">
                           {member.first_name} {member.last_name}
-                        </div>
-                        <div className="text-xs text-gray-500 truncate">
-                          {member.location || 'No location'}
                         </div>
                       </div>
                     </div>
@@ -129,7 +126,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                       <td 
                         key={day.date} 
                         className={`
-                          text-center p-1
+                          text-center p-0.5
                           ${day.isWeekend ? 'weekend' : ''}
                           ${day.isSunday ? 'sunday-border' : ''}
                           ${hasValue ? 'leave-cell-filled' : ''}
@@ -142,14 +139,14 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                           step="0.5"
                           value={currentValue || ''}
                           onChange={(e) => handleLeaveChange(member.id, day.date, e.target.value)}
-                          className="enhanced-input h-8 text-xs"
+                          className="enhanced-input h-6 text-xs w-10"
                           placeholder="0"
                         />
                       </td>
                     );
                   })}
-                  <td className="text-center total-hours-column">
-                    <div className="enhanced-hours-pill">
+                  <td className="text-center total-hours-column px-1 py-1">
+                    <div className="enhanced-hours-pill text-xs">
                       {totalHours || 0}h
                     </div>
                   </td>
