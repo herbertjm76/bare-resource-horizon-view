@@ -1,0 +1,54 @@
+
+/* Sticky positioning for member names */
+.sticky-left-0 {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: white;
+  border-right: 2px solid #e5e7eb;
+}
+
+/* Header styling */
+.enhanced-table thead th {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 2px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
+  padding: 4px 2px;
+  height: 40px;
+  vertical-align: middle;
+}
+
+/* Row styling */
+.member-row {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.15s ease;
+}
+
+.even-row {
+  background-color: #ffffff;
+}
+
+.odd-row {
+  background-color: #f9fafb;
+}
+
+.member-row:hover {
+  background-color: #f0f9ff !important;
+}
+
+/* Cell styling */
+.enhanced-table td {
+  border-right: 1px solid #f3f4f6;
+  vertical-align: middle;
+  height: 36px;
+}
+
+/* Weekend styling */
+.weekend {
+  background-color: #fef3f2 !important;
+}
+
+.sunday-border {
+  border-left: 2px solid #dc2626;
+}

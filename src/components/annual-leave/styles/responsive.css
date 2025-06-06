@@ -1,0 +1,73 @@
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .enhanced-table {
+    font-size: 11px;
+  }
+  
+  .enhanced-table thead th {
+    padding: 2px 1px;
+    height: 36px;
+  }
+  
+  .member-row {
+    height: 32px;
+  }
+  
+  .enhanced-table td {
+    height: 32px;
+  }
+  
+  .enhanced-input {
+    width: 22px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 1px 1px;
+  }
+  
+  .enhanced-hours-pill {
+    font-size: 9px;
+    min-width: 24px;
+    height: 18px;
+    padding: 1px 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .enhanced-table {
+    font-size: 10px;
+  }
+  
+  .enhanced-table thead th {
+    padding: 1px;
+    height: 32px;
+  }
+  
+  .member-row {
+    height: 28px;
+  }
+  
+  .enhanced-table td {
+    height: 28px;
+  }
+  
+  .enhanced-input {
+    width: 20px;
+    height: 18px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 1px;
+  }
+  
+  .enhanced-hours-pill {
+    font-size: 8px;
+    min-width: 20px;
+    height: 16px;
+    padding: 1px 3px;
+  }
+  
+  .sticky-left-0 {
+    min-width: 120px;
+  }
+}
