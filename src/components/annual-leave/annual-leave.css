@@ -83,7 +83,8 @@
   border: 1px solid #d1d5db;
   border-radius: 4px;
   text-align: center;
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 600;
   padding: 2px 2px;
   background: white;
   transition: all 0.15s ease;
@@ -105,7 +106,7 @@
 .leave-cell-filled .enhanced-input {
   background-color: #dbeafe;
   border-color: #3b82f6;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Total hours column */
@@ -152,7 +153,8 @@
   .enhanced-input {
     width: 22px;
     height: 20px;
-    font-size: 11px;
+    font-size: 12px;
+    font-weight: 600;
     padding: 1px 1px;
   }
   
@@ -185,7 +187,8 @@
   .enhanced-input {
     width: 20px;
     height: 18px;
-    font-size: 10px;
+    font-size: 11px;
+    font-weight: 600;
     padding: 1px 1px;
   }
   
