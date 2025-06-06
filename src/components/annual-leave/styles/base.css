@@ -2,7 +2,7 @@
 
 /* Base container styles */
 .annual-leave-grid-container {
-  width: calc(100vw - 19rem);
+  width: calc(100vw - 22rem);
   overflow-x: auto;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -56,4 +56,3 @@
   border-right: 2px solid rgba(255,255,255,0.2);
   color: white;
 }
-
