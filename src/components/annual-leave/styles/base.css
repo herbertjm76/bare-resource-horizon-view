@@ -1,19 +1,40 @@
-
-
 /* Base container styles */
 .annual-leave-grid-container {
   width: calc(100vw - 22rem);
-  overflow-x: auto;
+  overflow-x: scroll;
+  overflow-y: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   background: white;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  /* Force horizontal scrollbar to always be visible */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* Custom scrollbar styling for WebKit browsers */
+.annual-leave-grid-container::-webkit-scrollbar {
+  height: 12px;
+}
+
+.annual-leave-grid-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 6px;
+}
+
+.annual-leave-grid-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+
+.annual-leave-grid-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* Enhanced table container */
 .enhanced-table-container {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: visible;
   -webkit-overflow-scrolling: touch;
   /* Force horizontal scrollbar to always be visible */
   scrollbar-width: thin;
@@ -45,6 +66,7 @@
   border-collapse: collapse;
   font-size: 13px;
   line-height: 1.2;
+  min-width: 1200px; /* Ensure table is wide enough to trigger horizontal scroll */
 }
 
 /* Sticky positioning for member names */
