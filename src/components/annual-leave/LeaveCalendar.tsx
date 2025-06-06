@@ -60,7 +60,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
   };
 
   return (
-    <div className="enhanced-table-scroll">
+    <div className="annual-leave-grid-container">
       <div className="enhanced-table-container">
         <table className="enhanced-table">
           <thead>
