@@ -70,7 +70,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 <th 
                   key={day.day} 
                   className={`
-                    min-w-12 text-center text-xs font-semibold px-1 py-1
+                    min-w-8 text-center text-xs font-semibold px-1 py-1
                     ${day.isWeekend ? 'weekend' : ''}
                     ${day.isSunday ? 'sunday-border' : ''}
                   `}
@@ -139,7 +139,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                           step="0.5"
                           value={currentValue || ''}
                           onChange={(e) => handleLeaveChange(member.id, day.date, e.target.value)}
-                          className="enhanced-input h-6 text-xs w-10"
+                          className="enhanced-input h-6 text-xs w-6"
                           placeholder="0"
                         />
                       </td>
