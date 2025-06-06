@@ -14,18 +14,16 @@ export const CapacityGauge: React.FC<CapacityGaugeProps> = ({
   const percentageRemaining = Math.round((availableHours / totalCapacity) * 100);
   const percentageUsed = 100 - percentageRemaining;
   
-  // Determine color based on available hours
+  // Determine color based on available hours - GREEN for 0 available (optimal)
   const getColor = () => {
-    const remainingPercentage = (availableHours / totalCapacity) * 100;
-    
-    if (remainingPercentage <= 0) {
-      return '#F2FCE2'; // Green for 0% remaining
-    } else if (remainingPercentage < 20) {
-      return '#FEC6A1'; // Soft orange for 1-19% remaining
-    } else if (remainingPercentage < 30) {
-      return '#F97316'; // Bright orange for 20-29% remaining
+    if (availableHours <= 0) {
+      return '#22c55e'; // Green for 0 available hours (100% utilization - optimal)
+    } else if (availableHours <= 5) {
+      return '#facc15'; // Yellow for 1-5 available hours (good utilization)
+    } else if (availableHours <= 10) {
+      return '#f97316'; // Orange for 6-10 available hours (moderate utilization)
     } else {
-      return '#ea384c'; // Red for 30-40% remaining
+      return '#ef4444'; // Red for 11+ available hours (low utilization)
     }
   };
 

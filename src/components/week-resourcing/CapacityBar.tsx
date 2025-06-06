@@ -15,33 +15,29 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   // Calculate the percentage of capacity that is USED (not available)
   const utilizationPercentage = Math.min(100, Math.max(0, (totalCapacity - availableHours) / totalCapacity * 100));
 
-  // Calculate color based on utilization percentage
+  // Calculate color based on available hours - GREEN for 0 available (100% utilized)
   const getUtilizationColor = () => {
-    if (utilizationPercentage >= 90) {
-      return 'bg-red-500'; // Red for very high utilization (90-100%)
-    } else if (utilizationPercentage >= 80) {
-      return 'bg-orange-500'; // Orange for high utilization (80-90%)
-    } else if (utilizationPercentage >= 60) {
-      return 'bg-yellow-400'; // Yellow for medium-high utilization (60-80%)
-    } else if (utilizationPercentage >= 40) {
-      return 'bg-green-500'; // Green for medium utilization (40-60%)
+    if (availableHours <= 0) {
+      return '#22c55e'; // Green for 0 available hours (100% utilization - optimal)
+    } else if (availableHours <= 5) {
+      return '#facc15'; // Yellow for 1-5 available hours (good utilization)
+    } else if (availableHours <= 10) {
+      return '#f97316'; // Orange for 6-10 available hours (moderate utilization)
     } else {
-      return 'bg-blue-500'; // Blue for low utilization (0-40%)
+      return '#ef4444'; // Red for 11+ available hours (low utilization)
     }
   };
 
-  // Get text color for the available hours number based on utilization
+  // Get text color for the available hours number - GREEN for 0 available
   const getTextColor = () => {
-    if (utilizationPercentage >= 90) {
-      return 'text-red-600 font-semibold';
-    } else if (utilizationPercentage >= 80) {
-      return 'text-orange-600 font-semibold';
-    } else if (utilizationPercentage >= 60) {
-      return 'text-yellow-600 font-semibold';
-    } else if (utilizationPercentage >= 40) {
+    if (availableHours <= 0) {
       return 'text-green-600 font-semibold';
+    } else if (availableHours <= 5) {
+      return 'text-yellow-600 font-semibold';
+    } else if (availableHours <= 10) {
+      return 'text-orange-600 font-semibold';
     } else {
-      return 'text-blue-600 font-semibold';
+      return 'text-red-600 font-semibold';
     }
   };
 
@@ -70,11 +66,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
                       className="h-2.5 w-2.5 relative overflow-hidden border border-gray-300"
                       style={{
                         backgroundColor: isFilled 
-                          ? utilizationColor.includes('red') ? '#ef4444'
-                          : utilizationColor.includes('orange') ? '#f97316'
-                          : utilizationColor.includes('yellow') ? '#facc15'
-                          : utilizationColor.includes('green') ? '#22c55e'
-                          : '#3b82f6'
+                          ? utilizationColor
                           : '#f3f4f6'
                       }}
                     >
@@ -84,11 +76,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
                           className="absolute top-0 bottom-0 left-0"
                           style={{
                             width: `${(utilizationPercentage - boxStartPercent) / 20 * 100}%`,
-                            backgroundColor: utilizationColor.includes('red') ? '#ef4444'
-                              : utilizationColor.includes('orange') ? '#f97316'
-                              : utilizationColor.includes('yellow') ? '#facc15'
-                              : utilizationColor.includes('green') ? '#22c55e'
-                              : '#3b82f6'
+                            backgroundColor: utilizationColor
                           }} 
                         />
                       )}
@@ -105,6 +93,9 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
                     </p>
                     <p className="text-xs font-medium">
                       Total Utilization: {utilizationPercentage.toFixed(1)}%
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {availableHours <= 0 ? 'Optimal utilization!' : `${availableHours}h under-utilized`}
                     </p>
                   </TooltipContent>
                 </Tooltip>
