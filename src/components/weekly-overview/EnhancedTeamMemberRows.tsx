@@ -158,18 +158,11 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                     </Badge>
                   </TableCell>
 
-                  {/* Leave */}
+                  {/* Annual Leave - READ-ONLY display with gray styling */}
                   <TableCell className="text-center">
-                    <input
-                      type="number"
-                      min="0"
-                      max="40"
-                      step="0.5"
-                      value={allocation.annualLeave || ''}
-                      onChange={(e) => handleInputChange(member.id, 'annualLeave', parseFloat(e.target.value) || 0)}
-                      className="enhanced-input"
-                      placeholder="0"
-                    />
+                    <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-medium rounded-lg bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300 text-gray-700 cursor-default">
+                      {allocation.annualLeave || 0}h
+                    </div>
                   </TableCell>
 
                   {/* Remarks */}
