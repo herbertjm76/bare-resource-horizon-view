@@ -83,17 +83,11 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                   </div>
                 </th>
               ))}
-              <th className="min-w-20 text-center total-hours-column px-3 py-3">
-                <div className="enhanced-hours-pill">
-                  Total
-                </div>
-              </th>
             </tr>
           </thead>
           <tbody>
             {members.map((member, memberIndex) => {
               const memberLeaveData = leaveData[member.id] || {};
-              const totalHours = Object.values(memberLeaveData).reduce((sum, hours) => sum + hours, 0);
               
               return (
                 <tr 
@@ -145,11 +139,6 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                       </td>
                     );
                   })}
-                  <td className="text-center total-hours-column px-3 py-2">
-                    <div className="enhanced-hours-pill">
-                      {totalHours || 0}h
-                    </div>
-                  </td>
                 </tr>
               );
             })}
