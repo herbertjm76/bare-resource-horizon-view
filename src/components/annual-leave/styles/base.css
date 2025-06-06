@@ -1,6 +1,7 @@
+
 /* Base container styles */
 .annual-leave-grid-container {
-  width: calc(100vw - 22rem);
+  width: calc(100vw - 19rem);
   overflow-x: scroll;
   overflow-y: hidden;
   border: 1px solid #e5e7eb;
