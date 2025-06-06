@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { MemberNameCell } from './MemberNameCell';
@@ -96,7 +95,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       
       <CapacityBarCell availableHours={Math.max(0, weeklyCapacity - totalHours - annualLeave - otherLeave - holidayHours)} totalCapacity={weeklyCapacity} />
       
-      {/* Annual Leave Cell - READ-ONLY display from database */}
+      {/* Annual Leave Cell - READ-ONLY display from database with gray styling */}
       <AnnualLeaveCell annualLeave={annualLeave} leaveDays={leaveDays} />
       
       {/* Holiday Cell - READ-ONLY display from database */}
