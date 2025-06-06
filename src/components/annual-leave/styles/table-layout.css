@@ -1,47 +1,51 @@
 
-/* Sticky positioning for member names */
-.sticky-left-0 {
-  position: sticky;
-  left: 0;
-  z-index: 10;
-  background: white;
-  border-right: 2px solid #e5e7eb;
-}
-
 /* Header styling */
 .enhanced-table thead th {
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-bottom: 2px solid #e5e7eb;
+  background: #6465F0;
+  border-bottom: 2px solid rgba(255,255,255,0.2);
   font-weight: 600;
-  color: #374151;
-  padding: 4px 2px;
-  height: 40px;
+  color: white;
+  padding: 8px 4px;
+  height: 50px;
   vertical-align: middle;
+  border-right: 1px solid rgba(255,255,255,0.2);
+}
+
+.enhanced-table thead th:last-child {
+  border-right: none;
 }
 
 /* Row styling */
 .member-row {
   border-bottom: 1px solid #f3f4f6;
   transition: background-color 0.15s ease;
+  height: 48px;
 }
 
 .even-row {
-  background-color: #ffffff;
+  background-color: rgba(248,250,252,0.4);
 }
 
 .odd-row {
-  background-color: #f9fafb;
+  background-color: white;
 }
 
 .member-row:hover {
-  background-color: #f0f9ff !important;
+  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* Cell styling */
 .enhanced-table td {
   border-right: 1px solid #f3f4f6;
   vertical-align: middle;
-  height: 36px;
+  height: 48px;
+  position: relative;
+}
+
+.enhanced-table td:last-child {
+  border-right: none;
 }
 
 /* Weekend styling */
@@ -51,4 +55,11 @@
 
 .sunday-border {
   border-left: 2px solid #dc2626;
+}
+
+/* Total hours column */
+.total-hours-column {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-left: 2px solid #0ea5e9;
+  font-weight: 600;
 }

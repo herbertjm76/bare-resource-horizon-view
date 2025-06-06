@@ -60,31 +60,31 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
   };
 
   return (
-    <div className="annual-leave-grid-container">
+    <div className="enhanced-table-scroll">
       <div className="enhanced-table-container">
         <table className="enhanced-table">
           <thead>
             <tr>
-              <th className="sticky-left-0 min-w-32 bg-white text-left px-2 py-1">Team Member</th>
+              <th className="sticky-left-0 min-w-48 bg-white text-left px-4 py-3">Team Member</th>
               {days.map((day) => (
                 <th 
                   key={day.day} 
                   className={`
-                    min-w-8 text-center text-xs font-semibold px-1 py-1
+                    min-w-12 text-center text-xs font-semibold px-2 py-3
                     ${day.isWeekend ? 'weekend' : ''}
                     ${day.isSunday ? 'sunday-border' : ''}
                   `}
                 >
-                  <div className="flex flex-col items-center gap-0.5">
-                    <span className="text-[9px] opacity-75">
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-xs opacity-80">
                       {format(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), day.day), 'EEE')}
                     </span>
-                    <span className="text-xs font-bold">{day.day}</span>
+                    <span className="text-sm font-bold">{day.day}</span>
                   </div>
                 </th>
               ))}
-              <th className="min-w-16 text-center total-hours-column px-1 py-1">
-                <div className="enhanced-hours-pill text-xs">
+              <th className="min-w-20 text-center total-hours-column px-3 py-3">
+                <div className="enhanced-hours-pill">
                   Total
                 </div>
               </th>
@@ -99,20 +99,20 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                 <tr 
                   key={member.id} 
                   className={`
-                    member-row h-10
+                    member-row
                     ${memberIndex % 2 === 0 ? 'even-row' : 'odd-row'}
                   `}
                 >
-                  <td className="sticky-left-0 bg-inherit border-r-2 border-gray-200 px-2 py-1">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-6 w-6">
+                  <td className="sticky-left-0 bg-inherit border-r px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-8 w-8">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                        <AvatarFallback className="bg-brand-violet text-white text-xs">
+                        <AvatarFallback className="bg-brand-violet text-white text-sm">
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
-                        <div className="text-xs font-medium text-gray-900 truncate">
+                        <div className="text-sm font-medium text-gray-900 truncate">
                           {member.first_name} {member.last_name}
                         </div>
                       </div>
@@ -126,27 +126,27 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                       <td 
                         key={day.date} 
                         className={`
-                          text-center p-0.5
+                          text-center p-2
                           ${day.isWeekend ? 'weekend' : ''}
                           ${day.isSunday ? 'sunday-border' : ''}
                           ${hasValue ? 'leave-cell-filled' : ''}
                         `}
                       >
-                        <Input
+                        <input
                           type="number"
                           min="0"
                           max="8"
                           step="0.5"
                           value={currentValue || ''}
                           onChange={(e) => handleLeaveChange(member.id, day.date, e.target.value)}
-                          className="enhanced-input h-6 text-xs w-6"
+                          className="enhanced-input"
                           placeholder="0"
                         />
                       </td>
                     );
                   })}
-                  <td className="text-center total-hours-column px-1 py-1">
-                    <div className="enhanced-hours-pill text-xs">
+                  <td className="text-center total-hours-column px-3 py-2">
+                    <div className="enhanced-hours-pill">
                       {totalHours || 0}h
                     </div>
                   </td>
