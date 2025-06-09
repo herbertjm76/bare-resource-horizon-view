@@ -53,10 +53,12 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       <CellStyles />
       <TableRow 
         key={member.id}
-        className={`h-9 ${isEvenRow ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50`}
+        className={`h-9 mobile-resource-table ${isEvenRow ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50`}
       >
         <NameCell member={member} />
+        
         <ProjectCountCell projectCount={projectCount} />
+        
         <CapacityCell availableHours={availableHours} totalCapacity={weeklyCapacity} />
         
         {/* Annual Leave Cell - READ-ONLY display from database with gray styling */}
