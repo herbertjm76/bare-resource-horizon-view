@@ -4,6 +4,8 @@ import { WeeklyOverviewHeader } from './WeeklyOverviewHeader';
 import { WeeklyExecutiveSummary } from './WeeklyExecutiveSummary';
 import { WeeklyResourceSection } from './WeeklyResourceSection';
 import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
+import { WeekResourceSummary } from '@/components/week-resourcing/WeekResourceSummary';
+import { useWeekResourceData } from '@/components/week-resourcing/hooks/useWeekResourceData';
 
 interface WeeklyOverviewContentProps {
   selectedWeek: Date;
@@ -24,6 +26,18 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
   filters,
   handleFilterChange
 }) => {
+  // Get week resource data for the summary cards
+  const {
+    projects,
+    members,
+    weekAllocations,
+    weekStartDate,
+    isLoading: isLoadingResourceData
+  } = useWeekResourceData({ 
+    selectedWeek, 
+    filters: { office: filters.office, searchTerm: "" } 
+  });
+
   return (
     <div className="flex-1 p-4 sm:p-6 bg-background">
       {/* Print only title - hidden in normal view */}
@@ -38,6 +52,16 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
           totalActiveProjects={0}
           totalOffices={0}
         />
+        
+        {/* Weekly Resource Summary Cards */}
+        {!isLoadingResourceData && projects && members && weekAllocations && (
+          <WeekResourceSummary 
+            projects={projects}
+            members={members}
+            allocations={weekAllocations}
+            weekStartDate={weekStartDate}
+          />
+        )}
         
         {/* Executive Summary */}
         <WeeklyExecutiveSummary
