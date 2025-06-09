@@ -17,7 +17,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
           <div className="px-2 sm:px-6 text-xs sm:text-sm">Name</div>
         </TableHead>
         <TableHead className="w-8 sm:w-16 text-center border-r text-white font-semibold text-xs sm:text-sm">#</TableHead>
-        <TableHead className="w-20 sm:w-32 text-center border-r text-white font-semibold text-xs sm:text-sm">Cap</TableHead>
+        <TableHead className="w-20 sm:w-32 text-center border-r text-white font-semibold text-xs sm:text-sm">Capacity</TableHead>
         <TableHead className="w-8 sm:w-12 text-center border-r text-white font-semibold text-xs">AL</TableHead>
         <TableHead className="w-8 sm:w-12 text-center border-r text-white font-semibold text-xs">HO</TableHead>
         <TableHead className="w-8 sm:w-12 text-center border-r text-white font-semibold text-xs">OL</TableHead>
