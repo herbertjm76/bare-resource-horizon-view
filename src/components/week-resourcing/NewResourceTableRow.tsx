@@ -7,8 +7,9 @@ import {
   ReadOnlyLeaveCell,
   EditableLeaveCell,
   OfficeCell, 
-  ProjectAllocationCell 
-} from './NewResourceTableCells';
+  ProjectAllocationCell,
+  CellStyles
+} from './cells';
 
 interface NewResourceTableRowProps {
   member: any;
@@ -48,50 +49,53 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   const projectColumnsCount = Math.max(15, projects.length);
   
   return (
-    <TableRow 
-      key={member.id}
-      className={`h-9 ${isEvenRow ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50`}
-    >
-      <NameCell member={member} />
-      <ProjectCountCell projectCount={projectCount} />
-      <CapacityCell availableHours={availableHours} totalCapacity={weeklyCapacity} />
-      
-      {/* Annual Leave Cell - READ-ONLY display from database with gray styling */}
-      <ReadOnlyLeaveCell value={annualLeave} />
-      
-      {/* Holiday Cell - READ-ONLY display from database with gray styling */}
-      <ReadOnlyLeaveCell value={holidayHours} />
-      
-      {/* Other Leave Cell - EDITABLE manual input with purple styling */}
-      <EditableLeaveCell />
-      
-      <OfficeCell location={member.location} />
-      
-      {/* Project allocation cells - show all projects or fill to minimum */}
-      {Array.from({ length: projectColumnsCount }).map((_, idx) => {
-        const project = projects[idx];
-        if (project) {
-          const key = `${member.id}:${project.id}`;
-          const hours = allocationMap.get(key) || 0;
-          
-          return (
-            <ProjectAllocationCell 
-              key={project.id}
-              hours={hours}
-              readOnly
-            />
-          );
-        } else {
-          // Empty cells for consistent column count
-          return (
-            <ProjectAllocationCell 
-              key={`empty-${idx}`}
-              hours={0}
-              disabled
-            />
-          );
-        }
-      })}
-    </TableRow>
+    <>
+      <CellStyles />
+      <TableRow 
+        key={member.id}
+        className={`h-9 ${isEvenRow ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50`}
+      >
+        <NameCell member={member} />
+        <ProjectCountCell projectCount={projectCount} />
+        <CapacityCell availableHours={availableHours} totalCapacity={weeklyCapacity} />
+        
+        {/* Annual Leave Cell - READ-ONLY display from database with gray styling */}
+        <ReadOnlyLeaveCell value={annualLeave} />
+        
+        {/* Holiday Cell - READ-ONLY display from database with gray styling */}
+        <ReadOnlyLeaveCell value={holidayHours} />
+        
+        {/* Other Leave Cell - EDITABLE manual input with purple styling */}
+        <EditableLeaveCell />
+        
+        <OfficeCell location={member.location} />
+        
+        {/* Project allocation cells - show all projects or fill to minimum */}
+        {Array.from({ length: projectColumnsCount }).map((_, idx) => {
+          const project = projects[idx];
+          if (project) {
+            const key = `${member.id}:${project.id}`;
+            const hours = allocationMap.get(key) || 0;
+            
+            return (
+              <ProjectAllocationCell 
+                key={project.id}
+                hours={hours}
+                readOnly
+              />
+            );
+          } else {
+            // Empty cells for consistent column count
+            return (
+              <ProjectAllocationCell 
+                key={`empty-${idx}`}
+                hours={0}
+                disabled
+              />
+            );
+          }
+        })}
+      </TableRow>
+    </>
   );
 };
