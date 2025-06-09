@@ -4,7 +4,7 @@ import { ResourceTableLoadingState } from '@/components/weekly-overview/componen
 import { ResourceTableErrorState } from '@/components/weekly-overview/components/ResourceTableErrorState';
 import { EmptyResourceState } from '@/components/weekly-overview/components/EmptyResourceState';
 import { NewResourceTable } from '@/components/week-resourcing/NewResourceTable';
-import { WeekResourceSummary } from '@/components/week-resourcing/WeekResourceSummary';
+import { WeekResourceOverviewCards } from '@/components/week-resourcing/WeekResourceOverviewCards';
 import { useWeekResourceData } from './hooks/useWeekResourceData';
 import './week-resourcing.css';
 
@@ -49,7 +49,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Summary Card */}
-      <WeekResourceSummary 
+      <WeekResourceOverviewCards 
         projects={projects}
         members={members}
         allocations={weekAllocations}
