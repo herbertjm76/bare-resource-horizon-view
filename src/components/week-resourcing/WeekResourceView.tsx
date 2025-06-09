@@ -6,8 +6,7 @@ import { NewResourceTable } from './NewResourceTable';
 import { WeekResourceControls } from './WeekResourceControls';
 import { WeekResourceSummaryCard } from './WeekResourceSummaryCard';
 import { useWeekResourceData } from './hooks/useWeekResourceData';
-import { useWeekResourceLeaveData } from './hooks/useWeekResourceLeaveData';
-import { format } from 'date-fns';
+import { format, startOfWeek } from 'date-fns';
 
 interface WeekResourceViewProps {
   selectedWeek: Date;
@@ -27,7 +26,18 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   filters,
   onFilterChange
 }) => {
-  const weekStartDate = format(selectedWeek, 'yyyy-MM-dd');
+  // Safely format the week start date
+  let weekStartDate: string;
+  try {
+    const monday = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+    weekStartDate = format(monday, 'yyyy-MM-dd');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    // Fallback to current week if date is invalid
+    const today = new Date();
+    const monday = startOfWeek(today, { weekStartsOn: 1 });
+    weekStartDate = format(monday, 'yyyy-MM-dd');
+  }
   
   const {
     members,
@@ -37,16 +47,12 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     allocationMap,
     getMemberTotal,
     getProjectCount,
-    getWeeklyLeave
+    getWeeklyLeave,
+    annualLeaveData,
+    holidaysData
   } = useWeekResourceData(weekStartDate, filters);
 
-  const memberIds = members.map(member => member.id);
-  const { annualLeaveData, holidaysData, isLoading: isLoadingLeave } = useWeekResourceLeaveData({
-    weekStartDate,
-    memberIds
-  });
-
-  if (isLoading || isLoadingLeave) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-12 w-full" />
@@ -69,8 +75,8 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         members={members}
         projects={projects}
         allocations={allocations}
-        annualLeaveData={annualLeaveData}
-        holidaysData={holidaysData}
+        weekStartDate={weekStartDate}
+        selectedWeek={selectedWeek}
       />
       
       <Card>

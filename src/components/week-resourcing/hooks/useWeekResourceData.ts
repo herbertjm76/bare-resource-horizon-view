@@ -6,19 +6,14 @@ import { useWeekResourceAllocations } from './useWeekResourceAllocations';
 import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
 
 interface UseWeekResourceDataProps {
-  selectedWeek: Date;
+  weekStartDate: string;
   filters: {
     office: string;
     searchTerm?: string;
   };
 }
 
-export const useWeekResourceData = ({ selectedWeek, filters }: UseWeekResourceDataProps) => {
-  // Format week start date for allocations - ensure it's Monday
-  const monday = startOfWeek(selectedWeek, { weekStartsOn: 1 });
-  const weekStartDate = format(monday, 'yyyy-MM-dd');
-  console.log('Week start date for allocations:', weekStartDate);
-
+export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResourceDataProps['filters']) => {
   // Get team members
   const {
     members,
@@ -47,6 +42,48 @@ export const useWeekResourceData = ({ selectedWeek, filters }: UseWeekResourceDa
     isLoading: isLoadingLeaveData
   } = useWeekResourceLeaveData({ weekStartDate, memberIds });
 
+  // Create allocation map for easy lookup
+  const allocationMap = new Map<string, number>();
+  if (weekAllocations) {
+    weekAllocations.forEach(allocation => {
+      const key = `${allocation.resource_id}:${allocation.project_id}`;
+      allocationMap.set(key, allocation.hours);
+    });
+  }
+
+  // Utility function to get member total hours
+  const getMemberTotal = (memberId: string): number => {
+    let total = 0;
+    if (projects) {
+      projects.forEach(project => {
+        const key = `${memberId}:${project.id}`;
+        total += allocationMap.get(key) || 0;
+      });
+    }
+    return total;
+  };
+
+  // Utility function to get project count for a member
+  const getProjectCount = (memberId: string): number => {
+    let count = 0;
+    if (projects) {
+      projects.forEach(project => {
+        const key = `${memberId}:${project.id}`;
+        if ((allocationMap.get(key) || 0) > 0) {
+          count++;
+        }
+      });
+    }
+    return count;
+  };
+
+  // Utility function to get weekly leave dates
+  const getWeeklyLeave = (memberId: string): Array<{ date: string; hours: number }> => {
+    // This would need to be implemented based on your annual leave data structure
+    // For now, return empty array as placeholder
+    return [];
+  };
+
   // Determine overall loading state
   const isLoading = isLoadingProjects || loadingMembers || isLoadingAllocations || isLoadingLeaveData;
   
@@ -56,7 +93,11 @@ export const useWeekResourceData = ({ selectedWeek, filters }: UseWeekResourceDa
   return {
     projects: projects || [],
     members,
-    weekAllocations: weekAllocations || [],
+    allocations: weekAllocations || [], // Renamed from weekAllocations to allocations
+    allocationMap,
+    getMemberTotal,
+    getProjectCount,
+    getWeeklyLeave,
     annualLeaveData,
     holidaysData,
     weekStartDate,
