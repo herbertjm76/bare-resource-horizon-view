@@ -39,22 +39,13 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
     filters: { office: filters.office, searchTerm: "" } 
   });
 
-  // Simple check: only show cards when we have all required data and not loading
-  const canShowCards = !isLoadingResourceData && 
-                      projects && 
-                      members && 
-                      weekAllocations !== undefined && 
-                      weekStartDate &&
-                      projects.length >= 0 && 
-                      members.length >= 0;
-
-  console.log('WeeklyOverviewContent - Cards render check:', {
-    canShowCards,
+  console.log('WeeklyOverviewContent - Resource data status:', {
     isLoading: isLoadingResourceData,
     hasProjects: !!projects,
     hasMembers: !!members,
     hasAllocations: weekAllocations !== undefined,
-    hasWeekStartDate: !!weekStartDate
+    hasWeekStartDate: !!weekStartDate,
+    error: !!error
   });
 
   return (
@@ -72,31 +63,13 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
           totalOffices={0}
         />
         
-        {/* Weekly Resource Summary Cards - Only show when data is ready */}
-        {canShowCards && (
-          <WeekResourceOverviewCards 
-            projects={projects}
-            members={members}
-            allocations={weekAllocations}
-            weekStartDate={weekStartDate}
-          />
-        )}
-        
-        {/* Loading state for resource summary */}
-        {isLoadingResourceData && (
-          <div className="scale-85 origin-top">
-            <div className="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
-          </div>
-        )}
-        
-        {/* Error state for resource summary */}
-        {error && (
-          <div className="scale-85 origin-top">
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              Error loading resource data: {error.message}
-            </div>
-          </div>
-        )}
+        {/* Weekly Resource Summary Cards - Always render the component, let it handle its own loading states */}
+        <WeekResourceOverviewCards 
+          projects={projects || []}
+          members={members || []}
+          allocations={weekAllocations || []}
+          weekStartDate={weekStartDate || ''}
+        />
         
         {/* Executive Summary */}
         <WeeklyExecutiveSummary
