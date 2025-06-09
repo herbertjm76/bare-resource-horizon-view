@@ -13,8 +13,8 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
   return (
     <TableHeader>
       <TableRow className="bg-brand-violet hover:bg-brand-violet/90">
-        {/* Sticky Name Column Header */}
-        <TableHead className="text-white font-semibold text-center border-r sticky left-0 z-20 bg-brand-violet w-[150px] mobile-name-cell">
+        {/* Sticky Name Column Header with proper classes */}
+        <TableHead className="text-white font-semibold text-center border-r mobile-name-cell header-cell">
           Name
         </TableHead>
         

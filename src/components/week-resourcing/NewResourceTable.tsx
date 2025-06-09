@@ -49,15 +49,26 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   return (
     <TooltipProvider>
       <div className="w-full border rounded-2xl shadow-lg mt-8 week-resource-table-wrapper mobile-optimized-table bg-gradient-to-br from-white to-gray-50">
-        {/* Mobile-first responsive container */}
+        {/* Mobile-first responsive container with proper overflow */}
         <div className="mobile-table-scroll-container">
           <div 
             className="mobile-enhanced-scroll"
             style={{
-              minWidth: `${minTableWidth}px`
+              minWidth: `${minTableWidth}px`,
+              overflowX: 'auto',
+              position: 'relative'
             }}
           >
-            <Table className="w-full mobile-resource-table" style={{ minWidth: `${minTableWidth}px`, tableLayout: 'fixed' }}>
+            <Table 
+              className="w-full mobile-resource-table" 
+              style={{ 
+                minWidth: `${minTableWidth}px`, 
+                tableLayout: 'fixed',
+                borderCollapse: 'separate',
+                borderSpacing: 0,
+                position: 'relative'
+              }}
+            >
               <NewResourceTableHeader projects={projects} />
               
               <TableBody>
