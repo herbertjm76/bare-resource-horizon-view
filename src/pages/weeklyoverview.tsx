@@ -4,7 +4,6 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
-import { WeekResourceControls } from '@/components/week-resourcing/WeekResourceControls';
 import { WeeklyOverviewHeader } from '@/components/weekly-overview/WeeklyOverviewHeader';
 import { startOfWeek, format } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
@@ -53,18 +52,16 @@ const WeeklyOverview = () => {
             <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
               <WeeklyOverviewHeader selectedWeek={selectedWeek} />
               
-              <WeekResourceControls 
-                selectedWeek={selectedWeek} 
-                setSelectedWeek={setSelectedWeek} 
-                weekLabel={weekLabel} 
-                filters={filters} 
-                onFilterChange={handleFilterChange} 
-              />
-              
               <OfficeSettingsProvider>
                 <WeekResourceView 
-                  selectedWeek={selectedWeek} 
-                  filters={filters}
+                  selectedWeek={selectedWeek}
+                  setSelectedWeek={setSelectedWeek}
+                  weekLabel={weekLabel}
+                  filters={{
+                    office: filters.office,
+                    searchTerm: filters.searchTerm
+                  }}
+                  onFilterChange={handleFilterChange}
                 />
               </OfficeSettingsProvider>
             </div>

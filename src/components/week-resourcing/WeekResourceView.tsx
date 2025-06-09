@@ -18,7 +18,7 @@ interface WeekResourceViewProps {
   weekLabel: string;
   filters: {
     office: string;
-    searchTerm?: string;
+    searchTerm: string;
   };
   onFilterChange: (key: string, value: string) => void;
 }
