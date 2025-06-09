@@ -194,51 +194,25 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
             <div key={index} className="min-w-0">
               <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
                 <CardContent className="p-1.5 sm:p-2">
-                  {badgePosition === 'title' ? (
-                    <>
-                      {/* Line 1: Icon + Title (left) and Badge (right) */}
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                          <div className={`p-0.5 sm:p-1 rounded-full ${getIconColor()} flex-shrink-0`}>
-                            <IconComponent className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                          </div>
-                          <Typography variant="body-sm" className="font-medium text-gray-700 text-xs leading-tight truncate">
-                            {metric.title}
-                          </Typography>
-                        </div>
-                        <Badge className={`text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 ${getBadgeStyle(badge.color, metric.isGood)}`}>
-                          {badge.text}
-                        </Badge>
-                      </div>
-                      
-                      {/* Line 2: Value (left) */}
-                      <div className="text-base sm:text-lg font-bold text-gray-900 leading-none mb-1">
-                        {metric.value}
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Line 1: Icon + Title (left) */}
-                      <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
-                        <div className={`p-0.5 sm:p-1 rounded-full ${getIconColor()} flex-shrink-0`}>
-                          <IconComponent className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                        </div>
-                        <Typography variant="body-sm" className="font-medium text-gray-700 text-xs leading-tight truncate">
-                          {metric.title}
-                        </Typography>
-                      </div>
-                      
-                      {/* Line 2: Value (left) and Badge (right) */}
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="text-base sm:text-lg font-bold text-gray-900 leading-none">
-                          {metric.value}
-                        </div>
-                        <Badge className={`text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 ${getBadgeStyle(badge.color, metric.isGood)}`}>
-                          {badge.text}
-                        </Badge>
-                      </div>
-                    </>
-                  )}
+                  {/* Line 1: Icon + Title */}
+                  <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
+                    <div className={`p-0.5 sm:p-1 rounded-full ${getIconColor()} flex-shrink-0`}>
+                      <IconComponent className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                    </div>
+                    <Typography variant="body-sm" className="font-medium text-gray-700 text-xs leading-tight truncate">
+                      {metric.title}
+                    </Typography>
+                  </div>
+                  
+                  {/* Line 2: Value (left) and Badge (right) */}
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="text-base sm:text-lg font-bold text-gray-900 leading-none">
+                      {metric.value}
+                    </div>
+                    <Badge className={`text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 ${getBadgeStyle(badge.color, metric.isGood)}`}>
+                      {badge.text}
+                    </Badge>
+                  </div>
                   
                   {/* Line 3: Subtitle (left) */}
                   <p className="text-xs text-gray-500 leading-tight">
