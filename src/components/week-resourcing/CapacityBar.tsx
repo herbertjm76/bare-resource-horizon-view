@@ -17,30 +17,23 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   const utilizationPercentage = Math.min(100, Math.max(0, (totalCapacity - availableHours) / totalCapacity * 100));
   const utilizationRate = Math.round(utilizationPercentage);
 
-  // Use standardized color calculation
+  // Get color based on utilization with same logic as mobile display
   const getUtilizationColor = () => {
-    const colorName = UtilizationCalculationService.getUtilizationColor(utilizationRate);
-    const colorMap = {
-      'blue': '#3b82f6',
-      'green': '#22c55e', 
-      'yellow': '#facc15',
-      'orange': '#f97316',
-      'red': '#ef4444'
-    };
-    return colorMap[colorName as keyof typeof colorMap] || '#6b7280';
+    if (utilizationRate > 100) return '#ef4444'; // red
+    if (utilizationRate >= 95) return '#22c55e'; // green
+    if (utilizationRate >= 80) return '#f97316'; // orange
+    if (utilizationRate >= 50) return '#3b82f6'; // blue
+    return '#6b7280'; // gray
   };
 
-  // Get text color for the available hours number using standardized logic
+  // Get text color for the available hours number using same logic
   const getTextColor = () => {
-    const colorName = UtilizationCalculationService.getUtilizationColor(utilizationRate);
-    const textColorMap = {
-      'blue': 'text-blue-600 font-semibold',
-      'green': 'text-green-600 font-semibold',
-      'yellow': 'text-yellow-600 font-semibold', 
-      'orange': 'text-orange-600 font-semibold',
-      'red': 'text-red-600 font-semibold'
-    };
-    return textColorMap[colorName as keyof typeof textColorMap] || 'text-gray-600 font-semibold';
+    if (utilizationRate === 0) return 'text-gray-400'; // faint for 0%
+    if (utilizationRate > 100) return 'text-red-600 font-semibold';
+    if (utilizationRate >= 95) return 'text-green-600 font-semibold';
+    if (utilizationRate >= 80) return 'text-orange-600 font-semibold';
+    if (utilizationRate >= 50) return 'text-blue-600 font-semibold';
+    return 'text-gray-600 font-semibold';
   };
 
   const utilizationColor = getUtilizationColor();
@@ -108,7 +101,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
             })}
           </div>
           
-          {/* Available hours number with standardized color coding */}
+          {/* Available hours number with color coding */}
           <span className={cn("text-xs font-medium", textColor)}>
             {availableHours}
           </span>

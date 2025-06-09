@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { 
@@ -48,6 +49,19 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   // Calculate the number of project columns to show (minimum 15)
   const projectColumnsCount = Math.max(15, projects.length);
   
+  // Get projects this member is working on for tooltip
+  const memberProjects = projects
+    .map(project => {
+      const key = `${member.id}:${project.id}`;
+      const hours = allocationMap.get(key) || 0;
+      return hours > 0 ? { 
+        name: project.name, 
+        hours, 
+        project_code: project.project_code 
+      } : null;
+    })
+    .filter(Boolean);
+  
   return (
     <>
       <CellStyles />
@@ -57,9 +71,17 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       >
         <NameCell member={member} />
         
-        <ProjectCountCell projectCount={projectCount} />
+        <ProjectCountCell projectCount={projectCount} projects={memberProjects} />
         
-        <CapacityCell availableHours={availableHours} totalCapacity={weeklyCapacity} />
+        <CapacityCell 
+          availableHours={availableHours} 
+          totalCapacity={weeklyCapacity}
+          member={member}
+          totalAllocatedHours={totalHours}
+          annualLeave={annualLeave}
+          holidayHours={holidayHours}
+          otherLeave={0}
+        />
         
         {/* Annual Leave Cell - READ-ONLY display from database with gray styling */}
         <ReadOnlyLeaveCell value={annualLeave} />
