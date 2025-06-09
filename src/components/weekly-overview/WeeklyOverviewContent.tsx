@@ -49,6 +49,21 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
     error
   });
 
+  // Only show summary when we have actual data (not just empty arrays)
+  const hasValidData = !isLoadingResourceData && 
+                      projects && 
+                      members && 
+                      weekAllocations !== undefined &&
+                      weekStartDate;
+
+  console.log('WeeklyOverviewContent - Render decision:', {
+    hasValidData,
+    isLoadingResourceData,
+    projectsLength: projects?.length,
+    membersLength: members?.length,
+    allocationsLength: weekAllocations?.length
+  });
+
   return (
     <div className="flex-1 p-4 sm:p-6 bg-background">
       {/* Print only title - hidden in normal view */}
@@ -64,12 +79,12 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
           totalOffices={0}
         />
         
-        {/* Weekly Resource Summary Cards - Always show when not loading */}
-        {!isLoadingResourceData && (
+        {/* Weekly Resource Summary Cards - Only show when we have valid data */}
+        {hasValidData && (
           <WeekResourceSummary 
-            projects={projects || []}
-            members={members || []}
-            allocations={weekAllocations || []}
+            projects={projects}
+            members={members}
+            allocations={weekAllocations}
             weekStartDate={weekStartDate}
           />
         )}
