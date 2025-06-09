@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { MemberNameCell } from './MemberNameCell';
@@ -98,7 +99,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       {/* Annual Leave Cell - READ-ONLY display from database with gray styling */}
       <AnnualLeaveCell annualLeave={annualLeave} leaveDays={leaveDays} />
       
-      {/* Holiday Cell - READ-ONLY display from database */}
+      {/* Holiday Cell - READ-ONLY display from database with gray styling */}
       <HolidayCell 
         memberId={member.id}
         memberOffice={member.location}
@@ -107,7 +108,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         onLeaveInputChange={onLeaveInputChange}
       />
       
-      {/* Combined Other Leave Cell with Notes - purple for manual input */}
+      {/* Combined Other Leave Cell with Notes - purple for manual input (EDITABLE) */}
       <OtherLeaveCell 
         leaveValue={otherLeave} 
         memberId={member.id}

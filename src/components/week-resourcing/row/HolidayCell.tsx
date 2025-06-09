@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { DisplayPillCell } from './DisplayPillCell';
+import { TableCell } from '@/components/ui/table';
 
 interface HolidayCellProps {
   memberId: string;
@@ -18,11 +18,10 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
   onLeaveInputChange
 }) => {
   return (
-    <DisplayPillCell
-      value={holidayHours}
-      label="h"
-      className="leave-column"
-      pillClassName="bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300 text-gray-700 cursor-default"
-    />
+    <TableCell className="text-center border-r p-1">
+      <div className="w-full h-8 p-1 bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-300 text-gray-700 rounded-lg font-medium text-xs flex items-center justify-center cursor-default">
+        {holidayHours || 0}h
+      </div>
+    </TableCell>
   );
 };
