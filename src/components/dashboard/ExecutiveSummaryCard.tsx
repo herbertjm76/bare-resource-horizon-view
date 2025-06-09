@@ -86,6 +86,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       title="Executive Summary"
       timeRangeText={timeRangeText}
       metrics={metrics}
+      badgePosition="title"
     />
   );
 };

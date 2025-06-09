@@ -19,6 +19,7 @@ export const WeeklyExecutiveSummary: React.FC<WeeklyExecutiveSummaryProps> = ({
       <StandardizedExecutiveSummary
         metrics={metrics}
         gradientType="purple"
+        badgePosition="title"
       />
     </div>
   );

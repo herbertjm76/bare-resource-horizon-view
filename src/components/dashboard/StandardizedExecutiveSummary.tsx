@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,12 +23,14 @@ interface StandardizedExecutiveSummaryProps {
   metrics: SummaryMetric[];
   gradientType?: GradientType;
   cardOpacity?: number;
+  badgePosition?: 'title' | 'value'; // New prop to control badge positioning
 }
 
 export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummaryProps> = ({
   metrics,
   gradientType = 'purple',
-  cardOpacity = 0.9
+  cardOpacity = 0.9,
+  badgePosition = 'title'
 }) => {
   console.log('StandardizedExecutiveSummary render (unified desktop/mobile format)');
 
@@ -47,6 +50,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
       case 'red': return 'bg-red-500 text-white border-red-400';
       case 'orange': return 'bg-orange-500 text-white border-orange-400';
       case 'blue': return 'bg-blue-500 text-white border-blue-400';
+      case 'yellow': return 'bg-yellow-500 text-white border-yellow-400';
       default: return 'bg-brand-violet text-white border-brand-violet';
     }
   };
@@ -165,9 +169,22 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     };
   };
 
+  const getGradientClasses = () => {
+    switch (gradientType) {
+      case 'blue':
+        return 'bg-gradient-to-r from-blue-50 via-cyan-50 to-blue-50';
+      case 'emerald':
+        return 'bg-gradient-to-r from-emerald-50 via-green-50 to-emerald-50';
+      case 'violet':
+        return 'bg-gradient-to-r from-violet-50 via-purple-50 to-violet-50';
+      default:
+        return 'bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50';
+    }
+  };
+
   console.log('Rendering unified desktop/mobile format');
   return (
-    <div className="w-[90%] sm:w-full mx-auto bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-2 sm:p-3 border border-purple-100/50 shadow-sm">
+    <div className={`w-[90%] sm:w-full mx-auto ${getGradientClasses()} rounded-xl p-2 sm:p-3 border border-purple-100/50 shadow-sm`}>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2">
         {metrics.map((metric, index) => {
           const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
@@ -177,25 +194,51 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
             <div key={index} className="min-w-0">
               <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
                 <CardContent className="p-1.5 sm:p-2">
-                  {/* Line 1: Icon + Title (left) and Badge (right) */}
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                      <div className={`p-0.5 sm:p-1 rounded-full ${getIconColor()} flex-shrink-0`}>
-                        <IconComponent className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                  {badgePosition === 'title' ? (
+                    <>
+                      {/* Line 1: Icon + Title (left) and Badge (right) */}
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                          <div className={`p-0.5 sm:p-1 rounded-full ${getIconColor()} flex-shrink-0`}>
+                            <IconComponent className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                          </div>
+                          <Typography variant="body-sm" className="font-medium text-gray-700 text-xs leading-tight truncate">
+                            {metric.title}
+                          </Typography>
+                        </div>
+                        <Badge className={`text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 ${getBadgeStyle(badge.color, metric.isGood)}`}>
+                          {badge.text}
+                        </Badge>
                       </div>
-                      <Typography variant="body-sm" className="font-medium text-gray-700 text-xs leading-tight truncate">
-                        {metric.title}
-                      </Typography>
-                    </div>
-                    <Badge className={`text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 ${getBadgeStyle(badge.color, metric.isGood)}`}>
-                      {badge.text}
-                    </Badge>
-                  </div>
-                  
-                  {/* Line 2: Value (left) */}
-                  <div className="text-base sm:text-lg font-bold text-gray-900 leading-none mb-1">
-                    {metric.value}
-                  </div>
+                      
+                      {/* Line 2: Value (left) */}
+                      <div className="text-base sm:text-lg font-bold text-gray-900 leading-none mb-1">
+                        {metric.value}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Line 1: Icon + Title (left) */}
+                      <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
+                        <div className={`p-0.5 sm:p-1 rounded-full ${getIconColor()} flex-shrink-0`}>
+                          <IconComponent className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                        </div>
+                        <Typography variant="body-sm" className="font-medium text-gray-700 text-xs leading-tight truncate">
+                          {metric.title}
+                        </Typography>
+                      </div>
+                      
+                      {/* Line 2: Value (left) and Badge (right) */}
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="text-base sm:text-lg font-bold text-gray-900 leading-none">
+                          {metric.value}
+                        </div>
+                        <Badge className={`text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 ${getBadgeStyle(badge.color, metric.isGood)}`}>
+                          {badge.text}
+                        </Badge>
+                      </div>
+                    </>
+                  )}
                   
                   {/* Line 3: Subtitle (left) */}
                   <p className="text-xs text-gray-500 leading-tight">
