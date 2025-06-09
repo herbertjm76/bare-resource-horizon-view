@@ -2,6 +2,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
 
 interface CapacityBarProps {
   availableHours: number;
@@ -14,31 +15,32 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
 }) => {
   // Calculate the percentage of capacity that is USED (not available)
   const utilizationPercentage = Math.min(100, Math.max(0, (totalCapacity - availableHours) / totalCapacity * 100));
+  const utilizationRate = Math.round(utilizationPercentage);
 
-  // Calculate color based on available hours - GREEN for 0 available (100% utilized)
+  // Use standardized color calculation
   const getUtilizationColor = () => {
-    if (availableHours <= 0) {
-      return '#22c55e'; // Green for 0 available hours (100% utilization - optimal)
-    } else if (availableHours <= 5) {
-      return '#facc15'; // Yellow for 1-5 available hours (good utilization)
-    } else if (availableHours <= 10) {
-      return '#f97316'; // Orange for 6-10 available hours (moderate utilization)
-    } else {
-      return '#ef4444'; // Red for 11+ available hours (low utilization)
-    }
+    const colorName = UtilizationCalculationService.getUtilizationColor(utilizationRate);
+    const colorMap = {
+      'blue': '#3b82f6',
+      'green': '#22c55e', 
+      'yellow': '#facc15',
+      'orange': '#f97316',
+      'red': '#ef4444'
+    };
+    return colorMap[colorName as keyof typeof colorMap] || '#6b7280';
   };
 
-  // Get text color for the available hours number - GREEN for 0 available
+  // Get text color for the available hours number using standardized logic
   const getTextColor = () => {
-    if (availableHours <= 0) {
-      return 'text-green-600 font-semibold';
-    } else if (availableHours <= 5) {
-      return 'text-yellow-600 font-semibold';
-    } else if (availableHours <= 10) {
-      return 'text-orange-600 font-semibold';
-    } else {
-      return 'text-red-600 font-semibold';
-    }
+    const colorName = UtilizationCalculationService.getUtilizationColor(utilizationRate);
+    const textColorMap = {
+      'blue': 'text-blue-600 font-semibold',
+      'green': 'text-green-600 font-semibold',
+      'yellow': 'text-yellow-600 font-semibold', 
+      'orange': 'text-orange-600 font-semibold',
+      'red': 'text-red-600 font-semibold'
+    };
+    return textColorMap[colorName as keyof typeof textColorMap] || 'text-gray-600 font-semibold';
   };
 
   const utilizationColor = getUtilizationColor();
@@ -94,6 +96,9 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
                     <p className="text-xs font-medium">
                       Total Utilization: {utilizationPercentage.toFixed(1)}%
                     </p>
+                    <p className="text-xs">
+                      Status: {UtilizationCalculationService.getUtilizationBadgeText(utilizationRate)}
+                    </p>
                     <p className="text-xs text-gray-500">
                       {availableHours <= 0 ? 'Optimal utilization!' : `${availableHours}h under-utilized`}
                     </p>
@@ -103,7 +108,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
             })}
           </div>
           
-          {/* Available hours number with color coding */}
+          {/* Available hours number with standardized color coding */}
           <span className={cn("text-xs font-medium", textColor)}>
             {availableHours}
           </span>

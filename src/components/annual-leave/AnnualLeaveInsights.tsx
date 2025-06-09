@@ -4,6 +4,7 @@ import { StandardizedExecutiveSummary } from '@/components/dashboard/Standardize
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
+import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
 import { format, getDaysInMonth, startOfWeek, endOfWeek, addWeeks, eachWeekOfInterval, differenceInDays, addDays, isSameDay } from 'date-fns';
 
 interface AnnualLeaveInsightsProps {
@@ -33,6 +34,13 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
   const getMemberDisplayName = (member: TeamMember): string => {
     return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
+
+  // Calculate standardized team utilization for annual leave
+  const teamUtilization = UtilizationCalculationService.calculateAnnualLeaveUtilization(
+    teamMembers,
+    selectedMonth,
+    leaveData
+  );
 
   // Calculate people on leave this month
   const calculatePeopleOnLeaveThisMonth = () => {
@@ -173,7 +181,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
     );
   };
 
-  // Calculate all metrics
+  // Calculate all metrics using standardized calculations
   const peopleOnLeaveThisMonth = calculatePeopleOnLeaveThisMonth();
   const peakLeavePeriod = calculatePeakLeavePeriod();
   const upcomingLeaveCount = calculateUpcomingLeaveAlerts();
@@ -190,11 +198,11 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
       badgeColor: peopleOnLeaveThisMonth.length > 5 ? "orange" : "blue"
     },
     {
-      title: "Peak Leave Period",
-      value: peakLeavePeriod ? `Week of ${peakLeavePeriod.weekStart}` : "No peak period",
-      subtitle: peakLeavePeriod ? `${peakLeavePeriod.count} people affected` : "Evenly distributed",
-      badgeText: peakLeavePeriod ? `${peakLeavePeriod.count} people` : "0",
-      badgeColor: peakLeavePeriod && peakLeavePeriod.count > 3 ? "red" : peakLeavePeriod && peakLeavePeriod.count > 1 ? "orange" : "green"
+      title: "Team Capacity Impact",
+      value: `${teamUtilization.teamUtilizationRate}%`,
+      subtitle: `${teamUtilization.totalAvailableHours}h available capacity`,
+      badgeText: UtilizationCalculationService.getUtilizationBadgeText(teamUtilization.teamUtilizationRate),
+      badgeColor: UtilizationCalculationService.getUtilizationColor(teamUtilization.teamUtilizationRate)
     },
     {
       title: "Upcoming Leave Alerts",

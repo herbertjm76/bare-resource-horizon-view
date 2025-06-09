@@ -3,6 +3,8 @@ import React from 'react';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
+import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
 
 interface WeekResourceSummaryProps {
   projects: any[];
@@ -17,49 +19,23 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
   allocations,
   weekStartDate
 }) => {
-  // Calculate total allocated hours
-  const totalAllocatedHours = allocations.reduce((total, allocation) => {
-    return total + (allocation.hours || 0);
-  }, 0);
-
-  // Calculate total capacity
-  const totalCapacity = members.reduce((total, member) => {
-    return total + (member.weekly_capacity || 40);
-  }, 0);
-
-  // Calculate utilization rate
-  const utilizationRate = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
-
-  // Calculate available hours
-  const availableHours = Math.max(0, totalCapacity - totalAllocatedHours);
-
-  // Count active projects (projects with allocations)
-  const activeProjectsCount = projects.filter(project => {
-    return allocations.some(allocation => allocation.project_id === project.id && allocation.hours > 0);
-  }).length;
-
-  // Find underutilized members (less than 60% capacity)
-  const underUtilizedMembers = members.filter(member => {
-    const memberAllocations = allocations.filter(a => a.resource_id === member.id);
-    const memberTotal = memberAllocations.reduce((sum, a) => sum + a.hours, 0);
-    const memberCapacity = member.weekly_capacity || 40;
-    const memberUtilization = memberCapacity > 0 ? (memberTotal / memberCapacity) * 100 : 0;
-    return memberUtilization < 60;
+  const selectedWeek = new Date(weekStartDate);
+  const { teamSummary, isLoading } = useStandardizedUtilizationData({
+    selectedWeek,
+    teamMembers: members
   });
 
-  // Helper to get user initials
+  // Helper functions for member avatars
   const getUserInitials = (member: any): string => {
     const firstName = member.first_name || '';
     const lastName = member.last_name || '';
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  // Helper to get avatar URL safely
   const getAvatarUrl = (member: any): string | undefined => {
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
-  // Helper to get member display name
   const getMemberDisplayName = (member: any): string => {
     return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
@@ -89,6 +65,25 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     );
   };
 
+  // Count active projects (projects with allocations > 0)
+  const activeProjectsCount = projects.filter(project => {
+    return allocations.some(allocation => allocation.project_id === project.id && allocation.hours > 0);
+  }).length;
+
+  if (isLoading || !teamSummary) {
+    return (
+      <div className="scale-85 origin-top">
+        <div className="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+      </div>
+    );
+  }
+
+  // Get members who need resourcing (under-utilized)
+  const needsResourcingMembers = members.filter(member => {
+    const memberUtilization = teamSummary.underUtilizedMembers.find(u => u.id === member.id);
+    return memberUtilization && memberUtilization.utilizationRate < 60;
+  });
+
   const metrics = [
     {
       title: "Active Projects",
@@ -99,28 +94,26 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     },
     {
       title: "Team Utilization",
-      value: `${utilizationRate}%`,
-      subtitle: `${totalAllocatedHours}h of ${totalCapacity}h`,
-      badgeText: utilizationRate < 70 ? 'Low' : 
-                utilizationRate > 90 ? 'High' : 'Optimal',
-      badgeColor: utilizationRate < 70 ? 'orange' : 
-                 utilizationRate > 90 ? 'red' : 'green'
+      value: `${teamSummary.teamUtilizationRate}%`,
+      subtitle: `${teamSummary.totalAllocatedHours}h of ${teamSummary.totalCapacity}h`,
+      badgeText: UtilizationCalculationService.getUtilizationBadgeText(teamSummary.teamUtilizationRate),
+      badgeColor: UtilizationCalculationService.getUtilizationColor(teamSummary.teamUtilizationRate)
     },
     {
       title: "Available Capacity",
-      value: `${availableHours}h`,
+      value: `${teamSummary.totalAvailableHours}h`,
       subtitle: "This week",
-      badgeText: availableHours === 0 ? "Fully Booked" : "Available",
-      badgeColor: availableHours === 0 ? "orange" : "blue"
+      badgeText: UtilizationCalculationService.getAvailableHoursBadgeText(teamSummary.totalAvailableHours),
+      badgeColor: UtilizationCalculationService.getAvailableHoursColor(teamSummary.totalAvailableHours)
     },
     {
       title: "Needs Resourcing",
-      value: underUtilizedMembers.length > 0 ? renderMemberAvatars(underUtilizedMembers) : (
+      value: needsResourcingMembers.length > 0 ? renderMemberAvatars(needsResourcingMembers) : (
         <span className="text-xs text-gray-600">All well utilized</span>
       ),
       subtitle: "Under 60% utilization",
-      badgeText: `${underUtilizedMembers.length}`,
-      badgeColor: underUtilizedMembers.length > 0 ? "blue" : "green"
+      badgeText: `${needsResourcingMembers.length}`,
+      badgeColor: needsResourcingMembers.length > 0 ? "blue" : "green"
     }
   ];
 

@@ -1,7 +1,9 @@
 
 import React from 'react';
 import { TrendingUp, Users, Clock, CheckCircle } from 'lucide-react';
+import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { useWeekResourceData } from '../week-resourcing/hooks/useWeekResourceData';
+import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
 import { startOfWeek } from 'date-fns';
 
 interface WeeklyOverviewMetricsProps {
@@ -15,33 +17,33 @@ export const useWeeklyOverviewMetrics = ({ selectedWeek }: WeeklyOverviewMetrics
     projects,
     members,
     weekAllocations,
-    isLoading,
+    isLoading: isLoadingResourceData,
     error
   } = useWeekResourceData({ 
     selectedWeek, 
     filters: { office: "all", searchTerm: "" } 
   });
 
-  // Calculate total allocated hours for the week
-  const totalAllocatedHours = weekAllocations?.reduce((total, allocation) => {
-    return total + (allocation.hours || 0);
-  }, 0) || 0;
+  const {
+    teamSummary,
+    isLoading: isLoadingUtilization
+  } = useStandardizedUtilizationData({
+    selectedWeek,
+    teamMembers: members || []
+  });
 
-  // Calculate total capacity for the week
-  const totalCapacity = members?.reduce((total, member) => {
-    return total + (member.weekly_capacity || 40);
-  }, 0) || 0;
-
-  // Calculate utilization rate
-  const utilizationRate = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
-
-  // Calculate available hours
-  const availableHours = Math.max(0, totalCapacity - totalAllocatedHours);
+  const isLoading = isLoadingResourceData || isLoadingUtilization;
 
   // Count active projects for the week
   const activeProjectsCount = projects?.filter(project => {
-    return weekAllocations?.some(allocation => allocation.project_id === project.id);
+    return weekAllocations?.some(allocation => allocation.project_id === project.id && allocation.hours > 0);
   }).length || 0;
+
+  // Use standardized calculations if available, otherwise fallback
+  const utilizationRate = teamSummary?.teamUtilizationRate || 0;
+  const totalAllocatedHours = teamSummary?.totalAllocatedHours || 0;
+  const availableHours = teamSummary?.totalAvailableHours || 0;
+  const totalCapacity = teamSummary?.totalCapacity || 0;
 
   const metrics = [
     {
@@ -56,8 +58,8 @@ export const useWeeklyOverviewMetrics = ({ selectedWeek }: WeeklyOverviewMetrics
       value: `${utilizationRate}%`,
       icon: Clock,
       subtitle: `${totalAllocatedHours}h allocated`,
-      badgeText: utilizationRate > 90 ? "High Load" : utilizationRate < 50 ? "Available" : "Optimal",
-      badgeColor: utilizationRate > 90 ? "red" : utilizationRate < 50 ? "blue" : "green",
+      badgeText: UtilizationCalculationService.getUtilizationBadgeText(utilizationRate),
+      badgeColor: UtilizationCalculationService.getUtilizationColor(utilizationRate),
       isGood: utilizationRate >= 70 && utilizationRate <= 85
     },
     {
@@ -72,8 +74,8 @@ export const useWeeklyOverviewMetrics = ({ selectedWeek }: WeeklyOverviewMetrics
       value: `${availableHours}h`,
       icon: CheckCircle,
       subtitle: "This week",
-      badgeText: availableHours === 0 ? "Fully Booked" : undefined,
-      badgeColor: availableHours === 0 ? "orange" : undefined,
+      badgeText: UtilizationCalculationService.getAvailableHoursBadgeText(availableHours),
+      badgeColor: UtilizationCalculationService.getAvailableHoursColor(availableHours),
       isGood: availableHours > 0
     }
   ];
