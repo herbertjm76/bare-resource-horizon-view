@@ -32,10 +32,21 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
     members,
     weekAllocations,
     weekStartDate,
-    isLoading: isLoadingResourceData
+    isLoading: isLoadingResourceData,
+    error
   } = useWeekResourceData({ 
     selectedWeek, 
     filters: { office: filters.office, searchTerm: "" } 
+  });
+
+  // Debug logging
+  console.log('WeeklyOverviewContent - Resource data:', {
+    isLoading: isLoadingResourceData,
+    projectsCount: projects?.length || 0,
+    membersCount: members?.length || 0,
+    allocationsCount: weekAllocations?.length || 0,
+    weekStartDate,
+    error
   });
 
   return (
@@ -53,14 +64,30 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
           totalOffices={0}
         />
         
-        {/* Weekly Resource Summary Cards */}
-        {!isLoadingResourceData && projects && members && weekAllocations && (
+        {/* Weekly Resource Summary Cards - Always show when not loading */}
+        {!isLoadingResourceData && (
           <WeekResourceSummary 
-            projects={projects}
-            members={members}
-            allocations={weekAllocations}
+            projects={projects || []}
+            members={members || []}
+            allocations={weekAllocations || []}
             weekStartDate={weekStartDate}
           />
+        )}
+        
+        {/* Loading state for resource summary */}
+        {isLoadingResourceData && (
+          <div className="scale-85 origin-top">
+            <div className="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+          </div>
+        )}
+        
+        {/* Error state for resource summary */}
+        {error && (
+          <div className="scale-85 origin-top">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              Error loading resource data: {error.message}
+            </div>
+          </div>
         )}
         
         {/* Executive Summary */}
