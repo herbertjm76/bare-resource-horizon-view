@@ -21,6 +21,7 @@ interface NewResourceTableRowProps {
   holidaysData: Record<string, number>;
   getMemberTotal: (memberId: string) => number;
   getProjectCount: (memberId: string) => number;
+  getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
 }
 
 export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
@@ -31,7 +32,8 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   annualLeaveData,
   holidaysData,
   getMemberTotal,
-  getProjectCount
+  getProjectCount,
+  getWeeklyLeave
 }) => {
   const weeklyCapacity = member.weekly_capacity || 40;
   const totalHours = getMemberTotal(member.id);
@@ -40,6 +42,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   // Get leave data for this member
   const annualLeave = annualLeaveData[member.id] || 0;
   const holidayHours = holidaysData[member.id] || 0;
+  const annualLeaveDates = getWeeklyLeave ? getWeeklyLeave(member.id) : [];
   
   // Calculate available hours after all allocations and leave
   const availableHours = Math.max(0, weeklyCapacity - totalHours - annualLeave - holidayHours);
@@ -81,6 +84,8 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           annualLeave={annualLeave}
           holidayHours={holidayHours}
           otherLeave={0}
+          projects={memberProjects}
+          annualLeaveDates={annualLeaveDates}
         />
         
         {/* Annual Leave Cell - READ-ONLY display from database with gray styling */}

@@ -1,16 +1,13 @@
 
 import React from 'react';
-import { ResourceTableLoadingState } from '@/components/weekly-overview/components/ResourceTableLoadingState';
-import { ResourceTableErrorState } from '@/components/weekly-overview/components/ResourceTableErrorState';
-import { EmptyResourceState } from '@/components/weekly-overview/components/EmptyResourceState';
-import { NewResourceTable } from '@/components/week-resourcing/NewResourceTable';
-import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
-import { WeekResourceControls } from '@/components/week-resourcing/WeekResourceControls';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { NewResourceTable } from './NewResourceTable';
+import { WeekResourceControls } from './WeekResourceControls';
+import { WeekResourceSummaryCard } from './WeekResourceSummaryCard';
 import { useWeekResourceData } from './hooks/useWeekResourceData';
-import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
-import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
-import { Users, Calendar, Clock, TrendingUp } from 'lucide-react';
-import './week-resourcing.css';
+import { useWeekResourceLeaveData } from './hooks/useWeekResourceLeaveData';
+import { format } from 'date-fns';
 
 interface WeekResourceViewProps {
   selectedWeek: Date;
@@ -30,105 +27,37 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   filters,
   onFilterChange
 }) => {
+  const weekStartDate = format(selectedWeek, 'yyyy-MM-dd');
+  
   const {
-    projects,
     members,
-    weekAllocations,
-    annualLeaveData,
-    holidaysData,
-    weekStartDate,
+    projects,
+    allocations,
     isLoading,
-    error
-  } = useWeekResourceData({ selectedWeek, filters });
+    allocationMap,
+    getMemberTotal,
+    getProjectCount,
+    getWeeklyLeave
+  } = useWeekResourceData(weekStartDate, filters);
 
-  // Use standardized utilization data
-  const {
-    teamSummary,
-    isLoading: isLoadingUtilization
-  } = useStandardizedUtilizationData({
-    selectedWeek,
-    teamMembers: members || []
+  const memberIds = members.map(member => member.id);
+  const { annualLeaveData, holidaysData, isLoading: isLoadingLeave } = useWeekResourceLeaveData({
+    weekStartDate,
+    memberIds
   });
-  
-  // Render loading state
-  if (isLoading || isLoadingUtilization) {
-    return <ResourceTableLoadingState />;
-  }
-  
-  // Render error state
-  if (error) {
-    return <ResourceTableErrorState error={error} />;
-  }
-  
-  // Render empty state
-  if (!projects || projects.length === 0) {
-    return <EmptyResourceState />;
-  }
 
-  // Calculate summary metrics using standardized service
-  const totalAllocatedHours = teamSummary?.totalAllocatedHours || 
-    weekAllocations.reduce((sum, allocation) => sum + (allocation.hours || 0), 0);
-  
-  const totalCapacity = teamSummary?.totalCapacity || 
-    members.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
-  
-  const utilizationRate = teamSummary?.teamUtilizationRate || 
-    (totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0);
-  
-  const availableHours = teamSummary?.totalAvailableHours || 
-    Math.max(0, totalCapacity - totalAllocatedHours);
-  
-  // Count active projects (projects with allocations)
-  const activeProjects = projects.filter(project => 
-    weekAllocations.some(allocation => allocation.project_id === project.id && allocation.hours > 0)
-  ).length;
-
-  // Create metrics for StandardizedExecutiveSummary
-  const metrics = [
-    {
-      title: "Team Utilization",
-      value: `${utilizationRate}%`,
-      subtitle: `${totalAllocatedHours}h of ${totalCapacity}h`,
-      badgeText: UtilizationCalculationService.getUtilizationBadgeText(utilizationRate),
-      badgeColor: UtilizationCalculationService.getUtilizationColor(utilizationRate),
-      icon: TrendingUp
-    },
-    {
-      title: "Active Projects",
-      value: activeProjects,
-      subtitle: `${projects.length} total projects`,
-      badgeText: "Active",
-      badgeColor: "green",
-      icon: Calendar
-    },
-    {
-      title: "Team Members",
-      value: members.length,
-      subtitle: `${totalCapacity}h total capacity`,
-      badgeText: "Stable",
-      badgeColor: "green",
-      icon: Users
-    },
-    {
-      title: "Available Hours",
-      value: `${availableHours}h`,
-      subtitle: "Remaining capacity",
-      badgeText: UtilizationCalculationService.getAvailableHoursBadgeText(availableHours),
-      badgeColor: UtilizationCalculationService.getAvailableHoursColor(availableHours),
-      icon: Clock
-    }
-  ];
+  if (isLoading || isLoadingLeave) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Summary Card - moved to top */}
-      <StandardizedExecutiveSummary
-        metrics={metrics}
-        gradientType="blue"
-      />
-      
-      {/* Controls/Filters */}
-      <WeekResourceControls
+      <WeekResourceControls 
         selectedWeek={selectedWeek}
         setSelectedWeek={setSelectedWeek}
         weekLabel={weekLabel}
@@ -136,15 +65,33 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         onFilterChange={onFilterChange}
       />
       
-      {/* Resource Table */}
-      <NewResourceTable 
-        projects={projects}
+      <WeekResourceSummaryCard 
         members={members}
-        allocations={weekAllocations}
+        projects={projects}
+        allocations={allocations}
         annualLeaveData={annualLeaveData}
         holidaysData={holidaysData}
-        weekStartDate={weekStartDate}
       />
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">
+            Resource Allocation - {weekLabel}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <NewResourceTable 
+            members={members}
+            projects={projects}
+            allocationMap={allocationMap}
+            annualLeaveData={annualLeaveData}
+            holidaysData={holidaysData}
+            getMemberTotal={getMemberTotal}
+            getProjectCount={getProjectCount}
+            getWeeklyLeave={getWeeklyLeave}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 };
