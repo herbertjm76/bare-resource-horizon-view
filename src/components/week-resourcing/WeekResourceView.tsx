@@ -5,6 +5,7 @@ import { ResourceTableErrorState } from '@/components/weekly-overview/components
 import { EmptyResourceState } from '@/components/weekly-overview/components/EmptyResourceState';
 import { NewResourceTable } from '@/components/week-resourcing/NewResourceTable';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
+import { WeekResourceControls } from '@/components/week-resourcing/WeekResourceControls';
 import { useWeekResourceData } from './hooks/useWeekResourceData';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
@@ -13,15 +14,21 @@ import './week-resourcing.css';
 
 interface WeekResourceViewProps {
   selectedWeek: Date;
+  setSelectedWeek: (date: Date) => void;
+  weekLabel: string;
   filters: {
     office: string;
     searchTerm?: string;
   };
+  onFilterChange: (key: string, value: string) => void;
 }
 
 export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   selectedWeek,
-  filters
+  setSelectedWeek,
+  weekLabel,
+  filters,
+  onFilterChange
 }) => {
   const {
     projects,
@@ -114,10 +121,19 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Summary Card */}
+      {/* Summary Card - moved to top */}
       <StandardizedExecutiveSummary
         metrics={metrics}
         gradientType="blue"
+      />
+      
+      {/* Controls/Filters */}
+      <WeekResourceControls
+        selectedWeek={selectedWeek}
+        setSelectedWeek={setSelectedWeek}
+        weekLabel={weekLabel}
+        filters={filters}
+        onFilterChange={onFilterChange}
       />
       
       {/* Resource Table */}
