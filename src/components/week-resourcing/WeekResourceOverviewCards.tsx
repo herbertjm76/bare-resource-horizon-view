@@ -25,8 +25,28 @@ export const WeekResourceOverviewCards: React.FC<WeekResourceOverviewCardsProps>
     teamMembers: members
   });
 
-  // Don't render anything while loading or if no data
-  if (isLoading || !teamSummary || !projects || !members || !allocations) {
+  console.log('WeekResourceOverviewCards Debug:', {
+    weekStartDate,
+    projectsCount: projects?.length,
+    membersCount: members?.length,
+    allocationsCount: allocations?.length,
+    isLoading,
+    teamSummary
+  });
+
+  // Show loading state while data is being fetched
+  if (isLoading) {
+    console.log('WeekResourceOverviewCards: Still loading...');
+    return (
+      <div className="scale-85 origin-top">
+        <div className="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+      </div>
+    );
+  }
+
+  // If we don't have basic data, don't render
+  if (!projects || !members || !allocations) {
+    console.log('WeekResourceOverviewCards: Missing basic data');
     return null;
   }
 
@@ -75,10 +95,42 @@ export const WeekResourceOverviewCards: React.FC<WeekResourceOverviewCardsProps>
     return allocations.some(allocation => allocation.project_id === project.id && allocation.hours > 0);
   }).length;
 
+  // Calculate basic utilization if teamSummary is not available
+  const fallbackUtilization = teamSummary ? null : (() => {
+    const totalCapacity = members.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
+    const totalAllocated = allocations.reduce((sum, allocation) => sum + (allocation.hours || 0), 0);
+    const utilizationRate = totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
+    const availableHours = Math.max(0, totalCapacity - totalAllocated);
+    
+    return {
+      teamUtilizationRate: utilizationRate,
+      totalAllocatedHours: totalAllocated,
+      totalCapacity,
+      totalAvailableHours: availableHours,
+      underUtilizedMembers: members.filter(member => {
+        const memberAllocated = allocations
+          .filter(a => a.resource_id === member.id)
+          .reduce((sum, a) => sum + (a.hours || 0), 0);
+        const memberCapacity = member.weekly_capacity || 40;
+        return (memberAllocated / memberCapacity) < 0.6;
+      })
+    };
+  })();
+
+  // Use teamSummary if available, otherwise use fallback
+  const summary = teamSummary || fallbackUtilization;
+
   // Get members who need resourcing (under-utilized)
   const needsResourcingMembers = members.filter(member => {
-    const memberUtilization = teamSummary.underUtilizedMembers.find(u => u.id === member.id);
-    return memberUtilization && memberUtilization.utilizationRate < 60;
+    const memberUtilization = summary.underUtilizedMembers?.find(u => u.id === member.id);
+    if (memberUtilization) return true;
+    
+    // Fallback calculation
+    const memberAllocated = allocations
+      .filter(a => a.resource_id === member.id)
+      .reduce((sum, a) => sum + (a.hours || 0), 0);
+    const memberCapacity = member.weekly_capacity || 40;
+    return (memberAllocated / memberCapacity) < 0.6;
   });
 
   const metrics = [
@@ -91,17 +143,17 @@ export const WeekResourceOverviewCards: React.FC<WeekResourceOverviewCardsProps>
     },
     {
       title: "Team Utilization",
-      value: `${teamSummary.teamUtilizationRate}%`,
-      subtitle: `${teamSummary.totalAllocatedHours}h of ${teamSummary.totalCapacity}h`,
-      badgeText: UtilizationCalculationService.getUtilizationBadgeText(teamSummary.teamUtilizationRate),
-      badgeColor: UtilizationCalculationService.getUtilizationColor(teamSummary.teamUtilizationRate)
+      value: `${summary.teamUtilizationRate}%`,
+      subtitle: `${summary.totalAllocatedHours}h of ${summary.totalCapacity}h`,
+      badgeText: UtilizationCalculationService.getUtilizationBadgeText(summary.teamUtilizationRate),
+      badgeColor: UtilizationCalculationService.getUtilizationColor(summary.teamUtilizationRate)
     },
     {
       title: "Available Capacity",
-      value: `${teamSummary.totalAvailableHours}h`,
+      value: `${summary.totalAvailableHours}h`,
       subtitle: "This week",
-      badgeText: UtilizationCalculationService.getAvailableHoursBadgeText(teamSummary.totalAvailableHours),
-      badgeColor: UtilizationCalculationService.getAvailableHoursColor(teamSummary.totalAvailableHours)
+      badgeText: UtilizationCalculationService.getAvailableHoursBadgeText(summary.totalAvailableHours),
+      badgeColor: UtilizationCalculationService.getAvailableHoursColor(summary.totalAvailableHours)
     },
     {
       title: "Needs Resourcing",
@@ -113,6 +165,8 @@ export const WeekResourceOverviewCards: React.FC<WeekResourceOverviewCardsProps>
       badgeColor: needsResourcingMembers.length > 0 ? "blue" : "green"
     }
   ];
+
+  console.log('WeekResourceOverviewCards: Rendering with metrics:', metrics);
 
   return (
     <div className="scale-85 origin-top">
