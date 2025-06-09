@@ -19,9 +19,9 @@ export const HolidayCell: React.FC<HolidayCellProps> = ({
 }) => {
   return (
     <TableCell className="text-center border-r p-1">
-      <div className="w-full h-8 p-1 bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-300 text-gray-700 rounded-lg font-medium text-xs flex items-center justify-center cursor-default">
-        {holidayHours || 0}h
-      </div>
+      <span className="inline-flex items-center justify-center w-6 h-5 sm:w-8 sm:h-6 text-xs bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 rounded border border-gray-200 font-medium shadow-sm">
+        {holidayHours || ''}
+      </span>
     </TableCell>
   );
 };
