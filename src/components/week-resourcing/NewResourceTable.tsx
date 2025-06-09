@@ -43,7 +43,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
 
   return (
     <TooltipProvider>
-      <div className="w-full border rounded-2xl shadow-lg mt-8 bg-gradient-to-br from-white to-gray-50">
+      <div className="w-full border rounded-2xl shadow-lg mt-8 bg-gradient-to-br from-white to-gray-50 overflow-hidden">
         {/* Simple single scrolling container */}
         <div className="overflow-x-auto">
           <Table className="w-full border-collapse">

@@ -12,33 +12,33 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
 
   return (
     <TableHeader>
-      <TableRow className="bg-brand-violet hover:bg-brand-violet/90">
+      <TableRow className="bg-[#6465F0] hover:bg-[#6465F0]/90">
         {/* Sticky Name Column Header */}
-        <TableHead className="text-white font-semibold text-center border-r sticky left-0 z-10 bg-brand-violet min-w-[120px] max-w-[150px]">
+        <TableHead className="text-white font-semibold text-center border-r sticky left-0 z-10 bg-[#6465F0] min-w-[120px] max-w-[150px]">
           Name
         </TableHead>
         
-        <TableHead className="text-white font-semibold text-center border-r w-[32px]">
+        <TableHead className="text-white font-semibold text-center border-r w-[32px] bg-[#6465F0]">
           #
         </TableHead>
         
-        <TableHead className="text-white font-semibold text-center border-r w-[80px]">
+        <TableHead className="text-white font-semibold text-center border-r w-[80px] bg-[#6465F0]">
           Cap
         </TableHead>
         
-        <TableHead className="text-white font-semibold text-center border-r w-[32px]">
+        <TableHead className="text-white font-semibold text-center border-r w-[32px] bg-[#6465F0]">
           AL
         </TableHead>
         
-        <TableHead className="text-white font-semibold text-center border-r w-[32px]">
+        <TableHead className="text-white font-semibold text-center border-r w-[32px] bg-[#6465F0]">
           HO
         </TableHead>
         
-        <TableHead className="text-white font-semibold text-center border-r w-[32px]">
+        <TableHead className="text-white font-semibold text-center border-r w-[32px] bg-[#6465F0]">
           OL
         </TableHead>
         
-        <TableHead className="text-white font-semibold text-center border-r w-[32px]">
+        <TableHead className="text-white font-semibold text-center border-r w-[32px] bg-[#6465F0]">
           Off
         </TableHead>
         
@@ -49,11 +49,25 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
             return (
               <TableHead 
                 key={project.id} 
-                className="text-white font-semibold text-center border-r w-[40px] writing-mode-vertical text-orientation-mixed h-[80px] transform rotate-180"
+                className="text-white font-semibold text-center border-r w-[40px] bg-[#6465F0] relative"
+                style={{ height: '80px' }}
                 title={project.name}
               >
-                <div className="transform rotate-180 text-xs truncate max-w-[30px]">
-                  {project.project_code || project.name?.substring(0, 4) || 'N/A'}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div 
+                    className="text-xs font-bold whitespace-nowrap"
+                    style={{
+                      transform: 'rotate(-90deg)',
+                      transformOrigin: 'center',
+                      width: '60px',
+                      height: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    {project.project_code || project.name?.substring(0, 4) || 'N/A'}
+                  </div>
                 </div>
               </TableHead>
             );
@@ -61,7 +75,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
             return (
               <TableHead 
                 key={`empty-${idx}`} 
-                className="text-white font-semibold text-center border-r w-[40px]"
+                className="text-white font-semibold text-center border-r w-[40px] bg-[#6465F0]"
               />
             );
           }
