@@ -4,7 +4,7 @@ import { WeeklyOverviewHeader } from './WeeklyOverviewHeader';
 import { WeeklyExecutiveSummary } from './WeeklyExecutiveSummary';
 import { WeeklyResourceSection } from './WeeklyResourceSection';
 import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
-import { WeekResourceSummary } from '@/components/week-resourcing/WeekResourceSummary';
+import { WeekResourceOverviewCards } from '@/components/week-resourcing/WeekResourceOverviewCards';
 import { useWeekResourceData } from '@/components/week-resourcing/hooks/useWeekResourceData';
 
 interface WeeklyOverviewContentProps {
@@ -39,29 +39,22 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
     filters: { office: filters.office, searchTerm: "" } 
   });
 
-  // Debug logging
-  console.log('WeeklyOverviewContent - Resource data:', {
-    isLoading: isLoadingResourceData,
-    projectsCount: projects?.length || 0,
-    membersCount: members?.length || 0,
-    allocationsCount: weekAllocations?.length || 0,
-    weekStartDate,
-    error
-  });
-
-  // Only show summary when we have actual data (not just empty arrays)
-  const hasValidData = !isLoadingResourceData && 
+  // Simple check: only show cards when we have all required data and not loading
+  const canShowCards = !isLoadingResourceData && 
                       projects && 
                       members && 
-                      weekAllocations !== undefined &&
-                      weekStartDate;
+                      weekAllocations !== undefined && 
+                      weekStartDate &&
+                      projects.length >= 0 && 
+                      members.length >= 0;
 
-  console.log('WeeklyOverviewContent - Render decision:', {
-    hasValidData,
-    isLoadingResourceData,
-    projectsLength: projects?.length,
-    membersLength: members?.length,
-    allocationsLength: weekAllocations?.length
+  console.log('WeeklyOverviewContent - Cards render check:', {
+    canShowCards,
+    isLoading: isLoadingResourceData,
+    hasProjects: !!projects,
+    hasMembers: !!members,
+    hasAllocations: weekAllocations !== undefined,
+    hasWeekStartDate: !!weekStartDate
   });
 
   return (
@@ -79,9 +72,9 @@ export const WeeklyOverviewContent: React.FC<WeeklyOverviewContentProps> = ({
           totalOffices={0}
         />
         
-        {/* Weekly Resource Summary Cards - Only show when we have valid data */}
-        {hasValidData && (
-          <WeekResourceSummary 
+        {/* Weekly Resource Summary Cards - Only show when data is ready */}
+        {canShowCards && (
+          <WeekResourceOverviewCards 
             projects={projects}
             members={members}
             allocations={weekAllocations}

@@ -6,14 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
 
-interface WeekResourceSummaryProps {
+interface WeekResourceOverviewCardsProps {
   projects: any[];
   members: any[];
   allocations: any[];
   weekStartDate: string;
 }
 
-export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
+export const WeekResourceOverviewCards: React.FC<WeekResourceOverviewCardsProps> = ({
   projects,
   members,
   allocations,
@@ -24,6 +24,11 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
     selectedWeek,
     teamMembers: members
   });
+
+  // Don't render anything while loading or if no data
+  if (isLoading || !teamSummary || !projects || !members || !allocations) {
+    return null;
+  }
 
   // Helper functions for member avatars
   const getUserInitials = (member: any): string => {
@@ -69,14 +74,6 @@ export const WeekResourceSummary: React.FC<WeekResourceSummaryProps> = ({
   const activeProjectsCount = projects.filter(project => {
     return allocations.some(allocation => allocation.project_id === project.id && allocation.hours > 0);
   }).length;
-
-  if (isLoading || !teamSummary) {
-    return (
-      <div className="scale-85 origin-top">
-        <div className="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
-      </div>
-    );
-  }
 
   // Get members who need resourcing (under-utilized)
   const needsResourcingMembers = members.filter(member => {
