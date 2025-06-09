@@ -6,6 +6,11 @@ const mobileStyles = `
   .mobile-name-cell {
     min-width: 90px;
     max-width: 150px;
+    position: sticky;
+    left: 0;
+    z-index: 15;
+    background: white !important;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
   }
   
   .mobile-count-cell,
@@ -22,10 +27,26 @@ const mobileStyles = `
     max-width: 80px;
   }
   
+  /* Ensure sticky name cell stays on top during hover states */
+  .mobile-name-cell:hover {
+    background: #f8fafc !important;
+    z-index: 16;
+  }
+  
+  /* Make sure table row hover doesn't override name cell background */
+  tr:hover .mobile-name-cell {
+    background: #f8fafc !important;
+  }
+  
   @media (max-width: 768px) {
     .mobile-name-cell {
       min-width: 80px;
       max-width: 120px;
+      position: sticky;
+      left: 0;
+      z-index: 15;
+      background: white !important;
+      box-shadow: 1px 0 3px rgba(0, 0, 0, 0.1);
     }
     
     .mobile-count-cell,
@@ -47,6 +68,11 @@ const mobileStyles = `
     .mobile-name-cell {
       min-width: 70px;
       max-width: 100px;
+      position: sticky;
+      left: 0;
+      z-index: 15;
+      background: white !important;
+      box-shadow: 1px 0 2px rgba(0, 0, 0, 0.1);
     }
     
     .mobile-count-cell,
