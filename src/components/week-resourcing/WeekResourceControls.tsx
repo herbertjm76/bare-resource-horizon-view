@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Calendar, Filter } from 'lucide-react';
-import { addWeeks, subWeeks, format, startOfWeek, addDays } from 'date-fns';
+import { ChevronLeft, ChevronRight, Calendar, Filter, RotateCcw } from 'lucide-react';
+import { addWeeks, subWeeks, format, startOfWeek, addDays, isToday, isSameWeek } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
@@ -39,17 +39,27 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
     setSelectedWeek(addWeeks(selectedWeek, 1));
   };
 
-  // Generate a list of weeks (8 previous, current, 8 next)
-  const weekOptions = Array.from({ length: 17 }, (_, i) => {
-    const weekDate = subWeeks(selectedWeek, 8 - i);
+  const handleCurrentWeek = () => {
+    const currentWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
+    setSelectedWeek(currentWeek);
+  };
+
+  // Check if current week is selected
+  const isCurrentWeek = isSameWeek(selectedWeek, new Date(), { weekStartsOn: 1 });
+
+  // Generate a list of weeks (12 previous, current, 12 next for better range)
+  const weekOptions = Array.from({ length: 25 }, (_, i) => {
+    const weekDate = subWeeks(selectedWeek, 12 - i);
     const mondayOfWeek = startOfWeek(weekDate, { weekStartsOn: 1 });
     const sundayOfWeek = addDays(mondayOfWeek, 6);
     const label = `${format(mondayOfWeek, 'MMM d')} - ${format(sundayOfWeek, 'MMM d, yyyy')}`;
+    const isCurrentOption = isSameWeek(mondayOfWeek, new Date(), { weekStartsOn: 1 });
     
     return {
       value: mondayOfWeek.toISOString(),
       label: label,
-      isCurrent: i === 8
+      isCurrent: isCurrentOption,
+      isSelected: i === 12
     };
   });
 
@@ -67,46 +77,69 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
     { id: '3', name: 'Alex Johnson' }
   ];
 
+  // Format the selected week range for display
+  const mondayOfSelected = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const sundayOfSelected = addDays(mondayOfSelected, 6);
+  const weekRangeDisplay = `${format(mondayOfSelected, 'MMM d')} - ${format(sundayOfSelected, 'MMM d')}`;
+
   return (
     <div className="space-y-3">
-      {/* Single row layout - mobile optimized */}
+      {/* Enhanced week navigation */}
       <div className="flex items-center justify-between gap-2 sm:gap-4">
         
-        {/* Week navigation - flex-shrink-0 to prevent compression */}
-        <div className="flex items-center border rounded-lg p-1.5 sm:p-2 shadow-sm bg-white flex-shrink-0">
+        {/* Week navigation - improved design */}
+        <div className="flex items-center bg-white border rounded-lg shadow-sm overflow-hidden">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={handlePreviousWeek} 
-            className="h-7 w-7 p-0 hover:bg-gray-100"
+            className="h-9 px-3 rounded-none border-r hover:bg-gray-50 transition-colors"
           >
-            <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+            <ChevronLeft className="h-4 w-4" />
             <span className="sr-only">Previous week</span>
           </Button>
           
+          {/* Week selector dropdown */}
           <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
             <PopoverTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-1 px-2 py-1 h-7 hover:bg-gray-100 min-w-0">
-                <Calendar className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                <span className="text-xs sm:text-sm font-medium truncate max-w-[80px] sm:max-w-none">
-                  {format(selectedWeek, 'MMM d')}
-                </span>
+              <Button 
+                variant="ghost" 
+                className="flex items-center gap-2 px-3 py-2 h-9 rounded-none border-r hover:bg-gray-50 min-w-0 text-sm font-medium"
+              >
+                <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <div className="flex flex-col items-start min-w-0">
+                  <span className="text-xs text-muted-foreground hidden sm:block">
+                    {format(selectedWeek, 'yyyy')}
+                  </span>
+                  <span className="font-medium truncate max-w-[120px] sm:max-w-none">
+                    {weekRangeDisplay}
+                  </span>
+                </div>
+                {isCurrentWeek && (
+                  <Badge className="ml-1 bg-green-100 text-green-700 text-xs px-1.5 py-0.5 h-auto">
+                    Current
+                  </Badge>
+                )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
-                mode="single"
-                selected={selectedWeek}
-                onSelect={(date) => {
-                  if (date) {
-                    const mondayOfWeek = startOfWeek(date, { weekStartsOn: 1 });
-                    setSelectedWeek(mondayOfWeek);
-                    setCalendarOpen(false);
-                  }
-                }}
-                initialFocus
-              />
-              <div className="border-t p-3">
+              <div className="p-3 border-b">
+                <h4 className="font-medium text-sm mb-2">Select Week</h4>
+                <CalendarComponent
+                  mode="single"
+                  selected={selectedWeek}
+                  onSelect={(date) => {
+                    if (date) {
+                      const mondayOfWeek = startOfWeek(date, { weekStartsOn: 1 });
+                      setSelectedWeek(mondayOfWeek);
+                      setCalendarOpen(false);
+                    }
+                  }}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </div>
+              <div className="p-3">
                 <Select 
                   value={selectedWeek.toISOString()}
                   onValueChange={(value) => {
@@ -117,17 +150,21 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select week" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-60">
                     {weekOptions.map((option) => (
                       <SelectItem 
                         key={option.value} 
                         value={option.value}
-                        className={option.isCurrent ? "font-bold" : ""}
+                        className={option.isCurrent ? "font-bold bg-green-50" : ""}
                       >
-                        {option.label}
-                        {option.isCurrent && (
-                          <Badge className="ml-2 bg-brand-primary text-white">Current</Badge>
-                        )}
+                        <div className="flex items-center justify-between w-full">
+                          <span>{option.label}</span>
+                          {option.isCurrent && (
+                            <Badge className="ml-2 bg-green-500 text-white text-xs">
+                              Current
+                            </Badge>
+                          )}
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -135,31 +172,45 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
               </div>
             </PopoverContent>
           </Popover>
+
+          {/* Current week button */}
+          {!isCurrentWeek && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleCurrentWeek}
+              className="h-9 px-3 rounded-none border-r hover:bg-green-50 text-green-600 transition-colors"
+              title="Go to current week"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span className="sr-only">Current week</span>
+            </Button>
+          )}
           
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={handleNextWeek}
-            className="h-7 w-7 p-0 hover:bg-gray-100"
+            className="h-9 px-3 rounded-none hover:bg-gray-50 transition-colors"
           >
-            <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
+            <ChevronRight className="h-4 w-4" />
             <span className="sr-only">Next week</span>
           </Button>
         </div>
         
-        {/* Filter controls - compact and right-aligned */}
-        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+        {/* Filter controls - improved spacing and design */}
+        <div className="flex items-center gap-2 flex-shrink-0">
           <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
                 size="sm"
-                className="flex items-center gap-1 h-8 px-2 sm:px-2.5 bg-white border-gray-200 shadow-sm hover:bg-gray-50 text-xs"
+                className="flex items-center gap-2 h-9 px-3 bg-white border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
               >
-                <Filter className="h-3 w-3" />
+                <Filter className="h-4 w-4" />
                 <span className="hidden xs:inline">Filters</span>
                 {activeFilterCount > 0 && (
-                  <Badge variant="secondary" className="h-4 px-1 text-xs bg-brand-violet/10 text-brand-violet border-0">
+                  <Badge variant="secondary" className="h-5 px-1.5 text-xs bg-brand-violet/10 text-brand-violet border-0 ml-0.5">
                     {activeFilterCount}
                   </Badge>
                 )}
@@ -182,7 +233,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
             </PopoverContent>
           </Popover>
           
-          {/* Clear filters - only show when there are active filters */}
+          {/* Clear filters - enhanced visibility */}
           {activeFilterCount > 0 && (
             <Button 
               variant="ghost" 
@@ -191,19 +242,31 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
                 onFilterChange('office', 'all');
                 onFilterChange('searchTerm', '');
               }}
-              className="h-8 text-xs text-muted-foreground hover:text-foreground hover:bg-gray-50 px-1.5 sm:px-2"
+              className="h-9 text-sm text-muted-foreground hover:text-foreground hover:bg-gray-50 px-3"
             >
-              Clear
+              Clear ({activeFilterCount})
             </Button>
           )}
         </div>
       </div>
       
-      {/* Mobile week label - shown below controls on small screens */}
-      <div className="sm:hidden">
-        <p className="text-sm text-muted-foreground px-1">
-          {weekLabel}
-        </p>
+      {/* Mobile week label - enhanced display */}
+      <div className="sm:hidden bg-gray-50 rounded-lg p-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-900">
+              {weekLabel}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {format(selectedWeek, 'EEEE, MMMM d, yyyy')}
+            </p>
+          </div>
+          {isCurrentWeek && (
+            <Badge className="bg-green-100 text-green-700">
+              Current Week
+            </Badge>
+          )}
+        </div>
       </div>
     </div>
   );
