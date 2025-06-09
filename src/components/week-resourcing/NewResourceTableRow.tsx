@@ -4,7 +4,8 @@ import {
   NameCell, 
   ProjectCountCell, 
   CapacityCell, 
-  LeaveCell, 
+  ReadOnlyLeaveCell,
+  EditableLeaveCell,
   OfficeCell, 
   ProjectAllocationCell 
 } from './NewResourceTableCells';
@@ -55,14 +56,14 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       <ProjectCountCell projectCount={projectCount} />
       <CapacityCell availableHours={availableHours} totalCapacity={weeklyCapacity} />
       
-      {/* Annual Leave Cell - display actual data from database */}
-      <LeaveCell defaultValue={annualLeave.toString()} />
+      {/* Annual Leave Cell - READ-ONLY display from database with gray styling */}
+      <ReadOnlyLeaveCell value={annualLeave} />
       
-      {/* Holiday Cell - display actual data from database */}
-      <LeaveCell defaultValue={holidayHours.toString()} />
+      {/* Holiday Cell - READ-ONLY display from database with gray styling */}
+      <ReadOnlyLeaveCell value={holidayHours} />
       
-      {/* Other Leave Cell - manual input */}
-      <LeaveCell />
+      {/* Other Leave Cell - EDITABLE manual input with purple styling */}
+      <EditableLeaveCell />
       
       <OfficeCell location={member.location} />
       
