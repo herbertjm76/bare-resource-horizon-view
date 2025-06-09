@@ -3,46 +3,74 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, Calendar, Clock, TrendingUp } from 'lucide-react';
+import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
+import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
 
 interface WeekResourceSummaryCardProps {
   projects: any[];
   members: any[];
   allocations: any[];
   weekStartDate: string;
+  selectedWeek: Date;
 }
 
 export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = ({
   projects,
   members,
   allocations,
-  weekStartDate
+  weekStartDate,
+  selectedWeek
 }) => {
-  // Calculate total allocated hours for the week
-  const totalAllocatedHours = allocations.reduce((sum, allocation) => sum + (allocation.hours || 0), 0);
+  // Use standardized utilization data
+  const {
+    teamSummary,
+    isLoading
+  } = useStandardizedUtilizationData({
+    selectedWeek,
+    teamMembers: members || []
+  });
+
+  // Fallback to local calculations if standardized data is loading
+  const totalAllocatedHours = teamSummary?.totalAllocatedHours || 
+    allocations.reduce((sum, allocation) => sum + (allocation.hours || 0), 0);
   
-  // Calculate total team capacity
-  const totalCapacity = members.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
+  const totalCapacity = teamSummary?.totalCapacity || 
+    members.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
   
-  // Calculate utilization percentage
-  const utilization = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
+  const utilizationRate = teamSummary?.teamUtilizationRate || 
+    (totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0);
+  
+  const availableHours = teamSummary?.totalAvailableHours || 
+    Math.max(0, totalCapacity - totalAllocatedHours);
   
   // Count active projects (projects with allocations)
   const activeProjects = projects.filter(project => 
     allocations.some(allocation => allocation.project_id === project.id && allocation.hours > 0)
   ).length;
   
-  // Calculate available capacity
-  const availableHours = Math.max(0, totalCapacity - totalAllocatedHours);
-  
-  // Get utilization status
-  const getUtilizationStatus = (percentage: number) => {
-    if (percentage < 60) return { text: 'Low', color: 'bg-yellow-100 text-yellow-800' };
-    if (percentage <= 85) return { text: 'Optimal', color: 'bg-green-100 text-green-800' };
-    if (percentage <= 100) return { text: 'High', color: 'bg-orange-100 text-orange-800' };
-    return { text: 'Over-allocated', color: 'bg-red-100 text-red-800' };
+  // Get standardized colors and badge text
+  const utilizationColor = UtilizationCalculationService.getUtilizationColor(utilizationRate);
+  const utilizationBadgeText = UtilizationCalculationService.getUtilizationBadgeText(utilizationRate);
+  const availableHoursColor = UtilizationCalculationService.getAvailableHoursColor(availableHours);
+  const availableHoursBadgeText = UtilizationCalculationService.getAvailableHoursBadgeText(availableHours);
+
+  // Map colors to Tailwind classes
+  const getColorClasses = (color: string) => {
+    switch (color) {
+      case 'blue':
+        return 'bg-blue-100 text-blue-800';
+      case 'green':
+        return 'bg-green-100 text-green-800';
+      case 'yellow':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'orange':
+        return 'bg-orange-100 text-orange-800';
+      case 'red':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
-  
-  const utilizationStatus = getUtilizationStatus(utilization);
 
   return (
     <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
@@ -61,9 +89,9 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
               <span className="text-sm font-medium text-gray-700">Utilization</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">{utilization}%</span>
-              <Badge className={`text-xs ${utilizationStatus.color}`}>
-                {utilizationStatus.text}
+              <span className="text-2xl font-bold text-gray-900">{utilizationRate}%</span>
+              <Badge className={`text-xs ${getColorClasses(utilizationColor)}`}>
+                {utilizationBadgeText}
               </Badge>
             </div>
             <p className="text-xs text-gray-500">{totalAllocatedHours}h of {totalCapacity}h</p>
@@ -102,6 +130,9 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
             </div>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-gray-900">{availableHours}h</span>
+              <Badge className={`text-xs ${getColorClasses(availableHoursColor)}`}>
+                {availableHoursBadgeText}
+              </Badge>
             </div>
             <p className="text-xs text-gray-500">Remaining capacity</p>
           </div>

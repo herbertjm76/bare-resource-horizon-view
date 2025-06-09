@@ -54,6 +54,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         members={members}
         allocations={weekAllocations}
         weekStartDate={weekStartDate}
+        selectedWeek={selectedWeek}
       />
       
       {/* Resource Table */}
