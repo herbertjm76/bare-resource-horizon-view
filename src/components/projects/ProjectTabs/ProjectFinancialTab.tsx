@@ -343,7 +343,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold">
-                  {((consumedHours / derivedBudgetHours) * 100).toFixed(1) || 0}%
+                  {derivedBudgetHours > 0 ? ((consumedHours / derivedBudgetHours) * 100).toFixed(1) : '0'}%
                 </div>
                 <div className="text-xs text-muted-foreground">Hours Utilization</div>
               </div>
