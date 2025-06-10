@@ -40,15 +40,15 @@ export const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="w-full px-3 sm:px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[64px] pl-[280px] transition-all duration-300">
-      {/* Left side - Mobile-responsive Date display */}
-      <div className="flex items-center min-w-0">
+    <header className="w-full px-3 sm:px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-[64px] ml-[280px] transition-all duration-300">
+      {/* Left side - Date display */}
+      <div className="flex items-center flex-1 min-w-0">
         <DateDisplay 
           showIcon={true}
           showTimezone={false}
           allowFormatSelection={true}
           defaultFormat="long"
-          className="text-gray-600 min-w-0"
+          className="text-gray-600"
         />
       </div>
 
