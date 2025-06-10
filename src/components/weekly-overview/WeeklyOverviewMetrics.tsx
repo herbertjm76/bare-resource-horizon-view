@@ -4,7 +4,7 @@ import { TrendingUp, Users, Clock, CheckCircle } from 'lucide-react';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { useWeekResourceData } from '../week-resourcing/hooks/useWeekResourceData';
 import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
-import { startOfWeek } from 'date-fns';
+import { startOfWeek, format } from 'date-fns';
 
 interface WeeklyOverviewMetricsProps {
   selectedWeek: Date;
@@ -12,17 +12,15 @@ interface WeeklyOverviewMetricsProps {
 
 export const useWeeklyOverviewMetrics = ({ selectedWeek }: WeeklyOverviewMetricsProps) => {
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const weekStartDate = format(weekStart, 'yyyy-MM-dd');
   
   const {
     projects,
     members,
-    weekAllocations,
+    allocations,
     isLoading: isLoadingResourceData,
     error
-  } = useWeekResourceData({ 
-    selectedWeek, 
-    filters: { office: "all", searchTerm: "" } 
-  });
+  } = useWeekResourceData(weekStartDate, { office: "all", searchTerm: "" });
 
   const {
     teamSummary,
@@ -36,7 +34,7 @@ export const useWeeklyOverviewMetrics = ({ selectedWeek }: WeeklyOverviewMetrics
 
   // Count active projects for the week
   const activeProjectsCount = projects?.filter(project => {
-    return weekAllocations?.some(allocation => allocation.project_id === project.id && allocation.hours > 0);
+    return allocations?.some(allocation => allocation.project_id === project.id && allocation.hours > 0);
   }).length || 0;
 
   // Use standardized calculations if available, otherwise fallback
