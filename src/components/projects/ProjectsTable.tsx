@@ -28,12 +28,12 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   onSelectProject,
   refetch
 }) => {
-  const { office_stages = [] } = useOfficeSettings();
+  const { office_stages = [], isLoading: officeLoading } = useOfficeSettings();
   const stageColorMap = useStageColorMap(office_stages);
   const { getProjectStageFee, isLoading: stagesLoading } = useProjectStages(projects, office_stages);
 
-  // Show loading if either projects or stages are loading
-  const isTableLoading = loading || stagesLoading;
+  // Only show loading when essential data is loading
+  const isTableLoading = loading || stagesLoading || officeLoading;
 
   if (isTableLoading) {
     return <div className="text-center p-8 border rounded-md border-dashed">Loading projects...</div>;
