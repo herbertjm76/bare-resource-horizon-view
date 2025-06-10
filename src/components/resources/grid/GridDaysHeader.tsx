@@ -37,7 +37,7 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
           >
             {/* Month indicator for new months */}
             {isNewMonth && (
-              <div className="absolute -top-1 left-0 right-0 text-[10px] opacity-80 font-bold">
+              <div className="absolute -top-1 left-0 right-0 text-[12px] opacity-80 font-bold">
                 {day.monthLabel}
               </div>
             )}
