@@ -56,58 +56,45 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   // Calculate available hours
   const availableHours = Math.max(0, weeklyCapacity - totalHours - annualLeave - holidayHours - otherLeave);
 
-  // Get projects this member is working on for tooltip
-  const memberProjects = projects
-    .map(project => {
-      const key = `${member.id}:${project.id}`;
-      const hours = allocationMap.get(key) || 0;
-      return hours > 0 ? { 
-        name: project.name, 
-        hours, 
-        project_code: project.project_code 
-      } : null;
-    })
-    .filter(Boolean);
-
   return (
     <TableRow className={`h-9 ${rowBgClass} hover:bg-gray-100/50`}>
       <MemberNameCell member={member} />
       
-      <DisplayPillCell projectCount={projectCount} projects={memberProjects} />
+      <DisplayPillCell 
+        value={projectCount}
+        label=""
+        pillClassName="bg-gradient-to-r from-purple-100 to-purple-200 border-purple-300 text-purple-800"
+      />
       
       <CapacityBarCell 
         availableHours={availableHours} 
         totalCapacity={weeklyCapacity}
-        member={member}
-        totalAllocatedHours={totalHours}
-        annualLeave={annualLeave}
-        holidayHours={holidayHours}
-        otherLeave={otherLeave}
-        projects={memberProjects}
-        annualLeaveDates={leaveDays}
       />
       
       <AnnualLeaveCell 
-        memberId={member.id}
-        value={annualLeave}
+        annualLeave={annualLeave}
         leaveDays={leaveDays}
       />
       
       <HolidayCell 
         memberId={member.id}
-        value={holidayHours}
+        memberOffice={member.location}
+        weekStartDate={weekStartDate}
+        holidayHours={holidayHours}
+        onLeaveInputChange={onLeaveInputChange}
       />
       
       <ManualInputCell 
         memberId={member.id}
-        leaveType="other"
+        field="other"
         value={manualLeaveData[member.id]?.['other'] || ''}
-        onChange={onLeaveInputChange}
+        onInputChange={onLeaveInputChange}
       />
       
       <DisplayPillCell 
-        location={member.location}
-        isLocationCell
+        value={member.location || 'N/A'}
+        label=""
+        pillClassName="bg-gradient-to-r from-blue-100 to-blue-200 border-blue-300 text-blue-800"
       />
       
       {/* Project allocation cells */}
