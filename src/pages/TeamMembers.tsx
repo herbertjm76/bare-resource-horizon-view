@@ -12,6 +12,7 @@ import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
 import { useProjects } from '@/hooks/useProjects';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
+import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import AuthGuard from '@/components/AuthGuard';
 
 const TeamMembersPageContent = () => {
@@ -102,7 +103,9 @@ const TeamMembersPage = () => {
   return (
     <AuthGuard>
       <StandardLayout title="Team Members">
-        <TeamMembersPageContent />
+        <OfficeSettingsProvider>
+          <TeamMembersPageContent />
+        </OfficeSettingsProvider>
       </StandardLayout>
     </AuthGuard>
   );
