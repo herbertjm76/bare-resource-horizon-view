@@ -46,7 +46,7 @@ export const useProjectFinancialMetrics = (projectId: string) => {
         budget_hours: Number(rawData.budget_hours || 0),
         blended_rate: Number(rawData.blended_rate || 0),
         burn_rate: Number(rawData.burn_rate || 0),
-      };
+      } as FinancialMetrics;
     },
     enabled: !!projectId,
     staleTime: 5 * 60 * 1000, // 5 minutes
