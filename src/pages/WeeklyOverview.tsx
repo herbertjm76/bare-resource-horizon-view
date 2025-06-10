@@ -7,6 +7,7 @@ import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView'
 import { startOfWeek, format } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { Toaster } from 'sonner';
+import { Calendar } from 'lucide-react';
 
 const HEADER_HEIGHT = 56;
 
@@ -49,10 +50,12 @@ const WeeklyOverview = () => {
           }} className="print:hidden" />
           <div className="flex-1 p-3 sm:p-4 lg:p-6 bg-gray-50 min-w-0">
             <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
-              {/* Page Header */}
+              {/* Page Header - Simplified to match Project Resourcing style */}
               <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">Weekly Overview</h1>
-                <p className="text-gray-600">Plan and track team allocation across projects for {weekLabel}</p>
+                <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                  <Calendar className="h-8 w-8 text-brand-violet" />
+                  Weekly Overview
+                </h1>
               </div>
               
               <OfficeSettingsProvider>
