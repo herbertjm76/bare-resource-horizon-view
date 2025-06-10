@@ -6,7 +6,7 @@ import { useTeamMembersPermissions } from '@/hooks/team/useTeamMembersPermission
 import { TeamMembersContent } from '@/components/team-members/TeamMembersContent';
 import { TeamMembersLoadingState } from '@/components/team-members/TeamMembersLoadingState';
 import { TeamMembersPermissionError } from '@/components/team-members/TeamMembersPermissionError';
-import { ModernTeamMembersHeader } from '@/components/team-members/ModernTeamMembersHeader';
+import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
@@ -44,6 +44,9 @@ const TeamMembersPageContent = () => {
   const totalDepartments = departments.size;
   
   const totalLocations = locations.length;
+  
+  // Calculate active projects for dashboard header
+  const activeProjects = projects.filter(project => project.status === 'In Progress').length;
   
   // Check permissions once when component mounts or userId changes
   React.useEffect(() => {
@@ -94,11 +97,11 @@ const TeamMembersPageContent = () => {
 
   return (
     <>
-      <ModernTeamMembersHeader
-        totalMembers={totalMembers}
-        totalActiveMembers={totalActiveMembers}
-        totalDepartments={totalDepartments}
-        totalLocations={totalLocations}
+      <ModernDashboardHeader
+        totalTeamMembers={totalActiveMembers}
+        totalActiveProjects={activeProjects}
+        totalOffices={totalLocations}
+        utilizationRate={0}
       />
       <TeamMembersContent userId={userId} />
     </>
