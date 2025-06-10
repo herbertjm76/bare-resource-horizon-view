@@ -21,13 +21,7 @@ export const ModernTeamMembersHeader: React.FC<ModernTeamMembersHeaderProps> = (
       {/* Main Header Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div className="space-y-2">
-          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-            <Users className="h-8 w-8 text-brand-violet" strokeWidth={1.5} />
-            Team Members
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Manage your team members, roles, and organizational structure
-          </p>
+          {/* Empty space where title used to be */}
         </div>
         
         {/* Quick Stats Cards */}
