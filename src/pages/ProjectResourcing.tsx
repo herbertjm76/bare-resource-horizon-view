@@ -41,7 +41,6 @@ const ProjectResourcing = () => {
 
   return (
     <StandardLayout 
-      title="Project Resourcing"
       contentClassName="p-6 bg-gray-50 flex flex-col"
     >
       <div className="flex-1 flex flex-col" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto' }}>
