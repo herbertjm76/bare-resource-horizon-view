@@ -78,6 +78,15 @@ export const useWeeklyOverviewMetrics = ({ selectedWeek }: WeeklyOverviewMetrics
     }
   ];
 
+  console.log('WeeklyOverviewMetrics - Final metrics:', {
+    metricsCount: metrics.length,
+    utilizationRate,
+    totalAllocatedHours,
+    availableHours,
+    totalCapacity,
+    activeProjectsCount
+  });
+
   return {
     metrics,
     isLoading,

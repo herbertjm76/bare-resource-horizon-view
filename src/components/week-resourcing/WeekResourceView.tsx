@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NewResourceTable } from './NewResourceTable';
 import { WeekResourceControls } from './WeekResourceControls';
@@ -80,11 +80,6 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       />
       
       <Card>
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold">
-            Resource Allocation - {weekLabel}
-          </CardTitle>
-        </CardHeader>
         <CardContent className="p-0">
           <NewResourceTable 
             members={members}
