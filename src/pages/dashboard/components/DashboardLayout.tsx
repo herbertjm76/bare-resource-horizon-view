@@ -3,9 +3,8 @@ import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
-import { SummaryDashboard } from '@/components/dashboard/SummaryDashboard';
+import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Users, Calendar, Clock, Target } from 'lucide-react';
 
 const HEADER_HEIGHT = 64;
 
@@ -22,42 +21,6 @@ export const DashboardLayout: React.FC = () => {
     setSidebarCollapsed(isCollapsed);
   };
 
-  // Provide default metrics in the correct SummaryMetric[] format
-  const defaultMetrics = [
-    {
-      title: "Active Projects",
-      value: 0,
-      subtitle: "Current projects",
-      icon: <Target className="h-4 w-4" />,
-      status: 'info' as const,
-      trend: 'neutral' as const
-    },
-    {
-      title: "Active Resources",
-      value: 0,
-      subtitle: "Team members",
-      icon: <Users className="h-4 w-4" />,
-      status: 'info' as const,
-      trend: 'neutral' as const
-    },
-    {
-      title: "Utilization",
-      value: "0%",
-      subtitle: "Current week",
-      icon: <Clock className="h-4 w-4" />,
-      status: 'info' as const,
-      trend: 'neutral' as const
-    },
-    {
-      title: "Capacity",
-      value: "0h",
-      subtitle: "Available hours",
-      icon: <Calendar className="h-4 w-4" />,
-      status: 'info' as const,
-      trend: 'neutral' as const
-    }
-  ];
-
   return (
     <SidebarProvider>
       <div className="w-full min-h-screen flex bg-gray-50">
@@ -73,7 +36,7 @@ export const DashboardLayout: React.FC = () => {
           />
           <div style={{ height: HEADER_HEIGHT }} />
           <main className="flex-1 overflow-auto">
-            <SummaryDashboard metrics={defaultMetrics} />
+            <DashboardMetrics />
           </main>
         </div>
       </div>
