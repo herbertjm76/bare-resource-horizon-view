@@ -63,7 +63,7 @@ export const StaffMemberCard: React.FC<StaffMemberCardProps & { onClick?: () => 
       <div className="flex items-center gap-3">
         <Avatar className="h-8 w-8">
           <AvatarImage src={getAvatarUrl()} alt={member.name} />
-          <AvatarFallback className="bg-brand-violet text-white text-xs">
+          <AvatarFallback className="bg-[#6F4BF6] text-white text-xs">
             {getUserInitials()}
           </AvatarFallback>
         </Avatar>

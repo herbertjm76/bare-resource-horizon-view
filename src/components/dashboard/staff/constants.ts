@@ -14,8 +14,8 @@ export const COLOR_SCHEMES = {
     percentage: 'text-red-600',
     progress: 'bg-red-500',
     progressBg: 'bg-red-100',
-    avatarBg: 'bg-red-200',
-    avatarText: 'text-red-800',
+    avatarBg: 'bg-[#6F4BF6]', // Unified brand color
+    avatarText: 'text-white',
   },
   blue: {
     bg: 'bg-blue-50',
@@ -24,8 +24,8 @@ export const COLOR_SCHEMES = {
     percentage: 'text-blue-600',
     progress: 'bg-blue-500',
     progressBg: 'bg-blue-100',
-    avatarBg: 'bg-blue-200',
-    avatarText: 'text-blue-800',
+    avatarBg: 'bg-[#6F4BF6]', // Unified brand color
+    avatarText: 'text-white',
   },
   green: {
     bg: 'bg-green-50',
@@ -34,7 +34,7 @@ export const COLOR_SCHEMES = {
     percentage: 'text-green-600',
     progress: 'bg-green-500',
     progressBg: 'bg-green-100',
-    avatarBg: 'bg-green-200',
-    avatarText: 'text-green-800',
+    avatarBg: 'bg-[#6F4BF6]', // Unified brand color
+    avatarText: 'text-white',
   },
 } as const;

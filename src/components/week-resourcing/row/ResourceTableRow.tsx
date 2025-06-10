@@ -2,18 +2,12 @@
 import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { MemberNameCell } from './MemberNameCell';
-import { ProjectCountCell } from './ProjectCountCell';
-import { OfficeLocationCell } from './OfficeLocationCell';
 import { CapacityBarCell } from './CapacityBarCell';
 import { AnnualLeaveCell } from './AnnualLeaveCell';
-import { OtherLeaveCell } from './OtherLeaveCell';
 import { HolidayCell } from './HolidayCell';
-import { ProjectAllocationCells } from './ProjectAllocationCells';
-
-interface LeaveDay {
-  date: string;
-  hours: number;
-}
+import { ManualInputCell } from './ManualInputCell';
+import { DisplayPillCell } from './DisplayPillCell';
+import { ResourceAllocationCell } from '../ResourceAllocationCell';
 
 interface ResourceTableRowProps {
   member: any;
@@ -22,14 +16,14 @@ interface ResourceTableRowProps {
   weekStartDate: string;
   allocationMap: Map<string, number>;
   projectCount: number;
-  manualLeaveData: Record<string, Record<string, string | number>>;
+  manualLeaveData: Record<string, Record<string, number | string>>;
   remarksData: Record<string, string>;
-  leaveDays: LeaveDay[];
+  leaveDays: Array<{ date: string; hours: number }>;
   weeklyCapacity: number;
   totalHours: number;
   annualLeave: number;
   holidayHours: number;
-  onLeaveInputChange: (memberId: string, leaveType: string, value: string) => void;
+  onLeaveInputChange: (memberId: string, leaveType: string, value: string | number) => void;
   onRemarksUpdate: (memberId: string, remarks: string) => void;
 }
 
@@ -41,6 +35,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   allocationMap,
   projectCount,
   manualLeaveData,
+  remarksData,
   leaveDays,
   weeklyCapacity,
   totalHours,
@@ -49,84 +44,89 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
   onLeaveInputChange,
   onRemarksUpdate
 }) => {
-  // Combine sick and other leave into a single "other" leave
-  // Make sure to safely convert to number for calculations
-  const otherLeaveValue = manualLeaveData[member.id]?.['sick'] || 0;
-  const otherLeaveNum = typeof otherLeaveValue === 'string' 
+  const isEvenRow = idx % 2 === 0;
+  const rowBgClass = isEvenRow ? 'bg-white' : 'bg-gray-50/50';
+
+  // Get other leave value
+  const otherLeaveValue = manualLeaveData[member.id]?.['other'] || 0;
+  const otherLeave = typeof otherLeaveValue === 'string' 
     ? parseFloat(otherLeaveValue) || 0 
     : otherLeaveValue;
-  
-  const secondLeaveValue = manualLeaveData[member.id]?.['other'] || 0;
-  const secondLeaveNum = typeof secondLeaveValue === 'string'
-    ? parseFloat(secondLeaveValue) || 0
-    : secondLeaveValue;
 
-  const otherLeave = otherLeaveNum + secondLeaveNum;
-  
-  // Get notes for this member
-  const memberNotes = manualLeaveData[member.id]?.['notes'] || '';
-  
-  // Alternating row background
-  const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-muted/10';
+  // Calculate available hours
+  const availableHours = Math.max(0, weeklyCapacity - totalHours - annualLeave - holidayHours - otherLeave);
 
-  // Handler for notes - use the onLeaveInputChange function to store notes
-  const handleNotesChange = (memberId: string, notes: string) => {
-    onLeaveInputChange(memberId, 'notes', notes);
-  };
-
-  // Ensure we always show at least 15 project columns
-  const minProjectsToShow = 15;
-  const projectsToRender = [...projects];
-  
-  // Add empty placeholders if we have less than 15 projects
-  if (projects.length < minProjectsToShow) {
-    const emptyProjectsNeeded = minProjectsToShow - projects.length;
-    for (let i = 0; i < emptyProjectsNeeded; i++) {
-      projectsToRender.push({
-        id: `empty-project-${i}`,
-        isEmpty: true
-      });
-    }
-  }
+  // Get projects this member is working on for tooltip
+  const memberProjects = projects
+    .map(project => {
+      const key = `${member.id}:${project.id}`;
+      const hours = allocationMap.get(key) || 0;
+      return hours > 0 ? { 
+        name: project.name, 
+        hours, 
+        project_code: project.project_code 
+      } : null;
+    })
+    .filter(Boolean);
 
   return (
-    <TableRow key={member.id} className={`h-9 ${rowBg} hover:bg-muted/20`}>
+    <TableRow className={`h-9 ${rowBgClass} hover:bg-gray-100/50`}>
       <MemberNameCell member={member} />
-      <ProjectCountCell projectCount={projectCount} />
       
-      <CapacityBarCell availableHours={Math.max(0, weeklyCapacity - totalHours - annualLeave - otherLeave - holidayHours)} totalCapacity={weeklyCapacity} />
+      <DisplayPillCell projectCount={projectCount} projects={memberProjects} />
       
-      {/* Annual Leave Cell - READ-ONLY display from database with gray styling */}
-      <AnnualLeaveCell annualLeave={annualLeave} leaveDays={leaveDays} />
+      <CapacityBarCell 
+        availableHours={availableHours} 
+        totalCapacity={weeklyCapacity}
+        member={member}
+        totalAllocatedHours={totalHours}
+        annualLeave={annualLeave}
+        holidayHours={holidayHours}
+        otherLeave={otherLeave}
+        projects={memberProjects}
+        annualLeaveDates={leaveDays}
+      />
       
-      {/* Holiday Cell - READ-ONLY display from database with gray styling */}
+      <AnnualLeaveCell 
+        memberId={member.id}
+        value={annualLeave}
+        leaveDays={leaveDays}
+      />
+      
       <HolidayCell 
         memberId={member.id}
-        memberOffice={member.location}
-        weekStartDate={weekStartDate}
-        holidayHours={holidayHours}
-        onLeaveInputChange={onLeaveInputChange}
+        value={holidayHours}
       />
       
-      {/* Combined Other Leave Cell with Notes - purple for manual input (EDITABLE) */}
-      <OtherLeaveCell 
-        leaveValue={otherLeave} 
+      <ManualInputCell 
         memberId={member.id}
-        notes={typeof memberNotes === 'string' ? memberNotes : ''}
-        onLeaveInputChange={onLeaveInputChange}
-        onNotesChange={handleNotesChange}
+        leaveType="other"
+        value={manualLeaveData[member.id]?.['other'] || ''}
+        onChange={onLeaveInputChange}
       />
       
-      {/* Office Location Cell moved after all leave cells */}
-      <OfficeLocationCell member={member} />
+      <DisplayPillCell 
+        location={member.location}
+        isLocationCell
+      />
       
       {/* Project allocation cells */}
-      <ProjectAllocationCells 
-        projects={projectsToRender} 
-        member={member} 
-        allocationMap={allocationMap}
-        weekStartDate={weekStartDate}
-      />
+      {projects.map((project, projectIdx) => {
+        const key = `${member.id}:${project.id}`;
+        const hours = allocationMap.get(key) || 0;
+        
+        return (
+          <ResourceAllocationCell 
+            key={project.id}
+            memberId={member.id}
+            projectId={project.id}
+            weekStartDate={weekStartDate}
+            currentHours={hours}
+            isReadOnly
+            projectIdx={projectIdx}
+          />
+        );
+      })}
     </TableRow>
   );
 };

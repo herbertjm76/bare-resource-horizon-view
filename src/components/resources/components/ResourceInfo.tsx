@@ -56,7 +56,7 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
         <div className="flex items-center gap-2">
           <Avatar className="h-6 w-6">
             <AvatarImage src={getAvatarUrl()} alt={resource.name} />
-            <AvatarFallback className="bg-brand-violet text-white text-xs">
+            <AvatarFallback className="bg-[#6F4BF6] text-white text-xs">
               {getUserInitials()}
             </AvatarFallback>
           </Avatar>
