@@ -1,9 +1,12 @@
 
-import { format, startOfWeek } from 'date-fns';
+import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 import { useWeekResourceTeamMembers } from './useWeekResourceTeamMembers';
 import { useWeekResourceProjects } from './useWeekResourceProjects';
 import { useWeekResourceAllocations } from './useWeekResourceAllocations';
 import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useCompany } from '@/context/CompanyContext';
 
 interface UseWeekResourceDataProps {
   weekStartDate: string;
@@ -14,6 +17,8 @@ interface UseWeekResourceDataProps {
 }
 
 export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResourceDataProps['filters']) => {
+  const { company } = useCompany();
+  
   // Get team members
   const {
     members,
@@ -41,6 +46,48 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     holidaysData,
     isLoading: isLoadingLeaveData
   } = useWeekResourceLeaveData({ weekStartDate, memberIds });
+
+  // Fetch detailed annual leave data for the week to get individual dates
+  const { data: weeklyLeaveDetails } = useQuery({
+    queryKey: ['weekly-leave-details', weekStartDate, company?.id, memberIds],
+    queryFn: async () => {
+      if (!company?.id || memberIds.length === 0) return {};
+
+      const weekStart = new Date(weekStartDate);
+      const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+
+      console.log('Fetching detailed annual leave for week:', weekStartDate);
+
+      const { data, error } = await supabase
+        .from('annual_leaves')
+        .select('member_id, date, hours')
+        .eq('company_id', company.id)
+        .in('member_id', memberIds)
+        .gte('date', format(weekStart, 'yyyy-MM-dd'))
+        .lte('date', format(weekEnd, 'yyyy-MM-dd'));
+
+      if (error) {
+        console.error('Error fetching detailed annual leave:', error);
+        return {};
+      }
+
+      // Group by member
+      const leaveByMember: Record<string, Array<{ date: string; hours: number }>> = {};
+      data?.forEach(leave => {
+        if (!leaveByMember[leave.member_id]) {
+          leaveByMember[leave.member_id] = [];
+        }
+        leaveByMember[leave.member_id].push({
+          date: leave.date,
+          hours: Number(leave.hours) || 0
+        });
+      });
+
+      console.log('Detailed leave data processed:', leaveByMember);
+      return leaveByMember;
+    },
+    enabled: !!company?.id && memberIds.length > 0
+  });
 
   // Create allocation map for easy lookup
   const allocationMap = new Map<string, number>();
@@ -77,11 +124,16 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     return count;
   };
 
-  // Utility function to get weekly leave dates
+  // Utility function to get weekly leave dates - now properly implemented
   const getWeeklyLeave = (memberId: string): Array<{ date: string; hours: number }> => {
-    // This would need to be implemented based on your annual leave data structure
-    // For now, return empty array as placeholder
-    return [];
+    if (!weeklyLeaveDetails || !weeklyLeaveDetails[memberId]) {
+      return [];
+    }
+    
+    // Sort by date and return
+    return weeklyLeaveDetails[memberId].sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
   };
 
   // Determine overall loading state
@@ -93,7 +145,7 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
   return {
     projects: projects || [],
     members,
-    allocations: weekAllocations || [], // Renamed from weekAllocations to allocations
+    allocations: weekAllocations || [],
     allocationMap,
     getMemberTotal,
     getProjectCount,
