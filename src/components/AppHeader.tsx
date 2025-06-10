@@ -41,8 +41,8 @@ export const AppHeader: React.FC = () => {
 
   return (
     <header className="w-full px-2 sm:px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-[64px] sm:ml-[280px] transition-all duration-300">
-      {/* Left side - Date display */}
-      <div className="flex items-center flex-1 min-w-0 mr-2 sm:mr-4">
+      {/* Left side - Date display with mobile spacing for hamburger menu */}
+      <div className="flex items-center flex-1 min-w-0 mr-2 sm:mr-4 ml-12 sm:ml-0">
         <DateDisplay 
           showIcon={true}
           showTimezone={false}
