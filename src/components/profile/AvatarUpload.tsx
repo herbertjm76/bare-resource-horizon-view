@@ -30,8 +30,9 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
     if (!file) return;
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Please select a valid image file (JPEG, PNG, WebP, or GIF)');
       return;
     }
 
@@ -54,16 +55,30 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
       const timestamp = Date.now();
       const fileName = `${userId}/avatar-${timestamp}.${fileExt}`;
 
-      console.log('Uploading file:', fileName);
+      console.log('Uploading file to path:', fileName);
 
       // Delete existing avatar if it exists
       if (currentAvatarUrl) {
-        const oldPath = currentAvatarUrl.split('/').pop();
-        if (oldPath && oldPath.includes('avatar')) {
-          console.log('Removing old avatar:', oldPath);
-          await supabase.storage
-            .from('avatars')
-            .remove([`${userId}/${oldPath}`]);
+        try {
+          // Extract the file path from the current URL
+          const urlParts = currentAvatarUrl.split('/');
+          const bucketIndex = urlParts.findIndex(part => part === 'avatars');
+          if (bucketIndex !== -1 && bucketIndex < urlParts.length - 1) {
+            const filePath = urlParts.slice(bucketIndex + 1).join('/');
+            console.log('Attempting to remove old avatar:', filePath);
+            
+            const { error: deleteError } = await supabase.storage
+              .from('avatars')
+              .remove([filePath]);
+            
+            if (deleteError) {
+              console.warn('Could not delete old avatar:', deleteError);
+              // Don't throw error, just warn as this shouldn't block the upload
+            }
+          }
+        } catch (deleteError) {
+          console.warn('Error trying to delete old avatar:', deleteError);
+          // Continue with upload even if deletion fails
         }
       }
 
@@ -77,7 +92,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
-        throw uploadError;
+        throw new Error(`Upload failed: ${uploadError.message}`);
       }
 
       console.log('Upload successful:', data);
@@ -98,17 +113,18 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
       if (updateError) {
         console.error('Database update error:', updateError);
-        throw updateError;
+        throw new Error(`Failed to update profile: ${updateError.message}`);
       }
 
       console.log('Profile updated successfully');
       setPreviewUrl(newAvatarUrl);
       onAvatarUpdate(newAvatarUrl);
-      toast.success('Avatar updated successfully');
+      toast.success('Avatar updated successfully!');
 
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      toast.error('Failed to upload avatar. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Failed to upload avatar: ${errorMessage}`);
     } finally {
       setUploading(false);
       // Clear the file input
@@ -135,7 +151,11 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         <AvatarImage 
           src={previewUrl || undefined} 
           alt="Profile picture" 
-          className="rounded-lg object-cover" 
+          className="rounded-lg object-cover"
+          onError={() => {
+            console.warn('Failed to load avatar image:', previewUrl);
+            setPreviewUrl(null);
+          }}
         />
         <AvatarFallback className="text-lg bg-brand-primary text-white rounded-lg">
           {userInitials}
@@ -164,7 +184,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
       <Input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/gif"
         onChange={handleFileSelect}
         className="hidden"
         disabled={uploading}
