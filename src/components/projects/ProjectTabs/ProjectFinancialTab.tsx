@@ -24,10 +24,15 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
   // Calculate derived budget amount from stage fees
   const derivedBudgetAmount = useMemo((): number => {
     if (!form.stageFees) return 0;
-    return Object.values(form.stageFees).reduce((total: number, stage: any): number => {
-      const feeValue = stage?.fee || '0';
-      const fee = parseFloat(String(feeValue));
-      return total + (isNaN(fee) ? 0 : fee);
+    return Object.values(form.stageFees).reduce((total: number, stage: unknown): number => {
+      // Type guard to ensure stage is an object with fee property
+      if (stage && typeof stage === 'object' && stage !== null) {
+        const stageObj = stage as { fee?: string | number };
+        const feeValue = stageObj.fee || '0';
+        const fee = parseFloat(String(feeValue));
+        return total + (isNaN(fee) ? 0 : fee);
+      }
+      return total;
     }, 0);
   }, [form.stageFees]);
 
