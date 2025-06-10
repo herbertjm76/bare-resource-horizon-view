@@ -65,19 +65,19 @@ export const TeamMemberInsightsHighlight: React.FC<TeamMemberInsightsHighlightPr
 
             {/* Compact Search section */}
             <div className="space-y-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center gap-2">
                 <Search className="h-4 w-4 text-gray-400" />
                 <h4 className="text-base font-semibold text-gray-900">Find Team Member</h4>
               </div>
               
-              <div className="max-w-lg">
+              <div className="max-w-lg mx-auto">
                 <SearchInput
                   value={searchQuery}
                   onChange={onSearchChange}
                   placeholder="Search by name, department, or role..."
                   className="h-11 text-sm bg-gray-50/80 border-2 border-gray-200/80 focus-within:border-brand-violet focus-within:bg-white focus-within:shadow-md rounded-lg transition-all duration-200 px-4"
                 />
-                <p className="text-xs text-gray-500 mt-1.5 ml-1">
+                <p className="text-xs text-gray-500 mt-1.5 ml-1 text-center">
                   Start typing to discover detailed insights for any team member
                 </p>
               </div>
