@@ -1,17 +1,11 @@
-
-import React, { useEffect, useState } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { AppHeader } from '@/components/AppHeader';
+import React from 'react';
+import { StandardLayout } from '@/components/layout/StandardLayout';
 import { useUserSession } from '@/hooks/useUserSession';
 import { useTeamMembersPermissions } from '@/hooks/team/useTeamMembersPermissions';
 import { TeamMembersContent } from '@/components/team-members/TeamMembersContent';
 import { TeamMembersLoadingState } from '@/components/team-members/TeamMembersLoadingState';
 import { TeamMembersPermissionError } from '@/components/team-members/TeamMembersPermissionError';
 import AuthGuard from '@/components/AuthGuard';
-import { useIsMobile } from '@/hooks/use-mobile';
-
-const HEADER_HEIGHT = 56;
 
 const TeamMembersPageContent = () => {
   const userId = useUserSession();
@@ -26,7 +20,7 @@ const TeamMembersPageContent = () => {
   } = useTeamMembersPermissions();
   
   // Check permissions once when component mounts or userId changes
-  useEffect(() => {
+  React.useEffect(() => {
     const verifyAccess = async () => {
       if (!userId) {
         console.log('No user ID available, cannot check permissions');
@@ -76,25 +70,11 @@ const TeamMembersPageContent = () => {
 };
 
 const TeamMembersPage = () => {
-  const [collapsed, setCollapsed] = useState(true); // Start collapsed on mobile
-  const isMobile = useIsMobile();
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
-
   return (
     <AuthGuard>
-      <SidebarProvider>
-        <div className="w-full min-h-screen flex bg-gradient-to-br from-gray-50 to-white">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-          <div className="flex-1 flex flex-col min-w-0">
-            <AppHeader onMenuToggle={isMobile ? toggleSidebar : undefined} />
-            <div style={{ height: HEADER_HEIGHT }} />
-            <TeamMembersPageContent />
-          </div>
-        </div>
-      </SidebarProvider>
+      <StandardLayout title="Team Members">
+        <TeamMembersPageContent />
+      </StandardLayout>
     </AuthGuard>
   );
 };
