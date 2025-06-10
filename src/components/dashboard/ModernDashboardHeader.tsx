@@ -28,6 +28,9 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
   const title = customTitle || `${companyName} Dashboard`;
   const IconComponent = CustomIcon || LayoutDashboard;
 
+  // If custom icon is provided but no custom title, show only the icon
+  const showTitle = customTitle !== undefined ? customTitle : `${companyName} Dashboard`;
+
   return (
     <div className="space-y-6 p-4 sm:p-8">
       {/* Main Header Section */}
@@ -35,7 +38,7 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
         <div className="space-y-2">
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
             <IconComponent className="h-8 w-8 text-brand-violet" strokeWidth={1.5} />
-            {title}
+            {showTitle && showTitle}
           </h1>
         </div>
         
