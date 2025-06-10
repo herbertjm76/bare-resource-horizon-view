@@ -48,9 +48,9 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
   ).length;
   
   // Get standardized colors and badge text
-  const utilizationColor = UtilizationCalculationService.getUtilizationColor(utilizationRate);
+  const utilizationColor = UtilizationCalculationService.getUtilizationColor(utilizationRate) as 'green' | 'blue' | 'purple' | 'red' | 'orange';
   const utilizationBadgeText = UtilizationCalculationService.getUtilizationBadgeText(utilizationRate);
-  const availableHoursColor = UtilizationCalculationService.getAvailableHoursColor(availableHours);
+  const availableHoursColor = UtilizationCalculationService.getAvailableHoursColor(availableHours) as 'green' | 'blue' | 'purple' | 'red' | 'orange';
   const availableHoursBadgeText = UtilizationCalculationService.getAvailableHoursBadgeText(availableHours);
 
   const metrics = [
@@ -68,7 +68,7 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
       icon: Calendar,
       subtitle: `${projects.length} total projects`,
       badgeText: activeProjects > 0 ? 'Active' : 'None',
-      badgeColor: activeProjects > 0 ? 'green' : 'red'
+      badgeColor: (activeProjects > 0 ? 'green' : 'red') as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     },
     {
       title: "Team Members",
@@ -76,7 +76,7 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
       icon: Users,
       subtitle: `Total capacity: ${totalCapacity}h`,
       badgeText: members.length > 0 ? 'Active' : 'None',
-      badgeColor: members.length > 0 ? 'green' : 'red'
+      badgeColor: (members.length > 0 ? 'green' : 'red') as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     },
     {
       title: "Available Hours",

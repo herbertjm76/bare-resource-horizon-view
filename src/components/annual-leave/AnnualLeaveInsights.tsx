@@ -156,7 +156,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
     return Math.round(averageBlockSize * 10) / 10; // Round to 1 decimal place
   };
 
-  const renderMemberAvatars = (memberList: TeamMember[], maxShow: number = 6) => {
+  const renderMemberAvatars = (memberList: TeamMember[], maxShow: number = 6): React.ReactElement => {
     const membersToShow = memberList.slice(0, maxShow);
     const remainingCount = memberList.length - maxShow;
 
@@ -190,33 +190,31 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
   const metrics = [
     {
       title: "People on Leave",
-      value: peopleOnLeaveThisMonth.length > 0 ? renderMemberAvatars(peopleOnLeaveThisMonth) : (
-        <span className="text-sm text-white/80">No one on leave</span>
-      ),
+      value: peopleOnLeaveThisMonth.length > 0 ? renderMemberAvatars(peopleOnLeaveThisMonth) : "No one on leave",
       subtitle: `${peopleOnLeaveThisMonth.length} of ${teamMembers.length} team members`,
       badgeText: `${peopleOnLeaveThisMonth.length} of ${teamMembers.length}`,
-      badgeColor: peopleOnLeaveThisMonth.length > 5 ? "orange" : "blue"
+      badgeColor: (peopleOnLeaveThisMonth.length > 5 ? "orange" : "blue") as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     },
     {
       title: "Team Capacity Impact",
       value: `${teamUtilization.teamUtilizationRate}%`,
       subtitle: `${teamUtilization.totalAvailableHours}h available capacity`,
       badgeText: UtilizationCalculationService.getUtilizationBadgeText(teamUtilization.teamUtilizationRate),
-      badgeColor: UtilizationCalculationService.getUtilizationColor(teamUtilization.teamUtilizationRate)
+      badgeColor: UtilizationCalculationService.getUtilizationColor(teamUtilization.teamUtilizationRate) as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     },
     {
       title: "Upcoming Leave Alerts",
       value: upcomingLeaveCount > 0 ? `${upcomingLeaveCount} people` : "No upcoming leave",
       subtitle: "Next week impact",
       badgeText: upcomingLeaveCount > 3 ? "High Impact" : upcomingLeaveCount > 1 ? "Medium Impact" : "Low Impact",
-      badgeColor: upcomingLeaveCount > 3 ? "red" : upcomingLeaveCount > 1 ? "orange" : "green"
+      badgeColor: (upcomingLeaveCount > 3 ? "red" : upcomingLeaveCount > 1 ? "orange" : "green") as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     },
     {
       title: "Average Leave Block",
       value: averageBlockSize > 0 ? `${averageBlockSize} days` : "No data",
       subtitle: "Typical leave duration",
       badgeText: `${averageBlockSize} days average`,
-      badgeColor: "blue"
+      badgeColor: "blue" as const
     }
   ];
 

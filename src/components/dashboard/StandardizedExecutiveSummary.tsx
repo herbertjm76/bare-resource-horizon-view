@@ -6,7 +6,7 @@ import { LucideIcon } from 'lucide-react';
 
 interface Metric {
   title: string;
-  value: string | number;
+  value: string | number | React.ReactElement;
   subtitle?: string;
   icon?: LucideIcon;
   badgeText?: string;

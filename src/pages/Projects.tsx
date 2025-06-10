@@ -39,28 +39,28 @@ const Projects = () => {
       value: totalProjects,
       subtitle: "All projects in system",
       badgeText: totalProjects > 15 ? 'High Volume' : totalProjects > 8 ? 'Active Portfolio' : 'Growing',
-      badgeColor: totalProjects > 15 ? 'blue' : totalProjects > 8 ? 'green' : 'orange'
+      badgeColor: (totalProjects > 15 ? 'blue' : totalProjects > 8 ? 'green' : 'orange') as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     },
     {
       title: "Active Projects",
       value: activeProjects,
       subtitle: "Currently in progress",
       badgeText: activeProjects > 8 ? 'Very Busy' : activeProjects > 4 ? 'Busy' : activeProjects > 0 ? 'Normal Load' : 'Available',
-      badgeColor: activeProjects > 8 ? 'orange' : activeProjects > 4 ? 'blue' : activeProjects > 0 ? 'green' : 'gray'
+      badgeColor: (activeProjects > 8 ? 'orange' : activeProjects > 4 ? 'blue' : activeProjects > 0 ? 'green' : 'red') as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     },
     {
       title: "Completion Rate",
       value: `${completionRate}%`,
       subtitle: `${completedProjects} of ${totalProjects} completed`,
       badgeText: completionRate >= 80 ? 'Excellent' : completionRate >= 60 ? 'Good' : completionRate >= 40 ? 'Average' : 'Needs Focus',
-      badgeColor: completionRate >= 80 ? 'green' : completionRate >= 60 ? 'blue' : completionRate >= 40 ? 'orange' : 'red'
+      badgeColor: (completionRate >= 80 ? 'green' : completionRate >= 60 ? 'blue' : completionRate >= 40 ? 'orange' : 'red') as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     },
     {
       title: "Office Locations",
       value: totalOffices,
       subtitle: totalOffices === 1 ? "Single location" : "Multi-location operations",
       badgeText: totalOffices > 3 ? 'Global Reach' : totalOffices > 1 ? 'Multi-Location' : 'Single Office',
-      badgeColor: totalOffices > 3 ? 'blue' : totalOffices > 1 ? 'green' : 'gray'
+      badgeColor: (totalOffices > 3 ? 'blue' : totalOffices > 1 ? 'green' : 'orange') as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     }
   ];
 

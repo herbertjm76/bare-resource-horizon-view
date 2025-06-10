@@ -92,7 +92,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
   const needsResourcing = memberStatus.filter(m => m.utilization < 60);
   const overloaded = memberStatus.filter(m => m.utilization > 100);
 
-  const renderMemberAvatars = (memberList: typeof memberStatus, maxShow: number = 6) => {
+  const renderMemberAvatars = (memberList: typeof memberStatus, maxShow: number = 6): React.ReactElement => {
     const membersToShow = memberList.slice(0, maxShow);
     const remainingCount = memberList.length - maxShow;
 
@@ -129,33 +129,29 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
                overallUtilization > 90 ? 'At capacity' : 'Good utilization',
       badgeText: overallUtilization < 70 ? 'Low' : 
                 overallUtilization > 90 ? 'High' : 'Optimal',
-      badgeColor: overallUtilization < 70 ? 'orange' : 
-                 overallUtilization > 90 ? 'red' : 'green'
+      badgeColor: (overallUtilization < 70 ? 'orange' : 
+                 overallUtilization > 90 ? 'red' : 'green') as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     },
     {
       title: "Available Hours",
       value: `${availableCapacity}h`,
       subtitle: `Next ${periodToShow} weeks capacity`,
       badgeText: "Plan Ahead",
-      badgeColor: "blue"
+      badgeColor: "blue" as const
     },
     {
       title: "Needs Resourcing",
-      value: needsResourcing.length > 0 ? renderMemberAvatars(needsResourcing) : (
-        <span className="text-xs sm:text-sm text-gray-600">All well utilized</span>
-      ),
+      value: needsResourcing.length > 0 ? renderMemberAvatars(needsResourcing) : "All well utilized",
       subtitle: "Under 60% utilization",
       badgeText: `${needsResourcing.length}`,
-      badgeColor: needsResourcing.length > 0 ? "blue" : "green"
+      badgeColor: (needsResourcing.length > 0 ? "blue" : "green") as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     },
     {
       title: "Overloaded Staff",
-      value: overloaded.length > 0 ? renderMemberAvatars(overloaded) : (
-        <span className="text-xs sm:text-sm text-gray-600">No one overloaded</span>
-      ),
+      value: overloaded.length > 0 ? renderMemberAvatars(overloaded) : "No one overloaded",
       subtitle: "Over 100% utilization",
       badgeText: `${overloaded.length}`,
-      badgeColor: overloaded.length > 0 ? "red" : "green"
+      badgeColor: (overloaded.length > 0 ? "red" : "green") as 'green' | 'blue' | 'purple' | 'red' | 'orange'
     }
   ];
 
