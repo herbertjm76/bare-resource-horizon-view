@@ -5,6 +5,7 @@ import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
 import { SummaryDashboard } from '@/components/dashboard/SummaryDashboard';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Users, Calendar, Clock, Target } from 'lucide-react';
 
 const HEADER_HEIGHT = 64;
 
@@ -21,18 +22,41 @@ export const DashboardLayout: React.FC = () => {
     setSidebarCollapsed(isCollapsed);
   };
 
-  // Provide default metrics to prevent the map error
-  const defaultMetrics = {
-    activeProjects: 0,
-    activeResources: 0,
-    utilizationTrends: {
-      days7: 0,
-      days30: 0,
-      days90: 0
+  // Provide default metrics in the correct SummaryMetric[] format
+  const defaultMetrics = [
+    {
+      title: "Active Projects",
+      value: 0,
+      subtitle: "Current projects",
+      icon: <Target className="h-4 w-4" />,
+      status: 'info' as const,
+      trend: 'neutral' as const
     },
-    totalRevenue: 0,
-    avgProjectValue: 0
-  };
+    {
+      title: "Active Resources",
+      value: 0,
+      subtitle: "Team members",
+      icon: <Users className="h-4 w-4" />,
+      status: 'info' as const,
+      trend: 'neutral' as const
+    },
+    {
+      title: "Utilization",
+      value: "0%",
+      subtitle: "Current week",
+      icon: <Clock className="h-4 w-4" />,
+      status: 'info' as const,
+      trend: 'neutral' as const
+    },
+    {
+      title: "Capacity",
+      value: "0h",
+      subtitle: "Available hours",
+      icon: <Calendar className="h-4 w-4" />,
+      status: 'info' as const,
+      trend: 'neutral' as const
+    }
+  ];
 
   return (
     <SidebarProvider>
