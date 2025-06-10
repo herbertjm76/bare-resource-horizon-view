@@ -22,18 +22,20 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
   officeStages = []
 }) => {
   // Calculate derived budget amount from stage fees
-  const derivedBudgetAmount = useMemo(() => {
+  const derivedBudgetAmount = useMemo((): number => {
     if (!form.stageFees) return 0;
-    return Object.values(form.stageFees).reduce((total: number, stage: any) => {
-      const fee = parseFloat(String(stage?.fee || '0'));
+    return Object.values(form.stageFees).reduce((total: number, stage: any): number => {
+      const feeValue = stage?.fee || '0';
+      const fee = parseFloat(String(feeValue));
       return total + (isNaN(fee) ? 0 : fee);
     }, 0);
   }, [form.stageFees]);
 
   // Calculate budget hours from derived budget and blended rate
-  const derivedBudgetHours = useMemo(() => {
-    const rate = parseFloat(String(form.blended_rate || form.avgRate || '0'));
-    return rate > 0 ? Number(derivedBudgetAmount) / Number(rate) : 0;
+  const derivedBudgetHours = useMemo((): number => {
+    const blendedRateValue = form.blended_rate || form.avgRate || '0';
+    const rate = parseFloat(String(blendedRateValue));
+    return rate > 0 ? derivedBudgetAmount / rate : 0;
   }, [derivedBudgetAmount, form.blended_rate, form.avgRate]);
 
   const consumedHours = parseFloat(String(form.consumed_hours || '0'));
