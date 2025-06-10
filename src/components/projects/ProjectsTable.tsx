@@ -28,7 +28,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   onSelectProject,
   refetch
 }) => {
-  const { office_stages = [], isLoading: officeLoading } = useOfficeSettings();
+  const { office_stages = [], loading: officeLoading } = useOfficeSettings();
   const stageColorMap = useStageColorMap(office_stages);
   const { getProjectStageFee, isLoading: stagesLoading } = useProjectStages(projects, office_stages);
 
