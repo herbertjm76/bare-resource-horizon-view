@@ -611,16 +611,69 @@ export type Database = {
           },
         ]
       }
+      project_budgets: {
+        Row: {
+          budget_type: string
+          budgeted_amount: number
+          committed_amount: number | null
+          company_id: string
+          created_at: string | null
+          forecast_amount: number | null
+          id: string
+          project_id: string
+          spent_amount: number | null
+          stage_id: string | null
+          updated_at: string | null
+          variance_amount: number | null
+          variance_percentage: number | null
+        }
+        Insert: {
+          budget_type: string
+          budgeted_amount?: number
+          committed_amount?: number | null
+          company_id: string
+          created_at?: string | null
+          forecast_amount?: number | null
+          id?: string
+          project_id: string
+          spent_amount?: number | null
+          stage_id?: string | null
+          updated_at?: string | null
+          variance_amount?: number | null
+          variance_percentage?: number | null
+        }
+        Update: {
+          budget_type?: string
+          budgeted_amount?: number
+          committed_amount?: number | null
+          company_id?: string
+          created_at?: string | null
+          forecast_amount?: number | null
+          id?: string
+          project_id?: string
+          spent_amount?: number | null
+          stage_id?: string | null
+          updated_at?: string | null
+          variance_amount?: number | null
+          variance_percentage?: number | null
+        }
+        Relationships: []
+      }
       project_fees: {
         Row: {
           billing_month: string | null
           company_id: string
           created_at: string | null
           currency: string | null
+          due_date: string | null
           fee: number
           id: string
           invoice_date: string | null
+          invoice_number: string | null
           invoice_status: string | null
+          notes: string | null
+          payment_date: string | null
+          payment_terms: number | null
           project_id: string
           stage_id: string
           updated_at: string | null
@@ -630,10 +683,15 @@ export type Database = {
           company_id: string
           created_at?: string | null
           currency?: string | null
+          due_date?: string | null
           fee?: number
           id?: string
           invoice_date?: string | null
+          invoice_number?: string | null
           invoice_status?: string | null
+          notes?: string | null
+          payment_date?: string | null
+          payment_terms?: number | null
           project_id: string
           stage_id: string
           updated_at?: string | null
@@ -643,10 +701,15 @@ export type Database = {
           company_id?: string
           created_at?: string | null
           currency?: string | null
+          due_date?: string | null
           fee?: number
           id?: string
           invoice_date?: string | null
+          invoice_number?: string | null
           invoice_status?: string | null
+          notes?: string | null
+          payment_date?: string | null
+          payment_terms?: number | null
           project_id?: string
           stage_id?: string
           updated_at?: string | null
@@ -674,6 +737,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      project_financial_tracking: {
+        Row: {
+          budget_variance: number | null
+          company_id: string
+          cost_incurred: number | null
+          created_at: string | null
+          hours_consumed: number | null
+          id: string
+          project_id: string
+          revenue_recognized: number | null
+          stage_id: string | null
+          updated_at: string | null
+          utilization_rate: number | null
+          week_ending: string
+        }
+        Insert: {
+          budget_variance?: number | null
+          company_id: string
+          cost_incurred?: number | null
+          created_at?: string | null
+          hours_consumed?: number | null
+          id?: string
+          project_id: string
+          revenue_recognized?: number | null
+          stage_id?: string | null
+          updated_at?: string | null
+          utilization_rate?: number | null
+          week_ending: string
+        }
+        Update: {
+          budget_variance?: number | null
+          company_id?: string
+          cost_incurred?: number | null
+          created_at?: string | null
+          hours_consumed?: number | null
+          id?: string
+          project_id?: string
+          revenue_recognized?: number | null
+          stage_id?: string | null
+          updated_at?: string | null
+          utilization_rate?: number | null
+          week_ending?: string
+        }
+        Relationships: []
       }
       project_resource_allocations: {
         Row: {
@@ -781,7 +889,11 @@ export type Database = {
       project_stages: {
         Row: {
           billing_month: string | null
+          budgeted_hours: number | null
           company_id: string | null
+          completion_percentage: number | null
+          consumed_hours: number | null
+          contracted_weeks: number | null
           created_at: string | null
           currency: string | null
           fee: number
@@ -793,10 +905,15 @@ export type Database = {
           project_id: string
           stage_name: string
           updated_at: string | null
+          variance_percentage: number | null
         }
         Insert: {
           billing_month?: string | null
+          budgeted_hours?: number | null
           company_id?: string | null
+          completion_percentage?: number | null
+          consumed_hours?: number | null
+          contracted_weeks?: number | null
           created_at?: string | null
           currency?: string | null
           fee: number
@@ -808,10 +925,15 @@ export type Database = {
           project_id: string
           stage_name: string
           updated_at?: string | null
+          variance_percentage?: number | null
         }
         Update: {
           billing_month?: string | null
+          budgeted_hours?: number | null
           company_id?: string | null
+          completion_percentage?: number | null
+          consumed_hours?: number | null
+          contracted_weeks?: number | null
           created_at?: string | null
           currency?: string | null
           fee?: number
@@ -823,6 +945,7 @@ export type Database = {
           project_id?: string
           stage_name?: string
           updated_at?: string | null
+          variance_percentage?: number | null
         }
         Relationships: [
           {
@@ -889,12 +1012,18 @@ export type Database = {
       projects: {
         Row: {
           average_rate: number | null
+          blended_rate: number | null
+          budget_amount: number | null
+          budget_hours: number | null
           code: string
           company_id: string | null
+          contract_end_date: string | null
+          contract_start_date: string | null
           country: string
           created_at: string | null
           currency: string | null
           current_stage: string
+          financial_status: string | null
           id: string
           name: string
           office_id: string
@@ -907,12 +1036,18 @@ export type Database = {
         }
         Insert: {
           average_rate?: number | null
+          blended_rate?: number | null
+          budget_amount?: number | null
+          budget_hours?: number | null
           code: string
           company_id?: string | null
+          contract_end_date?: string | null
+          contract_start_date?: string | null
           country: string
           created_at?: string | null
           currency?: string | null
           current_stage: string
+          financial_status?: string | null
           id?: string
           name: string
           office_id: string
@@ -925,12 +1060,18 @@ export type Database = {
         }
         Update: {
           average_rate?: number | null
+          blended_rate?: number | null
+          budget_amount?: number | null
+          budget_hours?: number | null
           code?: string
           company_id?: string | null
+          contract_end_date?: string | null
+          contract_start_date?: string | null
           country?: string
           created_at?: string | null
           currency?: string | null
           current_stage?: string
+          financial_status?: string | null
           id?: string
           name?: string
           office_id?: string
@@ -964,6 +1105,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      staff_rates: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          currency: string | null
+          effective_from: string
+          effective_to: string | null
+          id: string
+          is_active: boolean | null
+          project_id: string | null
+          rate_type: string
+          rate_value: number
+          staff_id: string
+          stage_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          currency?: string | null
+          effective_from: string
+          effective_to?: string | null
+          id?: string
+          is_active?: boolean | null
+          project_id?: string | null
+          rate_type?: string
+          rate_value?: number
+          staff_id: string
+          stage_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          currency?: string | null
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          is_active?: boolean | null
+          project_id?: string | null
+          rate_type?: string
+          rate_value?: number
+          staff_id?: string
+          stage_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       weekly_other_leave: {
         Row: {
@@ -1006,6 +1195,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_project_financial_metrics: {
+        Args: { project_uuid: string }
+        Returns: {
+          total_budget: number
+          total_spent: number
+          total_revenue: number
+          profit_margin: number
+          budget_variance: number
+          schedule_variance: number
+        }[]
+      }
       get_user_company_id: {
         Args: { user_id: string }
         Returns: string

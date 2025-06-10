@@ -28,6 +28,7 @@ interface EditProjectContentProps {
   isDataLoaded: boolean;
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
+  projectId?: string;
 }
 
 export const EditProjectContent: React.FC<EditProjectContentProps> = ({
@@ -44,7 +45,8 @@ export const EditProjectContent: React.FC<EditProjectContentProps> = ({
   handleChange,
   isDataLoaded,
   onClose,
-  onSubmit
+  onSubmit,
+  projectId
 }) => {
   const isMobile = useIsMobile();
 
@@ -88,6 +90,7 @@ export const EditProjectContent: React.FC<EditProjectContentProps> = ({
               updateStageFee={updateStageFee}
               handleChange={handleChange}
               isDataLoaded={isDataLoaded}
+              projectId={projectId}
             />
             
             <ProjectDialogActions 

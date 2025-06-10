@@ -5,6 +5,7 @@ import { TabsContent } from "@/components/ui/tabs";
 import { ProjectInfoTabContent } from "./tabs/ProjectInfoTabContent";
 import { ProjectStageFeesTabContent } from "./tabs/ProjectStageFeesTabContent";
 import { ProjectFinancialTabContent } from "./tabs/ProjectFinancialTabContent";
+import { useProjectFinancialMetrics } from "../hooks/useProjectFinancialMetrics";
 
 interface ProjectDialogContentProps {
   form: any;
@@ -16,6 +17,7 @@ interface ProjectDialogContentProps {
   updateStageFee: (stageId: string, data: any) => void;
   handleChange: (key: string, value: any) => void;
   isDataLoaded: boolean;
+  projectId?: string;
 }
 
 export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
@@ -28,7 +30,13 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
   updateStageFee,
   handleChange,
   isDataLoaded,
+  projectId
 }) => {
+  // Fetch financial metrics for existing projects
+  const { data: financialMetrics, isLoading: isLoadingMetrics } = useProjectFinancialMetrics(
+    projectId || ''
+  );
+
   return (
     <div className="flex-1 overflow-hidden">
       <TabsContent value="info" className="mt-0">
@@ -58,7 +66,11 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
 
       <TabsContent value="financial" className="mt-0">
         <ScrollArea className="h-[400px] px-6">
-          <ProjectFinancialTabContent />
+          <ProjectFinancialTabContent 
+            form={form}
+            onChange={handleChange}
+            financialMetrics={financialMetrics}
+          />
         </ScrollArea>
       </TabsContent>
     </div>

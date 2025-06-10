@@ -1,12 +1,11 @@
 
-// This file already exists with StageFee but it's being imported from the wrong location
 export interface StageFee {
-  fee: string;
-  billingMonth: Date | string | null;
-  status: "Not Billed" | "Invoiced" | "Paid" | "";
+  fee: string | number;
+  billingMonth: string;
+  status: string;
   invoiceDate: Date | null;
-  hours: string;
-  invoiceAge: string | number;
+  hours: string | number;
+  invoiceAge: number;
   currency: string;
 }
 
@@ -15,8 +14,8 @@ export interface FormState {
   name: string;
   manager: string;
   country: string;
-  profit: string;
-  avgRate: string;
+  profit: string | number;
+  avgRate: string | number;
   currency: string;
   status: string;
   office: string;
@@ -24,5 +23,37 @@ export interface FormState {
   stages: string[];
   stageFees: Record<string, StageFee>;
   stageApplicability: Record<string, boolean>;
-  officeStages?: Array<{ id: string; name: string; color?: string }>;
+  // New financial tracking fields
+  budget_amount?: number;
+  budget_hours?: number;
+  blended_rate?: number;
+  contract_start_date?: string;
+  contract_end_date?: string;
+  financial_status?: string;
+}
+
+export interface ProjectData {
+  id: string;
+  code: string;
+  name: string;
+  company_id: string;
+  project_manager_id?: string;
+  office_id: string;
+  temp_office_location_id?: string;
+  status: string;
+  country?: string;
+  current_stage: string;
+  target_profit_percentage?: number;
+  stages?: string[];
+  currency?: string;
+  average_rate?: number;
+  // New financial fields
+  budget_amount?: number;
+  budget_hours?: number;
+  blended_rate?: number;
+  contract_start_date?: string;
+  contract_end_date?: string;
+  financial_status?: string;
+  created_at: string;
+  updated_at: string;
 }
