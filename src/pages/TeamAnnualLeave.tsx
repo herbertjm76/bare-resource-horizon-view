@@ -1,8 +1,6 @@
 
 import React, { useState } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { AppHeader } from '@/components/AppHeader';
+import { StandardLayout } from '@/components/layout/StandardLayout';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
@@ -13,17 +11,10 @@ import { Calendar } from 'lucide-react';
 import '@/styles/enhanced-tables.css';
 import '@/components/annual-leave/annual-leave.css';
 
-const HEADER_HEIGHT = 56;
-
 const TeamAnnualLeave = () => {
-  const [collapsed, setCollapsed] = useState(false);
   // State for selected month
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
 
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
-  
   // Fetch team members data
   const { teamMembers, isLoading: isLoadingTeamMembers } = useTeamMembersData(true);
   
@@ -66,49 +57,38 @@ const TeamAnnualLeave = () => {
   const isLoading = isLoadingTeamMembers || isLoadingLeave;
 
   return (
-    <SidebarProvider>
-      <div className="w-full min-h-screen flex flex-row">
-        <div className="flex-shrink-0">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-        </div>
-        <div className="flex-1 flex flex-col">
-          <AppHeader />
-          <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background">
-            {/* Modern Header Section */}
-            <div className="space-y-6 mb-6">
-              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                <div className="space-y-2">
-                  <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                    <Calendar className="h-8 w-8 text-brand-violet" />
-                    Team Annual Leave
-                  </h1>
-                </div>
-              </div>
-            </div>
-
-            <TeamAnnualLeaveContent
-              selectedMonth={selectedMonth}
-              onMonthChange={handleMonthChange}
-              isLoading={isLoading}
-              filteredMembers={filteredMembers}
-              leaveData={leaveData}
-              onLeaveChange={handleLeaveChange}
-              departments={departments}
-              locations={locations}
-              activeFilter={activeFilter}
-              filterValue={filterValue}
-              searchQuery={searchQuery}
-              setActiveFilter={setActiveFilter}
-              setFilterValue={setFilterValue}
-              setSearchQuery={setSearchQuery}
-              clearFilters={clearFilters}
-              allMembers={allMembers}
-            />
+    <StandardLayout>
+      {/* Modern Header Section */}
+      <div className="space-y-6 mb-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+              <Calendar className="h-8 w-8 text-brand-violet" />
+              Team Annual Leave
+            </h1>
           </div>
         </div>
       </div>
-    </SidebarProvider>
+
+      <TeamAnnualLeaveContent
+        selectedMonth={selectedMonth}
+        onMonthChange={handleMonthChange}
+        isLoading={isLoading}
+        filteredMembers={filteredMembers}
+        leaveData={leaveData}
+        onLeaveChange={handleLeaveChange}
+        departments={departments}
+        locations={locations}
+        activeFilter={activeFilter}
+        filterValue={filterValue}
+        searchQuery={searchQuery}
+        setActiveFilter={setActiveFilter}
+        setFilterValue={setFilterValue}
+        setSearchQuery={setSearchQuery}
+        clearFilters={clearFilters}
+        allMembers={allMembers}
+      />
+    </StandardLayout>
   );
 };
 

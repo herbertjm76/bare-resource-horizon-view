@@ -1,8 +1,6 @@
 
 import React, { useState } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { AppHeader } from '@/components/AppHeader';
+import { StandardLayout } from '@/components/layout/StandardLayout';
 import { ProjectsList } from '@/components/projects/ProjectsList';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { Button } from '@/components/ui/button';
@@ -10,15 +8,8 @@ import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
 import { FolderOpen } from 'lucide-react';
 
-const HEADER_HEIGHT = 56;
-
 const Projects = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const { projects } = useProjects();
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
 
   // Calculate statistics
   const totalProjects = projects.length;
@@ -65,41 +56,30 @@ const Projects = () => {
   ];
 
   return (
-    <SidebarProvider>
-      <div className="w-full min-h-screen flex flex-row bg-gradient-to-br from-gray-50 to-white">
-        <div className="flex-shrink-0">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-        </div>
-        <div className="flex-1 flex flex-col">
-          <AppHeader />
-          <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-6 sm:p-8 bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
-            <div className="max-w-6xl mx-auto space-y-8">
-              {/* Modern Header Section */}
-              <div className="space-y-6 mb-6">
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                  <div className="space-y-2">
-                    <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                      <FolderOpen className="h-8 w-8 text-brand-violet" />
-                      All Projects
-                    </h1>
-                  </div>
-                </div>
-              </div>
-
-              <StandardizedExecutiveSummary
-                metrics={metrics}
-                gradientType="purple"
-              />
-              
-              <OfficeSettingsProvider>
-                <ProjectsList />
-              </OfficeSettingsProvider>
+    <StandardLayout>
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Modern Header Section */}
+        <div className="space-y-6 mb-6">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div className="space-y-2">
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                <FolderOpen className="h-8 w-8 text-brand-violet" />
+                All Projects
+              </h1>
             </div>
           </div>
         </div>
+
+        <StandardizedExecutiveSummary
+          metrics={metrics}
+          gradientType="purple"
+        />
+        
+        <OfficeSettingsProvider>
+          <ProjectsList />
+        </OfficeSettingsProvider>
       </div>
-    </SidebarProvider>
+    </StandardLayout>
   );
 };
 

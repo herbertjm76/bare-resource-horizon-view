@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { AppHeader } from '@/components/AppHeader';
+import { StandardLayout } from '@/components/layout/StandardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -23,8 +21,6 @@ import {
   Target,
   HelpCircle
 } from 'lucide-react';
-
-const HEADER_HEIGHT = 56;
 
 interface FAQItem {
   id: string;
@@ -195,13 +191,8 @@ const categories = [
 ];
 
 const FAQ = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
 
   const filteredFAQs = faqData.filter(faq => {
     const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -224,178 +215,167 @@ const FAQ = () => {
   };
 
   return (
-    <SidebarProvider>
-      <div className="w-full min-h-screen flex flex-row">
-        <div className="flex-shrink-0">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-        </div>
-        <div className="flex-1 flex flex-col">
-          <AppHeader />
-          <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background">
-            <div className="max-w-6xl mx-auto space-y-8">
-              {/* Modern Header Section */}
-              <div className="space-y-6 mb-6">
-                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-                  <div className="space-y-2">
-                    <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                      <HelpCircle className="h-8 w-8 text-brand-violet" />
-                      Frequently Asked Questions
-                    </h1>
-                  </div>
-                  
-                  <Badge variant="outline" className="text-sm">
-                    {filteredFAQs.length} {filteredFAQs.length === 1 ? 'Question' : 'Questions'}
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Search */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Search className="h-5 w-5" />
-                    Search FAQs
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Input
-                    placeholder="Search questions, answers, or topics..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full"
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Categories */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Categories</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => {
-                      const Icon = category.icon;
-                      const isSelected = selectedCategory === category.name;
-                      
-                      return (
-                        <button
-                          key={category.name}
-                          onClick={() => setSelectedCategory(category.name)}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                            isSelected 
-                              ? 'bg-brand-violet text-white' 
-                              : `${category.color} hover:opacity-80`
-                          }`}
-                        >
-                          <Icon className="h-4 w-4" />
-                          {category.name}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* FAQ Accordion */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">
-                    {selectedCategory === 'All' ? 'All Questions' : selectedCategory}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {filteredFAQs.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>No questions found matching your search.</p>
-                      <p className="text-sm mt-2">Try adjusting your search terms or selecting a different category.</p>
-                    </div>
-                  ) : (
-                    <Accordion type="single" collapsible className="space-y-4">
-                      {filteredFAQs.map((faq) => {
-                        const CategoryIcon = getCategoryIcon(faq.category);
-                        
-                        return (
-                          <AccordionItem key={faq.id} value={faq.id} className="border rounded-lg">
-                            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                              <div className="flex items-start gap-3 text-left">
-                                <CategoryIcon className="h-5 w-5 mt-0.5 text-brand-violet flex-shrink-0" />
-                                <div className="flex-1">
-                                  <h3 className="font-medium text-foreground">
-                                    {faq.question}
-                                  </h3>
-                                  <div className="flex items-center gap-2 mt-2">
-                                    <Badge 
-                                      variant="outline" 
-                                      className={`text-xs ${getCategoryColor(faq.category)}`}
-                                    >
-                                      {faq.category}
-                                    </Badge>
-                                    {faq.tags.slice(0, 2).map(tag => (
-                                      <Badge key={tag} variant="secondary" className="text-xs">
-                                        {tag}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent className="px-4 pb-4">
-                              <div className="pl-8">
-                                <p className="text-muted-foreground leading-relaxed">
-                                  {faq.answer}
-                                </p>
-                                {faq.tags.length > 2 && (
-                                  <div className="flex flex-wrap gap-1 mt-3">
-                                    {faq.tags.slice(2).map(tag => (
-                                      <Badge key={tag} variant="secondary" className="text-xs">
-                                        {tag}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        );
-                      })}
-                    </Accordion>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Help Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5" />
-                    Still need help?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="rounded-md border p-4">
-                      <h3 className="font-medium mb-2">Contact Support</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Can't find what you're looking for? Reach out to our support team for personalized assistance.
-                      </p>
-                    </div>
-                    <div className="rounded-md border p-4">
-                      <h3 className="font-medium mb-2">Video Tutorials</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Check out our video guides for step-by-step walkthroughs of key features and workflows.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+    <StandardLayout>
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Modern Header Section */}
+        <div className="space-y-6 mb-6">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div className="space-y-2">
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+                <HelpCircle className="h-8 w-8 text-brand-violet" />
+                Frequently Asked Questions
+              </h1>
             </div>
+            
+            <Badge variant="outline" className="text-sm">
+              {filteredFAQs.length} {filteredFAQs.length === 1 ? 'Question' : 'Questions'}
+            </Badge>
           </div>
         </div>
+
+        {/* Search */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              Search FAQs
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Input
+              placeholder="Search questions, answers, or topics..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full"
+            />
+          </CardContent>
+        </Card>
+
+        {/* Categories */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Categories</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => {
+                const Icon = category.icon;
+                const isSelected = selectedCategory === category.name;
+                
+                return (
+                  <button
+                    key={category.name}
+                    onClick={() => setSelectedCategory(category.name)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isSelected 
+                        ? 'bg-brand-violet text-white' 
+                        : `${category.color} hover:opacity-80`
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {category.name}
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* FAQ Accordion */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">
+              {selectedCategory === 'All' ? 'All Questions' : selectedCategory}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {filteredFAQs.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No questions found matching your search.</p>
+                <p className="text-sm mt-2">Try adjusting your search terms or selecting a different category.</p>
+              </div>
+            ) : (
+              <Accordion type="single" collapsible className="space-y-4">
+                {filteredFAQs.map((faq) => {
+                  const CategoryIcon = getCategoryIcon(faq.category);
+                  
+                  return (
+                    <AccordionItem key={faq.id} value={faq.id} className="border rounded-lg">
+                      <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                        <div className="flex items-start gap-3 text-left">
+                          <CategoryIcon className="h-5 w-5 mt-0.5 text-brand-violet flex-shrink-0" />
+                          <div className="flex-1">
+                            <h3 className="font-medium text-foreground">
+                              {faq.question}
+                            </h3>
+                            <div className="flex items-center gap-2 mt-2">
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs ${getCategoryColor(faq.category)}`}
+                              >
+                                {faq.category}
+                              </Badge>
+                              {faq.tags.slice(0, 2).map(tag => (
+                                <Badge key={tag} variant="secondary" className="text-xs">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="px-4 pb-4">
+                        <div className="pl-8">
+                          <p className="text-muted-foreground leading-relaxed">
+                            {faq.answer}
+                          </p>
+                          {faq.tags.length > 2 && (
+                            <div className="flex flex-wrap gap-1 mt-3">
+                              {faq.tags.slice(2).map(tag => (
+                                <Badge key={tag} variant="secondary" className="text-xs">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  );
+                })}
+              </Accordion>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Help Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Still need help?
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="rounded-md border p-4">
+                <h3 className="font-medium mb-2">Contact Support</h3>
+                <p className="text-sm text-muted-foreground">
+                  Can't find what you're looking for? Reach out to our support team for personalized assistance.
+                </p>
+              </div>
+              <div className="rounded-md border p-4">
+                <h3 className="font-medium mb-2">Video Tutorials</h3>
+                <p className="text-sm text-muted-foreground">
+                  Check out our video guides for step-by-step walkthroughs of key features and workflows.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </SidebarProvider>
+    </StandardLayout>
   );
 };
 
