@@ -40,7 +40,7 @@ export const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="w-full px-2 sm:px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-[64px] ml-[280px] transition-all duration-300">
+    <header className="w-full px-2 sm:px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-[64px] sm:ml-[280px] transition-all duration-300">
       {/* Left side - Date display */}
       <div className="flex items-center flex-1 min-w-0 mr-2 sm:mr-4">
         <DateDisplay 
@@ -48,7 +48,7 @@ export const AppHeader: React.FC = () => {
           showTimezone={false}
           allowFormatSelection={true}
           defaultFormat="long"
-          className="text-gray-600 max-w-full"
+          className="text-gray-600 max-w-full truncate"
         />
       </div>
 
