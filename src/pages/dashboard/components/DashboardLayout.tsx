@@ -21,6 +21,19 @@ export const DashboardLayout: React.FC = () => {
     setSidebarCollapsed(isCollapsed);
   };
 
+  // Provide default metrics to prevent the map error
+  const defaultMetrics = {
+    activeProjects: 0,
+    activeResources: 0,
+    utilizationTrends: {
+      days7: 0,
+      days30: 0,
+      days90: 0
+    },
+    totalRevenue: 0,
+    avgProjectValue: 0
+  };
+
   return (
     <SidebarProvider>
       <div className="w-full min-h-screen flex bg-gray-50">
@@ -36,7 +49,7 @@ export const DashboardLayout: React.FC = () => {
           />
           <div style={{ height: HEADER_HEIGHT }} />
           <main className="flex-1 overflow-auto">
-            <SummaryDashboard />
+            <SummaryDashboard metrics={defaultMetrics} />
           </main>
         </div>
       </div>
