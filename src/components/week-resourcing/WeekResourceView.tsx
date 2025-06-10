@@ -79,19 +79,18 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         selectedWeek={selectedWeek}
       />
       
-      <Card>
-        <CardContent className="p-0">
-          <NewResourceTable 
-            members={members}
-            projects={projects}
-            allocationMap={allocationMap}
-            annualLeaveData={annualLeaveData}
-            holidaysData={holidaysData}
-            getMemberTotal={getMemberTotal}
-            getProjectCount={getProjectCount}
-            getWeeklyLeave={getWeeklyLeave}
-          />
-        </CardContent>
+      {/* Simplified single container for the table */}
+      <Card className="overflow-hidden">
+        <NewResourceTable 
+          members={members}
+          projects={projects}
+          allocationMap={allocationMap}
+          annualLeaveData={annualLeaveData}
+          holidaysData={holidaysData}
+          getMemberTotal={getMemberTotal}
+          getProjectCount={getProjectCount}
+          getWeeklyLeave={getWeeklyLeave}
+        />
       </Card>
     </div>
   );

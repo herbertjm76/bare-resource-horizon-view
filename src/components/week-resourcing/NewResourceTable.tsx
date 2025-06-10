@@ -34,28 +34,27 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="overflow-x-auto">
-        <Table>
-          <NewResourceTableHeader projects={projects} />
-          <TableBody>
-            {members.map((member, index) => (
-              <NewResourceTableRow
-                key={member.id}
-                member={member}
-                memberIndex={index}
-                projects={projects}
-                allocationMap={allocationMap}
-                annualLeaveData={annualLeaveData}
-                holidaysData={holidaysData}
-                getMemberTotal={getMemberTotal}
-                getProjectCount={getProjectCount}
-                getWeeklyLeave={getWeeklyLeave}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+    // Removed the extra border and overflow wrapper - now using single container
+    <div className="overflow-x-auto">
+      <Table>
+        <NewResourceTableHeader projects={projects} />
+        <TableBody>
+          {members.map((member, index) => (
+            <NewResourceTableRow
+              key={member.id}
+              member={member}
+              memberIndex={index}
+              projects={projects}
+              allocationMap={allocationMap}
+              annualLeaveData={annualLeaveData}
+              holidaysData={holidaysData}
+              getMemberTotal={getMemberTotal}
+              getProjectCount={getProjectCount}
+              getWeeklyLeave={getWeeklyLeave}
+            />
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };
