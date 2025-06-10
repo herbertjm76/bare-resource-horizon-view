@@ -17,7 +17,7 @@ export const SidebarLogo = ({
   };
 
   return (
-    <div className="flex items-center justify-between h-[48px] border-b border-indigo-600 px-4 bg-gradient-to-r from-indigo-600 to-purple-700">
+    <div className="flex items-center justify-between h-[48px] border-b border-indigo-600 px-4 bg-gradient-to-r from-[#6F4BF6] to-purple-700">
       {collapsed ? (
         <div className="w-full flex items-center justify-center">
           <img 

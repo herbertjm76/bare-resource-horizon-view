@@ -32,7 +32,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({ collapsed 
                   className={cn(
                     "flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 group",
                     isActive 
-                      ? "bg-indigo-700 text-white shadow-md border border-indigo-600" 
+                      ? "bg-[#6F4BF6] text-white shadow-md border border-[#5D3FD3]" 
                       : "text-indigo-100 hover:bg-indigo-800/50 hover:text-white",
                     collapsed ? "justify-center" : "justify-start"
                   )}

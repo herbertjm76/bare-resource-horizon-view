@@ -1,7 +1,7 @@
 
-/* Header styling */
+/* Header styling - Unified Brand Color */
 .enhanced-table thead th {
-  background: #6465F0;
+  background: #6F4BF6;
   border-bottom: 2px solid rgba(255,255,255,0.2);
   font-weight: 600;
   color: white;
@@ -62,4 +62,14 @@
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
   border-left: 2px solid #0ea5e9;
   font-weight: 600;
+}
+
+/* Sticky positioning for member names */
+.sticky-left-0 {
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: #6F4BF6;
+  border-right: 2px solid rgba(255,255,255,0.2);
+  color: white;
 }

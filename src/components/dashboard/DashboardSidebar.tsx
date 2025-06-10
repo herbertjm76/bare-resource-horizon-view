@@ -21,7 +21,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   if (isMobile) {
     return (
       <Sheet open={!collapsed} onOpenChange={() => toggleSidebar()}>
-        <SheetContent side="left" className="w-[280px] p-0 bg-gradient-to-b from-indigo-600 to-purple-700 text-white border-indigo-500">
+        <SheetContent side="left" className="w-[280px] p-0 bg-gradient-to-b from-[#6F4BF6] to-purple-700 text-white border-[#6F4BF6]">
           <div className="h-full flex flex-col">
             <SidebarLogo collapsed={false} toggleSidebar={toggleSidebar} />
             <SidebarNavigation collapsed={false} />
@@ -34,7 +34,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   // Desktop sidebar
   return (
     <aside className={cn(
-      "h-full bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-all duration-300 z-40 shadow-xl border-r border-indigo-500 flex-shrink-0 hidden md:block",
+      "h-full bg-gradient-to-b from-[#6F4BF6] to-purple-700 text-white transition-all duration-300 z-40 shadow-xl border-r border-[#6F4BF6] flex-shrink-0 hidden md:block",
       collapsed ? "w-16" : "w-[280px]"
     )}>
       <SidebarLogo collapsed={collapsed} toggleSidebar={toggleSidebar} />

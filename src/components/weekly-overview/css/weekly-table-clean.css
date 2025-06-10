@@ -1,77 +1,59 @@
 
-/* Clean Weekly Overview Table Styles */
+/* Weekly Overview Table - Clean Implementation with Unified Brand Color */
 
-.weekly-table-wrapper {
-  width: 100%;
+/* Container */
+.enhanced-weekly-scroll {
   overflow-x: auto;
-  border-radius: 16px;
-  background: white;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  border-radius: 8px;
 }
 
-.weekly-overview-table {
+.enhanced-weekly-container {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.enhanced-weekly-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   background: white;
-  font-size: 12px;
-  border-radius: 16px;
-  overflow: hidden;
 }
 
-/* Header Styling - Purple background for ALL header cells */
-.weekly-overview-table thead {
-  background: #6465F0 !important;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+/* Header Styling - Unified Brand Purple */
+.enhanced-weekly-table thead {
+  background: #6F4BF6;
 }
 
-.weekly-overview-table thead th {
-  background: #6465F0 !important;
+.enhanced-weekly-table thead th {
+  background: #6F4BF6 !important;
   color: white !important;
-  padding: 16px 12px;
+  padding: 12px 8px;
   font-weight: 600;
   font-size: 12px;
   text-align: center;
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(255,255,255,0.2);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
-/* First column header - Name column - FORCE purple with maximum specificity */
-.weekly-overview-table thead th:first-child,
-.weekly-overview-table thead th:first-child span,
-.weekly-overview-table thead th:first-child div,
-.weekly-overview-table thead th:first-child * {
-  background: #6465F0 !important;
-  background-color: #6465F0 !important;
+/* First column header - Name column */
+.enhanced-weekly-table thead th:first-child {
+  background: #6F4BF6 !important;
   color: white !important;
   position: sticky;
   left: 0;
   z-index: 15;
   min-width: 150px;
   text-align: center;
-  border-top-left-radius: 16px;
-}
-
-/* Last header column rounded corner */
-.weekly-overview-table thead th:last-child {
-  border-top-right-radius: 16px;
-  border-right: none;
-}
-
-/* Additional specificity for the first header cell */
-.weekly-table-wrapper .weekly-overview-table thead th:first-child {
-  background: #6465F0 !important;
-  background-color: #6465F0 !important;
-  color: white !important;
 }
 
 /* Project code headers - vertical text */
-.weekly-project-header {
+.enhanced-project-code-header {
   writing-mode: vertical-lr;
   text-orientation: mixed;
   height: 60px;
@@ -81,169 +63,93 @@
   justify-content: center;
   font-weight: 600;
   font-size: 11px;
-  color: white !important;
-  background: #6465F0 !important;
+  color: white;
 }
 
 /* Body Rows */
-.weekly-overview-table tbody tr {
+.enhanced-weekly-table tbody tr {
   background: white;
   border-bottom: 1px solid #f1f5f9;
-  transition: all 0.2s ease;
 }
 
-.weekly-overview-table tbody tr:hover {
+.enhanced-weekly-table tbody tr:hover {
   background: #f8fafc;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.weekly-overview-table tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 16px;
-}
-
-.weekly-overview-table tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 16px;
-}
-
-.weekly-overview-table tbody td {
-  padding: 12px;
+.enhanced-weekly-table tbody td {
+  padding: 8px;
   text-align: center;
   border-right: 1px solid #e2e8f0;
   font-size: 13px;
-  background: white;
-  transition: all 0.2s ease;
 }
 
-/* First column in body - sticky name column */
-.weekly-overview-table tbody td:first-child {
+/* First column in body - sticky */
+.enhanced-weekly-table tbody td:first-child {
   position: sticky;
   left: 0;
   background: white;
   font-weight: 500;
   z-index: 5;
   border-right: 2px solid #e2e8f0;
-  text-align: left;
 }
 
-.weekly-overview-table tbody tr:hover td:first-child {
+.enhanced-weekly-table tbody tr:hover td:first-child {
   background: #f8fafc;
 }
 
 /* Office header rows */
-.weekly-overview-table .office-header-row {
-  background: #6465F0 !important;
+.enhanced-weekly-table .office-header-row {
+  background: #6F4BF6 !important;
 }
 
-.weekly-overview-table .office-header-row td {
-  background: #6465F0 !important;
+.enhanced-weekly-table .office-header-row td {
+  background: #6F4BF6 !important;
   color: white !important;
   font-weight: 600;
-  padding: 16px 12px;
+  padding: 12px 8px;
 }
 
 /* Footer/Totals */
-.weekly-overview-table tfoot tr {
+.enhanced-weekly-table tfoot tr {
   background: #f8fafc;
   font-weight: 600;
 }
 
-.weekly-overview-table tfoot td {
-  padding: 16px 12px;
+.enhanced-weekly-table tfoot td {
+  padding: 12px 8px;
   text-align: center;
   border-right: 1px solid #e2e8f0;
   border-top: 2px solid #e2e8f0;
 }
 
-.weekly-overview-table tfoot td:first-child {
+.enhanced-weekly-table tfoot td:first-child {
   position: sticky;
   left: 0;
   background: #f8fafc;
   z-index: 5;
-  border-bottom-left-radius: 16px;
-}
-
-.weekly-overview-table tfoot td:last-child {
-  border-bottom-right-radius: 16px;
 }
 
 /* Remove last border */
-.weekly-overview-table th:last-child,
-.weekly-overview-table td:last-child {
+.enhanced-weekly-table th:last-child,
+.enhanced-weekly-table td:last-child {
   border-right: none;
 }
 
-/* Enhanced pill styling for consistent appearance */
-.weekly-overview-table .display-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  min-width: 40px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid;
-}
-
-/* Manual input styling for Other Leave */
-.weekly-overview-table .manual-input {
-  border-radius: 12px;
-  border: 2px solid #d8b4fe;
-  background: #f3e8ff;
-  transition: all 0.2s ease;
-}
-
-.weekly-overview-table .manual-input:focus {
-  border-color: #8b5cf6;
-  background: #ede9fe;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-}
-
 /* Scrollbar */
-.weekly-table-wrapper::-webkit-scrollbar {
-  height: 12px;
+.enhanced-weekly-scroll::-webkit-scrollbar {
+  height: 8px;
 }
 
-.weekly-table-wrapper::-webkit-scrollbar-track {
+.enhanced-weekly-scroll::-webkit-scrollbar-track {
   background: #f1f5f9;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
-.weekly-table-wrapper::-webkit-scrollbar-thumb {
+.enhanced-weekly-scroll::-webkit-scrollbar-thumb {
   background: #94a3b8;
-  border-radius: 6px;
-  border: 2px solid #f1f5f9;
+  border-radius: 4px;
 }
 
-.weekly-table-wrapper::-webkit-scrollbar-thumb:hover {
+.enhanced-weekly-scroll::-webkit-scrollbar-thumb:hover {
   background: #64748b;
-}
-
-/* Responsive design */
-@media (max-width: 640px) {
-  .weekly-table-wrapper {
-    border-radius: 12px;
-  }
-  
-  .weekly-overview-table {
-    border-radius: 12px;
-  }
-  
-  .weekly-overview-table thead th:first-child {
-    border-top-left-radius: 12px;
-  }
-  
-  .weekly-overview-table thead th:last-child {
-    border-top-right-radius: 12px;
-  }
-  
-  .weekly-overview-table tbody tr:last-child td:first-child {
-    border-bottom-left-radius: 12px;
-  }
-  
-  .weekly-overview-table tbody tr:last-child td:last-child {
-    border-bottom-right-radius: 12px;
-  }
 }

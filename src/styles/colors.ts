@@ -35,7 +35,7 @@ export const colors = {
       primary: '#E5E7EB',
       secondary: '#D1D5DB',
       accent: '#6F4BF6',
-      focus: '#6F4BF6', // Changed from #6366F1
+      focus: '#6F4BF6',
     },
     
     // State colors
@@ -70,10 +70,10 @@ export const colors = {
   // Status colors for projects and resources
   status: {
     inProgress: { bg: '#E2F8F0', text: '#0D9488' },
-    notStarted: { bg: '#E5DEFF', text: '#6F4BF6' }, // Changed from #6E59A5
+    notStarted: { bg: '#E5DEFF', text: '#6F4BF6' },
     completed: { bg: '#E0F2FE', text: '#0EA5E9' },
     onHold: { bg: '#FEF3C7', text: '#D97706' },
-    planning: { bg: '#E5DEFF', text: '#6F4BF6' }, // Changed from #6E59A5
+    planning: { bg: '#E5DEFF', text: '#6F4BF6' },
     default: { bg: '#F3F4F6', text: '#6B7280' },
   },
 
@@ -112,12 +112,12 @@ export const colors = {
       background: '#FFFFFF',
       border: '#D1D5DB',
       borderHover: '#6F4BF6',
-      borderFocus: '#6F4BF6', // Changed from #6366F1
+      borderFocus: '#6F4BF6',
       placeholder: '#9CA3AF',
     },
   },
 
-  // Table and grid colors - updated with #D2C6FB
+  // Table and grid colors - updated with unified brand color
   table: {
     headerBg: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)',
     headerText: '#ffffff',
@@ -127,7 +127,7 @@ export const colors = {
     borderDark: 'rgba(156, 163, 175, 0.6)',
   },
 
-  // Office and section headers - standardized to #6F4BF6
+  // Office and section headers - standardized to unified brand color
   office: {
     headerBg: 'linear-gradient(135deg, #6F4BF6 0%, #7c3aed 100%)',
     headerText: '#ffffff',
@@ -140,10 +140,10 @@ export const colors = {
     pattern: 'repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(156,163,175,0.1) 2px, rgba(156,163,175,0.1) 4px)',
   },
 
-  // Project area and stage colors (consistent palette)
+  // Project area and stage colors (consistent palette with unified brand color)
   projectColors: [
     '#F5A3B3', '#F48F8F', '#F47E63', '#F4A363', '#F4C463',
-    '#A8E6A8', '#89CFF0', '#6F4BF6', '#9B87F5', '#FFE082', // Updated one color to match brand
+    '#A8E6A8', '#89CFF0', '#6F4BF6', '#9B87F5', '#FFE082',
     '#89E6CF', '#7ECFD6', '#FFF3D4', '#D2C0A7', '#FFE566'
   ],
 
