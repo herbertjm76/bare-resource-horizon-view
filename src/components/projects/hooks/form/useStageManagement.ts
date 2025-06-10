@@ -58,10 +58,17 @@ export const useStageManagement = (form: FormState, setForm: React.Dispatch<Reac
         };
       }
       
-      // Update the fee data
+      // Update the fee data, ensuring invoiceAge is always a number
+      const updatedData = { ...data };
+      if (updatedData.invoiceAge !== undefined) {
+        updatedData.invoiceAge = typeof updatedData.invoiceAge === 'string' 
+          ? parseInt(updatedData.invoiceAge, 10) || 0 
+          : updatedData.invoiceAge;
+      }
+      
       updatedStageFees[stageId] = {
         ...updatedStageFees[stageId],
-        ...data
+        ...updatedData
       };
       
       return {

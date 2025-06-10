@@ -11,16 +11,16 @@ export interface ProjectSubmitData {
   stages: string[];
   stageFees: Record<string, {
     fee: string;
-    billingMonth: Date | string | null;
+    billingMonth: string | Date | null;
     status: "Not Billed" | "Invoiced" | "Paid" | "";
     invoiceDate: Date | null;
     hours: string;
-    invoiceAge: string | number;
+    invoiceAge: number;
     currency: string;
   }>;
   stageApplicability: Record<string, boolean>;
   officeStages?: Array<{ id: string; name: string; color?: string }>;
-  company_id?: string; // Added company_id property as optional
+  company_id?: string;
 }
 
 export interface ProjectUpdateData {
@@ -28,7 +28,7 @@ export interface ProjectUpdateData {
   name: string;
   project_manager_id: string | null;
   office_id: string | null;
-  status: string; // Changed to string to accept any status value which will be mapped correctly
+  status: string;
   country: string | null;
   current_stage: string | null;
   target_profit_percentage: number | null;

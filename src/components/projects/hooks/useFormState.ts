@@ -61,10 +61,7 @@ export const useFormState = (project: any) => {
         for (const stage of projectStages) {
           // Get the corresponding office stage name
           const officeStageName = stage.stage_name;
-          const officeStage = form.officeStages?.find(s => s.name === officeStageName);
           
-          if (!officeStage) continue;
-
           // Get fee data for this stage
           const { data: feeData } = await supabase
             .from('project_fees')
@@ -75,12 +72,12 @@ export const useFormState = (project: any) => {
 
           // Calculate invoice age if we have an invoice date
           const invoiceDate = feeData?.invoice_date ? new Date(feeData.invoice_date) : null;
-          let invoiceAge = '0';
+          let invoiceAge = 0;
           
           if (invoiceDate && !isNaN(invoiceDate.getTime())) {
             const now = new Date();
             const diffTime = Math.abs(now.getTime() - invoiceDate.getTime());
-            invoiceAge = Math.ceil(diffTime / (1000 * 60 * 60 * 24)).toString();
+            invoiceAge = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           }
 
           // Format billing month as a Date object if it's a string
@@ -98,7 +95,10 @@ export const useFormState = (project: any) => {
             }
           }
 
-          stageFees[officeStage.id] = {
+          // Find the office stage ID that matches this stage name
+          // This would require office stages to be available, but since we removed that dependency,
+          // we'll need to match by stage name directly
+          stageFees[stage.stage_name] = {
             fee: feeData?.fee?.toString() || stage.fee?.toString() || '',
             billingMonth: billingMonth || (stage.billing_month ? new Date(stage.billing_month) : null),
             status: feeData?.invoice_status || stage.invoice_status || 'Not Billed',

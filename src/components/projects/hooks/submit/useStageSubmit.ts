@@ -75,7 +75,7 @@ export const useStageSubmit = () => {
             String(feeData.invoiceDate)) : 
           null,
         status: feeData?.status || 'Not Billed',
-        invoiceAge: typeof feeData?.invoiceAge === 'number' ? feeData.invoiceAge : parseInt(String(feeData?.invoiceAge || 0), 10) || 0,
+        invoiceAge: typeof feeData?.invoiceAge === 'number' ? feeData.invoiceAge : 0,
         currency: feeData?.currency || 'USD'
       };
       

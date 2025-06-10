@@ -43,7 +43,7 @@ export const StageForm: React.FC<StageFormProps> = ({
     });
   };
 
-  // Safe access to fee value with fallbacks
+  // Safe access to fee value with fallbacks - ensure it's always a string
   const feeValue = String(stageFeeData?.fee || "");
   const statusValue = stageFeeData?.status || "Not Billed";
   const currencyValue = stageFeeData?.currency || "USD";
@@ -70,7 +70,7 @@ export const StageForm: React.FC<StageFormProps> = ({
   // Calculate hours based on fee and average rate
   const hours = calculateHours(feeValue);
 
-  // Calculate invoice age based on invoice date
+  // Calculate invoice age based on invoice date - ensure it's a string for display
   const invoiceAgeString = calculateInvoiceAge(invoiceDate);
 
   return (

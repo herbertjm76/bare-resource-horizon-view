@@ -1,10 +1,10 @@
 
 export interface StageFee {
-  fee: string | number;
+  fee: string;
   billingMonth: string | Date | null;
-  status: string;
+  status: "Not Billed" | "Invoiced" | "Paid" | "";
   invoiceDate: Date | null;
-  hours: string | number;
+  hours: string;
   invoiceAge: number;
   currency: string;
 }
