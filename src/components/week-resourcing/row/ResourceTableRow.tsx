@@ -105,12 +105,10 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         return (
           <ResourceAllocationCell 
             key={project.id}
-            memberId={member.id}
+            resourceId={member.id}
             projectId={project.id}
+            hours={hours}
             weekStartDate={weekStartDate}
-            currentHours={hours}
-            isReadOnly
-            projectIdx={projectIdx}
           />
         );
       })}
