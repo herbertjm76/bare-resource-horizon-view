@@ -5,7 +5,6 @@ import { ProjectResourcingContent } from './ProjectResourcing/components/Project
 import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
-import { CalendarDays } from 'lucide-react';
 
 const ProjectResourcing = () => {
   const {
@@ -45,16 +44,6 @@ const ProjectResourcing = () => {
       contentClassName="p-6 bg-gray-50 flex flex-col"
     >
       <div className="flex-1 flex flex-col" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto' }}>
-        {/* Standardized Header with icon and title */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-brand-primary/10 rounded-lg">
-            <CalendarDays className="h-6 w-6 text-brand-primary" />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Project Resourcing
-          </h1>
-        </div>
-
         <ProjectResourcingContent
           selectedMonth={selectedMonth}
           searchTerm={searchTerm}

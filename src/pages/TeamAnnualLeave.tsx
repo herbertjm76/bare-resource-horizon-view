@@ -58,36 +58,36 @@ const TeamAnnualLeave = () => {
 
   return (
     <StandardLayout>
-      <div className="space-y-6">
-        {/* Standardized Header with icon and title */}
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-brand-primary/10 rounded-lg">
-            <Calendar className="h-6 w-6 text-brand-primary" />
+      {/* Modern Header Section */}
+      <div className="space-y-6 mb-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+              <Calendar className="h-8 w-8 text-brand-violet" />
+              Team Annual Leave
+            </h1>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-            Team Annual Leave
-          </h1>
         </div>
-
-        <TeamAnnualLeaveContent
-          selectedMonth={selectedMonth}
-          onMonthChange={handleMonthChange}
-          isLoading={isLoading}
-          filteredMembers={filteredMembers}
-          leaveData={leaveData}
-          onLeaveChange={handleLeaveChange}
-          departments={departments}
-          locations={locations}
-          activeFilter={activeFilter}
-          filterValue={filterValue}
-          searchQuery={searchQuery}
-          setActiveFilter={setActiveFilter}
-          setFilterValue={setFilterValue}
-          setSearchQuery={setSearchQuery}
-          clearFilters={clearFilters}
-          allMembers={allMembers}
-        />
       </div>
+
+      <TeamAnnualLeaveContent
+        selectedMonth={selectedMonth}
+        onMonthChange={handleMonthChange}
+        isLoading={isLoading}
+        filteredMembers={filteredMembers}
+        leaveData={leaveData}
+        onLeaveChange={handleLeaveChange}
+        departments={departments}
+        locations={locations}
+        activeFilter={activeFilter}
+        filterValue={filterValue}
+        searchQuery={searchQuery}
+        setActiveFilter={setActiveFilter}
+        setFilterValue={setFilterValue}
+        setSearchQuery={setSearchQuery}
+        clearFilters={clearFilters}
+        allMembers={allMembers}
+      />
     </StandardLayout>
   );
 };
