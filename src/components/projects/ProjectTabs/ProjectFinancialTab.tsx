@@ -59,13 +59,13 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
   const consumedHours = parseFloat(String(form.consumed_hours || '0'));
   const hoursProgress = derivedBudgetHours > 0 ? (consumedHours / derivedBudgetHours) * 100 : 0;
 
-  // Safe access to financial metrics with proper type casting
-  const safeBurnRate = financialMetrics?.burn_rate ?? 0;
-  const safeTotalSpent = financialMetrics?.total_spent ?? 0;
-  const safeBudgetVariance = financialMetrics?.budget_variance ?? 0;
-  const safeProfitMargin = financialMetrics?.profit_margin ?? 0;
-  const safeConsumedHours = financialMetrics?.consumed_hours ?? 0;
-  const safeBudgetHours = financialMetrics?.budget_hours ?? 0;
+  // Safe access to financial metrics with explicit Number conversion
+  const safeBurnRate = Number(financialMetrics?.burn_rate ?? 0);
+  const safeTotalSpent = Number(financialMetrics?.total_spent ?? 0);
+  const safeBudgetVariance = Number(financialMetrics?.budget_variance ?? 0);
+  const safeProfitMargin = Number(financialMetrics?.profit_margin ?? 0);
+  const safeConsumedHours = Number(financialMetrics?.consumed_hours ?? 0);
+  const safeBudgetHours = Number(financialMetrics?.budget_hours ?? 0);
 
   return (
     <div className="space-y-6">
