@@ -24,7 +24,7 @@ export const ModernTeamMembersHeader: React.FC<ModernTeamMembersHeaderProps> = (
           {/* Empty space where title used to be */}
         </div>
         
-        {/* Quick Stats Cards */}
+        {/* Quick Stats Cards - Brand colors: purple, blue, magenta */}
         <div className="flex flex-wrap items-center gap-3">
           <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
             <div className="flex items-center gap-2">
@@ -36,31 +36,31 @@ export const ModernTeamMembersHeader: React.FC<ModernTeamMembersHeaderProps> = (
             </div>
           </Card>
           
-          <Card className="px-4 py-2 bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
+          <Card className="px-4 py-2 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border-blue-500/20">
             <div className="flex items-center gap-2">
-              <BarChart3 className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.5} />
+              <BarChart3 className="h-3.5 w-3.5 text-blue-600" strokeWidth={1.5} />
               <div className="text-sm">
-                <span className="font-semibold text-emerald-600">{totalMembers}</span>
+                <span className="font-semibold text-blue-600">{totalMembers}</span>
                 <span className="text-muted-foreground ml-1">Total</span>
               </div>
             </div>
           </Card>
           
-          <Card className="px-4 py-2 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border-blue-500/20">
+          <Card className="px-4 py-2 bg-gradient-to-r from-fuchsia-500/10 to-fuchsia-500/5 border-fuchsia-500/20">
             <div className="flex items-center gap-2">
-              <Building2 className="h-3.5 w-3.5 text-blue-600" strokeWidth={1.5} />
+              <Building2 className="h-3.5 w-3.5 text-fuchsia-600" strokeWidth={1.5} />
               <div className="text-sm">
-                <span className="font-semibold text-blue-600">{totalDepartments}</span>
+                <span className="font-semibold text-fuchsia-600">{totalDepartments}</span>
                 <span className="text-muted-foreground ml-1">Departments</span>
               </div>
             </div>
           </Card>
           
-          <Card className="px-4 py-2 bg-gradient-to-r from-purple-500/10 to-purple-500/5 border-purple-500/20">
+          <Card className="px-4 py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
             <div className="flex items-center gap-2">
-              <Clock className="h-3.5 w-3.5 text-purple-600" strokeWidth={1.5} />
+              <Clock className="h-3.5 w-3.5 text-brand-violet" strokeWidth={1.5} />
               <div className="text-sm">
-                <span className="font-semibold text-purple-600">{totalLocations}</span>
+                <span className="font-semibold text-brand-violet">{totalLocations}</span>
                 <span className="text-muted-foreground ml-1">Locations</span>
               </div>
             </div>
