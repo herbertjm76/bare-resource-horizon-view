@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { MemberNameCell } from './row/MemberNameCell';
@@ -117,7 +116,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         notes={typeof memberNotes === 'string' ? memberNotes : ''}
         onLeaveInputChange={onLeaveInputChange}
         onNotesChange={handleNotesChange}
-        className="border-r-8 border-gray-400"
+        className="border-r-4 border-gray-400"
       />
       
       {/* Project allocation cells */}

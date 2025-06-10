@@ -11,19 +11,15 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
   return (
     <TableHeader className="sticky top-0 z-10 bg-white border-b">
       <TableRow className="h-20" style={{ backgroundColor: '#6F4BF6' }}>
-        {/* Member info cells */}
         <TableHead className="w-48 max-w-48 min-w-32 border-r sticky left-0 z-20 non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>Name</TableHead>
         <TableHead className="w-16 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>#</TableHead>
         
-        {/* Capacity bar header - increased width */}
         <TableHead className="w-32 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>Capacity</TableHead>
         
-        {/* Leave cells - rearranged order */}
         <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>AL</TableHead>
         <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>HO</TableHead>
-        <TableHead className="w-12 text-center border-r-8 border-gray-400 non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>OL</TableHead>
+        <TableHead className="w-12 text-center border-r-4 border-gray-400 non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>OL</TableHead>
         
-        {/* Project allocation headers - with enhanced styling and project codes */}
         {projects.map((project, idx) => {
           return (
             <TableHead 
@@ -53,7 +49,6 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
           );
         })}
         
-        {/* Add Remarks column if showRemarks is true */}
         {showRemarks && (
           <TableHead className="w-40 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>Remarks</TableHead>
         )}

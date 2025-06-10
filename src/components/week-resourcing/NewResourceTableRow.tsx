@@ -93,7 +93,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         <ReadOnlyLeaveCell value={holidayHours} />
         
         {/* Other Leave Cell - EDITABLE manual input with thick border divider */}
-        <EditableLeaveCell className="border-r-8 border-gray-400" />
+        <EditableLeaveCell className="border-r-4 border-gray-400" />
         
         {/* Project allocation cells - show all projects or fill to minimum */}
         {Array.from({ length: projectColumnsCount }).map((_, idx) => {
