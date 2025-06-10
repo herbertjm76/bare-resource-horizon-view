@@ -43,6 +43,20 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
     return defaultFormat;
   });
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check for mobile screen size
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640); // sm breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   // Save format preference to localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -56,7 +70,7 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
   }, []);
 
-  // Format options with examples - removed relative format
+  // Format options with examples
   const formatOptions: DateFormatOption[] = useMemo(() => {
     const now = new Date();
     return [
@@ -97,9 +111,17 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
     ];
   }, []);
 
-  // Format the current date based on selected format
+  // Get the effective format (mobile override)
+  const effectiveFormat = useMemo(() => {
+    if (isMobile) {
+      return 'numeric'; // Shortest format for mobile
+    }
+    return selectedFormat;
+  }, [isMobile, selectedFormat]);
+
+  // Format the current date based on effective format
   const formattedDate = useMemo(() => {
-    switch (selectedFormat) {
+    switch (effectiveFormat) {
       case 'short':
         return currentDate.toLocaleDateString('en-US', { 
           month: 'short', 
@@ -130,11 +152,11 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
           year: 'numeric' 
         });
     }
-  }, [currentDate, selectedFormat]);
+  }, [currentDate, effectiveFormat]);
 
   // Get appropriate icon based on format
   const getIcon = () => {
-    if (selectedFormat === 'time') return Clock;
+    if (effectiveFormat === 'time') return Clock;
     if (showTimezone) return Globe;
     return Calendar;
   };
@@ -159,7 +181,7 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
     </div>
   );
 
-  if (!allowFormatSelection) {
+  if (!allowFormatSelection || isMobile) {
     return dateContent;
   }
 
