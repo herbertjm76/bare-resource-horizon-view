@@ -48,50 +48,71 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle }) => {
 
   return (
     <header className={cn(
-      "w-full px-2 sm:px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-[64px] transition-all duration-300",
+      "w-full px-3 sm:px-6 py-3 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-[64px] transition-all duration-300",
       !isMobile && "sm:ml-[280px]"
     )}>
       {/* Left side - Mobile hamburger menu + Date display */}
-      <div className="flex items-center flex-1 min-w-0 mr-2 sm:mr-4">
+      <div className="flex items-center flex-1 min-w-0 mr-4">
         {isMobile && onMenuToggle && (
           <Button
             variant="ghost"
             size="sm"
             onClick={onMenuToggle}
-            className="mr-3 p-2 text-gray-600 hover:bg-gray-100"
+            className="mr-3 p-2 text-gray-600 hover:bg-gray-100 flex-shrink-0"
           >
             <Menu className="h-5 w-5" />
           </Button>
         )}
-        <DateDisplay 
-          showIcon={true}
-          showTimezone={false}
-          allowFormatSelection={true}
-          defaultFormat="long"
-          className="text-gray-600 max-w-full truncate"
-        />
+        <div className="flex-1 min-w-0">
+          <DateDisplay 
+            showIcon={true}
+            showTimezone={false}
+            allowFormatSelection={!isMobile}
+            defaultFormat="long"
+            className="text-gray-600 max-w-full"
+          />
+        </div>
       </div>
 
       {/* Right side - User actions */}
-      <div className="flex items-center gap-1 sm:gap-4 flex-shrink-0">
-        <Button asChild variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100 hidden sm:flex">
+      <div className="flex items-center gap-2 flex-shrink-0">
+        {/* Profile button */}
+        <Button 
+          asChild 
+          variant="ghost" 
+          size="sm" 
+          className="text-gray-600 hover:bg-gray-100 hidden sm:flex px-3 py-2"
+        >
           <Link to="/profile">
-            <UserIcon className="mr-2 h-4 w-4" /> My Profile
+            <UserIcon className="mr-2 h-4 w-4" /> 
+            Profile
           </Link>
         </Button>
-        <Button asChild variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100 sm:hidden p-2">
+        
+        {/* Mobile profile button */}
+        <Button 
+          asChild 
+          variant="ghost" 
+          size="sm" 
+          className="text-gray-600 hover:bg-gray-100 sm:hidden p-2"
+        >
           <Link to="/profile">
             <UserIcon className="h-4 w-4" />
           </Link>
         </Button>
+        
+        {/* Sign out button */}
         <Button
           variant="ghost"
           size="sm"
-          className="text-gray-600 hover:bg-gray-100 hidden sm:flex"
+          className="text-gray-600 hover:bg-gray-100 hidden sm:flex px-3 py-2"
           onClick={handleLogout}
         >
-          <LogOut className="mr-2 h-4 w-4" /> Sign Out
+          <LogOut className="mr-2 h-4 w-4" /> 
+          Sign Out
         </Button>
+        
+        {/* Mobile sign out button */}
         <Button
           variant="ghost"
           size="sm"
