@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-type DateFormat = 'short' | 'long' | 'numeric' | 'relative' | 'time';
+type DateFormat = 'short' | 'long' | 'numeric' | 'time';
 
 interface DateFormatOption {
   key: DateFormat;
@@ -33,7 +33,7 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
   showIcon = true,
   showTimezone = false,
   allowFormatSelection = true,
-  defaultFormat = 'short'
+  defaultFormat = 'long'
 }) => {
   const [selectedFormat, setSelectedFormat] = useState<DateFormat>(() => {
     if (typeof window !== 'undefined') {
@@ -56,7 +56,7 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
   }, []);
 
-  // Format options with examples
+  // Format options with examples - removed relative format
   const formatOptions: DateFormatOption[] = useMemo(() => {
     const now = new Date();
     return [
@@ -83,11 +83,6 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
         key: 'numeric',
         label: 'Numeric',
         example: now.toLocaleDateString('en-US')
-      },
-      {
-        key: 'relative',
-        label: 'Relative',
-        example: 'Today'
       },
       {
         key: 'time',
@@ -120,8 +115,6 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
         });
       case 'numeric':
         return currentDate.toLocaleDateString('en-US');
-      case 'relative':
-        return 'Today';
       case 'time':
         return currentDate.toLocaleString('en-US', {
           month: 'short',
@@ -131,7 +124,8 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
         });
       default:
         return currentDate.toLocaleDateString('en-US', { 
-          month: 'short', 
+          weekday: 'long',
+          month: 'long', 
           day: 'numeric', 
           year: 'numeric' 
         });
@@ -148,16 +142,16 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
   const IconComponent = getIcon();
 
   const dateContent = (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-2 min-w-0", className)}>
       {showIcon && (
-        <IconComponent className="h-4 w-4 text-gray-500" />
+        <IconComponent className="h-4 w-4 text-gray-500 flex-shrink-0" />
       )}
-      <div className="flex flex-col">
-        <span className="text-sm font-medium text-gray-700">
+      <div className="flex flex-col min-w-0">
+        <span className="text-sm font-medium text-gray-700 truncate">
           {formattedDate}
         </span>
         {showTimezone && (
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 truncate">
             {timezone}
           </span>
         )}
@@ -172,7 +166,7 @@ export const DateDisplay: React.FC<DateDisplayProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-auto p-2 hover:bg-gray-50">
+        <Button variant="ghost" size="sm" className="h-auto p-2 hover:bg-gray-50 min-w-0">
           {dateContent}
         </Button>
       </DropdownMenuTrigger>

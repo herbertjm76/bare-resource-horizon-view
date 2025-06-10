@@ -40,32 +40,45 @@ export const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="w-full px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[64px] pl-[280px] transition-all duration-300">
-      {/* Left side - Enhanced Date display */}
-      <div className="flex items-center">
+    <header className="w-full px-3 sm:px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 right-0 z-30 h-[64px] pl-[280px] transition-all duration-300">
+      {/* Left side - Mobile-responsive Date display */}
+      <div className="flex items-center min-w-0">
         <DateDisplay 
           showIcon={true}
           showTimezone={false}
           allowFormatSelection={true}
-          defaultFormat="short"
-          className="text-gray-600"
+          defaultFormat="long"
+          className="text-gray-600 min-w-0"
         />
       </div>
 
       {/* Right side - User actions */}
-      <div className="flex items-center gap-4">
-        <Button asChild variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100">
+      <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+        <Button asChild variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100 hidden sm:flex">
           <Link to="/profile">
             <UserIcon className="mr-2 h-4 w-4" /> My Profile
+          </Link>
+        </Button>
+        <Button asChild variant="ghost" size="sm" className="text-gray-600 hover:bg-gray-100 sm:hidden p-2">
+          <Link to="/profile">
+            <UserIcon className="h-4 w-4" />
           </Link>
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          className="text-gray-600 hover:bg-gray-100"
+          className="text-gray-600 hover:bg-gray-100 hidden sm:flex"
           onClick={handleLogout}
         >
           <LogOut className="mr-2 h-4 w-4" /> Sign Out
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-gray-600 hover:bg-gray-100 sm:hidden p-2"
+          onClick={handleLogout}
+        >
+          <LogOut className="h-4 w-4" />
         </Button>
       </div>
     </header>
