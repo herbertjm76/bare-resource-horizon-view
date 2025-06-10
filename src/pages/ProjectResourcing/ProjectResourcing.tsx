@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
@@ -11,6 +11,12 @@ import { calculateActiveFiltersCount, createClearFiltersFunction } from './utils
 const HEADER_HEIGHT = 56;
 
 const ProjectResourcing = () => {
+  const [collapsed, setCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setCollapsed(prev => !prev);
+  };
+
   const {
     selectedMonth,
     searchTerm,
@@ -47,7 +53,7 @@ const ProjectResourcing = () => {
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row bg-gray-50">
         <div className="flex-shrink-0">
-          <DashboardSidebar />
+          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
         </div>
         <div className="flex-1 flex flex-col">
           <AppHeader />
