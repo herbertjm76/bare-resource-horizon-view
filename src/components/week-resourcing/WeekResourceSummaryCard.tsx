@@ -54,90 +54,90 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
   const availableHoursColor = UtilizationCalculationService.getAvailableHoursColor(availableHours);
   const availableHoursBadgeText = UtilizationCalculationService.getAvailableHoursBadgeText(availableHours);
 
-  // Map colors to Tailwind classes
-  const getColorClasses = (color: string) => {
+  // Map colors to exact badge styles
+  const getBadgeClasses = (color: string) => {
     switch (color) {
       case 'blue':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-500 text-white';
       case 'green':
-        return 'bg-green-100 text-green-800';
+        return 'bg-green-500 text-white';
       case 'yellow':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-yellow-500 text-white';
       case 'orange':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-orange-500 text-white';
       case 'red':
-        return 'bg-red-100 text-red-800';
+        return 'bg-red-500 text-white';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-blue-500 text-white';
     }
   };
 
+  const metrics = [
+    {
+      title: "Team Utilization",
+      value: `${utilizationRate}%`,
+      icon: TrendingUp,
+      subtitle: `${totalAllocatedHours}h of ${totalCapacity}h`,
+      badgeText: utilizationBadgeText,
+      badgeColor: utilizationColor
+    },
+    {
+      title: "Active Projects",
+      value: activeProjects,
+      icon: Calendar,
+      subtitle: `${projects.length} total projects`,
+      badgeText: activeProjects > 0 ? 'Active' : 'None',
+      badgeColor: activeProjects > 0 ? 'green' : 'red'
+    },
+    {
+      title: "Team Members",
+      value: members.length,
+      icon: Users,
+      subtitle: `Total capacity: ${totalCapacity}h`,
+      badgeText: members.length > 0 ? 'Active' : 'None',
+      badgeColor: members.length > 0 ? 'green' : 'red'
+    },
+    {
+      title: "Available Hours",
+      value: `${availableHours}h`,
+      icon: Clock,
+      subtitle: "Remaining capacity",
+      badgeText: availableHoursBadgeText,
+      badgeColor: availableHoursColor
+    }
+  ];
+
   return (
-    <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-blue-600" />
-          Week Summary
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Team Utilization */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium text-gray-700">Utilization</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">{utilizationRate}%</span>
-              <Badge className={`text-xs ${getColorClasses(utilizationColor)}`}>
-                {utilizationBadgeText}
-              </Badge>
-            </div>
-            <p className="text-xs text-gray-500">{totalAllocatedHours}h of {totalCapacity}h</p>
-          </div>
-
-          {/* Active Projects */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium text-gray-700">Active Projects</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">{activeProjects}</span>
-              <span className="text-sm text-gray-500">of {projects.length}</span>
-            </div>
-            <p className="text-xs text-gray-500">Projects with allocations</p>
-          </div>
-
-          {/* Team Size */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium text-gray-700">Team Members</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">{members.length}</span>
-            </div>
-            <p className="text-xs text-gray-500">Total capacity: {totalCapacity}h</p>
-          </div>
-
-          {/* Available Hours */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-orange-600" />
-              <span className="text-sm font-medium text-gray-700">Available</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold text-gray-900">{availableHours}h</span>
-              <Badge className={`text-xs ${getColorClasses(availableHoursColor)}`}>
-                {availableHoursBadgeText}
-              </Badge>
-            </div>
-            <p className="text-xs text-gray-500">Remaining capacity</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {metrics.map((metric, index) => {
+          const IconComponent = metric.icon;
+          
+          return (
+            <Card key={index} className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="p-1.5 rounded-md bg-brand-violet/10">
+                    <IconComponent className="h-4 w-4 text-brand-violet" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">{metric.title}</span>
+                </div>
+                
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-2xl font-bold text-gray-900">{metric.value}</span>
+                  {metric.badgeText && (
+                    <Badge className={`text-xs px-2 py-1 rounded-full font-medium ${getBadgeClasses(metric.badgeColor)}`}>
+                      {metric.badgeText}
+                    </Badge>
+                  )}
+                </div>
+                
+                <p className="text-sm text-gray-500">{metric.subtitle}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
   );
 };
