@@ -12,7 +12,7 @@ import Projects from "./pages/Projects";
 import TeamMembers from "./pages/TeamMembers";
 import TeamMemberDetail from "./pages/TeamMemberDetail";
 import OfficeSettings from "./pages/OfficeSettings";
-import WeeklyOverview from "./pages/weeklyoverview";
+import WeeklyResourcePlanning from "./pages/WeeklyResourcePlanning";
 import TeamWorkload from "./pages/TeamWorkload";
 import TeamAnnualLeave from "./pages/TeamAnnualLeave";
 import ProjectResourcing from "./pages/ProjectResourcing";
@@ -42,7 +42,8 @@ function App() {
               <Route path="/team-members" element={<TeamMembers />} />
               <Route path="/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/office-settings" element={<OfficeSettings />} />
-              <Route path="/weekly-overview" element={<WeeklyOverview />} />
+              <Route path="/weekly-resource-planning" element={<WeeklyResourcePlanning />} />
+              <Route path="/weekly-overview" element={<WeeklyResourcePlanning />} />
               <Route path="/team-workload" element={<TeamWorkload />} />
               <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
               <Route path="/project-resourcing" element={<ProjectResourcing />} />
