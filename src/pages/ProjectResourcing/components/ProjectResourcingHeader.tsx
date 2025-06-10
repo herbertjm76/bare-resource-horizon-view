@@ -22,13 +22,13 @@ export const ProjectResourcingHeader: React.FC<ProjectResourcingHeaderProps> = (
         </h1>
       </div>
 
-      {/* Right side - Metrics as rounded badges with standardized colors */}
+      {/* Right side - Metrics as rounded badges */}
       <div className="flex flex-wrap items-center gap-3">
         <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-blue-200 rounded-full px-4 py-2 text-sm font-medium">
           <BarChart3 className="h-4 w-4 mr-2" />
           {projectCount} Projects
         </Badge>
-        <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 border-emerald-200 rounded-full px-4 py-2 text-sm font-medium">
+        <Badge variant="secondary" className="bg-green-50 text-green-600 border-green-200 rounded-full px-4 py-2 text-sm font-medium">
           <Clock className="h-4 w-4 mr-2" />
           {periodToShow} Weeks View
         </Badge>
