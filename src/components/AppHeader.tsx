@@ -12,9 +12,10 @@ import { cn } from "@/lib/utils";
 
 interface AppHeaderProps {
   onMenuToggle?: () => void;
+  sidebarCollapsed?: boolean;
 }
 
-export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle }) => {
+export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle, sidebarCollapsed = false }) => {
   const { company } = useCompany();
   const [user, setUser] = React.useState<User | null>(null);
   const [loading, setLoading] = React.useState(true);
@@ -48,10 +49,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle }) => {
 
   return (
     <header className="w-full bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-16">
-      {/* Container that handles sidebar margin only on desktop */}
+      {/* Container that handles sidebar margin dynamically */}
       <div className={cn(
         "h-full px-4 py-2 flex items-center justify-between transition-all duration-300",
-        !isMobile && "md:ml-[280px]"
+        !isMobile && !sidebarCollapsed && "md:ml-[280px]",
+        !isMobile && sidebarCollapsed && "md:ml-16"
       )}>
         {/* Left side - Mobile hamburger menu + Date display */}
         <div className="flex items-center gap-3 flex-1 min-w-0">

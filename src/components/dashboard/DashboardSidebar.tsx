@@ -9,13 +9,22 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 interface DashboardSidebarProps {
   collapsed: boolean;
   toggleSidebar: () => void;
+  onCollapseChange?: (collapsed: boolean) => void;
 }
 
 export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ 
   collapsed, 
-  toggleSidebar 
+  toggleSidebar,
+  onCollapseChange 
 }) => {
   const isMobile = useIsMobile();
+
+  // Notify parent of collapse state changes
+  React.useEffect(() => {
+    if (onCollapseChange) {
+      onCollapseChange(collapsed);
+    }
+  }, [collapsed, onCollapseChange]);
 
   // Mobile sidebar as a sheet/drawer
   if (isMobile) {

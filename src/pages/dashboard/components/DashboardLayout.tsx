@@ -3,39 +3,43 @@ import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
-import { DashboardMetrics } from '@/components/dashboard/DashboardMetrics';
-import { HerbieFloatingButton } from '@/components/dashboard/HerbieFloatingButton';
-import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
-import AuthGuard from '@/components/AuthGuard';
+import { SummaryDashboard } from '@/components/dashboard/SummaryDashboard';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-const HEADER_HEIGHT = 56;
+const HEADER_HEIGHT = 64;
 
 export const DashboardLayout: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(true); // Start collapsed on mobile
+  const [collapsed, setCollapsed] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const isMobile = useIsMobile();
 
   const toggleSidebar = () => {
     setCollapsed(prev => !prev);
   };
 
+  const handleCollapseChange = (isCollapsed: boolean) => {
+    setSidebarCollapsed(isCollapsed);
+  };
+
   return (
-    <AuthGuard>
-      <OfficeSettingsProvider>
-        <SidebarProvider>
-          <div className="flex w-full min-h-screen bg-background">
-            <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-            <div className="flex-1 flex flex-col min-w-0">
-              <AppHeader onMenuToggle={isMobile ? toggleSidebar : undefined} />
-              <div style={{ height: HEADER_HEIGHT }} />
-              <div className="flex-1 bg-background">
-                <DashboardMetrics />
-              </div>
-            </div>
-            <HerbieFloatingButton />
-          </div>
-        </SidebarProvider>
-      </OfficeSettingsProvider>
-    </AuthGuard>
+    <SidebarProvider>
+      <div className="w-full min-h-screen flex bg-gray-50">
+        <DashboardSidebar 
+          collapsed={collapsed} 
+          toggleSidebar={toggleSidebar}
+          onCollapseChange={handleCollapseChange}
+        />
+        <div className="flex-1 flex flex-col min-w-0">
+          <AppHeader 
+            onMenuToggle={isMobile ? toggleSidebar : undefined}
+            sidebarCollapsed={sidebarCollapsed}
+          />
+          <div style={{ height: HEADER_HEIGHT }} />
+          <main className="flex-1 overflow-auto">
+            <SummaryDashboard />
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
