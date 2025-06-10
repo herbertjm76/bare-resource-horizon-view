@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { SearchInput } from '@/components/resources/filters/SearchInput';
-import { Eye, TrendingUp, Users, Target } from 'lucide-react';
+import { Search, TrendingUp, Users, Target, Sparkles } from 'lucide-react';
 
 interface TeamMemberInsightsHighlightProps {
   searchQuery: string;
@@ -14,61 +14,73 @@ export const TeamMemberInsightsHighlight: React.FC<TeamMemberInsightsHighlightPr
   onSearchChange
 }) => {
   return (
-    <Card className="w-full bg-gradient-to-br from-brand-violet/5 via-blue-50/50 to-purple-50/50 border-2 border-brand-violet/15 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-      <CardContent className="p-6 lg:p-8">
-        <div className="space-y-6">
-          {/* Header Section */}
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0">
-              <div className="p-3 bg-brand-violet/10 rounded-xl border border-brand-violet/20">
-                <Eye className="h-6 w-6 text-brand-violet" />
+    <Card className="w-full bg-white border border-gray-200/60 rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+      <CardContent className="p-0">
+        <div className="relative">
+          {/* Header with gradient background */}
+          <div className="bg-gradient-to-r from-brand-violet to-purple-600 p-8 text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-8 translate-x-8"></div>
+            <div className="absolute bottom-0 left-0 w-20 h-20 bg-white/5 rounded-full translate-y-4 -translate-x-4"></div>
+            
+            <div className="relative z-10 flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30">
+                  <Sparkles className="h-7 w-7 text-white" />
+                </div>
               </div>
-            </div>
-            <div className="flex-1 space-y-3">
-              <div className="space-y-2">
-                <h3 className="text-xl font-semibold text-gray-900 tracking-tight">
-                  Team Member Insights
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold mb-2 tracking-tight">
+                  Member Insights
                 </h3>
-                <p className="text-gray-600 text-sm leading-relaxed max-w-2xl">
-                  Search for any team member to view their utilization metrics, performance insights, and resource allocation details.
+                <p className="text-white/90 text-base leading-relaxed max-w-2xl">
+                  Search for any team member to access comprehensive analytics, performance metrics, and resource allocation insights.
                 </p>
-              </div>
-              
-              {/* Feature Tags */}
-              <div className="flex flex-wrap items-center gap-3 text-xs">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/60 rounded-full border border-gray-200/50">
-                  <TrendingUp className="h-3.5 w-3.5 text-brand-violet" />
-                  <span className="text-gray-700 font-medium">Utilization Tracking</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/60 rounded-full border border-gray-200/50">
-                  <Target className="h-3.5 w-3.5 text-emerald-600" />
-                  <span className="text-gray-700 font-medium">Performance Metrics</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/60 rounded-full border border-gray-200/50">
-                  <Users className="h-3.5 w-3.5 text-blue-600" />
-                  <span className="text-gray-700 font-medium">Resource Planning</span>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Search Section */}
-          <div className="border-t border-gray-200/50 pt-6">
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Search Team Members
-              </label>
-              <div className="max-w-md">
+          {/* Content section */}
+          <div className="p-8 space-y-6">
+            {/* Feature highlights */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-center gap-3 p-4 bg-emerald-50/80 rounded-xl border border-emerald-100/60">
+                <div className="p-2 bg-emerald-100 rounded-lg">
+                  <TrendingUp className="h-4 w-4 text-emerald-600" />
+                </div>
+                <span className="text-sm font-medium text-emerald-700">Utilization Tracking</span>
+              </div>
+              <div className="flex items-center gap-3 p-4 bg-blue-50/80 rounded-xl border border-blue-100/60">
+                <div className="p-2 bg-blue-100 rounded-lg">
+                  <Target className="h-4 w-4 text-blue-600" />
+                </div>
+                <span className="text-sm font-medium text-blue-700">Performance Metrics</span>
+              </div>
+              <div className="flex items-center gap-3 p-4 bg-purple-50/80 rounded-xl border border-purple-100/60">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Users className="h-4 w-4 text-purple-600" />
+                </div>
+                <span className="text-sm font-medium text-purple-700">Resource Planning</span>
+              </div>
+            </div>
+
+            {/* Search section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <Search className="h-5 w-5 text-gray-400" />
+                <h4 className="text-lg font-semibold text-gray-900">Find Team Member</h4>
+              </div>
+              
+              <div className="max-w-lg">
                 <SearchInput
                   value={searchQuery}
                   onChange={onSearchChange}
                   placeholder="Search by name, department, or role..."
-                  className="h-12 text-base bg-white/80 border-2 border-gray-200/60 focus-within:border-brand-violet focus-within:bg-white shadow-sm rounded-lg transition-all duration-200"
+                  className="h-14 text-base bg-gray-50/80 border-2 border-gray-200/80 focus-within:border-brand-violet focus-within:bg-white focus-within:shadow-md rounded-xl transition-all duration-200 px-5"
                 />
+                <p className="text-sm text-gray-500 mt-2 ml-1">
+                  Start typing to discover detailed insights for any team member
+                </p>
               </div>
-              <p className="text-xs text-gray-500">
-                Start typing to filter team members and access their detailed insights
-              </p>
             </div>
           </div>
         </div>
