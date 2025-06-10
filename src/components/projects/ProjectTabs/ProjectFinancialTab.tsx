@@ -27,14 +27,14 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
   const derivedBudgetAmount = useMemo(() => {
     if (!form.stageFees) return 0;
     return Object.values(form.stageFees).reduce((total: number, stage: any) => {
-      const fee = parseFloat(stage?.fee || '0');
+      const fee = parseFloat(String(stage?.fee || '0'));
       return total + (isNaN(fee) ? 0 : fee);
     }, 0);
   }, [form.stageFees]);
 
   // Calculate budget hours from derived budget and blended rate
   const derivedBudgetHours = useMemo(() => {
-    const rate = parseFloat(form.blended_rate || form.avgRate || '0');
+    const rate = parseFloat(String(form.blended_rate || form.avgRate || '0'));
     return rate > 0 ? derivedBudgetAmount / rate : 0;
   }, [derivedBudgetAmount, form.blended_rate, form.avgRate]);
 
@@ -56,7 +56,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
     }
   };
 
-  const consumedHours = parseFloat(form.consumed_hours || '0');
+  const consumedHours = parseFloat(String(form.consumed_hours || '0'));
   const hoursProgress = derivedBudgetHours > 0 ? (consumedHours / derivedBudgetHours) * 100 : 0;
 
   return (
@@ -115,7 +115,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {financialMetrics?.burn_rate?.toFixed(1) || '0.0'}
+              {financialMetrics?.burn_rate ? Number(financialMetrics.burn_rate).toFixed(1) : '0.0'}
             </div>
             <p className="text-xs text-muted-foreground">
               hours per day
@@ -149,7 +149,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
             <CardContent>
               <ProgressIndicator
                 label="Budget Spent"
-                current={financialMetrics.total_spent}
+                current={Number(financialMetrics.total_spent)}
                 total={derivedBudgetAmount}
                 unit="$"
                 variant="budget"
@@ -289,18 +289,18 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Budget Variance</span>
-                  <Badge variant={Math.abs(financialMetrics.budget_variance) > 1000 ? 'destructive' : 'default'}>
-                    ${financialMetrics.budget_variance?.toLocaleString() || 0}
+                  <Badge variant={Math.abs(Number(financialMetrics.budget_variance)) > 1000 ? 'destructive' : 'default'}>
+                    ${Number(financialMetrics.budget_variance || 0).toLocaleString()}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  {financialMetrics.budget_variance > 0 ? (
+                  {Number(financialMetrics.budget_variance) > 0 ? (
                     <TrendingUp className="h-4 w-4 text-red-500" />
                   ) : (
                     <TrendingDown className="h-4 w-4 text-green-500" />
                   )}
-                  <span className={`text-sm ${getVarianceColor(financialMetrics.budget_variance)}`}>
-                    {financialMetrics.budget_variance > 0 ? 'Over budget' : 'Under budget'}
+                  <span className={`text-sm ${getVarianceColor(Number(financialMetrics.budget_variance))}`}>
+                    {Number(financialMetrics.budget_variance) > 0 ? 'Over budget' : 'Under budget'}
                   </span>
                 </div>
               </div>
@@ -314,7 +314,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
-                    Profit Margin: {financialMetrics.profit_margin?.toFixed(1) || 0}%
+                    Profit Margin: {Number(financialMetrics.profit_margin || 0).toFixed(1)}%
                   </span>
                 </div>
               </div>
@@ -323,13 +323,13 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
               <div className="text-center">
                 <div className="text-lg font-semibold">
-                  {financialMetrics.consumed_hours?.toFixed(1) || 0}
+                  {Number(financialMetrics.consumed_hours || 0).toFixed(1)}
                 </div>
                 <div className="text-xs text-muted-foreground">Hours Consumed</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold">
-                  {financialMetrics.budget_hours?.toFixed(1) || 0}
+                  {Number(financialMetrics.budget_hours || 0).toFixed(1)}
                 </div>
                 <div className="text-xs text-muted-foreground">Budget Hours</div>
               </div>
