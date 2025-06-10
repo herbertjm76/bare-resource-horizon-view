@@ -59,6 +59,14 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
   const consumedHours = parseFloat(String(form.consumed_hours || '0'));
   const hoursProgress = derivedBudgetHours > 0 ? (consumedHours / derivedBudgetHours) * 100 : 0;
 
+  // Safe access to financial metrics with proper type casting
+  const safeBurnRate = financialMetrics?.burn_rate ?? 0;
+  const safeTotalSpent = financialMetrics?.total_spent ?? 0;
+  const safeBudgetVariance = financialMetrics?.budget_variance ?? 0;
+  const safeProfitMargin = financialMetrics?.profit_margin ?? 0;
+  const safeConsumedHours = financialMetrics?.consumed_hours ?? 0;
+  const safeBudgetHours = financialMetrics?.budget_hours ?? 0;
+
   return (
     <div className="space-y-6">
       {/* Current Stage Progress */}
@@ -115,7 +123,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {financialMetrics?.burn_rate ? financialMetrics.burn_rate.toFixed(1) : '0.0'}
+              {safeBurnRate.toFixed(1)}
             </div>
             <p className="text-xs text-muted-foreground">
               hours per day
@@ -149,7 +157,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
             <CardContent>
               <ProgressIndicator
                 label="Budget Spent"
-                current={financialMetrics.total_spent}
+                current={safeTotalSpent}
                 total={derivedBudgetAmount}
                 unit="$"
                 variant="budget"
@@ -289,18 +297,18 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Budget Variance</span>
-                  <Badge variant={Math.abs(financialMetrics.budget_variance) > 1000 ? 'destructive' : 'default'}>
-                    ${financialMetrics.budget_variance.toLocaleString()}
+                  <Badge variant={Math.abs(safeBudgetVariance) > 1000 ? 'destructive' : 'default'}>
+                    ${safeBudgetVariance.toLocaleString()}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  {financialMetrics.budget_variance > 0 ? (
+                  {safeBudgetVariance > 0 ? (
                     <TrendingUp className="h-4 w-4 text-red-500" />
                   ) : (
                     <TrendingDown className="h-4 w-4 text-green-500" />
                   )}
-                  <span className={`text-sm ${getVarianceColor(financialMetrics.budget_variance)}`}>
-                    {financialMetrics.budget_variance > 0 ? 'Over budget' : 'Under budget'}
+                  <span className={`text-sm ${getVarianceColor(safeBudgetVariance)}`}>
+                    {safeBudgetVariance > 0 ? 'Over budget' : 'Under budget'}
                   </span>
                 </div>
               </div>
@@ -314,7 +322,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
-                    Profit Margin: {financialMetrics.profit_margin.toFixed(1)}%
+                    Profit Margin: {safeProfitMargin.toFixed(1)}%
                   </span>
                 </div>
               </div>
@@ -323,13 +331,13 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
               <div className="text-center">
                 <div className="text-lg font-semibold">
-                  {financialMetrics.consumed_hours.toFixed(1)}
+                  {safeConsumedHours.toFixed(1)}
                 </div>
                 <div className="text-xs text-muted-foreground">Hours Consumed</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold">
-                  {financialMetrics.budget_hours.toFixed(1)}
+                  {safeBudgetHours.toFixed(1)}
                 </div>
                 <div className="text-xs text-muted-foreground">Budget Hours</div>
               </div>
