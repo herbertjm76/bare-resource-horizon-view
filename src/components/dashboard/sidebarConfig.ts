@@ -11,7 +11,11 @@ import {
   FileQuestion,
   User,
   BookOpen,
-  MessageCircle
+  MessageCircle,
+  DollarSign,
+  TrendingUp,
+  Receipt,
+  Clock
 } from "lucide-react"
 
 export const navigationItems = [
@@ -42,6 +46,31 @@ export const navigationItems = [
         title: "All Projects",
         url: "/projects",
         icon: FolderKanban,
+      },
+    ],
+  },
+  {
+    label: "FINANCIALS",
+    items: [
+      {
+        title: "Financial Overview",
+        url: "/financial-overview",
+        icon: DollarSign,
+      },
+      {
+        title: "Project Profit Dashboard",
+        url: "/project-profit-dashboard",
+        icon: TrendingUp,
+      },
+      {
+        title: "Project Billing",
+        url: "/project-billing",
+        icon: Receipt,
+      },
+      {
+        title: "Aging Invoices",
+        url: "/aging-invoices",
+        icon: Clock,
       },
     ],
   },

@@ -23,6 +23,10 @@ import ContactSupport from "./pages/ContactSupport";
 import Join from "./pages/Join";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import NotFound from "./pages/NotFound";
+import FinancialOverview from "./pages/FinancialOverview";
+import ProjectProfitDashboard from "./pages/ProjectProfitDashboard";
+import ProjectBilling from "./pages/ProjectBilling";
+import AgingInvoices from "./pages/AgingInvoices";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +51,10 @@ function App() {
               <Route path="/team-workload" element={<TeamWorkload />} />
               <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
               <Route path="/project-resourcing" element={<ProjectResourcing />} />
+              <Route path="/financial-overview" element={<FinancialOverview />} />
+              <Route path="/project-profit-dashboard" element={<ProjectProfitDashboard />} />
+              <Route path="/project-billing" element={<ProjectBilling />} />
+              <Route path="/aging-invoices" element={<AgingInvoices />} />
               <Route path="/documentation" element={<Documentation />} />
               <Route path="/help" element={<Help />} />
               <Route path="/faq" element={<FAQ />} />
