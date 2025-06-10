@@ -8,6 +8,7 @@ import { User as UserIcon, LogOut, Menu } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { DateDisplay } from "@/components/ui/date-display";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface AppHeaderProps {
   onMenuToggle?: () => void;
