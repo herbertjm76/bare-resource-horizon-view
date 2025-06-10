@@ -1,2 +1,2 @@
 
-export { default } from './ProjectResourcing';
+export { default } from '../ProjectResourcing';
