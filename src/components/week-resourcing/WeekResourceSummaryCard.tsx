@@ -1,10 +1,9 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Users, Calendar, Clock, TrendingUp } from 'lucide-react';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
+import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 
 interface WeekResourceSummaryCardProps {
   projects: any[];
@@ -54,24 +53,6 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
   const availableHoursColor = UtilizationCalculationService.getAvailableHoursColor(availableHours);
   const availableHoursBadgeText = UtilizationCalculationService.getAvailableHoursBadgeText(availableHours);
 
-  // Map colors to exact badge styles
-  const getBadgeClasses = (color: string) => {
-    switch (color) {
-      case 'blue':
-        return 'bg-blue-500 text-white';
-      case 'green':
-        return 'bg-green-500 text-white';
-      case 'yellow':
-        return 'bg-yellow-500 text-white';
-      case 'orange':
-        return 'bg-orange-500 text-white';
-      case 'red':
-        return 'bg-red-500 text-white';
-      default:
-        return 'bg-blue-500 text-white';
-    }
-  };
-
   const metrics = [
     {
       title: "Team Utilization",
@@ -108,36 +89,11 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
   ];
 
   return (
-    <div className="w-full bg-gray-50 rounded-lg p-6 mb-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {metrics.map((metric, index) => {
-          const IconComponent = metric.icon;
-          
-          return (
-            <Card key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2 rounded-lg bg-brand-violet/10">
-                    <IconComponent className="h-5 w-5 text-brand-violet" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">{metric.title}</span>
-                </div>
-                
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-3xl font-bold text-gray-900">{metric.value}</span>
-                  {metric.badgeText && (
-                    <Badge className={`text-xs px-3 py-1 rounded-full font-medium ${getBadgeClasses(metric.badgeColor)}`}>
-                      {metric.badgeText}
-                    </Badge>
-                  )}
-                </div>
-                
-                <p className="text-sm text-gray-500">{metric.subtitle}</p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+    <div className="mb-6">
+      <StandardizedExecutiveSummary 
+        metrics={metrics}
+        gradientType="purple"
+      />
     </div>
   );
 };
