@@ -35,7 +35,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
   // Calculate budget hours from derived budget and blended rate
   const derivedBudgetHours = useMemo(() => {
     const rate = parseFloat(String(form.blended_rate || form.avgRate || '0'));
-    return rate > 0 ? derivedBudgetAmount / rate : 0;
+    return rate > 0 ? Number(derivedBudgetAmount) / Number(rate) : 0;
   }, [derivedBudgetAmount, form.blended_rate, form.avgRate]);
 
   const getVarianceColor = (variance: number) => {
@@ -149,7 +149,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
             <CardContent>
               <ProgressIndicator
                 label="Budget Spent"
-                current={Number(financialMetrics.total_spent)}
+                current={Number(financialMetrics.total_spent || 0)}
                 total={derivedBudgetAmount}
                 unit="$"
                 variant="budget"
@@ -289,18 +289,18 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Budget Variance</span>
-                  <Badge variant={Math.abs(Number(financialMetrics.budget_variance)) > 1000 ? 'destructive' : 'default'}>
+                  <Badge variant={Math.abs(Number(financialMetrics.budget_variance || 0)) > 1000 ? 'destructive' : 'default'}>
                     ${Number(financialMetrics.budget_variance || 0).toLocaleString()}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  {Number(financialMetrics.budget_variance) > 0 ? (
+                  {Number(financialMetrics.budget_variance || 0) > 0 ? (
                     <TrendingUp className="h-4 w-4 text-red-500" />
                   ) : (
                     <TrendingDown className="h-4 w-4 text-green-500" />
                   )}
-                  <span className={`text-sm ${getVarianceColor(Number(financialMetrics.budget_variance))}`}>
-                    {Number(financialMetrics.budget_variance) > 0 ? 'Over budget' : 'Under budget'}
+                  <span className={`text-sm ${getVarianceColor(Number(financialMetrics.budget_variance || 0))}`}>
+                    {Number(financialMetrics.budget_variance || 0) > 0 ? 'Over budget' : 'Under budget'}
                   </span>
                 </div>
               </div>
