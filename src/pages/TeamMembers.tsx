@@ -7,6 +7,7 @@ import { TeamMembersContent } from '@/components/team-members/TeamMembersContent
 import { TeamMembersLoadingState } from '@/components/team-members/TeamMembersLoadingState';
 import { TeamMembersPermissionError } from '@/components/team-members/TeamMembersPermissionError';
 import AuthGuard from '@/components/AuthGuard';
+import { Users } from 'lucide-react';
 
 const TeamMembersPageContent = () => {
   const userId = useUserSession();
@@ -67,7 +68,21 @@ const TeamMembersPageContent = () => {
     );
   }
 
-  return <TeamMembersContent userId={userId} />;
+  return (
+    <div className="space-y-6">
+      {/* Header with icon and title */}
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-brand-primary/10 rounded-lg">
+          <Users className="h-6 w-6 text-brand-primary" />
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          Team Members
+        </h1>
+      </div>
+      
+      <TeamMembersContent userId={userId} />
+    </div>
+  );
 };
 
 const TeamMembersPage = () => {
