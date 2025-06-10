@@ -49,31 +49,31 @@ export const navigationItems = [
       },
     ],
   },
-  {
-    label: "FINANCIALS",
-    items: [
-      {
-        title: "Financial Overview",
-        url: "/financial-overview",
-        icon: DollarSign,
-      },
-      {
-        title: "Project Profit Dashboard",
-        url: "/project-profit-dashboard",
-        icon: TrendingUp,
-      },
-      {
-        title: "Project Billing",
-        url: "/project-billing",
-        icon: Receipt,
-      },
-      {
-        title: "Aging Invoices",
-        url: "/aging-invoices",
-        icon: Clock,
-      },
-    ],
-  },
+  // {
+  //   label: "FINANCIALS",
+  //   items: [
+  //     {
+  //       title: "Financial Overview",
+  //       url: "/financial-overview",
+  //       icon: DollarSign,
+  //     },
+  //     {
+  //       title: "Project Profit Dashboard",
+  //       url: "/project-profit-dashboard",
+  //       icon: TrendingUp,
+  //     },
+  //     {
+  //       title: "Project Billing",
+  //       url: "/project-billing",
+  //       icon: Receipt,
+  //     },
+  //     {
+  //       title: "Aging Invoices",
+  //       url: "/aging-invoices",
+  //       icon: Clock,
+  //     },
+  //   ],
+  // },
   {
     label: "RESOURCES",
     items: [
