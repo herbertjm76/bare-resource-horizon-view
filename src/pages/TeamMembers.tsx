@@ -70,7 +70,7 @@ const TeamMembersPageContent = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header with icon and title */}
+      {/* Standardized Header with icon and title */}
       <div className="flex items-center gap-3">
         <div className="p-2 bg-brand-primary/10 rounded-lg">
           <Users className="h-6 w-6 text-brand-primary" />

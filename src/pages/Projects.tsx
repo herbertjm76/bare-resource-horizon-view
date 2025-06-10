@@ -58,16 +58,14 @@ const Projects = () => {
   return (
     <StandardLayout>
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Modern Header Section */}
-        <div className="space-y-6 mb-6">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                <FolderOpen className="h-8 w-8 text-brand-violet" />
-                All Projects
-              </h1>
-            </div>
+        {/* Standardized Header with icon and title */}
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-brand-primary/10 rounded-lg">
+            <FolderOpen className="h-6 w-6 text-brand-primary" />
           </div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            All Projects
+          </h1>
         </div>
 
         <StandardizedExecutiveSummary

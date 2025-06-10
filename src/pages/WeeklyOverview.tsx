@@ -34,10 +34,12 @@ const WeeklyOverview = () => {
   return (
     <StandardLayout>
       <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
-        {/* Page Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: '#6465F0' }}>
-            <Calendar className="h-8 w-8 inline-block mr-3" style={{ color: '#6465F0' }} />
+        {/* Standardized Header with icon and title */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-brand-primary/10 rounded-lg">
+            <Calendar className="h-6 w-6 text-brand-primary" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
             Weekly Overview
           </h1>
         </div>

@@ -7,7 +7,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { TeamMemberDetailContent } from '@/components/team-member-detail/TeamMemberDetailContent';
 import { useTeamMemberDetail } from '@/hooks/useTeamMemberDetail';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, User } from 'lucide-react';
 import AuthGuard from '@/components/AuthGuard';
 
 const HEADER_HEIGHT = 56;
@@ -96,7 +96,18 @@ const TeamMemberDetailPage = () => {
           <div className="flex-1 flex flex-col">
             <AppHeader />
             <div style={{ height: HEADER_HEIGHT }} />
-            <TeamMemberDetailContent memberData={memberData} />
+            <div className="p-6">
+              {/* Standardized Header with icon and title */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-brand-primary/10 rounded-lg">
+                  <User className="h-6 w-6 text-brand-primary" />
+                </div>
+                <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+                  Team Member Details
+                </h1>
+              </div>
+              <TeamMemberDetailContent memberData={memberData} />
+            </div>
           </div>
         </div>
       </SidebarProvider>
