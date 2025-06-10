@@ -48,22 +48,22 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle }) => {
 
   return (
     <header className={cn(
-      "w-full px-4 sm:px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-16 transition-all duration-300",
-      !isMobile && "sm:ml-[280px]"
+      "w-full px-4 py-2 flex items-center bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-16 transition-all duration-300",
+      !isMobile && "md:ml-[280px]"
     )}>
       {/* Left side - Mobile hamburger menu + Date display */}
-      <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="flex items-center flex-1 min-w-0">
         {isMobile && onMenuToggle && (
           <Button
             variant="ghost"
             size="sm"
             onClick={onMenuToggle}
-            className="p-2 text-gray-600 hover:bg-gray-100 flex-shrink-0"
+            className="mr-3 p-2 text-gray-600 hover:bg-gray-100 flex-shrink-0"
           >
             <Menu className="h-5 w-5" />
           </Button>
         )}
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0">
           <DateDisplay 
             showIcon={true}
             showTimezone={false}
@@ -75,7 +75,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle }) => {
       </div>
 
       {/* Right side - User actions */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-1 ml-4">
         {/* Desktop Profile button */}
         <Button 
           asChild 
