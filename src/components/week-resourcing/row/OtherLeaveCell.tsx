@@ -1,12 +1,11 @@
 
 import React, { useState } from 'react';
 import { TableCell } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { MessageSquare } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { MessageSquare } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface OtherLeaveCellProps {
   leaveValue: number;
@@ -14,6 +13,7 @@ interface OtherLeaveCellProps {
   notes: string;
   onLeaveInputChange: (memberId: string, leaveType: string, value: string) => void;
   onNotesChange: (memberId: string, notes: string) => void;
+  className?: string;
 }
 
 export const OtherLeaveCell: React.FC<OtherLeaveCellProps> = ({
@@ -21,86 +21,60 @@ export const OtherLeaveCell: React.FC<OtherLeaveCellProps> = ({
   memberId,
   notes,
   onLeaveInputChange,
-  onNotesChange
+  onNotesChange,
+  className
 }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [tempHours, setTempHours] = useState(leaveValue.toString());
-  const [tempNotes, setTempNotes] = useState(notes);
+  const [localValue, setLocalValue] = useState(leaveValue.toString());
+  const [localNotes, setLocalNotes] = useState(notes);
 
-  const handleDialogOpen = () => {
-    setTempHours(leaveValue.toString());
-    setTempNotes(notes);
-    setIsDialogOpen(true);
+  const handleBlur = () => {
+    const numValue = parseFloat(localValue) || 0;
+    onLeaveInputChange(memberId, 'other', numValue.toString());
   };
 
-  const handleSave = () => {
-    // Save the hours value to the 'sick' field (which represents other leave in the system)
-    onLeaveInputChange(memberId, 'sick', tempHours);
-    // Save notes separately
-    onNotesChange(memberId, tempNotes);
-    setIsDialogOpen(false);
+  const handleNotesBlur = () => {
+    onNotesChange(memberId, localNotes);
   };
 
-  const handleCancel = () => {
-    setTempHours(leaveValue.toString());
-    setTempNotes(notes);
-    setIsDialogOpen(false);
-  };
+  const hasNotes = notes && notes.trim().length > 0;
 
   return (
-    <TableCell className="text-center border-r p-1">
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="ghost"
-            className="w-full h-8 p-1 bg-gradient-to-r from-purple-100 to-purple-200 border border-purple-300 text-purple-800 hover:from-purple-200 hover:to-purple-300 hover:border-purple-400 rounded-lg font-medium text-xs cursor-pointer"
-            onClick={handleDialogOpen}
-          >
-            <div className="flex items-center justify-center gap-1">
-              <span>{leaveValue || 0}h</span>
-              {notes && <MessageSquare className="h-3 w-3" />}
-            </div>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Other Leave Details</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
+    <TableCell className={cn("p-1 text-center", className)}>
+      <div className="flex items-center justify-center gap-1">
+        <Input
+          type="number"
+          value={localValue}
+          onChange={(e) => setLocalValue(e.target.value)}
+          onBlur={handleBlur}
+          className="w-12 h-6 text-center text-xs"
+          min="0"
+          max="40"
+          step="0.5"
+        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <button 
+              className={`p-1 rounded hover:bg-gray-100 ${hasNotes ? 'text-blue-600' : 'text-gray-400'}`}
+              title="Add notes"
+            >
+              <MessageSquare className="h-3 w-3" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64 p-3">
             <div className="space-y-2">
-              <Label htmlFor="hours">Hours</Label>
-              <Input
-                id="hours"
-                type="number"
-                min="0"
-                max="40"
-                step="0.5"
-                value={tempHours}
-                onChange={(e) => setTempHours(e.target.value)}
-                placeholder="0"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="notes">Notes</Label>
+              <label className="text-sm font-medium">Notes</label>
               <Textarea
-                id="notes"
-                value={tempNotes}
-                onChange={(e) => setTempNotes(e.target.value)}
+                value={localNotes}
+                onChange={(e) => setLocalNotes(e.target.value)}
+                onBlur={handleNotesBlur}
                 placeholder="Add notes about leave..."
-                className="min-h-20"
+                className="text-xs"
+                rows={3}
               />
             </div>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button onClick={handleSave}>
-                Save
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </PopoverContent>
+        </Popover>
+      </div>
     </TableCell>
   );
 };

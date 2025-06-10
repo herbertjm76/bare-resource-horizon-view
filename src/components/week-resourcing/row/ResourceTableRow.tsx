@@ -89,12 +89,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         field="other"
         value={manualLeaveData[member.id]?.['other'] || ''}
         onInputChange={onLeaveInputChange}
-      />
-      
-      <DisplayPillCell 
-        value={member.location || 'N/A'}
-        label=""
-        pillClassName="bg-gradient-to-r from-blue-100 to-blue-200 border-blue-300 text-blue-800"
+        className="border-r-4 border-[#6F4BF6]"
       />
       
       {/* Project allocation cells */}

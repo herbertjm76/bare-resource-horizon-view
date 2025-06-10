@@ -1,42 +1,47 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { TableCell } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 interface ManualInputCellProps {
-  value: string | number;
   memberId: string;
   field: string;
-  placeholder?: string;
-  onInputChange: (memberId: string, field: string, value: string) => void;
+  value: string | number;
+  onInputChange: (memberId: string, field: string, value: string | number) => void;
   className?: string;
 }
 
 export const ManualInputCell: React.FC<ManualInputCellProps> = ({
-  value,
   memberId,
   field,
-  placeholder = "0",
+  value,
   onInputChange,
-  className = ""
+  className
 }) => {
+  const [localValue, setLocalValue] = useState(value.toString());
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onInputChange(memberId, field, e.target.value);
+    setLocalValue(e.target.value);
+  };
+
+  const handleBlur = () => {
+    const numericValue = parseFloat(localValue) || 0;
+    onInputChange(memberId, field, numericValue);
   };
 
   return (
-    <TableCell className={`text-center border-r p-1 ${className}`}>
-      <div className="flex items-center justify-center">
-        <Input
-          type="number"
-          min="0"
-          max="40"
-          value={value}
-          onChange={handleChange}
-          className="w-12 h-8 text-xs text-center border-2 border-gray-300 rounded-lg bg-gray-50 focus:border-brand-violet focus:bg-white transition-all"
-          placeholder={placeholder}
-        />
-      </div>
+    <TableCell className={cn("p-1 text-center", className)}>
+      <Input
+        type="number"
+        value={localValue}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        className="w-12 h-6 text-center text-xs"
+        min="0"
+        max="40"
+        step="0.5"
+      />
     </TableCell>
   );
 };

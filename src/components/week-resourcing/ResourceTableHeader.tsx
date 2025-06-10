@@ -10,7 +10,7 @@ interface ResourceTableHeaderProps {
 export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projects, showRemarks = false }) => {
   return (
     <TableHeader className="sticky top-0 z-10 bg-white border-b">
-      <TableRow className="h-12" style={{ backgroundColor: '#6F4BF6' }}>
+      <TableRow className="h-20" style={{ backgroundColor: '#6F4BF6' }}>
         {/* Member info cells */}
         <TableHead className="w-48 max-w-48 min-w-32 border-r sticky left-0 z-20 non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>Name</TableHead>
         <TableHead className="w-16 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>#</TableHead>
@@ -21,10 +21,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
         {/* Leave cells - rearranged order */}
         <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>AL</TableHead>
         <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>HO</TableHead>
-        <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>OL</TableHead>
-        
-        {/* Office Location Header */}
-        <TableHead className="w-16 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>Off</TableHead>
+        <TableHead className="w-12 text-center border-r-4 border-[#6F4BF6] non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>OL</TableHead>
         
         {/* Project allocation headers - with enhanced styling and project codes */}
         {projects.map((project, idx) => {
@@ -35,14 +32,14 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
               style={{ backgroundColor: '#6F4BF6', color: 'white' }}
             >
               {!project.isEmpty && (
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center p-1">
                   <div 
                     className="project-code-text text-xs font-bold whitespace-nowrap"
                     style={{
                       transform: 'rotate(-90deg)',
                       transformOrigin: 'center',
-                      width: '40px',
-                      height: '40px',
+                      width: '60px',
+                      height: '60px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'

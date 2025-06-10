@@ -3,7 +3,6 @@ import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { MemberNameCell } from './row/MemberNameCell';
 import { ProjectCountCell } from './row/ProjectCountCell';
-import { OfficeLocationCell } from './row/OfficeLocationCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
 import { AnnualLeaveCell } from './row/AnnualLeaveCell';
 import { OtherLeaveCell } from './row/OtherLeaveCell';
@@ -111,17 +110,15 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         onLeaveInputChange={onLeaveInputChange}
       />
       
-      {/* Combined Other Leave Cell with Notes */}
+      {/* Combined Other Leave Cell with Notes and thick border */}
       <OtherLeaveCell 
         leaveValue={otherLeave} 
         memberId={member.id}
         notes={typeof memberNotes === 'string' ? memberNotes : ''}
         onLeaveInputChange={onLeaveInputChange}
         onNotesChange={handleNotesChange}
+        className="border-r-4 border-[#6F4BF6]"
       />
-      
-      {/* Office Location Cell moved after all leave cells */}
-      <OfficeLocationCell member={member} />
       
       {/* Project allocation cells */}
       <ProjectAllocationCells 

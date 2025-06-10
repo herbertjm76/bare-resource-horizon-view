@@ -12,7 +12,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
   
   return (
     <TableHeader className="sticky top-0 z-20">
-      <TableRow style={{ backgroundColor: '#6F4BF6' }}>
+      <TableRow className="h-20" style={{ backgroundColor: '#6F4BF6' }}>
         {/* Name column - sticky */}
         <TableHead className="sticky-column sticky-left-0 border-r text-center font-semibold min-w-[150px] max-w-[150px] w-[150px]" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
           Name
@@ -35,13 +35,8 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
         <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
           HO
         </TableHead>
-        <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
+        <TableHead className="w-12 text-center border-r-4 border-[#6F4BF6] font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
           OL
-        </TableHead>
-        
-        {/* Office column */}
-        <TableHead className="w-16 text-center border-r font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
-          Off
         </TableHead>
         
         {/* Project columns */}
@@ -54,14 +49,14 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
               style={{ backgroundColor: '#6F4BF6', color: 'white' }}
             >
               {project && !project.isEmpty && (
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center p-1">
                   <div 
                     className="project-code-text text-xs font-bold whitespace-nowrap"
                     style={{
                       transform: 'rotate(-90deg)',
                       transformOrigin: 'center',
-                      width: '40px',
-                      height: '40px',
+                      width: '60px',
+                      height: '60px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
