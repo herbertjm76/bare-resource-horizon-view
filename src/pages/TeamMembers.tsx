@@ -9,6 +9,7 @@ import { TeamMembersContent } from '@/components/team-members/TeamMembersContent
 import { TeamMembersLoadingState } from '@/components/team-members/TeamMembersLoadingState';
 import { TeamMembersPermissionError } from '@/components/team-members/TeamMembersPermissionError';
 import AuthGuard from '@/components/AuthGuard';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const HEADER_HEIGHT = 56;
 
@@ -75,7 +76,8 @@ const TeamMembersPageContent = () => {
 };
 
 const TeamMembersPage = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true); // Start collapsed on mobile
+  const isMobile = useIsMobile();
 
   const toggleSidebar = () => {
     setCollapsed(prev => !prev);
@@ -87,7 +89,7 @@ const TeamMembersPage = () => {
         <div className="w-full min-h-screen flex bg-gradient-to-br from-gray-50 to-white">
           <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
           <div className="flex-1 flex flex-col min-w-0">
-            <AppHeader />
+            <AppHeader onMenuToggle={isMobile ? toggleSidebar : undefined} />
             <div style={{ height: HEADER_HEIGHT }} />
             <TeamMembersPageContent />
           </div>

@@ -3,6 +3,8 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { SidebarLogo } from './SidebarLogo';
 import { SidebarNavigation } from './SidebarNavigation';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 
 interface DashboardSidebarProps {
   collapsed: boolean;
@@ -13,9 +15,26 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
   collapsed, 
   toggleSidebar 
 }) => {
+  const isMobile = useIsMobile();
+
+  // Mobile sidebar as a sheet/drawer
+  if (isMobile) {
+    return (
+      <Sheet open={!collapsed} onOpenChange={() => toggleSidebar()}>
+        <SheetContent side="left" className="w-[280px] p-0 bg-gradient-to-b from-indigo-600 to-purple-700 text-white border-indigo-500">
+          <div className="h-full flex flex-col">
+            <SidebarLogo collapsed={false} toggleSidebar={toggleSidebar} />
+            <SidebarNavigation collapsed={false} />
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
+  // Desktop sidebar
   return (
     <aside className={cn(
-      "h-full bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-all duration-300 z-40 shadow-xl border-r border-indigo-500 flex-shrink-0",
+      "h-full bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-all duration-300 z-40 shadow-xl border-r border-indigo-500 flex-shrink-0 hidden md:block",
       collapsed ? "w-16" : "w-[280px]"
     )}>
       <SidebarLogo collapsed={collapsed} toggleSidebar={toggleSidebar} />

@@ -6,12 +6,14 @@ import { AppHeader } from '@/components/AppHeader';
 import { HelpCircle, BookOpen, MessageCircle, FileText } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { useCompany } from '@/context/CompanyContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const HEADER_HEIGHT = 56;
 
 const Help = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true); // Start collapsed on mobile
   const { company } = useCompany();
+  const isMobile = useIsMobile();
 
   const toggleSidebar = () => {
     setCollapsed(prev => !prev);
@@ -22,7 +24,7 @@ const Help = () => {
       <div className="w-full min-h-screen flex">
         <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
         <div className="flex-1 flex flex-col min-w-0">
-          <AppHeader />
+          <AppHeader onMenuToggle={isMobile ? toggleSidebar : undefined} />
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">
             <div className="max-w-6xl mx-auto space-y-8">

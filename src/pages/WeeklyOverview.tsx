@@ -8,11 +8,12 @@ import { startOfWeek, format } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { Toaster } from 'sonner';
 import { Calendar } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const HEADER_HEIGHT = 56;
 
 const WeeklyOverview = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true); // Start collapsed on mobile
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
   const [filters, setFilters] = useState({
     office: "all",
@@ -20,6 +21,7 @@ const WeeklyOverview = () => {
     manager: "all",
     searchTerm: ""
   });
+  const isMobile = useIsMobile();
 
   const toggleSidebar = () => {
     setCollapsed(prev => !prev);
@@ -48,7 +50,7 @@ const WeeklyOverview = () => {
         </div>
         <div className="flex-1 flex flex-col min-w-0">
           <div className="print:hidden">
-            <AppHeader />
+            <AppHeader onMenuToggle={isMobile ? toggleSidebar : undefined} />
           </div>
           <div style={{
             height: HEADER_HEIGHT

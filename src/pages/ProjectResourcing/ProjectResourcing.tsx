@@ -7,11 +7,13 @@ import { ProjectResourcingContent } from './components/ProjectResourcingContent'
 import { useProjectResourcingState } from './hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './utils/filterUtils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const HEADER_HEIGHT = 56;
 
 const ProjectResourcing = () => {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true); // Start collapsed on mobile
+  const isMobile = useIsMobile();
 
   const toggleSidebar = () => {
     setCollapsed(prev => !prev);
@@ -54,7 +56,7 @@ const ProjectResourcing = () => {
       <div className="w-full min-h-screen flex bg-gray-50">
         <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
         <div className="flex-1 flex flex-col min-w-0">
-          <AppHeader />
+          <AppHeader onMenuToggle={isMobile ? toggleSidebar : undefined} />
           <div style={{ height: HEADER_HEIGHT }} />
           <div 
             className="flex-1 p-6 bg-gray-50 flex flex-col" 

@@ -4,16 +4,22 @@ import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon, LogOut } from "lucide-react";
+import { User as UserIcon, LogOut, Menu } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { DateDisplay } from "@/components/ui/date-display";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-export const AppHeader: React.FC = () => {
+interface AppHeaderProps {
+  onMenuToggle?: () => void;
+}
+
+export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle }) => {
   const { company } = useCompany();
   const [user, setUser] = React.useState<User | null>(null);
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   React.useEffect(() => {
     let authSubscription: { unsubscribe: () => void } | null = null;
@@ -40,9 +46,22 @@ export const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="w-full px-2 sm:px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-[64px] sm:ml-[280px] transition-all duration-300">
-      {/* Left side - Date display with mobile spacing for hamburger menu */}
-      <div className="flex items-center flex-1 min-w-0 mr-2 sm:mr-4 ml-12 sm:ml-0">
+    <header className={cn(
+      "w-full px-2 sm:px-6 py-2 flex items-center justify-between bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-[64px] transition-all duration-300",
+      !isMobile && "sm:ml-[280px]"
+    )}>
+      {/* Left side - Mobile hamburger menu + Date display */}
+      <div className="flex items-center flex-1 min-w-0 mr-2 sm:mr-4">
+        {isMobile && onMenuToggle && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onMenuToggle}
+            className="mr-3 p-2 text-gray-600 hover:bg-gray-100"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        )}
         <DateDisplay 
           showIcon={true}
           showTimezone={false}
