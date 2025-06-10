@@ -23,10 +23,12 @@ export const StandardLayout: React.FC<StandardLayoutProps> = ({
   const isMobile = useIsMobile();
 
   const toggleSidebar = () => {
+    console.log("StandardLayout: Toggling sidebar, current state:", collapsed);
     setCollapsed(prev => !prev);
   };
 
   const handleCollapseChange = (isCollapsed: boolean) => {
+    console.log("StandardLayout: Sidebar collapse changed to:", isCollapsed);
     setSidebarCollapsed(isCollapsed);
   };
 

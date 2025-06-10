@@ -15,7 +15,7 @@ interface AppHeaderProps {
   sidebarCollapsed?: boolean;
 }
 
-export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle, sidebarCollapsed = false }) => {
+export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle, sidebarCollapsed = true }) => {
   const { company } = useCompany();
   const [user, setUser] = React.useState<User | null>(null);
   const [loading, setLoading] = React.useState(true);
