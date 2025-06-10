@@ -1,38 +1,20 @@
 
-import React, { useState } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { AppHeader } from '@/components/AppHeader';
-import { useIsMobile } from '@/hooks/use-mobile';
-
-const HEADER_HEIGHT = 56;
+import React from 'react';
+import { StandardLayout } from '@/components/layout/StandardLayout';
 
 interface ProfileLayoutProps {
   children: React.ReactNode;
 }
 
 export const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(true); // Start collapsed on mobile
-  const isMobile = useIsMobile();
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
-
   return (
-    <SidebarProvider>
-      <div className="w-full min-h-screen flex">
-        <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-        <div className="flex-1 flex flex-col min-w-0">
-          <AppHeader onMenuToggle={isMobile ? toggleSidebar : undefined} />
-          <div style={{ height: HEADER_HEIGHT }} />
-          <div className="flex-1 p-4 sm:p-8 bg-background">
-            <div className="max-w-6xl mx-auto space-y-8">
-              {children}
-            </div>
-          </div>
-        </div>
+    <StandardLayout 
+      className="bg-background" 
+      contentClassName="p-4 sm:p-8"
+    >
+      <div className="max-w-6xl mx-auto space-y-8">
+        {children}
       </div>
-    </SidebarProvider>
+    </StandardLayout>
   );
 };

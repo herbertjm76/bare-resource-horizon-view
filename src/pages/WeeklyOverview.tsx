@@ -1,19 +1,13 @@
 
 import React, { useState } from 'react';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { AppHeader } from '@/components/AppHeader';
+import { StandardLayout } from '@/components/layout/StandardLayout';
 import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
 import { startOfWeek, format } from 'date-fns';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { Toaster } from 'sonner';
 import { Calendar } from 'lucide-react';
-import { useIsMobile } from '@/hooks/use-mobile';
-
-const HEADER_HEIGHT = 56;
 
 const WeeklyOverview = () => {
-  const [collapsed, setCollapsed] = useState(true); // Start collapsed on mobile
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
   const [filters, setFilters] = useState({
     office: "all",
@@ -21,11 +15,6 @@ const WeeklyOverview = () => {
     manager: "all",
     searchTerm: ""
   });
-  const isMobile = useIsMobile();
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
 
   // Get Monday of the current week
   const weekStart = startOfWeek(selectedWeek, {
@@ -43,46 +32,31 @@ const WeeklyOverview = () => {
   };
   
   return (
-    <SidebarProvider>
-      <div className="w-full min-h-screen flex bg-gray-50">
-        <div className="print:hidden">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+    <StandardLayout>
+      <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
+        {/* Page Header */}
+        <div className="mb-6">
+          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: '#6465F0' }}>
+            <Calendar className="h-8 w-8 inline-block mr-3" style={{ color: '#6465F0' }} />
+            Weekly Overview
+          </h1>
         </div>
-        <div className="flex-1 flex flex-col min-w-0">
-          <div className="print:hidden">
-            <AppHeader onMenuToggle={isMobile ? toggleSidebar : undefined} />
-          </div>
-          <div style={{
-            height: HEADER_HEIGHT
-          }} className="print:hidden" />
-          <div className="flex-1 p-3 sm:p-4 lg:p-6 bg-gray-50 min-w-0">
-            <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
-              {/* Page Header - Updated title color */}
-              <div className="mb-6">
-                <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: '#6465F0' }}>
-                  <Calendar className="h-8 w-8 inline-block mr-3" style={{ color: '#6465F0' }} />
-                  Weekly Overview
-                </h1>
-              </div>
-              
-              <OfficeSettingsProvider>
-                <WeekResourceView 
-                  selectedWeek={selectedWeek}
-                  setSelectedWeek={setSelectedWeek}
-                  weekLabel={weekLabel}
-                  filters={{
-                    office: filters.office,
-                    searchTerm: filters.searchTerm
-                  }}
-                  onFilterChange={handleFilterChange}
-                />
-              </OfficeSettingsProvider>
-            </div>
-          </div>
-        </div>
+        
+        <OfficeSettingsProvider>
+          <WeekResourceView 
+            selectedWeek={selectedWeek}
+            setSelectedWeek={setSelectedWeek}
+            weekLabel={weekLabel}
+            filters={{
+              office: filters.office,
+              searchTerm: filters.searchTerm
+            }}
+            onFilterChange={handleFilterChange}
+          />
+        </OfficeSettingsProvider>
       </div>
       <Toaster position="top-right" />
-    </SidebarProvider>
+    </StandardLayout>
   );
 };
 
