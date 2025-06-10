@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, Calendar, Clock, TrendingUp } from 'lucide-react';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
@@ -108,25 +108,25 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
   ];
 
   return (
-    <div className="mb-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="w-full bg-gray-50 rounded-lg p-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {metrics.map((metric, index) => {
           const IconComponent = metric.icon;
           
           return (
-            <Card key={index} className="bg-white border border-gray-200 rounded-lg shadow-sm">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="p-1.5 rounded-md bg-brand-violet/10">
-                    <IconComponent className="h-4 w-4 text-brand-violet" />
+            <Card key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 rounded-lg bg-brand-violet/10">
+                    <IconComponent className="h-5 w-5 text-brand-violet" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">{metric.title}</span>
                 </div>
                 
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl font-bold text-gray-900">{metric.value}</span>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-3xl font-bold text-gray-900">{metric.value}</span>
                   {metric.badgeText && (
-                    <Badge className={`text-xs px-2 py-1 rounded-full font-medium ${getBadgeClasses(metric.badgeColor)}`}>
+                    <Badge className={`text-xs px-3 py-1 rounded-full font-medium ${getBadgeClasses(metric.badgeColor)}`}>
                       {metric.badgeText}
                     </Badge>
                   )}
