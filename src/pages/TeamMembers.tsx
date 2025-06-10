@@ -102,6 +102,7 @@ const TeamMembersPageContent = () => {
         totalActiveProjects={activeProjects}
         totalOffices={totalLocations}
         utilizationRate={0}
+        customTitle="Team Members"
         customIcon={Users}
       />
       <TeamMembersContent userId={userId} />
