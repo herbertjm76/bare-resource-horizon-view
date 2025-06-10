@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { useUserSession } from '@/hooks/useUserSession';
@@ -14,6 +13,7 @@ import { useProjects } from '@/hooks/useProjects';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import AuthGuard from '@/components/AuthGuard';
+import { Users } from 'lucide-react';
 
 const TeamMembersPageContent = () => {
   const userId = useUserSession();
@@ -102,6 +102,8 @@ const TeamMembersPageContent = () => {
         totalActiveProjects={activeProjects}
         totalOffices={totalLocations}
         utilizationRate={0}
+        customTitle="Team Members"
+        customIcon={Users}
       />
       <TeamMembersContent userId={userId} />
     </>

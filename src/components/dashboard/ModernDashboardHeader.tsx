@@ -9,16 +9,24 @@ interface ModernDashboardHeaderProps {
   totalActiveProjects?: number;
   totalOffices?: number;
   utilizationRate?: number;
+  customTitle?: string;
+  customIcon?: React.ComponentType<any>;
 }
 
 export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
   totalTeamMembers = 0,
   totalActiveProjects = 0,
   totalOffices = 0,
-  utilizationRate = 0
+  utilizationRate = 0,
+  customTitle,
+  customIcon: CustomIcon
 }) => {
   const { company } = useCompany();
   const companyName = company?.name || 'Your Company';
+
+  // Use custom title and icon if provided, otherwise use default dashboard
+  const title = customTitle || `${companyName} Dashboard`;
+  const IconComponent = CustomIcon || LayoutDashboard;
 
   return (
     <div className="space-y-6 p-4 sm:p-8">
@@ -26,8 +34,8 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
         <div className="space-y-2">
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-            <LayoutDashboard className="h-8 w-8 text-brand-violet" strokeWidth={1.5} />
-            {companyName} Dashboard
+            <IconComponent className="h-8 w-8 text-brand-violet" strokeWidth={1.5} />
+            {title}
           </h1>
         </div>
         
