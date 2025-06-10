@@ -47,15 +47,20 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   const uploadAvatar = async (file: File) => {
     try {
       setUploading(true);
+      console.log('Starting avatar upload for user:', userId);
 
-      // Create a unique file name
+      // Create a unique file name with timestamp to avoid caching issues
       const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}/avatar.${fileExt}`;
+      const timestamp = Date.now();
+      const fileName = `${userId}/avatar-${timestamp}.${fileExt}`;
+
+      console.log('Uploading file:', fileName);
 
       // Delete existing avatar if it exists
       if (currentAvatarUrl) {
         const oldPath = currentAvatarUrl.split('/').pop();
-        if (oldPath) {
+        if (oldPath && oldPath.includes('avatar')) {
+          console.log('Removing old avatar:', oldPath);
           await supabase.storage
             .from('avatars')
             .remove([`${userId}/${oldPath}`]);
@@ -63,7 +68,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
       }
 
       // Upload the new file
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data } = await supabase.storage
         .from('avatars')
         .upload(fileName, file, {
           cacheControl: '3600',
@@ -71,15 +76,19 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         });
 
       if (uploadError) {
+        console.error('Upload error:', uploadError);
         throw uploadError;
       }
 
+      console.log('Upload successful:', data);
+
       // Get the public URL
-      const { data } = supabase.storage
+      const { data: urlData } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      const newAvatarUrl = data.publicUrl;
+      const newAvatarUrl = urlData.publicUrl;
+      console.log('New avatar URL:', newAvatarUrl);
 
       // Update the profile in the database
       const { error: updateError } = await supabase
@@ -88,18 +97,30 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         .eq('id', userId);
 
       if (updateError) {
+        console.error('Database update error:', updateError);
         throw updateError;
       }
 
+      console.log('Profile updated successfully');
       setPreviewUrl(newAvatarUrl);
       onAvatarUpdate(newAvatarUrl);
       toast.success('Avatar updated successfully');
 
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      toast.error('Failed to upload avatar');
+      toast.error('Failed to upload avatar. Please try again.');
     } finally {
       setUploading(false);
+      // Clear the file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleClick = () => {
+    if (!uploading) {
+      fileInputRef.current?.click();
     }
   };
 
@@ -108,10 +129,14 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
       className="relative inline-block cursor-pointer"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      onClick={() => fileInputRef.current?.click()}
+      onClick={handleClick}
     >
       <Avatar className="h-24 w-24 rounded-lg">
-        <AvatarImage src={previewUrl || undefined} alt="Profile picture" className="rounded-lg" />
+        <AvatarImage 
+          src={previewUrl || undefined} 
+          alt="Profile picture" 
+          className="rounded-lg object-cover" 
+        />
         <AvatarFallback className="text-lg bg-brand-primary text-white rounded-lg">
           {userInitials}
         </AvatarFallback>
@@ -142,6 +167,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         accept="image/*"
         onChange={handleFileSelect}
         className="hidden"
+        disabled={uploading}
       />
     </div>
   );
