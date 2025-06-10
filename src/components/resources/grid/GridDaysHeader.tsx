@@ -34,18 +34,20 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
               backgroundColor: isWeekendDay ? '#5a5b8a' : '#6465F0'
             }}
           >
-            <div className="flex flex-col items-center justify-center gap-0.5 h-full">
+            <div className="flex flex-col items-center justify-between h-full">
               {isNewMonth && (
                 <span className="text-[10px] font-bold uppercase leading-none text-yellow-200">
                   {day.monthLabel}
                 </span>
               )}
-              <span className="text-[10px] opacity-90 uppercase leading-none font-medium">
-                {day.dayName}
-              </span>
-              <span className="text-sm font-bold leading-none">
-                {day.label}
-              </span>
+              <div className="flex flex-col items-center justify-end gap-0.5 flex-1">
+                <span className="text-[10px] opacity-90 uppercase leading-none font-medium">
+                  {day.dayName}
+                </span>
+                <span className="text-sm font-bold leading-none">
+                  {day.label}
+                </span>
+              </div>
             </div>
           </th>
         );
