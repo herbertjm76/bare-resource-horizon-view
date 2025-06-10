@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { useUserSession } from '@/hooks/useUserSession';
@@ -5,6 +6,12 @@ import { useTeamMembersPermissions } from '@/hooks/team/useTeamMembersPermission
 import { TeamMembersContent } from '@/components/team-members/TeamMembersContent';
 import { TeamMembersLoadingState } from '@/components/team-members/TeamMembersLoadingState';
 import { TeamMembersPermissionError } from '@/components/team-members/TeamMembersPermissionError';
+import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
+import { useTeamMembersData } from '@/hooks/useTeamMembersData';
+import { useTeamMembersState } from '@/hooks/useTeamMembersState';
+import { useCompany } from '@/context/CompanyContext';
+import { useProjects } from '@/hooks/useProjects';
+import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import AuthGuard from '@/components/AuthGuard';
 
 const TeamMembersPageContent = () => {
@@ -18,6 +25,19 @@ const TeamMembersPageContent = () => {
     setPermissionChecked,
     handleRetryPermission
   } = useTeamMembersPermissions();
+  
+  // Fetch team members data for header statistics
+  const { teamMembers } = useTeamMembersData(true);
+  const { company } = useCompany();
+  const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
+  const { projects } = useProjects();
+  const { locations } = useOfficeSettings();
+  
+  // Calculate statistics for header
+  const allMembers = [...teamMembers, ...preRegisteredMembers];
+  const totalTeamMembers = allMembers.length;
+  const totalActiveProjects = projects.filter(project => project.status === 'In Progress').length;
+  const totalOffices = locations.length;
   
   // Check permissions once when component mounts or userId changes
   React.useEffect(() => {
@@ -66,7 +86,16 @@ const TeamMembersPageContent = () => {
     );
   }
 
-  return <TeamMembersContent userId={userId} />;
+  return (
+    <>
+      <ModernDashboardHeader
+        totalTeamMembers={totalTeamMembers}
+        totalActiveProjects={totalActiveProjects}
+        totalOffices={totalOffices}
+      />
+      <TeamMembersContent userId={userId} />
+    </>
+  );
 };
 
 const TeamMembersPage = () => {
