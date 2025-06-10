@@ -1,3 +1,4 @@
+
 import { useMemo } from 'react';
 import { format, addDays, isWeekend, isSunday, startOfMonth, eachDayOfInterval, addWeeks } from 'date-fns';
 import { DayInfo } from '../grid/types';
@@ -30,6 +31,12 @@ const getDayOfWeek = (date: Date, weekStartsOnSunday: boolean): number => {
   }
   
   return day;
+};
+
+// Get single letter day abbreviation
+const getSingleLetterDay = (date: Date): string => {
+  const dayNames = ['S', 'M', 'T', 'W', 'Th', 'F', 'Sa'];
+  return dayNames[date.getDay()];
 };
 
 export const useGridDays = (
@@ -77,7 +84,7 @@ export const useGridDays = (
       return {
         date: day,
         label: format(day, 'd'), // Day of month
-        dayName: format(day, 'EEE'), // Short day name (Mon, Tue, etc.)
+        dayName: getSingleLetterDay(day), // Single letter day name
         monthLabel: format(day, 'MMM'), // Short month name
         isWeekend: isWeekend(day),
         isSunday: isSunday(day),
