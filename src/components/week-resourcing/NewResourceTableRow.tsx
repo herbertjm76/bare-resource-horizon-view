@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { 
@@ -86,8 +87,12 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           annualLeaveDates={annualLeaveDates}
         />
         
-        {/* Annual Leave Cell - READ-ONLY display from database with gray styling */}
-        <ReadOnlyLeaveCell value={annualLeave} />
+        {/* Annual Leave Cell - READ-ONLY display from database with tooltip */}
+        <ReadOnlyLeaveCell 
+          value={annualLeave} 
+          leaveDays={annualLeaveDates}
+          leaveType="Annual Leave"
+        />
         
         {/* Holiday Cell - READ-ONLY display from database with gray styling */}
         <ReadOnlyLeaveCell value={holidayHours} />
