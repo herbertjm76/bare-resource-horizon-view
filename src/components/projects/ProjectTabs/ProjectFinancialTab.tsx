@@ -24,7 +24,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
   // Calculate derived budget amount from stage fees
   const derivedBudgetAmount = useMemo((): number => {
     if (!form.stageFees) return 0;
-    return Object.values(form.stageFees).reduce((total: number, stage: unknown): number => {
+    return (Object.values(form.stageFees) as unknown[]).reduce<number>((total: number, stage: unknown): number => {
       // Type guard to ensure stage is an object with fee property
       if (stage && typeof stage === 'object' && stage !== null) {
         const stageObj = stage as { fee?: string | number };
