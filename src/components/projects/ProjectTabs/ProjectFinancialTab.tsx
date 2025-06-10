@@ -1,31 +1,43 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { DollarSign, TrendingUp, TrendingDown, AlertTriangle, Calendar, Calculator } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, AlertTriangle, Calendar, Calculator, Clock, Target } from 'lucide-react';
+import { ProgressIndicator } from '../components/ProgressIndicator';
+import { CurrentStageIndicator } from '../components/CurrentStageIndicator';
+import type { FinancialMetrics } from '../hooks/useProjectFinancialMetrics';
 
 interface ProjectFinancialTabProps {
   form: any;
   onChange: (key: string, value: any) => void;
-  financialMetrics?: {
-    total_budget: number;
-    total_spent: number;
-    total_revenue: number;
-    profit_margin: number;
-    budget_variance: number;
-    schedule_variance: number;
-  };
+  financialMetrics?: FinancialMetrics;
+  officeStages?: Array<{ id: string; name: string; color?: string }>;
 }
 
 export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
   form,
   onChange,
-  financialMetrics
+  financialMetrics,
+  officeStages = []
 }) => {
+  // Calculate derived budget amount from stage fees
+  const derivedBudgetAmount = useMemo(() => {
+    if (!form.stageFees) return 0;
+    return Object.values(form.stageFees).reduce((total: number, stage: any) => {
+      const fee = parseFloat(stage?.fee || '0');
+      return total + (isNaN(fee) ? 0 : fee);
+    }, 0);
+  }, [form.stageFees]);
+
+  // Calculate budget hours from derived budget and blended rate
+  const derivedBudgetHours = useMemo(() => {
+    const rate = parseFloat(form.blended_rate || form.avgRate || '0');
+    return rate > 0 ? derivedBudgetAmount / rate : 0;
+  }, [derivedBudgetAmount, form.blended_rate, form.avgRate]);
+
   const getVarianceColor = (variance: number) => {
     if (variance > 10) return 'text-red-600';
     if (variance < -5) return 'text-green-600';
@@ -37,68 +49,115 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
       case 'on track': return 'default';
       case 'at risk': return 'destructive';
       case 'delayed': return 'destructive';
+      case 'over budget': return 'destructive';
+      case 'under budget': return 'secondary';
       case 'completed': return 'secondary';
       default: return 'outline';
     }
   };
 
+  const consumedHours = parseFloat(form.consumed_hours || '0');
+  const hoursProgress = derivedBudgetHours > 0 ? (consumedHours / derivedBudgetHours) * 100 : 0;
+
   return (
     <div className="space-y-6">
-      {/* Financial Overview Cards */}
-      {financialMetrics && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <DollarSign className="h-4 w-4" />
-                Total Budget
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                ${financialMetrics.total_budget?.toLocaleString() || 0}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Total project budget
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Revenue
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                ${financialMetrics.total_revenue?.toLocaleString() || 0}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Total revenue recognized
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Calculator className="h-4 w-4" />
-                Profit Margin
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {financialMetrics.profit_margin?.toFixed(1) || 0}%
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Current profit margin
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Current Stage Progress */}
+      {form.current_stage && officeStages.length > 0 && (
+        <CurrentStageIndicator
+          currentStage={form.current_stage}
+          allStages={officeStages}
+          completionPercentage={hoursProgress}
+        />
       )}
+
+      {/* Financial Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Total Budget
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              ${derivedBudgetAmount.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Calculated from stage fees
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Hours Progress
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {consumedHours.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              of {derivedBudgetHours.toFixed(0)} budgeted hours
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Burn Rate
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {financialMetrics?.burn_rate?.toFixed(1) || '0.0'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              hours per day
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Progress Indicators */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Hours Consumption</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProgressIndicator
+              label="Hours Used"
+              current={consumedHours}
+              total={derivedBudgetHours}
+              unit="hrs"
+              variant="hours"
+            />
+          </CardContent>
+        </Card>
+
+        {financialMetrics && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Budget Utilization</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ProgressIndicator
+                label="Budget Spent"
+                current={financialMetrics.total_spent}
+                total={derivedBudgetAmount}
+                unit="$"
+                variant="budget"
+              />
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Budget Configuration */}
       <Card>
@@ -111,28 +170,46 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="budget_amount">Budget Amount</Label>
+              <Label htmlFor="budget_amount">Budget Amount (Calculated)</Label>
               <Input
                 id="budget_amount"
                 type="number"
-                placeholder="0.00"
-                value={form.budget_amount || ''}
-                onChange={(e) => onChange('budget_amount', parseFloat(e.target.value) || 0)}
+                value={derivedBudgetAmount.toFixed(2)}
+                readOnly
+                disabled
+                className="bg-muted"
               />
+              <p className="text-xs text-muted-foreground">
+                Automatically calculated from stage fees
+              </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="budget_hours">Budget Hours</Label>
+              <Label htmlFor="budget_hours">Budget Hours (Calculated)</Label>
               <Input
                 id="budget_hours"
                 type="number"
-                placeholder="0"
-                value={form.budget_hours || ''}
-                onChange={(e) => onChange('budget_hours', parseFloat(e.target.value) || 0)}
+                value={derivedBudgetHours.toFixed(2)}
+                readOnly
+                disabled
+                className="bg-muted"
               />
+              <p className="text-xs text-muted-foreground">
+                Budget amount ÷ blended rate
+              </p>
             </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="consumed_hours">Consumed Hours</Label>
+              <Input
+                id="consumed_hours"
+                type="number"
+                placeholder="0"
+                value={form.consumed_hours || ''}
+                onChange={(e) => onChange('consumed_hours', parseFloat(e.target.value) || 0)}
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="blended_rate">Blended Rate</Label>
               <Input
@@ -143,29 +220,30 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
                 onChange={(e) => onChange('blended_rate', parseFloat(e.target.value) || 0)}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="financial_status">Financial Status</Label>
-              <Select
-                value={form.financial_status || 'On Track'}
-                onValueChange={(value) => onChange('financial_status', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="On Track">On Track</SelectItem>
-                  <SelectItem value="At Risk">At Risk</SelectItem>
-                  <SelectItem value="Over Budget">Over Budget</SelectItem>
-                  <SelectItem value="Under Budget">Under Budget</SelectItem>
-                  <SelectItem value="Completed">Completed</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="financial_status">Financial Status</Label>
+            <Select
+              value={form.financial_status || 'On Track'}
+              onValueChange={(value) => onChange('financial_status', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="On Track">On Track</SelectItem>
+                <SelectItem value="At Risk">At Risk</SelectItem>
+                <SelectItem value="Over Budget">Over Budget</SelectItem>
+                <SelectItem value="Under Budget">Under Budget</SelectItem>
+                <SelectItem value="Completed">Completed</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
 
-      {/* Contract Dates */}
+      {/* Contract Timeline */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -197,7 +275,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
         </CardContent>
       </Card>
 
-      {/* Financial Variance Indicators */}
+      {/* Enhanced Financial Health */}
       {financialMetrics && (
         <Card>
           <CardHeader>
@@ -236,9 +314,30 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
-                    Last updated: {new Date().toLocaleDateString()}
+                    Profit Margin: {financialMetrics.profit_margin?.toFixed(1) || 0}%
                   </span>
                 </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
+              <div className="text-center">
+                <div className="text-lg font-semibold">
+                  {financialMetrics.consumed_hours?.toFixed(1) || 0}
+                </div>
+                <div className="text-xs text-muted-foreground">Hours Consumed</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-semibold">
+                  {financialMetrics.budget_hours?.toFixed(1) || 0}
+                </div>
+                <div className="text-xs text-muted-foreground">Budget Hours</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-semibold">
+                  {((consumedHours / derivedBudgetHours) * 100).toFixed(1) || 0}%
+                </div>
+                <div className="text-xs text-muted-foreground">Hours Utilization</div>
               </div>
             </div>
           </CardContent>

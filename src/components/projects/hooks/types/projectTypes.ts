@@ -23,13 +23,14 @@ export interface FormState {
   stages: string[];
   stageFees: Record<string, StageFee>;
   stageApplicability: Record<string, boolean>;
-  // New financial tracking fields
+  // Enhanced financial tracking fields
   budget_amount?: number;
   budget_hours?: number;
   blended_rate?: number;
   contract_start_date?: string;
   contract_end_date?: string;
   financial_status?: string;
+  consumed_hours?: number;
 }
 
 export interface ProjectData {
@@ -47,13 +48,14 @@ export interface ProjectData {
   stages?: string[];
   currency?: string;
   average_rate?: number;
-  // New financial fields
+  // Enhanced financial fields
   budget_amount?: number;
   budget_hours?: number;
   blended_rate?: number;
   contract_start_date?: string;
   contract_end_date?: string;
   financial_status?: string;
+  consumed_hours?: number;
   created_at: string;
   updated_at: string;
 }

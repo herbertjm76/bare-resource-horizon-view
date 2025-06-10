@@ -1017,6 +1017,7 @@ export type Database = {
           budget_hours: number | null
           code: string
           company_id: string | null
+          consumed_hours: number | null
           contract_end_date: string | null
           contract_start_date: string | null
           country: string
@@ -1041,6 +1042,7 @@ export type Database = {
           budget_hours?: number | null
           code: string
           company_id?: string | null
+          consumed_hours?: number | null
           contract_end_date?: string | null
           contract_start_date?: string | null
           country: string
@@ -1065,6 +1067,7 @@ export type Database = {
           budget_hours?: number | null
           code?: string
           company_id?: string | null
+          consumed_hours?: number | null
           contract_end_date?: string | null
           contract_start_date?: string | null
           country?: string
@@ -1204,6 +1207,10 @@ export type Database = {
           profit_margin: number
           budget_variance: number
           schedule_variance: number
+          consumed_hours: number
+          budget_hours: number
+          blended_rate: number
+          burn_rate: number
         }[]
       }
       get_user_company_id: {

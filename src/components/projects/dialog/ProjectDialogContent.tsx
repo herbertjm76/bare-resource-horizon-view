@@ -70,6 +70,7 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
             form={form}
             onChange={handleChange}
             financialMetrics={financialMetrics}
+            officeStages={officeStages}
           />
         </ScrollArea>
       </TabsContent>
