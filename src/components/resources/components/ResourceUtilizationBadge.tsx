@@ -2,9 +2,9 @@
 import React from 'react';
 import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
-// Helper function to get color based on utilization percentage
+// Helper function to get standardized color based on utilization percentage
 const getUtilizationColor = (utilization: number) => {
-  if (utilization < 70) return { bg: '#EDFAE5', text: '#25701B' }; // Green - under utilized
+  if (utilization < 70) return { bg: '#EDFAE5', text: '#25701B' }; // Standardized green
   if (utilization <= 100) return { bg: '#FEF7CD', text: '#856404' }; // Yellow - good utilization
   return { bg: '#FFDEE2', text: '#C0392B' }; // Red - over utilized
 };

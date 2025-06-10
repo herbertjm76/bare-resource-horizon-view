@@ -35,10 +35,10 @@ export const CEOMetricsCard: React.FC<CEOMetricsCardProps> = ({
 
   const getIconColors = () => {
     switch (status) {
-      case 'good': return 'text-green-600 bg-green-100';
-      case 'warning': return 'text-yellow-600 bg-yellow-100';
+      case 'good': return 'text-emerald-600 bg-emerald-100'; // Updated to match standardized green
+      case 'warning': return 'text-orange-600 bg-orange-100';
       case 'danger': return 'text-red-600 bg-red-100';
-      default: return 'text-blue-600 bg-blue-100';
+      default: return 'text-blue-600 bg-blue-100'; // Updated to match standardized blue
     }
   };
 
