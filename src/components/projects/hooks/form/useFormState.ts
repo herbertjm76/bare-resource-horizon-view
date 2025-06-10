@@ -116,12 +116,12 @@ export const useFormState = (
           
           // Calculate invoice age if we have an invoice date
           const invoiceDate = feeData?.invoice_date ? new Date(feeData.invoice_date) : null;
-          let invoiceAge = '0';
+          let invoiceAge = 0;
           
           if (invoiceDate && !isNaN(invoiceDate.getTime())) {
             const now = new Date();
             const diffTime = Math.abs(now.getTime() - invoiceDate.getTime());
-            invoiceAge = Math.ceil(diffTime / (1000 * 60 * 60 * 24)).toString();
+            invoiceAge = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
           }
 
           // Parse billing month to ensure it's a proper Date object

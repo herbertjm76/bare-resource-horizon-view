@@ -49,9 +49,9 @@ export const ProjectStageFeesTab: React.FC<ProjectStageFeesTabProps> = ({
   };
   
   const calculateHours = (fee: string): string => {
-    if (!fee || !form.avgRate || parseFloat(form.avgRate) === 0) return '';
+    if (!fee || !form.avgRate || parseFloat(String(form.avgRate)) === 0) return '';
     const feeValue = parseFloat(fee);
-    const rateValue = parseFloat(form.avgRate);
+    const rateValue = parseFloat(String(form.avgRate));
     if (isNaN(feeValue) || isNaN(rateValue) || rateValue === 0) return '';
     return (feeValue / rateValue).toFixed(2);
   };

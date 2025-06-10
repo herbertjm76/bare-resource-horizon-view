@@ -1,7 +1,7 @@
 
 export interface StageFee {
   fee: string | number;
-  billingMonth: string;
+  billingMonth: string | Date | null;
   status: string;
   invoiceDate: Date | null;
   hours: string | number;
@@ -14,8 +14,8 @@ export interface FormState {
   name: string;
   manager: string;
   country: string;
-  profit: string | number;
-  avgRate: string | number;
+  profit: string;
+  avgRate: string;
   currency: string;
   status: string;
   office: string;

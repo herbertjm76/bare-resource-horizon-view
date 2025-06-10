@@ -62,7 +62,7 @@ export const useStageSubmit = () => {
       }
 
       const stageData = {
-        fee: feeData?.fee ? parseFloat(feeData.fee) : 0,
+        fee: feeData?.fee ? parseFloat(String(feeData.fee)) : 0,
         isApplicable: stageApplicability[stageId] ?? true,
         billingMonth: feeData?.billingMonth ? 
           (feeData.billingMonth instanceof Date ? 
@@ -75,7 +75,7 @@ export const useStageSubmit = () => {
             String(feeData.invoiceDate)) : 
           null,
         status: feeData?.status || 'Not Billed',
-        invoiceAge: feeData?.invoiceAge ? parseInt(String(feeData.invoiceAge), 10) || 0 : 0,
+        invoiceAge: typeof feeData?.invoiceAge === 'number' ? feeData.invoiceAge : parseInt(String(feeData?.invoiceAge || 0), 10) || 0,
         currency: feeData?.currency || 'USD'
       };
       

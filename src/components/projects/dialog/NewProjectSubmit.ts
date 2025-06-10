@@ -135,7 +135,7 @@ export const submitNewProject = async (
           project_id: projectId,
           company_id: companyId,
           stage_name: stage?.name ?? "Unknown Stage",
-          fee: feeObj?.fee ? parseFloat(feeObj.fee) : 0,
+          fee: feeObj?.fee ? parseFloat(String(feeObj.fee)) : 0,
           is_applicable: form.stageApplicability?.[stageId] ?? true
         });
       });

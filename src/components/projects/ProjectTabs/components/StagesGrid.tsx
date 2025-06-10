@@ -58,7 +58,7 @@ export const StagesGrid: React.FC<StagesGridProps> = ({
             status: 'Not Billed',
             invoiceDate: null,
             hours: '',
-            invoiceAge: '0',
+            invoiceAge: 0,
             currency: 'USD'
           };
           

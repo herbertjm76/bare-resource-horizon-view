@@ -26,7 +26,7 @@ export const useStageManagement = (form: FormState, setForm: React.Dispatch<Reac
         status: 'Not Billed',
         invoiceDate: null,
         hours: '',
-        invoiceAge: '0',
+        invoiceAge: 0,
         currency: form.currency
       };
     }
@@ -53,7 +53,7 @@ export const useStageManagement = (form: FormState, setForm: React.Dispatch<Reac
           status: 'Not Billed',
           invoiceDate: null,
           hours: '',
-          invoiceAge: '0',
+          invoiceAge: 0,
           currency: prev.currency
         };
       }

@@ -35,14 +35,16 @@ export const StageForm: React.FC<StageFormProps> = ({
   
   const handleToday = () => {
     const today = new Date();
+    const ageString = calculateInvoiceAge(today);
+    const ageNumber = parseInt(ageString, 10) || 0;
     updateStageFee(stageId, { 
       invoiceDate: today,
-      invoiceAge: calculateInvoiceAge(today)
+      invoiceAge: ageNumber
     });
   };
 
   // Safe access to fee value with fallbacks
-  const feeValue = stageFeeData?.fee || "";
+  const feeValue = String(stageFeeData?.fee || "");
   const statusValue = stageFeeData?.status || "Not Billed";
   const currencyValue = stageFeeData?.currency || "USD";
   
@@ -51,9 +53,14 @@ export const StageForm: React.FC<StageFormProps> = ({
   console.log(`Stage ${stageId} invoice date:`, stageFeeData?.invoiceDate);
   
   // Ensure billingMonth is a proper Date object if it exists
-  const billingMonth = stageFeeData?.billingMonth instanceof Date ? stageFeeData.billingMonth : 
-                      (typeof stageFeeData?.billingMonth === 'string' && stageFeeData.billingMonth ? 
-                        new Date(stageFeeData.billingMonth) : null);
+  let billingMonth: Date | null = null;
+  if (stageFeeData?.billingMonth) {
+    if (stageFeeData.billingMonth instanceof Date) {
+      billingMonth = stageFeeData.billingMonth;
+    } else if (typeof stageFeeData.billingMonth === 'string') {
+      billingMonth = new Date(stageFeeData.billingMonth);
+    }
+  }
                         
   // Ensure invoiceDate is a proper Date object if it exists
   const invoiceDate = stageFeeData?.invoiceDate instanceof Date ? stageFeeData.invoiceDate : 
@@ -64,7 +71,7 @@ export const StageForm: React.FC<StageFormProps> = ({
   const hours = calculateHours(feeValue);
 
   // Calculate invoice age based on invoice date
-  const invoiceAge = calculateInvoiceAge(invoiceDate);
+  const invoiceAgeString = calculateInvoiceAge(invoiceDate);
 
   return (
     <div className="p-4 space-y-3">
@@ -148,9 +155,11 @@ export const StageForm: React.FC<StageFormProps> = ({
             value={invoiceDate}
             onChange={(date) => {
               console.log(`Updating invoice date for stage ${stageId} to ${date}`);
+              const ageString = date ? calculateInvoiceAge(date) : '0';
+              const ageNumber = parseInt(ageString, 10) || 0;
               updateStageFee(stageId, { 
                 invoiceDate: date,
-                invoiceAge: date ? calculateInvoiceAge(date) : '0'
+                invoiceAge: ageNumber
               });
             }}
             onToday={handleToday}
@@ -161,7 +170,7 @@ export const StageForm: React.FC<StageFormProps> = ({
           <Label htmlFor={`invoiceAge-${stageId}`} className="text-xs">Invoice Age (Days)</Label>
           <Input
             id={`invoiceAge-${stageId}`}
-            value={invoiceAge}
+            value={invoiceAgeString}
             readOnly
             disabled
             className="h-8 bg-muted"
