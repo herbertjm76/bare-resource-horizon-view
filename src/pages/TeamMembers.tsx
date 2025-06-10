@@ -1,4 +1,5 @@
 import React from 'react';
+import { Users } from 'lucide-react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { useUserSession } from '@/hooks/useUserSession';
 import { useTeamMembersPermissions } from '@/hooks/team/useTeamMembersPermissions';
@@ -101,6 +102,8 @@ const TeamMembersPageContent = () => {
         totalActiveProjects={activeProjects}
         totalOffices={totalLocations}
         utilizationRate={0}
+        customTitle="Team Members"
+        customIcon={Users}
       />
       <TeamMembersContent userId={userId} />
     </>
