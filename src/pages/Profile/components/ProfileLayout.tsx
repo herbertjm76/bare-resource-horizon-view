@@ -19,11 +19,9 @@ export const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
 
   return (
     <SidebarProvider>
-      <div className="w-full min-h-screen flex flex-row">
-        <div className="flex-shrink-0">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-        </div>
-        <div className="flex-1 flex flex-col">
+      <div className="w-full min-h-screen flex">
+        <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+        <div className="flex-1 flex flex-col min-w-0">
           <AppHeader />
           <div style={{ height: HEADER_HEIGHT }} />
           <div className="flex-1 p-4 sm:p-8 bg-background">

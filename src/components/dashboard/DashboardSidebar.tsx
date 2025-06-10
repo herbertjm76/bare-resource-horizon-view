@@ -15,7 +15,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
 }) => {
   return (
     <aside className={cn(
-      "fixed left-0 top-0 h-full bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-all duration-300 z-40 shadow-xl border-r border-indigo-500",
+      "h-full bg-gradient-to-b from-indigo-600 to-purple-700 text-white transition-all duration-300 z-40 shadow-xl border-r border-indigo-500 flex-shrink-0",
       collapsed ? "w-16" : "w-[280px]"
     )}>
       <SidebarLogo collapsed={collapsed} toggleSidebar={toggleSidebar} />

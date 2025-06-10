@@ -84,11 +84,9 @@ const TeamMembersPage = () => {
   return (
     <AuthGuard>
       <SidebarProvider>
-        <div className="w-full min-h-screen flex flex-row bg-gradient-to-br from-gray-50 to-white">
-          <div className="flex-shrink-0">
-            <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-          </div>
-          <div className="flex-1 flex flex-col">
+        <div className="w-full min-h-screen flex bg-gradient-to-br from-gray-50 to-white">
+          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+          <div className="flex-1 flex flex-col min-w-0">
             <AppHeader />
             <div style={{ height: HEADER_HEIGHT }} />
             <TeamMembersPageContent />

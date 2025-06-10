@@ -21,15 +21,13 @@ export const DashboardLayout: React.FC = () => {
     <AuthGuard>
       <OfficeSettingsProvider>
         <SidebarProvider>
-          <div className="flex flex-col w-full min-h-screen bg-background">
-            <div className="flex flex-1 w-full">
-              <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-              <div className="flex-1 flex flex-col">
-                <AppHeader />
-                <div style={{ height: HEADER_HEIGHT }} />
-                <div className="flex-1 bg-background">
-                  <DashboardMetrics />
-                </div>
+          <div className="flex w-full min-h-screen bg-background">
+            <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+            <div className="flex-1 flex flex-col min-w-0">
+              <AppHeader />
+              <div style={{ height: HEADER_HEIGHT }} />
+              <div className="flex-1 bg-background">
+                <DashboardMetrics />
               </div>
             </div>
             <HerbieFloatingButton />
