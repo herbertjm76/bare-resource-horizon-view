@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { useUserSession } from '@/hooks/useUserSession';
@@ -72,7 +73,7 @@ const TeamMembersPageContent = () => {
 const TeamMembersPage = () => {
   return (
     <AuthGuard>
-      <StandardLayout title="Team Members">
+      <StandardLayout>
         <TeamMembersPageContent />
       </StandardLayout>
     </AuthGuard>
