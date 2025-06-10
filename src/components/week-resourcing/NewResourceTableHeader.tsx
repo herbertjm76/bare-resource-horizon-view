@@ -35,7 +35,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
         <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
           HO
         </TableHead>
-        <TableHead className="w-12 text-center border-r-4 border-[#6F4BF6] font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
+        <TableHead className="w-12 text-center border-r-8 border-gray-400 font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
           OL
         </TableHead>
         

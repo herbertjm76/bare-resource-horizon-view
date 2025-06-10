@@ -117,7 +117,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         notes={typeof memberNotes === 'string' ? memberNotes : ''}
         onLeaveInputChange={onLeaveInputChange}
         onNotesChange={handleNotesChange}
-        className="border-r-4 border-[#6F4BF6]"
+        className="border-r-8 border-gray-400"
       />
       
       {/* Project allocation cells */}

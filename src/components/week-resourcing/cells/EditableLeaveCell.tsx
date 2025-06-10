@@ -1,23 +1,26 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { TableCell } from '@/components/ui/table';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 interface EditableLeaveCellProps {
-  defaultValue?: string;
-  onChange?: (value: string) => void;
+  className?: string;
 }
 
-export const EditableLeaveCell: React.FC<EditableLeaveCellProps> = ({ defaultValue = "0", onChange }) => {
+export const EditableLeaveCell: React.FC<EditableLeaveCellProps> = ({ className }) => {
+  const [value, setValue] = useState('0');
+
   return (
-    <TableCell className="text-center border-r mobile-leave-cell bg-gradient-to-br from-purple-50 to-violet-50">
-      <input
+    <TableCell className={cn("p-1 text-center", className)}>
+      <Input
         type="number"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        className="w-12 h-6 text-center text-xs bg-purple-50 border-purple-200 focus:border-purple-400"
         min="0"
         max="40"
-        defaultValue={defaultValue}
-        onChange={(e) => onChange?.(e.target.value)}
-        className="w-6 h-5 sm:w-8 sm:h-6 text-xs text-center border-2 border-purple-300 rounded-md bg-white/80 focus:border-purple-500 focus:bg-white focus:ring-2 focus:ring-purple-200 transition-all"
-        placeholder="0"
+        step="0.5"
       />
     </TableCell>
   );

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow } from '@/components/ui/table';
 import { 
@@ -7,7 +6,6 @@ import {
   CapacityCell, 
   ReadOnlyLeaveCell,
   EditableLeaveCell,
-  OfficeCell, 
   ProjectAllocationCell,
   CellStyles
 } from './cells';
@@ -94,10 +92,8 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         {/* Holiday Cell - READ-ONLY display from database with gray styling */}
         <ReadOnlyLeaveCell value={holidayHours} />
         
-        {/* Other Leave Cell - EDITABLE manual input with purple styling */}
-        <EditableLeaveCell />
-        
-        <OfficeCell location={member.location} />
+        {/* Other Leave Cell - EDITABLE manual input with thick border divider */}
+        <EditableLeaveCell className="border-r-8 border-gray-400" />
         
         {/* Project allocation cells - show all projects or fill to minimum */}
         {Array.from({ length: projectColumnsCount }).map((_, idx) => {

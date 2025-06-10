@@ -89,7 +89,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
         field="other"
         value={manualLeaveData[member.id]?.['other'] || ''}
         onInputChange={onLeaveInputChange}
-        className="border-r-4 border-[#6F4BF6]"
+        className="border-r-8 border-gray-400"
       />
       
       {/* Project allocation cells */}

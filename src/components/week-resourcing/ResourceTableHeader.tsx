@@ -21,7 +21,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
         {/* Leave cells - rearranged order */}
         <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>AL</TableHead>
         <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>HO</TableHead>
-        <TableHead className="w-12 text-center border-r-4 border-[#6F4BF6] non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>OL</TableHead>
+        <TableHead className="w-12 text-center border-r-8 border-gray-400 non-project-column" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>OL</TableHead>
         
         {/* Project allocation headers - with enhanced styling and project codes */}
         {projects.map((project, idx) => {
