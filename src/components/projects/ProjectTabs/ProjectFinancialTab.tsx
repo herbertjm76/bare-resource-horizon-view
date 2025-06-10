@@ -115,7 +115,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {financialMetrics?.burn_rate ? Number(financialMetrics.burn_rate).toFixed(1) : '0.0'}
+              {financialMetrics?.burn_rate ? financialMetrics.burn_rate.toFixed(1) : '0.0'}
             </div>
             <p className="text-xs text-muted-foreground">
               hours per day
@@ -149,7 +149,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
             <CardContent>
               <ProgressIndicator
                 label="Budget Spent"
-                current={Number(financialMetrics.total_spent || 0)}
+                current={financialMetrics.total_spent}
                 total={derivedBudgetAmount}
                 unit="$"
                 variant="budget"
@@ -289,18 +289,18 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Budget Variance</span>
-                  <Badge variant={Math.abs(Number(financialMetrics.budget_variance || 0)) > 1000 ? 'destructive' : 'default'}>
-                    ${Number(financialMetrics.budget_variance || 0).toLocaleString()}
+                  <Badge variant={Math.abs(financialMetrics.budget_variance) > 1000 ? 'destructive' : 'default'}>
+                    ${financialMetrics.budget_variance.toLocaleString()}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  {Number(financialMetrics.budget_variance || 0) > 0 ? (
+                  {financialMetrics.budget_variance > 0 ? (
                     <TrendingUp className="h-4 w-4 text-red-500" />
                   ) : (
                     <TrendingDown className="h-4 w-4 text-green-500" />
                   )}
-                  <span className={`text-sm ${getVarianceColor(Number(financialMetrics.budget_variance || 0))}`}>
-                    {Number(financialMetrics.budget_variance || 0) > 0 ? 'Over budget' : 'Under budget'}
+                  <span className={`text-sm ${getVarianceColor(financialMetrics.budget_variance)}`}>
+                    {financialMetrics.budget_variance > 0 ? 'Over budget' : 'Under budget'}
                   </span>
                 </div>
               </div>
@@ -314,7 +314,7 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">
-                    Profit Margin: {Number(financialMetrics.profit_margin || 0).toFixed(1)}%
+                    Profit Margin: {financialMetrics.profit_margin.toFixed(1)}%
                   </span>
                 </div>
               </div>
@@ -323,13 +323,13 @@ export const ProjectFinancialTab: React.FC<ProjectFinancialTabProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
               <div className="text-center">
                 <div className="text-lg font-semibold">
-                  {Number(financialMetrics.consumed_hours || 0).toFixed(1)}
+                  {financialMetrics.consumed_hours.toFixed(1)}
                 </div>
                 <div className="text-xs text-muted-foreground">Hours Consumed</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-semibold">
-                  {Number(financialMetrics.budget_hours || 0).toFixed(1)}
+                  {financialMetrics.budget_hours.toFixed(1)}
                 </div>
                 <div className="text-xs text-muted-foreground">Budget Hours</div>
               </div>
