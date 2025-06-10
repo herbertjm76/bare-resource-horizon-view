@@ -3,6 +3,7 @@ import React from 'react';
 import { Table, TableBody } from "@/components/ui/table";
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { useStageColorMap } from './hooks/useProjectColors';
+import { useProjectStages } from '@/hooks/useProjectStages';
 import { ProjectTableHeader } from './table/ProjectTableHeader';
 import { ProjectTableRow } from './table/ProjectTableRow';
 
@@ -29,8 +30,12 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
 }) => {
   const { office_stages = [] } = useOfficeSettings();
   const stageColorMap = useStageColorMap(office_stages);
+  const { getProjectStageFee, isLoading: stagesLoading } = useProjectStages(projects, office_stages);
 
-  if (loading) {
+  // Show loading if either projects or stages are loading
+  const isTableLoading = loading || stagesLoading;
+
+  if (isTableLoading) {
     return <div className="text-center p-8 border rounded-md border-dashed">Loading projects...</div>;
   }
   if (error) {
@@ -58,6 +63,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               onSelect={onSelectProject}
               stageColorMap={stageColorMap}
               office_stages={office_stages}
+              getProjectStageFee={getProjectStageFee}
               refetch={refetch}
             />
           ))}
