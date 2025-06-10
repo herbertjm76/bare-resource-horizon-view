@@ -10,7 +10,7 @@ import { Toaster } from 'sonner';
 
 const HEADER_HEIGHT = 56;
 
-const WeeklyResourcePlanning = () => {
+const WeeklyOverview = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
   const [filters, setFilters] = useState({
     office: "all",
@@ -51,7 +51,7 @@ const WeeklyResourcePlanning = () => {
             <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
               {/* Page Header */}
               <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">Weekly Resource Planning</h1>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">Weekly Overview</h1>
                 <p className="text-gray-600">Plan and track team allocation across projects for {weekLabel}</p>
               </div>
               
@@ -76,4 +76,4 @@ const WeeklyResourcePlanning = () => {
   );
 };
 
-export default WeeklyResourcePlanning;
+export default WeeklyOverview;
