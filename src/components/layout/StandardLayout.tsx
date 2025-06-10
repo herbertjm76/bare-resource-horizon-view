@@ -20,8 +20,8 @@ export const StandardLayout: React.FC<StandardLayoutProps> = ({
   contentClassName = "p-3 sm:p-4 lg:p-6",
   title
 }) => {
-  const [collapsed, setCollapsed] = useState(true);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const isMobile = useIsMobile();
 
   const toggleSidebar = () => {
