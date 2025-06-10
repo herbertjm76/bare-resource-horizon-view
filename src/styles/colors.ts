@@ -1,10 +1,10 @@
 
 // Enhanced Centralized Color System with Semantic Tokens
 export const colors = {
-  // Primary brand colors - standardized to #6F4BF6
+  // Primary brand colors - standardized to #6465F0
   brand: {
-    primary: '#6F4BF6',
-    violet: '#6F4BF6',
+    primary: '#6465F0',
+    violet: '#6465F0',
     violetLight: '#ECECFB',
     gray: '#8E9196',
     border: '#F0F0F4',
@@ -18,7 +18,7 @@ export const colors = {
       secondary: '#6B7280',
       tertiary: '#9CA3AF',
       inverse: '#FFFFFF',
-      brand: '#6F4BF6',
+      brand: '#6465F0',
     },
     
     // Background colors
@@ -34,8 +34,8 @@ export const colors = {
     border: {
       primary: '#E5E7EB',
       secondary: '#D1D5DB',
-      accent: '#6F4BF6',
-      focus: '#6F4BF6',
+      accent: '#6465F0',
+      focus: '#6465F0',
     },
     
     // State colors
@@ -70,10 +70,10 @@ export const colors = {
   // Status colors for projects and resources
   status: {
     inProgress: { bg: '#E2F8F0', text: '#0D9488' },
-    notStarted: { bg: '#E5DEFF', text: '#6F4BF6' },
+    notStarted: { bg: '#E5DEFF', text: '#6465F0' },
     completed: { bg: '#E0F2FE', text: '#0EA5E9' },
     onHold: { bg: '#FEF3C7', text: '#D97706' },
-    planning: { bg: '#E5DEFF', text: '#6F4BF6' },
+    planning: { bg: '#E5DEFF', text: '#6465F0' },
     default: { bg: '#F3F4F6', text: '#6B7280' },
   },
 
@@ -96,7 +96,7 @@ export const colors = {
     // Button colors
     button: {
       primary: {
-        background: '#6F4BF6',
+        background: '#6465F0',
         hover: '#5D3FD3',
         text: '#FFFFFF',
       },
@@ -111,15 +111,15 @@ export const colors = {
     input: {
       background: '#FFFFFF',
       border: '#D1D5DB',
-      borderHover: '#6F4BF6',
-      borderFocus: '#6F4BF6',
+      borderHover: '#6465F0',
+      borderFocus: '#6465F0',
       placeholder: '#9CA3AF',
     },
   },
 
   // Table and grid colors - updated with unified brand color
   table: {
-    headerBg: 'linear-gradient(135deg, #6F4BF6 0%, #8b5cf6 100%)',
+    headerBg: 'linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%)',
     headerText: '#ffffff',
     rowEven: '#D2C6FB',
     rowHover: 'linear-gradient(90deg, #D2C6FB 0%, #C4B5F7 100%)',
@@ -129,7 +129,7 @@ export const colors = {
 
   // Office and section headers - standardized to unified brand color
   office: {
-    headerBg: 'linear-gradient(135deg, #6F4BF6 0%, #7c3aed 100%)',
+    headerBg: 'linear-gradient(135deg, #6465F0 0%, #7c3aed 100%)',
     headerText: '#ffffff',
     hoverBg: 'linear-gradient(135deg, #5D3FD3 0%, #6b21a8 100%)',
   },
@@ -143,7 +143,7 @@ export const colors = {
   // Project area and stage colors (consistent palette with unified brand color)
   projectColors: [
     '#F5A3B3', '#F48F8F', '#F47E63', '#F4A363', '#F4C463',
-    '#A8E6A8', '#89CFF0', '#6F4BF6', '#9B87F5', '#FFE082',
+    '#A8E6A8', '#89CFF0', '#6465F0', '#9B87F5', '#FFE082',
     '#89E6CF', '#7ECFD6', '#FFF3D4', '#D2C0A7', '#FFE566'
   ],
 

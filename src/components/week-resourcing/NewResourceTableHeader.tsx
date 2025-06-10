@@ -11,26 +11,26 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
   
   return (
     <TableHeader className="sticky top-0 z-20">
-      <TableRow className="h-20" style={{ backgroundColor: '#6F4BF6' }}>
-        <TableHead className="sticky-column sticky-left-0 border-r text-center font-semibold min-w-[150px] max-w-[150px] w-[150px]" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
+      <TableRow className="h-20" style={{ backgroundColor: '#6465F0' }}>
+        <TableHead className="sticky-column sticky-left-0 border-r text-center font-semibold min-w-[150px] max-w-[150px] w-[150px]" style={{ backgroundColor: '#6465F0', color: 'white' }}>
           Name
         </TableHead>
         
-        <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
+        <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6465F0', color: 'white' }}>
           #
         </TableHead>
         
-        <TableHead className="w-32 text-center border-r font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
+        <TableHead className="w-32 text-center border-r font-semibold" style={{ backgroundColor: '#6465F0', color: 'white' }}>
           Capacity
         </TableHead>
         
-        <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
+        <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6465F0', color: 'white' }}>
           AL
         </TableHead>
-        <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
+        <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6465F0', color: 'white' }}>
           HO
         </TableHead>
-        <TableHead className="w-12 text-center border-r-4 border-gray-400 font-semibold" style={{ backgroundColor: '#6F4BF6', color: 'white' }}>
+        <TableHead className="w-12 text-center border-r-4 border-gray-400 font-semibold" style={{ backgroundColor: '#6465F0', color: 'white' }}>
           OL
         </TableHead>
         
@@ -40,7 +40,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
             <TableHead 
               key={project?.id || `empty-${idx}`}
               className="w-[40px] text-center border-r project-header relative"
-              style={{ backgroundColor: '#6F4BF6', color: 'white' }}
+              style={{ backgroundColor: '#6465F0', color: 'white' }}
             >
               {project && !project.isEmpty && (
                 <div className="absolute inset-0 flex items-center justify-center p-1">

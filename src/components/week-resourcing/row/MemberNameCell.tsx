@@ -40,7 +40,7 @@ export const MemberNameCell: React.FC<MemberNameCellProps> = ({ member }) => {
       <div className="flex items-center gap-2 justify-center">
         <Avatar className="h-8 w-8">
           <AvatarImage src={getAvatarUrl()} alt={getMemberName()} />
-          <AvatarFallback className="bg-[#6F4BF6] text-white text-xs">
+          <AvatarFallback className="bg-[#6465F0] text-white text-xs">
             {getUserInitials()}
           </AvatarFallback>
         </Avatar>

@@ -20,7 +20,7 @@ export default {
     },
     extend: {
       backgroundImage: {
-        hero: 'linear-gradient(145deg, #6F4BF6 0%, #6F4BF6 55%, #E64FC4 100%)', // Standardized to #6F4BF6
+        hero: 'linear-gradient(145deg, #6465F0 0%, #6465F0 55%, #E64FC4 100%)', // Standardized to #6465F0
       },
       colors: {
         border: "hsl(var(--border))",
@@ -28,19 +28,19 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        "brand-primary": "#6F4BF6",
-        "brand-violet": "#6F4BF6",
+        "brand-primary": "#6465F0",
+        "brand-violet": "#6465F0",
         "brand-violet-light": "#ECECFB",
         "brand-gray": "#8E9196",
         "brand-border": "#F0F0F4",
         "gray-250": "#e2e2e2",
         
-        // Semantic color tokens - standardized to #6F4BF6
+        // Semantic color tokens - standardized to #6465F0
         "text-primary": "#1F2937",
         "text-secondary": "#6B7280",
         "text-tertiary": "#9CA3AF",
         "text-inverse": "#FFFFFF",
-        "text-brand": "#6F4BF6",
+        "text-brand": "#6465F0",
         
         "bg-primary": "#FFFFFF",
         "bg-secondary": "#F9FAFB",
@@ -50,8 +50,8 @@ export default {
         
         "border-primary": "#E5E7EB",
         "border-secondary": "#D1D5DB",
-        "border-accent": "#6F4BF6",
-        "border-focus": "#6F4BF6", // Changed from #6366F1
+        "border-accent": "#6465F0",
+        "border-focus": "#6465F0",
         
         primary: {
           DEFAULT: "hsl(var(--primary))",

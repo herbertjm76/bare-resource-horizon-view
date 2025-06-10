@@ -57,10 +57,10 @@ const WeeklyOverview = () => {
           }} className="print:hidden" />
           <div className="flex-1 p-3 sm:p-4 lg:p-6 bg-gray-50 min-w-0">
             <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
-              {/* Page Header - Simplified to match Project Resourcing style */}
+              {/* Page Header - Updated title color */}
               <div className="mb-6">
-                <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                  <Calendar className="h-8 w-8 text-brand-violet" />
+                <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: '#6465F0' }}>
+                  <Calendar className="h-8 w-8 inline-block mr-3" style={{ color: '#6465F0' }} />
                   Weekly Overview
                 </h1>
               </div>
