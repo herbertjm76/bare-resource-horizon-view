@@ -7,12 +7,13 @@ interface InsightItemProps {
   insight: InsightData;
 }
 
+// Pastel colors for status card backgrounds
 const getSeverityCardStyle = (type: string) => {
   switch (type) {
-    case 'critical': return 'bg-gradient-to-r from-red-50 to-red-100 border-[3px] border-red-200';
-    case 'warning': return 'bg-gradient-to-r from-orange-50 to-orange-100 border-[3px] border-orange-200';
-    case 'success': return 'bg-gradient-to-r from-green-50 to-green-100 border-[3px] border-green-200';
-    case 'info': return 'bg-gradient-to-r from-blue-50 to-blue-100 border-[3px] border-blue-200';
+    case 'critical': return 'bg-gradient-to-r from-red-50 to-red-100 border-[3px] border-red-200'; // Pastel red
+    case 'warning': return 'bg-gradient-to-r from-orange-50 to-orange-100 border-[3px] border-orange-200'; // Pastel orange
+    case 'success': return 'bg-gradient-to-r from-green-50 to-green-100 border-[3px] border-green-200'; // Pastel green
+    case 'info': return 'bg-gradient-to-r from-blue-50 to-blue-100 border-[3px] border-blue-200'; // Brand blue
     default: return 'bg-gradient-to-r from-gray-50 to-gray-100 border-[3px] border-gray-200';
   }
 };
@@ -23,9 +24,9 @@ export const InsightItem: React.FC<InsightItemProps> = ({ insight }) => {
   return (
     <div className={`flex items-start gap-3 p-6 rounded-xl shadow-sm transition-all hover:shadow-md ${getSeverityCardStyle(insight.type)}`}>
       <div className={`p-2 rounded-full flex-shrink-0 ${
-        insight.type === 'critical' ? 'bg-red-100' :
-        insight.type === 'warning' ? 'bg-orange-100' :
-        insight.type === 'success' ? 'bg-green-100' : 'bg-blue-100'
+        insight.type === 'critical' ? 'bg-red-100' : // Pastel red
+        insight.type === 'warning' ? 'bg-orange-100' : // Pastel orange
+        insight.type === 'success' ? 'bg-green-100' : 'bg-blue-100' // Pastel green/blue
       }`}>
         <Icon className={`h-4 w-4 ${
           insight.type === 'critical' ? 'text-red-600' :

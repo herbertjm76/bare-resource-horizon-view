@@ -25,20 +25,16 @@ export const CEOMetricsCard: React.FC<CEOMetricsCardProps> = ({
   trend
 }) => {
   const getStatusColors = () => {
-    switch (status) {
-      case 'good': return 'bg-white text-gray-900';
-      case 'warning': return 'bg-white text-gray-900';
-      case 'danger': return 'bg-white text-gray-900';
-      default: return 'bg-white text-gray-900';
-    }
+    return 'bg-white text-gray-900';
   };
 
+  // Pastel colors for status indicators
   const getIconColors = () => {
     switch (status) {
-      case 'good': return 'text-green-600 bg-green-100';
-      case 'warning': return 'text-yellow-600 bg-yellow-100';
-      case 'danger': return 'text-red-600 bg-red-100';
-      default: return 'text-blue-600 bg-blue-100';
+      case 'good': return 'text-green-600 bg-green-100'; // Pastel green
+      case 'warning': return 'text-orange-600 bg-orange-100'; // Pastel orange
+      case 'danger': return 'text-red-600 bg-red-100'; // Pastel red
+      default: return 'text-brand-violet bg-brand-violet/10'; // Brand violet
     }
   };
 

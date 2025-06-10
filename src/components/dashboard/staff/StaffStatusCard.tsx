@@ -57,26 +57,26 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
       <CardContent className="flex-1 overflow-hidden p-0">
         <ScrollArea className="h-full">
           <div className="space-y-6 px-6 pb-6">
-            {/* At Capacity Staff (>90%) */}
+            {/* At Capacity Staff (>90%) - Pastel Red for critical status */}
             <StaffSection
               title="At Capacity"
-              icon={<AlertTriangle className="h-4 w-4 text-red-500" strokeWidth={1.5} />}
+              icon={<AlertTriangle className="h-4 w-4 text-red-400" strokeWidth={1.5} />}
               members={atCapacityStaff}
               colorScheme="red"
             />
 
-            {/* Optimally Allocated Staff (66-90%) */}
+            {/* Optimally Allocated Staff (66-90%) - Pastel Orange for warning status */}
             <StaffSection
               title="Optimally Allocated"
-              icon={<Target className="h-4 w-4 text-blue-500" strokeWidth={1.5} />}
+              icon={<Target className="h-4 w-4 text-orange-400" strokeWidth={1.5} />}
               members={optimalStaff}
-              colorScheme="blue"
+              colorScheme="orange"
             />
 
-            {/* Ready for Projects Staff (≤65%) */}
+            {/* Ready for Projects Staff (≤65%) - Pastel Green for good status */}
             <StaffSection
               title="Ready for Projects"
-              icon={<Target className="h-4 w-4 text-green-500" strokeWidth={1.5} />}
+              icon={<Target className="h-4 w-4 text-green-400" strokeWidth={1.5} />}
               members={readyStaff}
               colorScheme="green"
               showLimit={4}

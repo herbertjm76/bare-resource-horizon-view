@@ -32,8 +32,8 @@ export const NoFeeBadge: React.FC<NoFeeBadgeProps> = ({
       variant="status"
       className={sizeClasses}
       style={{
-        backgroundColor: '#F1F0FB',
-        color: '#6E59A5',
+        backgroundColor: '#E0E7FF', // Brand violet light background
+        color: '#5B21B6', // Brand violet dark text
         marginLeft: '0'
       }}
     >
