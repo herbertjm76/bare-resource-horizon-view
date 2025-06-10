@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
@@ -11,19 +11,13 @@ import AuthGuard from '@/components/AuthGuard';
 const HEADER_HEIGHT = 56;
 
 export const DashboardLayout: React.FC = () => {
-  const [collapsed, setCollapsed] = useState(false);
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
-
   return (
     <AuthGuard>
       <OfficeSettingsProvider>
         <SidebarProvider>
           <div className="flex flex-col w-full min-h-screen bg-background">
             <div className="flex flex-1 w-full">
-              <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+              <DashboardSidebar />
               <div className="flex-1 flex flex-col">
                 <AppHeader />
                 <div style={{ height: HEADER_HEIGHT }} />

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
@@ -10,12 +10,7 @@ import { useCompany } from '@/context/CompanyContext';
 const HEADER_HEIGHT = 56;
 
 const Documentation = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const { company } = useCompany();
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
   
   const documentationSections = [
     {
@@ -64,7 +59,7 @@ const Documentation = () => {
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
         <div className="flex-shrink-0">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+          <DashboardSidebar />
         </div>
         <div className="flex-1 flex flex-col">
           <AppHeader />

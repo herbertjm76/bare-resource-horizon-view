@@ -15,7 +15,6 @@ import { toast } from 'sonner';
 const HEADER_HEIGHT = 56;
 
 const ContactSupport = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const { company } = useCompany();
   const [formData, setFormData] = useState({
     subject: '',
@@ -24,10 +23,6 @@ const ContactSupport = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +64,7 @@ const ContactSupport = () => {
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
         <div className="flex-shrink-0">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+          <DashboardSidebar />
         </div>
         <div className="flex-1 flex flex-col">
           <AppHeader />

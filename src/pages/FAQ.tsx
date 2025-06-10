@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
@@ -195,13 +196,8 @@ const categories = [
 ];
 
 const FAQ = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
 
   const filteredFAQs = faqData.filter(faq => {
     const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -227,7 +223,7 @@ const FAQ = () => {
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
         <div className="flex-shrink-0">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+          <DashboardSidebar />
         </div>
         <div className="flex-1 flex flex-col">
           <AppHeader />

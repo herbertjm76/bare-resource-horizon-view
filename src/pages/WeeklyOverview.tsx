@@ -12,7 +12,6 @@ import { Calendar } from 'lucide-react';
 const HEADER_HEIGHT = 56;
 
 const WeeklyOverview = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
   const [filters, setFilters] = useState({
     office: "all",
@@ -20,10 +19,6 @@ const WeeklyOverview = () => {
     manager: "all",
     searchTerm: ""
   });
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
 
   // Get Monday of the current week
   const weekStart = startOfWeek(selectedWeek, {
@@ -44,7 +39,7 @@ const WeeklyOverview = () => {
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row bg-gray-50">
         <div className="flex-shrink-0 print:hidden">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+          <DashboardSidebar />
         </div>
         <div className="flex-1 flex flex-col min-w-0">
           <div className="print:hidden">

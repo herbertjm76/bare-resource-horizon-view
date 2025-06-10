@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { AppHeader } from '@/components/AppHeader';
@@ -11,17 +11,11 @@ interface ProfileLayoutProps {
 }
 
 export const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(false);
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
-
   return (
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
         <div className="flex-shrink-0">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+          <DashboardSidebar />
         </div>
         <div className="flex-1 flex flex-col">
           <AppHeader />

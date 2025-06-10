@@ -16,15 +16,10 @@ import '@/components/workload/workload.css';
 const HEADER_HEIGHT = 56;
 
 const TeamWorkload = () => {
-  const [collapsed, setCollapsed] = useState(false);
   // State for selected week (starting Monday) - still used for calculations
   const [selectedWeek, setSelectedWeek] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
   
   // Fetch team members data
   const { teamMembers, isLoading: isLoadingTeamMembers } = useTeamMembersData(true);
@@ -74,7 +69,7 @@ const TeamWorkload = () => {
     <SidebarProvider>
       <div className="w-full min-h-screen flex flex-row">
         <div className="flex-shrink-0">
-          <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
+          <DashboardSidebar />
         </div>
         <div className="flex-1 flex flex-col">
           <AppHeader />
