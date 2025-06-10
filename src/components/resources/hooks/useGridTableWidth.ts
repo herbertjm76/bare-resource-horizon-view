@@ -7,12 +7,12 @@ export const useGridTableWidth = (daysCount: number): number => {
     const fixedColumnsWidth = 48 + 200;
     // Day columns: 30px per day (fixed width)
     const daysColumnsWidth = daysCount * 30;
-    // Add minimal padding but respect viewport constraints
-    const totalWidth = fixedColumnsWidth + daysColumnsWidth + 20;
+    // Add padding for better spacing
+    const totalWidth = fixedColumnsWidth + daysColumnsWidth + 40;
     
-    // Don't exceed a reasonable maximum to prevent extreme horizontal scrolling
-    const maxReasonableWidth = Math.max(800, window.innerWidth * 1.5);
+    // Ensure minimum width but allow expansion
+    const minWidth = 1200;
     
-    return Math.min(totalWidth, maxReasonableWidth);
+    return Math.max(totalWidth, minWidth);
   }, [daysCount]);
 };

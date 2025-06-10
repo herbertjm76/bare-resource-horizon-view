@@ -21,10 +21,10 @@ export const EnhancedResourceTable: React.FC<EnhancedResourceTableProps> = ({
 }) => {
   return (
     <table 
-      className="enhanced-resource-table" 
+      className="enhanced-resource-table w-full" 
       style={{
-        width: `${tableWidth}px`,
-        minWidth: 'max-content'
+        minWidth: `${tableWidth}px`,
+        width: '100%'
       }}
     >
       <thead>
