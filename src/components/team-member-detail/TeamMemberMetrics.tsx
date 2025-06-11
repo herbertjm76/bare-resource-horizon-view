@@ -45,16 +45,14 @@ export const TeamMemberMetrics: React.FC<TeamMemberMetricsProps> = ({ memberId }
 
   const getUtilizationColor = (percentage: number) => {
     if (percentage >= 90) return 'text-red-600';
-    if (percentage >= 75) return 'text-yellow-600';
-    if (percentage >= 50) return 'text-green-600';
-    return 'text-blue-600';
+    if (percentage >= 75) return 'text-orange-600';
+    return 'text-brand-violet';
   };
 
   const getUtilizationBgColor = (percentage: number) => {
     if (percentage >= 90) return 'bg-red-50 border-red-200';
-    if (percentage >= 75) return 'bg-yellow-50 border-yellow-200';
-    if (percentage >= 50) return 'bg-green-50 border-green-200';
-    return 'bg-blue-50 border-blue-200';
+    if (percentage >= 75) return 'bg-orange-50 border-orange-200';
+    return 'bg-brand-violet-light border-brand-violet/30';
   };
 
   if (isLoading) {
@@ -122,7 +120,7 @@ export const TeamMemberMetrics: React.FC<TeamMemberMetricsProps> = ({ memberId }
           </CardContent>
         </Card>
 
-        {/* Capacity Planning */}
+        {/* Capacity Status */}
         <Card className="border-2 bg-purple-50 border-purple-200">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Capacity Status</CardTitle>

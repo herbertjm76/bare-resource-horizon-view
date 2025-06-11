@@ -36,11 +36,11 @@ export const PlanningRecommendations: React.FC<PlanningRecommendationsProps> = (
         )}
         
         {averageFutureUtilization < 70 && (
-          <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
-            <TrendingUp className="h-5 w-5 text-yellow-500" />
+          <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+            <TrendingUp className="h-5 w-5 text-blue-500" />
             <div>
-              <h4 className="font-medium text-yellow-800">Capacity Available</h4>
-              <p className="text-sm text-yellow-600">
+              <h4 className="font-medium text-blue-800">Capacity Available</h4>
+              <p className="text-sm text-blue-600">
                 Resource has {underutilizedWeeks} weeks below 80% utilization. Consider additional assignments.
               </p>
             </div>
@@ -48,11 +48,11 @@ export const PlanningRecommendations: React.FC<PlanningRecommendationsProps> = (
         )}
         
         {averageFutureUtilization >= 70 && averageFutureUtilization <= 100 && (
-          <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-            <CheckCircle className="h-5 w-5 text-green-500" />
+          <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+            <CheckCircle className="h-5 w-5 text-purple-500" />
             <div>
-              <h4 className="font-medium text-green-800">Optimal Allocation</h4>
-              <p className="text-sm text-green-600">
+              <h4 className="font-medium text-purple-800">Optimal Allocation</h4>
+              <p className="text-sm text-purple-600">
                 Resource allocation is well balanced for the planning period.
               </p>
             </div>

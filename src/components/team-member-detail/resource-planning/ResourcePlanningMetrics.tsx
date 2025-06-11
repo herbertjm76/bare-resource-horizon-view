@@ -13,8 +13,8 @@ interface ResourcePlanningMetricsProps {
 const getUtilizationColor = (utilization: number) => {
   if (utilization > 100) return 'text-red-600';
   if (utilization > 90) return 'text-orange-600';
-  if (utilization > 70) return 'text-green-600';
-  return 'text-yellow-600';
+  if (utilization > 70) return 'text-brand-violet';
+  return 'text-blue-600';
 };
 
 export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = ({
@@ -38,7 +38,7 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
         </CardContent>
       </Card>
 
-      <Card className="border-2 bg-green-50 border-green-200">
+      <Card className="border-2 bg-brand-violet-light border-brand-violet/30">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-gray-600">Avg Future Utilization</CardTitle>
           <TrendingUp className="h-4 w-4 text-gray-500" />
