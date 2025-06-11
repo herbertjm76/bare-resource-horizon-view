@@ -49,7 +49,7 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
         {/* Direct team member sections without inner container */}
         <ScrollArea className="flex-1">
           <div className="space-y-6 pr-4">
-            {/* At Capacity Staff (>90%) */}
+            {/* At Capacity Staff (>90%) - Show all members */}
             <StaffSection
               title="At Capacity"
               icon={<Users className="h-4 w-4 text-red-400" strokeWidth={1.5} />}
@@ -57,7 +57,7 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
               colorScheme="red"
             />
 
-            {/* Optimally Allocated Staff (66-90%) */}
+            {/* Optimally Allocated Staff (66-90%) - Show all members */}
             <StaffSection
               title="Optimally Allocated"
               icon={<Users className="h-4 w-4 text-orange-400" strokeWidth={1.5} />}
@@ -65,13 +65,12 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
               colorScheme="orange"
             />
 
-            {/* Ready for Projects Staff (≤65%) */}
+            {/* Ready for Projects Staff (≤65%) - Show all members, no limit */}
             <StaffSection
               title="Ready for Projects"
               icon={<Users className="h-4 w-4 text-green-400" strokeWidth={1.5} />}
               members={readyStaff}
               colorScheme="green"
-              showLimit={4}
               subtitle="available for new work"
             />
 

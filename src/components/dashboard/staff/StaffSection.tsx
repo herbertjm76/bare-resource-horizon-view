@@ -32,6 +32,7 @@ export const StaffSection: React.FC<StaffSectionProps> = ({
     setDialogOpen(true);
   };
 
+  // Show all members unless showLimit is specifically set
   const membersToShow = showLimit ? members.slice(0, showLimit) : members;
   const remainingCount = showLimit && members.length > showLimit ? members.length - showLimit : 0;
 
