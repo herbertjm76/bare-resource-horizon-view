@@ -59,7 +59,7 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
   // Generate sample insights based on the unified data
   const generateInsights = () => {
     const insights = [];
-    const { currentUtilizationRate, activeProjects, teamMembers } = data;
+    const { currentUtilizationRate, activeProjects, totalTeamSize, preRegisteredMembers } = data;
 
     // Utilization insights
     if (currentUtilizationRate > 90) {
@@ -112,15 +112,27 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
       });
     }
 
-    // Team size insights
-    if (teamMembers.length < 5) {
+    // Team size insights including pre-registered members
+    if (totalTeamSize < 5) {
       insights.push({
         type: 'info',
         icon: 'trending-up',
         title: 'Small Team Size',
-        description: `Consider scaling team - currently ${teamMembers.length} members`,
+        description: `Consider scaling team - currently ${totalTeamSize} total members`,
         priority: 'medium',
-        metric: `${teamMembers.length} team members`
+        metric: `${totalTeamSize} team members`
+      });
+    }
+
+    // Pre-registered members insight
+    if (preRegisteredMembers.length > 0) {
+      insights.push({
+        type: 'info',
+        icon: 'clock',
+        title: 'Pending Team Members',
+        description: `${preRegisteredMembers.length} pre-registered members waiting to join`,
+        priority: 'medium',
+        metric: `${preRegisteredMembers.length} pending members`
       });
     }
 

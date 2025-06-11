@@ -1,75 +1,104 @@
 
 import React from 'react';
-import { LayoutDashboard, Users, Briefcase, Building2 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { useCompany } from '@/context/CompanyContext';
+import { Building2, Users, TrendingUp, FolderOpen, Briefcase } from 'lucide-react';
+import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 
 interface ModernDashboardHeaderProps {
   totalTeamMembers?: number;
   totalActiveProjects?: number;
   totalOffices?: number;
   utilizationRate?: number;
-  customTitle?: string;
-  customIcon?: React.ComponentType<any>;
 }
 
 export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
-  totalTeamMembers = 0,
-  totalActiveProjects = 0,
-  totalOffices = 0,
-  utilizationRate = 0,
-  customTitle,
-  customIcon: CustomIcon
+  totalTeamMembers: propTotalTeamMembers,
+  totalActiveProjects: propTotalActiveProjects,
+  totalOffices: propTotalOffices,
+  utilizationRate: propUtilizationRate
 }) => {
-  const { company } = useCompany();
-  const companyName = company?.name || 'Your Company';
+  // Try to use unified data if available, otherwise fallback to props
+  let unifiedData;
+  try {
+    unifiedData = useUnifiedDashboardData();
+  } catch {
+    // Context not available, use props
+    unifiedData = null;
+  }
 
-  // Use custom title and icon if provided, otherwise use default dashboard
-  const title = customTitle || `${companyName} Dashboard`;
-  const IconComponent = CustomIcon || LayoutDashboard;
+  // Use unified data if available, otherwise use props
+  const totalTeamMembers = unifiedData?.totalTeamSize ?? propTotalTeamMembers ?? 0;
+  const totalActiveProjects = unifiedData?.activeProjects ?? propTotalActiveProjects ?? 0;
+  const totalOffices = propTotalOffices ?? 1;
+  const utilizationRate = unifiedData?.currentUtilizationRate ?? propUtilizationRate ?? 0;
+
+  const stats = [
+    {
+      icon: Users,
+      label: 'Team Members',
+      value: totalTeamMembers,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50'
+    },
+    {
+      icon: FolderOpen,
+      label: 'Active Projects',
+      value: totalActiveProjects,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50'
+    },
+    {
+      icon: Building2,
+      label: 'Offices',
+      value: totalOffices,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-50'
+    },
+    {
+      icon: TrendingUp,
+      label: 'Utilization',
+      value: `${utilizationRate}%`,
+      color: 'text-orange-600',
+      bgColor: 'bg-orange-50'
+    }
+  ];
 
   return (
-    <div className="space-y-6 p-4 sm:p-8">
-      {/* Main Header Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-            <IconComponent className="h-8 w-8 text-brand-violet" strokeWidth={1.5} />
-            {title}
-          </h1>
+    <div className="bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20 border-b border-gray-200/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Main Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <Briefcase className="h-8 w-8 text-brand-primary" />
+              Dashboard Overview
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Real-time insights into your team and project performance
+            </p>
+          </div>
         </div>
-        
-        {/* Quick Stats Cards - Brand colors: purple, blue, magenta */}
-        <div className="flex flex-wrap items-center gap-3">
-          <Card className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-brand-violet/10 to-brand-violet/5 border-brand-violet/20">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-brand-violet" strokeWidth={1.5} />
-              <div className="text-xs sm:text-sm">
-                <span className="font-semibold text-brand-violet">{totalTeamMembers}</span>
-                <span className="text-muted-foreground ml-1">Members</span>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((stat, index) => {
+            const IconComponent = stat.icon;
+            return (
+              <div
+                key={index}
+                className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  </div>
+                  <div className={`p-3 rounded-lg ${stat.bgColor}`}>
+                    <IconComponent className={`h-6 w-6 ${stat.color}`} />
+                  </div>
+                </div>
               </div>
-            </div>
-          </Card>
-          
-          <Card className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border-blue-500/20">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600" strokeWidth={1.5} />
-              <div className="text-xs sm:text-sm">
-                <span className="font-semibold text-blue-600">{totalActiveProjects}</span>
-                <span className="text-muted-foreground ml-1">Projects</span>
-              </div>
-            </div>
-          </Card>
-          
-          <Card className="px-3 py-1.5 sm:px-4 sm:py-2 bg-gradient-to-r from-fuchsia-500/10 to-fuchsia-500/5 border-fuchsia-500/20">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-fuchsia-600" strokeWidth={1.5} />
-              <div className="text-xs sm:text-sm">
-                <span className="font-semibold text-fuchsia-600">{totalOffices}</span>
-                <span className="text-muted-foreground ml-1">Offices</span>
-              </div>
-            </div>
-          </Card>
+            );
+          })}
         </div>
       </div>
     </div>

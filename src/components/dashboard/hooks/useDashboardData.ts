@@ -12,6 +12,7 @@ export interface UnifiedDashboardData {
   teamMembers: any[];
   preRegisteredMembers: any[];
   transformedStaffData: any[];
+  totalTeamSize: number; // Include pre-registered in total count
   
   // Project data
   projects: any[];
@@ -39,6 +40,7 @@ export interface UnifiedDashboardData {
     teamMembers: any[];
     activeProjects: number;
     utilizationRate: number;
+    totalTeamSize: number; // Include total team size for insights
   };
   
   // Office data
@@ -111,14 +113,19 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
       setPreRegisteredMembers(invitesData || []);
       setProjects(projectsData || []);
 
-      // Calculate utilization (simplified calculation)
+      // Calculate utilization including pre-registered members in total team count
       const activeMembers = membersData?.filter(member => 
         member.role && ['owner', 'admin', 'member'].includes(member.role)
       ) || [];
+      const totalTeamSize = activeMembers.length + (invitesData?.length || 0);
       const totalCapacity = activeMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
       
+      // Include pre-registered capacity in total calculation
+      const preRegisteredCapacity = (invitesData || []).reduce((total, member) => total + (member.weekly_capacity || 40), 0);
+      const totalTeamCapacity = totalCapacity + preRegisteredCapacity;
+      
       // Mock utilization calculation - replace with actual logic
-      const utilizationRate = Math.min(Math.round((activeMembers.length * 30) / Math.max(totalCapacity, 1) * 100), 100);
+      const utilizationRate = Math.min(Math.round((activeMembers.length * 30) / Math.max(totalTeamCapacity, 1) * 100), 100);
       
       setCurrentUtilizationRate(utilizationRate);
       
@@ -185,6 +192,9 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
 
   // Combine active staff and pre-registered members
   const transformedStaffData = [...transformedActiveMembers, ...transformedPreRegistered];
+  
+  // Calculate total team size including pre-registered members
+  const totalTeamSize = transformedStaffData.length;
 
   // Create mock data structure with proper location data
   const mockData = {
@@ -201,11 +211,12 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     days90: Math.round(currentUtilizationRate * 0.85)
   };
 
-  // Smart insights data structure
+  // Smart insights data structure including total team size
   const smartInsightsData = {
     teamMembers: transformedStaffData,
     activeProjects: timeRangeMetrics.activeProjects,
-    utilizationRate: currentUtilizationRate
+    utilizationRate: currentUtilizationRate,
+    totalTeamSize: totalTeamSize
   };
 
   const officeOptions = ['All Offices'];
@@ -215,6 +226,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     teamMembers,
     preRegisteredMembers,
     transformedStaffData,
+    totalTeamSize,
     
     // Project data
     projects,
