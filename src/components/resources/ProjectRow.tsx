@@ -48,6 +48,16 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     checkResourceInOtherProjects
   } = useProjectRowData(project, days);
   
+  // Add debugging
+  console.log('ProjectRow render:', {
+    projectId: project.id,
+    projectName: project.name,
+    isExpanded,
+    resourcesCount: resources.length,
+    isLoading,
+    isLoadingAllocations
+  });
+  
   // Base background color for project rows
   const rowBgClass = isEven 
     ? "bg-white hover:bg-gray-50" 
@@ -112,27 +122,43 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         <td className="p-0"></td>
       </tr>
       
+      {/* Debug expansion state */}
+      {isExpanded && (
+        <>
+          <tr>
+            <td colSpan={days.length + 3} className="p-2 bg-yellow-100 text-xs">
+              DEBUG: Project expanded - Resources: {resources.length}, Loading: {isLoading.toString()}
+            </td>
+          </tr>
+        </>
+      )}
+      
       {/* Resource rows when project is expanded */}
-      {isExpanded && resources.map(resource => (
-        <ResourceRow 
-          key={resource.id} 
-          resource={resource}
-          days={days}
-          projectId={project.id} 
-          onAllocationChange={handleAllocationChange} 
-          onDeleteResource={handleDeleteResource}
-          onCheckOtherProjects={checkResourceInOtherProjects}
-          isEven={isEven}
-        />
-      ))}
+      {isExpanded && resources.map(resource => {
+        console.log('Rendering resource row:', resource.id, resource.name);
+        return (
+          <ResourceRow 
+            key={resource.id} 
+            resource={resource}
+            days={days}
+            projectId={project.id} 
+            onAllocationChange={handleAllocationChange} 
+            onDeleteResource={handleDeleteResource}
+            onCheckOtherProjects={checkResourceInOtherProjects}
+            isEven={isEven}
+          />
+        );
+      })}
       
       {/* Add resource row when project is expanded */}
-      <AddResourceRow
-        isExpanded={isExpanded}
-        rowBgClass={rowBgClass}
-        daysCount={days.length}
-        onAddResource={() => setShowAddResource(true)}
-      />
+      {isExpanded && (
+        <AddResourceRow
+          isExpanded={isExpanded}
+          rowBgClass={rowBgClass}
+          daysCount={days.length}
+          onAddResource={() => setShowAddResource(true)}
+        />
+      )}
       
       {showAddResource && (
         <AddResourceDialog 
