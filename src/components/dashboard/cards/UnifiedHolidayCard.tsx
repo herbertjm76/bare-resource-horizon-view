@@ -7,11 +7,30 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
 import { useHolidays } from '../hooks/useHolidays';
 
+interface Holiday {
+  id: string;
+  name: string;
+  date: string;
+  office: string;
+  type: 'public' | 'company';
+}
+
+interface MockEvent {
+  id: number;
+  title: string;
+  date: string;
+  type: string;
+  location: string;
+  attendees: number | null;
+}
+
+type UnifiedEvent = Holiday | MockEvent;
+
 export const UnifiedHolidayCard: React.FC = () => {
   const { holidays, isLoading } = useHolidays();
 
   // Mock upcoming events for demonstration
-  const mockEvents = [
+  const mockEvents: MockEvent[] = [
     {
       id: 1,
       title: 'Annual Team Retreat',
@@ -56,7 +75,23 @@ export const UnifiedHolidayCard: React.FC = () => {
     });
   };
 
-  const allEvents = [...(holidays || []), ...mockEvents];
+  const isHoliday = (event: UnifiedEvent): event is Holiday => {
+    return 'name' in event;
+  };
+
+  const getEventTitle = (event: UnifiedEvent): string => {
+    return isHoliday(event) ? event.name : event.title;
+  };
+
+  const getEventLocation = (event: UnifiedEvent): string => {
+    return isHoliday(event) ? event.office : event.location;
+  };
+
+  const getEventAttendees = (event: UnifiedEvent): number | null => {
+    return isHoliday(event) ? null : event.attendees;
+  };
+
+  const allEvents: UnifiedEvent[] = [...(holidays || []), ...mockEvents];
   const upcomingEvents = allEvents
     .filter(event => new Date(event.date) >= new Date())
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -113,29 +148,29 @@ export const UnifiedHolidayCard: React.FC = () => {
               </div>
             ) : (
               upcomingEvents.map((event) => (
-                <div key={event.id} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
+                <div key={isHoliday(event) ? event.id : `mock-${event.id}`} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
                   <div className="p-1 rounded bg-brand-violet/20">
                     <Calendar className="h-4 w-4 text-brand-violet" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-gray-900">{event.title}</h4>
+                      <h4 className="font-medium text-gray-900">{getEventTitle(event)}</h4>
                       <Badge className={`${getEventTypeColor(event.type)} border text-xs`}>
                         {event.type}
                       </Badge>
                     </div>
                     <p className="text-sm text-gray-600 mb-2">{formatDate(event.date)}</p>
                     <div className="flex items-center gap-3 text-xs text-gray-500">
-                      {event.location && (
+                      {getEventLocation(event) && (
                         <div className="flex items-center gap-1">
                           <MapPin className="h-3 w-3" />
-                          <span>{event.location}</span>
+                          <span>{getEventLocation(event)}</span>
                         </div>
                       )}
-                      {event.attendees && (
+                      {getEventAttendees(event) && (
                         <div className="flex items-center gap-1">
                           <Users className="h-3 w-3" />
-                          <span>{event.attendees} attendees</span>
+                          <span>{getEventAttendees(event)} attendees</span>
                         </div>
                       )}
                     </div>
