@@ -21,9 +21,9 @@ export const useResourcePlanningData = (memberId: string) => {
       return data;
     },
     enabled: !!memberId,
-    staleTime: 10 * 60 * 1000, // 10 minutes cache
-    retry: 1, // Reduce retry attempts
-    gcTime: 15 * 60 * 1000, // Garbage collection time
+    staleTime: 15 * 60 * 1000, // Increased cache time
+    retry: 1,
+    gcTime: 20 * 60 * 1000,
   });
 
   // Use a separate query for active projects with minimal data needed
@@ -38,7 +38,8 @@ export const useResourcePlanningData = (memberId: string) => {
         .eq('resource_id', memberId)
         .eq('resource_type', 'active')
         .eq('company_id', company.id)
-        .not('hours', 'is', null); // Fixed TypeScript error
+        .not('hours', 'is', null)
+        .limit(10); // Limit results for faster loading
         
       if (error) throw error;
       
@@ -52,7 +53,7 @@ export const useResourcePlanningData = (memberId: string) => {
       }, [] as any[]);
     },
     enabled: !!memberId && !!company?.id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // Increased cache time
     retry: 1,
   });
 
@@ -63,25 +64,26 @@ export const useResourcePlanningData = (memberId: string) => {
       if (!company?.id || !memberId) return { futureAllocations: [], historicalData: [] };
       
       const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-      const eightWeeksOut = addWeeks(currentWeekStart, 8); // Reduced from 12 to 8 weeks for faster loading
-      const fourWeeksAgo = subWeeks(currentWeekStart, 4); // Reduced from 8 to 4 weeks for faster loading
+      const sixWeeksOut = addWeeks(currentWeekStart, 6); // Reduced from 8 to 6 weeks
+      const threeWeeksAgo = subWeeks(currentWeekStart, 3); // Reduced from 4 to 3 weeks
       
       const startDateFuture = format(currentWeekStart, 'yyyy-MM-dd');
-      const endDateFuture = format(eightWeeksOut, 'yyyy-MM-dd');
-      const startDateHistory = format(fourWeeksAgo, 'yyyy-MM-dd');
+      const endDateFuture = format(sixWeeksOut, 'yyyy-MM-dd');
+      const startDateHistory = format(threeWeeksAgo, 'yyyy-MM-dd');
       const endDateHistory = format(currentWeekStart, 'yyyy-MM-dd');
       
-      // Parallel fetching of all required data
+      // Parallel fetching of all required data with reduced scope
       const [futureResponse, historicalResponse] = await Promise.all([
         // Future allocations - optimized query
         supabase
           .from('project_resource_allocations')
-          .select('hours, week_start_date, project:projects(id, name)')
+          .select('hours, week_start_date, project:projects!inner(id, name)')
           .eq('resource_id', memberId)
           .eq('resource_type', 'active')
           .eq('company_id', company.id)
           .gte('week_start_date', startDateFuture)
-          .lte('week_start_date', endDateFuture),
+          .lte('week_start_date', endDateFuture)
+          .limit(50), // Add limit for performance
           
         // Historical data - optimized query
         supabase
@@ -91,7 +93,8 @@ export const useResourcePlanningData = (memberId: string) => {
           .eq('resource_type', 'active')
           .eq('company_id', company.id)
           .gte('week_start_date', startDateHistory)
-          .lt('week_start_date', endDateHistory),
+          .lt('week_start_date', endDateHistory)
+          .limit(20), // Add limit for performance
       ]);
 
       // Handle errors
@@ -104,7 +107,7 @@ export const useResourcePlanningData = (memberId: string) => {
       };
     },
     enabled: !!memberId && !!company?.id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 8 * 60 * 1000, // Increased cache time
     retry: 1,
   });
 
