@@ -19,18 +19,11 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
-        <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
-          <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
-          <span className="hidden sm:inline">Utilization Analytics</span>
-          <span className="sm:hidden">Analytics</span>
-        </h2>
-        <Card>
-          <CardContent className="p-6">
-            <div className="h-64 animate-pulse bg-gradient-to-r from-gray-100 to-gray-200 rounded-lg"></div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardContent className="p-6">
+          <div className="h-64 animate-pulse bg-gradient-to-r from-gray-100 to-gray-200 rounded-lg"></div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -88,95 +81,87 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
   };
 
   return (
-    <div className="space-y-4 w-full">
-      <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
-        <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
-        <span className="hidden sm:inline">Utilization Analytics</span>
-        <span className="sm:hidden">Analytics</span>
-      </h2>
-
-      <Card className="bg-gradient-to-br from-gray-50 to-white border-2 w-full">
-        <CardContent className="p-3 sm:p-6">
-          {/* Responsive Chart Container */}
-          <div className="mb-4 sm:mb-6 w-full">
-            <ChartContainer config={chartConfig} className="h-32 sm:h-40 lg:h-48 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart 
-                  data={chartData}
-                  margin={{ 
-                    top: 5, 
-                    right: 5, 
-                    left: 5, 
-                    bottom: 5 
+    <Card className="bg-gradient-to-br from-gray-50 to-white border-2 w-full">
+      <CardContent className="p-3 sm:p-6">
+        {/* Responsive Chart Container */}
+        <div className="mb-4 sm:mb-6 w-full">
+          <ChartContainer config={chartConfig} className="h-32 sm:h-40 lg:h-48 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart 
+                data={chartData}
+                margin={{ 
+                  top: 5, 
+                  right: 5, 
+                  left: 5, 
+                  bottom: 5 
+                }}
+              >
+                <defs>
+                  <linearGradient id="utilizationGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <XAxis 
+                  dataKey="period" 
+                  tickLine={false}
+                  axisLine={false}
+                  className="text-xs fill-gray-600"
+                  tick={{ fontSize: 10 }}
+                  interval={0}
+                />
+                <YAxis 
+                  tickLine={false}
+                  axisLine={false}
+                  className="text-xs fill-gray-600"
+                  tick={{ fontSize: 10 }}
+                  width={30}
+                />
+                <ChartTooltip 
+                  content={<ChartTooltipContent />}
+                  contentStyle={{
+                    fontSize: '12px',
+                    padding: '8px'
                   }}
-                >
-                  <defs>
-                    <linearGradient id="utilizationGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis 
-                    dataKey="period" 
-                    tickLine={false}
-                    axisLine={false}
-                    className="text-xs fill-gray-600"
-                    tick={{ fontSize: 10 }}
-                    interval={0}
-                  />
-                  <YAxis 
-                    tickLine={false}
-                    axisLine={false}
-                    className="text-xs fill-gray-600"
-                    tick={{ fontSize: 10 }}
-                    width={30}
-                  />
-                  <ChartTooltip 
-                    content={<ChartTooltipContent />}
-                    contentStyle={{
-                      fontSize: '12px',
-                      padding: '8px'
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="utilization"
-                    stroke="#8b5cf6"
-                    strokeWidth={2}
-                    fill="url(#utilizationGradient)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+                />
+                <Area
+                  type="monotone"
+                  dataKey="utilization"
+                  stroke="#8b5cf6"
+                  strokeWidth={2}
+                  fill="url(#utilizationGradient)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
+        
+        {/* Responsive Stats Cards */}
+        <div className="grid grid-cols-1 gap-3">
+          {/* Main Current Week Card */}
+          <div className={`p-3 sm:p-4 rounded-xl bg-gradient-to-r ${getUtilizationGradient(days7)} text-white`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-xl sm:text-2xl font-bold">{days7}%</div>
+                <p className="text-xs sm:text-sm opacity-90">Current Week</p>
+              </div>
+              <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 opacity-80" />
+            </div>
           </div>
           
-          {/* Responsive Stats Cards */}
-          <div className="grid grid-cols-1 gap-3">
-            {/* Main Current Week Card */}
-            <div className={`p-3 sm:p-4 rounded-xl bg-gradient-to-r ${getUtilizationGradient(days7)} text-white`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold">{days7}%</div>
-                  <p className="text-xs sm:text-sm opacity-90">Current Week</p>
-                </div>
-                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 opacity-80" />
-              </div>
+          {/* Responsive Sub-stats */}
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
+            <div className="p-2 sm:p-3 rounded-lg bg-gray-50 border">
+              <div className="text-sm sm:text-lg font-semibold text-gray-800">{days30}%</div>
+              <p className="text-xs text-gray-600">30-Day Avg</p>
             </div>
-            
-            {/* Responsive Sub-stats */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              <div className="p-2 sm:p-3 rounded-lg bg-gray-50 border">
-                <div className="text-sm sm:text-lg font-semibold text-gray-800">{days30}%</div>
-                <p className="text-xs text-gray-600">30-Day Avg</p>
-              </div>
-              <div className="p-2 sm:p-3 rounded-lg bg-gray-50 border">
-                <div className="text-sm sm:text-lg font-semibold text-gray-800">{days90}%</div>
-                <p className="text-xs text-gray-600">90-Day Avg</p>
-              </div>
+            <div className="p-2 sm:p-3 rounded-lg bg-gray-50 border">
+              <div className="text-sm sm:text-lg font-semibold text-gray-800">{days90}%</div>
+              <p className="text-xs text-gray-600">90-Day Avg</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
