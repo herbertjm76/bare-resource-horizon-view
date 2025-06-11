@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Lightbulb, AlertTriangle, CheckCircle, TrendingUp, Calendar, Clock, Info } from 'lucide-react';
+import { Lightbulb, AlertTriangle, CheckCircle, TrendingUp, Calendar, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
@@ -50,24 +50,23 @@ const getInsightIcon = (iconName: string, priority: string) => {
     case 'check-circle': return CheckCircle;
     case 'trending-up': return TrendingUp;
     case 'calendar': return Calendar;
-    case 'clock': return Clock;
     default: return priorityConfig.icon;
   }
 };
 
 export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> = ({ data }) => {
-  // Generate sample insights based on the unified data
+  // Generate insights focused on resourcing and capacity
   const generateInsights = () => {
     const insights = [];
-    const { currentUtilizationRate, activeProjects, totalTeamSize, preRegisteredMembers } = data;
+    const { currentUtilizationRate, activeProjects, totalTeamSize } = data;
 
-    // Utilization insights
+    // Utilization and capacity insights
     if (currentUtilizationRate > 90) {
       insights.push({
         type: 'warning',
         icon: 'alert-triangle',
-        title: 'High Team Utilization',
-        description: `Team is at ${currentUtilizationRate}% capacity - consider workload redistribution`,
+        title: 'Team Over-Capacity',
+        description: `Team is at ${currentUtilizationRate}% utilization - consider workload redistribution or additional resources`,
         priority: 'high',
         metric: `${currentUtilizationRate}% team utilization`
       });
@@ -75,8 +74,8 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
       insights.push({
         type: 'info',
         icon: 'trending-up',
-        title: 'Capacity Available',
-        description: `Team has ${100 - currentUtilizationRate}% available capacity for new projects`,
+        title: 'Available Capacity',
+        description: `Team has ${100 - currentUtilizationRate}% available capacity for new projects or strategic initiatives`,
         priority: 'medium',
         metric: `${100 - currentUtilizationRate}% available capacity`
       });
@@ -84,65 +83,66 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
       insights.push({
         type: 'success',
         icon: 'check-circle',
-        title: 'Optimal Utilization',
-        description: `Team utilization at healthy ${currentUtilizationRate}% level`,
+        title: 'Optimal Resource Utilization',
+        description: `Team utilization at ${currentUtilizationRate}% is within the optimal range for sustainable productivity`,
         priority: 'low',
         metric: `${currentUtilizationRate}% optimal range`
       });
     }
 
-    // Project load insights
-    if (activeProjects > 10) {
+    // Project load and resource allocation insights
+    if (activeProjects > 10 && totalTeamSize < 8) {
       insights.push({
         type: 'warning',
         icon: 'calendar',
-        title: 'High Project Load',
-        description: `Managing ${activeProjects} active projects - monitor resource allocation`,
+        title: 'High Project-to-Team Ratio',
+        description: `${activeProjects} active projects for ${totalTeamSize} team members may strain resources - consider prioritization`,
         priority: 'medium',
-        metric: `${activeProjects} active projects`
+        metric: `${(activeProjects / totalTeamSize).toFixed(1)} projects per team member`
       });
     } else if (activeProjects === 0) {
       insights.push({
         type: 'info',
         icon: 'calendar',
-        title: 'No Active Projects',
-        description: 'Team available for new project assignments',
+        title: 'Full Resource Availability',
+        description: 'No active projects - all team resources available for new assignments',
         priority: 'low',
         metric: 'No current projects'
       });
     }
 
-    // Team size insights including pre-registered members
-    if (totalTeamSize < 5) {
+    // Team scaling insights
+    if (totalTeamSize < 5 && activeProjects > 8) {
       insights.push({
         type: 'info',
         icon: 'trending-up',
-        title: 'Small Team Size',
-        description: `Consider scaling team - currently ${totalTeamSize} total members`,
+        title: 'Consider Team Expansion',
+        description: `Small team of ${totalTeamSize} managing ${activeProjects} projects - scaling may improve capacity`,
         priority: 'medium',
         metric: `${totalTeamSize} team members`
       });
     }
 
-    // Pre-registered members insight
-    if (preRegisteredMembers.length > 0) {
+    // Capacity buffer insights
+    const capacityBuffer = 100 - currentUtilizationRate;
+    if (capacityBuffer < 20 && currentUtilizationRate > 70) {
       insights.push({
-        type: 'info',
-        icon: 'clock',
-        title: 'Pending Team Members',
-        description: `${preRegisteredMembers.length} pre-registered members waiting to join`,
-        priority: 'medium',
-        metric: `${preRegisteredMembers.length} pending members`
+        type: 'warning',
+        icon: 'alert-triangle',
+        title: 'Limited Capacity Buffer',
+        description: `Only ${capacityBuffer}% capacity buffer remaining - risk of overallocation with new work`,
+        priority: 'high',
+        metric: `${capacityBuffer}% capacity buffer`
       });
     }
 
     return insights.length > 0 ? insights : [{
       type: 'success',
       icon: 'check-circle',
-      title: 'All Systems Green',
-      description: 'No immediate concerns - performance looks healthy',
+      title: 'Optimal Resource Balance',
+      description: 'Team capacity and project load are well-balanced for sustained performance',
       priority: 'low',
-      metric: 'Optimal performance'
+      metric: 'Balanced allocation'
     }];
   };
 
