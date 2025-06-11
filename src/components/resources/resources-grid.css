@@ -1,12 +1,12 @@
 
-/* Resource Grid Styles - Enhanced Design */
+/* Resource Grid Styles - Clean and Simple */
 .grid-table-card-scroll {
   overflow-x: auto;
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e2e8f0;
 }
 
@@ -16,7 +16,7 @@
   width: 100%;
   min-width: 100%;
   background: white;
-  border-radius: 15px;
+  border-radius: 8px;
 }
 
 .resource-allocation-table {
@@ -25,228 +25,184 @@
   width: 100%;
   min-width: max-content;
   background: white;
-  border-radius: 16px;
+  border-radius: 8px;
   overflow: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Enhanced Header styling */
+/* Header styling */
 .resource-allocation-table thead {
-  background: linear-gradient(135deg, #6F4BF6 0%, #8B5CF6 100%);
+  background: #6F4BF6;
   color: white;
   position: sticky;
   top: 0;
   z-index: 10;
-  box-shadow: 0 2px 10px rgba(111, 75, 246, 0.15);
 }
 
 .resource-allocation-table thead th {
-  padding: 16px 12px;
+  padding: 12px 8px;
   font-weight: 600;
-  font-size: 13px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  font-size: 12px;
   border-right: 1px solid rgba(255,255,255,0.2);
   position: relative;
   color: white;
-  background: inherit;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  transition: background-color 0.2s ease;
-}
-
-.resource-allocation-table thead th:first-child {
-  border-top-left-radius: 16px;
-  padding-left: 20px;
+  background: #6F4BF6;
 }
 
 .resource-allocation-table thead th:last-child {
   border-right: none;
-  border-top-right-radius: 16px;
-  padding-right: 20px;
 }
 
-.resource-allocation-table thead th:hover {
-  background: rgba(255,255,255,0.1);
-}
-
-/* Enhanced Row styling */
+/* Row styling */
 .resource-allocation-table tbody tr {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.2s ease;
   border-bottom: 1px solid #f1f5f9;
   background: white;
 }
 
 .resource-allocation-table tbody tr:hover {
-  background: linear-gradient(90deg, #fafbff 0%, #f8fafc 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.12);
+  background: #f8fafc;
 }
 
 .resource-allocation-table tbody tr:nth-child(even) {
-  background: linear-gradient(90deg, #fafbff 0%, #f8fafc 100%);
+  background: #fafbff;
 }
 
 .resource-allocation-table tbody tr:nth-child(even):hover {
-  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%);
+  background: #f1f5f9;
 }
 
-/* Enhanced Cell styling */
+/* Cell styling */
 .resource-allocation-table td {
-  padding: 14px 10px;
+  padding: 8px;
   border-right: 1px solid #e5e7eb;
-  font-size: 14px;
+  font-size: 13px;
   position: relative;
   color: #374151;
-  font-weight: 500;
   vertical-align: middle;
-  min-height: 50px;
 }
 
 .resource-allocation-table td:last-child {
   border-right: none;
-  padding-right: 20px;
 }
 
-.resource-allocation-table td:first-child {
-  padding-left: 20px;
-  font-weight: 600;
-  color: #1f2937;
-}
-
-/* Enhanced day cells for better 3-months view */
-.resource-allocation-table td[style*="width: 30px"] {
-  width: 40px !important;
-  min-width: 40px !important;
-  max-width: 40px !important;
-  padding: 8px 4px !important;
+/* Day cells */
+.resource-allocation-table td[style*="width: 30px"],
+.resource-allocation-table td[style*="width: 35px"],
+.resource-allocation-table td[style*="width: 40px"],
+.resource-allocation-table td[style*="width: 45px"] {
   text-align: center;
-  background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+  background: white;
   border-right: 1px solid #e5e7eb;
   position: relative;
 }
 
-.resource-allocation-table td[style*="width: 30px"]:hover {
-  background: linear-gradient(180deg, #f0f4ff 0%, #e0e7ff 100%);
-  border-color: #c7d2fe;
+.resource-allocation-table td[style*="width: 30px"]:hover,
+.resource-allocation-table td[style*="width: 35px"]:hover,
+.resource-allocation-table td[style*="width: 40px"]:hover,
+.resource-allocation-table td[style*="width: 45px"]:hover {
+  background: #f0f4ff;
 }
 
 /* Weekend styling */
 .resource-allocation-table .weekend {
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
-  border-left: 2px solid #e2e8f0;
+  background: #f8fafc !important;
 }
 
 .resource-allocation-table .weekend:hover {
-  background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+  background: #f1f5f9 !important;
 }
 
-/* Sunday border enhancement */
+/* Sunday border */
 .resource-allocation-table .sunday-border {
-  border-left: 3px solid #fbbf24 !important;
-  box-shadow: inset 3px 0 0 #fbbf24;
+  border-left: 2px solid #fbbf24 !important;
 }
 
 /* First of month styling */
 .resource-allocation-table td.border-l-2 {
-  border-left: 3px solid #f97316 !important;
-  box-shadow: inset 3px 0 0 #f97316;
+  border-left: 2px solid #f97316 !important;
 }
 
-/* Project header rows enhancement */
+/* Project header rows */
 .resource-allocation-table .project-header-row {
-  background: linear-gradient(135deg, #6F4BF6 0%, #8B5CF6 100%);
+  background: #6F4BF6;
   color: white;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  border-left: 4px solid #5B21B6;
 }
 
 .resource-allocation-table .project-header-row:hover {
-  background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+  background: #5B21B6;
 }
 
 .resource-allocation-table .project-header-row td {
   border-right: 1px solid rgba(255,255,255,0.2);
-  padding: 18px 16px;
+  padding: 12px 8px;
   color: white;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-/* Enhanced allocation input styling */
+/* Allocation input styling */
 .resource-allocation-table input[type="number"] {
   background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 6px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 4px 6px;
   text-align: center;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   color: #374151;
   width: 100%;
   max-width: 50px;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: border-color 0.2s ease;
 }
 
 .resource-allocation-table input[type="number"]:focus {
   outline: none;
   border-color: #6F4BF6;
-  box-shadow: 0 0 0 3px rgba(111, 75, 246, 0.1);
-  background: #fafbff;
+  box-shadow: 0 0 0 2px rgba(111, 75, 246, 0.1);
 }
 
 .resource-allocation-table input[type="number"]:hover {
   border-color: #a5b4fc;
-  background: #fafbff;
 }
 
-/* Enhanced allocation display pills */
+/* Allocation display */
 .resource-allocation-table .bg-white\/80 {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+  background: white !important;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 6px 10px !important;
-  font-weight: 600;
+  border-radius: 6px;
+  padding: 4px 8px !important;
+  font-weight: 500;
   color: #374151;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  transition: all 0.2s ease;
   display: inline-block;
   min-width: 32px;
+  text-align: center;
 }
 
 .resource-allocation-table .bg-white\/80:hover {
-  background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%) !important;
+  background: #f8fafc !important;
   border-color: #c7d2fe;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* Enhanced scrollbar */
+/* Scrollbar */
 .grid-table-card-scroll::-webkit-scrollbar {
-  height: 14px;
+  height: 12px;
 }
 
 .grid-table-card-scroll::-webkit-scrollbar-track {
-  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 100%);
-  border-radius: 8px;
-  margin: 0 8px;
+  background: #f1f5f9;
+  border-radius: 6px;
 }
 
 .grid-table-card-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(90deg, #6F4BF6 0%, #8B5CF6 100%);
-  border-radius: 8px;
-  border: 2px solid #f1f5f9;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: #94a3b8;
+  border-radius: 6px;
 }
 
 .grid-table-card-scroll::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(90deg, #5B21B6 0%, #7C3AED 100%);
+  background: #64748b;
 }
 
-/* Mobile responsiveness enhancements */
+/* Mobile responsiveness */
 @media (max-width: 640px) {
   .grid-table-card-scroll {
     width: 100vw;
@@ -254,49 +210,21 @@
     margin-left: calc(-1rem);
     padding-left: 1rem;
     padding-right: 1rem;
-    border-radius: 12px;
   }
   
   .resource-allocation-table {
-    min-width: 900px;
-    border-radius: 12px;
+    min-width: 800px;
   }
   
   .resource-allocation-table thead th,
   .resource-allocation-table td {
-    padding: 8px 6px;
-    font-size: 12px;
-  }
-  
-  .resource-allocation-table td[style*="width: 30px"] {
-    width: 35px !important;
-    min-width: 35px !important;
-    max-width: 35px !important;
-    padding: 6px 3px !important;
+    padding: 6px 4px;
+    font-size: 11px;
   }
   
   .resource-allocation-table input[type="number"] {
-    padding: 4px 6px;
-    font-size: 12px;
-    max-width: 45px;
+    padding: 3px 4px;
+    font-size: 11px;
+    max-width: 40px;
   }
-}
-
-/* Enhanced loading states */
-.resource-allocation-table .loading-cell {
-  background: linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-/* Enhanced focus states for accessibility */
-.resource-allocation-table *:focus-visible {
-  outline: 2px solid #6F4BF6;
-  outline-offset: 2px;
-  border-radius: 4px;
 }
