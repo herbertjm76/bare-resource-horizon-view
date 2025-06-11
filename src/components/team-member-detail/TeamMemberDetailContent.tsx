@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Shield, Loader2 } from 'lucide-react';
 import { TeamMemberDetailHeader } from './TeamMemberDetailHeader';
@@ -24,7 +23,7 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
   const userId = useUserSession();
   const weeklyCapacity = memberData.weekly_capacity || 40;
   
-  // Get utilization data for smart insights
+  // Get utilization data for chart
   const { utilization, isLoading: isLoadingUtilization } = useIndividualMemberUtilization(memberData.id, weeklyCapacity);
   
   // Get active projects count for baseline
@@ -107,15 +106,12 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
               />
             </div>
 
-            {/* Column 2: Smart Insights */}
+            {/* Column 2: Smart Insights - Now uses unified calculation */}
             <div className="lg:col-span-1">
-              {!isLoadingUtilization && (
-                <TeamMemberSmartInsights 
-                  utilization={utilization}
-                  activeProjectsCount={activeProjects?.length || 0}
-                  weeklyCapacity={weeklyCapacity}
-                />
-              )}
+              <TeamMemberSmartInsights 
+                memberId={memberData.id}
+                weeklyCapacity={weeklyCapacity}
+              />
             </div>
 
             {/* Column 3: Project Allocations */}
