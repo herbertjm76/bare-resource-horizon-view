@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { format } from 'date-fns';
 import { ProjectRow } from '@/components/resources/ProjectRow';
@@ -27,17 +27,20 @@ interface ResourceAllocationGridProps {
     selectedDays: string[];
     weekStartsOnSunday: boolean;
   };
+  expandedProjects: string[];
+  onToggleProjectExpand: (projectId: string) => void;
 }
 
 export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   startDate,
   periodToShow,
   filters,
-  displayOptions
+  displayOptions,
+  expandedProjects,
+  onToggleProjectExpand
 }) => {
   const { projects, isLoading } = useProjects();
   const { office_stages } = useOfficeSettings();
-  const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
   
   // Generate array of days for the selected period
   const days = useGridDays(startDate, periodToShow, displayOptions);
@@ -47,22 +50,6 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
 
   // Calculate the table width
   const tableWidth = useGridTableWidth(days.length);
-  
-  // Toggle project expansion with better logging
-  const toggleProjectExpanded = (projectId: string) => {
-    console.log('toggleProjectExpanded called for:', projectId);
-    console.log('Current expandedProjects:', expandedProjects);
-    
-    setExpandedProjects(prev => {
-      const isCurrentlyExpanded = prev.includes(projectId);
-      const newExpandedProjects = isCurrentlyExpanded 
-        ? prev.filter(id => id !== projectId) 
-        : [...prev, projectId];
-      
-      console.log('New expandedProjects will be:', newExpandedProjects);
-      return newExpandedProjects;
-    });
-  };
   
   if (isLoading) {
     return <GridLoadingState />;
@@ -100,7 +87,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
                       isExpanded={isExpanded} 
                       onToggleExpand={() => {
                         console.log('onToggleExpand called from ResourceAllocationGrid for:', project.id);
-                        toggleProjectExpanded(project.id);
+                        onToggleProjectExpand(project.id);
                       }} 
                       isEven={index % 2 === 0} 
                     />

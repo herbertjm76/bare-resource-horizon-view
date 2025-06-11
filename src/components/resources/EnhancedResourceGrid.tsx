@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useProjects } from '@/hooks/useProjects';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { GridLoadingState } from './grid/GridLoadingState';
@@ -26,17 +26,24 @@ interface EnhancedResourceGridProps {
     selectedDays: string[];
     weekStartsOnSunday: boolean;
   };
+  expandedProjects?: string[];
+  onToggleProjectExpand?: (projectId: string) => void;
+  onExpandAll?: () => void;
+  onCollapseAll?: () => void;
 }
 
 export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
   startDate,
   periodToShow,
   filters,
-  displayOptions
+  displayOptions,
+  expandedProjects = [],
+  onToggleProjectExpand,
+  onExpandAll,
+  onCollapseAll
 }) => {
   const { projects, isLoading } = useProjects();
   const { office_stages } = useOfficeSettings();
-  const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
   
   // Generate array of days for the selected period
   const days = useGridDays(startDate, periodToShow, displayOptions);
@@ -47,22 +54,10 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
   // Calculate the table width
   const tableWidth = useGridTableWidth(days.length);
   
-  // Toggle project expansion
-  const toggleProjectExpanded = (projectId: string) => {
-    setExpandedProjects(prev => 
-      prev.includes(projectId) ? prev.filter(id => id !== projectId) : [...prev, projectId]
-    );
-  };
-
-  // Expand all projects
-  const expandAll = () => {
-    setExpandedProjects(filteredProjects.map(p => p.id));
-  };
-
-  // Collapse all projects
-  const collapseAll = () => {
-    setExpandedProjects([]);
-  };
+  // Default handlers if not provided
+  const handleToggleProjectExpand = onToggleProjectExpand || (() => {});
+  const handleExpandAll = onExpandAll || (() => {});
+  const handleCollapseAll = onCollapseAll || (() => {});
   
   if (isLoading) {
     return <GridLoadingState />;
@@ -80,8 +75,8 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
       <GridControls
         projectCount={filteredProjects.length}
         periodToShow={periodToShow}
-        onExpandAll={expandAll}
-        onCollapseAll={collapseAll}
+        onExpandAll={handleExpandAll}
+        onCollapseAll={handleCollapseAll}
       />
 
       {/* Resource Grid Table */}
@@ -91,7 +86,7 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
           days={days}
           expandedProjects={expandedProjects}
           tableWidth={tableWidth}
-          onToggleProjectExpand={toggleProjectExpanded}
+          onToggleProjectExpand={handleToggleProjectExpand}
         />
       </GridTableWrapper>
     </div>

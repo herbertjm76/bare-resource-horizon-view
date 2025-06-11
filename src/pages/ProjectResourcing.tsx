@@ -65,6 +65,22 @@ const ProjectResourcing = () => {
     setDisplayOptions
   );
 
+  // Toggle project expansion
+  const handleToggleProjectExpand = useCallback((projectId: string) => {
+    console.log('Main toggleProjectExpanded called for:', projectId);
+    console.log('Current expandedProjects:', expandedProjects);
+    
+    setExpandedProjects(prev => {
+      const isCurrentlyExpanded = prev.includes(projectId);
+      const newExpandedProjects = isCurrentlyExpanded 
+        ? prev.filter(id => id !== projectId) 
+        : [...prev, projectId];
+      
+      console.log('New expandedProjects will be:', newExpandedProjects);
+      return newExpandedProjects;
+    });
+  }, [expandedProjects]);
+
   // Expand/collapse handlers
   const handleExpandAll = () => {
     setExpandedProjects(['all']);
@@ -90,7 +106,8 @@ const ProjectResourcing = () => {
     selectedView,
     startDate: startDate.toISOString(),
     periodToShow,
-    activeFiltersCount
+    activeFiltersCount,
+    expandedProjectsCount: expandedProjects.length
   });
 
   return (
@@ -129,8 +146,10 @@ const ProjectResourcing = () => {
           <ResourceAllocationGrid
             startDate={startDate}
             periodToShow={periodToShow}
-            filters={filters}
+            filters={{ ...filters, searchTerm }}
             displayOptions={displayOptions}
+            expandedProjects={expandedProjects}
+            onToggleProjectExpand={handleToggleProjectExpand}
           />
         </div>
       </OfficeSettingsProvider>
