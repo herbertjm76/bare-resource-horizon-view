@@ -54,9 +54,9 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             </div>
             
             {totalHours > 0 && (
-              <div className="flex items-center gap-1 bg-white/80 rounded-full px-2.5 py-0.5">
-                <Clock className="h-3 w-3" />
-                <span className="font-medium text-sm">{totalHours}h</span>
+              <div className="flex items-center gap-1 bg-white/80 rounded-full px-2 py-1 whitespace-nowrap">
+                <Clock className="h-3 w-3 flex-shrink-0" />
+                <span className="font-medium text-xs leading-none">{totalHours}h</span>
               </div>
             )}
             
