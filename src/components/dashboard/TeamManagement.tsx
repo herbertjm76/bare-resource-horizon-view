@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Profile } from './types';
+import { TeamMember } from './types';
 import { EmptyTeamState } from './teamManagement/EmptyTeamState';
 import { TeamManagementContent } from './teamManagement/TeamManagementContent';
 import { TeamManagementDialogs } from './teamManagement/TeamManagementDialogs';
@@ -8,7 +8,7 @@ import { useTeamManagementState } from './teamManagement/useTeamManagementState'
 import { useTeamManagementHandlers } from './teamManagement/useTeamManagementHandlers';
 
 interface TeamManagementProps {
-  teamMembers: Profile[];
+  teamMembers: TeamMember[];
   inviteUrl: string;
   userRole: string;
   onRefresh?: () => void;
