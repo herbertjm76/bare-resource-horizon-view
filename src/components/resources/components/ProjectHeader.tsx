@@ -54,10 +54,10 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             </div>
             
             {totalHours > 0 && (
-              <span className="inline-flex items-center gap-0.5 bg-white/80 rounded px-1 py-0.5 text-[8px] font-medium leading-none whitespace-nowrap">
-                <Clock className="h-2 w-2 flex-shrink-0" />
-                {totalHours}h
-              </span>
+              <>
+                <Clock className="h-3 w-3" />
+                <span className="text-[10px] font-medium">{totalHours}h</span>
+              </>
             )}
             
             {hasFeesSet ? (
