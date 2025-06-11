@@ -1,10 +1,19 @@
 
+interface WeekData {
+  total: number;
+  projects: any[];
+}
+
+interface FutureWeeksData {
+  [weekKey: string]: WeekData;
+}
+
 export const calculatePlanningMetrics = (
   futureAllocations: any[],
   weeklyCapacity: number
 ) => {
   // Calculate planning metrics with null checks
-  const futureWeeksData = futureAllocations?.reduce((acc, allocation) => {
+  const futureWeeksData: FutureWeeksData = futureAllocations?.reduce((acc: FutureWeeksData, allocation) => {
     const weekKey = allocation.week_start_date;
     if (!acc[weekKey]) {
       acc[weekKey] = { total: 0, projects: [] };
@@ -14,7 +23,7 @@ export const calculatePlanningMetrics = (
       acc[weekKey].projects.push(allocation.project);
     }
     return acc;
-  }, {} as Record<string, { total: number; projects: any[] }>) || {};
+  }, {} as FutureWeeksData) || {};
 
   const averageFutureUtilization = Object.keys(futureWeeksData).length > 0 
     ? Object.values(futureWeeksData).reduce((sum, week) => {
