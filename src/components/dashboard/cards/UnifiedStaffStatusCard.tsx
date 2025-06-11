@@ -11,29 +11,49 @@ interface StaffMember {
   first_name?: string;
   last_name?: string;
   availability: number;
-  role?: string;
+  role: string;
   department?: string;
   location?: string;
+  isPending?: boolean;
 }
 
 interface UnifiedStaffStatusCardProps {
   staffData: StaffMember[];
+  preRegisteredMembers?: any[];
   selectedTimeRange?: string;
 }
 
 export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
   staffData,
+  preRegisteredMembers = [],
   selectedTimeRange = 'week'
 }) => {
-  const availableMembers = staffData.filter(member => member.availability >= 60).length;
+  // Transform pre-registered members to match the staff data format
+  const transformedPreRegistered = preRegisteredMembers.map(member => ({
+    id: member.id,
+    name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Pending Member',
+    first_name: member.first_name || '',
+    last_name: member.last_name || '',
+    availability: 0, // Pre-registered members have 0% availability
+    role: member.role || 'member',
+    department: member.department,
+    location: member.location,
+    isPending: true
+  }));
+
+  // Combine active staff and pre-registered members
+  const combinedStaffData = [...staffData, ...transformedPreRegistered];
 
   // Transform staffData to match the expected StaffStatusCard interface
-  const transformedStaffData = staffData.map(member => ({
+  const transformedStaffData = combinedStaffData.map(member => ({
     ...member,
     name: member.name || `${member.first_name || ''} ${member.last_name || ''}`.trim(),
     first_name: member.first_name || member.name?.split(' ')[0] || '',
     last_name: member.last_name || member.name?.split(' ').slice(1).join(' ') || '',
+    role: member.role || 'member' // Ensure role is always defined
   }));
+
+  const availableMembers = transformedStaffData.filter(member => member.availability >= 60).length;
 
   return (
     <Card className="rounded-2xl border-2 border-zinc-300 bg-white shadow-sm h-[500px]">
@@ -45,7 +65,7 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
             Team Status
           </h2>
           <StandardizedHeaderBadge>
-            {availableMembers} / {staffData.length} Available
+            {availableMembers} / {transformedStaffData.length} Available
           </StandardizedHeaderBadge>
         </div>
 

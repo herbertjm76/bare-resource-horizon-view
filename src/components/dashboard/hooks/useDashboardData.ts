@@ -8,6 +8,7 @@ import { useTimeRangeMetrics } from './useTimeRangeMetrics';
 
 export const useDashboardData = (selectedTimeRange: TimeRange) => {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
+  const [preRegisteredMembers, setPreRegisteredMembers] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [currentUtilizationRate, setCurrentUtilizationRate] = useState(0);
   const [utilizationStatus, setUtilizationStatus] = useState({
@@ -38,6 +39,16 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
 
       if (membersError) throw membersError;
 
+      // Fetch pre-registered members from invites table
+      const { data: invitesData, error: invitesError } = await supabase
+        .from('invites')
+        .select('*')
+        .eq('company_id', company.id)
+        .eq('status', 'pending')
+        .eq('invitation_type', 'pre_registered');
+
+      if (invitesError) throw invitesError;
+
       // Fetch projects
       const { data: projectsData, error: projectsError } = await supabase
         .from('projects')
@@ -47,6 +58,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
       if (projectsError) throw projectsError;
 
       setTeamMembers(membersData || []);
+      setPreRegisteredMembers(invitesData || []);
       setProjects(projectsData || []);
 
       // Calculate utilization (simplified calculation)
@@ -116,13 +128,14 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
     weekly_capacity: member.weekly_capacity || 40,
     first_name: member.first_name,
     last_name: member.last_name,
-    role: member.role
+    role: member.role || 'member'
   }));
 
   const officeOptions = ['All Offices'];
 
   return {
     teamMembers,
+    preRegisteredMembers,
     projects,
     currentUtilizationRate,
     utilizationStatus,
