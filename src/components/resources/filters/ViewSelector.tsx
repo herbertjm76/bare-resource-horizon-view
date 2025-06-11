@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, Clock } from 'lucide-react';
 
 export type ViewOption = '1-month' | '3-months' | '12-months';
 
@@ -23,53 +22,36 @@ export const ViewSelector: React.FC<ViewSelectorProps> = ({
   const viewOptions = [
     { 
       value: '1-month' as const, 
-      label: '1 Month View',
-      description: '4 weeks',
-      icon: <Calendar className="h-4 w-4" />
+      label: '1 Month'
     },
     { 
       value: '3-months' as const, 
-      label: '3 Months View',
-      description: '12 weeks',
-      icon: <Clock className="h-4 w-4" />
+      label: '3 Months'
     },
     { 
       value: '12-months' as const, 
-      label: '12 Months View',
-      description: '52 weeks',
-      icon: <Calendar className="h-4 w-4" />
+      label: '12 Months'
     }
   ];
 
-  const currentOption = viewOptions.find(option => option.value === selectedView);
-
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm font-medium text-gray-700 hidden sm:block">Time Range:</span>
+      <span className="text-sm font-medium text-gray-700 hidden sm:block">Range:</span>
       <Select 
         value={selectedView}
         onValueChange={onViewChange}
       >
-        <SelectTrigger className="w-[160px]">
-          <div className="flex items-center gap-2">
-            {currentOption?.icon}
-            <SelectValue placeholder="Select view" />
-          </div>
+        <SelectTrigger className="w-[120px]">
+          <SelectValue placeholder="Select range" />
         </SelectTrigger>
-        <SelectContent className="bg-white border shadow-lg">
+        <SelectContent className="bg-white border shadow-lg z-50">
           {viewOptions.map((option) => (
             <SelectItem 
               key={option.value} 
               value={option.value}
               className="cursor-pointer"
             >
-              <div className="flex items-center gap-2">
-                {option.icon}
-                <div className="flex flex-col">
-                  <span className="font-medium">{option.label}</span>
-                  <span className="text-xs text-gray-500">{option.description}</span>
-                </div>
-              </div>
+              {option.label}
             </SelectItem>
           ))}
         </SelectContent>
