@@ -7,16 +7,17 @@ import { TeamSizeCard } from './executiveSummary/components/TeamSizeCard';
 
 interface Metric {
   title: string;
-  value: string | number;
+  value: string | number | React.ReactNode;
   subtitle?: string;
   badgeText?: string;
-  badgeColor?: 'red' | 'orange' | 'green' | 'blue' | 'purple';
+  badgeColor?: 'red' | 'orange' | 'green' | 'blue' | 'purple' | string;
   customData?: {
     activeResources?: number;
     totalTeamMembers?: number;
     preRegisteredCount?: number;
     utilizationRate?: number;
   };
+  icon?: React.ComponentType<any>;
 }
 
 interface StandardizedExecutiveSummaryProps {
@@ -116,7 +117,7 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
             }
 
             // Standard metric card for other metrics
-            const IconComponent = getMetricIcon(metric.title);
+            const IconComponent = metric.icon || getMetricIcon(metric.title);
             
             return (
               <Card key={index} className="rounded-2xl border-0 shadow-sm bg-white">
@@ -124,7 +125,13 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-gray-600 mb-1">{metric.title}</p>
-                      <p className="text-2xl font-bold text-gray-900 mb-0.5">{metric.value}</p>
+                      <div className="text-2xl font-bold text-gray-900 mb-0.5">
+                        {typeof metric.value === 'string' || typeof metric.value === 'number' ? (
+                          metric.value
+                        ) : (
+                          metric.value
+                        )}
+                      </div>
                       {metric.subtitle && (
                         <p className="text-xs font-medium text-gray-500 mb-1">{metric.subtitle}</p>
                       )}
