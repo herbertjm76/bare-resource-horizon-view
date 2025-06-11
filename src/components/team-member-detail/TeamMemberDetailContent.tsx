@@ -1,16 +1,18 @@
 
 import React from 'react';
-import { Shield, TrendingUp, Loader2 } from 'lucide-react';
+import { Shield, Loader2 } from 'lucide-react';
 import { TeamMemberDetailHeader } from './TeamMemberDetailHeader';
 import { TeamMemberProfileCard } from './TeamMemberProfileCard';
-import { TeamMemberInsightsGrid } from './TeamMemberInsightsGrid';
-import { TeamMemberUtilizationMetrics } from './TeamMemberUtilizationMetrics';
-import { TeamMemberResourceOverview } from './TeamMemberResourceOverview';
-import { TeamMemberProjectOverview } from './TeamMemberProjectOverview';
+import { TeamMemberBaselineSection } from './TeamMemberBaselineSection';
+import { TeamMemberUtilizationChart } from './TeamMemberUtilizationChart';
+import { TeamMemberSmartInsights } from './TeamMemberSmartInsights';
+import { TeamMemberProjectAllocations } from './TeamMemberProjectAllocations';
 import { Card, CardContent } from '@/components/ui/card';
 import { useUserSession } from '@/hooks/useUserSession';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useIndividualMemberUtilization } from '@/hooks/useIndividualMemberUtilization';
+import { useResourcePlanningData } from './resource-planning/hooks/useResourcePlanningData';
 
 interface TeamMemberDetailContentProps {
   memberData: any;
@@ -20,6 +22,13 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
   memberData
 }) => {
   const userId = useUserSession();
+  const weeklyCapacity = memberData.weekly_capacity || 40;
+  
+  // Get utilization data for smart insights
+  const { utilization, isLoading: isLoadingUtilization } = useIndividualMemberUtilization(memberData.id, weeklyCapacity);
+  
+  // Get active projects count for baseline
+  const { activeProjects } = useResourcePlanningData(memberData.id);
 
   // Fetch current user's profile to determine role with timeout protection
   const { data: currentUserProfile, isLoading: isLoadingUserProfile } = useQuery({
@@ -73,35 +82,41 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      {/* Standardized Header - No redundant name display */}
+      {/* Header */}
       <TeamMemberDetailHeader />
 
-      {/* Member Profile Card - Centralized member info */}
+      {/* Member Profile Card */}
       <TeamMemberProfileCard member={memberData} />
-
-      {/* Quick Insights Grid - Consistent layout */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <TrendingUp className="h-6 w-6 text-brand-violet" />
-          <h2 className="text-2xl font-bold text-brand-primary">Performance Overview</h2>
-        </div>
-        <TeamMemberInsightsGrid memberId={memberData.id} />
-      </div>
 
       {/* Management Features - Only for admin, owner, or PM */}
       {canViewManagementFeatures ? (
         <>
-          {/* Utilization Metrics - Detailed view */}
-          <TeamMemberUtilizationMetrics 
-            memberId={memberData.id} 
-            weeklyCapacity={memberData.weekly_capacity || 40}
+          {/* Baseline Section */}
+          <TeamMemberBaselineSection 
+            member={memberData} 
+            activeProjectsCount={activeProjects?.length || 0}
           />
 
-          {/* Resource Planning - Optimized component */}
-          <TeamMemberResourceOverview memberId={memberData.id} />
+          {/* Utilization Analytics */}
+          <TeamMemberUtilizationChart 
+            memberId={memberData.id} 
+            weeklyCapacity={weeklyCapacity}
+          />
 
-          {/* Project Management - Streamlined */}
-          <TeamMemberProjectOverview memberId={memberData.id} />
+          {/* Smart Insights */}
+          {!isLoadingUtilization && (
+            <TeamMemberSmartInsights 
+              utilization={utilization}
+              activeProjectsCount={activeProjects?.length || 0}
+              weeklyCapacity={weeklyCapacity}
+            />
+          )}
+
+          {/* Project Allocations */}
+          <TeamMemberProjectAllocations 
+            memberId={memberData.id}
+            weeklyCapacity={weeklyCapacity}
+          />
         </>
       ) : (
         <>
