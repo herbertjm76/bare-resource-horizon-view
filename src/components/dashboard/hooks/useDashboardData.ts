@@ -6,21 +6,9 @@ import { useTimeRangeMetrics } from './useTimeRangeMetrics';
 import { useHolidays } from './useHolidays';
 import { useTeamData } from './useTeamData';
 import { useProjectData } from './useProjectData';
+import { useUtilizationData } from './useUtilizationData';
+import { useAggregatedData } from './useAggregatedData';
 import { UnifiedDashboardData } from './types/dashboardTypes';
-import { 
-  combineStaffData,
-  transformPreRegisteredMembers,
-  transformActiveMembers
-} from './utils/dataTransformations';
-import { 
-  calculateUtilizationRate,
-  getUtilizationStatus,
-  generateUtilizationTrends
-} from './utils/utilizationCalculations';
-import { 
-  createMockData,
-  createSmartInsightsData
-} from './utils/mockDataUtils';
 
 export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboardData & {
   setSelectedOffice: (office: string) => void;
@@ -32,7 +20,6 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   const { metrics: timeRangeMetrics, isLoading: metricsLoading } = useTimeRangeMetrics(selectedTimeRange);
   const { holidays, isLoading: isHolidaysLoading } = useHolidays();
   
-  // Use the new modular hooks
   const { 
     teamMembers, 
     preRegisteredMembers, 
@@ -46,22 +33,18 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     refetch: refetchProjects 
   } = useProjectData(company?.id);
 
-  // Calculate utilization using utilities
-  const currentUtilizationRate = calculateUtilizationRate(teamMembers, preRegisteredMembers);
-  const utilizationStatus = getUtilizationStatus(currentUtilizationRate);
-  const utilizationTrends = generateUtilizationTrends(currentUtilizationRate);
+  // Use extracted utilization hook
+  const { currentUtilizationRate, utilizationStatus, utilizationTrends } = useUtilizationData(
+    teamMembers, 
+    preRegisteredMembers
+  );
 
-  // Transform staff data using utilities
-  const transformedStaffData = combineStaffData(teamMembers, preRegisteredMembers);
-  const totalTeamSize = transformedStaffData.length;
-
-  // Create mock data and insights using utilities
-  const mockData = createMockData(timeRangeMetrics);
-  const smartInsightsData = createSmartInsightsData(
-    transformedStaffData,
-    timeRangeMetrics.activeProjects,
-    currentUtilizationRate,
-    totalTeamSize
+  // Use extracted aggregated data hook
+  const { transformedStaffData, totalTeamSize, mockData, smartInsightsData } = useAggregatedData(
+    teamMembers,
+    preRegisteredMembers,
+    timeRangeMetrics,
+    currentUtilizationRate
   );
 
   const officeOptions = ['All Offices'];
