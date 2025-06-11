@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Area, AreaChart } from 'recharts';
 import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
@@ -20,7 +20,11 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-800">Utilization Analytics</h2>
+        <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+          <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="hidden sm:inline">Utilization Analytics</span>
+          <span className="sm:hidden">Analytics</span>
+        </h2>
         <Card>
           <CardContent className="p-6">
             <div className="h-64 animate-pulse bg-gradient-to-r from-gray-100 to-gray-200 rounded-lg"></div>
@@ -71,8 +75,8 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
   return (
     <div className="space-y-4 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <h2 className="text-lg sm:text-xl font-semibold text-gray-800 flex items-center gap-2">
-          <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-brand-violet" />
+        <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+          <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
           <span className="hidden sm:inline">Utilization Analytics</span>
           <span className="sm:hidden">Analytics</span>
         </h2>
@@ -90,9 +94,6 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
       </div>
 
       <Card className="bg-gradient-to-br from-gray-50 to-white border-2 w-full">
-        <CardHeader className="pb-2 sm:pb-3">
-          <CardTitle className="text-base sm:text-lg text-brand-primary">Performance Metrics</CardTitle>
-        </CardHeader>
         <CardContent className="p-3 sm:p-6">
           {/* Responsive Chart Container */}
           <div className="mb-4 sm:mb-6 w-full">

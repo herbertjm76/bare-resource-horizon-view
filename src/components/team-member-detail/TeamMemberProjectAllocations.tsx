@@ -1,8 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { FolderOpen, Clock, Briefcase } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
@@ -104,8 +103,8 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-          <Briefcase className="h-5 w-5 text-brand-violet" />
+        <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+          <Briefcase className="h-4 w-4 sm:h-5 sm:w-5" />
           Project Allocations
         </h2>
         <Card>
@@ -126,71 +125,62 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-        <Briefcase className="h-5 w-5 text-brand-violet" />
+      <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+        <Briefcase className="h-4 w-4 sm:h-5 sm:w-5" />
         Project Allocations
       </h2>
 
-      {/* Summary Card */}
+      {/* Combined Card with Weekly Summary and Projects */}
       <Card className="bg-gradient-to-br from-brand-violet/5 to-brand-primary/5 border-2">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-brand-primary flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Weekly Summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-brand-violet mb-1">
+        <CardContent className="p-4 sm:p-6">
+          {/* Weekly Summary Section */}
+          <div className="mb-6 text-center pb-4 border-b border-brand-primary/10">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Clock className="h-4 w-4 text-brand-primary" />
+              <span className="font-medium text-brand-primary">Weekly Summary</span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-bold text-brand-violet mb-1">
               {totalWeeklyHours.toFixed(1)}h
             </div>
             <p className="text-sm text-gray-600">Average per week</p>
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Project List */}
-      <div className="space-y-3">
-        {projectAllocations.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <FolderOpen className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-600 mb-2">No Active Projects</h3>
-              <p className="text-gray-500 text-sm">No upcoming project allocations found.</p>
-            </CardContent>
-          </Card>
-        ) : (
-          projectAllocations.map((project) => (
-            <Card key={project.id} className="hover:shadow-md transition-all duration-200 border-l-4 border-l-brand-violet">
-              <CardContent className="p-4">
-                <div className="space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 mb-1">{project.name}</h4>
-                      <Badge className={`${getStatusColor(project.status)} text-xs`}>
+          {/* Project List Section */}
+          <div className="space-y-2">
+            {projectAllocations.length === 0 ? (
+              <div className="py-6 text-center">
+                <FolderOpen className="h-8 w-8 mx-auto text-gray-300 mb-3" />
+                <h3 className="text-base font-medium text-gray-600 mb-1">No Active Projects</h3>
+                <p className="text-gray-500 text-sm">No upcoming project allocations found.</p>
+              </div>
+            ) : (
+              projectAllocations.map((project) => (
+                <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-white/80 border border-brand-primary/10 hover:bg-white/90 transition-all duration-200">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium text-gray-900 truncate">{project.name}</h4>
+                      <Badge className={`${getStatusColor(project.status)} text-xs flex-shrink-0`}>
                         {project.status?.replace('_', ' ') || 'Unknown'}
                       </Badge>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
+                    <div className="flex items-center gap-1 text-xs text-gray-600">
                       <Clock className="h-3 w-3" />
                       <span>{project.weeklyAverage.toFixed(1)}h/week</span>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-brand-primary">
-                        {project.totalHours}h
-                      </div>
-                      <div className="text-xs text-gray-500">total</div>
+                  </div>
+                  
+                  <div className="text-right flex-shrink-0 ml-3">
+                    <div className="text-lg font-bold text-brand-primary">
+                      {project.totalHours}h
                     </div>
+                    <div className="text-xs text-gray-500">total</div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Lightbulb, AlertTriangle, CheckCircle, TrendingUp, Calendar } from 'lucide-react';
 
@@ -100,16 +100,13 @@ export const TeamMemberSmartInsights: React.FC<SmartInsightsProps> = ({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-gray-800">Smart Insights</h2>
+      <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+        <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5" />
+        Smart Insights
+      </h2>
       
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="h-5 w-5 text-yellow-500" />
-            Performance Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-3 sm:p-6 space-y-4">
           {insights.map((insight, index) => (
             <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
               <div className={`p-1 rounded ${insight.type === 'warning' ? 'bg-orange-100 text-orange-600' : insight.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
