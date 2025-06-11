@@ -1,9 +1,7 @@
 
 import React, { useState } from 'react';
 import { TeamMember, Profile } from './types';
-import { TeamMemberInsightsHighlight } from './TeamMemberInsightsHighlight';
 import { TeamManagement } from './TeamManagement';
-import { useTeamFilters } from '@/hooks/useTeamFilters';
 
 interface TeamMemberContentProps {
   userProfile: any;
@@ -23,13 +21,6 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
   teamMembers,
   onRefresh
 }) => {
-  // Use the team filters hook with search functionality
-  const {
-    filteredMembers,
-    searchQuery,
-    setSearchQuery
-  } = useTeamFilters(teamMembers);
-
   if (isProfileLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -52,15 +43,10 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
     : `${window.location.origin}/join`;
 
   // Filter out only active members (Profile types) for TeamManagement using type guard
-  const activeMembers: Profile[] = filteredMembers.filter(isProfile);
+  const activeMembers: Profile[] = teamMembers.filter(isProfile);
 
   return (
     <div className="space-y-6">
-      <TeamMemberInsightsHighlight
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-      />
-      
       <TeamManagement
         teamMembers={activeMembers}
         inviteUrl={inviteUrl}
