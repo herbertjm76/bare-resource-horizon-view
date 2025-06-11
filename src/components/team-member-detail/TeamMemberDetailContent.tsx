@@ -6,7 +6,7 @@ import { ArrowLeft, Users, Shield, TrendingUp } from 'lucide-react';
 import { TeamMemberOverview } from './TeamMemberOverview';
 import { TeamMemberMetrics } from './TeamMemberMetrics';
 import { TeamMemberProjects } from './TeamMemberProjects';
-import { TeamMemberPerformance } from './TeamMemberPerformance';
+import { TeamMemberResourcePlanning } from './TeamMemberResourcePlanning';
 import { TeamMemberExpandedInsights } from './TeamMemberExpandedInsights';
 import { Card, CardContent } from '@/components/ui/card';
 import { useUserSession } from '@/hooks/useUserSession';
@@ -69,7 +69,7 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
                 <h1 className="text-3xl font-bold text-brand-primary">
                   {`${memberData.first_name || ''} ${memberData.last_name || ''}`.trim() || 'Team Member'}
                 </h1>
-                <p className="text-gray-600">Team Insights & Resource Overview</p>
+                <p className="text-gray-600">Resource Planning & Allocation Overview</p>
               </div>
             </div>
           </div>
@@ -90,8 +90,8 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
         {/* Utilization Metrics - Always visible (MVP feature) */}
         <TeamMemberMetrics memberId={memberData.id} />
 
-        {/* Performance Insights - Always visible */}
-        <TeamMemberPerformance memberId={memberData.id} />
+        {/* Resource Planning Insights - Always visible */}
+        <TeamMemberResourcePlanning memberId={memberData.id} />
 
         {/* Management Features - Only for admin, owner, or PM */}
         {canViewManagementFeatures ? (
