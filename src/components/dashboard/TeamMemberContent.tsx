@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { TeamMember } from './types';
+import { TeamMember, Profile } from './types';
 import { TeamMemberInsightsHighlight } from './TeamMemberInsightsHighlight';
 import { TeamManagement } from './TeamManagement';
 import { useTeamFilters } from '@/hooks/useTeamFilters';
@@ -11,6 +11,11 @@ interface TeamMemberContentProps {
   teamMembers: TeamMember[];
   onRefresh?: () => void;
 }
+
+// Type guard function to check if a TeamMember is a Profile
+const isProfile = (member: TeamMember): member is Profile => {
+  return !('isPending' in member);
+};
 
 export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
   userProfile,
@@ -46,8 +51,8 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
     ? `${window.location.origin}/join?company=${userProfile.company_id}`
     : `${window.location.origin}/join`;
 
-  // Filter out only active members (Profile types) for TeamManagement
-  const activeMembers = filteredMembers.filter(member => !('isPending' in member));
+  // Filter out only active members (Profile types) for TeamManagement using type guard
+  const activeMembers: Profile[] = filteredMembers.filter(isProfile);
 
   return (
     <div className="space-y-6">
