@@ -38,41 +38,21 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, utilizationRate, staffData);
   const isOverCapacity = capacityHours < 0;
 
-  // Calculate team composition for enhanced team size card
-  // Check if staff member has isPending property, otherwise assume it's an active member
-  const preRegisteredCount = staffData.filter(member => 
-    'isPending' in member ? member.isPending : false
-  ).length;
-  const totalTeamMembers = staffData.length;
-
   const metrics = [
-    {
-      title: "Team Size",
-      value: totalTeamMembers,
-      subtitle: `${activeResources} active, ${preRegisteredCount} pending`,
-      badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
-      badgeColor: utilizationRate > 85 ? 'orange' : 'green' as const,
-      customData: {
-        activeResources,
-        totalTeamMembers,
-        preRegisteredCount,
-        utilizationRate
-      }
-    },
     {
       title: "Team Utilization",
       value: `${Math.round(utilizationRate)}%`,
       subtitle: timeRangeText,
       badgeText: utilizationStatus.label,
-      badgeColor: utilizationStatus.color === 'destructive' ? 'red' as const : 
-                 utilizationStatus.color === 'default' ? 'green' as const : 'blue' as const
+      badgeColor: utilizationStatus.color === 'destructive' ? 'red' : 
+                 utilizationStatus.color === 'default' ? 'green' : 'blue'
     },
     {
       title: isOverCapacity ? "Over Capacity" : "Available Capacity",
       value: `${Math.abs(capacityHours).toLocaleString()}h`,
       subtitle: timeRangeText,
       badgeText: isOverCapacity ? "Over Capacity" : undefined,
-      badgeColor: isOverCapacity ? "red" as const : undefined
+      badgeColor: isOverCapacity ? "red" : undefined
     },
     {
       title: "Active Projects",
@@ -80,6 +60,13 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       subtitle: activeResources > 0 
         ? `${(activeProjects / activeResources).toFixed(1)} per person` 
         : 'No team members'
+    },
+    {
+      title: "Team Size",
+      value: activeResources,
+      subtitle: "Active resources",
+      badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
+      badgeColor: utilizationRate > 85 ? 'orange' : 'green'
     }
   ];
 
@@ -91,9 +78,7 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
     standardizedUtilizationRate,
     capacityHours,
     isOverCapacity,
-    staffDataCount: staffData.length,
-    preRegisteredCount,
-    totalTeamMembers
+    staffDataCount: staffData.length
   });
 
   return (

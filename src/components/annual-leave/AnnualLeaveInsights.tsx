@@ -190,31 +190,33 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
   const metrics = [
     {
       title: "People on Leave",
-      value: peopleOnLeaveThisMonth.length > 0 ? renderMemberAvatars(peopleOnLeaveThisMonth) : "No one on leave",
+      value: peopleOnLeaveThisMonth.length > 0 ? renderMemberAvatars(peopleOnLeaveThisMonth) : (
+        <span className="text-sm text-white/80">No one on leave</span>
+      ),
       subtitle: `${peopleOnLeaveThisMonth.length} of ${teamMembers.length} team members`,
       badgeText: `${peopleOnLeaveThisMonth.length} of ${teamMembers.length}`,
-      badgeColor: peopleOnLeaveThisMonth.length > 5 ? "orange" as const : "blue" as const
+      badgeColor: peopleOnLeaveThisMonth.length > 5 ? "orange" : "blue"
     },
     {
       title: "Team Capacity Impact",
       value: `${teamUtilization.teamUtilizationRate}%`,
       subtitle: `${teamUtilization.totalAvailableHours}h available capacity`,
       badgeText: UtilizationCalculationService.getUtilizationBadgeText(teamUtilization.teamUtilizationRate),
-      badgeColor: UtilizationCalculationService.getUtilizationColor(teamUtilization.teamUtilizationRate) as 'red' | 'orange' | 'green' | 'blue' | 'purple'
+      badgeColor: UtilizationCalculationService.getUtilizationColor(teamUtilization.teamUtilizationRate)
     },
     {
       title: "Upcoming Leave Alerts",
       value: upcomingLeaveCount > 0 ? `${upcomingLeaveCount} people` : "No upcoming leave",
       subtitle: "Next week impact",
       badgeText: upcomingLeaveCount > 3 ? "High Impact" : upcomingLeaveCount > 1 ? "Medium Impact" : "Low Impact",
-      badgeColor: upcomingLeaveCount > 3 ? "red" as const : upcomingLeaveCount > 1 ? "orange" as const : "green" as const
+      badgeColor: upcomingLeaveCount > 3 ? "red" : upcomingLeaveCount > 1 ? "orange" : "green"
     },
     {
       title: "Average Leave Block",
       value: averageBlockSize > 0 ? `${averageBlockSize} days` : "No data",
       subtitle: "Typical leave duration",
       badgeText: `${averageBlockSize} days average`,
-      badgeColor: "blue" as const
+      badgeColor: "blue"
     }
   ];
 

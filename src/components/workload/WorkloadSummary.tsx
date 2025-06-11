@@ -129,15 +129,15 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
                overallUtilization > 90 ? 'At capacity' : 'Good utilization',
       badgeText: overallUtilization < 70 ? 'Low' : 
                 overallUtilization > 90 ? 'High' : 'Optimal',
-      badgeColor: overallUtilization < 70 ? 'orange' as const : 
-                 overallUtilization > 90 ? 'red' as const : 'green' as const
+      badgeColor: overallUtilization < 70 ? 'orange' : 
+                 overallUtilization > 90 ? 'red' : 'green'
     },
     {
       title: "Available Hours",
       value: `${availableCapacity}h`,
       subtitle: `Next ${periodToShow} weeks capacity`,
       badgeText: "Plan Ahead",
-      badgeColor: "blue" as const
+      badgeColor: "blue"
     },
     {
       title: "Needs Resourcing",
@@ -146,7 +146,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
       ),
       subtitle: "Under 60% utilization",
       badgeText: `${needsResourcing.length}`,
-      badgeColor: needsResourcing.length > 0 ? "blue" as const : "green" as const
+      badgeColor: needsResourcing.length > 0 ? "blue" : "green"
     },
     {
       title: "Overloaded Staff",
@@ -155,7 +155,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
       ),
       subtitle: "Over 100% utilization",
       badgeText: `${overloaded.length}`,
-      badgeColor: overloaded.length > 0 ? "red" as const : "green" as const
+      badgeColor: overloaded.length > 0 ? "red" : "green"
     }
   ];
 
