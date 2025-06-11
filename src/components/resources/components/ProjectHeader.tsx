@@ -27,8 +27,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   const handleToggleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('ProjectHeader: Toggle button clicked, current isExpanded:', isExpanded);
-    console.log('ProjectHeader: About to call onToggleExpand for project:', project.id);
+    console.log('ProjectHeader: Toggle clicked for project:', project.id, 'current isExpanded:', isExpanded);
     onToggleExpand();
   };
 

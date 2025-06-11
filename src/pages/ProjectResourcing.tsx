@@ -67,8 +67,8 @@ const ProjectResourcing = () => {
 
   // Toggle project expansion
   const handleToggleProjectExpand = useCallback((projectId: string) => {
-    console.log('Main toggleProjectExpanded called for:', projectId);
-    console.log('Current expandedProjects:', expandedProjects);
+    console.log('ProjectResourcing - toggleProjectExpanded called for:', projectId);
+    console.log('ProjectResourcing - Current expandedProjects:', expandedProjects);
     
     setExpandedProjects(prev => {
       const isCurrentlyExpanded = prev.includes(projectId);
@@ -76,19 +76,21 @@ const ProjectResourcing = () => {
         ? prev.filter(id => id !== projectId) 
         : [...prev, projectId];
       
-      console.log('New expandedProjects will be:', newExpandedProjects);
+      console.log('ProjectResourcing - New expandedProjects will be:', newExpandedProjects);
       return newExpandedProjects;
     });
   }, [expandedProjects]);
 
   // Expand/collapse handlers
-  const handleExpandAll = () => {
+  const handleExpandAll = useCallback(() => {
+    console.log('ProjectResourcing - Expand all projects');
     setExpandedProjects(['all']);
-  };
+  }, []);
 
-  const handleCollapseAll = () => {
+  const handleCollapseAll = useCallback(() => {
+    console.log('ProjectResourcing - Collapse all projects');
     setExpandedProjects([]);
-  };
+  }, []);
 
   // Mock data for filters
   const officeOptions = ['London', 'New York', 'Singapore', 'Tokyo', 'Paris'];
@@ -107,7 +109,8 @@ const ProjectResourcing = () => {
     startDate: startDate.toISOString(),
     periodToShow,
     activeFiltersCount,
-    expandedProjectsCount: expandedProjects.length
+    expandedProjectsCount: expandedProjects.length,
+    expandedProjects
   });
 
   return (

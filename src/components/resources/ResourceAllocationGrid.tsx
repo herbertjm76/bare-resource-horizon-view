@@ -51,6 +51,12 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   // Calculate the table width
   const tableWidth = useGridTableWidth(days.length);
   
+  console.log('ResourceAllocationGrid render:', {
+    filteredProjectsCount: filteredProjects.length,
+    expandedProjects,
+    expandedProjectsLength: expandedProjects.length
+  });
+  
   if (isLoading) {
     return <GridLoadingState />;
   }
@@ -77,7 +83,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
               <tbody>
                 {filteredProjects.map((project, index) => {
                   const isExpanded = expandedProjects.includes(project.id);
-                  console.log('Rendering project in ResourceAllocationGrid:', project.id, 'isExpanded:', isExpanded);
+                  console.log('ResourceAllocationGrid - Rendering project:', project.id, 'isExpanded:', isExpanded);
                   
                   return (
                     <ProjectRow 
@@ -86,7 +92,7 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
                       days={days} 
                       isExpanded={isExpanded} 
                       onToggleExpand={() => {
-                        console.log('onToggleExpand called from ResourceAllocationGrid for:', project.id);
+                        console.log('ResourceAllocationGrid - onToggleExpand called for:', project.id);
                         onToggleProjectExpand(project.id);
                       }} 
                       isEven={index % 2 === 0} 

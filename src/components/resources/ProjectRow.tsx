@@ -48,7 +48,6 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     checkResourceInOtherProjects
   } = useProjectRowData(project, days);
   
-  // Enhanced debugging
   console.log('ProjectRow render:', {
     projectId: project.id,
     projectName: project.name,
@@ -71,6 +70,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   const handleToggleExpand = () => {
     console.log('ProjectRow: handleToggleExpand called for project:', project.id);
     console.log('ProjectRow: Current isExpanded state:', isExpanded);
+    console.log('ProjectRow: About to call onToggleExpand');
     onToggleExpand();
   };
 
@@ -130,7 +130,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
       
       {/* Resource rows when project is expanded */}
       {isExpanded && resources.map(resource => {
-        console.log('Rendering resource row:', resource.id, resource.name);
+        console.log('Rendering resource row for expanded project:', resource.id, resource.name);
         return (
           <ResourceRow 
             key={resource.id} 
