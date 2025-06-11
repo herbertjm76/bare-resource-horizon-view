@@ -66,11 +66,22 @@ export class AdvancedInsightsService {
       monthOverMonth: Math.random() * 30 - 15 // -15 to +15%
     };
 
-    // Project load analysis
+    // Project load analysis with proper typing
+    const avgProjectsPerMember = totalTeamSize > 0 ? activeProjects / totalTeamSize : 0;
+    
+    // Ensure projectComplexity is properly typed
+    let projectComplexity: 'low' | 'medium' | 'high';
+    if (activeProjects > totalTeamSize * 2.5) {
+      projectComplexity = 'high';
+    } else if (activeProjects > totalTeamSize * 1.5) {
+      projectComplexity = 'medium';
+    } else {
+      projectComplexity = 'low';
+    }
+
     const projectLoad = {
-      averageProjectsPerMember: totalTeamSize > 0 ? activeProjects / totalTeamSize : 0,
-      projectComplexity: activeProjects > totalTeamSize * 2.5 ? 'high' : 
-                        activeProjects > totalTeamSize * 1.5 ? 'medium' : 'low',
+      averageProjectsPerMember: avgProjectsPerMember,
+      projectComplexity,
       contextSwitching: activeProjects > totalTeamSize * 2 ? 85 : 
                        activeProjects > totalTeamSize ? 60 : 30
     };
@@ -80,10 +91,20 @@ export class AdvancedInsightsService {
     const avgUtilization = utilizations.reduce((sum: number, util: number) => sum + util, 0) / utilizations.length;
     const variance = utilizations.reduce((sum: number, util: number) => sum + Math.pow(util - avgUtilization, 2), 0) / utilizations.length;
     
+    // Ensure workloadDistribution is properly typed
+    let workloadDistribution: 'balanced' | 'uneven' | 'concentrated';
+    if (variance > 400) {
+      workloadDistribution = 'uneven';
+    } else if (variance > 200) {
+      workloadDistribution = 'concentrated';
+    } else {
+      workloadDistribution = 'balanced';
+    }
+
     const efficiency = {
       utilizationVariance: Math.sqrt(variance),
       teamBalance: 100 - Math.min(variance / 10, 100), // Higher variance = lower balance
-      workloadDistribution: variance > 400 ? 'uneven' : variance > 200 ? 'concentrated' : 'balanced'
+      workloadDistribution
     };
 
     // Risk assessment
