@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,32 +15,46 @@ interface TeamMemberResourcePlanningProps {
 export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProps> = ({ memberId }) => {
   const { company } = useCompany();
 
+  console.log('🔍 RESOURCE PLANNING: Loading for member:', memberId, 'company:', company?.id);
+
   // Fetch member's profile data
-  const { data: memberProfile } = useQuery({
+  const { data: memberProfile, isLoading: isLoadingProfile, error: profileError } = useQuery({
     queryKey: ['memberProfile', memberId],
     queryFn: async () => {
+      console.log('🔍 RESOURCE PLANNING: Fetching member profile for:', memberId);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('weekly_capacity, first_name, last_name')
         .eq('id', memberId)
-        .single();
+        .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error('🔍 RESOURCE PLANNING: Profile fetch error:', error);
+        throw error;
+      }
+      
+      console.log('🔍 RESOURCE PLANNING: Profile data:', data);
       return data;
     },
     enabled: !!memberId,
   });
 
   // Fetch next 12 weeks of allocations for planning
-  const { data: futureAllocations } = useQuery({
-    queryKey: ['futureAllocations', memberId],
+  const { data: futureAllocations, isLoading: isLoadingFuture, error: futureError } = useQuery({
+    queryKey: ['futureAllocations', memberId, company?.id],
     queryFn: async () => {
-      if (!company?.id) return [];
+      if (!company?.id) {
+        console.log('🔍 RESOURCE PLANNING: No company ID available');
+        return [];
+      }
       
       const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
       const twelveWeeksOut = addWeeks(currentWeekStart, 12);
       const startDate = format(currentWeekStart, 'yyyy-MM-dd');
       const endDate = format(twelveWeeksOut, 'yyyy-MM-dd');
+      
+      console.log('🔍 RESOURCE PLANNING: Fetching future allocations from', startDate, 'to', endDate);
       
       const { data, error } = await supabase
         .from('project_resource_allocations')
@@ -56,15 +69,20 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
         .gte('week_start_date', startDate)
         .lte('week_start_date', endDate);
       
-      if (error) throw error;
+      if (error) {
+        console.error('🔍 RESOURCE PLANNING: Future allocations error:', error);
+        throw error;
+      }
+      
+      console.log('🔍 RESOURCE PLANNING: Future allocations data:', data);
       return data || [];
     },
     enabled: !!memberId && !!company?.id,
   });
 
   // Fetch historical utilization for trends
-  const { data: historicalData } = useQuery({
-    queryKey: ['historicalUtilization', memberId],
+  const { data: historicalData, isLoading: isLoadingHistorical, error: historicalError } = useQuery({
+    queryKey: ['historicalUtilization', memberId, company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
       
@@ -72,6 +90,8 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
       const eightWeeksAgo = subWeeks(currentWeekStart, 8);
       const startDate = format(eightWeeksAgo, 'yyyy-MM-dd');
       const endDate = format(currentWeekStart, 'yyyy-MM-dd');
+      
+      console.log('🔍 RESOURCE PLANNING: Fetching historical data from', startDate, 'to', endDate);
       
       const { data, error } = await supabase
         .from('project_resource_allocations')
@@ -82,17 +102,24 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
         .gte('week_start_date', startDate)
         .lt('week_start_date', endDate);
       
-      if (error) throw error;
+      if (error) {
+        console.error('🔍 RESOURCE PLANNING: Historical data error:', error);
+        throw error;
+      }
+      
+      console.log('🔍 RESOURCE PLANNING: Historical data:', data);
       return data || [];
     },
     enabled: !!memberId && !!company?.id,
   });
 
   // Fetch active projects
-  const { data: activeProjects } = useQuery({
-    queryKey: ['memberActiveProjects', memberId],
+  const { data: activeProjects, isLoading: isLoadingProjects, error: projectsError } = useQuery({
+    queryKey: ['memberActiveProjects', memberId, company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
+      
+      console.log('🔍 RESOURCE PLANNING: Fetching active projects');
       
       const { data, error } = await supabase
         .from('project_resource_allocations')
@@ -109,7 +136,10 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
         .eq('resource_type', 'active')
         .eq('company_id', company.id);
       
-      if (error) throw error;
+      if (error) {
+        console.error('🔍 RESOURCE PLANNING: Active projects error:', error);
+        throw error;
+      }
       
       // Get unique projects
       const uniqueProjects = data?.reduce((acc, allocation) => {
@@ -120,14 +150,62 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
         return acc;
       }, [] as any[]) || [];
       
+      console.log('🔍 RESOURCE PLANNING: Active projects data:', uniqueProjects);
       return uniqueProjects;
     },
     enabled: !!memberId && !!company?.id,
   });
 
+  // Show loading state if any query is loading
+  const isLoading = isLoadingProfile || isLoadingFuture || isLoadingHistorical || isLoadingProjects;
+  
+  // Show error state if any query has an error
+  const hasError = profileError || futureError || historicalError || projectsError;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-semibold text-gray-800">Resource Planning & Allocation</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="border-2">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+                <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-gray-200 rounded animate-pulse w-16 mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-32"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-semibold text-gray-800">Resource Planning & Allocation</h2>
+        <Card className="border-2 border-red-200 bg-red-50">
+          <CardContent className="p-6 text-center">
+            <AlertTriangle className="h-12 w-12 mx-auto text-red-500 mb-3" />
+            <h3 className="text-lg font-semibold text-red-800 mb-2">
+              Unable to Load Resource Data
+            </h3>
+            <p className="text-red-600">
+              There was an error loading the resource planning information. Please try refreshing the page.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   const weeklyCapacity = memberProfile?.weekly_capacity || 40;
 
-  // Calculate planning metrics
+  // Calculate planning metrics with null checks
   const futureWeeksData = futureAllocations?.reduce((acc, allocation) => {
     const weekKey = allocation.week_start_date;
     if (!acc[weekKey]) {
@@ -140,16 +218,19 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
     return acc;
   }, {} as Record<string, { total: number; projects: any[] }>) || {};
 
-  const averageFutureUtilization = Object.values(futureWeeksData).reduce((sum, week) => {
-    return sum + ((week.total / weeklyCapacity) * 100);
-  }, 0) / Math.max(Object.keys(futureWeeksData).length, 1);
+  const averageFutureUtilization = Object.keys(futureWeeksData).length > 0 
+    ? Object.values(futureWeeksData).reduce((sum, week) => {
+        return sum + ((week.total / weeklyCapacity) * 100);
+      }, 0) / Object.keys(futureWeeksData).length
+    : 0;
 
   const overallocatedWeeks = Object.values(futureWeeksData).filter(week => week.total > weeklyCapacity).length;
   const underutilizedWeeks = Object.values(futureWeeksData).filter(week => week.total < weeklyCapacity * 0.8).length;
 
-  // Calculate historical average
-  const historicalAverage = historicalData?.reduce((sum, allocation) => sum + (allocation.hours || 0), 0) / 
-    Math.max(historicalData?.length || 1, 1);
+  // Calculate historical average with null checks
+  const historicalAverage = historicalData && historicalData.length > 0
+    ? historicalData.reduce((sum, allocation) => sum + (allocation.hours || 0), 0) / historicalData.length
+    : 0;
   const historicalUtilization = (historicalAverage / weeklyCapacity) * 100;
 
   const getStatusColor = (status: string) => {
