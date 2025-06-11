@@ -19,6 +19,12 @@ export const EnhancedResourceTable: React.FC<EnhancedResourceTableProps> = ({
   tableWidth,
   onToggleProjectExpand
 }) => {
+  console.log('EnhancedResourceTable render:', {
+    projectsCount: projects.length,
+    expandedProjects,
+    daysCount: days.length
+  });
+
   return (
     <table 
       className="enhanced-resource-table w-full" 
@@ -31,16 +37,24 @@ export const EnhancedResourceTable: React.FC<EnhancedResourceTableProps> = ({
         <GridDaysHeader days={days} />
       </thead>
       <tbody>
-        {projects.map((project, index) => (
-          <ProjectRow 
-            key={project.id} 
-            project={project} 
-            days={days} 
-            isExpanded={expandedProjects.includes(project.id)} 
-            onToggleExpand={() => onToggleProjectExpand(project.id)} 
-            isEven={index % 2 === 0} 
-          />
-        ))}
+        {projects.map((project, index) => {
+          const isExpanded = expandedProjects.includes(project.id);
+          console.log('Rendering project:', project.id, 'isExpanded:', isExpanded);
+          
+          return (
+            <ProjectRow 
+              key={project.id} 
+              project={project} 
+              days={days} 
+              isExpanded={isExpanded} 
+              onToggleExpand={() => {
+                console.log('Toggle expand called for project:', project.id);
+                onToggleProjectExpand(project.id);
+              }} 
+              isEven={index % 2 === 0} 
+            />
+          );
+        })}
       </tbody>
     </table>
   );
