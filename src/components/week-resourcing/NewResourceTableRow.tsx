@@ -35,16 +35,20 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   getWeeklyLeave
 }) => {
   const weeklyCapacity = member.weekly_capacity || 40;
-  const totalHours = getMemberTotal(member.id);
+  const totalAllocatedHours = getMemberTotal(member.id);
   const projectCount = getProjectCount(member.id);
   
   // Get leave data for this member
   const annualLeave = annualLeaveData[member.id] || 0;
   const holidayHours = holidaysData[member.id] || 0;
+  const otherLeave = 0; // This could be expanded to include other leave types
   const annualLeaveDates = getWeeklyLeave ? getWeeklyLeave(member.id) : [];
   
+  // Calculate total used hours for the week (matching CapacityCell logic)
+  const totalUsedHours = totalAllocatedHours + annualLeave + holidayHours + otherLeave;
+  
   // Calculate available hours after all allocations and leave
-  const availableHours = Math.max(0, weeklyCapacity - totalHours - annualLeave - holidayHours);
+  const availableHours = Math.max(0, weeklyCapacity - totalUsedHours);
   
   const isEvenRow = memberIndex % 2 === 0;
   
@@ -79,10 +83,10 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           availableHours={availableHours} 
           totalCapacity={weeklyCapacity}
           member={member}
-          totalAllocatedHours={totalHours}
+          totalAllocatedHours={totalAllocatedHours}
           annualLeave={annualLeave}
           holidayHours={holidayHours}
-          otherLeave={0}
+          otherLeave={otherLeave}
           projects={memberProjects}
           annualLeaveDates={annualLeaveDates}
         />
