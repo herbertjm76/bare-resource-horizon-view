@@ -97,26 +97,35 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
             activeProjectsCount={activeProjects?.length || 0}
           />
 
-          {/* Utilization Analytics */}
-          <TeamMemberUtilizationChart 
-            memberId={memberData.id} 
-            weeklyCapacity={weeklyCapacity}
-          />
+          {/* 3-Column Layout for Desktop */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Column 1: Utilization Analytics */}
+            <div className="lg:col-span-1">
+              <TeamMemberUtilizationChart 
+                memberId={memberData.id} 
+                weeklyCapacity={weeklyCapacity}
+              />
+            </div>
 
-          {/* Smart Insights */}
-          {!isLoadingUtilization && (
-            <TeamMemberSmartInsights 
-              utilization={utilization}
-              activeProjectsCount={activeProjects?.length || 0}
-              weeklyCapacity={weeklyCapacity}
-            />
-          )}
+            {/* Column 2: Smart Insights */}
+            <div className="lg:col-span-1">
+              {!isLoadingUtilization && (
+                <TeamMemberSmartInsights 
+                  utilization={utilization}
+                  activeProjectsCount={activeProjects?.length || 0}
+                  weeklyCapacity={weeklyCapacity}
+                />
+              )}
+            </div>
 
-          {/* Project Allocations */}
-          <TeamMemberProjectAllocations 
-            memberId={memberData.id}
-            weeklyCapacity={weeklyCapacity}
-          />
+            {/* Column 3: Project Allocations */}
+            <div className="lg:col-span-1">
+              <TeamMemberProjectAllocations 
+                memberId={memberData.id}
+                weeklyCapacity={weeklyCapacity}
+              />
+            </div>
+          </div>
         </>
       ) : (
         <>
