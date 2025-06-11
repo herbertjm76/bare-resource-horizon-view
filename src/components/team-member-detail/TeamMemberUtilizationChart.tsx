@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Line, LineChart } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Line, LineChart, Cell } from 'recharts';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useIndividualMemberUtilization } from '@/hooks/useIndividualMemberUtilization';
 
@@ -95,9 +95,12 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
               <ChartTooltip content={<ChartTooltipContent />} />
               <Bar 
                 dataKey="utilization" 
-                fill={(entry) => getUtilizationColor(entry.utilization)}
                 radius={[4, 4, 0, 0]}
-              />
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={getUtilizationColor(entry.utilization)} />
+                ))}
+              </Bar>
               <Line
                 dataKey="target"
                 stroke="#64748b"
