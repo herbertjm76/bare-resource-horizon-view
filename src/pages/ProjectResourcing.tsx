@@ -65,12 +65,12 @@ const ProjectResourcing = () => {
     setDisplayOptions
   );
 
-  // Toggle project expansion
+  // Toggle project expansion - FIXED: Removed expandedProjects dependency to avoid stale closure
   const handleToggleProjectExpand = useCallback((projectId: string) => {
     console.log('ProjectResourcing - toggleProjectExpanded called for:', projectId);
-    console.log('ProjectResourcing - Current expandedProjects:', expandedProjects);
     
     setExpandedProjects(prev => {
+      console.log('ProjectResourcing - Current expandedProjects in setter:', prev);
       const isCurrentlyExpanded = prev.includes(projectId);
       const newExpandedProjects = isCurrentlyExpanded 
         ? prev.filter(id => id !== projectId) 
@@ -79,7 +79,7 @@ const ProjectResourcing = () => {
       console.log('ProjectResourcing - New expandedProjects will be:', newExpandedProjects);
       return newExpandedProjects;
     });
-  }, [expandedProjects]);
+  }, []); // Removed expandedProjects dependency
 
   // Expand/collapse handlers
   const handleExpandAll = useCallback(() => {
