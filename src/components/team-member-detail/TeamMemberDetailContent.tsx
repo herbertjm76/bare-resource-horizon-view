@@ -92,7 +92,10 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
       {canViewManagementFeatures ? (
         <>
           {/* Utilization Metrics - Detailed view */}
-          <TeamMemberUtilizationMetrics memberId={memberData.id} />
+          <TeamMemberUtilizationMetrics 
+            memberId={memberData.id} 
+            weeklyCapacity={memberData.weekly_capacity || 40}
+          />
 
           {/* Resource Planning - Optimized component */}
           <TeamMemberResourceOverview memberId={memberData.id} />
