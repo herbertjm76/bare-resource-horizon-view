@@ -17,17 +17,13 @@ interface ResourceGridContainerProps {
     selectedDays: string[];
     weekStartsOnSunday: boolean;
   };
-  expandedProjects: string[];
-  onToggleProjectExpand: (projectId: string) => void;
 }
 
 export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
   startDate,
   periodToShow,
   filters,
-  displayOptions,
-  expandedProjects,
-  onToggleProjectExpand
+  displayOptions
 }) => {
   return (
     <div className="mt-4 w-full max-w-full overflow-hidden">
@@ -38,8 +34,6 @@ export const ResourceGridContainer: React.FC<ResourceGridContainerProps> = ({
             periodToShow={periodToShow}
             filters={filters}
             displayOptions={displayOptions}
-            expandedProjects={expandedProjects}
-            onToggleProjectExpand={onToggleProjectExpand}
           />
         </div>
       </OfficeSettingsProvider>

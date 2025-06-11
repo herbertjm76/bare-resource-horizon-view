@@ -18,13 +18,15 @@ export const calculateActiveFiltersCount = (
 export const createClearFiltersFunction = (
   setFilters: Function,
   setSearchTerm: Function,
-  setDisplayOptions: Function
+  setDisplayOptions: Function,
+  currentPeriod: number
 ) => {
   return () => {
     setFilters({
       office: "all",
       country: "all",
-      manager: "all"
+      manager: "all",
+      periodToShow: currentPeriod // Keep the period setting
     });
     setSearchTerm('');
     setDisplayOptions({

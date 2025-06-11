@@ -3,33 +3,15 @@ import { useMemo } from 'react';
 
 export const useGridTableWidth = (daysCount: number): number => {
   return useMemo(() => {
-    // Fixed columns: counter (60px) + project name (250px) 
-    const fixedColumnsWidth = 60 + 250;
+    // Fixed columns: counter (48px) + project name (200px)
+    const fixedColumnsWidth = 48 + 200;
+    // Day columns: 30px per day (fixed width)
+    const daysColumnsWidth = daysCount * 30;
+    // Add padding for better spacing
+    const totalWidth = fixedColumnsWidth + daysColumnsWidth + 40;
     
-    // Dynamic day column width based on number of days
-    let dayColumnWidth = 40; // Base width for day columns
-    
-    // Adjust column width based on the number of days for better UX
-    if (daysCount > 90) { // 12 months view
-      dayColumnWidth = 35;
-    } else if (daysCount > 30) { // 3 months view
-      dayColumnWidth = 40;
-    } else { // 1 month view
-      dayColumnWidth = 45;
-    }
-    
-    // Day columns: calculated width per day
-    const daysColumnsWidth = daysCount * dayColumnWidth;
-    
-    // Add padding and flexible end column
-    const paddingAndFlexible = 80;
-    
-    const totalWidth = fixedColumnsWidth + daysColumnsWidth + paddingAndFlexible;
-    
-    // Ensure minimum width for usability
-    const minWidth = 1000;
-    
-    console.log(`Grid width calculation: ${daysCount} days, ${dayColumnWidth}px per day, total: ${totalWidth}px`);
+    // Ensure minimum width but allow expansion
+    const minWidth = 1200;
     
     return Math.max(totalWidth, minWidth);
   }, [daysCount]);

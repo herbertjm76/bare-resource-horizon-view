@@ -1,161 +1,66 @@
 
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
-import { ResourceAllocationGrid } from '@/components/resources/ResourceAllocationGrid';
-import { ProjectResourcingHeader } from './ProjectResourcing/components/ProjectResourcingHeader';
-import { ProjectResourcingFilterRow } from './ProjectResourcing/components/ProjectResourcingFilterRow';
-import { useViewBasedDates } from '@/hooks/useViewBasedDates';
-import { ViewOption } from '@/components/resources/filters/ViewSelector';
+import { ProjectResourcingContent } from './ProjectResourcing/components/ProjectResourcingContent';
+import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
+import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
-import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
-import { format, startOfMonth } from 'date-fns';
 
 const ProjectResourcing = () => {
-  // State management
-  const [selectedView, setSelectedView] = useState<ViewOption>('3-months');
-  const [selectedDate, setSelectedDate] = useState(startOfMonth(new Date()));
-  const [filters, setFilters] = useState({
-    office: "all",
-    country: "all",
-    manager: "all",
-    periodToShow: 12
-  });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [displayOptions, setDisplayOptions] = useState({
-    showWeekends: false,
-    selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri'],
-    weekStartsOnSunday: false
-  });
-  const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
-
-  // Get calculated dates based on view
-  const { startDate, periodToShow } = useViewBasedDates({ selectedView });
-
-  // Handle filter changes
-  const handleFilterChange = useCallback((key: string, value: string) => {
-    if (key === 'searchTerm') {
-      setSearchTerm(value);
-    } else {
-      setFilters(prev => ({ ...prev, [key]: value }));
-    }
-  }, []);
-
-  // Handle display option changes
-  const handleDisplayOptionChange = useCallback((option: string, value: boolean | string[]) => {
-    setDisplayOptions(prev => ({ ...prev, [option]: value }));
-  }, []);
-
-  // Handle period changes
-  const handlePeriodChange = useCallback((period: number) => {
-    setFilters(prev => ({ ...prev, periodToShow: period }));
-  }, []);
-
-  // Handle view changes
-  const handleViewChange = useCallback((view: ViewOption) => {
-    setSelectedView(view);
-  }, []);
-
-  // Calculate active filters count
-  const activeFiltersCount = calculateActiveFiltersCount(filters, searchTerm, displayOptions);
-
-  // Clear all filters function
-  const clearAllFilters = createClearFiltersFunction(
+  const {
+    selectedMonth,
+    searchTerm,
+    filters,
+    displayOptions,
+    handleFilterChange,
+    handlePeriodChange,
+    handleDisplayOptionChange,
+    handleSearchChange,
+    handleMonthChange,
     setFilters,
     setSearchTerm,
     setDisplayOptions
+  } = useProjectResourcingState();
+
+  const {
+    officeOptions,
+    countryOptions,
+    managers
+  } = useProjectResourcingData();
+
+  // Calculate active filters count (include display options)
+  const activeFiltersCount = calculateActiveFiltersCount(filters, searchTerm, displayOptions);
+  
+  // Clear all filters and reset display options
+  const clearFilters = createClearFiltersFunction(
+    setFilters,
+    setSearchTerm,
+    setDisplayOptions,
+    filters.periodToShow
   );
 
-  // Toggle project expansion - FIXED: Removed expandedProjects dependency to avoid stale closure
-  const handleToggleProjectExpand = useCallback((projectId: string) => {
-    console.log('ProjectResourcing - toggleProjectExpanded called for:', projectId);
-    
-    setExpandedProjects(prev => {
-      console.log('ProjectResourcing - Current expandedProjects in setter:', prev);
-      const isCurrentlyExpanded = prev.includes(projectId);
-      const newExpandedProjects = isCurrentlyExpanded 
-        ? prev.filter(id => id !== projectId) 
-        : [...prev, projectId];
-      
-      console.log('ProjectResourcing - New expandedProjects will be:', newExpandedProjects);
-      return newExpandedProjects;
-    });
-  }, []); // Removed expandedProjects dependency
-
-  // Expand/collapse handlers
-  const handleExpandAll = useCallback(() => {
-    console.log('ProjectResourcing - Expand all projects');
-    setExpandedProjects(['all']);
-  }, []);
-
-  const handleCollapseAll = useCallback(() => {
-    console.log('ProjectResourcing - Collapse all projects');
-    setExpandedProjects([]);
-  }, []);
-
-  // Mock data for filters
-  const officeOptions = ['London', 'New York', 'Singapore', 'Tokyo', 'Paris'];
-  const countryOptions = ['UK', 'USA', 'Singapore', 'Japan', 'France'];
-  const managerOptions = [
-    { id: '1', name: 'John Smith' },
-    { id: '2', name: 'Jane Doe' },
-    { id: '3', name: 'Alex Johnson' }
-  ];
-
-  // Calculate project count (mock for now)
-  const projectCount = 4;
-
-  console.log('ProjectResourcing render:', {
-    selectedView,
-    startDate: startDate.toISOString(),
-    periodToShow,
-    activeFiltersCount,
-    expandedProjectsCount: expandedProjects.length,
-    expandedProjects
-  });
-
   return (
-    <StandardLayout>
-      <OfficeSettingsProvider>
-        <div className="flex-1 space-y-6 p-4 md:p-8">
-          <ProjectResourcingHeader 
-            projectCount={projectCount}
-            periodToShow={periodToShow}
-          />
-          
-          <ProjectResourcingFilterRow
-            selectedDate={selectedDate}
-            onDateChange={setSelectedDate}
-            periodToShow={filters.periodToShow}
-            onPeriodChange={handlePeriodChange}
-            filters={filters}
-            searchTerm={searchTerm}
-            onFilterChange={handleFilterChange}
-            onSearchChange={setSearchTerm}
-            officeOptions={officeOptions}
-            countryOptions={countryOptions}
-            managers={managerOptions}
-            activeFiltersCount={activeFiltersCount}
-            displayOptions={displayOptions}
-            onDisplayOptionChange={handleDisplayOptionChange}
-            onClearFilters={clearAllFilters}
-            onExpandAll={handleExpandAll}
-            onCollapseAll={handleCollapseAll}
-            expandedProjects={expandedProjects}
-            totalProjects={projectCount}
-            selectedView={selectedView}
-            onViewChange={handleViewChange}
-          />
-          
-          <ResourceAllocationGrid
-            startDate={startDate}
-            periodToShow={periodToShow}
-            filters={{ ...filters, searchTerm }}
-            displayOptions={displayOptions}
-            expandedProjects={expandedProjects}
-            onToggleProjectExpand={handleToggleProjectExpand}
-          />
-        </div>
-      </OfficeSettingsProvider>
+    <StandardLayout 
+      contentClassName="p-6 bg-gray-50 flex flex-col"
+    >
+      <div className="flex-1 flex flex-col" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto' }}>
+        <ProjectResourcingContent
+          selectedMonth={selectedMonth}
+          searchTerm={searchTerm}
+          filters={filters}
+          displayOptions={displayOptions}
+          officeOptions={officeOptions}
+          countryOptions={countryOptions}
+          managers={managers}
+          activeFiltersCount={activeFiltersCount}
+          onMonthChange={handleMonthChange}
+          onSearchChange={handleSearchChange}
+          onFilterChange={handleFilterChange}
+          onPeriodChange={handlePeriodChange}
+          onDisplayOptionChange={handleDisplayOptionChange}
+          onClearFilters={clearFilters}
+        />
+      </div>
     </StandardLayout>
   );
 };

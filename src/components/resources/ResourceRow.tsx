@@ -65,28 +65,14 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
     return format(date, 'yyyy-MM-dd');
   };
 
-  // Calculate total allocated hours ONLY for the visible days in the grid
-  const totalAllocatedHours = days.reduce((sum, day) => {
-    const dayKey = getDayKey(day.date);
-    const hours = allocations[dayKey] || 0;
-    return sum + hours;
-  }, 0);
-
-  // Calculate standard capacity ONLY for the visible workdays in the grid
+  // Calculate total allocated hours across all days
+  const totalAllocatedHours = Object.values(allocations).reduce((sum, hours) => sum + hours, 0);
+  // Standard capacity would be 8 hours per workday
   const standardCapacity = days.filter(d => !d.isWeekend).length * 8;
-  
-  // Calculate utilization percentage based ONLY on visible days
+  // Calculate utilization percentage
   const utilizationPercentage = standardCapacity > 0 
     ? (totalAllocatedHours / standardCapacity) * 100 
     : 0;
-
-  console.log(`ResourceRow - ${resource.first_name} ${resource.last_name}:`, {
-    totalAllocatedHours,
-    standardCapacity,
-    utilizationPercentage,
-    visibleDays: days.length,
-    workDays: days.filter(d => !d.isWeekend).length
-  });
 
   // Base background color for project rows
   const rowBgClass = isEven 
