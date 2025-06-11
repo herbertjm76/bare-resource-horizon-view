@@ -48,7 +48,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     checkResourceInOtherProjects
   } = useProjectRowData(project, days);
   
-  // Add debugging
+  // Enhanced debugging
   console.log('ProjectRow render:', {
     projectId: project.id,
     projectName: project.name,
@@ -68,6 +68,12 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     ? "bg-brand-violet-light/70 hover:bg-brand-violet-light" 
     : "bg-brand-violet-light hover:bg-brand-violet-light/90";
 
+  const handleToggleExpand = () => {
+    console.log('ProjectRow: handleToggleExpand called for project:', project.id);
+    console.log('ProjectRow: Current isExpanded state:', isExpanded);
+    onToggleExpand();
+  };
+
   if ((isLoading || isLoadingAllocations) && isExpanded) {
     return (
       <tr className={`border-t border-b border-gray-200 ${headerBgClass} h-8`}>
@@ -75,7 +81,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           project={project}
           resourceCount={0}
           isExpanded={isExpanded}
-          onToggleExpand={onToggleExpand}
+          onToggleExpand={handleToggleExpand}
           headerBgClass={headerBgClass}
         />
         
@@ -98,7 +104,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           project={project}
           resourceCount={resources.length}
           isExpanded={isExpanded}
-          onToggleExpand={onToggleExpand}
+          onToggleExpand={handleToggleExpand}
           headerBgClass={headerBgClass}
           totalHours={totalProjectHours}
         />
@@ -121,17 +127,6 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         {/* Add blank flexible cell */}
         <td className="p-0"></td>
       </tr>
-      
-      {/* Debug expansion state */}
-      {isExpanded && (
-        <>
-          <tr>
-            <td colSpan={days.length + 3} className="p-2 bg-yellow-100 text-xs">
-              DEBUG: Project expanded - Resources: {resources.length}, Loading: {isLoading.toString()}
-            </td>
-          </tr>
-        </>
-      )}
       
       {/* Resource rows when project is expanded */}
       {isExpanded && resources.map(resource => {
