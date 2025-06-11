@@ -27,9 +27,11 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
   projects = [],
   annualLeaveDates = []
 }) => {
-  // Calculate utilization percentage
-  const usedHours = totalCapacity - availableHours;
-  const utilizationPercentage = totalCapacity > 0 ? Math.round((usedHours / totalCapacity) * 100) : 0;
+  // Calculate total used hours for the week
+  const totalUsedHours = totalAllocatedHours + annualLeave + holidayHours + otherLeave;
+  
+  // Calculate utilization percentage based on weekly capacity
+  const utilizationPercentage = totalCapacity > 0 ? Math.round((totalUsedHours / totalCapacity) * 100) : 0;
   
   // Get color based on utilization
   const getUtilizationColor = (percentage: number) => {
@@ -43,21 +45,21 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
   const capacityTooltip = (
     <div className="space-y-3 text-xs max-w-sm">
       <div>
-        <p className="font-semibold text-sm mb-2">Capacity Breakdown:</p>
+        <p className="font-semibold text-sm mb-2">Weekly Capacity Breakdown:</p>
         <div className="space-y-1">
-          <p>Total Capacity: {totalCapacity}h</p>
+          <p>Total Weekly Capacity: {totalCapacity}h</p>
           <p>Project Hours: {totalAllocatedHours}h</p>
           <p>Annual Leave: {annualLeave}h</p>
           <p>Holiday: {holidayHours}h</p>
           <p>Other Leave: {otherLeave}h</p>
           <p className="border-t pt-1 font-medium">Available: {availableHours}h</p>
-          <p>Utilization: {utilizationPercentage}%</p>
+          <p>Weekly Utilization: {utilizationPercentage}%</p>
         </div>
       </div>
       
       {projects.length > 0 && (
         <div>
-          <p className="font-semibold text-sm mb-1">Assigned Projects:</p>
+          <p className="font-semibold text-sm mb-1">Weekly Project Assignments:</p>
           <div className="space-y-1">
             {projects.map((project, idx) => (
               <div key={idx} className="flex justify-between gap-2">
@@ -73,7 +75,7 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
       
       {annualLeaveDates.length > 0 && (
         <div>
-          <p className="font-semibold text-sm mb-1">Annual Leave Dates:</p>
+          <p className="font-semibold text-sm mb-1">Annual Leave This Week:</p>
           <div className="space-y-1">
             {annualLeaveDates.map((leave, idx) => (
               <div key={idx} className="flex justify-between gap-2">

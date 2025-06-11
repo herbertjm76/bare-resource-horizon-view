@@ -29,20 +29,26 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
     teamMembers: members || []
   });
 
-  // Fallback to local calculations if standardized data is loading
+  // Calculate total allocated hours for the entire selected week
   const totalAllocatedHours = teamSummary?.totalAllocatedHours || 
     allocations.reduce((sum, allocation) => sum + (allocation.hours || 0), 0);
   
+  // Calculate total weekly capacity for all members
   const totalCapacity = teamSummary?.totalCapacity || 
-    members.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
+    members.reduce((sum, member) => {
+      const weeklyCapacity = member.weekly_capacity || 40;
+      return sum + weeklyCapacity;
+    }, 0);
   
+  // Calculate utilization rate for the entire week
   const utilizationRate = teamSummary?.teamUtilizationRate || 
     (totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0);
   
+  // Calculate available hours for the entire week (remaining capacity)
   const availableHours = teamSummary?.totalAvailableHours || 
     Math.max(0, totalCapacity - totalAllocatedHours);
   
-  // Count active projects (projects with allocations)
+  // Count active projects (projects with allocations for this week)
   const activeProjects = projects.filter(project => 
     allocations.some(allocation => allocation.project_id === project.id && allocation.hours > 0)
   ).length;
@@ -58,7 +64,7 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
       title: "Team Utilization",
       value: `${utilizationRate}%`,
       icon: TrendingUp,
-      subtitle: `${totalAllocatedHours}h of ${totalCapacity}h`,
+      subtitle: `${totalAllocatedHours}h of ${totalCapacity}h for selected week`,
       badgeText: utilizationBadgeText,
       badgeColor: utilizationColor
     },
@@ -74,7 +80,7 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
       title: "Team Members",
       value: members.length,
       icon: Users,
-      subtitle: `Total capacity: ${totalCapacity}h`,
+      subtitle: `Total weekly capacity: ${totalCapacity}h`,
       badgeText: members.length > 0 ? 'Active' : 'None',
       badgeColor: members.length > 0 ? 'green' : 'red'
     },
@@ -82,7 +88,7 @@ export const WeekResourceSummaryCard: React.FC<WeekResourceSummaryCardProps> = (
       title: "Available Hours",
       value: `${availableHours}h`,
       icon: Clock,
-      subtitle: "Remaining capacity",
+      subtitle: "Remaining capacity for selected week",
       badgeText: availableHoursBadgeText,
       badgeColor: availableHoursColor
     }

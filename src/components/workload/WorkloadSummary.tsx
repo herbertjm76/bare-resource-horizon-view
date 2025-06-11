@@ -44,6 +44,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     let totalAllocated = 0;
     
     members.forEach(member => {
+      // Calculate total capacity for the period (weeks * weekly capacity)
       const weeklyCapacity = member.weekly_capacity || 40;
       totalCapacity += weeklyCapacity * periodToShow;
       
@@ -60,6 +61,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     let totalAvailable = 0;
     
     members.forEach(member => {
+      // Calculate total capacity for the period
       const weeklyCapacity = member.weekly_capacity || 40;
       const totalCapacity = weeklyCapacity * periodToShow;
       
@@ -135,7 +137,7 @@ export const WorkloadSummary: React.FC<WorkloadSummaryProps> = ({
     {
       title: "Available Hours",
       value: `${availableCapacity}h`,
-      subtitle: `Next ${periodToShow} weeks capacity`,
+      subtitle: `Next ${periodToShow} weeks total capacity`,
       badgeText: "Plan Ahead",
       badgeColor: "blue"
     },
