@@ -36,17 +36,30 @@ export const useTeamMemberDetail = (memberId: string | undefined) => {
       try {
         console.log('Fetching member profile for ID:', memberId);
         
-        // Fetch the team member profile
-        const { data: profile, error: profileError } = await supabase
+        // Use a timeout for the query to prevent hanging
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 10000)
+        );
+        
+        const queryPromise = supabase
           .from('profiles')
           .select('*')
           .eq('id', memberId)
           .eq('company_id', company.id)
           .single();
 
+        const { data: profile, error: profileError } = await Promise.race([
+          queryPromise,
+          timeoutPromise
+        ]) as any;
+
         if (profileError) {
           console.error('Error fetching member profile:', profileError);
-          setError('Failed to load team member profile');
+          if (profileError.code === 'PGRST116') {
+            setError('Team member not found');
+          } else {
+            setError('Failed to load team member profile');
+          }
           return;
         }
 
@@ -58,10 +71,15 @@ export const useTeamMemberDetail = (memberId: string | undefined) => {
 
         console.log('Successfully fetched member profile:', profile);
         setMemberData(profile);
-      } catch (fetchError) {
+      } catch (fetchError: any) {
         console.error('Error in fetchMemberDetail:', fetchError);
-        setError('An error occurred while loading team member details');
-        toast.error('Failed to load team member details');
+        if (fetchError.message === 'Request timeout') {
+          setError('Request timed out. Please try refreshing the page.');
+          toast.error('Request timed out. Please try refreshing the page.');
+        } else {
+          setError('An error occurred while loading team member details');
+          toast.error('Failed to load team member details');
+        }
       } finally {
         setIsLoading(false);
       }
