@@ -7,7 +7,7 @@ import { AppHeader } from '@/components/AppHeader';
 import { TeamMemberDetailContent } from '@/components/team-member-detail/TeamMemberDetailContent';
 import { useTeamMemberDetail } from '@/hooks/useTeamMemberDetail';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Loader2, RefreshCw, UserX, Clock } from 'lucide-react';
 import AuthGuard from '@/components/AuthGuard';
 
 const HEADER_HEIGHT = 56;
@@ -59,6 +59,8 @@ const TeamMemberDetailPage = () => {
   }
 
   if (error || !memberData) {
+    const isPreRegistered = error?.includes('pre-registered') || error?.includes('not yet activated');
+    
     return (
       <AuthGuard>
         <SidebarProvider>
@@ -71,22 +73,38 @@ const TeamMemberDetailPage = () => {
               <div style={{ height: HEADER_HEIGHT }} />
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center space-y-4 max-w-md">
-                  <h2 className="text-2xl font-semibold text-gray-800">
-                    {error?.includes('timeout') ? 'Request Timed Out' : 'Team Member Not Found'}
-                  </h2>
-                  <p className="text-gray-600">
-                    {error || 'The requested team member could not be found.'}
-                  </p>
+                  {isPreRegistered ? (
+                    <>
+                      <div className="flex justify-center">
+                        <Clock className="h-16 w-16 text-yellow-500" />
+                      </div>
+                      <h2 className="text-2xl font-semibold text-gray-800">
+                        Team Member Not Activated
+                      </h2>
+                      <p className="text-gray-600">
+                        This team member has been invited but hasn't activated their account yet. 
+                        They will appear here once they complete their registration.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-center">
+                        <UserX className="h-16 w-16 text-gray-400" />
+                      </div>
+                      <h2 className="text-2xl font-semibold text-gray-800">
+                        Team Member Not Found
+                      </h2>
+                      <p className="text-gray-600">
+                        {error || 'The requested team member could not be found.'}
+                      </p>
+                    </>
+                  )}
+                  
                   <div className="text-sm text-gray-500">
-                    Requested ID: {id || 'No ID provided'}
+                    Member ID: {id || 'No ID provided'}
                   </div>
+                  
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    {error?.includes('timeout') && (
-                      <Button onClick={handleRefresh} variant="outline">
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        Refresh Page
-                      </Button>
-                    )}
                     <Button onClick={() => navigate('/team-members')} className="bg-brand-primary">
                       <ArrowLeft className="h-4 w-4 mr-2" />
                       Back to Team Members

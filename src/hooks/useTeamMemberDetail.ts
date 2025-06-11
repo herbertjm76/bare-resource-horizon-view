@@ -36,50 +36,56 @@ export const useTeamMemberDetail = (memberId: string | undefined) => {
       try {
         console.log('Fetching member profile for ID:', memberId);
         
-        // Use a timeout for the query to prevent hanging
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Request timeout')), 10000)
-        );
-        
-        const queryPromise = supabase
+        // First, try to get the active profile
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', memberId)
           .eq('company_id', company.id)
-          .single();
-
-        const { data: profile, error: profileError } = await Promise.race([
-          queryPromise,
-          timeoutPromise
-        ]) as any;
+          .maybeSingle();
 
         if (profileError) {
           console.error('Error fetching member profile:', profileError);
-          if (profileError.code === 'PGRST116') {
-            setError('Team member not found');
-          } else {
-            setError('Failed to load team member profile');
-          }
+          setError('Failed to load team member profile');
           return;
         }
 
-        if (!profile) {
-          console.log('No profile found for member ID:', memberId);
+        if (profile) {
+          console.log('Successfully fetched member profile:', profile);
+          setMemberData(profile);
+          return;
+        }
+
+        // If no profile found, check if this is a pre-registered invite
+        console.log('No profile found, checking invites table...');
+        const { data: invite, error: inviteError } = await supabase
+          .from('invites')
+          .select('*')
+          .eq('id', memberId)
+          .eq('company_id', company.id)
+          .eq('invitation_type', 'pre_registered')
+          .maybeSingle();
+
+        if (inviteError) {
+          console.error('Error checking invites:', inviteError);
           setError('Team member not found');
           return;
         }
 
-        console.log('Successfully fetched member profile:', profile);
-        setMemberData(profile);
+        if (invite) {
+          console.log('Found pre-registered invite:', invite);
+          setError('This team member has not yet activated their account. They are still in pre-registered status.');
+          return;
+        }
+
+        // Neither profile nor invite found
+        console.log('No profile or invite found for member ID:', memberId);
+        setError('Team member not found');
+        
       } catch (fetchError: any) {
         console.error('Error in fetchMemberDetail:', fetchError);
-        if (fetchError.message === 'Request timeout') {
-          setError('Request timed out. Please try refreshing the page.');
-          toast.error('Request timed out. Please try refreshing the page.');
-        } else {
-          setError('An error occurred while loading team member details');
-          toast.error('Failed to load team member details');
-        }
+        setError('An error occurred while loading team member details');
+        toast.error('Failed to load team member details');
       } finally {
         setIsLoading(false);
       }
