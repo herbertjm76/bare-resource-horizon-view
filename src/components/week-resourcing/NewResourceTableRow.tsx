@@ -78,6 +78,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
     holidayHours,
     totalUsedHours,
     availableHours,
+    weeklyCapacity,
     memberProjects
   });
   

@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
 
 interface CapacityBarProps {
   availableHours: number;
@@ -13,7 +12,8 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   totalCapacity
 }) => {
   // Calculate the percentage of capacity that is USED (not available)
-  const utilizationPercentage = Math.min(100, Math.max(0, (totalCapacity - availableHours) / totalCapacity * 100));
+  const usedHours = totalCapacity - availableHours;
+  const utilizationPercentage = totalCapacity > 0 ? Math.min(100, Math.max(0, (usedHours / totalCapacity) * 100)) : 0;
   const utilizationRate = Math.round(utilizationPercentage);
 
   // Get color based on utilization with same logic as mobile display
@@ -37,6 +37,14 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
 
   const utilizationColor = getUtilizationColor();
   const textColor = getTextColor();
+
+  console.log(`CapacityBar calculation:`, {
+    totalCapacity,
+    availableHours,
+    usedHours,
+    utilizationPercentage,
+    utilizationRate
+  });
 
   return (
     <div className="flex items-center justify-center w-full">
