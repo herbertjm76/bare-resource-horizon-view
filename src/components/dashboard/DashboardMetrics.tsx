@@ -93,17 +93,19 @@ const DashboardContent: React.FC<{
         />
       </div>
 
-      {/* Executive Summary - positioned directly after header with no padding */}
-      <ExecutiveSummaryCard
-        activeProjects={activeProjects}
-        activeResources={metrics.activeResources}
-        utilizationTrends={utilizationTrends}
-        selectedTimeRange={selectedTimeRange}
-        totalRevenue={metrics.totalRevenue}
-        avgProjectValue={metrics.avgProjectValue}
-        staffData={transformedStaffData}
-        standardizedUtilizationRate={utilizationRate}
-      />
+      {/* Executive Summary - positioned directly after header with minimal padding */}
+      <div className="px-2 sm:px-3 lg:px-4">
+        <ExecutiveSummaryCard
+          activeProjects={activeProjects}
+          activeResources={metrics.activeResources}
+          utilizationTrends={utilizationTrends}
+          selectedTimeRange={selectedTimeRange}
+          totalRevenue={metrics.totalRevenue}
+          avgProjectValue={metrics.avgProjectValue}
+          staffData={transformedStaffData}
+          standardizedUtilizationRate={utilizationRate}
+        />
+      </div>
 
       {/* Filters Header - now positioned after Executive Summary */}
       <DashboardHeader
@@ -114,8 +116,8 @@ const DashboardContent: React.FC<{
         officeOptions={officeOptions}
       />
 
-      {/* Main Content */}
-      <div className="pb-6">
+      {/* Main Content with optimized padding */}
+      <div className="pb-4 lg:pb-6">
         {isMobile ? (
           <MobileDashboard
             teamMembers={teamMembers}
@@ -128,7 +130,7 @@ const DashboardContent: React.FC<{
             standardizedUtilizationRate={utilizationRate}
           />
         ) : (
-          <div className="p-4">
+          <div className="px-2 sm:px-3 lg:px-4">
             <DesktopDashboard
               teamMembers={teamMembers}
               activeProjects={activeProjects}

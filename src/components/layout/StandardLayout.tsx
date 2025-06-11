@@ -17,7 +17,7 @@ interface StandardLayoutProps {
 export const StandardLayout: React.FC<StandardLayoutProps> = ({ 
   children, 
   className = "bg-gray-50",
-  contentClassName = "p-3 sm:p-4 lg:p-6",
+  contentClassName = "p-2 sm:p-3 lg:p-4",
   title
 }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -42,16 +42,16 @@ export const StandardLayout: React.FC<StandardLayoutProps> = ({
           toggleSidebar={toggleSidebar}
           onCollapseChange={handleCollapseChange}
         />
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 max-w-full">
           <AppHeader 
             onMenuToggle={isMobile ? toggleSidebar : undefined}
             sidebarCollapsed={sidebarCollapsed}
           />
           <div style={{ height: HEADER_HEIGHT }} />
-          <main className={`flex-1 overflow-auto ${contentClassName} min-w-0`}>
+          <main className={`flex-1 overflow-auto ${contentClassName} min-w-0 max-w-full`}>
             {title && (
-              <div className="mb-6">
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900">{title}</h1>
+              <div className="mb-4 lg:mb-6">
+                <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900">{title}</h1>
               </div>
             )}
             {children}
