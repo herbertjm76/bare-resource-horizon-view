@@ -38,7 +38,24 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, utilizationRate, staffData);
   const isOverCapacity = capacityHours < 0;
 
+  // Calculate team composition for enhanced team size card
+  const preRegisteredCount = staffData.filter(member => member.isPending).length;
+  const totalTeamMembers = staffData.length;
+
   const metrics = [
+    {
+      title: "Team Size",
+      value: totalTeamMembers,
+      subtitle: `${activeResources} active, ${preRegisteredCount} pending`,
+      badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
+      badgeColor: utilizationRate > 85 ? 'orange' : 'green',
+      customData: {
+        activeResources,
+        totalTeamMembers,
+        preRegisteredCount,
+        utilizationRate
+      }
+    },
     {
       title: "Team Utilization",
       value: `${Math.round(utilizationRate)}%`,
@@ -60,13 +77,6 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
       subtitle: activeResources > 0 
         ? `${(activeProjects / activeResources).toFixed(1)} per person` 
         : 'No team members'
-    },
-    {
-      title: "Team Size",
-      value: activeResources,
-      subtitle: "Active resources",
-      badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
-      badgeColor: utilizationRate > 85 ? 'orange' : 'green'
     }
   ];
 
@@ -78,7 +88,9 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
     standardizedUtilizationRate,
     capacityHours,
     isOverCapacity,
-    staffDataCount: staffData.length
+    staffDataCount: staffData.length,
+    preRegisteredCount,
+    totalTeamMembers
   });
 
   return (
