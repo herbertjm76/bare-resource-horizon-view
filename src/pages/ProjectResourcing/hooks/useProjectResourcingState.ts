@@ -78,8 +78,16 @@ export const useProjectResourcingState = () => {
   };
   
   const handleMonthChange = useCallback((date: Date) => {
-    setSelectedMonth(date);
+    // When user selects a date, we need to convert it to the Monday of that week
+    // to maintain consistency with our week-based system
+    const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+    setSelectedMonth(weekStart);
   }, []);
+
+  // Calculate the actual start date for the grid (should be Monday of selected week)
+  const gridStartDate = useMemo(() => {
+    return startOfWeek(selectedMonth, { weekStartsOn: 1 });
+  }, [selectedMonth]);
 
   // Format the month label
   const monthLabel = useMemo(() => {
@@ -88,6 +96,7 @@ export const useProjectResourcingState = () => {
 
   return {
     selectedMonth,
+    gridStartDate, // Add this new property for the grid
     searchTerm,
     filters,
     displayOptions,
