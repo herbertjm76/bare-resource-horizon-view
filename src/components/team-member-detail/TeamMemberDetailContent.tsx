@@ -8,7 +8,6 @@ import { TeamMemberUtilizationChart } from './TeamMemberUtilizationChart';
 import { TeamMemberSmartInsights } from './TeamMemberSmartInsights';
 import { TeamMemberProjectAllocations } from './TeamMemberProjectAllocations';
 import { Card, CardContent } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useUserSession } from '@/hooks/useUserSession';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -101,55 +100,43 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
           {/* 3-Column Layout for Desktop with Fixed Heights */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Column 1: Utilization Analytics */}
-            <div className="lg:col-span-1 h-[600px]">
-              <div className="h-full flex flex-col">
-                <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2 mb-4">
-                  <span className="hidden sm:inline">Utilization Analytics</span>
-                  <span className="sm:hidden">Analytics</span>
-                </h2>
-                <div className="flex-1 min-h-0">
-                  <ScrollArea className="h-full">
-                    <div className="pr-4">
-                      <TeamMemberUtilizationChart 
-                        memberId={memberData.id} 
-                        weeklyCapacity={weeklyCapacity}
-                      />
-                    </div>
-                  </ScrollArea>
-                </div>
-              </div>
+            <div className="lg:col-span-1">
+              <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2 mb-4">
+                <span className="hidden sm:inline">Utilization Analytics</span>
+                <span className="sm:hidden">Analytics</span>
+              </h2>
+              <Card className="h-[600px]">
+                <CardContent className="p-3 sm:p-6 h-full overflow-hidden">
+                  <TeamMemberUtilizationChart 
+                    memberId={memberData.id} 
+                    weeklyCapacity={weeklyCapacity}
+                  />
+                </CardContent>
+              </Card>
             </div>
 
             {/* Column 2: Smart Insights */}
-            <div className="lg:col-span-1 h-[600px]">
-              <div className="h-full flex flex-col">
-                <div className="flex-1 min-h-0">
-                  <ScrollArea className="h-full">
-                    <div className="pr-4">
-                      <TeamMemberSmartInsights 
-                        memberId={memberData.id}
-                        weeklyCapacity={weeklyCapacity}
-                      />
-                    </div>
-                  </ScrollArea>
-                </div>
-              </div>
+            <div className="lg:col-span-1">
+              <Card className="h-[600px]">
+                <CardContent className="p-3 sm:p-6 h-full overflow-hidden">
+                  <TeamMemberSmartInsights 
+                    memberId={memberData.id}
+                    weeklyCapacity={weeklyCapacity}
+                  />
+                </CardContent>
+              </Card>
             </div>
 
             {/* Column 3: Project Allocations */}
-            <div className="lg:col-span-1 h-[600px]">
-              <div className="h-full flex flex-col">
-                <div className="flex-1 min-h-0">
-                  <ScrollArea className="h-full">
-                    <div className="pr-4">
-                      <TeamMemberProjectAllocations 
-                        memberId={memberData.id}
-                        weeklyCapacity={weeklyCapacity}
-                      />
-                    </div>
-                  </ScrollArea>
-                </div>
-              </div>
+            <div className="lg:col-span-1">
+              <Card className="h-[600px]">
+                <CardContent className="p-3 sm:p-6 h-full overflow-hidden">
+                  <TeamMemberProjectAllocations 
+                    memberId={memberData.id}
+                    weeklyCapacity={weeklyCapacity}
+                  />
+                </CardContent>
+              </Card>
             </div>
           </div>
         </>

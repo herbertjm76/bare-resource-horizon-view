@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { FolderOpen, Clock, Briefcase } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { format, startOfWeek, addWeeks } from 'date-fns';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface ProjectAllocation {
   id: string;
@@ -102,51 +102,47 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 h-full">
         <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
           <Briefcase className="h-4 w-4 sm:h-5 sm:w-5" />
           Project Allocations
         </h2>
-        <Card>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-2 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              ))}
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-2 bg-gray-200 rounded w-1/2"></div>
             </div>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-full flex flex-col">
       <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
         <Briefcase className="h-4 w-4 sm:h-5 sm:w-5" />
         Project Allocations
       </h2>
 
-      {/* Combined Card with Weekly Summary and Projects */}
-      <Card className="bg-gradient-to-br from-brand-violet/5 to-brand-primary/5 border-2">
-        <CardContent className="p-4 sm:p-6">
-          {/* Weekly Summary Section */}
-          <div className="mb-6 text-center pb-4 border-b border-brand-primary/10">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Clock className="h-4 w-4 text-brand-primary" />
-              <span className="font-medium text-brand-primary">Weekly Summary</span>
-            </div>
-            <div className="text-2xl sm:text-3xl font-bold text-brand-violet mb-1">
-              {totalWeeklyHours.toFixed(1)}h
-            </div>
-            <p className="text-sm text-gray-600">Average per week</p>
+      {/* Combined Card content with Weekly Summary and Projects */}
+      <div className="bg-gradient-to-br from-brand-violet/5 to-brand-primary/5 border-2 rounded-lg p-4 sm:p-6 flex-1 flex flex-col overflow-hidden">
+        {/* Weekly Summary Section */}
+        <div className="text-center pb-4 border-b border-brand-primary/10 mb-4">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Clock className="h-4 w-4 text-brand-primary" />
+            <span className="font-medium text-brand-primary">Weekly Summary</span>
           </div>
+          <div className="text-2xl sm:text-3xl font-bold text-brand-violet mb-1">
+            {totalWeeklyHours.toFixed(1)}h
+          </div>
+          <p className="text-sm text-gray-600">Average per week</p>
+        </div>
 
-          {/* Project List Section */}
-          <div className="space-y-2">
+        {/* Project List Section with Scrolling */}
+        <ScrollArea className="flex-1">
+          <div className="pr-4 space-y-2">
             {projectAllocations.length === 0 ? (
               <div className="py-6 text-center">
                 <FolderOpen className="h-8 w-8 mx-auto text-gray-300 mb-3" />
@@ -179,8 +175,8 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
               ))
             )}
           </div>
-        </CardContent>
-      </Card>
+        </ScrollArea>
+      </div>
     </div>
   );
 };

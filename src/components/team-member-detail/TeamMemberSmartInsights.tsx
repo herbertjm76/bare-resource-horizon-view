@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Lightbulb, AlertTriangle, CheckCircle, TrendingUp, Calendar, Clock } from 'lucide-react';
 import { useUnifiedMemberInsights } from '@/hooks/useUnifiedMemberInsights';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface SmartInsightsProps {
   memberId: string;
@@ -39,27 +39,25 @@ export const TeamMemberSmartInsights: React.FC<SmartInsightsProps> = ({
 
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 h-full">
         <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
           <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5" />
           Smart Insights
         </h2>
         
-        <Card>
-          <CardContent className="p-3 sm:p-6 space-y-4">
-            {[...Array(3)].map((_, index) => (
-              <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
-                <div className="p-1 rounded bg-gray-200 animate-pulse">
-                  <div className="h-4 w-4"></div>
-                </div>
-                <div className="flex-1">
-                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
-                </div>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, index) => (
+            <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
+              <div className="p-1 rounded bg-gray-200 animate-pulse">
+                <div className="h-4 w-4"></div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
+              <div className="flex-1">
+                <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -87,14 +85,14 @@ export const TeamMemberSmartInsights: React.FC<SmartInsightsProps> = ({
   }];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 h-full flex flex-col">
       <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
         <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5" />
         Smart Insights
       </h2>
       
-      <Card>
-        <CardContent className="p-3 sm:p-6 space-y-4">
+      <ScrollArea className="flex-1">
+        <div className="pr-4 space-y-4">
           {displayInsights.slice(0, 5).map((insight, index) => (
             <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
               <div className={`p-1 rounded ${
@@ -119,8 +117,8 @@ export const TeamMemberSmartInsights: React.FC<SmartInsightsProps> = ({
               </div>
             </div>
           ))}
-        </CardContent>
-      </Card>
+        </div>
+      </ScrollArea>
     </div>
   );
 };

@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { TrendingUp, Activity } from 'lucide-react';
 import { useUnifiedMemberInsights } from '@/hooks/useUnifiedMemberInsights';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface TeamMemberUtilizationChartProps {
   memberId: string;
@@ -19,11 +19,9 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="h-64 animate-pulse bg-gradient-to-r from-gray-100 to-gray-200 rounded-lg"></div>
-        </CardContent>
-      </Card>
+      <div className="h-full flex items-center justify-center">
+        <div className="h-64 w-full animate-pulse bg-gradient-to-r from-gray-100 to-gray-200 rounded-lg"></div>
+      </div>
     );
   }
 
@@ -81,10 +79,10 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
   };
 
   return (
-    <Card className="bg-gradient-to-br from-gray-50 to-white border-2 w-full">
-      <CardContent className="p-3 sm:p-6">
+    <ScrollArea className="h-full">
+      <div className="pr-4 space-y-4">
         {/* Responsive Chart Container */}
-        <div className="mb-4 sm:mb-6 w-full">
+        <div className="w-full">
           <ChartContainer config={chartConfig} className="h-32 sm:h-40 lg:h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart 
@@ -161,7 +159,7 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </ScrollArea>
   );
 };
