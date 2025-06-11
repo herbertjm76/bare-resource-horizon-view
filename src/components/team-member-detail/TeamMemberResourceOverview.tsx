@@ -1,19 +1,17 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { AlertTriangle } from 'lucide-react';
-import { ResourcePlanningMetrics } from './resource-planning/ResourcePlanningMetrics';
-import { UtilizationTrendAnalysis } from './resource-planning/UtilizationTrendAnalysis';
-import { CurrentProjectAssignments } from './resource-planning/CurrentProjectAssignments';
-import { PlanningRecommendations } from './resource-planning/PlanningRecommendations';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertTriangle, TrendingUp, Target, CheckCircle } from 'lucide-react';
 import { useResourcePlanningData } from './resource-planning/hooks/useResourcePlanningData';
 import { calculatePlanningMetrics, calculateHistoricalMetrics } from './resource-planning/utils/resourcePlanningCalculations';
+import { ResourcePlanningMetrics } from './resource-planning/ResourcePlanningMetrics';
+import { UtilizationTrendAnalysis } from './resource-planning/UtilizationTrendAnalysis';
 
-interface TeamMemberResourcePlanningProps {
+interface TeamMemberResourceOverviewProps {
   memberId: string;
 }
 
-export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProps> = ({ memberId }) => {
+export const TeamMemberResourceOverview: React.FC<TeamMemberResourceOverviewProps> = ({ memberId }) => {
   const {
     memberProfile,
     futureAllocations,
@@ -82,7 +80,7 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold text-gray-800">Resource Planning</h2>
 
-      {/* Planning Overview Metrics - with loading state support */}
+      {/* Planning Overview Metrics */}
       <ResourcePlanningMetrics
         weeklyCapacity={weeklyCapacity}
         averageFutureUtilization={averageFutureUtilization}
@@ -91,31 +89,70 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
         isLoading={isLoadingAllocationData}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Utilization Trend */}
-        <UtilizationTrendAnalysis
-          historicalUtilization={historicalUtilization}
-          historicalAverage={historicalAverage}
-          averageFutureUtilization={averageFutureUtilization}
-          underutilizedWeeks={underutilizedWeeks}
-          overallocatedWeeks={overallocatedWeeks}
-          isLoading={isLoadingAllocationData}
-        />
-
-        {/* Current Project Assignments */}
-        <CurrentProjectAssignments 
-          activeProjects={activeProjects} 
-          isLoading={isLoadingAllocationData} 
-        />
-      </div>
-
-      {/* Resource Planning Recommendations */}
-      <PlanningRecommendations
+      {/* Utilization Trend Analysis */}
+      <UtilizationTrendAnalysis
+        historicalUtilization={historicalUtilization}
+        historicalAverage={historicalAverage}
         averageFutureUtilization={averageFutureUtilization}
-        overallocatedWeeks={overallocatedWeeks}
         underutilizedWeeks={underutilizedWeeks}
+        overallocatedWeeks={overallocatedWeeks}
         isLoading={isLoadingAllocationData}
       />
+
+      {/* Planning Recommendations */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-brand-violet" />
+            Planning Recommendations
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {isLoadingAllocationData ? (
+            <div className="animate-pulse">
+              <div className="h-20 bg-gray-100 rounded-lg mb-2"></div>
+            </div>
+          ) : (
+            <>
+              {averageFutureUtilization > 100 && (
+                <div className="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
+                  <AlertTriangle className="h-5 w-5 text-red-500" />
+                  <div>
+                    <h4 className="font-medium text-red-800">Overallocation Risk</h4>
+                    <p className="text-sm text-red-600">
+                      Resource is overallocated for {overallocatedWeeks} weeks. Consider redistributing workload.
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {averageFutureUtilization < 70 && (
+                <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
+                  <TrendingUp className="h-5 w-5 text-yellow-500" />
+                  <div>
+                    <h4 className="font-medium text-yellow-800">Capacity Available</h4>
+                    <p className="text-sm text-yellow-600">
+                      Resource has {underutilizedWeeks} weeks below 80% utilization. Consider additional assignments.
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {averageFutureUtilization >= 70 && averageFutureUtilization <= 100 && (
+                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                  <div>
+                    <h4 className="font-medium text-green-800">Optimal Allocation</h4>
+                    <p className="text-sm text-green-600">
+                      Resource allocation is well balanced for the planning period.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

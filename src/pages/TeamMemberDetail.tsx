@@ -2,7 +2,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Loader2, RefreshCw, UserX, Clock } from 'lucide-react';
+import { ArrowLeft, Loader2, UserX, Clock } from 'lucide-react';
 import { TeamMemberDetailContent } from '@/components/team-member-detail/TeamMemberDetailContent';
 import { useTeamMemberDetail } from '@/hooks/useTeamMemberDetail';
 import { StandardLayout } from '@/components/layout/StandardLayout';

@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { format, startOfWeek, addWeeks } from 'date-fns';
 
-interface TeamMemberProjectsProps {
+interface TeamMemberProjectOverviewProps {
   memberId: string;
 }
 
@@ -23,7 +23,7 @@ interface ProjectAllocation {
   weeklyBreakdown: { weekStart: string; hours: number }[];
 }
 
-export const TeamMemberProjects: React.FC<TeamMemberProjectsProps> = ({ memberId }) => {
+export const TeamMemberProjectOverview: React.FC<TeamMemberProjectOverviewProps> = ({ memberId }) => {
   const [projectAllocations, setProjectAllocations] = useState<ProjectAllocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { company } = useCompany();
@@ -103,32 +103,29 @@ export const TeamMemberProjects: React.FC<TeamMemberProjectsProps> = ({ memberId
     }
   };
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FolderOpen className="h-5 w-5 text-brand-violet" />
-            Project Allocations
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
-                <div className="h-2 bg-gray-200 rounded w-1/2"></div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   const totalAllocatedHours = projectAllocations.reduce((sum, project) => sum + project.totalHours, 0);
   const maxCapacity = 40 * 12; // 40 hours per week for 12 weeks
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <h2 className="text-2xl font-semibold text-gray-800">Project Allocations</h2>
+        <Card>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-full mb-1"></div>
+                  <div className="h-2 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

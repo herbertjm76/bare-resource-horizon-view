@@ -2,11 +2,11 @@
 import React from 'react';
 import { Shield, TrendingUp, Loader2 } from 'lucide-react';
 import { TeamMemberDetailHeader } from './TeamMemberDetailHeader';
-import { TeamMemberOverview } from './TeamMemberOverview';
-import { TeamMemberMetrics } from './TeamMemberMetrics';
-import { TeamMemberProjects } from './TeamMemberProjects';
-import { TeamMemberResourcePlanning } from './TeamMemberResourcePlanning';
-import { TeamMemberDetailInsights } from './TeamMemberDetailInsights';
+import { TeamMemberProfileCard } from './TeamMemberProfileCard';
+import { TeamMemberInsightsGrid } from './TeamMemberInsightsGrid';
+import { TeamMemberUtilizationMetrics } from './TeamMemberUtilizationMetrics';
+import { TeamMemberResourceOverview } from './TeamMemberResourceOverview';
+import { TeamMemberProjectOverview } from './TeamMemberProjectOverview';
 import { Card, CardContent } from '@/components/ui/card';
 import { useUserSession } from '@/hooks/useUserSession';
 import { useQuery } from '@tanstack/react-query';
@@ -73,32 +73,32 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      {/* Standardized Header */}
-      <TeamMemberDetailHeader memberData={memberData} />
+      {/* Standardized Header - No redundant name display */}
+      <TeamMemberDetailHeader />
 
-      {/* Member Overview Card - Always visible */}
-      <TeamMemberOverview member={memberData} />
+      {/* Member Profile Card - Centralized member info */}
+      <TeamMemberProfileCard member={memberData} />
 
-      {/* Quick Insights - Lightweight component */}
+      {/* Quick Insights Grid - Consistent layout */}
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <TrendingUp className="h-6 w-6 text-brand-violet" />
-          <h2 className="text-2xl font-bold text-brand-primary">Quick Insights</h2>
+          <h2 className="text-2xl font-bold text-brand-primary">Performance Overview</h2>
         </div>
-        <TeamMemberDetailInsights memberId={memberData.id} />
+        <TeamMemberInsightsGrid memberId={memberData.id} />
       </div>
 
       {/* Management Features - Only for admin, owner, or PM */}
       {canViewManagementFeatures ? (
         <>
-          {/* Utilization Metrics */}
-          <TeamMemberMetrics memberId={memberData.id} />
+          {/* Utilization Metrics - Detailed view */}
+          <TeamMemberUtilizationMetrics memberId={memberData.id} />
 
           {/* Resource Planning - Optimized component */}
-          <TeamMemberResourcePlanning memberId={memberData.id} />
+          <TeamMemberResourceOverview memberId={memberData.id} />
 
-          {/* Project Management */}
-          <TeamMemberProjects memberId={memberData.id} />
+          {/* Project Management - Streamlined */}
+          <TeamMemberProjectOverview memberId={memberData.id} />
         </>
       ) : (
         <>
@@ -107,10 +107,10 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
             <CardContent className="p-6 text-center">
               <Shield className="h-12 w-12 mx-auto text-orange-500 mb-4" />
               <h3 className="text-lg font-semibold text-orange-800 mb-2">
-                Detailed Resource Planning
+                Advanced Analytics
               </h3>
               <p className="text-orange-700">
-                Detailed resource planning and project allocation information is available to managers, admins, and project managers.
+                Detailed analytics and resource planning information is available to managers, admins, and project managers.
               </p>
             </CardContent>
           </Card>

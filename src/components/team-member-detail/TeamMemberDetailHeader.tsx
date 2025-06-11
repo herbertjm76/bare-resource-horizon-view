@@ -4,13 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, User } from 'lucide-react';
 
-interface TeamMemberDetailHeaderProps {
-  memberData: any;
-}
-
-export const TeamMemberDetailHeader: React.FC<TeamMemberDetailHeaderProps> = ({
-  memberData
-}) => {
+export const TeamMemberDetailHeader: React.FC = () => {
   const navigate = useNavigate();
 
   return (
@@ -28,7 +22,7 @@ export const TeamMemberDetailHeader: React.FC<TeamMemberDetailHeaderProps> = ({
         </Button>
       </div>
 
-      {/* Page Header - Standardized like other pages */}
+      {/* Page Header - Standardized without member name to avoid redundancy */}
       <div className="space-y-2">
         <div className="flex items-center gap-3">
           <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-brand-violet/10">
@@ -36,10 +30,10 @@ export const TeamMemberDetailHeader: React.FC<TeamMemberDetailHeaderProps> = ({
           </div>
           <div>
             <h1 className="text-3xl font-bold text-brand-primary">
-              {`${memberData?.first_name || ''} ${memberData?.last_name || ''}`.trim() || 'Team Member'}
+              Team Member Profile
             </h1>
             <p className="text-muted-foreground">
-              Team member details and resource planning
+              Performance insights and resource planning
             </p>
           </div>
         </div>
