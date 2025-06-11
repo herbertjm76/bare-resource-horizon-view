@@ -44,7 +44,7 @@ const ProjectResourcing = () => {
   // Calculate active filters count
   const activeFiltersCount = calculateActiveFiltersCount(filters, searchTerm, displayOptions);
 
-  // Clear all filters function - fix the function call to match the expected signature
+  // Clear all filters function
   const clearAllFilters = createClearFiltersFunction(
     setFilters,
     setSearchTerm,
