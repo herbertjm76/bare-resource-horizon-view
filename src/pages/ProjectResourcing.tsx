@@ -50,6 +50,11 @@ const ProjectResourcing = () => {
     setFilters(prev => ({ ...prev, periodToShow: period }));
   }, []);
 
+  // Handle view changes
+  const handleViewChange = useCallback((view: ViewOption) => {
+    setSelectedView(view);
+  }, []);
+
   // Calculate active filters count
   const activeFiltersCount = calculateActiveFiltersCount(filters, searchTerm, displayOptions);
 
@@ -62,7 +67,6 @@ const ProjectResourcing = () => {
 
   // Expand/collapse handlers
   const handleExpandAll = () => {
-    // This would expand all projects - implement with actual project IDs
     setExpandedProjects(['all']);
   };
 
@@ -118,6 +122,8 @@ const ProjectResourcing = () => {
             onCollapseAll={handleCollapseAll}
             expandedProjects={expandedProjects}
             totalProjects={projectCount}
+            selectedView={selectedView}
+            onViewChange={handleViewChange}
           />
           
           <ResourceAllocationGrid

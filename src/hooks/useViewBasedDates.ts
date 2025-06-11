@@ -10,12 +10,18 @@ interface UseViewBasedDatesProps {
 
 export const useViewBasedDates = ({ selectedView }: UseViewBasedDatesProps) => {
   return useMemo(() => {
+    // Get current week (Monday as start of week)
     const currentWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
-    const startDate = subWeeks(currentWeek, 1); // Current week - 1 week
+    
+    // Start from current week minus 1 week as requested
+    const startDate = subWeeks(currentWeek, 1);
+    
+    // Get period in weeks based on view option
     const periodInWeeks = viewOptionToPeriod(selectedView);
     
     console.log(`useViewBasedDates - View: ${selectedView}, Period: ${periodInWeeks} weeks`);
-    console.log(`Start date: ${startDate.toISOString()}`);
+    console.log(`Current week: ${currentWeek.toISOString()}`);
+    console.log(`Start date (current week - 1): ${startDate.toISOString()}`);
     
     return {
       startDate,

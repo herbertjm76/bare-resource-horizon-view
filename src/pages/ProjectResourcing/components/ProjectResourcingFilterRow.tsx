@@ -1,13 +1,15 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Calendar, ChevronLeft, ChevronRight, Filter, Expand, Shrink } from 'lucide-react';
-import { format, addMonths, subMonths, startOfMonth } from 'date-fns';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+import { Filter, MoreVertical, Expand, Minimize } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ProjectResourcingFilters } from './ProjectResourcingFilters';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { AdvancedFilters } from '@/components/resources/filters/AdvancedFilters';
+import { SearchInput } from '@/components/resources/filters/SearchInput';
+import { DisplayOptionsDropdown } from '@/components/resources/filters/DisplayOptionsDropdown';
+import { ViewSelector, ViewOption } from '@/components/resources/filters/ViewSelector';
+import { PeriodSelector } from '@/components/resources/filters/PeriodSelector';
+import { MonthYearSelector } from '@/components/resources/filters/MonthYearSelector';
 
 interface ProjectResourcingFilterRowProps {
   selectedDate: Date;
@@ -18,26 +20,27 @@ interface ProjectResourcingFilterRowProps {
     office: string;
     country: string;
     manager: string;
-    periodToShow: number;
   };
   searchTerm: string;
   onFilterChange: (key: string, value: string) => void;
   onSearchChange: (value: string) => void;
   officeOptions: string[];
   countryOptions: string[];
-  managers: Array<{id: string, name: string}>;
+  managers: Array<{ id: string; name: string }>;
   activeFiltersCount: number;
   displayOptions: {
     showWeekends: boolean;
     selectedDays: string[];
     weekStartsOnSunday: boolean;
   };
-  onDisplayOptionChange: (option: string, value: boolean | string[]) => void;
+  onDisplayOptionChange: (key: string, value: any) => void;
   onClearFilters: () => void;
   onExpandAll: () => void;
   onCollapseAll: () => void;
   expandedProjects: string[];
   totalProjects: number;
+  selectedView?: ViewOption;
+  onViewChange?: (view: ViewOption) => void;
 }
 
 export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProps> = ({
@@ -59,183 +62,125 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
   onExpandAll,
   onCollapseAll,
   expandedProjects,
-  totalProjects
+  totalProjects,
+  selectedView = '3-months',
+  onViewChange
 }) => {
-  const [calendarOpen, setCalendarOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  
-  const handlePreviousMonth = () => {
-    onDateChange(subMonths(selectedDate, 1));
-  };
+  const [displayOptionsOpen, setDisplayOptionsOpen] = useState(false);
 
-  const handleNextMonth = () => {
-    onDateChange(addMonths(selectedDate, 1));
-  };
-
-  const monthLabel = format(selectedDate, 'MMMM yyyy');
-
-  // Period options with clearer labels
-  const periodOptions = [
-    { value: '1', label: '1 Week' },
-    { value: '2', label: '2 Weeks' },
-    { value: '4', label: '1 Month' },
-    { value: '8', label: '2 Months' },
-    { value: '12', label: '3 Months' }
-  ];
-
-  // Determine if all projects are expanded
-  const allExpanded = expandedProjects.length === totalProjects && totalProjects > 0;
-  
-  // Handle toggle between expand all and collapse all
-  const handleToggleExpand = () => {
-    if (allExpanded) {
-      onCollapseAll();
-    } else {
-      onExpandAll();
-    }
-  };
+  const allExpanded = expandedProjects.includes('all') || expandedProjects.length === totalProjects;
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-4">
-      {/* Left section: Month selector with navigation */}
-      <div className="flex border rounded-lg p-2 items-center shadow-sm bg-gray-50/50">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handlePreviousMonth} 
-          className="h-7 w-7 p-0 hover:bg-white"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          <span className="sr-only">Previous month</span>
-        </Button>
+    <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between bg-white p-4 rounded-lg border">
+      {/* Left side - Search, Filters, and View Selector */}
+      <div className="flex flex-1 items-center gap-3 w-full lg:w-auto flex-wrap">
+        <SearchInput
+          value={searchTerm}
+          onChange={onSearchChange}
+          placeholder="Search projects..."
+          className="w-full sm:w-80 flex-shrink-0"
+        />
         
-        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-          <PopoverTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2 px-3 py-1 h-7 hover:bg-white">
-              <Calendar className="h-3 w-3 text-muted-foreground" />
-              <span className="text-sm font-medium min-w-[120px] text-left">{monthLabel}</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent
-              mode="single"
-              selected={selectedDate}
-              onSelect={(date) => {
-                if (date) {
-                  const startOfSelectedMonth = startOfMonth(date);
-                  onDateChange(startOfSelectedMonth);
-                  setCalendarOpen(false);
-                }
-              }}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
-        
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleNextMonth}
-          className="h-7 w-7 p-0 hover:bg-white"
-        >
-          <ChevronRight className="h-4 w-4" />
-          <span className="sr-only">Next month</span>
-        </Button>
-      </div>
-      
-      {/* Middle section: Period selector with compact design */}
-      <div className="flex items-center gap-3">
-        <span className="text-sm text-muted-foreground font-medium">View:</span>
-        <Select 
-          value={periodToShow.toString()}
-          onValueChange={(value) => onPeriodChange(parseInt(value, 10))}
-        >
-          <SelectTrigger className="w-[140px] h-8 bg-white border-gray-200 shadow-sm text-sm">
-            <SelectValue placeholder="Select period" />
-          </SelectTrigger>
-          <SelectContent className="bg-white border border-gray-200 shadow-lg min-w-[140px]">
-            {periodOptions.map((option) => (
-              <SelectItem 
-                key={option.value} 
-                value={option.value}
-                className="hover:bg-gray-50 focus:bg-gray-50 py-1.5 text-sm"
-              >
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      
-      {/* Expand/Collapse toggle button */}
-      <div className="flex items-center">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleToggleExpand}
-          className="h-8 text-sm"
-          disabled={totalProjects === 0}
-        >
-          {allExpanded ? (
-            <>
-              <Shrink className="h-3 w-3 mr-2" />
-              Collapse All
-            </>
-          ) : (
-            <>
-              <Expand className="h-3 w-3 mr-2" />
-              Expand All
-            </>
-          )}
-        </Button>
-      </div>
-      
-      {/* Filter controls */}
-      <div className="flex items-center gap-3">
         <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
           <PopoverTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="flex items-center gap-2 h-8 bg-white border-gray-200 shadow-sm hover:bg-gray-50 text-sm"
-            >
-              <Filter className="h-3 w-3" />
-              <span>Filters</span>
+            <Button variant="outline" size="sm" className="gap-2 flex-shrink-0">
+              <Filter className="h-4 w-4" />
+              <span className="hidden sm:inline">Filters</span>
               {activeFiltersCount > 0 && (
-                <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs bg-brand-violet/10 text-brand-violet border-0">
+                <Badge variant="secondary" className="h-5 px-1.5 text-xs">
                   {activeFiltersCount}
                 </Badge>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80 bg-white border border-gray-200 shadow-lg" align="end">
-            <ProjectResourcingFilters
+          <PopoverContent className="w-80" align="start">
+            <AdvancedFilters
               filters={filters}
-              searchTerm={searchTerm}
               onFilterChange={onFilterChange}
-              onPeriodChange={onPeriodChange}
-              onSearchChange={onSearchChange}
               officeOptions={officeOptions}
               countryOptions={countryOptions}
-              managers={managers}
-              activeFiltersCount={activeFiltersCount}
-              displayOptions={displayOptions}
-              onDisplayOptionChange={onDisplayOptionChange}
+              managerOptions={managers}
+              onClose={() => setFiltersOpen(false)}
+              show={true}
             />
           </PopoverContent>
         </Popover>
-        
-        {/* Clear filters button */}
+
         {activeFiltersCount > 0 && (
           <Button 
             variant="ghost" 
-            size="sm"
+            size="sm" 
             onClick={onClearFilters}
-            className="h-8 text-sm text-muted-foreground hover:text-foreground hover:bg-gray-50"
+            className="text-muted-foreground hover:text-foreground flex-shrink-0"
           >
-            Clear all
+            Clear ({activeFiltersCount})
           </Button>
         )}
+
+        {/* View Selector */}
+        {onViewChange && (
+          <ViewSelector
+            selectedView={selectedView}
+            onViewChange={onViewChange}
+          />
+        )}
+      </div>
+
+      {/* Right side - Controls */}
+      <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+        {/* Month/Year Selector - only show if no view selector */}
+        {!onViewChange && (
+          <div className="flex items-center gap-2">
+            <MonthYearSelector
+              selectedDate={selectedDate}
+              onDateChange={onDateChange}
+            />
+            <PeriodSelector
+              periodToShow={periodToShow}
+              onPeriodChange={onPeriodChange}
+            />
+          </div>
+        )}
+        
+        {/* Expand/Collapse Controls */}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={allExpanded ? onCollapseAll : onExpandAll}
+            className="gap-2 flex-shrink-0"
+          >
+            {allExpanded ? (
+              <>
+                <Minimize className="h-4 w-4" />
+                <span className="hidden sm:inline">Collapse All</span>
+              </>
+            ) : (
+              <>
+                <Expand className="h-4 w-4" />
+                <span className="hidden sm:inline">Expand All</span>
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Display Options */}
+        <Popover open={displayOptionsOpen} onOpenChange={setDisplayOptionsOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2 flex-shrink-0">
+              <MoreVertical className="h-4 w-4" />
+              <span className="hidden sm:inline">Display</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80" align="end">
+            <DisplayOptionsDropdown
+              displayOptions={displayOptions}
+              onDisplayOptionChange={onDisplayOptionChange}
+              onClose={() => setDisplayOptionsOpen(false)}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
