@@ -101,10 +101,6 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Column 1: Utilization Analytics */}
             <div className="lg:col-span-1">
-              <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2 mb-4">
-                <span className="hidden sm:inline">Utilization Analytics</span>
-                <span className="sm:hidden">Analytics</span>
-              </h2>
               <Card className="h-[600px]">
                 <CardContent className="p-3 sm:p-6 h-full overflow-hidden">
                   <TeamMemberUtilizationChart 
