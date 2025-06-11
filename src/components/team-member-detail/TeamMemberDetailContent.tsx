@@ -2,11 +2,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Users, Shield } from 'lucide-react';
+import { ArrowLeft, Users, Shield, TrendingUp } from 'lucide-react';
 import { TeamMemberOverview } from './TeamMemberOverview';
 import { TeamMemberMetrics } from './TeamMemberMetrics';
 import { TeamMemberProjects } from './TeamMemberProjects';
 import { TeamMemberPerformance } from './TeamMemberPerformance';
+import { TeamMemberExpandedInsights } from './TeamMemberExpandedInsights';
 import { Card, CardContent } from '@/components/ui/card';
 import { useUserSession } from '@/hooks/useUserSession';
 import { useQuery } from '@tanstack/react-query';
@@ -76,6 +77,15 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
 
         {/* Member Overview Card - Always visible */}
         <TeamMemberOverview member={memberData} />
+
+        {/* Expanded Insights Section */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <TrendingUp className="h-6 w-6 text-brand-violet" />
+            <h2 className="text-2xl font-bold text-brand-primary">Detailed Insights</h2>
+          </div>
+          <TeamMemberExpandedInsights memberId={memberData.id} />
+        </div>
 
         {/* Utilization Metrics - Always visible (MVP feature) */}
         <TeamMemberMetrics memberId={memberData.id} />
