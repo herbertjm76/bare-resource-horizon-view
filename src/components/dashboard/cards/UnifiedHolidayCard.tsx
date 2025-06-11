@@ -1,101 +1,87 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar, MapPin } from 'lucide-react';
-import { useHolidays } from '../hooks/useHolidays';
+import { Card, CardContent } from "@/components/ui/card";
+import { Calendar, MapPin, Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
-import { StandardizedBadge } from "@/components/ui/standardized-badge";
-import { useIsMobile } from "@/hooks/use-mobile";
-
-interface Holiday {
-  id: string;
-  name: string;
-  date: string;
-  office: string;
-  type: 'public' | 'company';
-}
+import { useHolidays } from '../hooks/useHolidays';
 
 export const UnifiedHolidayCard: React.FC = () => {
-  const isMobile = useIsMobile();
-  const { holidays: upcomingHolidays, isLoading, error } = useHolidays();
+  const { holidays, isLoading } = useHolidays();
+
+  // Mock upcoming events for demonstration
+  const mockEvents = [
+    {
+      id: 1,
+      title: 'Annual Team Retreat',
+      date: '2024-07-15',
+      type: 'company',
+      location: 'Remote',
+      attendees: 12
+    },
+    {
+      id: 2,
+      title: 'Q3 Planning Session',
+      date: '2024-07-22',
+      type: 'meeting',
+      location: 'Conference Room A',
+      attendees: 8
+    },
+    {
+      id: 3,
+      title: 'Independence Day',
+      date: '2024-07-04',
+      type: 'holiday',
+      location: 'All Offices',
+      attendees: null
+    }
+  ];
+
+  const getEventTypeColor = (type: string) => {
+    switch (type) {
+      case 'holiday': return 'bg-red-100 text-red-800 border-red-200';
+      case 'company': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'meeting': return 'bg-green-100 text-green-800 border-green-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return {
-      day: date.toLocaleDateString('en-US', { day: '2-digit' }),
-      month: date.toLocaleDateString('en-US', { month: 'short' }),
-      weekday: date.toLocaleDateString('en-US', { weekday: 'short' })
-    };
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      year: 'numeric'
+    });
   };
 
-  const getDaysUntil = (dateString: string) => {
-    const today = new Date();
-    const holidayDate = new Date(dateString);
-    const diffTime = holidayDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
-  const getCountdownBadgeStyle = (daysUntil: number) => {
-    if (daysUntil === 0) return { backgroundColor: '#ef4444', color: 'white' };
-    if (daysUntil === 1) return { backgroundColor: '#f97316', color: 'white' };
-    if (daysUntil <= 7) return { backgroundColor: '#eab308', color: 'white' };
-    if (daysUntil <= 30) return { backgroundColor: '#3b82f6', color: 'white' };
-    return { backgroundColor: '#6b7280', color: 'white' };
-  };
-
-  const getCountdownText = (daysUntil: number) => {
-    if (daysUntil === 0) return 'Today';
-    if (daysUntil === 1) return 'Tomorrow';
-    if (daysUntil <= 7) return `${daysUntil}d`;
-    if (daysUntil <= 30) return `${daysUntil}d`;
-    return `${daysUntil}d`;
-  };
-
-  // Use consistent mobile-style card design for both mobile and desktop
-  const cardStyles = "rounded-2xl border-0 shadow-sm bg-white";
-  const headerStyles = "pb-3 px-4";
-  const titleStyles = "text-lg flex items-center gap-3";
-  const contentStyles = "pt-0 px-4 pb-4";
+  const allEvents = [...(holidays || []), ...mockEvents];
+  const upcomingEvents = allEvents
+    .filter(event => new Date(event.date) >= new Date())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 5);
 
   if (isLoading) {
     return (
-      <Card className={cardStyles}>
-        <CardHeader className={headerStyles}>
-          <CardTitle className={titleStyles}>
-            <Calendar className="h-4 w-4 text-brand-violet" strokeWidth={1.5} />
-            <span className="text-brand-violet font-semibold">
-              Upcoming Holidays
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex-1 flex items-center justify-center">
-          <div className="text-center text-gray-500">
-            <Calendar className="h-6 w-6 mx-auto mb-2 text-gray-300 animate-pulse" strokeWidth={1.5} />
-            <p className="text-sm">Loading holidays...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card className={cardStyles}>
-        <CardHeader className={headerStyles}>
-          <CardTitle className={titleStyles}>
-            <Calendar className="h-4 w-4 text-brand-violet" strokeWidth={1.5} />
-            <span className="text-brand-violet font-semibold">
-              Upcoming Holidays
-            </span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex-1 flex items-center justify-center">
-          <div className="text-center text-gray-500">
-            <Calendar className="h-6 w-6 mx-auto mb-2 text-gray-300" strokeWidth={1.5} />
-            <p className="text-sm font-medium mb-1">Unable to Load Holidays</p>
-            <p className="text-xs">{error}</p>
+      <Card className="rounded-2xl border-0 shadow-sm bg-white h-[600px]">
+        <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
+          <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2 mb-4">
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+            Upcoming Events
+          </h2>
+          <div className="space-y-4 flex-1">
+            {[...Array(3)].map((_, index) => (
+              <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
+                <div className="p-1 rounded bg-gray-200 animate-pulse">
+                  <div className="h-4 w-4"></div>
+                </div>
+                <div className="flex-1">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded animate-pulse w-3/4"></div>
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -103,80 +89,59 @@ export const UnifiedHolidayCard: React.FC = () => {
   }
 
   return (
-    <Card className={cardStyles}>
-      <CardHeader className={headerStyles}>
-        <CardTitle className={titleStyles}>
-          <Calendar className="h-4 w-4 text-brand-violet" strokeWidth={1.5} />
-          <span className="text-brand-violet font-semibold">
-            Upcoming Holidays
-          </span>
-          {upcomingHolidays.length > 0 && (
-            <StandardizedHeaderBadge>
-              {upcomingHolidays.length}
-            </StandardizedHeaderBadge>
-          )}
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent className={contentStyles}>
-        <ScrollArea className="h-[320px]">
-          <div className="space-y-1">
-            {upcomingHolidays.map((holiday) => {
-              const daysUntil = getDaysUntil(holiday.date);
-              const dateInfo = formatDate(holiday.date);
-              
-              return (
-                <div key={holiday.id} className="group bg-white/70 hover:bg-white/90 rounded-lg p-2 border border-gray-100/50 hover:border-gray-200/80 transition-all duration-200">
-                  <div className="flex items-center gap-2">
-                    {/* Compact Date Display */}
-                    <div className="flex-shrink-0">
-                      <div className="bg-gradient-to-br from-brand-violet to-purple-600 text-white rounded-md px-1.5 py-1">
-                        <div className="text-xs font-bold leading-none">
-                          {dateInfo.day}
-                        </div>
-                        <div className="text-xs opacity-90 leading-none mt-0.5">
-                          {dateInfo.month}
-                        </div>
-                      </div>
+    <Card className="rounded-2xl border-0 shadow-sm bg-white h-[600px]">
+      <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
+        {/* Title inside the card */}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+            Upcoming Events
+          </h2>
+          <StandardizedHeaderBadge>
+            {upcomingEvents.length} Events
+          </StandardizedHeaderBadge>
+        </div>
+        
+        {/* Scrollable events list */}
+        <ScrollArea className="flex-1">
+          <div className="pr-4 space-y-4">
+            {upcomingEvents.length === 0 ? (
+              <div className="py-6 text-center">
+                <Calendar className="h-8 w-8 mx-auto text-gray-300 mb-3" />
+                <h3 className="text-base font-medium text-gray-600 mb-1">No Upcoming Events</h3>
+                <p className="text-gray-500 text-sm">No events scheduled for the coming weeks.</p>
+              </div>
+            ) : (
+              upcomingEvents.map((event) => (
+                <div key={event.id} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
+                  <div className="p-1 rounded bg-brand-violet/20">
+                    <Calendar className="h-4 w-4 text-brand-violet" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="font-medium text-gray-900">{event.title}</h4>
+                      <Badge className={`${getEventTypeColor(event.type)} border text-xs`}>
+                        {event.type}
+                      </Badge>
                     </div>
-                    
-                    {/* Holiday Information */}
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 text-sm leading-tight truncate group-hover:text-brand-violet transition-colors">
-                        {holiday.name}
-                      </h4>
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <MapPin className="h-3 w-3 text-brand-violet" strokeWidth={1.5} />
-                        <span className="text-xs text-gray-600 truncate">{holiday.office}</span>
-                      </div>
+                    <p className="text-sm text-gray-600 mb-2">{formatDate(event.date)}</p>
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      {event.location && (
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          <span>{event.location}</span>
+                        </div>
+                      )}
+                      {event.attendees && (
+                        <div className="flex items-center gap-1">
+                          <Users className="h-3 w-3" />
+                          <span>{event.attendees} attendees</span>
+                        </div>
+                      )}
                     </div>
-
-                    {/* Countdown Badge using StandardizedBadge */}
-                    {daysUntil >= 0 && (
-                      <StandardizedBadge
-                        variant="countdown"
-                        style={getCountdownBadgeStyle(daysUntil)}
-                      >
-                        {getCountdownText(daysUntil)}
-                      </StandardizedBadge>
-                    )}
                   </div>
                 </div>
-              );
-            })}
-            
-            {upcomingHolidays.length === 0 && (
-              <div className="text-center py-6">
-                <div className="p-3 rounded-full bg-brand-violet/10 mx-auto w-12 h-12 flex items-center justify-center mb-3">
-                  <Calendar className="h-6 w-6 text-brand-violet" strokeWidth={1.5} />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="font-medium text-gray-900 text-sm">No Upcoming Holidays</h3>
-                  <p className="text-xs text-gray-600 max-w-xs mx-auto leading-relaxed">
-                    All clear for the next few months! Your team can focus on upcoming projects.
-                  </p>
-                </div>
-              </div>
+              ))
             )}
           </div>
         </ScrollArea>
