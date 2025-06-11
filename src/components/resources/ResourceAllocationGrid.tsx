@@ -48,20 +48,11 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
   // Calculate the table width
   const tableWidth = useGridTableWidth(days.length);
   
-  // Toggle project expansion with better logging
+  // Toggle project expansion
   const toggleProjectExpanded = (projectId: string) => {
-    console.log('toggleProjectExpanded called for:', projectId);
-    console.log('Current expandedProjects:', expandedProjects);
-    
-    setExpandedProjects(prev => {
-      const isCurrentlyExpanded = prev.includes(projectId);
-      const newExpandedProjects = isCurrentlyExpanded 
-        ? prev.filter(id => id !== projectId) 
-        : [...prev, projectId];
-      
-      console.log('New expandedProjects will be:', newExpandedProjects);
-      return newExpandedProjects;
-    });
+    setExpandedProjects(prev => 
+      prev.includes(projectId) ? prev.filter(id => id !== projectId) : [...prev, projectId]
+    );
   };
   
   if (isLoading) {
@@ -88,24 +79,16 @@ export const ResourceAllocationGrid: React.FC<ResourceAllocationGridProps> = ({
                 <GridDaysHeader days={days} />
               </thead>
               <tbody>
-                {filteredProjects.map((project, index) => {
-                  const isExpanded = expandedProjects.includes(project.id);
-                  console.log('Rendering project in ResourceAllocationGrid:', project.id, 'isExpanded:', isExpanded);
-                  
-                  return (
-                    <ProjectRow 
-                      key={project.id} 
-                      project={project} 
-                      days={days} 
-                      isExpanded={isExpanded} 
-                      onToggleExpand={() => {
-                        console.log('onToggleExpand called from ResourceAllocationGrid for:', project.id);
-                        toggleProjectExpanded(project.id);
-                      }} 
-                      isEven={index % 2 === 0} 
-                    />
-                  );
-                })}
+                {filteredProjects.map((project, index) => (
+                  <ProjectRow 
+                    key={project.id} 
+                    project={project} 
+                    days={days} 
+                    isExpanded={expandedProjects.includes(project.id)} 
+                    onToggleExpand={() => toggleProjectExpanded(project.id)} 
+                    isEven={index % 2 === 0} 
+                  />
+                ))}
               </tbody>
             </table>
           </div>
