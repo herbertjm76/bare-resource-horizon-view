@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { format, addDays, isWeekend, isSunday, startOfMonth, eachDayOfInterval, addWeeks } from 'date-fns';
+import { format, addDays, isWeekend, isSunday, eachDayOfInterval, addWeeks } from 'date-fns';
 import { DayInfo } from '../grid/types';
 
 interface DisplayOptions {
@@ -45,15 +45,13 @@ export const useGridDays = (
   displayOptions: DisplayOptions
 ): DayInfo[] => {
   return useMemo(() => {
-    const monthStart = startOfMonth(startDate);
+    // Calculate end date based on the period in weeks
+    const endDate = addDays(addWeeks(startDate, periodToShow), -1);
     
-    // Convert periodToShow from weeks to days for eachDayOfInterval
-    // Using 7 days per week to ensure full weeks are shown
-    const daysToAdd = periodToShow * 7;
-    const endDate = addDays(monthStart, daysToAdd - 1);
+    console.log(`useGridDays - Start: ${startDate.toISOString()}, End: ${endDate.toISOString()}, Period: ${periodToShow} weeks`);
     
     let allDays = eachDayOfInterval({
-      start: monthStart,
+      start: startDate,
       end: endDate
     });
     
@@ -72,6 +70,8 @@ export const useGridDays = (
       // For non-weekend days, check if they are in the selectedDays list
       return displayOptions.selectedDays.includes(dayId);
     });
+    
+    console.log(`useGridDays - Filtered to ${allDays.length} days`);
     
     return allDays.map((day, index, days) => {
       const dayOfWeek = getDayOfWeek(day, displayOptions.weekStartsOnSunday);
