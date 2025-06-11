@@ -20,20 +20,22 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
     historicalData,
     activeProjects,
     isLoading,
+    isLoadingAllocationData,
     hasError
   } = useResourcePlanningData(memberId);
 
-  if (isLoading) {
+  // Show skeleton metrics when still loading data
+  if (!memberProfile) {
     return (
       <div className="space-y-4">
         <h2 className="text-2xl font-semibold text-gray-800">Resource Planning</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="border">
+            <Card key={i} className="border animate-pulse">
               <div className="p-4">
-                <div className="h-4 bg-gray-200 rounded animate-pulse w-24 mb-2"></div>
-                <div className="h-6 bg-gray-200 rounded animate-pulse w-16 mb-1"></div>
-                <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
+                <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
+                <div className="h-6 bg-gray-200 rounded w-16 mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded w-16"></div>
               </div>
             </Card>
           ))}
@@ -42,6 +44,7 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
     );
   }
 
+  // Show error state if there's an error
   if (hasError) {
     return (
       <div className="space-y-4">
@@ -63,24 +66,29 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
 
   const weeklyCapacity = memberProfile?.weekly_capacity || 40;
 
-  // Calculate planning metrics
+  // Calculate planning metrics - only when we have allocation data
   const { averageFutureUtilization, overallocatedWeeks, underutilizedWeeks } = 
-    calculatePlanningMetrics(futureAllocations || [], weeklyCapacity);
+    isLoadingAllocationData 
+      ? { averageFutureUtilization: 0, overallocatedWeeks: 0, underutilizedWeeks: 0 }
+      : calculatePlanningMetrics(futureAllocations || [], weeklyCapacity);
 
-  // Calculate historical metrics
+  // Calculate historical metrics - only when we have historical data
   const { historicalAverage, historicalUtilization } = 
-    calculateHistoricalMetrics(historicalData || [], weeklyCapacity);
+    isLoadingAllocationData
+      ? { historicalAverage: 0, historicalUtilization: 0 }
+      : calculateHistoricalMetrics(historicalData || [], weeklyCapacity);
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-semibold text-gray-800">Resource Planning</h2>
 
-      {/* Planning Overview Metrics */}
+      {/* Planning Overview Metrics - with loading state support */}
       <ResourcePlanningMetrics
         weeklyCapacity={weeklyCapacity}
         averageFutureUtilization={averageFutureUtilization}
         overallocatedWeeks={overallocatedWeeks}
         activeProjectsCount={activeProjects?.length || 0}
+        isLoading={isLoadingAllocationData}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -91,10 +99,14 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
           averageFutureUtilization={averageFutureUtilization}
           underutilizedWeeks={underutilizedWeeks}
           overallocatedWeeks={overallocatedWeeks}
+          isLoading={isLoadingAllocationData}
         />
 
         {/* Current Project Assignments */}
-        <CurrentProjectAssignments activeProjects={activeProjects} />
+        <CurrentProjectAssignments 
+          activeProjects={activeProjects} 
+          isLoading={isLoadingAllocationData} 
+        />
       </div>
 
       {/* Resource Planning Recommendations */}
@@ -102,6 +114,7 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
         averageFutureUtilization={averageFutureUtilization}
         overallocatedWeeks={overallocatedWeeks}
         underutilizedWeeks={underutilizedWeeks}
+        isLoading={isLoadingAllocationData}
       />
     </div>
   );

@@ -10,6 +10,7 @@ interface UtilizationTrendAnalysisProps {
   averageFutureUtilization: number;
   underutilizedWeeks: number;
   overallocatedWeeks: number;
+  isLoading?: boolean;
 }
 
 const getUtilizationColor = (utilization: number) => {
@@ -24,8 +25,43 @@ export const UtilizationTrendAnalysis: React.FC<UtilizationTrendAnalysisProps> =
   historicalAverage,
   averageFutureUtilization,
   underutilizedWeeks,
-  overallocatedWeeks
+  overallocatedWeeks,
+  isLoading = false
 }) => {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-brand-violet" />
+            Utilization Trend Analysis
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3 animate-pulse">
+              <div className="h-5 bg-gray-200 rounded w-2/3"></div>
+              <div className="flex items-center gap-3">
+                <div className="h-6 bg-gray-200 rounded w-12"></div>
+                <div className="h-2 bg-gray-200 rounded w-full"></div>
+              </div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+            
+            <div className="space-y-3 animate-pulse">
+              <div className="h-5 bg-gray-200 rounded w-2/3"></div>
+              <div className="flex items-center gap-3">
+                <div className="h-6 bg-gray-200 rounded w-12"></div>
+                <div className="h-2 bg-gray-200 rounded w-full"></div>
+              </div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -37,7 +73,7 @@ export const UtilizationTrendAnalysis: React.FC<UtilizationTrendAnalysisProps> =
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-800">Historical Performance (8 weeks)</h4>
+            <h4 className="font-medium text-gray-800">Historical Performance (4 weeks)</h4>
             <div className="flex items-center gap-3">
               <div className="text-xl font-bold text-gray-700">{Math.round(historicalUtilization)}%</div>
               <Progress value={historicalUtilization} className="flex-1 h-2" />
@@ -46,7 +82,7 @@ export const UtilizationTrendAnalysis: React.FC<UtilizationTrendAnalysisProps> =
           </div>
           
           <div className="space-y-3">
-            <h4 className="font-medium text-gray-800">Future Planning (12 weeks)</h4>
+            <h4 className="font-medium text-gray-800">Future Planning (8 weeks)</h4>
             <div className="flex items-center gap-3">
               <div className={`text-xl font-bold ${getUtilizationColor(averageFutureUtilization)}`}>
                 {Math.round(averageFutureUtilization)}%

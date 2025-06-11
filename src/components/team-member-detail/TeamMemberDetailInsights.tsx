@@ -9,7 +9,7 @@ interface TeamMemberDetailInsightsProps {
 }
 
 export const TeamMemberDetailInsights: React.FC<TeamMemberDetailInsightsProps> = ({ memberId }) => {
-  const { memberProfile, futureAllocations, historicalData, activeProjects, isLoading } = useResourcePlanningData(memberId);
+  const { memberProfile, historicalData, activeProjects, isLoadingProjects } = useResourcePlanningData(memberId);
   
   const weeklyCapacity = memberProfile?.weekly_capacity || 40;
   
@@ -23,7 +23,7 @@ export const TeamMemberDetailInsights: React.FC<TeamMemberDetailInsightsProps> =
     ? (fourWeekTotal / Math.min(4, historicalData.length)) / weeklyCapacity * 100
     : 0;
   
-  if (isLoading) {
+  if (!memberProfile) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
@@ -80,7 +80,12 @@ export const TeamMemberDetailInsights: React.FC<TeamMemberDetailInsightsProps> =
           </div>
           
           <div className="space-y-3">
-            {activeProjects.length > 0 ? (
+            {isLoadingProjects ? (
+              <div className="space-y-3">
+                <div className="h-12 bg-white/50 rounded-lg animate-pulse"></div>
+                <div className="h-12 bg-white/50 rounded-lg animate-pulse"></div>
+              </div>
+            ) : activeProjects.length > 0 ? (
               activeProjects.slice(0, 2).map((project: any) => (
                 <div key={project.id} className="bg-white p-3 rounded-lg border border-green-100">
                   <div className="font-medium">{project.name}</div>
@@ -128,7 +133,7 @@ export const TeamMemberDetailInsights: React.FC<TeamMemberDetailInsightsProps> =
                 ></div>
               </div>
               <div className="text-sm text-gray-600">
-                {fourWeekTotal} hours over past 4 weeks
+                {Math.round(fourWeekTotal)} hours over past 4 weeks
               </div>
             </div>
           </div>

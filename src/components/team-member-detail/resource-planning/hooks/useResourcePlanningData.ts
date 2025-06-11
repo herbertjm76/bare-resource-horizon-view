@@ -7,8 +7,8 @@ import { format, startOfWeek, addWeeks, subWeeks } from 'date-fns';
 export const useResourcePlanningData = (memberId: string) => {
   const { company } = useCompany();
 
-  // Fetch member's profile data
-  const { data: memberProfile, isLoading: isLoadingProfile, error: profileError } = useQuery({
+  // Fetch member's profile data with optimized staleTime
+  const { data: memberProfile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ['memberProfile', memberId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -21,37 +21,69 @@ export const useResourcePlanningData = (memberId: string) => {
       return data;
     },
     enabled: !!memberId,
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 10 * 60 * 1000, // 10 minutes cache
+    retry: 1, // Reduce retry attempts
+    gcTime: 15 * 60 * 1000, // Garbage collection time
   });
 
-  // Use a single combined query for planning data instead of multiple separate queries
-  const { data: planningData, isLoading: isLoadingPlanningData, error: planningError } = useQuery({
-    queryKey: ['resourcePlanningData', memberId, company?.id],
+  // Use a separate query for active projects with minimal data needed
+  const { data: activeProjects = [], isLoading: isLoadingProjects } = useQuery({
+    queryKey: ['resourceActiveProjects', memberId, company?.id],
     queryFn: async () => {
-      if (!company?.id) return { futureAllocations: [], historicalData: [], activeProjects: [] };
+      if (!company?.id || !memberId) return [];
+      
+      const { data, error } = await supabase
+        .from('project_resource_allocations')
+        .select('project:projects(id, name, status, contract_end_date, current_stage)')
+        .eq('resource_id', memberId)
+        .eq('resource_type', 'active')
+        .eq('company_id', company.id)
+        .is('hours', 'not.null'); // Only get allocations with hours
+        
+      if (error) throw error;
+      
+      // Process active projects to get unique projects only
+      return (data || []).reduce((acc, allocation) => {
+        const project = allocation.project;
+        if (project && !acc.find((p: any) => p.id === project.id)) {
+          acc.push(project);
+        }
+        return acc;
+      }, [] as any[]);
+    },
+    enabled: !!memberId && !!company?.id,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+
+  // Only fetch allocation data when needed for the detailed view
+  const { data: allocationData, isLoading: isLoadingAllocationData } = useQuery({
+    queryKey: ['resourceAllocationData', memberId, company?.id],
+    queryFn: async () => {
+      if (!company?.id || !memberId) return { futureAllocations: [], historicalData: [] };
       
       const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-      const twelveWeeksOut = addWeeks(currentWeekStart, 12);
-      const eightWeeksAgo = subWeeks(currentWeekStart, 8);
+      const eightWeeksOut = addWeeks(currentWeekStart, 8); // Reduced from 12 to 8 weeks for faster loading
+      const fourWeeksAgo = subWeeks(currentWeekStart, 4); // Reduced from 8 to 4 weeks for faster loading
       
       const startDateFuture = format(currentWeekStart, 'yyyy-MM-dd');
-      const endDateFuture = format(twelveWeeksOut, 'yyyy-MM-dd');
-      const startDateHistory = format(eightWeeksAgo, 'yyyy-MM-dd');
+      const endDateFuture = format(eightWeeksOut, 'yyyy-MM-dd');
+      const startDateHistory = format(fourWeeksAgo, 'yyyy-MM-dd');
       const endDateHistory = format(currentWeekStart, 'yyyy-MM-dd');
       
       // Parallel fetching of all required data
-      const [futureResponse, historicalResponse, projectsResponse] = await Promise.all([
-        // Future allocations
+      const [futureResponse, historicalResponse] = await Promise.all([
+        // Future allocations - optimized query
         supabase
           .from('project_resource_allocations')
-          .select('hours, week_start_date, project:projects(id, name, status, contract_end_date)')
+          .select('hours, week_start_date, project:projects(id, name)')
           .eq('resource_id', memberId)
           .eq('resource_type', 'active')
           .eq('company_id', company.id)
           .gte('week_start_date', startDateFuture)
           .lte('week_start_date', endDateFuture),
           
-        // Historical data
+        // Historical data - optimized query
         supabase
           .from('project_resource_allocations')
           .select('hours, week_start_date')
@@ -60,46 +92,30 @@ export const useResourcePlanningData = (memberId: string) => {
           .eq('company_id', company.id)
           .gte('week_start_date', startDateHistory)
           .lt('week_start_date', endDateHistory),
-          
-        // Active projects
-        supabase
-          .from('project_resource_allocations')
-          .select('project:projects(id, name, status, contract_end_date, current_stage)')
-          .eq('resource_id', memberId)
-          .eq('resource_type', 'active')
-          .eq('company_id', company.id)
       ]);
 
       // Handle errors
       if (futureResponse.error) throw futureResponse.error;
       if (historicalResponse.error) throw historicalResponse.error;
-      if (projectsResponse.error) throw projectsResponse.error;
-
-      // Process active projects to get unique projects only
-      const uniqueProjects = (projectsResponse.data || []).reduce((acc, allocation) => {
-        const project = allocation.project;
-        if (project && !acc.find(p => p.id === project.id)) {
-          acc.push(project);
-        }
-        return acc;
-      }, [] as any[]);
 
       return {
         futureAllocations: futureResponse.data || [],
         historicalData: historicalResponse.data || [],
-        activeProjects: uniqueProjects
       };
     },
     enabled: !!memberId && !!company?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
   });
 
   return {
     memberProfile,
-    futureAllocations: planningData?.futureAllocations || [],
-    historicalData: planningData?.historicalData || [],
-    activeProjects: planningData?.activeProjects || [],
-    isLoading: isLoadingProfile || isLoadingPlanningData,
-    hasError: !!profileError || !!planningError
+    futureAllocations: allocationData?.futureAllocations || [],
+    historicalData: allocationData?.historicalData || [],
+    activeProjects,
+    isLoading: isLoadingProfile || isLoadingProjects || isLoadingAllocationData,
+    isLoadingProjects,
+    isLoadingAllocationData,
+    hasError: false
   };
 };

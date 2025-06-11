@@ -15,6 +15,7 @@ interface Project {
 
 interface CurrentProjectAssignmentsProps {
   activeProjects: Project[] | null;
+  isLoading?: boolean;
 }
 
 const getStatusColor = (status: string) => {
@@ -28,8 +29,40 @@ const getStatusColor = (status: string) => {
 };
 
 export const CurrentProjectAssignments: React.FC<CurrentProjectAssignmentsProps> = ({
-  activeProjects
+  activeProjects,
+  isLoading = false
 }) => {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-brand-violet" />
+            Current Project Assignments
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="animate-pulse space-y-4">
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div className="space-y-2 w-3/4">
+                <div className="h-5 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              </div>
+              <div className="h-6 bg-gray-200 rounded w-16"></div>
+            </div>
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+              <div className="space-y-2 w-3/4">
+                <div className="h-5 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              </div>
+              <div className="h-6 bg-gray-200 rounded w-16"></div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>

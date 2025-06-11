@@ -7,13 +7,33 @@ interface PlanningRecommendationsProps {
   averageFutureUtilization: number;
   overallocatedWeeks: number;
   underutilizedWeeks: number;
+  isLoading?: boolean;
 }
 
 export const PlanningRecommendations: React.FC<PlanningRecommendationsProps> = ({
   averageFutureUtilization,
   overallocatedWeeks,
-  underutilizedWeeks
+  underutilizedWeeks,
+  isLoading = false
 }) => {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Target className="h-5 w-5 text-brand-violet" />
+            Planning Recommendations
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse">
+            <div className="h-20 bg-gray-100 rounded-lg mb-2"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
