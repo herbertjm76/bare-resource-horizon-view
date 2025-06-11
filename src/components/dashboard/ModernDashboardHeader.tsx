@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Building2, Users, TrendingUp, FolderOpen, Briefcase } from 'lucide-react';
+import { Building2, Users, TrendingUp, FolderOpen, Briefcase, LucideIcon } from 'lucide-react';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 
 interface ModernDashboardHeaderProps {
@@ -8,13 +8,17 @@ interface ModernDashboardHeaderProps {
   totalActiveProjects?: number;
   totalOffices?: number;
   utilizationRate?: number;
+  customTitle?: string;
+  customIcon?: LucideIcon;
 }
 
 export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
   totalTeamMembers: propTotalTeamMembers,
   totalActiveProjects: propTotalActiveProjects,
   totalOffices: propTotalOffices,
-  utilizationRate: propUtilizationRate
+  utilizationRate: propUtilizationRate,
+  customTitle,
+  customIcon
 }) => {
   // Try to use unified data if available, otherwise fallback to props
   let unifiedData;
@@ -30,6 +34,10 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
   const totalActiveProjects = unifiedData?.activeProjects ?? propTotalActiveProjects ?? 0;
   const totalOffices = propTotalOffices ?? 1;
   const utilizationRate = unifiedData?.currentUtilizationRate ?? propUtilizationRate ?? 0;
+
+  // Use custom title and icon if provided, otherwise use defaults
+  const headerTitle = customTitle || 'Dashboard Overview';
+  const HeaderIcon = customIcon || Briefcase;
 
   const stats = [
     {
@@ -69,8 +77,8 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <Briefcase className="h-8 w-8 text-brand-primary" />
-              Dashboard Overview
+              <HeaderIcon className="h-8 w-8 text-brand-primary" />
+              {headerTitle}
             </h1>
             <p className="text-gray-600 mt-1">
               Real-time insights into your team and project performance
