@@ -1,225 +1,75 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState } from 'react';
 import { useCompany } from '@/context/CompanyContext';
-import { toast } from 'sonner';
 import { TimeRange } from '../TimeRangeSelector';
 import { useTimeRangeMetrics } from './useTimeRangeMetrics';
 import { useHolidays } from './useHolidays';
-
-export interface UnifiedDashboardData {
-  // Team data
-  teamMembers: any[];
-  preRegisteredMembers: any[];
-  transformedStaffData: any[];
-  totalTeamSize: number; // Include pre-registered in total count
-  
-  // Project data
-  projects: any[];
-  activeProjects: number;
-  
-  // Utilization data
-  currentUtilizationRate: number;
-  utilizationStatus: {
-    status: string;
-    color: string;
-    textColor: string;
-  };
-  utilizationTrends: {
-    days7: number;
-    days30: number;
-    days90: number;
-  };
-  
-  // Holiday data
-  holidays: any[];
-  isHolidaysLoading: boolean;
-  
-  // Smart insights data
-  smartInsightsData: {
-    teamMembers: any[];
-    activeProjects: number;
-    utilizationRate: number;
-    totalTeamSize: number; // Include total team size for insights
-  };
-  
-  // Office data
-  selectedOffice: string;
-  officeOptions: string[];
-  
-  // Meta data
-  isLoading: boolean;
-  metrics: any;
-  mockData: any;
-  activeResources: number;
-}
+import { useTeamData } from './useTeamData';
+import { useProjectData } from './useProjectData';
+import { UnifiedDashboardData } from './types/dashboardTypes';
+import { 
+  combineStaffData,
+  transformPreRegisteredMembers,
+  transformActiveMembers
+} from './utils/dataTransformations';
+import { 
+  calculateUtilizationRate,
+  getUtilizationStatus,
+  generateUtilizationTrends
+} from './utils/utilizationCalculations';
+import { 
+  createMockData,
+  createSmartInsightsData
+} from './utils/mockDataUtils';
 
 export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboardData & {
   setSelectedOffice: (office: string) => void;
   refetch: () => Promise<void>;
 } => {
-  const [teamMembers, setTeamMembers] = useState<any[]>([]);
-  const [preRegisteredMembers, setPreRegisteredMembers] = useState<any[]>([]);
-  const [projects, setProjects] = useState<any[]>([]);
-  const [currentUtilizationRate, setCurrentUtilizationRate] = useState(0);
-  const [utilizationStatus, setUtilizationStatus] = useState({
-    status: 'Optimal',
-    color: '#10B981',
-    textColor: 'text-green-700'
-  });
-  const [isLoading, setIsLoading] = useState(true);
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
   
   const { company } = useCompany();
   const { metrics: timeRangeMetrics, isLoading: metricsLoading } = useTimeRangeMetrics(selectedTimeRange);
   const { holidays, isLoading: isHolidaysLoading } = useHolidays();
-
-  const fetchDashboardData = useCallback(async () => {
-    if (!company?.id) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-
-      // Fetch team members
-      const { data: membersData, error: membersError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('company_id', company.id);
-
-      if (membersError) throw membersError;
-
-      // Fetch pre-registered members from invites table
-      const { data: invitesData, error: invitesError } = await supabase
-        .from('invites')
-        .select('*')
-        .eq('company_id', company.id)
-        .eq('status', 'pending')
-        .eq('invitation_type', 'pre_registered');
-
-      if (invitesError) throw invitesError;
-
-      // Fetch projects
-      const { data: projectsData, error: projectsError } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('company_id', company.id);
-
-      if (projectsError) throw projectsError;
-
-      setTeamMembers(membersData || []);
-      setPreRegisteredMembers(invitesData || []);
-      setProjects(projectsData || []);
-
-      // Calculate utilization including pre-registered members in total team count
-      const activeMembers = membersData?.filter(member => 
-        member.role && ['owner', 'admin', 'member'].includes(member.role)
-      ) || [];
-      const totalTeamSize = activeMembers.length + (invitesData?.length || 0);
-      const totalCapacity = activeMembers.reduce((total, member) => total + (member.weekly_capacity || 40), 0);
-      
-      // Include pre-registered capacity in total calculation
-      const preRegisteredCapacity = (invitesData || []).reduce((total, member) => total + (member.weekly_capacity || 40), 0);
-      const totalTeamCapacity = totalCapacity + preRegisteredCapacity;
-      
-      // Mock utilization calculation - replace with actual logic
-      const utilizationRate = Math.min(Math.round((activeMembers.length * 30) / Math.max(totalTeamCapacity, 1) * 100), 100);
-      
-      setCurrentUtilizationRate(utilizationRate);
-      
-      // Set utilization status
-      if (utilizationRate >= 90) {
-        setUtilizationStatus({
-          status: 'High Load',
-          color: '#ef4444',
-          textColor: 'text-red-700'
-        });
-      } else if (utilizationRate >= 75) {
-        setUtilizationStatus({
-          status: 'Optimal',
-          color: '#22c55e',
-          textColor: 'text-green-700'
-        });
-      } else {
-        setUtilizationStatus({
-          status: 'Available',
-          color: '#3b82f6',
-          textColor: 'text-blue-700'
-        });
-      }
-
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [company?.id]);
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, [fetchDashboardData]);
-
-  // Transform pre-registered members to match the staff data format
-  const transformedPreRegistered = preRegisteredMembers.map(member => ({
-    id: member.id,
-    name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Pending Member',
-    first_name: member.first_name || '',
-    last_name: member.last_name || '',
-    availability: 0, // Pre-registered members have 0% availability
-    role: member.role || 'member',
-    department: member.department,
-    location: member.location,
-    isPending: true,
-    weekly_capacity: member.weekly_capacity || 40
-  }));
-
-  // Transform team members to staff data format
-  const transformedActiveMembers = teamMembers.map(member => ({
-    id: member.id,
-    name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unknown',
-    availability: Math.round(Math.random() * 100), // Mock availability
-    weekly_capacity: member.weekly_capacity || 40,
-    first_name: member.first_name,
-    last_name: member.last_name,
-    role: member.role || 'member',
-    department: member.department,
-    location: member.location,
-    isPending: false
-  }));
-
-  // Combine active staff and pre-registered members
-  const transformedStaffData = [...transformedActiveMembers, ...transformedPreRegistered];
   
-  // Calculate total team size including pre-registered members
+  // Use the new modular hooks
+  const { 
+    teamMembers, 
+    preRegisteredMembers, 
+    isLoading: isTeamLoading, 
+    refetch: refetchTeam 
+  } = useTeamData(company?.id);
+  
+  const { 
+    projects, 
+    isLoading: isProjectsLoading, 
+    refetch: refetchProjects 
+  } = useProjectData(company?.id);
+
+  // Calculate utilization using utilities
+  const currentUtilizationRate = calculateUtilizationRate(teamMembers, preRegisteredMembers);
+  const utilizationStatus = getUtilizationStatus(currentUtilizationRate);
+  const utilizationTrends = generateUtilizationTrends(currentUtilizationRate);
+
+  // Transform staff data using utilities
+  const transformedStaffData = combineStaffData(teamMembers, preRegisteredMembers);
   const totalTeamSize = transformedStaffData.length;
 
-  // Create mock data structure with proper location data
-  const mockData = {
-    projectsByStatus: timeRangeMetrics.projectsByStatus,
-    projectsByStage: timeRangeMetrics.projectsByStage,
-    projectsByLocation: timeRangeMetrics.projectsByLocation,
-    projectsByPM: timeRangeMetrics.projectsByPM || []
-  };
-
-  // Mock utilization trends
-  const utilizationTrends = {
-    days7: currentUtilizationRate,
-    days30: Math.round(currentUtilizationRate * 0.9),
-    days90: Math.round(currentUtilizationRate * 0.85)
-  };
-
-  // Smart insights data structure including total team size
-  const smartInsightsData = {
-    teamMembers: transformedStaffData,
-    activeProjects: timeRangeMetrics.activeProjects,
-    utilizationRate: currentUtilizationRate,
-    totalTeamSize: totalTeamSize
-  };
+  // Create mock data and insights using utilities
+  const mockData = createMockData(timeRangeMetrics);
+  const smartInsightsData = createSmartInsightsData(
+    transformedStaffData,
+    timeRangeMetrics.activeProjects,
+    currentUtilizationRate,
+    totalTeamSize
+  );
 
   const officeOptions = ['All Offices'];
+  const isLoading = isTeamLoading || isProjectsLoading || metricsLoading;
+
+  const refetch = async () => {
+    await Promise.all([refetchTeam(), refetchProjects()]);
+  };
 
   const unifiedData: UnifiedDashboardData = {
     // Team data
@@ -249,7 +99,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     officeOptions,
     
     // Meta data
-    isLoading: isLoading || metricsLoading,
+    isLoading,
     metrics: timeRangeMetrics,
     mockData,
     activeResources: timeRangeMetrics.activeResources
@@ -258,6 +108,9 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   return {
     ...unifiedData,
     setSelectedOffice,
-    refetch: fetchDashboardData
+    refetch
   };
 };
+
+// Re-export the types for backward compatibility
+export type { UnifiedDashboardData } from './types/dashboardTypes';
