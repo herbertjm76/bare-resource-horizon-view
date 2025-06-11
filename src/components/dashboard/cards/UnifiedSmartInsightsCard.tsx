@@ -139,9 +139,10 @@ export const UnifiedSmartInsightsCard: React.FC<SmartInsightsProps> = ({
   };
 
   const insights = generateInsights();
+  const highPriorityInsights = insights.filter(i => i.priority === 'high').length;
 
   return (
-    <Card className="rounded-2xl border-0 shadow-sm bg-white h-[500px]">
+    <Card className="rounded-2xl border-2 border-zinc-300 bg-white shadow-sm h-[500px]">
       <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
         {/* Title inside the card */}
         <div className="flex items-center justify-between mb-4">
@@ -150,7 +151,7 @@ export const UnifiedSmartInsightsCard: React.FC<SmartInsightsProps> = ({
             Smart Insights
           </h2>
           <StandardizedHeaderBadge>
-            {insights.filter(i => i.priority === 'high').length} Active
+            {highPriorityInsights > 0 ? `${highPriorityInsights} High Priority` : `${insights.length} Insights`}
           </StandardizedHeaderBadge>
         </div>
         
