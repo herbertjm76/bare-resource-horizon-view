@@ -1,10 +1,10 @@
 
 import { useMemo, useState } from 'react';
-import { TeamMember } from '@/components/dashboard/types';
+import { Profile } from '@/components/dashboard/types';
 
 type FilterType = 'all' | 'department' | 'location';
 
-export const useTeamFilters = (allMembers: TeamMember[]) => {
+export const useTeamFilters = (allMembers: Profile[]) => {
   // State for active filters
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [filterValue, setFilterValue] = useState<string>('');
@@ -35,10 +35,10 @@ export const useTeamFilters = (allMembers: TeamMember[]) => {
         const memberName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
         const searchLower = searchQuery.toLowerCase();
         
-        // Search in name, department, role, or location
+        // Search in name, department, job_title, or location
         if (!memberName.includes(searchLower) && 
             !(member.department && member.department.toLowerCase().includes(searchLower)) &&
-            !(('role' in member) && member.role && member.role.toLowerCase().includes(searchLower)) &&
+            !(member.job_title && member.job_title.toLowerCase().includes(searchLower)) &&
             !(member.location && member.location.toLowerCase().includes(searchLower))) {
           return false;
         }

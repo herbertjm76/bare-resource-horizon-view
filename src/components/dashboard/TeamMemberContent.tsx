@@ -18,20 +18,12 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
   teamMembers,
   onRefresh
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  
   // Use the team filters hook with search functionality
   const {
     filteredMembers,
-    searchQuery: filterSearchQuery,
-    setSearchQuery: setFilterSearchQuery
+    searchQuery,
+    setSearchQuery
   } = useTeamFilters(teamMembers);
-
-  // Sync search queries
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setFilterSearchQuery(value);
-  };
 
   if (isProfileLoading) {
     return (
@@ -58,11 +50,11 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
     <div className="space-y-6">
       <TeamMemberInsightsHighlight
         searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
+        onSearchChange={setSearchQuery}
       />
       
       <TeamManagement
-        teamMembers={searchQuery ? filteredMembers : teamMembers}
+        teamMembers={filteredMembers}
         inviteUrl={inviteUrl}
         userRole={userProfile?.role || 'member'}
         onRefresh={onRefresh}

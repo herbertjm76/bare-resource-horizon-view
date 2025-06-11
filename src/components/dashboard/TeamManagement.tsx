@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TeamMember } from './types';
+import { Profile } from './types';
 import { EmptyTeamState } from './teamManagement/EmptyTeamState';
 import { TeamManagementContent } from './teamManagement/TeamManagementContent';
 import { TeamManagementDialogs } from './teamManagement/TeamManagementDialogs';
@@ -8,7 +8,7 @@ import { useTeamManagementState } from './teamManagement/useTeamManagementState'
 import { useTeamManagementHandlers } from './teamManagement/useTeamManagementHandlers';
 
 interface TeamManagementProps {
-  teamMembers: TeamMember[];
+  teamMembers: Profile[];
   inviteUrl: string;
   userRole: string;
   onRefresh?: () => void;
@@ -55,8 +55,11 @@ export const TeamManagement = ({
     memberHandlers
   });
 
+  // Combine active members (filtered) with pre-registered members for display
+  const combinedMembers = [...activeMembers, ...preRegisteredMembers];
+
   // Handle the case when there are no team members and user is admin/owner
-  if (allMembers.length === 0 && isAdminOrOwner) {
+  if (combinedMembers.length === 0 && isAdminOrOwner) {
     return (
       <div className="space-y-6">
         <EmptyTeamState onAddMember={dialogsState.openAddDialog} />
@@ -106,7 +109,7 @@ export const TeamManagement = ({
   return (
     <div className="space-y-6">
       <TeamManagementContent
-        allMembers={allMembers}
+        allMembers={combinedMembers}
         userRole={userRole}
         editMode={editMode}
         setEditMode={setEditMode}
