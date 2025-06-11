@@ -98,29 +98,33 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     });
   }
 
-  // Utility function to get member total hours
+  // Create a map of total hours per member from all their allocations
+  const memberTotalHoursMap = new Map<string, number>();
+  if (weekAllocations) {
+    weekAllocations.forEach(allocation => {
+      const memberId = allocation.resource_id;
+      const currentTotal = memberTotalHoursMap.get(memberId) || 0;
+      memberTotalHoursMap.set(memberId, currentTotal + allocation.hours);
+    });
+  }
+
+  // Utility function to get member total hours - now uses the comprehensive calculation
   const getMemberTotal = (memberId: string): number => {
-    let total = 0;
-    if (projects) {
-      projects.forEach(project => {
-        const key = `${memberId}:${project.id}`;
-        total += allocationMap.get(key) || 0;
-      });
-    }
+    const total = memberTotalHoursMap.get(memberId) || 0;
+    console.log(`Member ${memberId} total hours:`, total);
     return total;
   };
 
   // Utility function to get project count for a member
   const getProjectCount = (memberId: string): number => {
     let count = 0;
-    if (projects) {
-      projects.forEach(project => {
-        const key = `${memberId}:${project.id}`;
-        if ((allocationMap.get(key) || 0) > 0) {
-          count++;
-        }
-      });
+    if (weekAllocations) {
+      const memberAllocations = weekAllocations.filter(allocation => 
+        allocation.resource_id === memberId && allocation.hours > 0
+      );
+      count = memberAllocations.length;
     }
+    console.log(`Member ${memberId} project count:`, count);
     return count;
   };
 

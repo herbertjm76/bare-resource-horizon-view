@@ -36,12 +36,8 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
 }) => {
   const weeklyCapacity = member.weekly_capacity || 40;
   
-  // Calculate total allocated hours directly from allocationMap
-  const totalAllocatedHours = projects.reduce((total, project) => {
-    const key = `${member.id}:${project.id}`;
-    const hours = allocationMap.get(key) || 0;
-    return total + hours;
-  }, 0);
+  // Use the corrected getMemberTotal function which calculates from all allocations
+  const totalAllocatedHours = getMemberTotal(member.id);
   
   const projectCount = getProjectCount(member.id);
   
@@ -74,6 +70,16 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       } : null;
     })
     .filter(Boolean);
+
+  console.log(`NewResourceTableRow - Member ${member.first_name} ${member.last_name}:`, {
+    totalAllocatedHours,
+    projectCount,
+    annualLeave,
+    holidayHours,
+    totalUsedHours,
+    availableHours,
+    memberProjects
+  });
   
   return (
     <>
