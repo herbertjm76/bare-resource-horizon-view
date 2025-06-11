@@ -54,13 +54,6 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
     return 'from-blue-400 to-blue-600';
   };
 
-  const getTrendIcon = () => {
-    const trend = utilization.days7 - utilization.days90;
-    if (trend > 5) return <TrendingUp className="h-4 w-4 text-green-600" />;
-    if (trend < -5) return <TrendingDown className="h-4 w-4 text-red-600" />;
-    return <Minus className="h-4 w-4 text-gray-600" />;
-  };
-
   const chartConfig = {
     utilization: {
       label: "Utilization %",
@@ -74,24 +67,11 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
 
   return (
     <div className="space-y-4 w-full">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
-          <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
-          <span className="hidden sm:inline">Utilization Analytics</span>
-          <span className="sm:hidden">Analytics</span>
-        </h2>
-        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-          {getTrendIcon()}
-          <span className="hidden sm:inline">
-            {utilization.days7 > utilization.days90 ? 'Trending Up' : 
-             utilization.days7 < utilization.days90 ? 'Trending Down' : 'Stable'}
-          </span>
-          <span className="sm:hidden">
-            {utilization.days7 > utilization.days90 ? 'Up' : 
-             utilization.days7 < utilization.days90 ? 'Down' : 'Stable'}
-          </span>
-        </div>
-      </div>
+      <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+        <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
+        <span className="hidden sm:inline">Utilization Analytics</span>
+        <span className="sm:hidden">Analytics</span>
+      </h2>
 
       <Card className="bg-gradient-to-br from-gray-50 to-white border-2 w-full">
         <CardContent className="p-3 sm:p-6">

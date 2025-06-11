@@ -14,7 +14,7 @@ export const TeamMemberBaselineSection: React.FC<TeamMemberBaselineSectionProps>
 }) => {
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-gray-800">Member Baseline</h2>
+      <h2 className="text-xl font-semibold text-brand-primary">Member Baseline</h2>
       
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {/* Weekly Capacity */}
