@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { TeamMember, Profile } from './types';
 import { TeamManagement } from './TeamManagement';
+import { TeamMemberInsightsExpanded } from '../team-members/TeamMemberInsightsExpanded';
 
 interface TeamMemberContentProps {
   userProfile: any;
@@ -47,6 +48,8 @@ export const TeamMemberContent: React.FC<TeamMemberContentProps> = ({
 
   return (
     <div className="space-y-6">
+      <TeamMemberInsightsExpanded teamMembers={activeMembers} />
+      
       <TeamManagement
         teamMembers={activeMembers}
         inviteUrl={inviteUrl}
