@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { ResourceAllocationGrid } from '@/components/resources/ResourceAllocationGrid';
-import { ProjectResourcesHeader } from '@/components/resources/ProjectResourcesHeader';
+import { ProjectResourcingHeader } from './ProjectResourcing/components/ProjectResourcingHeader';
 import { ResourcesToolbar } from '@/components/resources/ResourcesToolbar';
 import { useViewBasedDates } from '@/hooks/useViewBasedDates';
 import { ViewOption } from '@/components/resources/filters/ViewSelector';
@@ -43,12 +43,11 @@ const ProjectResourcing = () => {
   // Calculate active filters count
   const activeFiltersCount = calculateActiveFiltersCount(filters, searchTerm, displayOptions);
 
-  // Clear all filters function
+  // Clear all filters function - fix the function call to match the expected signature
   const clearAllFilters = createClearFiltersFunction(
     setFilters,
     setSearchTerm,
-    setDisplayOptions,
-    periodToShow
+    setDisplayOptions
   );
 
   console.log('ProjectResourcing render:', {
@@ -61,9 +60,9 @@ const ProjectResourcing = () => {
   return (
     <StandardLayout>
       <div className="flex-1 space-y-6 p-4 md:p-8">
-        <ProjectResourcesHeader 
-          title="Project Resourcing"
-          description="Manage team allocation across projects with intelligent capacity planning"
+        <ProjectResourcingHeader 
+          projectCount={0}
+          periodToShow={periodToShow}
         />
         
         <ResourcesToolbar
