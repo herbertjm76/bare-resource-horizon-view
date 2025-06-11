@@ -5,8 +5,57 @@ import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 import { TimeRange } from '../TimeRangeSelector';
 import { useTimeRangeMetrics } from './useTimeRangeMetrics';
+import { useHolidays } from './useHolidays';
 
-export const useDashboardData = (selectedTimeRange: TimeRange) => {
+export interface UnifiedDashboardData {
+  // Team data
+  teamMembers: any[];
+  preRegisteredMembers: any[];
+  transformedStaffData: any[];
+  
+  // Project data
+  projects: any[];
+  activeProjects: number;
+  
+  // Utilization data
+  currentUtilizationRate: number;
+  utilizationStatus: {
+    status: string;
+    color: string;
+    textColor: string;
+  };
+  utilizationTrends: {
+    days7: number;
+    days30: number;
+    days90: number;
+  };
+  
+  // Holiday data
+  holidays: any[];
+  isHolidaysLoading: boolean;
+  
+  // Smart insights data
+  smartInsightsData: {
+    teamMembers: any[];
+    activeProjects: number;
+    utilizationRate: number;
+  };
+  
+  // Office data
+  selectedOffice: string;
+  officeOptions: string[];
+  
+  // Meta data
+  isLoading: boolean;
+  metrics: any;
+  mockData: any;
+  activeResources: number;
+}
+
+export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboardData & {
+  setSelectedOffice: (office: string) => void;
+  refetch: () => Promise<void>;
+} => {
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
   const [preRegisteredMembers, setPreRegisteredMembers] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
@@ -21,6 +70,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
   
   const { company } = useCompany();
   const { metrics: timeRangeMetrics, isLoading: metricsLoading } = useTimeRangeMetrics(selectedTimeRange);
+  const { holidays, isLoading: isHolidaysLoading } = useHolidays();
 
   const fetchDashboardData = useCallback(async () => {
     if (!company?.id) {
@@ -105,6 +155,37 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
+  // Transform pre-registered members to match the staff data format
+  const transformedPreRegistered = preRegisteredMembers.map(member => ({
+    id: member.id,
+    name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Pending Member',
+    first_name: member.first_name || '',
+    last_name: member.last_name || '',
+    availability: 0, // Pre-registered members have 0% availability
+    role: member.role || 'member',
+    department: member.department,
+    location: member.location,
+    isPending: true,
+    weekly_capacity: member.weekly_capacity || 40
+  }));
+
+  // Transform team members to staff data format
+  const transformedActiveMembers = teamMembers.map(member => ({
+    id: member.id,
+    name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unknown',
+    availability: Math.round(Math.random() * 100), // Mock availability
+    weekly_capacity: member.weekly_capacity || 40,
+    first_name: member.first_name,
+    last_name: member.last_name,
+    role: member.role || 'member',
+    department: member.department,
+    location: member.location,
+    isPending: false
+  }));
+
+  // Combine active staff and pre-registered members
+  const transformedStaffData = [...transformedActiveMembers, ...transformedPreRegistered];
+
   // Create mock data structure with proper location data
   const mockData = {
     projectsByStatus: timeRangeMetrics.projectsByStatus,
@@ -120,38 +201,51 @@ export const useDashboardData = (selectedTimeRange: TimeRange) => {
     days90: Math.round(currentUtilizationRate * 0.85)
   };
 
-  // Transform team members to staff data format
-  const staffData = teamMembers.map(member => ({
-    id: member.id,
-    name: `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unknown',
-    availability: Math.round(Math.random() * 100), // Mock availability
-    weekly_capacity: member.weekly_capacity || 40,
-    first_name: member.first_name,
-    last_name: member.last_name,
-    role: member.role || 'member'
-  }));
+  // Smart insights data structure
+  const smartInsightsData = {
+    teamMembers: transformedStaffData,
+    activeProjects: timeRangeMetrics.activeProjects,
+    utilizationRate: currentUtilizationRate
+  };
 
   const officeOptions = ['All Offices'];
 
-  return {
+  const unifiedData: UnifiedDashboardData = {
+    // Team data
     teamMembers,
     preRegisteredMembers,
+    transformedStaffData,
+    
+    // Project data
     projects,
+    activeProjects: timeRangeMetrics.activeProjects,
+    
+    // Utilization data
     currentUtilizationRate,
     utilizationStatus,
-    isLoading: isLoading || metricsLoading,
-    mockData,
-    activeResources: timeRangeMetrics.activeResources,
-    activeProjects: timeRangeMetrics.activeProjects,
-    refetch: fetchDashboardData,
-    selectedOffice,
-    setSelectedOffice,
-    selectedTimeRange,
-    setSelectedTimeRange: () => {}, // Will be overridden in DashboardMetrics
-    allTeamMembers: teamMembers,
     utilizationTrends,
+    
+    // Holiday data
+    holidays: holidays || [],
+    isHolidaysLoading,
+    
+    // Smart insights data
+    smartInsightsData,
+    
+    // Office data
+    selectedOffice,
+    officeOptions,
+    
+    // Meta data
+    isLoading: isLoading || metricsLoading,
     metrics: timeRangeMetrics,
-    staffData,
-    officeOptions
+    mockData,
+    activeResources: timeRangeMetrics.activeResources
+  };
+
+  return {
+    ...unifiedData,
+    setSelectedOffice,
+    refetch: fetchDashboardData
   };
 };

@@ -1,15 +1,14 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Lightbulb, AlertTriangle, CheckCircle, TrendingUp, Calendar, Clock, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
+import { UnifiedDashboardData } from '../hooks/useDashboardData';
 
-interface SmartInsightsProps {
-  teamMembers: any[];
-  activeProjects: number;
-  utilizationRate: number;
+interface UnifiedSmartInsightsCardProps {
+  data: UnifiedDashboardData;
 }
 
 // Unified priority system for colors and icons
@@ -56,42 +55,39 @@ const getInsightIcon = (iconName: string, priority: string) => {
   }
 };
 
-export const UnifiedSmartInsightsCard: React.FC<SmartInsightsProps> = ({
-  teamMembers,
-  activeProjects,
-  utilizationRate
-}) => {
-  // Generate sample insights based on the data
+export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> = ({ data }) => {
+  // Generate sample insights based on the unified data
   const generateInsights = () => {
     const insights = [];
+    const { currentUtilizationRate, activeProjects, teamMembers } = data;
 
     // Utilization insights
-    if (utilizationRate > 90) {
+    if (currentUtilizationRate > 90) {
       insights.push({
         type: 'warning',
         icon: 'alert-triangle',
         title: 'High Team Utilization',
-        description: `Team is at ${utilizationRate}% capacity - consider workload redistribution`,
+        description: `Team is at ${currentUtilizationRate}% capacity - consider workload redistribution`,
         priority: 'high',
-        metric: `${utilizationRate}% team utilization`
+        metric: `${currentUtilizationRate}% team utilization`
       });
-    } else if (utilizationRate < 50) {
+    } else if (currentUtilizationRate < 50) {
       insights.push({
         type: 'info',
         icon: 'trending-up',
         title: 'Capacity Available',
-        description: `Team has ${100 - utilizationRate}% available capacity for new projects`,
+        description: `Team has ${100 - currentUtilizationRate}% available capacity for new projects`,
         priority: 'medium',
-        metric: `${100 - utilizationRate}% available capacity`
+        metric: `${100 - currentUtilizationRate}% available capacity`
       });
     } else {
       insights.push({
         type: 'success',
         icon: 'check-circle',
         title: 'Optimal Utilization',
-        description: `Team utilization at healthy ${utilizationRate}% level`,
+        description: `Team utilization at healthy ${currentUtilizationRate}% level`,
         priority: 'low',
-        metric: `${utilizationRate}% optimal range`
+        metric: `${currentUtilizationRate}% optimal range`
       });
     }
 

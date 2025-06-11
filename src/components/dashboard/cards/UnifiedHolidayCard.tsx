@@ -4,12 +4,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar } from 'lucide-react';
 import { HolidayCard } from '../HolidayCard';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
-import { useHolidays } from '../hooks/useHolidays';
+import { UnifiedDashboardData } from '../hooks/useDashboardData';
 
-export const UnifiedHolidayCard: React.FC = () => {
-  const { holidays, isLoading } = useHolidays();
+interface UnifiedHolidayCardProps {
+  data: UnifiedDashboardData;
+}
 
-  if (isLoading) {
+export const UnifiedHolidayCard: React.FC<UnifiedHolidayCardProps> = ({ data }) => {
+  if (data.isHolidaysLoading) {
     return (
       <Card className="rounded-2xl border-2 border-zinc-300 bg-white shadow-sm h-[500px]">
         <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
@@ -45,7 +47,7 @@ export const UnifiedHolidayCard: React.FC = () => {
             Upcoming Events
           </h2>
           <StandardizedHeaderBadge>
-            {holidays?.length || 0} Events
+            {data.holidays?.length || 0} Events
           </StandardizedHeaderBadge>
         </div>
         
