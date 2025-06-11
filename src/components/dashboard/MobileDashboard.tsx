@@ -4,6 +4,7 @@ import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { HerbieFloatingButton } from './HerbieFloatingButton';
+import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
 
 interface MobileDashboardProps {
@@ -22,33 +23,16 @@ interface MobileDashboardProps {
 }
 
 export const MobileDashboard: React.FC<MobileDashboardProps> = ({
-  teamMembers,
-  activeProjects,
-  activeResources,
-  utilizationTrends,
-  staffData,
-  mockData,
-  selectedTimeRange = 'week',
-  standardizedUtilizationRate
+  selectedTimeRange = 'week'
 }) => {
-  // Use standardized utilization rate if available, otherwise fall back to trends
-  const currentUtilizationRate = standardizedUtilizationRate !== undefined 
-    ? standardizedUtilizationRate 
-    : utilizationTrends.days7;
-
-  // Transform staffData to match StaffMember interface
-  const transformedStaffData = staffData.map(member => ({
-    ...member,
-    first_name: member.first_name || member.name.split(' ')[0] || '',
-    last_name: member.last_name || member.name.split(' ').slice(1).join(' ') || '',
-    role: member.role || 'Member'
-  }));
+  // Get unified data from context
+  const unifiedData = useUnifiedDashboardData();
 
   console.log('Mobile Dashboard - Using unified cards:', {
     selectedTimeRange,
-    activeResources,
-    currentUtilizationRate,
-    staffDataCount: staffData.length
+    activeResources: unifiedData.activeResources,
+    currentUtilizationRate: unifiedData.currentUtilizationRate,
+    staffDataCount: unifiedData.transformedStaffData.length
   });
 
   return (
@@ -57,23 +41,23 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         {/* Smart Insights */}
         <div className="w-full">
           <UnifiedSmartInsightsCard
-            teamMembers={transformedStaffData}
-            activeProjects={activeProjects}
-            utilizationRate={currentUtilizationRate}
+            data={unifiedData}
           />
         </div>
         
         {/* Team Status */}
         <div className="w-full">
           <UnifiedStaffStatusCard
-            staffData={transformedStaffData}
+            data={unifiedData}
             selectedTimeRange={selectedTimeRange}
           />
         </div>
 
         {/* Upcoming Events */}
         <div className="w-full">
-          <UnifiedHolidayCard />
+          <UnifiedHolidayCard 
+            data={unifiedData}
+          />
         </div>
 
         {/* Bottom padding for floating button */}

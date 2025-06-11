@@ -7,6 +7,7 @@ import { DashboardHeader } from './DashboardHeader';
 import { ModernDashboardHeader } from './ModernDashboardHeader';
 import { ExecutiveSummaryCard } from './ExecutiveSummaryCard';
 import { DashboardLoadingState } from './DashboardLoadingState';
+import { UnifiedDashboardProvider } from './UnifiedDashboardProvider';
 import { useDashboardData } from './hooks/useDashboardData';
 import { useStandardizedUtilization } from './hooks/useStandardizedUtilization';
 import { toast } from "sonner";
@@ -15,30 +16,6 @@ import { TimeRange } from './TimeRangeSelector';
 export const DashboardMetrics = () => {
   const isMobile = useIsMobile();
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('month');
-  
-  const dashboardData = useDashboardData(selectedTimeRange);
-  const {
-    selectedOffice,
-    setSelectedOffice,
-    allTeamMembers,
-    utilizationTrends,
-    metrics,
-    staffData,
-    officeOptions,
-    mockData,
-    isLoading
-  } = dashboardData;
-
-  // Use standardized utilization calculation
-  const { utilizationRate, isLoading: isUtilizationLoading } = useStandardizedUtilization(
-    allTeamMembers || [],
-    selectedTimeRange
-  );
-
-  // Show loading state with skeleton
-  if (isLoading || isUtilizationLoading) {
-    return <DashboardLoadingState />;
-  }
 
   // Show toast when time range changes
   const handleTimeRangeChange = (newRange: TimeRange) => {
@@ -56,9 +33,52 @@ export const DashboardMetrics = () => {
     toast.success(`Dashboard updated to show data for ${rangeText}`);
   };
 
+  return (
+    <UnifiedDashboardProvider selectedTimeRange={selectedTimeRange}>
+      <DashboardContent 
+        isMobile={isMobile}
+        selectedTimeRange={selectedTimeRange}
+        handleTimeRangeChange={handleTimeRangeChange}
+      />
+    </UnifiedDashboardProvider>
+  );
+};
+
+// Separate component to access the unified data context
+const DashboardContent: React.FC<{
+  isMobile: boolean;
+  selectedTimeRange: TimeRange;
+  handleTimeRangeChange: (newRange: TimeRange) => void;
+}> = ({ isMobile, selectedTimeRange, handleTimeRangeChange }) => {
+  const dashboardData = useDashboardData(selectedTimeRange);
+  const {
+    selectedOffice,
+    setSelectedOffice,
+    teamMembers,
+    transformedStaffData,
+    utilizationTrends,
+    metrics,
+    officeOptions,
+    mockData,
+    isLoading,
+    activeProjects,
+    currentUtilizationRate
+  } = dashboardData;
+
+  // Use standardized utilization calculation
+  const { utilizationRate, isLoading: isUtilizationLoading } = useStandardizedUtilization(
+    teamMembers || [],
+    selectedTimeRange
+  );
+
+  // Show loading state with skeleton
+  if (isLoading || isUtilizationLoading) {
+    return <DashboardLoadingState />;
+  }
+
   // Calculate stats for the modern header
-  const totalTeamMembers = allTeamMembers?.length || 0;
-  const totalActiveProjects = metrics.activeProjects || 0;
+  const totalTeamMembers = teamMembers?.length || 0;
+  const totalActiveProjects = activeProjects || 0;
   const totalOffices = officeOptions?.length || 0;
 
   return (
@@ -75,13 +95,13 @@ export const DashboardMetrics = () => {
 
       {/* Executive Summary - positioned directly after header with no padding */}
       <ExecutiveSummaryCard
-        activeProjects={metrics.activeProjects}
+        activeProjects={activeProjects}
         activeResources={metrics.activeResources}
         utilizationTrends={utilizationTrends}
         selectedTimeRange={selectedTimeRange}
         totalRevenue={metrics.totalRevenue}
         avgProjectValue={metrics.avgProjectValue}
-        staffData={staffData}
+        staffData={transformedStaffData}
         standardizedUtilizationRate={utilizationRate}
       />
 
@@ -98,11 +118,11 @@ export const DashboardMetrics = () => {
       <div className="pb-6">
         {isMobile ? (
           <MobileDashboard
-            teamMembers={allTeamMembers}
-            activeProjects={metrics.activeProjects}
+            teamMembers={teamMembers}
+            activeProjects={activeProjects}
             activeResources={metrics.activeResources}
             utilizationTrends={utilizationTrends}
-            staffData={staffData}
+            staffData={transformedStaffData}
             mockData={mockData}
             selectedTimeRange={selectedTimeRange}
             standardizedUtilizationRate={utilizationRate}
@@ -110,11 +130,11 @@ export const DashboardMetrics = () => {
         ) : (
           <div className="p-4">
             <DesktopDashboard
-              teamMembers={allTeamMembers}
-              activeProjects={metrics.activeProjects}
+              teamMembers={teamMembers}
+              activeProjects={activeProjects}
               activeResources={metrics.activeResources}
               utilizationTrends={utilizationTrends}
-              staffData={staffData}
+              staffData={transformedStaffData}
               mockData={mockData}
               selectedTimeRange={selectedTimeRange}
               totalRevenue={metrics.totalRevenue}

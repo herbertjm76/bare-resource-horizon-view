@@ -4,6 +4,7 @@ import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
 import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { AnalyticsSection } from './AnalyticsSection';
+import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
 
 interface DesktopDashboardProps {
@@ -32,24 +33,11 @@ interface DesktopDashboardProps {
 }
 
 export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
-  teamMembers,
-  activeProjects,
-  activeResources,
-  utilizationTrends,
-  staffData,
-  mockData,
   selectedTimeRange,
-  totalRevenue,
-  avgProjectValue,
-  standardizedUtilizationRate
+  mockData
 }) => {
-  // Transform staffData to match StaffMember interface
-  const transformedStaffData = staffData.map(member => ({
-    ...member,
-    first_name: member.first_name || member.name.split(' ')[0] || '',
-    last_name: member.last_name || member.name.split(' ').slice(1).join(' ') || '',
-    role: member.role || 'Member'
-  }));
+  // Get unified data from context
+  const unifiedData = useUnifiedDashboardData();
 
   // Prepare analytics data for separate section - using the correct property names
   const analyticsData = {
@@ -61,23 +49,23 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Main Row: Staff Status, Smart Insights, Upcoming Holidays - Using mobile-style cards */}
+      {/* Main Row: Staff Status, Smart Insights, Upcoming Holidays - Using unified cards */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div>
           <UnifiedStaffStatusCard 
-            staffData={transformedStaffData} 
+            data={unifiedData}
             selectedTimeRange={selectedTimeRange}
           />
         </div>
         <div>
           <UnifiedSmartInsightsCard 
-            teamMembers={transformedStaffData}
-            activeProjects={activeProjects}
-            utilizationRate={standardizedUtilizationRate || 0}
+            data={unifiedData}
           />
         </div>
         <div>
-          <UnifiedHolidayCard />
+          <UnifiedHolidayCard 
+            data={unifiedData}
+          />
         </div>
       </div>
       
