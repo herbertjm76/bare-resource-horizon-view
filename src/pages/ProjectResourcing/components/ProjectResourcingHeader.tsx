@@ -12,6 +12,14 @@ export const ProjectResourcingHeader: React.FC<ProjectResourcingHeaderProps> = (
   projectCount,
   periodToShow
 }) => {
+  // Convert weeks to month labels
+  const getPeriodLabel = (weeks: number): string => {
+    if (weeks === 4) return '1 Month';
+    if (weeks === 12) return '3 Months';
+    if (weeks === 52) return '12 Months';
+    return `${weeks} Weeks`;
+  };
+
   return (
     <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-6">
       {/* Left side - Title with icon */}
@@ -30,7 +38,7 @@ export const ProjectResourcingHeader: React.FC<ProjectResourcingHeaderProps> = (
         </Badge>
         <Badge variant="secondary" className="bg-green-50 text-green-600 border-green-200 rounded-full px-4 py-2 text-sm font-medium">
           <Clock className="h-4 w-4 mr-2" />
-          {periodToShow} Weeks View
+          {getPeriodLabel(periodToShow)} View
         </Badge>
       </div>
     </div>

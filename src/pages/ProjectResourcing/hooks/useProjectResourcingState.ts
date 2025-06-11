@@ -1,17 +1,24 @@
 
 import { useState, useCallback, useMemo } from 'react';
-import { format } from 'date-fns';
+import { format, subWeeks, startOfWeek } from 'date-fns';
 
 export const useProjectResourcingState = () => {
-  // Use the current month as the default view
-  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  // Calculate the date one week before the current week (Monday)
+  const getCurrentWeekMinus1 = () => {
+    const today = new Date();
+    const currentWeekStart = startOfWeek(today, { weekStartsOn: 1 }); // Start on Monday
+    return subWeeks(currentWeekStart, 1); // Go back one week
+  };
+
+  // Use one week before current week as the default view
+  const [selectedMonth, setSelectedMonth] = useState<Date>(getCurrentWeekMinus1());
   const [searchTerm, setSearchTerm] = useState('');
   
   const [filters, setFilters] = useState({
     office: "all",
     country: "all",
     manager: "all",
-    periodToShow: 12, // Default is 12 weeks
+    periodToShow: 4, // Default is 1 month (4 weeks)
   });
   
   const [displayOptions, setDisplayOptions] = useState({
