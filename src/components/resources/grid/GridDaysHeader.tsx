@@ -20,9 +20,12 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
         const isFirstOfMonthDay = day.isFirstOfMonth;
         const isNewMonth = index === 0 || days[index - 1].monthLabel !== day.monthLabel;
         
+        // Create a unique key using date and index to avoid duplicates
+        const uniqueKey = `${day.date.toISOString().split('T')[0]}-${index}`;
+        
         return (
           <th 
-            key={day.label} 
+            key={uniqueKey}
             className={`
               min-w-8 text-center text-xs font-semibold text-white py-2 px-1 relative
               ${isSundayDay ? 'border-l-2 border-yellow-300' : ''}
