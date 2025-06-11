@@ -1,59 +1,37 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
-import { AppHeader } from '@/components/AppHeader';
-import { TeamMemberDetailContent } from '@/components/team-member-detail/TeamMemberDetailContent';
-import { useTeamMemberDetail } from '@/hooks/useTeamMemberDetail';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Loader2, RefreshCw, UserX, Clock } from 'lucide-react';
+import { TeamMemberDetailContent } from '@/components/team-member-detail/TeamMemberDetailContent';
+import { useTeamMemberDetail } from '@/hooks/useTeamMemberDetail';
+import { StandardLayout } from '@/components/layout/StandardLayout';
 import AuthGuard from '@/components/AuthGuard';
 
-const HEADER_HEIGHT = 56;
-
 const TeamMemberDetailPage = () => {
-  const [collapsed, setCollapsed] = useState(false);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
-  const toggleSidebar = () => {
-    setCollapsed(prev => !prev);
-  };
   
   // Debug logging for URL parameters
-  useEffect(() => {
+  React.useEffect(() => {
     console.log('TeamMemberDetail - URL params:', { id });
     console.log('TeamMemberDetail - Current URL:', window.location.href);
   }, [id]);
   
   const { memberData, isLoading, error } = useTeamMemberDetail(id);
 
-  const handleRefresh = () => {
-    window.location.reload();
-  };
-
   if (isLoading) {
     return (
       <AuthGuard>
-        <SidebarProvider>
-          <div className="w-full min-h-screen flex flex-row bg-gradient-to-br from-gray-50 to-white">
-            <div className="flex-shrink-0">
-              <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-            </div>
-            <div className="flex-1 flex flex-col">
-              <AppHeader />
-              <div style={{ height: HEADER_HEIGHT }} />
-              <div className="flex-1 flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                  <Loader2 className="h-8 w-8 animate-spin text-brand-primary" />
-                  <span className="text-lg text-gray-600">Loading team member details...</span>
-                  <p className="text-sm text-gray-500">This may take a moment</p>
-                </div>
-              </div>
+        <StandardLayout>
+          <div className="flex items-center justify-center h-96">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 className="h-8 w-8 animate-spin text-brand-primary" />
+              <span className="text-lg text-gray-600">Loading team member details...</span>
+              <p className="text-sm text-gray-500">This may take a moment</p>
             </div>
           </div>
-        </SidebarProvider>
+        </StandardLayout>
       </AuthGuard>
     );
   }
@@ -63,76 +41,58 @@ const TeamMemberDetailPage = () => {
     
     return (
       <AuthGuard>
-        <SidebarProvider>
-          <div className="w-full min-h-screen flex flex-row bg-gradient-to-br from-gray-50 to-white">
-            <div className="flex-shrink-0">
-              <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-            </div>
-            <div className="flex-1 flex flex-col">
-              <AppHeader />
-              <div style={{ height: HEADER_HEIGHT }} />
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center space-y-4 max-w-md">
-                  {isPreRegistered ? (
-                    <>
-                      <div className="flex justify-center">
-                        <Clock className="h-16 w-16 text-yellow-500" />
-                      </div>
-                      <h2 className="text-2xl font-semibold text-gray-800">
-                        Team Member Not Activated
-                      </h2>
-                      <p className="text-gray-600">
-                        This team member has been invited but hasn't activated their account yet. 
-                        They will appear here once they complete their registration.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex justify-center">
-                        <UserX className="h-16 w-16 text-gray-400" />
-                      </div>
-                      <h2 className="text-2xl font-semibold text-gray-800">
-                        Team Member Not Found
-                      </h2>
-                      <p className="text-gray-600">
-                        {error || 'The requested team member could not be found.'}
-                      </p>
-                    </>
-                  )}
-                  
-                  <div className="text-sm text-gray-500">
-                    Member ID: {id || 'No ID provided'}
+        <StandardLayout>
+          <div className="flex items-center justify-center h-96">
+            <div className="text-center space-y-4 max-w-md">
+              {isPreRegistered ? (
+                <>
+                  <div className="flex justify-center">
+                    <Clock className="h-16 w-16 text-yellow-500" />
                   </div>
-                  
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button onClick={() => navigate('/team-members')} className="bg-brand-primary">
-                      <ArrowLeft className="h-4 w-4 mr-2" />
-                      Back to Team Members
-                    </Button>
+                  <h2 className="text-2xl font-semibold text-gray-800">
+                    Team Member Not Activated
+                  </h2>
+                  <p className="text-gray-600">
+                    This team member has been invited but hasn't activated their account yet. 
+                    They will appear here once they complete their registration.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-center">
+                    <UserX className="h-16 w-16 text-gray-400" />
                   </div>
-                </div>
+                  <h2 className="text-2xl font-semibold text-gray-800">
+                    Team Member Not Found
+                  </h2>
+                  <p className="text-gray-600">
+                    {error || 'The requested team member could not be found.'}
+                  </p>
+                </>
+              )}
+              
+              <div className="text-sm text-gray-500">
+                Member ID: {id || 'No ID provided'}
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button onClick={() => navigate('/team-members')} className="bg-brand-primary">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Team Members
+                </Button>
               </div>
             </div>
           </div>
-        </SidebarProvider>
+        </StandardLayout>
       </AuthGuard>
     );
   }
 
   return (
     <AuthGuard>
-      <SidebarProvider>
-        <div className="w-full min-h-screen flex flex-row bg-gradient-to-br from-gray-50 to-white">
-          <div className="flex-shrink-0">
-            <DashboardSidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-          </div>
-          <div className="flex-1 flex flex-col">
-            <AppHeader />
-            <div style={{ height: HEADER_HEIGHT }} />
-            <TeamMemberDetailContent memberData={memberData} />
-          </div>
-        </div>
-      </SidebarProvider>
+      <StandardLayout className="bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
+        <TeamMemberDetailContent memberData={memberData} />
+      </StandardLayout>
     </AuthGuard>
   );
 };
