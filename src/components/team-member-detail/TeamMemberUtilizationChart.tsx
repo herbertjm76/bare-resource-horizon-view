@@ -69,78 +69,105 @@ export const TeamMemberUtilizationChart: React.FC<TeamMemberUtilizationChartProp
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
-          <Activity className="h-5 w-5 text-brand-violet" />
-          Utilization Analytics
+    <div className="space-y-4 w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-800 flex items-center gap-2">
+          <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-brand-violet" />
+          <span className="hidden sm:inline">Utilization Analytics</span>
+          <span className="sm:hidden">Analytics</span>
         </h2>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
           {getTrendIcon()}
-          <span>
+          <span className="hidden sm:inline">
             {utilization.days7 > utilization.days90 ? 'Trending Up' : 
              utilization.days7 < utilization.days90 ? 'Trending Down' : 'Stable'}
+          </span>
+          <span className="sm:hidden">
+            {utilization.days7 > utilization.days90 ? 'Up' : 
+             utilization.days7 < utilization.days90 ? 'Down' : 'Stable'}
           </span>
         </div>
       </div>
 
-      <Card className="bg-gradient-to-br from-gray-50 to-white border-2">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg text-brand-primary">Performance Metrics</CardTitle>
+      <Card className="bg-gradient-to-br from-gray-50 to-white border-2 w-full">
+        <CardHeader className="pb-2 sm:pb-3">
+          <CardTitle className="text-base sm:text-lg text-brand-primary">Performance Metrics</CardTitle>
         </CardHeader>
-        <CardContent>
-          {/* Modern Chart with Gradients */}
-          <div className="mb-6">
-            <ChartContainer config={chartConfig} className="h-48">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="utilizationGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
-                  </linearGradient>
-                </defs>
-                <XAxis 
-                  dataKey="period" 
-                  tickLine={false}
-                  axisLine={false}
-                  className="text-xs fill-gray-600"
-                />
-                <YAxis 
-                  tickLine={false}
-                  axisLine={false}
-                  className="text-xs fill-gray-600"
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Area
-                  type="monotone"
-                  dataKey="utilization"
-                  stroke="#8b5cf6"
-                  strokeWidth={3}
-                  fill="url(#utilizationGradient)"
-                />
-              </AreaChart>
+        <CardContent className="p-3 sm:p-6">
+          {/* Responsive Chart Container */}
+          <div className="mb-4 sm:mb-6 w-full">
+            <ChartContainer config={chartConfig} className="h-32 sm:h-40 lg:h-48 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart 
+                  data={chartData}
+                  margin={{ 
+                    top: 5, 
+                    right: 5, 
+                    left: 5, 
+                    bottom: 5 
+                  }}
+                >
+                  <defs>
+                    <linearGradient id="utilizationGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis 
+                    dataKey="period" 
+                    tickLine={false}
+                    axisLine={false}
+                    className="text-xs fill-gray-600"
+                    tick={{ fontSize: 10 }}
+                    interval={0}
+                  />
+                  <YAxis 
+                    tickLine={false}
+                    axisLine={false}
+                    className="text-xs fill-gray-600"
+                    tick={{ fontSize: 10 }}
+                    width={30}
+                  />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent />}
+                    contentStyle={{
+                      fontSize: '12px',
+                      padding: '8px'
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="utilization"
+                    stroke="#8b5cf6"
+                    strokeWidth={2}
+                    fill="url(#utilizationGradient)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </ChartContainer>
           </div>
           
-          {/* Modern Stats Cards */}
+          {/* Responsive Stats Cards */}
           <div className="grid grid-cols-1 gap-3">
-            <div className={`p-4 rounded-xl bg-gradient-to-r ${getUtilizationGradient(utilization.days7)} text-white`}>
+            {/* Main Current Week Card */}
+            <div className={`p-3 sm:p-4 rounded-xl bg-gradient-to-r ${getUtilizationGradient(utilization.days7)} text-white`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-2xl font-bold">{utilization.days7}%</div>
-                  <p className="text-sm opacity-90">Current Week</p>
+                  <div className="text-xl sm:text-2xl font-bold">{utilization.days7}%</div>
+                  <p className="text-xs sm:text-sm opacity-90">Current Week</p>
                 </div>
-                <TrendingUp className="h-6 w-6 opacity-80" />
+                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 opacity-80" />
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-lg bg-gray-50 border">
-                <div className="text-lg font-semibold text-gray-800">{utilization.days30}%</div>
+            {/* Responsive Sub-stats */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="p-2 sm:p-3 rounded-lg bg-gray-50 border">
+                <div className="text-sm sm:text-lg font-semibold text-gray-800">{utilization.days30}%</div>
                 <p className="text-xs text-gray-600">30-Day Avg</p>
               </div>
-              <div className="p-3 rounded-lg bg-gray-50 border">
-                <div className="text-lg font-semibold text-gray-800">{utilization.days90}%</div>
+              <div className="p-2 sm:p-3 rounded-lg bg-gray-50 border">
+                <div className="text-sm sm:text-lg font-semibold text-gray-800">{utilization.days90}%</div>
                 <p className="text-xs text-gray-600">90-Day Avg</p>
               </div>
             </div>
