@@ -46,7 +46,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
         style={{ width: '200px', minWidth: '200px' }}
       >
         <div className="flex flex-col">
-          <div className="text-sm font-medium line-clamp-1 mb-0.5">{project.name || 'Untitled Project'}</div>
+          <div className="text-sm font-bold line-clamp-1 mb-0.5">{project.name || 'Untitled Project'}</div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-0.5">
               <Users className="h-3 w-3" />
@@ -54,7 +54,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             </div>
             
             {totalHours > 0 && (
-              <div className="flex items-center gap-0.5 bg-white/80 rounded-full px-2.5 py-0.5">
+              <div className="flex items-center gap-1 bg-white/80 rounded-full px-2.5 py-0.5">
                 <Clock className="h-3 w-3" />
                 <span className="font-medium text-sm">{totalHours}h</span>
               </div>
