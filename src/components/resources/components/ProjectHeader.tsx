@@ -24,13 +24,21 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   // Check if the project has fees set
   const hasFeesSet = project.fee > 0 || (project.stage_fees && project.stage_fees.length > 0);
 
+  const handleToggleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Toggle button clicked, isExpanded:', isExpanded);
+    onToggleExpand();
+  };
+
   return (
     <>
       {/* Fixed counter column */}
       <td className={`sticky-left-0 ${headerBgClass} z-10 p-1 w-12 text-center`}>
         <button 
-          onClick={onToggleExpand} 
-          className="rounded-full p-1 hover:bg-white/30 transition-colors"
+          onClick={handleToggleClick}
+          className="rounded-full p-1 hover:bg-white/30 transition-colors cursor-pointer"
+          type="button"
         >
           {isExpanded ? (
             <ChevronDown className="h-4 w-4 text-foreground/80" />
