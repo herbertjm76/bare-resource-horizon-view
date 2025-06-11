@@ -1,191 +1,227 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Lightbulb, AlertTriangle, CheckCircle, TrendingUp, Calendar, Info } from 'lucide-react';
+import { Lightbulb, AlertTriangle, CheckCircle, TrendingUp, Calendar, Info, ChevronRight, Brain, DollarSign, Users, Target, RefreshCw, UserX } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
 import { UnifiedDashboardData } from '../hooks/useDashboardData';
+import { AdvancedInsightsService, AdvancedInsight } from '@/services/advancedInsightsService';
 
 interface UnifiedSmartInsightsCardProps {
   data: UnifiedDashboardData;
 }
 
-// Unified priority system for colors and icons
-const getPriorityConfig = (priority: string) => {
-  switch (priority) {
-    case 'high':
-      return {
-        color: 'bg-red-100 text-red-800 border-red-200',
-        bgColor: 'bg-red-100 text-red-600',
-        icon: AlertTriangle
-      };
-    case 'medium':
-      return {
-        color: 'bg-orange-100 text-orange-800 border-orange-200',
-        bgColor: 'bg-orange-100 text-orange-600',
-        icon: TrendingUp
-      };
-    case 'low':
-      return {
-        color: 'bg-blue-100 text-blue-800 border-blue-200',
-        bgColor: 'bg-blue-100 text-blue-600',
-        icon: Info
-      };
-    default:
-      return {
-        color: 'bg-gray-100 text-gray-800 border-gray-200',
-        bgColor: 'bg-gray-100 text-gray-600',
-        icon: CheckCircle
-      };
+// Enhanced priority system with more nuanced colors
+const getPriorityConfig = (type: string, priority: string) => {
+  const configs = {
+    critical: {
+      color: 'bg-red-100 text-red-800 border-red-200',
+      bgColor: 'bg-red-100 text-red-600',
+      cardBg: 'bg-gradient-to-br from-red-50 via-red-50 to-red-100/80 border-red-200/60 hover:border-red-300/80',
+      icon: AlertTriangle
+    },
+    warning: {
+      color: 'bg-orange-100 text-orange-800 border-orange-200',
+      bgColor: 'bg-orange-100 text-orange-600',
+      cardBg: 'bg-gradient-to-br from-orange-50 via-orange-50 to-orange-100/80 border-orange-200/60 hover:border-orange-300/80',
+      icon: TrendingUp
+    },
+    opportunity: {
+      color: 'bg-blue-100 text-blue-800 border-blue-200',
+      bgColor: 'bg-blue-100 text-blue-600',
+      cardBg: 'bg-gradient-to-br from-blue-50 via-blue-50 to-blue-100/80 border-blue-200/60 hover:border-blue-300/80',
+      icon: Target
+    },
+    success: {
+      color: 'bg-green-100 text-green-800 border-green-200',
+      bgColor: 'bg-green-100 text-green-600',
+      cardBg: 'bg-gradient-to-br from-green-50 via-green-50 to-green-100/80 border-green-200/60 hover:border-green-300/80',
+      icon: CheckCircle
+    },
+    trend: {
+      color: 'bg-purple-100 text-purple-800 border-purple-200',
+      bgColor: 'bg-purple-100 text-purple-600',
+      cardBg: 'bg-gradient-to-br from-purple-50 via-purple-50 to-purple-100/80 border-purple-200/60 hover:border-purple-300/80',
+      icon: TrendingUp
+    }
+  };
+  
+  return configs[type as keyof typeof configs] || configs.success;
+};
+
+// Enhanced icon mapping for different insight types
+const getInsightIcon = (iconName: string) => {
+  const iconMap = {
+    'alert-triangle': AlertTriangle,
+    'check-circle': CheckCircle,
+    'trending-up': TrendingUp,
+    'trending-down': TrendingUp,
+    'calendar': Calendar,
+    'brain': Brain,
+    'dollar-sign': DollarSign,
+    'users': Users,
+    'target': Target,
+    'refresh-cw': RefreshCw,
+    'user-x': UserX,
+    'balance-scale': Users, // Using Users as placeholder for balance
+    'info': Info
+  };
+  
+  return iconMap[iconName as keyof typeof iconMap] || Info;
+};
+
+const getTimeframeColor = (timeframe: string) => {
+  switch (timeframe) {
+    case 'immediate': return 'bg-red-500';
+    case 'short-term': return 'bg-orange-500';
+    case 'medium-term': return 'bg-blue-500';
+    case 'long-term': return 'bg-green-500';
+    default: return 'bg-gray-500';
   }
 };
 
-// Get specific icons for insight types while maintaining priority colors
-const getInsightIcon = (iconName: string, priority: string) => {
-  const priorityConfig = getPriorityConfig(priority);
-  
-  switch (iconName) {
-    case 'alert-triangle': return AlertTriangle;
-    case 'check-circle': return CheckCircle;
-    case 'trending-up': return TrendingUp;
-    case 'calendar': return Calendar;
-    default: return priorityConfig.icon;
-  }
+const getCategoryEmoji = (category: string) => {
+  const emojis = {
+    capacity: '⚡',
+    efficiency: '🎯',
+    risk: '⚠️',
+    growth: '📈',
+    financial: '💰',
+    team: '👥'
+  };
+  return emojis[category as keyof typeof emojis] || '📊';
 };
 
 export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> = ({ data }) => {
-  // Generate insights focused on resourcing and capacity
-  const generateInsights = () => {
-    const insights = [];
-    const { currentUtilizationRate, activeProjects, totalTeamSize } = data;
+  const [expandedInsight, setExpandedInsight] = useState<string | null>(null);
+  
+  // Generate advanced insights using the new service
+  const insights = AdvancedInsightsService.generateAdvancedInsights(data);
+  
+  // Count insights by priority for header badge
+  const highPriorityInsights = insights.filter(i => i.priority === 'high').length;
+  const criticalInsights = insights.filter(i => i.type === 'critical').length;
 
-    // Utilization and capacity insights
-    if (currentUtilizationRate > 90) {
-      insights.push({
-        type: 'warning',
-        icon: 'alert-triangle',
-        title: 'Team Over-Capacity',
-        description: `Team is at ${currentUtilizationRate}% utilization - consider workload redistribution or additional resources`,
-        priority: 'high',
-        metric: `${currentUtilizationRate}% team utilization`
-      });
-    } else if (currentUtilizationRate < 50) {
-      insights.push({
-        type: 'info',
-        icon: 'trending-up',
-        title: 'Available Capacity',
-        description: `Team has ${100 - currentUtilizationRate}% available capacity for new projects or strategic initiatives`,
-        priority: 'medium',
-        metric: `${100 - currentUtilizationRate}% available capacity`
-      });
-    } else {
-      insights.push({
-        type: 'success',
-        icon: 'check-circle',
-        title: 'Optimal Resource Utilization',
-        description: `Team utilization at ${currentUtilizationRate}% is within the optimal range for sustainable productivity`,
-        priority: 'low',
-        metric: `${currentUtilizationRate}% optimal range`
-      });
-    }
-
-    // Project load and resource allocation insights
-    if (activeProjects > 10 && totalTeamSize < 8) {
-      insights.push({
-        type: 'warning',
-        icon: 'calendar',
-        title: 'High Project-to-Team Ratio',
-        description: `${activeProjects} active projects for ${totalTeamSize} team members may strain resources - consider prioritization`,
-        priority: 'medium',
-        metric: `${(activeProjects / totalTeamSize).toFixed(1)} projects per team member`
-      });
-    } else if (activeProjects === 0) {
-      insights.push({
-        type: 'info',
-        icon: 'calendar',
-        title: 'Full Resource Availability',
-        description: 'No active projects - all team resources available for new assignments',
-        priority: 'low',
-        metric: 'No current projects'
-      });
-    }
-
-    // Team scaling insights
-    if (totalTeamSize < 5 && activeProjects > 8) {
-      insights.push({
-        type: 'info',
-        icon: 'trending-up',
-        title: 'Consider Team Expansion',
-        description: `Small team of ${totalTeamSize} managing ${activeProjects} projects - scaling may improve capacity`,
-        priority: 'medium',
-        metric: `${totalTeamSize} team members`
-      });
-    }
-
-    // Capacity buffer insights
-    const capacityBuffer = 100 - currentUtilizationRate;
-    if (capacityBuffer < 20 && currentUtilizationRate > 70) {
-      insights.push({
-        type: 'warning',
-        icon: 'alert-triangle',
-        title: 'Limited Capacity Buffer',
-        description: `Only ${capacityBuffer}% capacity buffer remaining - risk of overallocation with new work`,
-        priority: 'high',
-        metric: `${capacityBuffer}% capacity buffer`
-      });
-    }
-
-    return insights.length > 0 ? insights : [{
-      type: 'success',
-      icon: 'check-circle',
-      title: 'Optimal Resource Balance',
-      description: 'Team capacity and project load are well-balanced for sustained performance',
-      priority: 'low',
-      metric: 'Balanced allocation'
-    }];
+  const toggleInsightExpansion = (insightId: string) => {
+    setExpandedInsight(expandedInsight === insightId ? null : insightId);
   };
 
-  const insights = generateInsights();
-  const highPriorityInsights = insights.filter(i => i.priority === 'high').length;
+  if (insights.length === 0) {
+    return (
+      <Card className="rounded-2xl border-2 border-zinc-300 bg-white shadow-sm h-[500px]">
+        <CardContent className="p-3 sm:p-6 h-full flex flex-col items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="p-4 rounded-full bg-brand-violet/10 mx-auto w-16 h-16 flex items-center justify-center">
+              <Brain className="h-8 w-8 text-brand-violet" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-medium text-gray-900">Analyzing Team Performance</h3>
+              <p className="text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
+                Our AI is processing your team data to generate actionable insights and recommendations.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="rounded-2xl border-2 border-zinc-300 bg-white shadow-sm h-[500px]">
       <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
-        {/* Title inside the card */}
+        {/* Enhanced Header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
-            <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5" />
+            <div className="p-1.5 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
+              <Brain className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+            </div>
             Smart Insights
           </h2>
           <StandardizedHeaderBadge>
-            {highPriorityInsights > 0 ? `${highPriorityInsights} High Priority` : `${insights.length} Insights`}
+            {criticalInsights > 0 ? `${criticalInsights} Critical` : 
+             highPriorityInsights > 0 ? `${highPriorityInsights} High Priority` : 
+             `${insights.length} Insights`}
           </StandardizedHeaderBadge>
         </div>
         
-        {/* Scrollable content */}
+        {/* Scrollable insights content */}
         <ScrollArea className="flex-1">
-          <div className="pr-4 space-y-4">
-            {insights.slice(0, 5).map((insight, index) => {
-              const priorityConfig = getPriorityConfig(insight.priority);
-              const IconComponent = getInsightIcon(insight.icon, insight.priority);
+          <div className="pr-4 space-y-3">
+            {insights.map((insight, index) => {
+              const priorityConfig = getPriorityConfig(insight.type, insight.priority);
+              const IconComponent = getInsightIcon(insight.icon);
+              const isExpanded = expandedInsight === insight.id;
               
               return (
-                <div key={index} className="flex items-start gap-3 p-3 rounded-lg border bg-gray-50">
-                  <div className={`p-1 rounded ${priorityConfig.bgColor}`}>
-                    <IconComponent className="h-4 w-4" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-medium text-gray-900">{insight.title}</h4>
-                      <Badge className={`${priorityConfig.color} border text-xs`}>
-                        {insight.priority}
-                      </Badge>
+                <div 
+                  key={insight.id} 
+                  className={`group rounded-xl border-2 p-4 transition-all duration-300 hover:shadow-lg cursor-pointer ${priorityConfig.cardBg}`}
+                  onClick={() => toggleInsightExpansion(insight.id)}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`p-2.5 rounded-xl flex-shrink-0 transition-transform group-hover:scale-110 ${priorityConfig.bgColor}`}>
+                      <IconComponent className="h-5 w-5" />
                     </div>
-                    <p className="text-sm text-gray-600">{insight.description}</p>
-                    {insight.metric && (
-                      <p className="text-xs text-gray-500 mt-1">{insight.metric}</p>
-                    )}
+                    
+                    <div className="flex-1 min-w-0 space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
+                            <span className="text-lg">{getCategoryEmoji(insight.category)}</span>
+                            <h4 className="font-semibold text-gray-900 text-sm leading-tight">
+                              {insight.title}
+                            </h4>
+                            <Badge variant="outline" className={`text-xs px-2 py-0.5 font-medium ${priorityConfig.color}`}>
+                              {insight.priority}
+                            </Badge>
+                            <div className="flex items-center gap-1">
+                              <div className={`w-2 h-2 rounded-full ${getTimeframeColor(insight.timeframe)}`}></div>
+                              <span className="text-xs text-gray-500 capitalize">{insight.timeframe}</span>
+                            </div>
+                          </div>
+                          <p className="text-sm text-gray-700 leading-relaxed mb-2">
+                            {insight.description}
+                          </p>
+                          
+                          {/* Metric Badge */}
+                          <div className="bg-white/60 rounded-lg px-3 py-2 border border-white/40 mb-2">
+                            <p className="text-xs font-medium text-gray-800">
+                              📊 {insight.metric}
+                            </p>
+                          </div>
+                          
+                          {/* Expandable content */}
+                          {isExpanded && (
+                            <div className="mt-3 space-y-3 animate-in slide-in-from-top-2 duration-200">
+                              <div className="bg-white/80 rounded-lg p-3 border border-white/60">
+                                <h5 className="font-medium text-gray-900 text-xs mb-1">💥 IMPACT</h5>
+                                <p className="text-xs text-gray-700 leading-relaxed">{insight.impact}</p>
+                              </div>
+                              
+                              <div className="bg-white/80 rounded-lg p-3 border border-white/60">
+                                <h5 className="font-medium text-gray-900 text-xs mb-1">🎯 RECOMMENDATION</h5>
+                                <p className="text-xs text-gray-700 leading-relaxed">{insight.recommendation}</p>
+                              </div>
+                              
+                              <div className="flex items-center justify-between text-xs text-gray-500">
+                                <span>Confidence: {insight.confidence}%</span>
+                                <span className="capitalize">{insight.timeframe} action needed</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-gray-700 flex-shrink-0"
+                        >
+                          <ChevronRight className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
