@@ -3,19 +3,22 @@ import React, { useState, useCallback } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { ResourceAllocationGrid } from '@/components/resources/ResourceAllocationGrid';
 import { ProjectResourcingHeader } from './ProjectResourcing/components/ProjectResourcingHeader';
-import { ResourcesToolbar } from '@/components/resources/ResourcesToolbar';
+import { ProjectResourcingFilterRow } from './ProjectResourcing/components/ProjectResourcingFilterRow';
 import { useViewBasedDates } from '@/hooks/useViewBasedDates';
 import { ViewOption } from '@/components/resources/filters/ViewSelector';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
+import { format, startOfMonth } from 'date-fns';
 
 const ProjectResourcing = () => {
   // State management
   const [selectedView, setSelectedView] = useState<ViewOption>('3-months');
+  const [selectedDate, setSelectedDate] = useState(startOfMonth(new Date()));
   const [filters, setFilters] = useState({
     office: "all",
     country: "all",
-    manager: "all"
+    manager: "all",
+    periodToShow: 12
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [displayOptions, setDisplayOptions] = useState({
@@ -23,6 +26,7 @@ const ProjectResourcing = () => {
     selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri'],
     weekStartsOnSunday: false
   });
+  const [expandedProjects, setExpandedProjects] = useState<string[]>([]);
 
   // Get calculated dates based on view
   const { startDate, periodToShow } = useViewBasedDates({ selectedView });
@@ -37,8 +41,13 @@ const ProjectResourcing = () => {
   }, []);
 
   // Handle display option changes
-  const handleDisplayOptionChange = useCallback((key: string, value: any) => {
-    setDisplayOptions(prev => ({ ...prev, [key]: value }));
+  const handleDisplayOptionChange = useCallback((option: string, value: boolean | string[]) => {
+    setDisplayOptions(prev => ({ ...prev, [option]: value }));
+  }, []);
+
+  // Handle period changes
+  const handlePeriodChange = useCallback((period: number) => {
+    setFilters(prev => ({ ...prev, periodToShow: period }));
   }, []);
 
   // Calculate active filters count
@@ -50,6 +59,28 @@ const ProjectResourcing = () => {
     setSearchTerm,
     setDisplayOptions
   );
+
+  // Expand/collapse handlers
+  const handleExpandAll = () => {
+    // This would expand all projects - implement with actual project IDs
+    setExpandedProjects(['all']);
+  };
+
+  const handleCollapseAll = () => {
+    setExpandedProjects([]);
+  };
+
+  // Mock data for filters
+  const officeOptions = ['London', 'New York', 'Singapore', 'Tokyo', 'Paris'];
+  const countryOptions = ['UK', 'USA', 'Singapore', 'Japan', 'France'];
+  const managerOptions = [
+    { id: '1', name: 'John Smith' },
+    { id: '2', name: 'Jane Doe' },
+    { id: '3', name: 'Alex Johnson' }
+  ];
+
+  // Calculate project count (mock for now)
+  const projectCount = 4;
 
   console.log('ProjectResourcing render:', {
     selectedView,
@@ -63,20 +94,30 @@ const ProjectResourcing = () => {
       <OfficeSettingsProvider>
         <div className="flex-1 space-y-6 p-4 md:p-8">
           <ProjectResourcingHeader 
-            projectCount={0}
+            projectCount={projectCount}
             periodToShow={periodToShow}
           />
           
-          <ResourcesToolbar
+          <ProjectResourcingFilterRow
+            selectedDate={selectedDate}
+            onDateChange={setSelectedDate}
+            periodToShow={filters.periodToShow}
+            onPeriodChange={handlePeriodChange}
             filters={filters}
             searchTerm={searchTerm}
-            displayOptions={displayOptions}
-            selectedView={selectedView}
             onFilterChange={handleFilterChange}
-            onDisplayOptionChange={handleDisplayOptionChange}
-            onViewChange={setSelectedView}
+            onSearchChange={setSearchTerm}
+            officeOptions={officeOptions}
+            countryOptions={countryOptions}
+            managers={managerOptions}
             activeFiltersCount={activeFiltersCount}
+            displayOptions={displayOptions}
+            onDisplayOptionChange={handleDisplayOptionChange}
             onClearFilters={clearAllFilters}
+            onExpandAll={handleExpandAll}
+            onCollapseAll={handleCollapseAll}
+            expandedProjects={expandedProjects}
+            totalProjects={projectCount}
           />
           
           <ResourceAllocationGrid
