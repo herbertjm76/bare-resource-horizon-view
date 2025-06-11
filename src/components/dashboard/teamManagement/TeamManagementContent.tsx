@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { TeamMember } from '../types';
+import { TeamMember, Invite } from '../types';
 import TeamMemberSection from '../TeamMemberSection';
 import PendingInvitesSection from '../PendingInvitesSection';
-import { Invite } from '../types';
 
 interface TeamManagementContentProps {
   allMembers: TeamMember[];
