@@ -38,7 +38,7 @@ export const useResourcePlanningData = (memberId: string) => {
         .eq('resource_id', memberId)
         .eq('resource_type', 'active')
         .eq('company_id', company.id)
-        .is('hours', 'not.null'); // Only get allocations with hours
+        .not('hours', 'is', null); // Fixed TypeScript error
         
       if (error) throw error;
       
