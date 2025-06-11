@@ -11,7 +11,7 @@ export const UnifiedHolidayCard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Card className="rounded-2xl border-0 shadow-sm bg-white h-[600px]">
+      <Card className="rounded-2xl border-0 shadow-sm bg-white h-[500px]">
         <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
           <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2 mb-4">
             <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -36,7 +36,7 @@ export const UnifiedHolidayCard: React.FC = () => {
   }
 
   return (
-    <Card className="rounded-2xl border-0 shadow-sm bg-white h-[600px]">
+    <Card className="rounded-2xl border-0 shadow-sm bg-white h-[500px]">
       <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
         {/* Title inside the card */}
         <div className="flex items-center justify-between mb-4">

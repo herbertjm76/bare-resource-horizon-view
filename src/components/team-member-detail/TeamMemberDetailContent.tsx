@@ -101,7 +101,7 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Column 1: Utilization Analytics */}
             <div className="lg:col-span-1">
-              <Card className="h-[600px]">
+              <Card className="h-[500px]">
                 <CardContent className="p-3 sm:p-6 h-full overflow-hidden">
                   <TeamMemberUtilizationChart 
                     memberId={memberData.id} 
@@ -113,7 +113,7 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
 
             {/* Column 2: Smart Insights */}
             <div className="lg:col-span-1">
-              <Card className="h-[600px]">
+              <Card className="h-[500px]">
                 <CardContent className="p-3 sm:p-6 h-full overflow-hidden">
                   <TeamMemberSmartInsights 
                     memberId={memberData.id}
@@ -125,7 +125,7 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
 
             {/* Column 3: Project Allocations */}
             <div className="lg:col-span-1">
-              <Card className="h-[600px]">
+              <Card className="h-[500px]">
                 <CardContent className="p-3 sm:p-6 h-full overflow-hidden">
                   <TeamMemberProjectAllocations 
                     memberId={memberData.id}

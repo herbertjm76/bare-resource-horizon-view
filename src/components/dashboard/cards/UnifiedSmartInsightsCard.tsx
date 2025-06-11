@@ -141,7 +141,7 @@ export const UnifiedSmartInsightsCard: React.FC<SmartInsightsProps> = ({
   const insights = generateInsights();
 
   return (
-    <Card className="rounded-2xl border-0 shadow-sm bg-white h-[600px]">
+    <Card className="rounded-2xl border-0 shadow-sm bg-white h-[500px]">
       <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
         {/* Title inside the card */}
         <div className="flex items-center justify-between mb-4">

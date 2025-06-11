@@ -27,8 +27,15 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
 }) => {
   const availableMembers = staffData.filter(member => member.availability >= 60).length;
 
+  // Transform staffData to match the expected StaffStatusCard interface
+  const transformedStaffData = staffData.map(member => ({
+    ...member,
+    first_name: member.first_name || member.name?.split(' ')[0] || '',
+    last_name: member.last_name || member.name?.split(' ').slice(1).join(' ') || '',
+  }));
+
   return (
-    <Card className="rounded-2xl border-0 shadow-sm bg-white h-[600px]">
+    <Card className="rounded-2xl border-0 shadow-sm bg-white h-[500px]">
       <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
         {/* Title inside the card */}
         <div className="flex items-center justify-between mb-4">
@@ -44,8 +51,8 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
         {/* Original StaffStatusCard content */}
         <div className="flex-1 overflow-hidden [&_.card]:border-0 [&_.card]:shadow-none [&_.card]:bg-transparent [&_h3]:hidden [&_.flex.items-center.gap-2]:hidden">
           <StaffStatusCard 
-            staffData={staffData} 
-            selectedTimeRange={selectedTimeRange}
+            staffData={transformedStaffData} 
+            selectedTimeRange={selectedTimeRange as any}
           />
         </div>
       </CardContent>
