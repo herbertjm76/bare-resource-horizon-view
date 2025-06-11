@@ -25,15 +25,15 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Resource Planning & Allocation</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold text-gray-800">Resource Planning</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="border-2">
-              <div className="p-6">
-                <div className="h-4 bg-gray-200 rounded animate-pulse w-24 mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded animate-pulse w-16 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded animate-pulse w-32"></div>
+            <Card key={i} className="border">
+              <div className="p-4">
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-24 mb-2"></div>
+                <div className="h-6 bg-gray-200 rounded animate-pulse w-16 mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded animate-pulse w-16"></div>
               </div>
             </Card>
           ))}
@@ -44,16 +44,16 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
 
   if (hasError) {
     return (
-      <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Resource Planning & Allocation</h2>
-        <Card className="border-2 border-red-200 bg-red-50">
-          <CardContent className="p-6 text-center">
-            <AlertTriangle className="h-12 w-12 mx-auto text-red-500 mb-3" />
-            <h3 className="text-lg font-semibold text-red-800 mb-2">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold text-gray-800">Resource Planning</h2>
+        <Card className="border border-red-200 bg-red-50">
+          <CardContent className="p-4 text-center">
+            <AlertTriangle className="h-8 w-8 mx-auto text-red-500 mb-2" />
+            <h3 className="text-lg font-semibold text-red-800 mb-1">
               Unable to Load Resource Data
             </h3>
-            <p className="text-red-600">
-              There was an error loading the resource planning information. Please try refreshing the page.
+            <p className="text-sm text-red-600">
+              There was an error loading the resource planning information.
             </p>
           </CardContent>
         </Card>
@@ -73,7 +73,7 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-semibold text-gray-800">Resource Planning & Allocation</h2>
+      <h2 className="text-2xl font-semibold text-gray-800">Resource Planning</h2>
 
       {/* Planning Overview Metrics */}
       <ResourcePlanningMetrics
@@ -83,17 +83,19 @@ export const TeamMemberResourcePlanning: React.FC<TeamMemberResourcePlanningProp
         activeProjectsCount={activeProjects?.length || 0}
       />
 
-      {/* Utilization Trend */}
-      <UtilizationTrendAnalysis
-        historicalUtilization={historicalUtilization}
-        historicalAverage={historicalAverage}
-        averageFutureUtilization={averageFutureUtilization}
-        underutilizedWeeks={underutilizedWeeks}
-        overallocatedWeeks={overallocatedWeeks}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Utilization Trend */}
+        <UtilizationTrendAnalysis
+          historicalUtilization={historicalUtilization}
+          historicalAverage={historicalAverage}
+          averageFutureUtilization={averageFutureUtilization}
+          underutilizedWeeks={underutilizedWeeks}
+          overallocatedWeeks={overallocatedWeeks}
+        />
 
-      {/* Current Project Assignments */}
-      <CurrentProjectAssignments activeProjects={activeProjects} />
+        {/* Current Project Assignments */}
+        <CurrentProjectAssignments activeProjects={activeProjects} />
+      </div>
 
       {/* Resource Planning Recommendations */}
       <PlanningRecommendations

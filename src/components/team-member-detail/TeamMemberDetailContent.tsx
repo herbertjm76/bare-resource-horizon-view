@@ -7,7 +7,7 @@ import { TeamMemberOverview } from './TeamMemberOverview';
 import { TeamMemberMetrics } from './TeamMemberMetrics';
 import { TeamMemberProjects } from './TeamMemberProjects';
 import { TeamMemberResourcePlanning } from './TeamMemberResourcePlanning';
-import { TeamMemberExpandedInsights } from './TeamMemberExpandedInsights';
+import { TeamMemberDetailInsights } from './TeamMemberDetailInsights';
 import { Card, CardContent } from '@/components/ui/card';
 import { useUserSession } from '@/hooks/useUserSession';
 import { useQuery } from '@tanstack/react-query';
@@ -43,6 +43,7 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
       return data;
     },
     enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
   });
 
   const userRole = currentUserProfile?.role || 'member';
@@ -78,20 +79,22 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
         {/* Member Overview Card - Always visible */}
         <TeamMemberOverview member={memberData} />
 
-        {/* Expanded Insights Section */}
+        {/* Detailed Insights - Optimized Section */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <TrendingUp className="h-6 w-6 text-brand-violet" />
             <h2 className="text-2xl font-bold text-brand-primary">Detailed Insights</h2>
           </div>
-          <TeamMemberExpandedInsights memberId={memberData.id} />
+          <TeamMemberDetailInsights memberId={memberData.id} />
         </div>
 
-        {/* Utilization Metrics - Always visible (MVP feature) */}
+        {/* Utilization Metrics - Lightweight version */}
         <TeamMemberMetrics memberId={memberData.id} />
 
-        {/* Resource Planning Insights - Always visible */}
-        <TeamMemberResourcePlanning memberId={memberData.id} />
+        {/* Resource Planning Insights - Optional with lazy loading */}
+        {canViewManagementFeatures && (
+          <TeamMemberResourcePlanning memberId={memberData.id} />
+        )}
 
         {/* Management Features - Only for admin, owner, or PM */}
         {canViewManagementFeatures ? (

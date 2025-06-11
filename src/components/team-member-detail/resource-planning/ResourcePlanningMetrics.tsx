@@ -24,8 +24,8 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
   activeProjectsCount
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <Card className="border-2 bg-blue-50 border-blue-200">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <Card className="border bg-blue-50 border-blue-200">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-gray-600">Weekly Capacity</CardTitle>
           <Clock className="h-4 w-4 text-gray-500" />
@@ -38,7 +38,7 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
         </CardContent>
       </Card>
 
-      <Card className="border-2 bg-green-50 border-green-200">
+      <Card className="border bg-green-50 border-green-200">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-gray-600">Avg Future Utilization</CardTitle>
           <TrendingUp className="h-4 w-4 text-gray-500" />
@@ -51,7 +51,7 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
         </CardContent>
       </Card>
 
-      <Card className="border-2 bg-orange-50 border-orange-200">
+      <Card className="border bg-orange-50 border-orange-200">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-gray-600">Overallocated Weeks</CardTitle>
           <AlertTriangle className="h-4 w-4 text-gray-500" />
@@ -64,7 +64,7 @@ export const ResourcePlanningMetrics: React.FC<ResourcePlanningMetricsProps> = (
         </CardContent>
       </Card>
 
-      <Card className="border-2 bg-purple-50 border-purple-200">
+      <Card className="border bg-purple-50 border-purple-200">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium text-gray-600">Active Projects</CardTitle>
           <Briefcase className="h-4 w-4 text-gray-500" />
