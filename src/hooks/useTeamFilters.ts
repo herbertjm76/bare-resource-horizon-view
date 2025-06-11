@@ -1,10 +1,10 @@
 
 import { useMemo, useState } from 'react';
-import { Profile } from '@/components/dashboard/types';
+import { TeamMember } from '@/components/dashboard/types';
 
 type FilterType = 'all' | 'department' | 'location';
 
-export const useTeamFilters = (allMembers: Profile[]) => {
+export const useTeamFilters = (allMembers: TeamMember[]) => {
   // State for active filters
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [filterValue, setFilterValue] = useState<string>('');
