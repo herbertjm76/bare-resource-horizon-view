@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Briefcase, LucideIcon } from 'lucide-react';
+import { LayoutDashboard, LucideIcon } from 'lucide-react';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
+import { useCompany } from '@/context/CompanyContext';
 
 interface ModernDashboardHeaderProps {
   totalTeamMembers?: number;
@@ -25,9 +26,12 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
     unifiedData = null;
   }
 
+  const { company } = useCompany();
+
   // Use custom title and icon if provided, otherwise use defaults
-  const headerTitle = customTitle || 'Dashboard Overview';
-  const HeaderIcon = customIcon || Briefcase;
+  const companyName = company?.name || 'Company';
+  const headerTitle = customTitle || `${companyName} Dashboard`;
+  const HeaderIcon = customIcon || LayoutDashboard;
 
   return (
     <div className="bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20 border-b border-gray-200/50">
@@ -35,7 +39,7 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
         {/* Main Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <h1 className="text-3xl font-bold text-brand-primary flex items-center gap-3">
               <HeaderIcon className="h-8 w-8 text-brand-primary" />
               {headerTitle}
             </h1>
