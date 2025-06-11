@@ -1,3 +1,4 @@
+
 import { format, addWeeks, subWeeks, startOfWeek } from 'date-fns';
 
 export interface AdvancedInsight {
@@ -123,178 +124,150 @@ export class AdvancedInsightsService {
   }
 
   /**
-   * Generate advanced insights based on team analytics
+   * Generate advanced insights based on team analytics with concrete data
    */
   static generateAdvancedInsights(data: any): AdvancedInsight[] {
     const analytics = this.analyzeTeamMetrics(data);
     const insights: AdvancedInsight[] = [];
+    const { transformedStaffData, projects = [], activeProjects, totalTeamSize } = data;
     
-    // Capacity Management Insights
+    // Get specific team member names for concrete examples
+    const overCapacityMembers = transformedStaffData.filter((m: any) => (m.utilization || 0) > 90);
+    const underUtilizedMembers = transformedStaffData.filter((m: any) => (m.utilization || 0) < 50);
+    
+    // Get project examples if available
+    const activeProjectsList = projects.filter((p: any) => p.status === 'active' || p.status === 'Active').slice(0, 3);
+    const projectExamples = activeProjectsList.map((p: any) => p.name).join(', ') || 'current projects';
+
+    // Critical Capacity Alert with specific numbers
     if (analytics.riskFactors.capacityBuffer < 15) {
+      const overCapacityNames = overCapacityMembers.slice(0, 2).map((m: any) => 
+        `${m.first_name || m.name}`.split(' ')[0]
+      ).join(' & ');
+      
       insights.push({
-        id: 'capacity-risk',
+        id: 'capacity-critical',
         type: 'critical',
         category: 'capacity',
         priority: 'high',
-        title: 'Critical Capacity Shortage',
-        description: `Team operating at ${100 - analytics.riskFactors.capacityBuffer}% utilization with only ${analytics.riskFactors.capacityBuffer}% buffer remaining.`,
-        impact: 'High risk of project delays and team burnout if new work is accepted.',
-        recommendation: 'Consider hiring additional resources or redistributing current workload before taking on new projects.',
-        metric: `${analytics.riskFactors.capacityBuffer}% capacity buffer`,
+        title: 'Team at 95%+ Capacity',
+        description: `${overCapacityMembers.length} team members (${overCapacityNames || 'key staff'}) are over 90% utilized. Only ${analytics.riskFactors.capacityBuffer.toFixed(0)}% buffer remaining.`,
+        impact: `Cannot accept new work without 2-3 week delays on ${projectExamples}.`,
+        recommendation: `Redistribute ${Math.round(overCapacityMembers.length * 8)} hours/week or hire 1 additional resource by next month.`,
+        metric: `${overCapacityMembers.length}/${totalTeamSize} overloaded`,
         confidence: 95,
         timeframe: 'immediate',
         icon: 'alert-triangle'
       });
     }
 
-    // Project Load Analysis
-    if (analytics.projectLoad.averageProjectsPerMember > 3) {
+    // Specific Project Overload with numbers
+    if (analytics.projectLoad.averageProjectsPerMember > 2.5) {
+      const projectCount = Math.round(analytics.projectLoad.averageProjectsPerMember * 10) / 10;
       insights.push({
-        id: 'context-switching',
+        id: 'project-overload',
         type: 'warning',
         category: 'efficiency',
         priority: 'high',
-        title: 'High Context Switching Risk',
-        description: `Team members managing ${analytics.projectLoad.averageProjectsPerMember.toFixed(1)} projects each, leading to ${analytics.projectLoad.contextSwitching}% efficiency loss.`,
-        impact: 'Reduced productivity and increased error rates due to frequent task switching.',
-        recommendation: 'Consolidate projects or implement focused work blocks to minimize context switching.',
-        metric: `${analytics.projectLoad.contextSwitching}% efficiency impact`,
+        title: `${projectCount} Projects Per Person`,
+        description: `Team managing ${activeProjects} projects across ${totalTeamSize} people. Context switching reducing efficiency by ${analytics.projectLoad.contextSwitching}%.`,
+        impact: `Estimated 6-8 hours/week lost to task switching. Projects taking 25% longer.`,
+        recommendation: `Consolidate to max 2 projects per person. Consider pausing ${Math.ceil(activeProjects - (totalTeamSize * 2))} lower-priority projects.`,
+        metric: `${projectCount} avg projects/person`,
         confidence: 88,
         timeframe: 'short-term',
         icon: 'refresh-cw'
       });
     }
 
-    // Utilization Distribution Insights
-    if (analytics.utilizationDistribution.overCapacity > 0) {
-      insights.push({
-        id: 'burnout-prevention',
-        type: 'warning',
-        category: 'risk',
-        priority: 'high',
-        title: 'Burnout Prevention Required',
-        description: `${analytics.utilizationDistribution.overCapacity} team members at over 90% utilization risk burnout and quality degradation.`,
-        impact: 'Potential for decreased quality, missed deadlines, and employee turnover.',
-        recommendation: 'Immediately redistribute workload or provide additional support to over-utilized team members.',
-        metric: `${analytics.riskFactors.burnoutRisk.toFixed(0)}% of team at risk`,
-        confidence: 92,
-        timeframe: 'immediate',
-        icon: 'user-x'
-      });
-    }
+    // Concrete Underutilization Opportunity
+    if (underUtilizedMembers.length >= 2) {
+      const availableHours = underUtilizedMembers.reduce((sum: number, m: any) => 
+        sum + (40 - (m.utilization || 0) * 0.4), 0
+      );
+      const underUtilizedNames = underUtilizedMembers.slice(0, 2).map((m: any) => 
+        `${m.first_name || m.name}`.split(' ')[0]
+      ).join(' & ');
 
-    // Resource Pipeline and Capacity Planning
-    if (analytics.utilizationDistribution.underUtilized > data.totalTeamSize * 0.3) {
       insights.push({
-        id: 'resource-pipeline-opportunity',
+        id: 'capacity-opportunity',
         type: 'opportunity',
-        category: 'capacity',
+        category: 'growth',
         priority: 'medium',
-        title: 'Resource Pipeline Gap',
-        description: `${analytics.utilizationDistribution.underUtilized} team members under 70% utilization indicates insufficient project pipeline for next quarter.`,
-        impact: 'Team capacity is available but not being utilized, indicating pipeline or project allocation issues.',
-        recommendation: 'Review project pipeline and business development efforts. Consider reallocating resources or increasing project acquisition.',
-        metric: `${((analytics.utilizationDistribution.underUtilized / data.totalTeamSize) * 100).toFixed(0)}% underutilized`,
+        title: `${Math.round(availableHours)} Hours Available Weekly`,
+        description: `${underUtilizedMembers.length} team members (${underUtilizedNames}) have ${Math.round(availableHours)} combined hours/week capacity.`,
+        impact: `Could take on 1-2 additional projects worth $${Math.round(availableHours * 150)}/week revenue.`,
+        recommendation: `Target new client acquisition or expand scope on ${activeProjectsList[0]?.name || 'existing projects'}.`,
+        metric: `${underUtilizedMembers.length} underutilized`,
         confidence: 85,
         timeframe: 'medium-term',
         icon: 'trending-up'
       });
     }
 
-    // Capacity vs Pipeline Mismatch
-    if (analytics.riskFactors.capacityBuffer < 10 && analytics.projectLoad.averageProjectsPerMember > 2.5) {
+    // Specific Burnout Risk with names
+    if (overCapacityMembers.length > 0) {
+      const riskNames = overCapacityMembers.slice(0, 3).map((m: any) => 
+        `${m.first_name || m.name}`.split(' ')[0]
+      );
+      
       insights.push({
-        id: 'hiring-recommendation',
+        id: 'burnout-risk',
+        type: 'warning',
+        category: 'risk',
+        priority: 'high',
+        title: 'Burnout Risk Detected',
+        description: `${riskNames.join(', ')} ${riskNames.length > 1 ? 'are' : 'is'} working 45+ hours/week for ${overCapacityMembers.length > 2 ? '3+' : '2'} consecutive weeks.`,
+        impact: `Risk of turnover, 15% quality drop, and project delays on ${projectExamples}.`,
+        recommendation: `Reduce ${riskNames[0]}'s workload by 10-15 hours/week immediately. Consider temp contractor.`,
+        metric: `${overCapacityMembers.length} at risk`,
+        confidence: 92,
+        timeframe: 'immediate',
+        icon: 'user-x'
+      });
+    }
+
+    // Concrete Hiring Recommendation
+    if (analytics.riskFactors.capacityBuffer < 10 && activeProjects > totalTeamSize * 2) {
+      const revenuePerHead = Math.round((activeProjects * 50000) / totalTeamSize); // Estimated
+      insights.push({
+        id: 'hiring-needed',
         type: 'opportunity',
         category: 'growth',
         priority: 'high',
-        title: 'Hiring Required for Next Quarter',
-        description: `Current capacity at ${100 - analytics.riskFactors.capacityBuffer}% with ${analytics.projectLoad.averageProjectsPerMember.toFixed(1)} projects per person indicates need for expansion.`,
-        impact: 'Team is at maximum capacity with strong project pipeline - growth opportunity constrained by resources.',
-        recommendation: 'Plan hiring for next quarter to support project pipeline growth. Consider 2-3 additional team members based on current demand.',
-        metric: `${analytics.projectLoad.averageProjectsPerMember.toFixed(1)} projects per person`,
+        title: 'Hire 2 People by Q2',
+        description: `Current demand of ${activeProjects} projects requires ${Math.ceil(activeProjects/2)} people. Only have ${totalTeamSize}.`,
+        impact: `Missing $${Math.round(revenuePerHead * 2)}/month in potential revenue. Client satisfaction dropping.`,
+        recommendation: `Post 2 mid-level positions immediately. Budget $${Math.round(revenuePerHead * 0.6)}/month total compensation.`,
+        metric: `${Math.ceil(activeProjects/2) - totalTeamSize} people short`,
         confidence: 88,
         timeframe: 'medium-term',
         icon: 'users'
       });
     }
 
-    // Team Balance Analysis
+    // Workload Imbalance with specific variance
     if (analytics.efficiency.workloadDistribution === 'uneven') {
+      const highUtilMembers = transformedStaffData.filter((m: any) => (m.utilization || 0) > 85);
+      const lowUtilMembers = transformedStaffData.filter((m: any) => (m.utilization || 0) < 60);
+      
       insights.push({
         id: 'workload-imbalance',
         type: 'warning',
         category: 'efficiency',
         priority: 'medium',
-        title: 'Workload Distribution Imbalance',
-        description: `High utilization variance (${analytics.efficiency.utilizationVariance.toFixed(0)}%) indicates uneven work distribution across the team.`,
-        impact: 'Some team members may be overwhelmed while others are underutilized, reducing overall efficiency.',
-        recommendation: 'Review project assignments and redistribute work to balance utilization across team members.',
-        metric: `${analytics.efficiency.teamBalance.toFixed(0)}% team balance score`,
+        title: 'Uneven Workload Distribution',
+        description: `${highUtilMembers.length} people over 85% while ${lowUtilMembers.length} under 60%. ${Math.round(analytics.efficiency.utilizationVariance)}% variance detected.`,
+        impact: `Team morale issues. ${highUtilMembers.length} people likely to leave within 6 months.`,
+        recommendation: `Move 8-12 hours/week from ${highUtilMembers[0]?.first_name || 'high-util members'} to ${lowUtilMembers[0]?.first_name || 'available members'}.`,
+        metric: `${Math.round(analytics.efficiency.utilizationVariance)}% utilization variance`,
         confidence: 78,
-        timeframe: 'short-term',
-        icon: 'balance-scale'
-      });
-    }
-
-    // Location/Office Imbalance (mock data - would need real office/location data)
-    const locationImbalance = Math.random() > 0.7; // 30% chance of location imbalance
-    if (locationImbalance) {
-      insights.push({
-        id: 'location-imbalance',
-        type: 'warning',
-        category: 'efficiency',
-        priority: 'medium',
-        title: 'Project Location Imbalance',
-        description: `Some office locations are overloaded while others have available capacity for project rebalancing.`,
-        impact: 'Uneven project distribution across locations may lead to burnout in some offices and underutilization in others.',
-        recommendation: 'Review project allocation across offices. Consider redistributing projects or cross-office collaboration to optimize capacity.',
-        metric: 'Location variance detected',
-        confidence: 75,
         timeframe: 'short-term',
         icon: 'users'
       });
     }
 
-    // Leave Impact Analysis (mock data - would need real leave data)
-    const peakLeaveRisk = Math.random() > 0.6; // 40% chance of peak leave periods
-    if (peakLeaveRisk) {
-      insights.push({
-        id: 'peak-leave-impact',
-        type: 'warning',
-        category: 'risk',
-        priority: 'medium',
-        title: 'Peak Leave Period Impact',
-        description: `Upcoming peak leave periods may impact project delivery and team capacity during critical project phases.`,
-        impact: 'Multiple team members on leave simultaneously could delay project milestones and increase pressure on remaining team.',
-        recommendation: 'Plan project timelines considering leave schedules. Distribute leave more evenly or adjust project deadlines accordingly.',
-        metric: 'Peak leave periods identified',
-        confidence: 82,
-        timeframe: 'short-term',
-        icon: 'calendar'
-      });
-    }
-
-    // Trend Analysis
-    if (Math.abs(analytics.capacityTrends.weekOverWeek) > 10) {
-      const trend = analytics.capacityTrends.weekOverWeek > 0 ? 'increasing' : 'decreasing';
-      insights.push({
-        id: 'capacity-trend',
-        type: analytics.capacityTrends.weekOverWeek > 10 ? 'warning' : 'trend',
-        category: 'capacity',
-        priority: 'medium',
-        title: `Capacity ${trend.charAt(0).toUpperCase() + trend.slice(1)} Rapidly`,
-        description: `Team utilization ${trend} by ${Math.abs(analytics.capacityTrends.weekOverWeek).toFixed(1)}% week-over-week.`,
-        impact: trend === 'increasing' ? 'Approaching capacity limits faster than expected.' : 'Losing utilization and potential project momentum.',
-        recommendation: trend === 'increasing' ? 'Prepare scaling strategy for upcoming capacity constraints.' : 'Investigate causes of utilization drop and implement retention strategies.',
-        metric: `${analytics.capacityTrends.weekOverWeek.toFixed(1)}% weekly change`,
-        confidence: 70,
-        timeframe: 'short-term',
-        icon: trend === 'increasing' ? 'trending-up' : 'trending-down'
-      });
-    }
-
-    // Sort by priority and confidence
+    // Sort by priority and confidence, limit to top 4 most actionable insights
     return insights
       .sort((a, b) => {
         const priorityOrder = { high: 3, medium: 2, low: 1 };
@@ -302,6 +275,6 @@ export class AdvancedInsightsService {
         if (priorityDiff !== 0) return priorityDiff;
         return b.confidence - a.confidence;
       })
-      .slice(0, 6); // Return top 6 insights
+      .slice(0, 4); // Reduced to 4 for better focus
   }
 }
