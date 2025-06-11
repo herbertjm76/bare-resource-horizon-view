@@ -17,6 +17,16 @@ export const COLOR_SCHEMES = {
     avatarBg: 'bg-[#6465F0]', // Updated brand color
     avatarText: 'text-white',
   },
+  orange: {
+    bg: 'bg-orange-50',
+    border: 'border-orange-100',
+    text: 'text-orange-700',
+    percentage: 'text-orange-600',
+    progress: 'bg-orange-500',
+    progressBg: 'bg-orange-100',
+    avatarBg: 'bg-[#6465F0]', // Updated brand color
+    avatarText: 'text-white',
+  },
   blue: {
     bg: 'bg-blue-50',
     border: 'border-blue-100',

@@ -22,13 +22,13 @@ export interface StaffSectionProps {
   title: string;
   icon: React.ReactNode;
   members: StaffMember[];
-  colorScheme: 'red' | 'blue' | 'green';
+  colorScheme: 'red' | 'orange' | 'blue' | 'green';
   showLimit?: number;
   subtitle?: string;
 }
 
 export interface StaffMemberCardProps {
   member: StaffMember;
-  colorScheme: 'red' | 'blue' | 'green';
+  colorScheme: 'red' | 'orange' | 'blue' | 'green';
   onClick?: () => void;
 }
