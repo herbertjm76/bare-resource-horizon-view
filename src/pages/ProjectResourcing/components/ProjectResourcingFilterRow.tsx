@@ -137,7 +137,7 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
               onDateChange={onDateChange}
             />
             <PeriodSelector
-              periodToShow={periodToShow}
+              selectedPeriod={periodToShow}
               onPeriodChange={onPeriodChange}
             />
           </div>
