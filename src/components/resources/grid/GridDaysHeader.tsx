@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { DayInfo } from './types';
+import { isToday } from 'date-fns';
 
 interface GridDaysHeaderProps {
   days: DayInfo[];
@@ -19,9 +20,18 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
         const isSundayDay = day.isSunday;
         const isFirstOfMonthDay = day.isFirstOfMonth;
         const isNewMonth = index === 0 || days[index - 1].monthLabel !== day.monthLabel;
+        const isTodayDay = isToday(day.date);
         
         // Create a unique key using date and index to avoid duplicates
         const uniqueKey = `${day.date.toISOString().split('T')[0]}-${index}`;
+        
+        // Determine background color based on day type
+        let backgroundColor = '#6465F0'; // Default
+        if (isTodayDay) {
+          backgroundColor = '#a855f7'; // Light purple for current day
+        } else if (isWeekendDay) {
+          backgroundColor = '#5a5b8a'; // Weekend color
+        }
         
         return (
           <th 
@@ -30,11 +40,12 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
               min-w-8 text-center text-xs font-semibold text-white py-2 px-1 relative
               ${isSundayDay ? 'border-l-2 border-yellow-300' : ''}
               ${isFirstOfMonthDay ? 'border-l-4 border-orange-400' : ''}
+              ${isTodayDay ? 'ring-2 ring-purple-300 ring-inset' : ''}
             `}
             style={{ 
               width: '30px', 
               minWidth: '30px',
-              backgroundColor: isWeekendDay ? '#5a5b8a' : '#6465F0'
+              backgroundColor: backgroundColor
             }}
           >
             <div className="flex flex-col items-center h-full">
