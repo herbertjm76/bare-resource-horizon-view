@@ -7,7 +7,6 @@ import { ResourcesToolbar } from '@/components/resources/ResourcesToolbar';
 import { useViewBasedDates } from '@/hooks/useViewBasedDates';
 import { ViewOption } from '@/components/resources/filters/ViewSelector';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
-import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 
 const ProjectResourcing = () => {
   // State management
@@ -60,33 +59,31 @@ const ProjectResourcing = () => {
 
   return (
     <StandardLayout>
-      <OfficeSettingsProvider>
-        <div className="flex-1 space-y-6 p-4 md:p-8">
-          <ProjectResourcingHeader 
-            projectCount={0}
-            periodToShow={periodToShow}
-          />
-          
-          <ResourcesToolbar
-            filters={filters}
-            searchTerm={searchTerm}
-            displayOptions={displayOptions}
-            selectedView={selectedView}
-            onFilterChange={handleFilterChange}
-            onDisplayOptionChange={handleDisplayOptionChange}
-            onViewChange={setSelectedView}
-            activeFiltersCount={activeFiltersCount}
-            onClearFilters={clearAllFilters}
-          />
-          
-          <ResourceAllocationGrid
-            startDate={startDate}
-            periodToShow={periodToShow}
-            filters={filters}
-            displayOptions={displayOptions}
-          />
-        </div>
-      </OfficeSettingsProvider>
+      <div className="flex-1 space-y-6 p-4 md:p-8">
+        <ProjectResourcingHeader 
+          projectCount={0}
+          periodToShow={periodToShow}
+        />
+        
+        <ResourcesToolbar
+          filters={filters}
+          searchTerm={searchTerm}
+          displayOptions={displayOptions}
+          selectedView={selectedView}
+          onFilterChange={handleFilterChange}
+          onDisplayOptionChange={handleDisplayOptionChange}
+          onViewChange={setSelectedView}
+          activeFiltersCount={activeFiltersCount}
+          onClearFilters={clearAllFilters}
+        />
+        
+        <ResourceAllocationGrid
+          startDate={startDate}
+          periodToShow={periodToShow}
+          filters={filters}
+          displayOptions={displayOptions}
+        />
+      </div>
     </StandardLayout>
   );
 };
