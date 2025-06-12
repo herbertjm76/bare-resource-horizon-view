@@ -27,7 +27,7 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
   projects = [],
   annualLeaveDates = []
 }) => {
-  // Calculate total used hours for the week
+  // Calculate total used hours for the week (sum of all daily allocations)
   const totalUsedHours = totalAllocatedHours + annualLeave + holidayHours + otherLeave;
   
   // Calculate utilization percentage based on weekly capacity
@@ -42,14 +42,20 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
     return 'text-gray-600'; // Under 50% - low utilization
   };
 
+  // Calculate weekly project hours sum
+  const weeklyProjectHours = projects.reduce((sum, project) => sum + project.hours, 0);
+  
+  // Calculate weekly annual leave sum
+  const weeklyAnnualLeave = annualLeaveDates.reduce((sum, leave) => sum + leave.hours, 0);
+
   const capacityTooltip = (
     <div className="space-y-3 text-xs max-w-sm">
       <div>
         <p className="font-semibold text-sm mb-2">Weekly Capacity Breakdown:</p>
         <div className="space-y-1">
           <p>Total Weekly Capacity: {totalCapacity}h</p>
-          <p>Project Hours: {totalAllocatedHours}h</p>
-          <p>Annual Leave: {annualLeave}h</p>
+          <p>Project Hours (Weekly Total): {weeklyProjectHours}h</p>
+          <p>Annual Leave (Weekly Total): {weeklyAnnualLeave}h</p>
           <p>Holiday: {holidayHours}h</p>
           <p>Other Leave: {otherLeave}h</p>
           <p className="border-t pt-1 font-medium">Available: {availableHours}h</p>
