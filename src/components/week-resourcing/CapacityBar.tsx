@@ -3,20 +3,20 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface CapacityBarProps {
-  availableHours: number;
+  totalUsedHours: number;
   totalCapacity: number;
 }
 
 export const CapacityBar: React.FC<CapacityBarProps> = ({
-  availableHours,
+  totalUsedHours,
   totalCapacity
 }) => {
-  // Calculate the total used hours (capacity minus available)
-  const usedHours = totalCapacity - availableHours;
-  
-  // Calculate utilization percentage based on used hours vs total capacity
-  const utilizationPercentage = totalCapacity > 0 ? Math.min(120, Math.max(0, (usedHours / totalCapacity) * 100)) : 0;
+  // Calculate utilization percentage based on actual used hours vs total capacity
+  const utilizationPercentage = totalCapacity > 0 ? Math.min(120, Math.max(0, (totalUsedHours / totalCapacity) * 100)) : 0;
   const utilizationRate = Math.round(utilizationPercentage);
+  
+  // Calculate available hours for display
+  const availableHours = Math.max(0, totalCapacity - totalUsedHours);
 
   // Get color based on utilization
   const getUtilizationColor = () => {
@@ -42,7 +42,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
 
   console.log(`CapacityBar calculation for ${totalCapacity}h capacity:`, {
     totalCapacity,
-    usedHours,
+    totalUsedHours,
     availableHours,
     utilizationPercentage,
     utilizationRate

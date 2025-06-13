@@ -123,7 +123,7 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
           <TooltipTrigger asChild>
             <div>
               <CapacityBar 
-                availableHours={availableHours} 
+                totalUsedHours={totalUsedHours} 
                 totalCapacity={totalCapacity} 
               />
             </div>
