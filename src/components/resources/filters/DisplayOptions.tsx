@@ -2,7 +2,6 @@
 import React from 'react';
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface DisplayOptionsProps {
   showWeekends: boolean;
@@ -13,46 +12,25 @@ interface DisplayOptionsProps {
   onWeekStartChange: (startsOnSunday: boolean) => void;
 }
 
-// Only weekdays
-const weekdays = [
-  { id: 'mon', name: 'Monday' },
-  { id: 'tue', name: 'Tuesday' },
-  { id: 'wed', name: 'Wednesday' },
-  { id: 'thu', name: 'Thursday' },
-  { id: 'fri', name: 'Friday' },
-];
-
 export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
   showWeekends,
   onToggleWeekends,
-  selectedDays = ['mon', 'tue', 'wed', 'thu', 'fri'], // Default to weekdays only
+  selectedDays,
   onSelectedDaysChange,
   weekStartsOnSunday,
   onWeekStartChange
 }) => {
   
-  // Handler for toggling a day in selection
-  const handleDayToggle = (day: string) => {
-    if (selectedDays.includes(day)) {
-      // Remove day if already selected
-      onSelectedDaysChange(selectedDays.filter(d => d !== day));
-    } else {
-      // Add day if not selected
-      onSelectedDaysChange([...selectedDays, day]);
-    }
-  };
-
-  // Handler for weekend toggle - this should add/remove Saturday and Sunday together
+  // Handler for weekend toggle - manages weekdays and weekends based on work week start
   const handleWeekendToggle = (show: boolean) => {
-    let updatedDays = [...selectedDays];
+    let updatedDays: string[];
     
     if (show) {
-      // Add weekend days if not already included
-      if (!updatedDays.includes('sat')) updatedDays.push('sat');
-      if (!updatedDays.includes('sun')) updatedDays.push('sun');
+      // Include all days (weekdays + weekends)
+      updatedDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     } else {
-      // Remove weekend days
-      updatedDays = updatedDays.filter(day => day !== 'sat' && day !== 'sun');
+      // Only include weekdays (Monday to Friday)
+      updatedDays = ['mon', 'tue', 'wed', 'thu', 'fri'];
     }
     
     // Update both the weekend toggle and selected days
@@ -73,27 +51,6 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
           checked={showWeekends} 
           onCheckedChange={handleWeekendToggle}
         />
-      </div>
-      
-      <div>
-        <p className="text-sm font-medium mb-2">Weekdays to Display</p>
-        <div className="grid grid-cols-1 gap-2">
-          {weekdays.map(day => (
-            <div key={day.id} className="flex items-center space-x-2">
-              <Checkbox 
-                id={`day-${day.id}`}
-                checked={selectedDays.includes(day.id)}
-                onCheckedChange={() => handleDayToggle(day.id)}
-              />
-              <Label 
-                htmlFor={`day-${day.id}`} 
-                className="cursor-pointer text-sm"
-              >
-                {day.name}
-              </Label>
-            </div>
-          ))}
-        </div>
       </div>
       
       <div className="flex items-center justify-between">

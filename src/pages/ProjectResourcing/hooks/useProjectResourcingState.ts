@@ -52,22 +52,16 @@ export const useProjectResourcingState = () => {
       const showWeekends = value as boolean;
       
       if (showWeekends) {
-        // Add weekend days if they're not already in the list
-        setDisplayOptions(prev => {
-          const updatedDays = [...prev.selectedDays];
-          if (!updatedDays.includes('sat')) updatedDays.push('sat');
-          if (!updatedDays.includes('sun')) updatedDays.push('sun');
-          
-          return {
-            ...prev,
-            selectedDays: updatedDays
-          };
-        });
-      } else {
-        // Remove weekend days from the selectedDays
+        // Show all days (weekdays + weekends)
         setDisplayOptions(prev => ({
           ...prev,
-          selectedDays: prev.selectedDays.filter(day => day !== 'sat' && day !== 'sun')
+          selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+        }));
+      } else {
+        // Show only weekdays
+        setDisplayOptions(prev => ({
+          ...prev,
+          selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri']
         }));
       }
     }

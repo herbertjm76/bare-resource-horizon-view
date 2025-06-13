@@ -12,7 +12,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   totalCapacity
 }) => {
   // Calculate utilization percentage based on actual used hours vs total capacity
-  const utilizationPercentage = totalCapacity > 0 ? Math.min(120, Math.max(0, (totalUsedHours / totalCapacity) * 100)) : 0;
+  const utilizationPercentage = totalCapacity > 0 ? Math.min(100, Math.max(0, (totalUsedHours / totalCapacity) * 100)) : 0;
   const utilizationRate = Math.round(utilizationPercentage);
   
   // Calculate available hours - can be negative if over capacity
@@ -59,25 +59,25 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
             const boxEndPercent = (index + 1) * 20;
 
             // Determine if this specific box should be filled
-            const isFilled = utilizationPercentage >= boxEndPercent;
-            const isPartiallyFilled = !isFilled && utilizationPercentage > boxStartPercent;
+            const isFilled = utilizationPercentage > boxStartPercent;
+            const fillPercentage = Math.min(100, Math.max(0, 
+              ((utilizationPercentage - boxStartPercent) / 20) * 100
+            ));
             
             return (
               <div 
                 key={index}
                 className="h-2.5 w-2.5 relative overflow-hidden border border-gray-300"
                 style={{
-                  backgroundColor: isFilled 
-                    ? utilizationColor
-                    : '#f3f4f6'
+                  backgroundColor: '#f3f4f6'
                 }}
               >
-                {/* For partially filled boxes - show gradient or partial fill */}
-                {isPartiallyFilled && (
+                {/* Fill the box based on utilization percentage */}
+                {isFilled && (
                   <div 
-                    className="absolute top-0 bottom-0 left-0"
+                    className="absolute top-0 bottom-0 left-0 transition-all duration-300"
                     style={{
-                      width: `${(utilizationPercentage - boxStartPercent) / 20 * 100}%`,
+                      width: `${fillPercentage}%`,
                       backgroundColor: utilizationColor
                     }} 
                   />
