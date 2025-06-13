@@ -53,8 +53,8 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
     ? parseFloat(otherLeaveValue) || 0 
     : otherLeaveValue;
 
-  // Calculate available hours
-  const availableHours = Math.max(0, weeklyCapacity - totalHours - annualLeave - holidayHours - otherLeave);
+  // Calculate total used hours (project hours + all leave types)
+  const totalUsedHours = totalHours + annualLeave + holidayHours + otherLeave;
 
   return (
     <TableRow className={`h-9 ${rowBgClass} hover:bg-gray-100/50`}>
@@ -67,7 +67,7 @@ export const ResourceTableRow: React.FC<ResourceTableRowProps> = ({
       />
       
       <CapacityBarCell 
-        availableHours={availableHours} 
+        totalUsedHours={totalUsedHours} 
         totalCapacity={weeklyCapacity}
       />
       
