@@ -30,8 +30,8 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
   // Use the weekly total allocated hours that's passed in (this should be the sum for the entire week)
   const weeklyProjectHours = totalAllocatedHours;
   
-  // Calculate weekly annual leave sum
-  const weeklyAnnualLeave = annualLeaveDates.reduce((sum, leave) => sum + leave.hours, 0);
+  // Use the annual leave value that's already calculated for the week (don't recalculate)
+  const weeklyAnnualLeave = annualLeave;
   
   // Calculate total used hours for the week
   const totalUsedHours = weeklyProjectHours + weeklyAnnualLeave + holidayHours + otherLeave;

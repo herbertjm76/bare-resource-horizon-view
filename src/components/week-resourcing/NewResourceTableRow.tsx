@@ -41,14 +41,14 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   
   const projectCount = getProjectCount(member.id);
   
-  // Get leave data for this member
-  const annualLeave = annualLeaveData[member.id] || 0;
+  // Get leave data for this member - these should already be weekly totals
+  const weeklyAnnualLeave = annualLeaveData[member.id] || 0;
   const holidayHours = holidaysData[member.id] || 0;
   const otherLeave = 0; // This could be expanded to include other leave types
   const annualLeaveDates = getWeeklyLeave ? getWeeklyLeave(member.id) : [];
   
-  // Calculate total used hours for the week (matching CapacityCell logic)
-  const totalUsedHours = totalWeeklyAllocatedHours + annualLeave + holidayHours + otherLeave;
+  // Calculate total used hours for the week
+  const totalUsedHours = totalWeeklyAllocatedHours + weeklyAnnualLeave + holidayHours + otherLeave;
   
   // Calculate available hours after all allocations and leave
   const availableHours = Math.max(0, weeklyCapacity - totalUsedHours);
@@ -74,7 +74,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   console.log(`NewResourceTableRow - Member ${member.first_name} ${member.last_name}:`, {
     totalWeeklyAllocatedHours,
     projectCount,
-    annualLeave,
+    weeklyAnnualLeave: weeklyAnnualLeave,
     holidayHours,
     totalUsedHours,
     availableHours,
@@ -99,7 +99,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           totalCapacity={weeklyCapacity}
           member={member}
           totalAllocatedHours={totalWeeklyAllocatedHours}
-          annualLeave={annualLeave}
+          annualLeave={weeklyAnnualLeave}
           holidayHours={holidayHours}
           otherLeave={otherLeave}
           projects={memberProjects}
@@ -108,7 +108,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         
         {/* Annual Leave Cell - READ-ONLY display from database with tooltip */}
         <ReadOnlyLeaveCell 
-          value={annualLeave} 
+          value={weeklyAnnualLeave} 
           leaveDays={annualLeaveDates}
           leaveType="Annual Leave"
         />
