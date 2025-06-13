@@ -54,7 +54,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
         {/* Capacity visual - rounded square with percentage inside */}
         <div className="relative">
           <div 
-            className="w-10 h-6 rounded border border-gray-300 overflow-hidden"
+            className="w-8 h-8 rounded-md border border-gray-300 overflow-hidden"
             style={{ backgroundColor: '#f3f4f6' }}
           >
             {/* Fill based on utilization percentage */}
@@ -67,9 +67,9 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
             />
           </div>
           
-          {/* Percentage text centered over the bar */}
+          {/* Percentage text centered over the square */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-[10px] font-medium text-gray-800">
+            <span className="text-[9px] font-medium text-gray-800">
               {utilizationRate}%
             </span>
           </div>
