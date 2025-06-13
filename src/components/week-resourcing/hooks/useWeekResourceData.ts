@@ -89,28 +89,47 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     enabled: !!company?.id && memberIds.length > 0
   });
 
-  // Fetch weekly resource allocations to calculate weekly totals
-  const { data: weeklyResourceAllocations } = useQuery({
-    queryKey: ['weekly-resource-allocations', weekStartDate, company?.id, memberIds],
+  // Fetch ALL resource allocations for this week to get comprehensive totals
+  const { data: comprehensiveWeeklyAllocations } = useQuery({
+    queryKey: ['comprehensive-weekly-allocations', weekStartDate, company?.id, memberIds],
     queryFn: async () => {
       if (!company?.id || memberIds.length === 0) return [];
 
-      console.log('Fetching weekly resource allocations for week:', weekStartDate);
+      console.log('Fetching comprehensive weekly allocations for week starting:', weekStartDate);
+      console.log('Member IDs:', memberIds);
 
       const { data, error } = await supabase
         .from('project_resource_allocations')
-        .select('resource_id, project_id, hours')
+        .select('resource_id, project_id, hours, week_start_date, resource_type')
         .eq('company_id', company.id)
         .in('resource_id', memberIds)
         .eq('week_start_date', weekStartDate);
 
       if (error) {
-        console.error('Error fetching weekly resource allocations:', error);
+        console.error('Error fetching comprehensive weekly allocations:', error);
         return [];
       }
 
-      console.log('Weekly resource allocations fetched:', data?.length || 0);
-      return data || [];
+      console.log('Raw comprehensive weekly allocations fetched:', data?.length || 0);
+      console.log('Sample allocation data:', data?.slice(0, 3));
+      
+      // Filter for active allocations and log the results
+      const activeAllocations = data?.filter(allocation => 
+        allocation.resource_type === 'active' && Number(allocation.hours) > 0
+      ) || [];
+      
+      console.log('Filtered active allocations:', activeAllocations.length);
+      console.log('Active allocations by member:', activeAllocations.reduce((acc, allocation) => {
+        const memberId = allocation.resource_id;
+        if (!acc[memberId]) acc[memberId] = [];
+        acc[memberId].push({
+          project_id: allocation.project_id,
+          hours: allocation.hours
+        });
+        return acc;
+      }, {} as Record<string, any[]>));
+
+      return activeAllocations;
     },
     enabled: !!company?.id && memberIds.length > 0
   });
@@ -124,32 +143,46 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     });
   }
 
-  // Calculate weekly totals per member from weekly resource allocations
+  // Calculate weekly totals per member from comprehensive allocations
   const memberWeeklyTotals = new Map<string, number>();
-  if (weeklyResourceAllocations) {
-    weeklyResourceAllocations.forEach(allocation => {
+  if (comprehensiveWeeklyAllocations) {
+    comprehensiveWeeklyAllocations.forEach(allocation => {
       const memberId = allocation.resource_id;
+      const hours = Number(allocation.hours) || 0;
       const currentTotal = memberWeeklyTotals.get(memberId) || 0;
-      memberWeeklyTotals.set(memberId, currentTotal + (Number(allocation.hours) || 0));
+      memberWeeklyTotals.set(memberId, currentTotal + hours);
     });
   }
 
+  console.log('=== WEEKLY TOTALS CALCULATION ===');
+  console.log('Week start date:', weekStartDate);
   console.log('Member weekly totals calculated:', Object.fromEntries(memberWeeklyTotals));
+  console.log('Total members with allocations:', memberWeeklyTotals.size);
 
-  // Utility function to get member total hours - now uses weekly calculation
+  // Utility function to get member total hours - now uses comprehensive weekly calculation
   const getMemberTotal = (memberId: string): number => {
     const total = memberWeeklyTotals.get(memberId) || 0;
+    console.log(`=== MEMBER TOTAL LOOKUP ===`);
     console.log(`Member ${memberId} weekly total hours:`, total);
+    
+    // Also log the individual allocations for this member for debugging
+    const memberAllocations = comprehensiveWeeklyAllocations?.filter(a => a.resource_id === memberId) || [];
+    console.log(`Member ${memberId} individual allocations:`, memberAllocations.map(a => ({
+      project_id: a.project_id,
+      hours: a.hours,
+      week_start_date: a.week_start_date
+    })));
+    
     return total;
   };
 
   // Utility function to get project count for a member
   const getProjectCount = (memberId: string): number => {
     let count = 0;
-    if (weeklyResourceAllocations) {
+    if (comprehensiveWeeklyAllocations) {
       // Count unique projects this member is allocated to during the week
       const memberProjects = new Set();
-      weeklyResourceAllocations
+      comprehensiveWeeklyAllocations
         .filter(allocation => allocation.resource_id === memberId && (Number(allocation.hours) || 0) > 0)
         .forEach(allocation => memberProjects.add(allocation.project_id));
       count = memberProjects.size;
