@@ -36,8 +36,8 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
 }) => {
   const weeklyCapacity = member.weekly_capacity || 40;
   
-  // Use the corrected getMemberTotal function which calculates from all allocations
-  const totalAllocatedHours = getMemberTotal(member.id);
+  // Get the WEEKLY total allocated hours (sum for entire week June 9-15)
+  const totalWeeklyAllocatedHours = getMemberTotal(member.id);
   
   const projectCount = getProjectCount(member.id);
   
@@ -48,7 +48,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   const annualLeaveDates = getWeeklyLeave ? getWeeklyLeave(member.id) : [];
   
   // Calculate total used hours for the week (matching CapacityCell logic)
-  const totalUsedHours = totalAllocatedHours + annualLeave + holidayHours + otherLeave;
+  const totalUsedHours = totalWeeklyAllocatedHours + annualLeave + holidayHours + otherLeave;
   
   // Calculate available hours after all allocations and leave
   const availableHours = Math.max(0, weeklyCapacity - totalUsedHours);
@@ -58,28 +58,29 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   // Calculate the number of project columns to show (minimum 15)
   const projectColumnsCount = Math.max(15, projects.length);
   
-  // Get projects this member is working on for tooltip
+  // Get projects this member is working on for tooltip - with WEEKLY totals
   const memberProjects = projects
     .map(project => {
       const key = `${member.id}:${project.id}`;
       const hours = allocationMap.get(key) || 0;
       return hours > 0 ? { 
         name: project.name, 
-        hours, 
+        hours, // This should already be the weekly total from allocationMap
         project_code: project.project_code 
       } : null;
     })
     .filter(Boolean);
 
   console.log(`NewResourceTableRow - Member ${member.first_name} ${member.last_name}:`, {
-    totalAllocatedHours,
+    totalWeeklyAllocatedHours,
     projectCount,
     annualLeave,
     holidayHours,
     totalUsedHours,
     availableHours,
     weeklyCapacity,
-    memberProjects
+    memberProjects,
+    allocationMapEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
   });
   
   return (
@@ -97,7 +98,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           availableHours={availableHours} 
           totalCapacity={weeklyCapacity}
           member={member}
-          totalAllocatedHours={totalAllocatedHours}
+          totalAllocatedHours={totalWeeklyAllocatedHours}
           annualLeave={annualLeave}
           holidayHours={holidayHours}
           otherLeave={otherLeave}
