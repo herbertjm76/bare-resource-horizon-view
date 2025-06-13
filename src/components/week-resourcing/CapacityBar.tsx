@@ -50,41 +50,29 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
 
   return (
     <div className="flex items-center justify-center w-full">
-      <div className="flex-1 flex justify-center items-center gap-1.5">
-        {/* Capacity boxes - 5 squares representing utilization */}
-        <div className="flex gap-[0.5px]">
-          {Array.from({ length: 5 }).map((_, index) => {
-            // Each box represents 20% (index 0 = 0-20%, index 1 = 20-40%, etc.)
-            const boxStartPercent = index * 20;
-            const boxEndPercent = (index + 1) * 20;
-
-            // Determine if this specific box should be filled
-            const isFilled = utilizationPercentage > boxStartPercent;
-            const fillPercentage = Math.min(100, Math.max(0, 
-              ((utilizationPercentage - boxStartPercent) / 20) * 100
-            ));
-            
-            return (
-              <div 
-                key={index}
-                className="h-2.5 w-2.5 relative overflow-hidden border border-gray-300"
-                style={{
-                  backgroundColor: '#f3f4f6'
-                }}
-              >
-                {/* Fill the box based on utilization percentage */}
-                {isFilled && (
-                  <div 
-                    className="absolute top-0 bottom-0 left-0 transition-all duration-300"
-                    style={{
-                      width: `${fillPercentage}%`,
-                      backgroundColor: utilizationColor
-                    }} 
-                  />
-                )}
-              </div>
-            );
-          })}
+      <div className="flex-1 flex justify-center items-center gap-2">
+        {/* Capacity visual - rounded square with percentage inside */}
+        <div className="relative">
+          <div 
+            className="w-10 h-6 rounded border border-gray-300 overflow-hidden"
+            style={{ backgroundColor: '#f3f4f6' }}
+          >
+            {/* Fill based on utilization percentage */}
+            <div 
+              className="h-full transition-all duration-300"
+              style={{
+                width: `${Math.min(100, utilizationPercentage)}%`,
+                backgroundColor: utilizationColor
+              }} 
+            />
+          </div>
+          
+          {/* Percentage text centered over the bar */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[10px] font-medium text-gray-800">
+              {utilizationRate}%
+            </span>
+          </div>
         </div>
         
         {/* Available hours number with color coding - show negative if over capacity */}
