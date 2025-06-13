@@ -53,11 +53,11 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   const projectCount = getProjectCount ? getProjectCount(member.id) : 
     (allocation.projectAllocations?.filter(proj => proj.hours > 0).length || 0);
   
-  // Calculate capacity utilization
+  // Calculate capacity utilization - use the correct property names from MemberAllocation
   const annualLeave = allocation.annualLeave || 0;
-  const holidayHours = allocation.holiday || 0;
-  const otherLeave = allocation.other || 0;
-  const totalUsedHours = totalWeeklyAllocatedHours + annualLeave + holidayHours + otherLeave;
+  const publicHolidayHours = allocation.publicHoliday || 0; // Use publicHoliday instead of holiday
+  const otherLeave = allocation.others || 0; // Use others instead of other
+  const totalUsedHours = totalWeeklyAllocatedHours + annualLeave + publicHolidayHours + otherLeave;
   const availableHours = Math.max(0, weeklyCapacity - totalUsedHours);
 
   console.log(`MemberTableRow - Member ${member.first_name} ${member.last_name}:`, {
@@ -114,24 +114,24 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
         />
       </TableCell>
 
-      {/* Holiday */}
+      {/* Holiday - use publicHoliday property */}
       <TableCell className="text-center py-2 px-1">
         <Input
           type="number"
-          value={allocation.holiday || ''}
-          onChange={(e) => onInputChange(member.id, 'holiday', Number(e.target.value) || 0)}
+          value={allocation.publicHoliday || ''}
+          onChange={(e) => onInputChange(member.id, 'publicHoliday', Number(e.target.value) || 0)}
           className="w-12 h-7 text-center text-xs p-1"
           min="0"
           step="0.5"
         />
       </TableCell>
 
-      {/* Other Leave */}
+      {/* Other Leave - use others property */}
       <TableCell className="text-center py-2 px-1">
         <Input
           type="number"
-          value={allocation.other || ''}
-          onChange={(e) => onInputChange(member.id, 'other', Number(e.target.value) || 0)}
+          value={allocation.others || ''}
+          onChange={(e) => onInputChange(member.id, 'others', Number(e.target.value) || 0)}
           className="w-12 h-7 text-center text-xs p-1"
           min="0"
           step="0.5"
@@ -171,7 +171,13 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
                 const existingProjectAllocations = allocation.projectAllocations || [];
                 const updatedProjectAllocations = existingProjectAllocations.filter(p => p.projectId !== project.id);
                 if (newHours > 0) {
-                  updatedProjectAllocations.push({ projectId: project.id, hours: newHours });
+                  // Create a complete ProjectAllocation object with all required properties
+                  updatedProjectAllocations.push({ 
+                    projectId: project.id, 
+                    hours: newHours,
+                    projectName: project.name,
+                    projectCode: project.code
+                  });
                 }
                 onInputChange(member.id, 'projectAllocations', updatedProjectAllocations);
               }}
