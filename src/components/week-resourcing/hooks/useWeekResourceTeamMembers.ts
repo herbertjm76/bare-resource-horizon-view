@@ -15,17 +15,17 @@ export const useWeekResourceTeamMembers = () => {
     }
   });
 
-  // Get active team members
+  // Get active team members from profiles table
   const { data: activeMembers = [], isLoading: isLoadingActive, error: activeError } = useQuery({
     queryKey: ['active-team-members', company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
       
       const { data, error } = await supabase
-        .from('team_members')
-        .select('id, first_name, last_name, email, location, weekly_capacity, status')
+        .from('profiles')
+        .select('id, first_name, last_name, email, location, weekly_capacity, role')
         .eq('company_id', company.id)
-        .in('status', ['active', 'inactive']); // Include both active and inactive
+        .not('role', 'is', null); // Only get profiles with roles (actual team members)
         
       if (error) {
         console.error("Error fetching active team members:", error);
@@ -33,7 +33,17 @@ export const useWeekResourceTeamMembers = () => {
       }
       
       console.log("Fetched active team members:", data?.length || 0);
-      return data || [];
+      
+      // Transform to match expected structure
+      return data?.map(member => ({
+        id: member.id,
+        first_name: member.first_name || '',
+        last_name: member.last_name || '',
+        email: member.email || '',
+        location: member.location || null,
+        weekly_capacity: member.weekly_capacity || 40,
+        status: 'active'
+      })) || [];
     },
     enabled: !!company?.id
   });

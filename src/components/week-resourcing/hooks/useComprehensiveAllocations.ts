@@ -28,22 +28,21 @@ export const useComprehensiveAllocations = ({ weekStartDate, memberIds }: UseCom
 
       console.log('Fetching allocations between:', weekStartDate, 'and', weekEndDate);
 
-      // Fetch ALL daily allocations for the entire week range
+      // Fetch ALL weekly allocations for the entire week range from project_resource_allocations
       const { data, error } = await supabase
-        .from('resource_allocations')
-        .select('resource_id, project_id, hours, date')
+        .from('project_resource_allocations')
+        .select('resource_id, project_id, hours, week_start_date, resource_type')
         .eq('company_id', company.id)
         .in('resource_id', memberIds)
-        .gte('date', weekStartDate)
-        .lte('date', weekEndDate);
+        .eq('week_start_date', weekStartDate); // Match exact week
 
       if (error) {
         console.error('Error fetching comprehensive weekly allocations:', error);
         return [];
       }
 
-      console.log('Raw daily allocations fetched:', data?.length || 0);
-      console.log('Sample daily allocations:', data?.slice(0, 5));
+      console.log('Raw weekly allocations fetched:', data?.length || 0);
+      console.log('Sample weekly allocations:', data?.slice(0, 5));
       
       // Group by member and project, then sum hours for the entire week
       const weeklyAllocations = new Map<string, { resource_id: string; project_id: string; hours: number; resource_type: string }>();
@@ -56,14 +55,11 @@ export const useComprehensiveAllocations = ({ weekStartDate, memberIds }: UseCom
           const existing = weeklyAllocations.get(key)!;
           existing.hours += hours;
         } else {
-          // Determine resource type based on whether the member is in active or pre-registered list
-          const resourceType = 'active'; // We'll improve this logic later if needed
-          
           weeklyAllocations.set(key, {
             resource_id: allocation.resource_id,
             project_id: allocation.project_id,
             hours: hours,
-            resource_type: resourceType
+            resource_type: allocation.resource_type || 'active'
           });
         }
       });

@@ -43,7 +43,7 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
   } = useWeekResourceAllocations({ weekStartDate });
 
   // Get leave data (annual leave and holidays)
-  const memberIds = members.map(m => m.id);
+  const memberIds = members?.map(m => m.id) || [];
   const {
     annualLeaveData,
     holidaysData,
@@ -64,7 +64,7 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
   const memberWeeklyTotals = calculateMemberWeeklyTotals(
     comprehensiveWeeklyAllocations || [],
     weekStartDate,
-    members
+    members || []
   );
 
   // Create utility functions
@@ -85,7 +85,7 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
 
   return {
     projects: projects || [],
-    members,
+    members: members || [],
     allocations: weekAllocations || [], // Keep for backward compatibility, but not used for main calculations
     allocationMap, // Now correctly populated from comprehensive weekly data
     getMemberTotal,
