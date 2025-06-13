@@ -19,7 +19,7 @@ interface UseWeekResourceDataProps {
 export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResourceDataProps['filters']) => {
   const { company } = useCompany();
   
-  // Get team members
+  // Get team members (both active and pre-registered)
   const {
     members,
     loadingMembers,
@@ -89,21 +89,24 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     enabled: !!company?.id && memberIds.length > 0
   });
 
-  // Fetch ALL resource allocations for this week to get comprehensive totals
+  // Fetch comprehensive weekly allocations for BOTH active and pre-registered members
   const { data: comprehensiveWeeklyAllocations } = useQuery({
     queryKey: ['comprehensive-weekly-allocations', weekStartDate, company?.id, memberIds],
     queryFn: async () => {
       if (!company?.id || memberIds.length === 0) return [];
 
-      console.log('Fetching comprehensive weekly allocations for week starting:', weekStartDate);
-      console.log('Member IDs:', memberIds);
+      console.log('=== FETCHING COMPREHENSIVE WEEKLY ALLOCATIONS ===');
+      console.log('Week starting:', weekStartDate);
+      console.log('All member IDs (active + pre-registered):', memberIds);
 
+      // Fetch allocations for both active and pre-registered members
       const { data, error } = await supabase
         .from('project_resource_allocations')
         .select('resource_id, project_id, hours, week_start_date, resource_type')
         .eq('company_id', company.id)
         .in('resource_id', memberIds)
-        .eq('week_start_date', weekStartDate);
+        .eq('week_start_date', weekStartDate)
+        .in('resource_type', ['active', 'pre_registered']);
 
       if (error) {
         console.error('Error fetching comprehensive weekly allocations:', error);
@@ -111,18 +114,19 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
       }
 
       console.log('Raw comprehensive weekly allocations fetched:', data?.length || 0);
-      console.log('Sample allocation data:', data?.slice(0, 3));
+      console.log('All allocation data:', data);
       
-      // Filter for active allocations and log the results
+      // Filter for allocations with hours > 0
       const activeAllocations = data?.filter(allocation => 
-        allocation.resource_type === 'active' && Number(allocation.hours) > 0
+        Number(allocation.hours) > 0
       ) || [];
       
-      console.log('Filtered active allocations:', activeAllocations.length);
-      console.log('Active allocations by member:', activeAllocations.reduce((acc, allocation) => {
+      console.log('Filtered allocations with hours > 0:', activeAllocations.length);
+      console.log('Allocations by member and type:', activeAllocations.reduce((acc, allocation) => {
         const memberId = allocation.resource_id;
-        if (!acc[memberId]) acc[memberId] = [];
-        acc[memberId].push({
+        const key = `${memberId} (${allocation.resource_type})`;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push({
           project_id: allocation.project_id,
           hours: allocation.hours
         });
@@ -143,7 +147,7 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     });
   }
 
-  // Calculate weekly totals per member from comprehensive allocations
+  // Calculate weekly totals per member from comprehensive allocations (including pre-registered)
   const memberWeeklyTotals = new Map<string, number>();
   if (comprehensiveWeeklyAllocations) {
     comprehensiveWeeklyAllocations.forEach(allocation => {
@@ -154,15 +158,20 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     });
   }
 
-  console.log('=== WEEKLY TOTALS CALCULATION ===');
+  console.log('=== UPDATED WEEKLY TOTALS CALCULATION ===');
   console.log('Week start date:', weekStartDate);
-  console.log('Member weekly totals calculated:', Object.fromEntries(memberWeeklyTotals));
+  console.log('Member weekly totals (active + pre-registered):', Object.fromEntries(memberWeeklyTotals));
   console.log('Total members with allocations:', memberWeeklyTotals.size);
+  console.log('All members in system:', members.map(m => ({ 
+    id: m.id, 
+    name: `${m.first_name} ${m.last_name}`,
+    total: memberWeeklyTotals.get(m.id) || 0
+  })));
 
-  // Utility function to get member total hours - now uses comprehensive weekly calculation
+  // Utility function to get member total hours (now includes pre-registered)
   const getMemberTotal = (memberId: string): number => {
     const total = memberWeeklyTotals.get(memberId) || 0;
-    console.log(`=== MEMBER TOTAL LOOKUP ===`);
+    console.log(`=== MEMBER TOTAL LOOKUP (UPDATED) ===`);
     console.log(`Member ${memberId} weekly total hours:`, total);
     
     // Also log the individual allocations for this member for debugging
@@ -170,13 +179,14 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     console.log(`Member ${memberId} individual allocations:`, memberAllocations.map(a => ({
       project_id: a.project_id,
       hours: a.hours,
+      resource_type: a.resource_type,
       week_start_date: a.week_start_date
     })));
     
     return total;
   };
 
-  // Utility function to get project count for a member
+  // Utility function to get project count for a member (including pre-registered)
   const getProjectCount = (memberId: string): number => {
     let count = 0;
     if (comprehensiveWeeklyAllocations) {
@@ -187,7 +197,7 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
         .forEach(allocation => memberProjects.add(allocation.project_id));
       count = memberProjects.size;
     }
-    console.log(`Member ${memberId} project count:`, count);
+    console.log(`Member ${memberId} project count (active + pre-registered):`, count);
     return count;
   };
 
