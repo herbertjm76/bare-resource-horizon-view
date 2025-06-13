@@ -89,31 +89,27 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     enabled: !!company?.id && memberIds.length > 0
   });
 
-  // Fetch daily allocations for the entire week to calculate weekly totals
-  const { data: dailyAllocations } = useQuery({
-    queryKey: ['daily-allocations', weekStartDate, company?.id, memberIds],
+  // Fetch weekly resource allocations to calculate weekly totals
+  const { data: weeklyResourceAllocations } = useQuery({
+    queryKey: ['weekly-resource-allocations', weekStartDate, company?.id, memberIds],
     queryFn: async () => {
       if (!company?.id || memberIds.length === 0) return [];
 
-      const weekStart = new Date(weekStartDate);
-      const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-
-      console.log('Fetching daily allocations for week:', weekStartDate, 'to', format(weekEnd, 'yyyy-MM-dd'));
+      console.log('Fetching weekly resource allocations for week:', weekStartDate);
 
       const { data, error } = await supabase
-        .from('resource_allocations')
-        .select('resource_id, project_id, date, hours')
+        .from('project_resource_allocations')
+        .select('resource_id, project_id, hours')
         .eq('company_id', company.id)
         .in('resource_id', memberIds)
-        .gte('date', format(weekStart, 'yyyy-MM-dd'))
-        .lte('date', format(weekEnd, 'yyyy-MM-dd'));
+        .eq('week_start_date', weekStartDate);
 
       if (error) {
-        console.error('Error fetching daily allocations:', error);
+        console.error('Error fetching weekly resource allocations:', error);
         return [];
       }
 
-      console.log('Daily allocations fetched:', data?.length || 0);
+      console.log('Weekly resource allocations fetched:', data?.length || 0);
       return data || [];
     },
     enabled: !!company?.id && memberIds.length > 0
@@ -128,10 +124,10 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     });
   }
 
-  // Calculate weekly totals per member from daily allocations
+  // Calculate weekly totals per member from weekly resource allocations
   const memberWeeklyTotals = new Map<string, number>();
-  if (dailyAllocations) {
-    dailyAllocations.forEach(allocation => {
+  if (weeklyResourceAllocations) {
+    weeklyResourceAllocations.forEach(allocation => {
       const memberId = allocation.resource_id;
       const currentTotal = memberWeeklyTotals.get(memberId) || 0;
       memberWeeklyTotals.set(memberId, currentTotal + (Number(allocation.hours) || 0));
@@ -150,10 +146,10 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
   // Utility function to get project count for a member
   const getProjectCount = (memberId: string): number => {
     let count = 0;
-    if (dailyAllocations) {
+    if (weeklyResourceAllocations) {
       // Count unique projects this member is allocated to during the week
       const memberProjects = new Set();
-      dailyAllocations
+      weeklyResourceAllocations
         .filter(allocation => allocation.resource_id === memberId && (Number(allocation.hours) || 0) > 0)
         .forEach(allocation => memberProjects.add(allocation.project_id));
       count = memberProjects.size;
