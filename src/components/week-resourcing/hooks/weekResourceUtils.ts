@@ -29,6 +29,7 @@ export const calculateMemberWeeklyTotals = (
   const memberWeeklyTotals = new Map<string, number>();
   
   if (comprehensiveWeeklyAllocations) {
+    // Group allocations by member and sum ALL their project hours for the week
     comprehensiveWeeklyAllocations.forEach(allocation => {
       const memberId = allocation.resource_id;
       const hours = Number(allocation.hours) || 0;
@@ -39,13 +40,23 @@ export const calculateMemberWeeklyTotals = (
 
   console.log('=== UPDATED WEEKLY TOTALS CALCULATION ===');
   console.log('Week start date:', weekStartDate);
-  console.log('Member weekly totals (active + pre-registered):', Object.fromEntries(memberWeeklyTotals));
+  console.log('Total comprehensive allocations processed:', comprehensiveWeeklyAllocations?.length || 0);
+  console.log('Member weekly totals (ALL projects combined):', Object.fromEntries(memberWeeklyTotals));
   console.log('Total members with allocations:', memberWeeklyTotals.size);
-  console.log('All members in system:', members.map(m => ({ 
-    id: m.id, 
-    name: `${m.first_name} ${m.last_name}`,
-    total: memberWeeklyTotals.get(m.id) || 0
-  })));
+  
+  // Log detailed breakdown for each member
+  memberWeeklyTotals.forEach((totalHours, memberId) => {
+    const memberAllocations = comprehensiveWeeklyAllocations?.filter(a => a.resource_id === memberId) || [];
+    const memberName = members.find(m => m.id === memberId);
+    console.log(`Member ${memberName?.first_name} ${memberName?.last_name} (${memberId}):`, {
+      totalWeeklyHours: totalHours,
+      projectBreakdown: memberAllocations.map(a => ({
+        project_id: a.project_id,
+        hours: a.hours,
+        resource_type: a.resource_type
+      }))
+    });
+  });
 
   return memberWeeklyTotals;
 };

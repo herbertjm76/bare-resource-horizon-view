@@ -56,7 +56,9 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
     totalUsedHours,
     availableHours,
     totalCapacity,
-    utilizationPercentage
+    utilizationPercentage,
+    projectsCount: projects.length,
+    projectsTotalFromTooltip: projects.reduce((sum, p) => sum + p.hours, 0)
   });
 
   const capacityTooltip = (
@@ -86,6 +88,10 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
                 <span className="font-medium">{project.hours}h</span>
               </div>
             ))}
+            <div className="border-t pt-1 font-semibold flex justify-between">
+              <span>Total Projects:</span>
+              <span>{projects.reduce((sum, p) => sum + p.hours, 0)}h</span>
+            </div>
           </div>
         </div>
       )}
