@@ -40,7 +40,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   const utilizationColor = getUtilizationColor();
   const textColor = getTextColor();
 
-  console.log(`CapacityBar calculation for ${totalCapacity}h capacity:`, {
+  console.log(`CapacityBar calculation for ${totalCapacity}h weekly capacity:`, {
     totalCapacity,
     totalUsedHours,
     availableHours,
