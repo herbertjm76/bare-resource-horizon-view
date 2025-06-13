@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -58,7 +59,7 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   const publicHolidayHours = allocation.publicHoliday || 0; // Use publicHoliday instead of holiday
   const otherLeave = allocation.others || 0; // Use others instead of other
   const totalUsedHours = totalWeeklyAllocatedHours + annualLeave + publicHolidayHours + otherLeave;
-  const availableHours = Math.max(0, weeklyCapacity - totalUsedHours);
+  const availableHours = weeklyCapacity - totalUsedHours; // Remove Math.max(0, ...) to allow negative values
 
   console.log(`MemberTableRow - Member ${member.first_name} ${member.last_name}:`, {
     totalWeeklyAllocatedHours,
@@ -141,7 +142,9 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
       {/* Capacity Bar */}
       <TableCell className="text-center py-2 px-2">
         <div className="text-xs">
-          <span className="font-medium">{availableHours}h</span>
+          <span className={`font-medium ${availableHours < 0 ? 'text-red-600 font-bold' : ''}`}>
+            {availableHours}h
+          </span>
           <span className="text-gray-500 ml-1">avail</span>
         </div>
       </TableCell>
