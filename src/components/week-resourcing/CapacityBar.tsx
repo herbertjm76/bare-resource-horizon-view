@@ -11,21 +11,23 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   availableHours,
   totalCapacity
 }) => {
-  // Calculate the percentage of capacity that is USED (not available)
+  // Calculate the total used hours (capacity minus available)
   const usedHours = totalCapacity - availableHours;
-  const utilizationPercentage = totalCapacity > 0 ? Math.min(100, Math.max(0, (usedHours / totalCapacity) * 100)) : 0;
+  
+  // Calculate utilization percentage based on used hours vs total capacity
+  const utilizationPercentage = totalCapacity > 0 ? Math.min(120, Math.max(0, (usedHours / totalCapacity) * 100)) : 0;
   const utilizationRate = Math.round(utilizationPercentage);
 
-  // Get color based on utilization with same logic as mobile display
+  // Get color based on utilization
   const getUtilizationColor = () => {
-    if (utilizationRate > 100) return '#ef4444'; // red
-    if (utilizationRate >= 95) return '#22c55e'; // green
-    if (utilizationRate >= 80) return '#f97316'; // orange
-    if (utilizationRate >= 50) return '#3b82f6'; // blue
-    return '#6b7280'; // gray
+    if (utilizationRate > 100) return '#ef4444'; // red - overallocated
+    if (utilizationRate >= 95) return '#22c55e'; // green - fully utilized
+    if (utilizationRate >= 80) return '#f97316'; // orange - well utilized
+    if (utilizationRate >= 50) return '#3b82f6'; // blue - moderate utilization
+    return '#6b7280'; // gray - low utilization
   };
 
-  // Get text color for the available hours number using same logic
+  // Get text color for the available hours number
   const getTextColor = () => {
     if (utilizationRate === 0) return 'text-gray-400'; // faint for 0%
     if (utilizationRate > 100) return 'text-red-600 font-semibold';
@@ -38,10 +40,10 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   const utilizationColor = getUtilizationColor();
   const textColor = getTextColor();
 
-  console.log(`CapacityBar calculation:`, {
+  console.log(`CapacityBar calculation for ${totalCapacity}h capacity:`, {
     totalCapacity,
-    availableHours,
     usedHours,
+    availableHours,
     utilizationPercentage,
     utilizationRate
   });
