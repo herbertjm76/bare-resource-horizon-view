@@ -4,18 +4,18 @@ import { TableCell } from '@/components/ui/table';
 import { CapacityBar } from '../CapacityBar';
 
 interface CapacityBarCellProps {
-  availableHours: number;
+  totalUsedHours: number;
   totalCapacity: number;
 }
 
 export const CapacityBarCell: React.FC<CapacityBarCellProps> = ({ 
-  availableHours, 
+  totalUsedHours, 
   totalCapacity 
 }) => {
   return (
     <TableCell className="text-center p-2">
       <CapacityBar 
-        availableHours={availableHours} 
+        totalUsedHours={totalUsedHours} 
         totalCapacity={totalCapacity} 
       />
     </TableCell>
