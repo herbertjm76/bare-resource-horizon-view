@@ -1,12 +1,23 @@
 
-export const createAllocationMap = (weekAllocations: any[]) => {
+export const createAllocationMap = (allocations: any[]) => {
   const allocationMap = new Map<string, number>();
-  if (weekAllocations) {
-    weekAllocations.forEach(allocation => {
+  if (allocations) {
+    allocations.forEach(allocation => {
       const key = `${allocation.resource_id}:${allocation.project_id}`;
-      allocationMap.set(key, allocation.hours);
+      const hours = Number(allocation.hours) || 0;
+      
+      // For comprehensive allocations, we sum up all hours for the same member-project combination
+      // This handles cases where there might be multiple entries for the same member-project in a week
+      const currentTotal = allocationMap.get(key) || 0;
+      allocationMap.set(key, currentTotal + hours);
     });
   }
+  
+  console.log('=== ALLOCATION MAP CREATION ===');
+  console.log('Input allocations:', allocations?.length || 0);
+  console.log('Created allocation map with entries:', allocationMap.size);
+  console.log('Sample entries:', Array.from(allocationMap.entries()).slice(0, 3));
+  
   return allocationMap;
 };
 
@@ -45,7 +56,7 @@ export const createMemberTotalFunction = (
 ) => {
   return (memberId: string): number => {
     const total = memberWeeklyTotals.get(memberId) || 0;
-    console.log(`=== MEMBER TOTAL LOOKUP (UPDATED) ===`);
+    console.log(`=== MEMBER TOTAL LOOKUP (COMPREHENSIVE) ===`);
     console.log(`Member ${memberId} weekly total hours:`, total);
     
     // Also log the individual allocations for this member for debugging
@@ -72,7 +83,7 @@ export const createProjectCountFunction = (comprehensiveWeeklyAllocations: any[]
         .forEach(allocation => memberProjects.add(allocation.project_id));
       count = memberProjects.size;
     }
-    console.log(`Member ${memberId} project count (active + pre-registered):`, count);
+    console.log(`Member ${memberId} project count (comprehensive):`, count);
     return count;
   };
 };

@@ -36,7 +36,7 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
     error: projectsError
   } = useWeekResourceProjects({ filters });
 
-  // Get resource allocations for the selected week
+  // Get resource allocations for the selected week (daily data - used for fallback only)
   const {
     data: weekAllocations,
     isLoading: isLoadingAllocations
@@ -56,8 +56,9 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
   // Fetch comprehensive weekly allocations for BOTH active and pre-registered members
   const { comprehensiveWeeklyAllocations } = useComprehensiveAllocations({ weekStartDate, memberIds });
 
-  // Create allocation map for easy lookup
-  const allocationMap = createAllocationMap(weekAllocations || []);
+  // Create allocation map from COMPREHENSIVE weekly allocations (not daily weekAllocations)
+  // This ensures we're using the correct weekly totals for each member-project combination
+  const allocationMap = createAllocationMap(comprehensiveWeeklyAllocations || []);
 
   // Calculate weekly totals per member from comprehensive allocations (including pre-registered)
   const memberWeeklyTotals = calculateMemberWeeklyTotals(
@@ -77,11 +78,16 @@ export const useWeekResourceData = (weekStartDate: string, filters: UseWeekResou
   // Handle errors
   const error = projectsError || membersError;
 
+  console.log('=== WEEK RESOURCE DATA SUMMARY ===');
+  console.log('Using comprehensive allocations for allocation map:', comprehensiveWeeklyAllocations?.length || 0);
+  console.log('Allocation map size:', allocationMap.size);
+  console.log('Sample allocation map entries:', Array.from(allocationMap.entries()).slice(0, 5));
+
   return {
     projects: projects || [],
     members,
-    allocations: weekAllocations || [],
-    allocationMap,
+    allocations: weekAllocations || [], // Keep for backward compatibility, but not used for main calculations
+    allocationMap, // Now correctly populated from comprehensive weekly data
     getMemberTotal,
     getProjectCount,
     getWeeklyLeave,
