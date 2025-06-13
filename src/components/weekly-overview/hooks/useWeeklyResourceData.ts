@@ -6,6 +6,15 @@ import { useCompany } from "@/context/CompanyContext";
 import { useResourceAllocations } from './useResourceAllocations';
 import { useOfficeMembers } from './useOfficeMembers';
 import { useOfficeDisplay } from './useOfficeDisplay';
+import { useComprehensiveAllocations } from '@/components/week-resourcing/hooks/useComprehensiveAllocations';
+import { useWeeklyLeaveDetails } from '@/components/week-resourcing/hooks/useWeeklyLeaveDetails';
+import {
+  createAllocationMap,
+  calculateMemberWeeklyTotals,
+  createMemberTotalFunction,
+  createProjectCountFunction,
+  createWeeklyLeaveFunction
+} from '@/components/week-resourcing/hooks/weekResourceUtils';
 import { useCallback, useEffect, useState } from 'react';
 
 export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: string }) => {
@@ -43,11 +52,6 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
       }
       
       console.log("Fetched projects:", data?.length || 0);
-      // Log the HERB project details if it exists
-      const herbProject = data?.find(p => p.name.includes('HERB'));
-      if (herbProject) {
-        console.log("Found HERB project:", herbProject);
-      }
       return data || [];
     },
     enabled: !!company?.id
@@ -92,11 +96,46 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
   // Get all members combined (active + pre-registered)
   const allMembers = useCallback(() => {
     const combined = [...(teamMembers || []), ...(preRegisteredMembers || [])];
-    console.log("All members for resource table:", combined.length);
+    console.log("All members for weekly overview:", combined.length);
     return combined;
   }, [teamMembers, preRegisteredMembers])();
 
-  // Get allocations from custom hook
+  // Calculate week start date for comprehensive allocations
+  const weekStartDate = new Date(selectedWeek);
+  weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay() + 1); // Monday
+  const weekStartDateString = weekStartDate.toISOString().split('T')[0];
+
+  // Get member IDs for comprehensive allocations
+  const memberIds = allMembers?.map(m => m.id) || [];
+
+  // Fetch comprehensive weekly allocations for BOTH active and pre-registered members
+  const { comprehensiveWeeklyAllocations } = useComprehensiveAllocations({ 
+    weekStartDate: weekStartDateString, 
+    memberIds 
+  });
+
+  // Fetch detailed annual leave data for the week
+  const { weeklyLeaveDetails } = useWeeklyLeaveDetails({ 
+    weekStartDate: weekStartDateString, 
+    memberIds 
+  });
+
+  // Create allocation map from COMPREHENSIVE weekly allocations
+  const allocationMap = createAllocationMap(comprehensiveWeeklyAllocations || []);
+
+  // Calculate weekly totals per member from comprehensive allocations
+  const memberWeeklyTotals = calculateMemberWeeklyTotals(
+    comprehensiveWeeklyAllocations || [],
+    weekStartDateString,
+    allMembers || []
+  );
+
+  // Create utility functions using the comprehensive data
+  const getMemberTotal = createMemberTotalFunction(memberWeeklyTotals, comprehensiveWeeklyAllocations || []);
+  const getProjectCount = createProjectCountFunction(comprehensiveWeeklyAllocations || []);
+  const getWeeklyLeave = createWeeklyLeaveFunction(weeklyLeaveDetails);
+
+  // Legacy resource allocations (kept for compatibility)
   const { 
     memberAllocations,
     getMemberAllocation, 
@@ -140,16 +179,27 @@ export const useWeeklyResourceData = (selectedWeek: Date, filters: { office: str
   const isLoading = isInitializing || isLoadingSession || isLoadingMembers || 
                     isLoadingPending || isLoadingAllocations || isLoadingProjects;
 
-  // Determine if there are any errors - handle both string and Error types
+  // Determine if there are any errors
   const error = teamMembersError || pendingError || allocationsError;
+
+  console.log('=== WEEKLY OVERVIEW DATA SUMMARY ===');
+  console.log('Using comprehensive allocations for allocation map:', comprehensiveWeeklyAllocations?.length || 0);
+  console.log('Allocation map size:', allocationMap.size);
+  console.log('Sample allocation map entries:', Array.from(allocationMap.entries()).slice(0, 5));
 
   return {
     projects,
     allMembers,
     membersByOffice,
     filteredOffices,
+    // Legacy functions for compatibility
     getMemberAllocation,
     handleInputChange,
+    // New comprehensive functions
+    getMemberTotal,
+    getProjectCount,
+    getWeeklyLeave,
+    allocationMap,
     getOfficeDisplay,
     projectTotals,
     refreshAllocations,

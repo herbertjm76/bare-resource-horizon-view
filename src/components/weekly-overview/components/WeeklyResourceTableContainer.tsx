@@ -14,6 +14,10 @@ interface WeeklyResourceTableContainerProps {
   getOfficeDisplay: (locationCode: string) => string;
   handleInputChange: (memberId: string, field: keyof MemberAllocation, value: any) => void;
   projectTotals: () => Record<string, number>;
+  // New comprehensive functions
+  getMemberTotal?: (memberId: string) => number;
+  getProjectCount?: (memberId: string) => number;
+  allocationMap?: Map<string, number>;
 }
 
 export const WeeklyResourceTableContainer: React.FC<WeeklyResourceTableContainerProps> = ({
@@ -23,8 +27,34 @@ export const WeeklyResourceTableContainer: React.FC<WeeklyResourceTableContainer
   getMemberAllocation,
   getOfficeDisplay,
   handleInputChange,
-  projectTotals
+  projectTotals,
+  getMemberTotal,
+  getProjectCount,
+  allocationMap
 }) => {
+  // Calculate project totals using the comprehensive allocation map if available
+  const calculateProjectTotals = () => {
+    if (allocationMap && getMemberTotal) {
+      const totals: Record<string, number> = {};
+      
+      // Calculate totals from the comprehensive allocation map
+      allocationMap.forEach((hours, key) => {
+        const [memberId, projectId] = key.split(':');
+        if (!totals[projectId]) {
+          totals[projectId] = 0;
+        }
+        totals[projectId] += hours;
+      });
+      
+      return totals;
+    }
+    
+    // Fallback to legacy calculation
+    return projectTotals();
+  };
+
+  const calculatedProjectTotals = calculateProjectTotals();
+
   return (
     <div className="border rounded-lg overflow-hidden">
       <div className="weekly-table-container">
@@ -38,12 +68,15 @@ export const WeeklyResourceTableContainer: React.FC<WeeklyResourceTableContainer
               getOfficeDisplay={getOfficeDisplay}
               handleInputChange={handleInputChange}
               projects={projects}
+              getMemberTotal={getMemberTotal}
+              getProjectCount={getProjectCount}
+              allocationMap={allocationMap}
             />
           </TableBody>
           <TableFooter>
             <ProjectTotalsRow 
               projects={projects}
-              projectTotals={projectTotals()}
+              projectTotals={calculatedProjectTotals}
             />
           </TableFooter>
         </Table>

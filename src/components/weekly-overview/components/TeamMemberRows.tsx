@@ -12,6 +12,10 @@ interface TeamMemberRowsProps {
   getOfficeDisplay: (locationCode: string) => string;
   handleInputChange: (memberId: string, field: keyof MemberAllocation, value: any) => void;
   projects: Project[];
+  // New comprehensive functions
+  getMemberTotal?: (memberId: string) => number;
+  getProjectCount?: (memberId: string) => number;
+  allocationMap?: Map<string, number>;
 }
 
 export const TeamMemberRows: React.FC<TeamMemberRowsProps> = ({
@@ -20,7 +24,10 @@ export const TeamMemberRows: React.FC<TeamMemberRowsProps> = ({
   getMemberAllocation,
   getOfficeDisplay,
   handleInputChange,
-  projects
+  projects,
+  getMemberTotal,
+  getProjectCount,
+  allocationMap
 }) => {
   // Helper to get user initials
   const getUserInitials = (member: any): string => {
@@ -69,6 +76,9 @@ export const TeamMemberRows: React.FC<TeamMemberRowsProps> = ({
                   getOfficeDisplay={getOfficeDisplay}
                   onInputChange={handleInputChange}
                   projects={projects}
+                  getMemberTotal={getMemberTotal}
+                  getProjectCount={getProjectCount}
+                  allocationMap={allocationMap}
                 />
               );
             })}

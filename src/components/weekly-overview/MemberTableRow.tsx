@@ -3,6 +3,7 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Project, MemberAllocation } from './types';
+import { CapacityBar } from '@/components/week-resourcing/CapacityBar';
 
 interface MemberTableRowProps {
   member: any;
@@ -11,6 +12,10 @@ interface MemberTableRowProps {
   getOfficeDisplay: (locationCode: string) => string;
   onInputChange: (memberId: string, field: keyof MemberAllocation, value: any) => void;
   projects: Project[];
+  // New comprehensive functions
+  getMemberTotal?: (memberId: string) => number;
+  getProjectCount?: (memberId: string) => number;
+  allocationMap?: Map<string, number>;
 }
 
 export const MemberTableRow: React.FC<MemberTableRowProps> = ({
@@ -19,7 +24,10 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
   isEven,
   getOfficeDisplay,
   onInputChange,
-  projects
+  projects,
+  getMemberTotal,
+  getProjectCount,
+  allocationMap
 }) => {
   // Helper to get user initials
   const getUserInitials = (member: any): string => {
@@ -38,171 +46,154 @@ export const MemberTableRow: React.FC<MemberTableRowProps> = ({
     return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
 
-  // Display pill component for read-only data with proper styling
-  const DisplayPill: React.FC<{ 
-    value: string | number; 
-    gradientClass: string;
-    textClass: string;
-  }> = ({ value, gradientClass, textClass }) => (
-    <div className={`
-      inline-flex items-center justify-center
-      px-3 py-1.5 
-      ${gradientClass}
-      rounded-xl 
-      text-xs font-semibold 
-      ${textClass}
-      shadow-sm
-      min-w-10
-      border
-    `}>
-      {value}
-    </div>
-  );
+  // Use comprehensive data if available, otherwise fall back to legacy allocation
+  const weeklyCapacity = member.weekly_capacity || 40;
+  const totalWeeklyAllocatedHours = getMemberTotal ? getMemberTotal(member.id) : 
+    (allocation.projectAllocations?.reduce((sum, proj) => sum + proj.hours, 0) || 0);
+  const projectCount = getProjectCount ? getProjectCount(member.id) : 
+    (allocation.projectAllocations?.filter(proj => proj.hours > 0).length || 0);
+  
+  // Calculate capacity utilization
+  const annualLeave = allocation.annualLeave || 0;
+  const holidayHours = allocation.holiday || 0;
+  const otherLeave = allocation.other || 0;
+  const totalUsedHours = totalWeeklyAllocatedHours + annualLeave + holidayHours + otherLeave;
+  const availableHours = Math.max(0, weeklyCapacity - totalUsedHours);
 
-  // Manual input component for Other Leave with light purple styling
-  const ManualInputCell: React.FC<{ 
-    value: string | number; 
-    field: keyof MemberAllocation;
-    placeholder?: string;
-  }> = ({ value, field, placeholder = "0" }) => (
-    <Input
-      type="number"
-      min="0"
-      max="40"
-      value={value}
-      onChange={(e) => onInputChange(member.id, field, e.target.value)}
-      className="w-16 h-9 text-xs text-center rounded-xl border-2 border-purple-300 bg-purple-50 focus:border-purple-500 focus:bg-purple-100 transition-all font-medium"
-      placeholder={placeholder}
-    />
-  );
+  console.log(`MemberTableRow - Member ${member.first_name} ${member.last_name}:`, {
+    totalWeeklyAllocatedHours,
+    projectCount,
+    weeklyCapacity,
+    totalUsedHours,
+    availableHours,
+    usingComprehensiveData: !!getMemberTotal
+  });
 
   return (
-    <TableRow className={`${isEven ? 'bg-white' : 'bg-gray-50/30'} hover:bg-gray-100/40 transition-colors`}>
+    <TableRow className={`${isEven ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50`}>
       {/* Member Name */}
-      <TableCell className="text-left border-r p-3 rounded-l-xl">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-7 w-7 flex-shrink-0">
-            <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-            <AvatarFallback className="text-xs bg-brand-violet text-white">
+      <TableCell className="py-2 px-3">
+        <div className="flex items-center gap-2">
+          <Avatar className="h-7 w-7">
+            <AvatarImage src={getAvatarUrl(member)} />
+            <AvatarFallback className="text-xs bg-blue-100">
               {getUserInitials(member)}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm font-medium text-gray-900 truncate">
-            {getMemberDisplayName(member)}
-          </span>
-        </div>
-      </TableCell>
-
-      {/* Project Count - Purple gradient pill */}
-      <TableCell className="text-center border-r p-3 bg-gray-50/50">
-        <div className="flex items-center justify-center">
-          <DisplayPill 
-            value={allocation.projectCount}
-            gradientClass="bg-gradient-to-r from-purple-100 to-purple-200 border-purple-300"
-            textClass="text-purple-800"
-          />
-        </div>
-      </TableCell>
-
-      {/* Project Hours - Default gray gradient pill */}
-      <TableCell className="text-center border-r p-3 bg-gray-50/50">
-        <div className="flex items-center justify-center">
-          <DisplayPill 
-            value={`${allocation.projectHours}h`}
-            gradientClass="bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300"
-            textClass="text-gray-700"
-          />
-        </div>
-      </TableCell>
-
-      {/* Vacation Hours - Blue gradient pill */}
-      <TableCell className="text-center border-r p-3 bg-gray-50/50">
-        <div className="flex items-center justify-center">
-          <DisplayPill 
-            value={`${allocation.vacationHours}h`}
-            gradientClass="bg-gradient-to-r from-blue-100 to-blue-200 border-blue-300"
-            textClass="text-blue-800"
-          />
-        </div>
-      </TableCell>
-
-      {/* General Office Hours - Default gray gradient pill */}
-      <TableCell className="text-center border-r p-3 bg-gray-50/50">
-        <div className="flex items-center justify-center">
-          <DisplayPill 
-            value={`${allocation.generalOfficeHours}h`}
-            gradientClass="bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300"
-            textClass="text-gray-700"
-          />
-        </div>
-      </TableCell>
-
-      {/* Marketing Hours - Default gray gradient pill */}
-      <TableCell className="text-center border-r p-3 bg-gray-50/50">
-        <div className="flex items-center justify-center">
-          <DisplayPill 
-            value={`${allocation.marketingHours}h`}
-            gradientClass="bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300"
-            textClass="text-gray-700"
-          />
-        </div>
-      </TableCell>
-
-      {/* Public Holiday Hours - Yellow gradient pill */}
-      <TableCell className="text-center border-r p-3 bg-gray-50/50">
-        <div className="flex items-center justify-center">
-          <DisplayPill 
-            value={`${allocation.publicHolidayHours}h`}
-            gradientClass="bg-gradient-to-r from-yellow-100 to-yellow-200 border-yellow-300"
-            textClass="text-yellow-800"
-          />
-        </div>
-      </TableCell>
-
-      {/* Medical Leave Hours - Red gradient pill */}
-      <TableCell className="text-center border-r p-3 bg-gray-50/50">
-        <div className="flex items-center justify-center">
-          <DisplayPill 
-            value={`${allocation.medicalLeaveHours}h`}
-            gradientClass="bg-gradient-to-r from-red-100 to-red-200 border-red-300"
-            textClass="text-red-800"
-          />
-        </div>
-      </TableCell>
-
-      {/* Other Leave (OL) - Manual Input with light purple styling */}
-      <TableCell className="text-center border-r p-3">
-        <div className="flex items-center justify-center">
-          <ManualInputCell 
-            value={allocation.otherLeaveHours || 0}
-            field="otherLeaveHours"
-          />
-        </div>
-      </TableCell>
-
-      {/* Office Location - Green gradient pill */}
-      <TableCell className="text-center border-r p-3 bg-gray-50/50">
-        <div className="flex items-center justify-center">
-          <DisplayPill 
-            value={getOfficeDisplay(member.location)}
-            gradientClass="bg-gradient-to-r from-green-100 to-green-200 border-green-300"
-            textClass="text-green-800"
-          />
-        </div>
-      </TableCell>
-
-      {/* Project allocation cells - Default gray gradient pills */}
-      {projects.map((project) => (
-        <TableCell key={project.id} className="text-center border-r p-3 bg-gray-50/50 rounded-r-xl last:rounded-r-xl">
-          <div className="flex items-center justify-center">
-            <DisplayPill 
-              value="0"
-              gradientClass="bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300"
-              textClass="text-gray-700"
-            />
+          <div className="flex flex-col">
+            <span className="text-xs font-medium text-gray-900">{getMemberDisplayName(member)}</span>
+            <span className="text-xs text-gray-500">{getOfficeDisplay(member.location || 'unknown')}</span>
           </div>
-        </TableCell>
-      ))}
+        </div>
+      </TableCell>
+
+      {/* Project Count */}
+      <TableCell className="text-center py-2 px-2">
+        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+          {projectCount}
+        </span>
+      </TableCell>
+
+      {/* Capacity */}
+      <TableCell className="text-center py-2 px-2">
+        <CapacityBar 
+          totalUsedHours={totalUsedHours} 
+          totalCapacity={weeklyCapacity} 
+        />
+      </TableCell>
+
+      {/* Annual Leave */}
+      <TableCell className="text-center py-2 px-1">
+        <Input
+          type="number"
+          value={allocation.annualLeave || ''}
+          onChange={(e) => onInputChange(member.id, 'annualLeave', Number(e.target.value) || 0)}
+          className="w-12 h-7 text-center text-xs p-1"
+          min="0"
+          step="0.5"
+        />
+      </TableCell>
+
+      {/* Holiday */}
+      <TableCell className="text-center py-2 px-1">
+        <Input
+          type="number"
+          value={allocation.holiday || ''}
+          onChange={(e) => onInputChange(member.id, 'holiday', Number(e.target.value) || 0)}
+          className="w-12 h-7 text-center text-xs p-1"
+          min="0"
+          step="0.5"
+        />
+      </TableCell>
+
+      {/* Other Leave */}
+      <TableCell className="text-center py-2 px-1">
+        <Input
+          type="number"
+          value={allocation.other || ''}
+          onChange={(e) => onInputChange(member.id, 'other', Number(e.target.value) || 0)}
+          className="w-12 h-7 text-center text-xs p-1"
+          min="0"
+          step="0.5"
+        />
+      </TableCell>
+
+      {/* Capacity Bar */}
+      <TableCell className="text-center py-2 px-2">
+        <div className="text-xs">
+          <span className="font-medium">{availableHours}h</span>
+          <span className="text-gray-500 ml-1">avail</span>
+        </div>
+      </TableCell>
+
+      {/* Project Allocation Cells */}
+      {projects.map((project) => {
+        let hours = 0;
+        
+        // Use comprehensive allocation map if available
+        if (allocationMap) {
+          const key = `${member.id}:${project.id}`;
+          hours = allocationMap.get(key) || 0;
+        } else {
+          // Fallback to legacy allocation
+          const projectAllocation = allocation.projectAllocations?.find(p => p.projectId === project.id);
+          hours = projectAllocation?.hours || 0;
+        }
+
+        return (
+          <TableCell key={project.id} className="text-center py-2 px-1">
+            <Input
+              type="number"
+              value={hours > 0 ? hours : ''}
+              onChange={(e) => {
+                const newHours = Number(e.target.value) || 0;
+                // Update using legacy system for now
+                const existingProjectAllocations = allocation.projectAllocations || [];
+                const updatedProjectAllocations = existingProjectAllocations.filter(p => p.projectId !== project.id);
+                if (newHours > 0) {
+                  updatedProjectAllocations.push({ projectId: project.id, hours: newHours });
+                }
+                onInputChange(member.id, 'projectAllocations', updatedProjectAllocations);
+              }}
+              className="w-12 h-7 text-center text-xs p-1"
+              min="0"
+              step="0.5"
+              placeholder="0"
+            />
+          </TableCell>
+        );
+      })}
+
+      {/* Remarks */}
+      <TableCell className="py-2 px-2">
+        <Input
+          type="text"
+          value={allocation.remarks || ''}
+          onChange={(e) => onInputChange(member.id, 'remarks', e.target.value)}
+          className="w-full h-7 text-xs p-1"
+          placeholder="Notes..."
+        />
+      </TableCell>
     </TableRow>
   );
 };
