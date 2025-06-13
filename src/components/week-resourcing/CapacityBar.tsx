@@ -51,29 +51,26 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   return (
     <div className="flex items-center justify-center w-full">
       <div className="flex-1 flex justify-center items-center gap-2">
-        {/* Capacity visual - rounded square with percentage inside */}
+        {/* Horizontal progress bar */}
         <div className="relative">
           <div 
-            className="w-8 h-8 rounded-md border border-gray-300 overflow-hidden"
-            style={{ backgroundColor: '#f3f4f6' }}
+            className="w-12 h-3 rounded-full border border-gray-300 overflow-hidden bg-gray-100"
           >
-            {/* Fill based on utilization percentage */}
+            {/* Fill bar that grows left-to-right */}
             <div 
-              className="h-full transition-all duration-300"
+              className="h-full transition-all duration-300 rounded-full"
               style={{
                 width: `${Math.min(100, utilizationPercentage)}%`,
                 backgroundColor: utilizationColor
               }} 
             />
           </div>
-          
-          {/* Percentage text centered over the square */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-[9px] font-medium text-gray-800">
-              {utilizationRate}%
-            </span>
-          </div>
         </div>
+        
+        {/* Percentage text next to the bar */}
+        <span className="text-[10px] font-medium text-gray-600 min-w-[20px]">
+          {utilizationRate}%
+        </span>
         
         {/* Available hours number with color coding - show negative if over capacity */}
         <span className={cn("text-xs font-medium", textColor)}>
