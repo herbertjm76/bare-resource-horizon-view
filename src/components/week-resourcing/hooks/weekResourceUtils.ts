@@ -11,10 +11,11 @@ export const createAllocationMap = (allocations: any[]) => {
     });
   }
   
-  console.log('=== ALLOCATION MAP CREATION (FIXED) ===');
+  console.log('=== ALLOCATION MAP CREATION (FIXED V2) ===');
   console.log('Input weekly allocations:', allocations?.length || 0);
   console.log('Created allocation map with entries:', allocationMap.size);
-  console.log('All allocation map entries:', Array.from(allocationMap.entries()));
+  console.log('All allocation map entries (key: member:project, value: weekly hours):', 
+    Array.from(allocationMap.entries()).map(([key, hours]) => `${key} = ${hours}h`));
   
   return allocationMap;
 };
@@ -36,18 +37,19 @@ export const calculateMemberWeeklyTotals = (
     });
   }
 
-  console.log('=== WEEKLY TOTALS CALCULATION (FIXED) ===');
+  console.log('=== WEEKLY TOTALS CALCULATION (FIXED V2) ===');
   console.log('Week start date:', weekStartDate);
   console.log('Total weekly allocations processed:', comprehensiveWeeklyAllocations?.length || 0);
-  console.log('Member weekly totals (ALL projects combined):', Object.fromEntries(memberWeeklyTotals));
+  console.log('Member weekly totals (ALL projects combined for ENTIRE week):', Object.fromEntries(memberWeeklyTotals));
   console.log('Total members with allocations:', memberWeeklyTotals.size);
   
-  // Log detailed breakdown for each member
+  // Log detailed breakdown for each member to verify weekly totals
   memberWeeklyTotals.forEach((totalHours, memberId) => {
     const memberAllocations = comprehensiveWeeklyAllocations?.filter(a => a.resource_id === memberId) || [];
     const memberName = members.find(m => m.id === memberId);
     console.log(`Member ${memberName?.first_name} ${memberName?.last_name} (${memberId}):`, {
       totalWeeklyHours: totalHours,
+      expectedWeeklyTotal: memberAllocations.reduce((sum, a) => sum + Number(a.hours), 0),
       projectBreakdown: memberAllocations.map(a => ({
         project_id: a.project_id,
         hours: a.hours
@@ -64,7 +66,7 @@ export const createMemberTotalFunction = (
 ) => {
   return (memberId: string): number => {
     const total = memberWeeklyTotals.get(memberId) || 0;
-    console.log(`=== MEMBER TOTAL LOOKUP (FIXED) ===`);
+    console.log(`=== MEMBER TOTAL LOOKUP (FIXED V2) ===`);
     console.log(`Member ${memberId} weekly total hours:`, total);
     
     // Also log the individual allocations for this member for debugging
@@ -73,6 +75,7 @@ export const createMemberTotalFunction = (
       project_id: a.project_id,
       hours: a.hours
     })));
+    console.log(`Verification: Sum of individual allocations = ${memberAllocations.reduce((sum, a) => sum + Number(a.hours), 0)}h`);
     
     return total;
   };
@@ -89,7 +92,7 @@ export const createProjectCountFunction = (comprehensiveWeeklyAllocations: any[]
         .forEach(allocation => memberProjects.add(allocation.project_id));
       count = memberProjects.size;
     }
-    console.log(`Member ${memberId} project count (fixed):`, count);
+    console.log(`Member ${memberId} project count (fixed v2):`, count);
     return count;
   };
 };
