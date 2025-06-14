@@ -112,10 +112,6 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
             <CapacityBarCell
               totalUsedHours={totalUsedHours}
               totalCapacity={weeklyCapacity}
-              utilizationValue={utilizationPercentage}
-              showText
-              size="lg"
-              className="mx-auto"
             />
           </EnhancedTooltip>
         </TableCell>
@@ -183,9 +179,6 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           <CapacityBarCell
             totalUsedHours={totalUsedHours}
             totalCapacity={weeklyCapacity}
-            utilizationValue={utilizationPercentage}
-            size="compact"
-            className="mx-auto"
           />
         </EnhancedTooltip>
       </TableCell>
