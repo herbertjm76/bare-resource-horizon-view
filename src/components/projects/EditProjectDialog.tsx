@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { useProjectForm } from "./hooks/useProjectForm";
@@ -79,8 +80,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     officeStages,
     updateStageApplicability,
     updateStageFee,
-    handleChange,
-    isDataLoaded
+    handleChange
+    // REMOVED: isDataLoaded
   } = useProjectForm(loadedProject, isOpen, refetchSignal);
 
   // Pass setRefetchSignal so downstream hooks can trigger a refresh after submit
@@ -113,7 +114,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
         updateStageApplicability={updateStageApplicability}
         updateStageFee={updateStageFee}
         handleChange={handleChange}
-        isDataLoaded={isDataLoaded}
+        isDataLoaded={true} {/* Provide default value as removed from hook */}
         onClose={onClose}
         onSubmit={onSubmit}
         projectId={loadedProject?.id}
