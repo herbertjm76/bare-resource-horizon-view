@@ -30,10 +30,6 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           COUNT
         </TableHead>
         
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'total-column'} ${headerPadding} ${headerTextSize}`}>
-          TOTAL
-        </TableHead>
-        
         <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[80px]' : 'utilization-column'} ${headerPadding} ${headerTextSize}`}>
           UTILIZATION
         </TableHead>

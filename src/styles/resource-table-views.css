@@ -27,7 +27,7 @@
   padding: 0.375rem;
 }
 
-/* Enhanced Fixed Column Widths */
+/* Enhanced Fixed Column Widths - Square Columns */
 .resource-table-compact .name-column {
   width: 160px;
   min-width: 160px;
@@ -39,48 +39,41 @@
 }
 
 .resource-table-compact .count-column {
-  width: 55px;
-  min-width: 55px;
-  max-width: 55px;
-}
-
-.resource-table-compact .total-column {
-  width: 65px;
-  min-width: 65px;
-  max-width: 65px;
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
 }
 
 .resource-table-compact .utilization-column {
-  width: 140px;
-  min-width: 140px;
   flex: 1;
+  min-width: 120px;
 }
 
 .resource-table-compact .leave-column {
-  width: 75px;
-  min-width: 75px;
-  max-width: 75px;
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
 }
 
 .resource-table-compact .other-leave-column {
-  width: 55px;
-  min-width: 55px;
-  max-width: 55px;
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
 }
 
 .resource-table-compact .remarks-column {
-  width: 65px;
-  min-width: 65px;
-  max-width: 65px;
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
 }
 
 .resource-table-compact .project-column {
-  width: 38px;
-  min-width: 38px;
-  max-width: 38px;
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
 }
 
-/* Enhanced Utilization Pill */
+/* Enhanced Utilization Pill - Elongated in Compact View */
 .resource-table-compact .utilization-pill {
   height: 32px;
   min-height: 32px;
@@ -98,7 +91,27 @@
   overflow: hidden;
 }
 
-.resource-table-compact .utilization-pill::before {
+/* New Elongated Pill for Compact View */
+.resource-table-compact .utilization-pill-elongated {
+  height: 28px;
+  min-height: 28px;
+  padding: 6px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  max-width: 100px;
+  border: 2px solid;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.resource-table-compact .utilization-pill::before,
+.resource-table-compact .utilization-pill-elongated::before {
   content: '';
   position: absolute;
   top: 0;
@@ -109,7 +122,8 @@
   transition: left 0.5s;
 }
 
-.resource-table-compact .utilization-pill:hover::before {
+.resource-table-compact .utilization-pill:hover::before,
+.resource-table-compact .utilization-pill-elongated:hover::before {
   left: 100%;
 }
 
@@ -266,7 +280,8 @@
     font-size: 12px;
   }
   
-  .resource-table-compact .utilization-pill {
+  .resource-table-compact .utilization-pill,
+  .resource-table-compact .utilization-pill-elongated {
     padding: 6px 12px;
     font-size: 11px;
     min-width: 60px;

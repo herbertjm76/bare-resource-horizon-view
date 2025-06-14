@@ -98,27 +98,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           </div>
         </TableCell>
         
-        {/* Total Hours - Expanded */}
-        <TableCell className="text-center border-r border-gray-200 px-3 py-3">
-          <EnhancedTooltip
-            type="total"
-            member={member}
-            totalUsedHours={totalUsedHours}
-            weeklyCapacity={weeklyCapacity}
-            annualLeave={annualLeave}
-            holidayHours={holidayHours}
-            leaveDays={leaveDays}
-          >
-            <div className="flex flex-col items-center gap-1">
-              <span className="inline-flex items-center justify-center w-16 h-8 bg-blue-500 text-white rounded-lg font-semibold text-sm shadow-sm">
-                {totalUsedHours}h
-              </span>
-              <span className="text-xs text-gray-500">of {weeklyCapacity}h</span>
-            </div>
-          </EnhancedTooltip>
-        </TableCell>
-        
-        {/* Utilization - Expanded */}
+        {/* Utilization - Expanded with Total below */}
         <TableCell className="text-center border-r border-gray-200 px-3 py-3">
           <EnhancedTooltip
             type="utilization"
@@ -130,9 +110,14 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
             holidayHours={holidayHours}
             leaveDays={leaveDays}
           >
-            <span className={`inline-flex items-center justify-center w-16 h-10 rounded-xl font-bold text-sm shadow-lg ${getUtilizationStyle()}`}>
-              {utilizationPercentage}%
-            </span>
+            <div className="flex flex-col items-center gap-1">
+              <span className={`inline-flex items-center justify-center w-16 h-10 rounded-xl font-bold text-sm shadow-lg ${getUtilizationStyle()}`}>
+                {utilizationPercentage}%
+              </span>
+              <span className="inline-flex items-center justify-center w-16 h-6 bg-blue-500 text-white rounded-lg font-semibold text-xs shadow-sm">
+                {totalUsedHours}h
+              </span>
+            </div>
           </EnhancedTooltip>
         </TableCell>
         
@@ -198,21 +183,14 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       
       {/* Project Count - Compact */}
       <TableCell className="text-center border-r border-gray-200 px-2 py-2 count-column">
-        <span className="inline-flex items-center justify-center w-7 h-7 bg-slate-500 text-white rounded-full font-bold text-xs shadow-sm">
+        <span className="inline-flex items-center justify-center w-8 h-8 bg-slate-500 text-white rounded-md font-bold text-xs shadow-sm">
           {projectCount}
         </span>
       </TableCell>
       
-      {/* Total Hours - Compact */}
-      <TableCell className="text-center border-r border-gray-200 px-2 py-2 total-column">
-        <span className="inline-flex items-center justify-center w-8 h-7 bg-blue-500 text-white rounded-md font-bold text-xs shadow-sm">
-          {totalUsedHours}h
-        </span>
-      </TableCell>
-      
-      {/* Utilization - Compact with enhanced pill */}
+      {/* Utilization - Compact with elongated pill */}
       <TableCell className="text-center border-r border-gray-200 px-3 py-2 utilization-column">
-        <span className={`utilization-pill inline-flex items-center justify-center rounded-full font-bold text-sm shadow-md transition-all duration-200 hover:scale-105 ${getUtilizationStyle()}`}>
+        <span className={`utilization-pill-elongated inline-flex items-center justify-center rounded-full font-bold text-sm shadow-md transition-all duration-200 hover:scale-105 ${getUtilizationStyle()}`}>
           {utilizationPercentage}%
         </span>
       </TableCell>
@@ -235,13 +213,13 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       </TableCell>
       
       <TableCell className="text-center border-r border-gray-200 px-2 py-2 other-leave-column">
-        <span className="inline-flex items-center justify-center w-6 h-6 bg-gray-200 text-gray-600 rounded text-xs">
+        <span className="inline-flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-600 rounded-md text-xs">
           -
         </span>
       </TableCell>
       
       <TableCell className="text-center border-r border-gray-200 px-2 py-2 remarks-column">
-        <span className="inline-flex items-center justify-center px-2 h-6 bg-gray-200 text-gray-600 rounded text-xs">
+        <span className="inline-flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-600 rounded-md text-xs">
           -
         </span>
       </TableCell>
@@ -253,7 +231,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         return (
           <TableCell key={project.id} className="text-center border-r border-gray-200 px-1 py-2 project-column">
             {hours > 0 && (
-              <span className="inline-flex items-center justify-center w-7 h-6 bg-emerald-500 text-white rounded-md font-bold text-xs shadow-sm hover:bg-emerald-600 transition-colors duration-200">
+              <span className="inline-flex items-center justify-center w-8 h-8 bg-emerald-500 text-white rounded-md font-bold text-xs shadow-sm hover:bg-emerald-600 transition-colors duration-200">
                 {hours}
               </span>
             )}
