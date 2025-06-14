@@ -77,47 +77,45 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     );
   }
 
-  // Compact view with tighter wrapping and centering
+  // Compact view - remove full width wrapper, let container be exact size
   return (
-    <div className="w-full flex justify-center overflow-x-auto">
-      <div 
-        ref={containerRef}
-        className="resource-table-compact-container"
+    <div 
+      ref={containerRef}
+      className="resource-table-compact-container overflow-x-auto"
+      style={{
+        width: `${tableWidth}px`,
+        minWidth: `${tableWidth}px`,
+        maxWidth: `${tableWidth}px`
+      }}
+    >
+      <Table 
+        ref={tableRef}
+        className="resource-table-compact"
         style={{
           width: `${tableWidth}px`,
           minWidth: `${tableWidth}px`,
-          maxWidth: `${tableWidth}px`
+          tableLayout: 'fixed'
         }}
       >
-        <Table 
-          ref={tableRef}
-          className="resource-table-compact"
-          style={{
-            width: `${tableWidth}px`,
-            minWidth: `${tableWidth}px`,
-            tableLayout: 'fixed'
-          }}
-        >
-          <NewResourceTableHeader projects={projects} viewMode={viewMode} />
-          <TableBody>
-            {members.map((member, index) => (
-              <NewResourceTableRow
-                key={member.id}
-                member={member}
-                memberIndex={index}
-                projects={projects}
-                allocationMap={allocationMap}
-                annualLeaveData={annualLeaveData}
-                holidaysData={holidaysData}
-                getMemberTotal={getMemberTotal}
-                getProjectCount={getProjectCount}
-                getWeeklyLeave={getWeeklyLeave}
-                viewMode={viewMode}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+        <NewResourceTableHeader projects={projects} viewMode={viewMode} />
+        <TableBody>
+          {members.map((member, index) => (
+            <NewResourceTableRow
+              key={member.id}
+              member={member}
+              memberIndex={index}
+              projects={projects}
+              allocationMap={allocationMap}
+              annualLeaveData={annualLeaveData}
+              holidaysData={holidaysData}
+              getMemberTotal={getMemberTotal}
+              getProjectCount={getProjectCount}
+              getWeeklyLeave={getWeeklyLeave}
+              viewMode={viewMode}
+            />
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };
