@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { useProjectForm } from "./hooks/useProjectForm";
@@ -114,7 +113,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
         updateStageApplicability={updateStageApplicability}
         updateStageFee={updateStageFee}
         handleChange={handleChange}
-        isDataLoaded={true} {/* Provide default value as removed from hook */}
+        // Provide default value as removed from hook
+        isDataLoaded={true}
         onClose={onClose}
         onSubmit={onSubmit}
         projectId={loadedProject?.id}
