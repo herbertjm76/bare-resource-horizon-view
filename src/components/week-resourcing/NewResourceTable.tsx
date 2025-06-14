@@ -29,34 +29,17 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLTableElement>(null);
-  const [needsHorizontalScroll, setNeedsHorizontalScroll] = useState(false);
+  const [tableWidth, setTableWidth] = useState<number>(0);
 
-  // Calculate if horizontal scroll is needed
+  // Calculate exact table width
   useEffect(() => {
-    if (!containerRef.current || !tableRef.current || viewMode !== 'compact') {
-      return;
-    }
-
-    const checkScrollNeeded = () => {
-      const containerWidth = containerRef.current?.clientWidth || 0;
+    if (viewMode === 'compact') {
       // Fixed width calculation: name(180) + utilization(200) + leave(150) + count(35) = 565
       const baseWidth = 565;
       const projectWidth = projects.length * 35; // Each project column is 35px
-      const totalMinWidth = baseWidth + projectWidth;
-      
-      setNeedsHorizontalScroll(totalMinWidth > containerWidth);
-    };
-
-    checkScrollNeeded();
-    
-    const resizeObserver = new ResizeObserver(checkScrollNeeded);
-    if (containerRef.current) {
-      resizeObserver.observe(containerRef.current);
+      const totalWidth = baseWidth + projectWidth;
+      setTableWidth(totalWidth);
     }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
   }, [projects.length, viewMode]);
 
   if (members.length === 0) {
@@ -67,44 +50,52 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     );
   }
 
-  const tableClasses = viewMode === 'expanded' 
-    ? 'resource-table-expanded' 
-    : 'resource-table-compact';
+  if (viewMode === 'expanded') {
+    return (
+      <div className="w-full overflow-x-auto">
+        <Table className="resource-table-expanded">
+          <NewResourceTableHeader projects={projects} viewMode={viewMode} />
+          <TableBody>
+            {members.map((member, index) => (
+              <NewResourceTableRow
+                key={member.id}
+                member={member}
+                memberIndex={index}
+                projects={projects}
+                allocationMap={allocationMap}
+                annualLeaveData={annualLeaveData}
+                holidaysData={holidaysData}
+                getMemberTotal={getMemberTotal}
+                getProjectCount={getProjectCount}
+                getWeeklyLeave={getWeeklyLeave}
+                viewMode={viewMode}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
 
-  // Calculate total table width for compact mode
-  const totalTableWidth = viewMode === 'compact' 
-    ? 565 + (projects.length * 35) // 180 + 200 + 150 + 35 + (projects * 35)
-    : 'auto';
-
-  // Container styles for center alignment and wrapping
-  const containerClasses = viewMode === 'compact'
-    ? 'flex justify-center w-full'
-    : 'overflow-x-auto';
-
-  const tableWrapperClasses = viewMode === 'compact'
-    ? `resource-table-compact-container ${needsHorizontalScroll ? 'has-horizontal-scroll' : 'fits-viewport'}`
-    : 'overflow-x-auto';
-
+  // Compact view with proper wrapping and centering
   return (
-    <div 
-      ref={containerRef}
-      className={containerClasses}
-    >
+    <div className="w-full flex justify-center">
       <div 
-        className={tableWrapperClasses}
+        ref={containerRef}
+        className="resource-table-compact-container"
         style={{
-          width: viewMode === 'compact' ? 'fit-content' : '100%',
+          width: `${tableWidth}px`,
           maxWidth: '100%',
           overflowX: 'auto'
         }}
       >
         <Table 
           ref={tableRef}
-          className={tableClasses}
+          className="resource-table-compact"
           style={{
-            width: totalTableWidth,
-            minWidth: totalTableWidth,
-            tableLayout: viewMode === 'compact' ? 'fixed' : 'auto'
+            width: `${tableWidth}px`,
+            minWidth: `${tableWidth}px`,
+            tableLayout: 'fixed'
           }}
         >
           <NewResourceTableHeader projects={projects} viewMode={viewMode} />
