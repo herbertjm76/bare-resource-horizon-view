@@ -28,7 +28,7 @@ export const ProjectCountCell: React.FC<ProjectCountCellProps> = ({ projectCount
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="inline-flex items-center justify-center w-6 h-5 sm:w-8 sm:h-6 text-xs bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 rounded border border-gray-200 font-medium shadow-sm cursor-help hover:bg-gradient-to-br hover:from-gray-200 hover:to-slate-200 transition-colors">
+            <span className="inline-flex items-center justify-center w-6 h-5 sm:w-8 sm:h-6 text-xs bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 rounded border border-gray-200 font-medium shadow-sm cursor-pointer hover:bg-gradient-to-br hover:from-gray-200 hover:to-slate-200 transition-colors">
               {projectCount}
             </span>
           </TooltipTrigger>

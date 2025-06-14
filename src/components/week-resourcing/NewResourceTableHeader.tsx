@@ -29,7 +29,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-help">AL</span>
+                <span className="cursor-pointer">AL</span>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="text-sm font-medium">
@@ -43,7 +43,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-help">HO</span>
+                <span className="cursor-pointer">HO</span>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="text-sm font-medium">
@@ -71,7 +71,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
                     <TooltipTrigger asChild>
                       <div className="absolute inset-0 flex items-center justify-center p-1">
                         <div 
-                          className="project-code-text text-xs font-bold whitespace-nowrap cursor-help"
+                          className="project-code-text text-xs font-bold whitespace-nowrap cursor-pointer"
                           style={{
                             transform: 'rotate(-90deg)',
                             transformOrigin: 'center',

@@ -53,7 +53,7 @@ export const NameCell: React.FC<NameCellProps> = ({ member }) => {
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="flex items-center gap-2 px-2 text-sm" title={getMemberDisplayName()}>
+            <div className="flex items-center gap-2 px-2 text-sm cursor-pointer" title={getMemberDisplayName()}>
               <Avatar className="h-6 w-6">
                 <AvatarImage 
                   src={avatarUrl} 
