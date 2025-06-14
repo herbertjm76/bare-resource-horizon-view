@@ -68,8 +68,8 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
     >
       {/* Team Member consolidated cell */}
       <TableCell
-        className="border-r border-gray-200 px-1 py-0.5 name-column min-w-[120px] max-w-[120px] w-[120px] overflow-hidden"
-        style={{ width: 120, minWidth: 120, maxWidth: 120, background: 'inherit', zIndex: 5 }}
+        className="border-r border-gray-200 px-2 py-0.5 name-column min-w-[160px] max-w-[160px] w-[160px] overflow-hidden bg-gradient-to-r from-blue-50 to-indigo-50"
+        style={{ width: 160, minWidth: 160, maxWidth: 160, zIndex: 5 }}
       >
         <TooltipProvider>
           <Tooltip>
@@ -91,7 +91,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
                 <span
                   className="truncate font-semibold"
                   style={{
-                    fontSize: '13px',
+                    fontSize: '12px',
                     lineHeight: '1.1',
                     maxWidth: 'calc(100% - 32px)', // Leave space for avatar
                     display: 'block',
@@ -116,14 +116,14 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
       </TableCell>
       
       {/* Project Count */}
-      <TableCell className="text-center border-r border-gray-200 px-0.5 py-0.5 count-column">
-        <span className="inline-flex items-center justify-center w-6 h-6 bg-slate-500 text-white rounded-sm font-semibold text-[11px] shadow-sm">
+      <TableCell className="text-center border-r border-gray-200 px-1 py-0.5 count-column bg-gradient-to-r from-gray-50 to-slate-50 min-w-[35px] max-w-[35px] w-[35px]">
+        <span className="inline-flex items-center justify-center w-7 h-6 bg-slate-500 text-white rounded-sm font-semibold text-[11px] shadow-sm">
           {projectCount}
         </span>
       </TableCell>
       
-      {/* Utilization: Compact Progress Bar */}
-      <TableCell className="text-center border-r border-gray-200 px-1 py-0.5 utilization-column min-w-[72px] max-w-[100px]">
+      {/* Utilization: Full Width Progress Bar with text inside */}
+      <TableCell className="text-center border-r border-gray-200 px-1 py-0.5 utilization-column bg-gradient-to-r from-emerald-50 to-green-50">
         <LongCapacityBar
           totalUsedHours={totalUsedHours}
           totalCapacity={weeklyCapacity}
@@ -138,7 +138,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
         otherLeave={displayedOtherLeave}
         remarks={remarks}
         leaveDays={leaveDays}
-        className="px-0.5 py-0.5"
+        className="px-0.5 py-0.5 bg-gradient-to-r from-yellow-50 to-orange-50"
         editableOther={editableOtherLeave}
         onOtherLeaveChange={handleOtherLeaveChange}
         compact
@@ -151,7 +151,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
         return (
           <TableCell
             key={project.id}
-            className="text-center border-r border-gray-200 px-0.5 py-0.5 project-column"
+            className="text-center border-r border-gray-200 px-0.5 py-0.5 project-column bg-gradient-to-r from-purple-50 to-violet-50"
             style={{ width: 30, minWidth: 30, maxWidth: 36 }}
           >
             {hours > 0 && (

@@ -27,9 +27,9 @@
 
 /* Fixed Column Widths - Compact */
 .resource-table-compact .name-column {
-  width: 60px;
-  min-width: 60px;
-  max-width: 60px;
+  width: 160px;
+  min-width: 160px;
+  max-width: 160px;
   position: sticky;
   left: 0;
   background: inherit;
@@ -37,9 +37,9 @@
 }
 
 .resource-table-compact .count-column {
-  width: 15px;
-  min-width: 15px;
-  max-width: 15px;
+  width: 35px;
+  min-width: 35px;
+  max-width: 35px;
 }
 
 .resource-table-compact .utilization-column {
@@ -196,17 +196,17 @@
   font-size: 9px !important;
 }
 
-/* Specific width overrides for ultra-compact mode */
+/* Updated specific width overrides for ultra-compact mode */
 .resource-table-row-compact .name-column {
-  width: 60px !important;
-  min-width: 60px !important;
-  max-width: 60px !important;
+  width: 160px !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
 }
 
 .resource-table-row-compact .count-column {
-  width: 15px !important;
-  min-width: 15px !important;
-  max-width: 15px !important;
+  width: 35px !important;
+  min-width: 35px !important;
+  max-width: 35px !important;
 }
 
 .resource-table-row-compact .leave-column {
