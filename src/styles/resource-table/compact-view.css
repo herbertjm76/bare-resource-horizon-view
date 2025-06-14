@@ -67,9 +67,10 @@
   width: 35px;
 }
 
-/* Enhanced Table Container for Fixed Behavior */
+/* Enhanced Table Container for Fixed Behavior - Updated for center alignment */
 .resource-table-compact-container {
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
   overflow-x: auto;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 12px;
@@ -78,7 +79,6 @@
 }
 
 .resource-table-compact-container table {
-  min-width: fit-content;
   width: 100%;
   table-layout: fixed;
   background: white;
@@ -87,28 +87,14 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Fixed width calculation based on content */
-@media (min-width: 768px) {
-  .resource-table-compact-container {
-    overflow-x: auto;
-  }
-  
-  .resource-table-compact-container table {
-    width: auto;
-    min-width: calc(565px + var(--project-columns, 0) * 35px);
-  }
+/* Center alignment when table fits viewport */
+.resource-table-compact-container.fits-viewport {
+  margin: 0 auto;
 }
 
 /* Horizontal scroll when content exceeds viewport */
-@media (max-width: 767px) {
-  .resource-table-compact-container {
-    overflow-x: auto;
-  }
-  
-  .resource-table-compact-container table {
-    min-width: calc(565px + var(--project-columns, 0) * 35px);
-    width: auto;
-  }
+.resource-table-compact-container.has-horizontal-scroll {
+  overflow-x: auto;
 }
 
 /* Enhanced Utilization Pill - Compact */
@@ -287,18 +273,22 @@
   font-weight: 700;
 }
 
-/* Dynamic table behavior */
+/* Dynamic table behavior - Updated for center alignment */
 .dynamic-table-container {
   width: 100%;
   position: relative;
+  display: flex;
+  justify-content: center;
 }
 
 .dynamic-table-container.has-horizontal-scroll {
   overflow-x: auto;
+  justify-content: flex-start;
 }
 
 .dynamic-table-container.fits-viewport {
-  overflow-x: auto;
+  overflow-x: visible;
+  justify-content: center;
 }
 
 /* Smooth transitions for dynamic behavior */

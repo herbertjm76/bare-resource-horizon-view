@@ -71,51 +71,62 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     ? 'resource-table-expanded' 
     : 'resource-table-compact';
 
-  const containerClasses = viewMode === 'compact'
-    ? `dynamic-table-container ${needsHorizontalScroll ? 'has-horizontal-scroll' : 'fits-viewport'} resource-table-compact-container`
-    : 'overflow-x-auto';
-
   // Calculate total table width for compact mode
   const totalTableWidth = viewMode === 'compact' 
     ? 565 + (projects.length * 35) // 180 + 200 + 150 + 35 + (projects * 35)
     : 'auto';
 
+  // Container styles for center alignment and wrapping
+  const containerClasses = viewMode === 'compact'
+    ? 'flex justify-center w-full'
+    : 'overflow-x-auto';
+
+  const tableWrapperClasses = viewMode === 'compact'
+    ? `resource-table-compact-container ${needsHorizontalScroll ? 'has-horizontal-scroll' : 'fits-viewport'}`
+    : 'overflow-x-auto';
+
   return (
     <div 
       ref={containerRef}
       className={containerClasses}
-      style={{
-        overflowX: 'auto'
-      }}
     >
-      <Table 
-        ref={tableRef}
-        className={tableClasses}
+      <div 
+        className={tableWrapperClasses}
         style={{
-          width: totalTableWidth,
-          minWidth: totalTableWidth,
-          tableLayout: viewMode === 'compact' ? 'fixed' : 'auto'
+          width: viewMode === 'compact' ? 'fit-content' : '100%',
+          maxWidth: '100%',
+          overflowX: 'auto'
         }}
       >
-        <NewResourceTableHeader projects={projects} viewMode={viewMode} />
-        <TableBody>
-          {members.map((member, index) => (
-            <NewResourceTableRow
-              key={member.id}
-              member={member}
-              memberIndex={index}
-              projects={projects}
-              allocationMap={allocationMap}
-              annualLeaveData={annualLeaveData}
-              holidaysData={holidaysData}
-              getMemberTotal={getMemberTotal}
-              getProjectCount={getProjectCount}
-              getWeeklyLeave={getWeeklyLeave}
-              viewMode={viewMode}
-            />
-          ))}
-        </TableBody>
-      </Table>
+        <Table 
+          ref={tableRef}
+          className={tableClasses}
+          style={{
+            width: totalTableWidth,
+            minWidth: totalTableWidth,
+            tableLayout: viewMode === 'compact' ? 'fixed' : 'auto'
+          }}
+        >
+          <NewResourceTableHeader projects={projects} viewMode={viewMode} />
+          <TableBody>
+            {members.map((member, index) => (
+              <NewResourceTableRow
+                key={member.id}
+                member={member}
+                memberIndex={index}
+                projects={projects}
+                allocationMap={allocationMap}
+                annualLeaveData={annualLeaveData}
+                holidaysData={holidaysData}
+                getMemberTotal={getMemberTotal}
+                getProjectCount={getProjectCount}
+                getWeeklyLeave={getWeeklyLeave}
+                viewMode={viewMode}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };
