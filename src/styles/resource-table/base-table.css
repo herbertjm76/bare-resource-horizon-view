@@ -1,0 +1,61 @@
+
+/* Base Resource Table Styles */
+
+.resource-table-compact,
+.resource-table-expanded {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Enhanced Table Container */
+.resource-table-compact-container {
+  overflow-x: auto;
+  width: 100%;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  padding: 2px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.resource-table-compact-container table {
+  min-width: 100%;
+  table-layout: auto;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Avatar Enhancements */
+.resource-table-expanded .avatar {
+  width: 36px;
+  height: 36px;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.resource-table-compact .avatar {
+  width: 28px;
+  height: 28px;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced Member Info */
+.resource-table-expanded .member-info-expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.resource-table-expanded .member-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.resource-table-expanded .allocation-percentage {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 3px;
+  font-weight: 500;
+}

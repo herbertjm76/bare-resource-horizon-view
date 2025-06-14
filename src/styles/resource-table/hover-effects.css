@@ -1,0 +1,34 @@
+
+/* Hover Effects and Interactions */
+
+.resource-table-compact tbody tr:hover {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.05) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.resource-table-expanded tbody tr:hover {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.03) 0%, rgba(147, 197, 253, 0.03) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar Styling */
+.resource-table-compact-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.resource-table-compact-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.resource-table-compact-container::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.resource-table-compact-container::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}

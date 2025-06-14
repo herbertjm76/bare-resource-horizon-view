@@ -1,0 +1,8 @@
+
+/* Resource Table Views - Modular CSS Implementation */
+
+@import './base-table.css';
+@import './compact-view.css';
+@import './expanded-view.css';
+@import './hover-effects.css';
+@import './responsive.css';

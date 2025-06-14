@@ -1,0 +1,216 @@
+
+/* Compact View Styles */
+
+.resource-table-compact {
+  font-size: 13px;
+}
+
+.resource-table-compact th {
+  padding: 12px 8px;
+  height: 56px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.resource-table-compact td {
+  padding: 6px 4px;
+  height: 48px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.resource-table-compact .project-code-header {
+  height: 90px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0.375rem;
+}
+
+/* Fixed Column Widths - Compact */
+.resource-table-compact .name-column {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  position: sticky;
+  left: 0;
+  background: inherit;
+  z-index: 5;
+}
+
+.resource-table-compact .count-column {
+  width: 15px;
+  min-width: 15px;
+  max-width: 15px;
+}
+
+.resource-table-compact .utilization-column {
+  flex: 1;
+  min-width: 120px;
+}
+
+.resource-table-compact .leave-column {
+  width: 33px;
+  min-width: 33px;
+  max-width: 33px;
+}
+
+.resource-table-compact .other-leave-column {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+}
+
+.resource-table-compact .remarks-column {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+}
+
+.resource-table-compact .project-column {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+}
+
+/* Enhanced Utilization Pill - Compact */
+.resource-table-compact .utilization-pill {
+  height: 32px;
+  min-height: 32px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 75px;
+  border: 2px solid;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Elongated Pill for Compact View */
+.resource-table-compact .utilization-pill-elongated {
+  height: 28px;
+  min-height: 28px;
+  padding: 6px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  max-width: 100px;
+  border: 2px solid;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.resource-table-compact .utilization-pill::before,
+.resource-table-compact .utilization-pill-elongated::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.resource-table-compact .utilization-pill:hover::before,
+.resource-table-compact .utilization-pill-elongated:hover::before {
+  left: 100%;
+}
+
+/* Ultra-Compact Mode */
+.resource-table-row-compact td,
+.resource-table-row-compact .name-column,
+.resource-table-row-compact .count-column,
+.resource-table-row-compact .utilization-column,
+.resource-table-row-compact .leave-column,
+.resource-table-row-compact .project-column {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+  font-size: 11px;
+  min-height: 20px;
+  height: 24px;
+  line-height: 1;
+}
+
+.resource-table-row-compact {
+  min-height: 24px !important;
+  height: 28px !important;
+  font-size: 11px;
+}
+
+.resource-table-row-compact .avatar {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.resource-table-row-compact .name-cell-label {
+  font-size: 12px !important;
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resource-table-row-compact .badge,
+.resource-table-row-compact .badge-outline {
+  min-width: 12px !important;
+  height: 18px !important;
+  font-size: 9px !important;
+  padding: 0 2px !important;
+  line-height: 1.2;
+}
+
+.resource-table-row-compact .project-column span {
+  min-width: 22px;
+  max-width: 32px;
+  height: 22px;
+  font-size: 11px;
+  border-radius: 4px;
+  padding: 0 3px !important;
+}
+
+.resource-table-row-compact .utilization-column,
+.resource-table-row-compact .leave-column {
+  min-width: 30px;
+  max-width: 60px;
+}
+
+.resource-table-row-compact .utilization-column .long-bar {
+  min-width: 40px !important;
+  height: 13px !important;
+}
+
+.resource-table-row-compact .compact-leave-badge {
+  padding: 0 1px;
+  min-width: 12px !important;
+  height: 16px !important;
+  font-size: 9px !important;
+}
+
+/* Specific width overrides for ultra-compact mode */
+.resource-table-row-compact .name-column {
+  width: 60px !important;
+  min-width: 60px !important;
+  max-width: 60px !important;
+}
+
+.resource-table-row-compact .count-column {
+  width: 15px !important;
+  min-width: 15px !important;
+  max-width: 15px !important;
+}
+
+.resource-table-row-compact .leave-column {
+  width: 33px !important;
+  min-width: 33px !important;
+  max-width: 33px !important;
+}
