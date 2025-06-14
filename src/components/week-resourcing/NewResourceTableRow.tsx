@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { NameCell } from './cells/NameCell';
@@ -7,7 +6,7 @@ import { CapacityBarCell } from './row/CapacityBarCell';
 import { Badge } from '@/components/ui/badge';
 import { EnhancedTooltip } from './EnhancedTooltip';
 
-// New helper for LeaveSummaryCell
+// Option 5: Stacked Badges for LeaveSummaryCell
 const LeaveSummaryCell = ({
   annualLeave,
   holidayHours,
@@ -32,12 +31,28 @@ const LeaveSummaryCell = ({
       holidayHours={holidayHours}
       leaveDays={leaveDays}
     >
-      <span className="inline-flex items-center text-xs bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 rounded border border-gray-200 font-medium shadow-sm px-2 py-1 gap-2">
-        <span>
-          A: {annualLeave || 0}h H: {holidayHours || 0}h O: {otherLeave || 0}h
-        </span>
-        {remarks && <span className="text-gray-500 truncate max-w-[80px]">| {remarks}</span>}
-      </span>
+      <div className="flex flex-col items-center space-y-1 min-w-[58px]">
+        {/* Annual Leave */}
+        <Badge variant="info" className="w-fit px-2 py-0.5 shadow-sm">
+          A: {annualLeave || 0}h
+        </Badge>
+        {/* Holiday Leave */}
+        <Badge variant="warning" className="w-fit px-2 py-0.5 shadow-sm">
+          H: {holidayHours || 0}h
+        </Badge>
+        {/* Other Leave, show only if value > 0 */}
+        {otherLeave > 0 && (
+          <Badge variant="brand" className="w-fit px-2 py-0.5 shadow-sm">
+            O: {otherLeave}h
+          </Badge>
+        )}
+        {/* Remarks, show if present */}
+        {remarks && (
+          <Badge variant="outline" className="w-fit px-2 py-0.5 mt-1 text-gray-500 border-gray-300 truncate max-w-[96px]">
+            {remarks}
+          </Badge>
+        )}
+      </div>
     </EnhancedTooltip>
   </TableCell>
 );
@@ -159,7 +174,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           </EnhancedTooltip>
         </TableCell>
         
-        {/* NEW: Leave Summary column */}
+        {/* Leave Summary column (Stacked Badges style) */}
         <LeaveSummaryCell
           annualLeave={annualLeave}
           holidayHours={holidayHours}
@@ -214,7 +229,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         </span>
       </TableCell>
       
-      {/* NEW: Leave Summary column */}
+      {/* Leave Summary column (Stacked Badges style) */}
       <LeaveSummaryCell
         annualLeave={annualLeave}
         holidayHours={holidayHours}
