@@ -1,88 +1,70 @@
 
 /* Resource Table View Modes */
 
-/* Compact View (Default) */
-.resource-table-compact {
-  font-size: 12px;
+/* ... keep existing code (all styles up to end) ... */
+
+/* --------- Custom: UI PLAN ENHANCEMENTS START ----------- */
+
+/* Project column block thick divider & background (expanded view) */
+.project-block-sep-header,
+.project-block-sep-cell {
+  min-width: 0.5rem;
+  width: 0.5rem;
+  background: #f3f4fd !important;
+  border-right: 4px solid #a5b4fc !important;
+  padding: 0 !important;
 }
 
-.resource-table-compact th {
-  padding: 8px 6px;
-  height: 48px;
+.project-col-header-expanded {
+  background: linear-gradient(to bottom, #6465F0 70%, #f3f4fd 100%) !important;
+  border-bottom: 1.5px solid #e0e7ff;
 }
 
-.resource-table-compact td {
-  padding: 4px 6px;
-  height: 40px;
+.project-col-cell {
+  background: #f6f9fd !important;
+  border-left: none !important;
 }
 
-.resource-table-compact .project-code-header {
-  height: 80px;
-  font-size: 11px;
-  padding: 0.25rem;
+/* Utilization pill colors */
+.pill-util-good {
+  background: linear-gradient(to right, #dcfce7, #bbf7d0) !important;
+  color: #047857 !important;
+  border: 1.5px solid #bbf7d0 !important;
 }
 
-/* Expanded View */
-.resource-table-expanded {
-  font-size: 14px;
+.pill-util-caution {
+  background: linear-gradient(to right, #fef9c3, #fde68a) !important;
+  color: #b45309 !important;
+  border: 1.5px solid #fde68a !important;
 }
 
-.resource-table-expanded th {
-  padding: 16px 12px;
-  height: 64px;
+.pill-util-over {
+  background: linear-gradient(to right, #fee2e2, #fca5a5) !important;
+  color: #b91c1c !important;
+  border: 1.5px solid #fca5a5 !important;
 }
 
-.resource-table-expanded td {
-  padding: 12px 8px;
-  height: 64px;
+/* Expanded project count pill */
+.pill-project-count {
+  background: linear-gradient(to right, #ede9fe, #a7f3d0) !important;
+  color: #6d28d9 !important;
+  border: 1.5px solid #c4b5fd !important;
 }
 
-.resource-table-expanded .project-code-header {
-  height: 100px;
-  font-size: 13px;
-  padding: 0.5rem;
-}
-
-/* Enhanced spacing for expanded pills */
-.resource-table-expanded .enhanced-pill,
-.resource-table-expanded .workload-pill {
-  padding: 8px 16px;
-  font-size: 13px;
+/* Expanded utilization/project count pill */
+.expanded-util-pill, .expanded-project-count-pill {
+  font-size: 1.08rem !important;
+  padding: 0.5rem 1.2rem !important;
+  border-radius: 16px !important;
+  font-weight: bold;
+  min-width: 62px;
   min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px 0 rgba(100,101,240,0.05);
 }
 
-.resource-table-expanded .enhanced-input {
-  height: 36px;
-  padding: 6px 8px;
-  font-size: 13px;
-}
+/* --------- Custom: UI PLAN ENHANCEMENTS END ----------- */
 
-/* Avatar sizing adjustments */
-.resource-table-expanded .avatar {
-  width: 32px;
-  height: 32px;
-}
-
-.resource-table-compact .avatar {
-  width: 24px;
-  height: 24px;
-}
-
-/* Enhanced member cell styling for expanded view */
-.resource-table-expanded .member-info-expanded {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.resource-table-expanded .member-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-}
-
-.resource-table-expanded .allocation-percentage {
-  font-size: 10px;
-  color: #6b7280;
-  margin-top: 2px;
-}
+/* ... keep existing code (all other unchanged styles) ... */
