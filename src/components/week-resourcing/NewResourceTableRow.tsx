@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { NameCell } from './cells/NameCell';
@@ -6,7 +5,7 @@ import { ProjectCountCell } from './cells/ProjectCountCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
 import { Badge } from '@/components/ui/badge';
 import { EnhancedTooltip } from './EnhancedTooltip';
-import { LeaveProgressBarCell } from './row/LeaveProgressBarCell';
+import { LeaveBadgeCell } from './row/LeaveBadgeCell';
 
 interface NewResourceTableRowProps {
   member: any;
@@ -95,12 +94,10 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         
         {/* Project Count */}
         <TableCell className="text-center border-r border-gray-200 px-3 py-3">
-          <div className="inline-flex items-center justify-center w-12 h-8 bg-slate-100 text-slate-700 rounded-lg font-semibold text-sm border border-slate-200">
-            {projectCount}
-          </div>
+          {projectCount}
         </TableCell>
         
-        {/* Utilization */}
+        {/* Utilization - replaced with Bar/percentage */}
         <TableCell className="text-center border-r border-gray-200 px-3 py-3">
           <EnhancedTooltip
             type="utilization"
@@ -112,19 +109,19 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
             holidayHours={holidayHours}
             leaveDays={leaveDays}
           >
-            <div className="flex flex-col items-center gap-1">
-              <span className={`inline-flex items-center justify-center w-16 h-10 rounded-xl font-bold text-sm shadow-lg ${getUtilizationStyle()}`}>
-                {utilizationPercentage}%
-              </span>
-              <span className="inline-flex items-center justify-center w-16 h-6 bg-blue-500 text-white rounded-lg font-semibold text-xs shadow-sm">
-                {totalUsedHours}h
-              </span>
-            </div>
+            <CapacityBarCell
+              totalUsedHours={totalUsedHours}
+              totalCapacity={weeklyCapacity}
+              utilizationValue={utilizationPercentage}
+              showText
+              size="lg"
+              className="mx-auto"
+            />
           </EnhancedTooltip>
         </TableCell>
         
-        {/* Leave Summary column (Progress Bar style) */}
-        <LeaveProgressBarCell
+        {/* Leave - replaced with one-line badge style */}
+        <LeaveBadgeCell
           annualLeave={annualLeave}
           holidayHours={holidayHours}
           otherLeave={otherLeave}
@@ -171,15 +168,30 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         </span>
       </TableCell>
       
-      {/* Utilization */}
+      {/* Utilization - swapped to bar/percent */}
       <TableCell className="text-center border-r border-gray-200 px-3 py-2 utilization-column">
-        <span className={`utilization-pill-elongated inline-flex items-center justify-center rounded-full font-bold text-sm shadow-md transition-all duration-200 hover:scale-105 ${getUtilizationStyle()}`}>
-          {utilizationPercentage}%
-        </span>
+        <EnhancedTooltip
+          type="utilization"
+          member={member}
+          utilizationPercentage={utilizationPercentage}
+          totalUsedHours={totalUsedHours}
+          weeklyCapacity={weeklyCapacity}
+          annualLeave={annualLeave}
+          holidayHours={holidayHours}
+          leaveDays={leaveDays}
+        >
+          <CapacityBarCell
+            totalUsedHours={totalUsedHours}
+            totalCapacity={weeklyCapacity}
+            utilizationValue={utilizationPercentage}
+            size="compact"
+            className="mx-auto"
+          />
+        </EnhancedTooltip>
       </TableCell>
       
-      {/* Leave Summary column (Progress Bar style) */}
-      <LeaveProgressBarCell
+      {/* Leave - swapped to single badge */}
+      <LeaveBadgeCell
         annualLeave={annualLeave}
         holidayHours={holidayHours}
         otherLeave={otherLeave}
