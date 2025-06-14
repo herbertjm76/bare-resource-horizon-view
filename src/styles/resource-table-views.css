@@ -1,162 +1,275 @@
 
-/* Resource Table View Modes */
+/* Resource Table View Modes - Enhanced Design */
 
-/* Compact View (Default) */
+/* Compact View (Default) - Improved Aesthetics */
 .resource-table-compact {
-  font-size: 12px;
+  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
 .resource-table-compact th {
-  padding: 8px 6px;
-  height: 48px;
+  padding: 12px 8px;
+  height: 56px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .resource-table-compact td {
-  padding: 4px 6px;
-  height: 40px;
+  padding: 6px 4px;
+  height: 48px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .resource-table-compact .project-code-header {
-  height: 80px;
-  font-size: 11px;
-  padding: 0.25rem;
+  height: 90px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0.375rem;
 }
 
-/* Fixed column widths for compact view */
+/* Enhanced Fixed Column Widths */
 .resource-table-compact .name-column {
-  width: 150px;
-  min-width: 150px;
-  max-width: 150px;
+  width: 160px;
+  min-width: 160px;
+  max-width: 160px;
+  position: sticky;
+  left: 0;
+  background: inherit;
+  z-index: 5;
 }
 
 .resource-table-compact .count-column {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
+  width: 55px;
+  min-width: 55px;
+  max-width: 55px;
 }
 
 .resource-table-compact .total-column {
-  width: 60px;
-  min-width: 60px;
-  max-width: 60px;
+  width: 65px;
+  min-width: 65px;
+  max-width: 65px;
 }
 
 .resource-table-compact .utilization-column {
-  width: auto;
-  min-width: 120px;
+  width: 140px;
+  min-width: 140px;
   flex: 1;
 }
 
 .resource-table-compact .leave-column {
-  width: 70px;
-  min-width: 70px;
-  max-width: 70px;
+  width: 75px;
+  min-width: 75px;
+  max-width: 75px;
 }
 
 .resource-table-compact .other-leave-column {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
+  width: 55px;
+  min-width: 55px;
+  max-width: 55px;
 }
 
 .resource-table-compact .remarks-column {
-  width: 60px;
-  min-width: 60px;
-  max-width: 60px;
+  width: 65px;
+  min-width: 65px;
+  max-width: 65px;
 }
 
 .resource-table-compact .project-column {
-  width: 35px;
-  min-width: 35px;
-  max-width: 35px;
+  width: 38px;
+  min-width: 38px;
+  max-width: 38px;
 }
 
-/* Utilization pill styling for compact view */
+/* Enhanced Utilization Pill */
 .resource-table-compact .utilization-pill {
-  height: 28px;
-  min-height: 28px;
-  padding: 6px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 14px;
+  height: 32px;
+  min-height: 32px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 60px;
+  min-width: 75px;
+  border: 2px solid;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
 }
 
-/* Table container for horizontal scrolling */
+.resource-table-compact .utilization-pill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.5s;
+}
+
+.resource-table-compact .utilization-pill:hover::before {
+  left: 100%;
+}
+
+/* Enhanced Table Container */
 .resource-table-compact-container {
   overflow-x: auto;
   width: 100%;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  padding: 2px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .resource-table-compact-container table {
   min-width: 100%;
   table-layout: auto;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Expanded View */
+/* Expanded View Enhancements */
 .resource-table-expanded {
   font-size: 14px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 }
 
 .resource-table-expanded th {
-  padding: 16px 12px;
-  height: 64px;
+  padding: 18px 14px;
+  height: 72px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .resource-table-expanded td {
-  padding: 12px 8px;
-  height: 64px;
+  padding: 14px 10px;
+  height: 80px;
 }
 
 .resource-table-expanded .project-code-header {
-  height: 100px;
-  font-size: 13px;
-  padding: 0.5rem;
+  height: 110px;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0.75rem;
 }
 
-/* Enhanced spacing for expanded pills */
+/* Enhanced Visual Elements */
 .resource-table-expanded .enhanced-pill,
 .resource-table-expanded .workload-pill {
-  padding: 8px 16px;
-  font-size: 13px;
-  min-height: 32px;
+  padding: 10px 18px;
+  font-size: 14px;
+  min-height: 36px;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
 }
 
 .resource-table-expanded .enhanced-input {
-  height: 36px;
-  padding: 6px 8px;
-  font-size: 13px;
+  height: 40px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+  transition: all 0.2s ease;
 }
 
-/* Avatar sizing adjustments */
+.resource-table-expanded .enhanced-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+/* Avatar Enhancements */
 .resource-table-expanded .avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .resource-table-compact .avatar {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Enhanced member cell styling for expanded view */
+/* Enhanced Member Info */
 .resource-table-expanded .member-info-expanded {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .resource-table-expanded .member-badges {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
+  gap: 4px;
 }
 
 .resource-table-expanded .allocation-percentage {
-  font-size: 10px;
-  color: #6b7280;
-  margin-top: 2px;
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* Hover Effects */
+.resource-table-compact tbody tr:hover {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.05) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.resource-table-expanded tbody tr:hover {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.03) 0%, rgba(147, 197, 253, 0.03) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar Styling */
+.resource-table-compact-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.resource-table-compact-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.resource-table-compact-container::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.resource-table-compact-container::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+  .resource-table-compact-container {
+    margin: 0 -1rem;
+    border-radius: 0;
+  }
+  
+  .resource-table-compact {
+    min-width: 900px;
+  }
+  
+  .resource-table-compact th,
+  .resource-table-compact td {
+    padding: 4px 3px;
+    font-size: 12px;
+  }
+  
+  .resource-table-compact .utilization-pill {
+    padding: 6px 12px;
+    font-size: 11px;
+    min-width: 60px;
+    height: 28px;
+  }
 }
