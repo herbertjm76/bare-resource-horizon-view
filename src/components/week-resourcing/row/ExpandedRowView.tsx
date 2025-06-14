@@ -17,7 +17,12 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
   memberIndex,
   projects,
   allocationMap,
-  ...props
+  annualLeaveData,
+  holidaysData,
+  getMemberTotal,
+  getProjectCount,
+  getWeeklyLeave,
+  onOtherLeaveEdit,
 }) => {
   const {
     weeklyCapacity,
@@ -31,7 +36,16 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
     remarks,
     handleOtherLeaveChange,
     getProjectBreakdown
-  } = useRowData(member, props);
+  } = useRowData(member, {
+    projects,
+    allocationMap,
+    annualLeaveData,
+    holidaysData,
+    getMemberTotal,
+    getProjectCount,
+    getWeeklyLeave,
+    onOtherLeaveEdit,
+  });
 
   return (
     <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors duration-200 h-20 border-b`}>
