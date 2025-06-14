@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   DialogContent,
@@ -92,7 +91,7 @@ export const EditProjectContent: React.FC<EditProjectContentProps> = ({
               isDataLoaded={isDataLoaded}
               projectId={projectId}
             />
-            
+
             <ProjectDialogActions 
               isLoading={isLoading}
               onClose={onClose}

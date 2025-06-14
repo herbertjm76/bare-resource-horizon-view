@@ -174,17 +174,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         onChange={(stageId) => onChange("current_stage", stageId)}
       />
 
-      {/* Add resource allocations section if project ID exists */}
-      {projectId && (
-        <ProjectResourceOverview 
-          projectId={projectId}
-          selectedWeek={selectedWeek}
-          onWeekChange={setSelectedWeek}
-          resourceAllocations={resourceAllocations}
-          isLoading={isLoadingResources}
-        />
-      )}
-
       {showRateCalc && (
         <RateCalculatorNew
           options={rateOptions}
