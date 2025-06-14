@@ -46,7 +46,7 @@ export const MemberNameCell: React.FC<MemberNameCellProps> = ({ member }) => {
         </Avatar>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="truncate">{getFirstName()}</span>
+            <span className="truncate cursor-pointer">{getFirstName()}</span>
           </TooltipTrigger>
           <TooltipContent>
             <p>{getMemberName()}</p>
