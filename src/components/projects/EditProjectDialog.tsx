@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { useProjectForm } from "./hooks/useProjectForm";
@@ -25,7 +24,10 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   const { company } = useCompany();
   const [loadedProject, setLoadedProject] = useState(project);
   const [isLoading, setIsLoading] = useState(false);
-  
+
+  // Add a refetch signal for fee/stage data (just a counter)
+  const [refetchSignal, setRefetchSignal] = useState(0);
+
   useEffect(() => {
     if (isOpen && project?.id) {
       const fetchCompleteProject = async () => {
@@ -66,6 +68,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     }
   }, [isOpen, project?.id]);
 
+  // Pass the refetchSignal to useProjectForm, so all sub-hooks can use it if needed:
   const {
     form,
     isLoading: formLoading,
@@ -78,9 +81,13 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
     updateStageFee,
     handleChange,
     isDataLoaded
-  } = useProjectForm(loadedProject, isOpen);
+  } = useProjectForm(loadedProject, isOpen, refetchSignal);
 
-  const { handleSubmit } = useProjectSubmit(loadedProject?.id, refetch, onClose);
+  // Pass setRefetchSignal so downstream hooks can trigger a refresh after submit
+  const { handleSubmit } = useProjectSubmit(loadedProject?.id, refetch, onClose, () => {
+    // bump the signal to refetch stage fee data after submit
+    setRefetchSignal(sig => sig + 1);
+  });
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

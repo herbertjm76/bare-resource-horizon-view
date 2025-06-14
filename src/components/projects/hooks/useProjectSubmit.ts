@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompany } from '@/context/CompanyContext';
@@ -7,7 +6,8 @@ import { useStageSubmit } from './submit/useStageSubmit';
 import { mapStatusToDb } from "../utils/projectMappings"; // Fixed import path
 import type { ProjectSubmitData } from './submit/types';
 
-export const useProjectSubmit = (projectId: string, refetch: () => void, onClose: () => void) => {
+// Add an optional onAfterSubmit callback and call it at the end
+export const useProjectSubmit = (projectId: string, refetch: () => void, onClose: () => void, onAfterSubmit?: () => void) => {
   const { company } = useCompany();
   const { updateProject } = useProjectUpdate();
   const { handleStageSubmit } = useStageSubmit();
@@ -67,6 +67,9 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
       toast.success('Project updated successfully');
       refetch();
       onClose();
+      if (onAfterSubmit) {
+        onAfterSubmit();
+      }
     } catch (error: any) {
       console.error('Error updating project:', error);
       toast.error('Failed to update project: ' + (error.message || "Unknown error"));

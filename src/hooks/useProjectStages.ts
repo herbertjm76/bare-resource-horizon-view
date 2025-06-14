@@ -2,7 +2,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useProjectStages = (projects: any[], office_stages: any[]) => {
+// Add a refetchSignal param (number or string), and reload if it changes.
+export const useProjectStages = (projects: any[], office_stages: any[], refetchSignal: any = null) => {
   const [projectStages, setProjectStages] = useState<Record<string, Record<string, number>>>({});
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,12 +37,10 @@ export const useProjectStages = (projects: any[], office_stages: any[]) => {
         // Pre-build the stages map for better performance
         const stagesMap: Record<string, Record<string, number>> = {};
         
-        // Initialize all project stage mappings
         projectIds.forEach(projectId => {
           stagesMap[projectId] = {};
         });
         
-        // Fill in the actual stage data
         if (projectStagesData) {
           projectStagesData.forEach(stageData => {
             if (stageData.fee !== null && stageData.fee > 0) {
@@ -64,7 +63,7 @@ export const useProjectStages = (projects: any[], office_stages: any[]) => {
     };
     
     fetchAllProjectStages();
-  }, [projectIds, office_stages]);
+  }, [projectIds, office_stages, refetchSignal]); // refetch when this changes!
 
   const getProjectStageFee = (projectId: string, officeStageId: string): number | null => {
     const fee = projectStages[projectId]?.[officeStageId];
