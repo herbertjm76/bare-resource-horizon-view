@@ -1,7 +1,6 @@
 
 import * as XLSX from 'xlsx';
 import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
 
 export interface ExcelParseResult {
   data: any[];
@@ -21,8 +20,13 @@ export class ExcelProcessor {
       
       reader.onload = (e) => {
         try {
-          const data = e.target?.result;
-          const workbook = XLSX.read(data, { type: 'binary' });
+          const fileData = e.target?.result;
+          if (!fileData) {
+            reject(new Error('Failed to read file data'));
+            return;
+          }
+          
+          const workbook = XLSX.read(fileData, { type: 'binary' });
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
           
@@ -34,11 +38,11 @@ export class ExcelProcessor {
           }
           
           const headers = jsonData[0] as string[];
-          const data = jsonData.slice(1).filter(row => 
+          const rows = jsonData.slice(1).filter(row => 
             Array.isArray(row) && row.some(cell => cell !== null && cell !== undefined && cell !== '')
           );
           
-          resolve({ headers, data });
+          resolve({ headers, data: rows });
         } catch (error) {
           reject(error);
         }
