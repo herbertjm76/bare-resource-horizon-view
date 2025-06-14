@@ -51,11 +51,11 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
   // Compact view
   return (
     <TableHeader>
-      <TableRow className="bg-gradient-to-r from-slate-100 to-gray-100 border-b-2 border-gray-300">
+      <TableRow className="border-b-2 border-gray-300" style={{ backgroundColor: '#6465F0' }}>
         {/* Team Member - 180px */}
         <TableHead 
-          className="font-bold text-gray-800 border-r border-gray-200 px-2 py-2 name-column"
-          style={{ width: 180, minWidth: 180, maxWidth: 180 }}
+          className="font-bold border-r border-gray-200 px-2 py-2 name-column"
+          style={{ width: 180, minWidth: 180, maxWidth: 180, backgroundColor: '#6465F0', color: 'white' }}
         >
           <div className="text-center text-xs leading-tight">
             <div>Team</div>
@@ -64,7 +64,10 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
         </TableHead>
         
         {/* Utilization - flexible width with 2-line title */}
-        <TableHead className="text-center font-bold text-gray-800 border-r border-gray-200 px-1 py-2 utilization-column">
+        <TableHead 
+          className="text-center font-bold border-r border-gray-200 px-1 py-2 utilization-column"
+          style={{ backgroundColor: '#6465F0', color: 'white' }}
+        >
           <div className="text-xs leading-tight">
             <div>Weekly Resource</div>
             <div>Utilization & Capacity</div>
@@ -73,8 +76,8 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
         
         {/* Leave Status - 150px */}
         <TableHead 
-          className="text-center font-bold text-gray-800 border-r border-gray-200 px-1 py-2 leave-column"
-          style={{ width: 150, minWidth: 150, maxWidth: 150 }}
+          className="text-center font-bold border-r border-gray-200 px-1 py-2 leave-column"
+          style={{ width: 150, minWidth: 150, maxWidth: 150, backgroundColor: '#6465F0', color: 'white' }}
         >
           <div className="text-xs leading-tight">
             <div>Leave</div>
@@ -84,28 +87,41 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
 
         {/* Project Count - 35px with rotated text */}
         <TableHead 
-          className="text-center font-bold text-gray-800 border-r border-gray-200 count-column count-column-header"
-          style={{ width: 35, minWidth: 35, maxWidth: 35 }}
+          className="text-center font-bold border-r border-gray-200 count-column count-column-header relative"
+          style={{ width: 35, minWidth: 35, maxWidth: 35, backgroundColor: '#6465F0', color: 'white' }}
         >
-          <div className="text-xs">
+          <div 
+            className="absolute inset-0 flex items-center justify-center"
+            style={{
+              transform: 'rotate(-90deg)',
+              transformOrigin: 'center',
+              fontSize: '11px',
+              fontWeight: 700,
+              whiteSpace: 'nowrap'
+            }}
+          >
             No. of Projects
           </div>
         </TableHead>
         
-        {/* Project columns */}
+        {/* Project columns - all 35px wide with rotated text */}
         {projects.map((project) => (
           <TableHead
             key={project.id}
-            className="text-center font-bold text-gray-800 border-r border-gray-200 px-1 py-2 project-column project-code-header"
-            style={{ width: 50, minWidth: 50, maxWidth: 50 }}
+            className="text-center font-bold border-r border-gray-200 px-1 py-2 project-column project-code-header relative"
+            style={{ width: 35, minWidth: 35, maxWidth: 35, backgroundColor: '#6465F0', color: 'white' }}
           >
-            <div className="flex flex-col items-center gap-1 h-full justify-center">
-              <span className="text-[10px] font-semibold text-gray-600 leading-tight">
-                {project.code || 'N/A'}
-              </span>
-              <span className="text-[11px] font-bold text-gray-800 leading-tight text-center">
-                {project.name?.length > 8 ? `${project.name.substring(0, 8)}...` : project.name}
-              </span>
+            <div 
+              className="absolute inset-0 flex items-center justify-center"
+              style={{
+                transform: 'rotate(-90deg)',
+                transformOrigin: 'center',
+                fontSize: '10px',
+                fontWeight: 700,
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {project.code || 'N/A'}
             </div>
           </TableHead>
         ))}

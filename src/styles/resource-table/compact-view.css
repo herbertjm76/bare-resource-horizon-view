@@ -66,9 +66,9 @@
 }
 
 .resource-table-compact .project-column {
-  width: 50px;
-  min-width: 50px;
-  max-width: 50px;
+  width: 35px;
+  min-width: 35px;
+  max-width: 35px;
 }
 
 /* Enhanced Utilization Pill - Compact */
@@ -219,13 +219,29 @@
   max-width: 150px !important;
 }
 
-/* Rotated text for project count header */
-.resource-table-compact .count-column-header {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  white-space: nowrap;
+.resource-table-row-compact .project-column {
+  width: 35px !important;
+  min-width: 35px !important;
+  max-width: 35px !important;
+}
+
+/* Rotated text for project count header and project headers */
+.resource-table-compact .count-column-header,
+.resource-table-compact .project-code-header {
+  position: relative;
   padding: 8px 4px;
   font-size: 11px;
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.resource-table-compact .count-column-header div,
+.resource-table-compact .project-code-header div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  white-space: nowrap;
+  font-size: 10px;
   font-weight: 700;
 }

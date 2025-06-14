@@ -58,6 +58,21 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
     </div>
   );
 
+  // Get project allocations for this member
+  const memberProjectAllocations = projects
+    .map(project => {
+      const allocationKey = `${member.id}:${project.id}`;
+      const hours = allocationMap.get(allocationKey) || 0;
+      return {
+        project,
+        hours
+      };
+    })
+    .filter(allocation => allocation.hours > 0);
+
+  // Calculate project hours total
+  const totalProjectHours = memberProjectAllocations.reduce((sum, allocation) => sum + allocation.hours, 0);
+
   // Utilization percentage for detailed tooltip
   const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0;
 
@@ -74,7 +89,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
           <span className="font-semibold">Total Used:</span> {totalUsedHours}h / {weeklyCapacity}h
         </div>
         <div>
-          <span className="font-semibold">Project Hours:</span> {totalUsedHours - annualLeave - holidayHours - displayedOtherLeave}h
+          <span className="font-semibold">Project Hours:</span> {totalProjectHours}h
         </div>
         <div>
           <span className="font-semibold">Annual Leave:</span> {annualLeave}h
@@ -85,6 +100,26 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
         <div>
           <span className="font-semibold">Other Leave:</span> {displayedOtherLeave}h
         </div>
+        
+        {/* Project breakdown */}
+        {memberProjectAllocations.length > 0 && (
+          <div className="mt-2 pt-2 border-t border-gray-200">
+            <div className="font-semibold mb-1">Project Allocations:</div>
+            {memberProjectAllocations.map(({ project, hours }) => (
+              <div key={project.id} className="flex justify-between items-center">
+                <span className="text-gray-600">
+                  {project.code ? `${project.code} - ${project.name}` : project.name}
+                </span>
+                <span className="font-medium">{hours}h</span>
+              </div>
+            ))}
+            <div className="flex justify-between items-center font-medium mt-1 pt-1 border-t border-gray-100">
+              <span>Total Projects:</span>
+              <span>{totalProjectHours}h</span>
+            </div>
+          </div>
+        )}
+
         <div className="text-gray-500 mt-1">
           <span>Strategic insight:</span> <br />
           {utilizationPercentage > 100
@@ -190,7 +225,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
               </div>
             </TooltipTrigger>
             <TooltipContent 
-              className="z-[250] max-w-xs px-3 py-2 bg-white border border-gray-200 shadow-xl"
+              className="z-[250] max-w-sm px-3 py-2 bg-white border border-gray-200 shadow-xl"
             >
               {utilizationTooltip}
             </TooltipContent>
@@ -233,7 +268,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
         </span>
       </TableCell>
       
-      {/* Project Cells */}
+      {/* Project Cells - all 35px wide */}
       {projects.map((project) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
@@ -241,7 +276,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
           <TableCell
             key={project.id}
             className="text-center border-r border-gray-200 px-0.5 py-0.5 project-column bg-gradient-to-r from-purple-50 to-violet-50"
-            style={{ width: 30, minWidth: 30, maxWidth: 36 }}
+            style={{ width: 35, minWidth: 35, maxWidth: 35 }}
           >
             {hours > 0 && (
               <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-sm font-semibold text-[11px] hover:bg-emerald-600 transition-colors duration-100">
