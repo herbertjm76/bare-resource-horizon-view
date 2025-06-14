@@ -39,11 +39,33 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
         </TableHead>
         
         <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
-          ANNUAL LEAVE
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">ANNUAL LEAVE</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-sm font-medium">
+                  Annual Leave hours for this week
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </TableHead>
         
         <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
-          HOLIDAY
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">HOLIDAY</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-sm font-medium">
+                  Public Holiday hours for this week
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </TableHead>
         
         <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
@@ -60,7 +82,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div 
-                    className="project-code-header cursor-help text-white"
+                    className="project-code-header cursor-help"
                     style={{
                       writingMode: 'vertical-lr',
                       textOrientation: 'mixed',
