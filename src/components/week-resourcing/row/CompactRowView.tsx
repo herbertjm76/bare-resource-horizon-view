@@ -68,14 +68,14 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
     >
       {/* Team Member consolidated cell */}
       <TableCell
-        className="border-r border-gray-200 px-1 py-0.5 name-column min-w-[120px] max-w-[120px] w-[120px] overflow-hidden text-ellipsis whitespace-nowrap"
+        className="border-r border-gray-200 px-1 py-0.5 name-column min-w-[120px] max-w-[120px] w-[120px] overflow-hidden"
         style={{ width: 120, minWidth: 120, maxWidth: 120, background: 'inherit', zIndex: 5 }}
       >
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-1 text-xs cursor-pointer" title={getMemberDisplayName()}>
-                <Avatar className="h-5 w-5 min-w-[20px] min-h-[20px]">
+              <div className="flex items-center gap-1 w-full text-xs cursor-pointer" title={getMemberDisplayName()}>
+                <Avatar className="h-5 w-5 min-w-[20px] min-h-[20px]" >
                   <AvatarImage 
                     src={getAvatarUrl()} 
                     alt={getMemberDisplayName()}
@@ -84,9 +84,9 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
                     {getUserInitials()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="truncate flex-1 name-cell-label max-w-[90px]">
-                  <span className="text-[11px]">
-                    {member.first_name?.substring(0, 1)}. {member.last_name}
+                <div className="truncate flex-1 name-cell-label max-w-[90px]" style={{maxWidth: '92px'}}>
+                  <span className="text-[11px] truncate block w-full">
+                    {getMemberDisplayName()}
                   </span>
                 </div>
               </div>
@@ -154,4 +154,3 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
     </TableRow>
   );
 };
-
