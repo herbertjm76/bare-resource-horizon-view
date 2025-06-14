@@ -13,6 +13,7 @@ interface NewResourceTableProps {
   getMemberTotal: (memberId: string) => number;
   getProjectCount: (memberId: string) => number;
   getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
+  viewMode?: 'compact' | 'expanded';
 }
 
 export const NewResourceTable: React.FC<NewResourceTableProps> = ({
@@ -23,7 +24,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   holidaysData,
   getMemberTotal,
   getProjectCount,
-  getWeeklyLeave
+  getWeeklyLeave,
+  viewMode = 'compact'
 }) => {
   if (members.length === 0) {
     return (
@@ -33,11 +35,14 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     );
   }
 
+  const tableClasses = viewMode === 'expanded' 
+    ? 'resource-table-expanded' 
+    : 'resource-table-compact';
+
   return (
-    // Removed the extra border and overflow wrapper - now using single container
     <div className="overflow-x-auto">
-      <Table>
-        <NewResourceTableHeader projects={projects} />
+      <Table className={tableClasses}>
+        <NewResourceTableHeader projects={projects} viewMode={viewMode} />
         <TableBody>
           {members.map((member, index) => (
             <NewResourceTableRow
@@ -51,6 +56,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
               getMemberTotal={getMemberTotal}
               getProjectCount={getProjectCount}
               getWeeklyLeave={getWeeklyLeave}
+              viewMode={viewMode}
             />
           ))}
         </TableBody>

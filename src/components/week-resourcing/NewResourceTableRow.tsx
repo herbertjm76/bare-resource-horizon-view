@@ -1,15 +1,10 @@
 
 import React from 'react';
-import { TableRow } from '@/components/ui/table';
-import { 
-  NameCell, 
-  ProjectCountCell, 
-  CapacityCell, 
-  ReadOnlyLeaveCell,
-  EditableLeaveCell,
-  ProjectAllocationCell,
-  CellStyles
-} from './cells';
+import { TableRow, TableCell } from "@/components/ui/table";
+import { NameCell } from './cells/NameCell';
+import { ProjectCountCell } from './cells/ProjectCountCell';
+import { CapacityBarCell } from './row/CapacityBarCell';
+import { ReadOnlyLeaveCell } from './cells/ReadOnlyLeaveCell';
 
 interface NewResourceTableRowProps {
   member: any;
@@ -21,6 +16,7 @@ interface NewResourceTableRowProps {
   getMemberTotal: (memberId: string) => number;
   getProjectCount: (memberId: string) => number;
   getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
+  viewMode?: 'compact' | 'expanded';
 }
 
 export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
@@ -32,119 +28,98 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   holidaysData,
   getMemberTotal,
   getProjectCount,
-  getWeeklyLeave
+  getWeeklyLeave,
+  viewMode = 'compact'
 }) => {
-  const weeklyCapacity = member.weekly_capacity || 40;
-  
-  // Get the WEEKLY total allocated hours (sum for entire week June 9-15)
-  const totalWeeklyAllocatedHours = getMemberTotal(member.id);
-  
-  const projectCount = getProjectCount(member.id);
-  
-  // Get leave data for this member - these should already be weekly totals
-  const weeklyAnnualLeave = annualLeaveData[member.id] || 0;
-  const holidayHours = holidaysData[member.id] || 0;
-  const otherLeave = 0; // This could be expanded to include other leave types
-  const annualLeaveDates = getWeeklyLeave ? getWeeklyLeave(member.id) : [];
-  
-  // Calculate total used hours for the week
-  const totalUsedHours = totalWeeklyAllocatedHours + weeklyAnnualLeave + holidayHours + otherLeave;
-  
-  // Calculate available hours after all allocations and leave
-  const availableHours = Math.max(0, weeklyCapacity - totalUsedHours);
-  
-  const isEvenRow = memberIndex % 2 === 0;
-  
-  // Calculate the number of project columns to show (minimum 15)
-  const projectColumnsCount = Math.max(15, projects.length);
-  
-  // Get projects this member is working on for tooltip - with WEEKLY totals
-  const memberProjects = projects
-    .map(project => {
-      const key = `${member.id}:${project.id}`;
-      const hours = allocationMap.get(key) || 0;
-      return hours > 0 ? { 
-        name: project.name, 
-        hours, // This should already be the weekly total from allocationMap
-        project_code: project.project_code 
-      } : null;
-    })
-    .filter(Boolean);
+  const isExpanded = viewMode === 'expanded';
+  const cellPadding = isExpanded ? 'py-3 px-3' : 'py-1 px-1';
+  const textSize = isExpanded ? 'text-sm' : 'text-xs';
+  const rowHeight = isExpanded ? 'h-14' : 'h-10';
 
-  console.log(`NewResourceTableRow - Member ${member.first_name} ${member.last_name}:`, {
-    totalWeeklyAllocatedHours,
-    projectCount,
-    weeklyAnnualLeave: weeklyAnnualLeave,
-    holidayHours,
-    totalUsedHours,
-    availableHours,
-    weeklyCapacity,
-    memberProjects,
-    allocationMapEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
-  });
-  
+  const weeklyCapacity = member.weekly_capacity || 40;
+  const totalUsedHours = getMemberTotal(member.id);
+  const projectCount = getProjectCount(member.id);
+  const annualLeave = annualLeaveData[member.id] || 0;
+  const holidayHours = holidaysData[member.id] || 0;
+  const leaveDays = getWeeklyLeave(member.id);
+
+  const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0;
+
   return (
-    <>
-      <CellStyles />
-      <TableRow 
-        key={member.id}
-        className={`h-9 mobile-resource-table ${isEvenRow ? 'bg-white' : 'bg-gray-50/50'} hover:bg-gray-100/50`}
-      >
-        <NameCell member={member} />
+    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 ${rowHeight}`}>
+      <NameCell member={member} />
+      
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
+        {member.office_location || '-'}
+      </TableCell>
+      
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
+        <span className={`inline-flex items-center justify-center rounded-full font-medium ${
+          isExpanded ? 'w-10 h-7 text-sm' : 'w-8 h-6 text-xs'
+        } bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 border border-gray-200 shadow-sm`}>
+          {weeklyCapacity}h
+        </span>
+      </TableCell>
+      
+      <ProjectCountCell projectCount={projectCount} />
+      
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
+        <span className={`inline-flex items-center justify-center rounded-full font-medium ${
+          isExpanded ? 'w-10 h-7 text-sm' : 'w-8 h-6 text-xs'
+        } bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 border border-blue-200 shadow-sm`}>
+          {totalUsedHours}h
+        </span>
+      </TableCell>
+      
+      <CapacityBarCell
+        totalUsedHours={totalUsedHours}
+        totalCapacity={weeklyCapacity}
+      />
+      
+      <ReadOnlyLeaveCell 
+        value={annualLeave} 
+        leaveDays={leaveDays}
+        leaveType="Annual Leave"
+      />
+      
+      <ReadOnlyLeaveCell 
+        value={holidayHours} 
+        leaveDays={[]}
+        leaveType="Holiday"
+      />
+      
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
+        <span className={`inline-flex items-center justify-center rounded font-medium ${
+          isExpanded ? 'w-8 h-7 text-sm' : 'w-6 h-5 text-xs'
+        } bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 border border-gray-200 shadow-sm`}>
+          -
+        </span>
+      </TableCell>
+      
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
+        <span className={`inline-flex items-center justify-center rounded font-medium ${
+          isExpanded ? 'px-3 h-7 text-sm' : 'px-2 h-5 text-xs'
+        } bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 border border-gray-200 shadow-sm`}>
+          -
+        </span>
+      </TableCell>
+      
+      {projects.map((project) => {
+        const allocationKey = `${member.id}:${project.id}`;
+        const hours = allocationMap.get(allocationKey) || 0;
         
-        <ProjectCountCell projectCount={projectCount} projects={memberProjects} />
-        
-        <CapacityCell 
-          availableHours={availableHours} 
-          totalCapacity={weeklyCapacity}
-          member={member}
-          totalAllocatedHours={totalWeeklyAllocatedHours}
-          annualLeave={weeklyAnnualLeave}
-          holidayHours={holidayHours}
-          otherLeave={otherLeave}
-          projects={memberProjects}
-          annualLeaveDates={annualLeaveDates}
-        />
-        
-        {/* Annual Leave Cell - READ-ONLY display from database with tooltip */}
-        <ReadOnlyLeaveCell 
-          value={weeklyAnnualLeave} 
-          leaveDays={annualLeaveDates}
-          leaveType="Annual Leave"
-        />
-        
-        {/* Holiday Cell - READ-ONLY display from database with gray styling */}
-        <ReadOnlyLeaveCell value={holidayHours} />
-        
-        {/* Other Leave Cell - EDITABLE manual input with thick border divider */}
-        <EditableLeaveCell className="border-r-4 border-gray-400" />
-        
-        {/* Project allocation cells - show all projects or fill to minimum */}
-        {Array.from({ length: projectColumnsCount }).map((_, idx) => {
-          const project = projects[idx];
-          if (project) {
-            const key = `${member.id}:${project.id}`;
-            const hours = allocationMap.get(key) || 0;
-            
-            return (
-              <ProjectAllocationCell 
-                key={project.id}
-                hours={hours}
-                readOnly
-              />
-            );
-          } else {
-            // Empty cells for consistent column count
-            return (
-              <ProjectAllocationCell 
-                key={`empty-${idx}`}
-                hours={0}
-                disabled
-              />
-            );
-          }
-        })}
-      </TableRow>
-    </>
+        return (
+          <TableCell key={project.id} className={`text-center border-r ${cellPadding} ${textSize}`}>
+            {hours > 0 && (
+              <span className={`inline-flex items-center justify-center rounded font-medium ${
+                isExpanded ? 'w-8 h-7 text-sm' : 'w-6 h-5 text-xs'
+              } bg-gradient-to-br from-green-100 to-emerald-100 text-green-700 border border-green-200 shadow-sm`}>
+                {hours}
+              </span>
+            )}
+          </TableCell>
+        );
+      })}
+    </TableRow>
   );
 };

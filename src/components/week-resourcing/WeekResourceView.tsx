@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NewResourceTable } from './NewResourceTable';
@@ -26,6 +26,8 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   filters,
   onFilterChange
 }) => {
+  const [viewMode, setViewMode] = useState<'compact' | 'expanded'>('compact');
+  
   // Safely format the week start date
   let weekStartDate: string;
   try {
@@ -69,6 +71,8 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         weekLabel={weekLabel}
         filters={filters}
         onFilterChange={onFilterChange}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       />
       
       <WeekResourceSummaryCard 
@@ -90,6 +94,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
           getMemberTotal={getMemberTotal}
           getProjectCount={getProjectCount}
           getWeeklyLeave={getWeeklyLeave}
+          viewMode={viewMode}
         />
       </Card>
     </div>

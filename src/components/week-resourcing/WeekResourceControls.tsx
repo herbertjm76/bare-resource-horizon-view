@@ -1,14 +1,14 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Calendar, Filter, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Filter, RotateCcw, LayoutGrid, LayoutList } from 'lucide-react';
 import { addWeeks, subWeeks, format, startOfWeek, addDays, isToday, isSameWeek } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { FilterButton } from '@/components/resources/filters/FilterButton';
 import { AdvancedFilters } from '@/components/resources/filters/AdvancedFilters';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 interface WeekResourceControlsProps {
   selectedWeek: Date;
@@ -19,6 +19,8 @@ interface WeekResourceControlsProps {
     searchTerm: string;
   };
   onFilterChange: (key: string, value: string) => void;
+  viewMode?: 'compact' | 'expanded';
+  onViewModeChange?: (mode: 'compact' | 'expanded') => void;
 }
 
 export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
@@ -26,7 +28,9 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
   setSelectedWeek,
   weekLabel,
   filters,
-  onFilterChange
+  onFilterChange,
+  viewMode = 'compact',
+  onViewModeChange
 }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -198,8 +202,35 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
           </Button>
         </div>
         
-        {/* Filter controls - improved spacing and design */}
+        {/* Filter controls and view toggle */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          {/* View Mode Toggle */}
+          {onViewModeChange && (
+            <ToggleGroup 
+              type="single" 
+              value={viewMode} 
+              onValueChange={(value) => value && onViewModeChange(value as 'compact' | 'expanded')}
+              className="bg-white border rounded-lg shadow-sm overflow-hidden"
+            >
+              <ToggleGroupItem 
+                value="compact" 
+                aria-label="Compact view"
+                className="h-9 px-3 data-[state=on]:bg-gray-100 data-[state=on]:text-gray-900"
+              >
+                <LayoutList className="h-4 w-4" />
+                <span className="hidden sm:inline ml-1">Compact</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem 
+                value="expanded" 
+                aria-label="Expanded view"
+                className="h-9 px-3 data-[state=on]:bg-gray-100 data-[state=on]:text-gray-900"
+              >
+                <LayoutGrid className="h-4 w-4" />
+                <span className="hidden sm:inline ml-1">Expanded</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
+          )}
+
           <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
             <PopoverTrigger asChild>
               <Button 
