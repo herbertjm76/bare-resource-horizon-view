@@ -2,7 +2,11 @@
 /* Resource Table Views - Modular CSS Implementation */
 
 @import './base-table.css';
-@import './compact-view.css';
+@import './compact-layout.css';
+@import './compact-pills.css';
+@import './compact-ultra-mode.css';
+@import './compact-headers.css';
+@import './compact-responsive.css';
 @import './expanded-view.css';
 @import './hover-effects.css';
 @import './responsive.css';

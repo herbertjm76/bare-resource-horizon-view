@@ -1,0 +1,87 @@
+
+/* Compact View - Layout and Basic Styling */
+
+.resource-table-compact {
+  font-size: 13px;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.resource-table-compact th {
+  padding: 12px 8px;
+  height: 56px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.resource-table-compact td {
+  padding: 6px 4px;
+  height: 48px;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* Fixed Column Widths - Compact */
+.resource-table-compact .name-column {
+  min-width: 180px;
+  width: 180px;
+  position: sticky;
+  left: 0;
+  background: inherit;
+  z-index: 5;
+}
+
+.resource-table-compact .count-column {
+  min-width: 35px;
+  width: 35px;
+}
+
+.resource-table-compact .utilization-column {
+  min-width: 200px;
+  width: 200px;
+}
+
+.resource-table-compact .leave-column {
+  min-width: 150px;
+  width: 150px;
+}
+
+.resource-table-compact .other-leave-column {
+  min-width: 50px;
+  width: 50px;
+}
+
+.resource-table-compact .remarks-column {
+  min-width: 50px;
+  width: 50px;
+}
+
+.resource-table-compact .project-column {
+  min-width: 35px;
+  width: 35px;
+}
+
+/* Enhanced Table Container - Wrapping and Centering */
+.resource-table-compact-container {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  padding: 2px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: block;
+  margin: 0 auto;
+}
+
+.resource-table-compact-container table {
+  width: 100%;
+  table-layout: fixed;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth transitions for dynamic behavior */
+.resource-table-compact,
+.resource-table-compact th,
+.resource-table-compact td {
+  transition: width 0.2s ease-in-out;
+}

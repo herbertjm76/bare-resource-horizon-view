@@ -1,0 +1,57 @@
+
+/* Compact View - Mobile Responsiveness */
+
+@media (max-width: 640px) {
+  .resource-table-compact-container {
+    margin: 0 -1rem;
+    border-radius: 0;
+  }
+  
+  .resource-table-compact {
+    min-width: 900px;
+  }
+  
+  .resource-table-compact th,
+  .resource-table-compact td {
+    padding: 4px 3px;
+    font-size: 12px;
+  }
+  
+  .resource-table-compact .utilization-pill,
+  .resource-table-compact .utilization-pill-elongated {
+    padding: 6px 12px;
+    font-size: 11px;
+    min-width: 60px;
+    height: 28px;
+  }
+
+  .resource-table-row-compact td {
+    font-size: 10px !important;
+    min-width: 12px !important;
+    padding-left: 1px !important;
+    padding-right: 1px !important;
+  }
+  
+  .resource-table-row-compact .utilization-column {
+    min-width: 36px !important;
+    max-width: 44px !important;
+  }
+  
+  .resource-table-row-compact .leave-column,
+  .resource-table-row-compact .project-column {
+    min-width: 20px !important;
+    max-width: 30px !important;
+  }
+  
+  .resource-table-row-compact .name-column {
+    width: 50px !important;
+    min-width: 50px !important;
+    max-width: 50px !important;
+  }
+  
+  .resource-table-row-compact .count-column {
+    width: 12px !important;
+    min-width: 12px !important;
+    max-width: 12px !important;
+  }
+}
