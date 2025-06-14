@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { useProjectForm } from "./hooks/useProjectForm";
@@ -28,6 +29,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
   // Add a refetch signal for fee/stage data (just a counter)
   const [refetchSignal, setRefetchSignal] = useState(0);
 
+  // FIX: Add refetchSignal as a dependency to reload the latest project data after submit
   useEffect(() => {
     if (isOpen && project?.id) {
       const fetchCompleteProject = async () => {
@@ -66,7 +68,8 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
       
       fetchCompleteProject();
     }
-  }, [isOpen, project?.id]);
+  // FIX: include refetchSignal so the latest project data is fetched after saving
+  }, [isOpen, project?.id, refetchSignal]);
 
   // Pass the refetchSignal to useProjectForm, so all sub-hooks can use it if needed:
   const {
