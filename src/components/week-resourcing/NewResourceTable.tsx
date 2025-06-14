@@ -77,45 +77,47 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     );
   }
 
-  // Compact view - remove full width wrapper, let container be exact size
+  // Compact view - wrap in centering container
   return (
-    <div 
-      ref={containerRef}
-      className="resource-table-compact-container overflow-x-auto"
-      style={{
-        width: `${tableWidth}px`,
-        minWidth: `${tableWidth}px`,
-        maxWidth: `${tableWidth}px`
-      }}
-    >
-      <Table 
-        ref={tableRef}
-        className="resource-table-compact"
+    <div className="compact-table-wrapper">
+      <div 
+        ref={containerRef}
+        className="resource-table-compact-container"
         style={{
           width: `${tableWidth}px`,
           minWidth: `${tableWidth}px`,
-          tableLayout: 'fixed'
+          maxWidth: `${tableWidth}px`
         }}
       >
-        <NewResourceTableHeader projects={projects} viewMode={viewMode} />
-        <TableBody>
-          {members.map((member, index) => (
-            <NewResourceTableRow
-              key={member.id}
-              member={member}
-              memberIndex={index}
-              projects={projects}
-              allocationMap={allocationMap}
-              annualLeaveData={annualLeaveData}
-              holidaysData={holidaysData}
-              getMemberTotal={getMemberTotal}
-              getProjectCount={getProjectCount}
-              getWeeklyLeave={getWeeklyLeave}
-              viewMode={viewMode}
-            />
-          ))}
-        </TableBody>
-      </Table>
+        <Table 
+          ref={tableRef}
+          className="resource-table-compact"
+          style={{
+            width: `${tableWidth}px`,
+            minWidth: `${tableWidth}px`,
+            tableLayout: 'fixed'
+          }}
+        >
+          <NewResourceTableHeader projects={projects} viewMode={viewMode} />
+          <TableBody>
+            {members.map((member, index) => (
+              <NewResourceTableRow
+                key={member.id}
+                member={member}
+                memberIndex={index}
+                projects={projects}
+                allocationMap={allocationMap}
+                annualLeaveData={annualLeaveData}
+                holidaysData={holidaysData}
+                getMemberTotal={getMemberTotal}
+                getProjectCount={getProjectCount}
+                getWeeklyLeave={getWeeklyLeave}
+                viewMode={viewMode}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

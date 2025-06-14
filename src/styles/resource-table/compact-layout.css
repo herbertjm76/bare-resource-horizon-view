@@ -60,23 +60,30 @@
   width: 35px;
 }
 
-/* Enhanced Table Container - Tighter wrapping and centering */
+/* Enhanced Table Container - Centered and properly sized */
 .resource-table-compact-container {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 12px;
   padding: 2px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  display: inline-block;
-  margin: 0;
+  overflow-x: auto;
+  margin: 0 auto;
+  display: block;
 }
 
 .resource-table-compact-container table {
-  width: 100%;
-  table-layout: fixed;
   background: white;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Center the compact table container */
+.compact-table-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  overflow-x: auto;
 }
 
 /* Smooth transitions for dynamic behavior */

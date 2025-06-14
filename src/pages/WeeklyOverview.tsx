@@ -33,7 +33,7 @@ const WeeklyOverview = () => {
   
   return (
     <StandardLayout>
-      <div className="max-w-full mx-auto space-y-4 sm:space-y-6">
+      <div className="w-full space-y-4 sm:space-y-6">
         {/* Page Header */}
         <div className="mb-6">
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: '#6465F0' }}>
