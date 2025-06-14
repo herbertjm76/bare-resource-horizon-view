@@ -39,10 +39,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
 
     const checkScrollNeeded = () => {
       const containerWidth = containerRef.current?.clientWidth || 0;
-      const tableWidth = tableRef.current?.scrollWidth || 0;
-      
-      // Base width calculation: name(180) + utilization(120) + leave(150) + count(35) = 485
-      const baseWidth = 485;
+      // Fixed width calculation: name(180) + utilization(200) + leave(150) + count(35) = 565
+      const baseWidth = 565;
       const projectWidth = projects.length * 35; // Each project column is 35px
       const totalMinWidth = baseWidth + projectWidth;
       
@@ -77,20 +75,26 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     ? `dynamic-table-container ${needsHorizontalScroll ? 'has-horizontal-scroll' : 'fits-viewport'} resource-table-compact-container`
     : 'overflow-x-auto';
 
+  // Calculate total table width for compact mode
+  const totalTableWidth = viewMode === 'compact' 
+    ? 565 + (projects.length * 35) // 180 + 200 + 150 + 35 + (projects * 35)
+    : 'auto';
+
   return (
     <div 
       ref={containerRef}
       className={containerClasses}
       style={{
-        overflowX: needsHorizontalScroll ? 'auto' : 'visible'
+        overflowX: 'auto'
       }}
     >
       <Table 
         ref={tableRef}
         className={tableClasses}
         style={{
-          minWidth: viewMode === 'compact' ? 'fit-content' : 'auto',
-          width: viewMode === 'compact' && !needsHorizontalScroll ? '100%' : 'auto'
+          width: totalTableWidth,
+          minWidth: totalTableWidth,
+          tableLayout: viewMode === 'compact' ? 'fixed' : 'auto'
         }}
       >
         <NewResourceTableHeader projects={projects} viewMode={viewMode} />

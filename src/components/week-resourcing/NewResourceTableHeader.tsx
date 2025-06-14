@@ -48,14 +48,14 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
     );
   }
 
-  // Compact view with dynamic widths
+  // Compact view with fixed widths
   return (
     <TableHeader>
       <TableRow className="border-b-2 border-gray-300" style={{ backgroundColor: '#6465F0' }}>
-        {/* Team Member - 180px min-width */}
+        {/* Team Member - 180px fixed */}
         <TableHead 
           className="font-bold border-r border-gray-200 px-2 py-2 name-column"
-          style={{ minWidth: 180, width: 180, backgroundColor: '#6465F0', color: 'white' }}
+          style={{ width: 180, minWidth: 180, maxWidth: 180, backgroundColor: '#6465F0', color: 'white' }}
         >
           <div className="text-center text-xs leading-tight">
             <div>Team</div>
@@ -63,10 +63,10 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </div>
         </TableHead>
         
-        {/* Utilization - flexible width with min-width */}
+        {/* Utilization - 200px fixed */}
         <TableHead 
           className="text-center font-bold border-r border-gray-200 px-1 py-2 utilization-column"
-          style={{ minWidth: 120, backgroundColor: '#6465F0', color: 'white' }}
+          style={{ width: 200, minWidth: 200, maxWidth: 200, backgroundColor: '#6465F0', color: 'white' }}
         >
           <div className="text-xs leading-tight">
             <div>Weekly Resource</div>
@@ -74,10 +74,10 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </div>
         </TableHead>
         
-        {/* Leave Status - 150px min-width */}
+        {/* Leave Status - 150px fixed */}
         <TableHead 
           className="text-center font-bold border-r border-gray-200 px-1 py-2 leave-column"
-          style={{ minWidth: 150, width: 150, backgroundColor: '#6465F0', color: 'white' }}
+          style={{ width: 150, minWidth: 150, maxWidth: 150, backgroundColor: '#6465F0', color: 'white' }}
         >
           <div className="text-xs leading-tight">
             <div>Leave</div>
@@ -85,10 +85,10 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </div>
         </TableHead>
 
-        {/* Project Count - 35px min-width with rotated text */}
+        {/* Project Count - 35px fixed with rotated text */}
         <TableHead 
           className="text-center font-bold border-r border-gray-200 count-column count-column-header relative"
-          style={{ minWidth: 35, width: 35, backgroundColor: '#6465F0', color: 'white' }}
+          style={{ width: 35, minWidth: 35, maxWidth: 35, backgroundColor: '#6465F0', color: 'white' }}
         >
           <div 
             className="absolute inset-0 flex items-center justify-center"
@@ -104,12 +104,12 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </div>
         </TableHead>
         
-        {/* Project columns - all 35px min-width with rotated text */}
+        {/* Project columns - all 35px fixed with rotated text */}
         {projects.map((project) => (
           <TableHead
             key={project.id}
             className="text-center font-bold border-r border-gray-200 px-1 py-2 project-column project-code-header relative"
-            style={{ minWidth: 35, width: 35, backgroundColor: '#6465F0', color: 'white' }}
+            style={{ width: 35, minWidth: 35, maxWidth: 35, backgroundColor: '#6465F0', color: 'white' }}
           >
             <div 
               className="absolute inset-0 flex items-center justify-center"

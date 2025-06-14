@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -156,10 +157,10 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
       }
       style={{ fontSize: 12, minHeight: 28, height: 28, lineHeight: 1 }}
     >
-      {/* Team Member consolidated cell - 180px min-width */}
+      {/* Team Member consolidated cell - 180px fixed */}
       <TableCell
         className="border-r border-gray-200 px-2 py-0.5 name-column bg-gradient-to-r from-blue-50 to-indigo-50"
-        style={{ minWidth: 180, width: 180, zIndex: 5 }}
+        style={{ width: 180, minWidth: 180, maxWidth: 180, zIndex: 5 }}
       >
         <TooltipProvider>
           <Tooltip>
@@ -210,10 +211,10 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
         </TooltipProvider>
       </TableCell>
       
-      {/* Utilization: Dynamic Width Progress Bar with detailed tooltip */}
+      {/* Utilization: 200px fixed Progress Bar with detailed tooltip */}
       <TableCell 
         className="text-center border-r border-gray-200 px-1 py-0.5 utilization-column bg-gradient-to-r from-emerald-50 to-green-50"
-        style={{ minWidth: 120 }}
+        style={{ width: 200, minWidth: 200, maxWidth: 200 }}
       >
         <TooltipProvider>
           <Tooltip>
@@ -235,10 +236,10 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
         </TooltipProvider>
       </TableCell>
       
-      {/* Leave Badge Cells + editable Other - 150px min-width */}
+      {/* Leave Badge Cells + editable Other - 150px fixed */}
       <TableCell 
         className="text-center border-r border-gray-200 px-0.5 py-0.5 bg-gradient-to-r from-yellow-50 to-orange-50 leave-column" 
-        style={{ minWidth: 150, width: 150 }}
+        style={{ width: 150, minWidth: 150, maxWidth: 150 }}
       >
         <TooltipProvider>
           <Tooltip>
@@ -266,17 +267,17 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
         </TooltipProvider>
       </TableCell>
 
-      {/* Project Count - 35px min-width */}
+      {/* Project Count - 35px fixed */}
       <TableCell 
         className="text-center border-r border-gray-200 px-1 py-0.5 count-column bg-gradient-to-r from-gray-50 to-slate-50"
-        style={{ minWidth: 35, width: 35 }}
+        style={{ width: 35, minWidth: 35, maxWidth: 35 }}
       >
         <span className="inline-flex items-center justify-center w-7 h-6 bg-slate-500 text-white rounded-sm font-semibold text-[11px] shadow-sm">
           {projectCount}
         </span>
       </TableCell>
       
-      {/* Project Cells - all 35px min-width */}
+      {/* Project Cells - all 35px fixed */}
       {projects.map((project) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
@@ -284,7 +285,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
           <TableCell
             key={project.id}
             className="text-center border-r border-gray-200 px-0.5 py-0.5 project-column bg-gradient-to-r from-purple-50 to-violet-50"
-            style={{ minWidth: 35, width: 35 }}
+            style={{ width: 35, minWidth: 35, maxWidth: 35 }}
           >
             {hours > 0 && (
               <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-sm font-semibold text-[11px] hover:bg-emerald-600 transition-colors duration-100">
