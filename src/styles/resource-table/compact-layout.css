@@ -63,7 +63,7 @@
 /* Enhanced Table Container - Centered and properly sized with rounded corners */
 .resource-table-compact-container {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 16px;
+  border-radius: 20px; /* increased for more card-like look */
   padding: 3px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow-x: auto;
@@ -71,21 +71,48 @@
   display: block;
 }
 
-.resource-table-compact-container table {
+/* Visually round the table itself so cells do not overhang the container corners */
+.resource-table-compact-container table.resource-table-compact {
   background: white;
-  /* We apply border-radius to cells instead to support sticky columns */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
+  overflow: hidden; /* prevent cell background spill-out */
+}
+
+/* --- Corner Styles --- */
+
+/* Top left */
+.resource-table-compact th.name-column {
+  border-top-left-radius: 16px;
+}
+/* Top right: always add radius to the last th in header */
+.resource-table-compact thead tr th:last-child {
+  border-top-right-radius: 16px;
 }
 
 /* Round bottom corners of the table body */
 .resource-table-compact tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 12px;
+  border-bottom-left-radius: 16px;
 }
-
 .resource-table-compact tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 12px;
+  border-bottom-right-radius: 16px;
 }
 
+/* Prevent sticky backgrounds from bleeding over corners */
+.resource-table-compact th.sticky,
+.resource-table-compact .name-column {
+  background-clip: padding-box;
+  /* fallback in case sticky overwrites */
+  border-radius: 0 !important;
+}
+
+/* Handle edge cases for sticky columns/cells at corners */
+.resource-table-compact thead tr th.name-column {
+  border-top-left-radius: 16px;
+}
+.resource-table-compact tbody tr:last-child td.name-column {
+  border-bottom-left-radius: 16px;
+}
 
 /* Center the compact table container */
 .compact-table-wrapper {
