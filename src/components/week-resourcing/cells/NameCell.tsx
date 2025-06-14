@@ -20,6 +20,12 @@ export const NameCell: React.FC<NameCellProps> = ({ member }) => {
   // Helper to get avatar URL safely
   const getAvatarUrl = (): string | undefined => {
     if (!member) return undefined;
+    
+    // Debug logging to check the member object and avatar_url
+    console.log('NameCell - Member object:', member);
+    console.log('NameCell - Avatar URL:', member.avatar_url);
+    console.log('NameCell - Member has avatar_url property:', 'avatar_url' in member);
+    
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
@@ -40,13 +46,24 @@ export const NameCell: React.FC<NameCellProps> = ({ member }) => {
     </div>
   );
 
+  const avatarUrl = getAvatarUrl();
+
   return (
     <TableCell className="font-medium border-r bg-white sticky left-0 z-10 min-w-[120px] max-w-[150px] shadow-[2px_0_4px_rgba(0,0,0,0.1)]">
       <Tooltip>
         <TooltipTrigger asChild>
           <div className="flex items-center gap-2 px-2 text-sm" title={getMemberDisplayName()}>
             <Avatar className="h-6 w-6">
-              <AvatarImage src={getAvatarUrl()} alt={getMemberDisplayName()} />
+              <AvatarImage 
+                src={avatarUrl} 
+                alt={getMemberDisplayName()}
+                onError={() => {
+                  console.log('NameCell - Avatar image failed to load:', avatarUrl);
+                }}
+                onLoad={() => {
+                  console.log('NameCell - Avatar image loaded successfully:', avatarUrl);
+                }}
+              />
               <AvatarFallback className="bg-[#6465F0] text-white text-xs">
                 {getUserInitials()}
               </AvatarFallback>
