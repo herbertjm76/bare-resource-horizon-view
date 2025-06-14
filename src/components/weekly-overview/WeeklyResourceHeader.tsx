@@ -1,142 +1,92 @@
 
 import React from 'react';
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger 
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { Project } from './types';
 
 interface WeeklyResourceHeaderProps {
   projects: Project[];
 }
 
-export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({ projects }) => {
+export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
+  projects
+}) => {
   return (
-    <TableHeader style={{ backgroundColor: '#6465F0' }} className="sticky top-0 z-10">
-      <TableRow style={{ backgroundColor: '#6465F0' }}>
-        <TableHead className="py-2 px-4 name-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-          <div className="font-medium">Name</div>
-        </TableHead>
-        
-        <TooltipProvider>
-          <TableHead className="header-cell number-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <div className="font-medium">PRJ</div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Projects</p>
-              </TooltipContent>
-            </Tooltip>
+    <TooltipProvider>
+      <TableHeader>
+        <TableRow className="bg-[#6465F0] hover:bg-[#6465F0]">
+          <TableHead className="text-white font-bold text-center border-r border-white/20 sticky left-0 z-20 bg-[#6465F0] min-w-[120px] max-w-[150px]">
+            TEAM MEMBER
           </TableHead>
           
-          <TableHead className="header-cell capacity-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <div className="font-medium">CAP</div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Capacity</p>
-              </TooltipContent>
-            </Tooltip>
+          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+            OFFICE
           </TableHead>
           
-          <TableHead className="header-cell number-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <div className="font-medium">UTL</div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Utilisation</p>
-              </TooltipContent>
-            </Tooltip>
+          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+            CAPACITY
           </TableHead>
           
-          <TableHead className="header-cell number-column leave-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <div className="font-medium">AL</div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Annual Leave</p>
-              </TooltipContent>
-            </Tooltip>
+          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+            COUNT
           </TableHead>
           
-          <TableHead className="header-cell number-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <div className="font-medium">PH</div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Public Holiday</p>
-              </TooltipContent>
-            </Tooltip>
+          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+            TOTAL
           </TableHead>
           
-          <TableHead className="header-cell number-column leave-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <div className="font-medium">VL</div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Vacation Leave</p>
-              </TooltipContent>
-            </Tooltip>
+          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[80px]">
+            UTILIZATION
           </TableHead>
           
-          <TableHead className="header-cell number-column leave-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <div className="font-medium">ML</div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Medical Leave</p>
-              </TooltipContent>
-            </Tooltip>
+          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+            ANNUAL LEAVE
           </TableHead>
           
-          <TableHead className="header-cell number-column leave-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-            <Tooltip>
-              <TooltipTrigger className="w-full">
-                <div className="font-medium">OL</div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Others</p>
-              </TooltipContent>
-            </Tooltip>
+          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+            HOLIDAY
           </TableHead>
-        </TooltipProvider>
-        
-        <TableHead className="py-2 px-4 remarks-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-          <div className="font-medium">Remarks</div>
-        </TableHead>
-        
-        {/* Project columns - each project in the company gets its own column */}
-        {projects.map(project => (
-          <TableHead 
-            key={project.id} 
-            className="project-code-column relative"
-            style={{ backgroundColor: '#6465F0', color: 'white' }}
-          >
-            <TooltipProvider>
+          
+          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+            OTHER LEAVE
+          </TableHead>
+          
+          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+            REMARKS
+          </TableHead>
+          
+          {projects.map((project) => (
+            <TableHead key={project.id} className="text-white font-bold text-center border-r border-white/20 min-w-[40px] max-w-[40px] p-1">
               <Tooltip>
-                <TooltipTrigger className="w-full h-full">
-                  <div className="project-code-header">
+                <TooltipTrigger asChild>
+                  <div 
+                    className="project-code-header cursor-help"
+                    style={{
+                      writingMode: 'vertical-lr',
+                      textOrientation: 'mixed',
+                      height: '80px',
+                      transform: 'rotate(180deg)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.75rem',
+                      fontWeight: '600',
+                      padding: '0.25rem'
+                    }}
+                  >
                     {project.code}
                   </div>
                 </TooltipTrigger>
-                <TooltipContent side="top">
-                  <p>{project.name}</p>
+                <TooltipContent>
+                  <div className="text-sm font-medium">
+                    {project.name}
+                  </div>
                 </TooltipContent>
               </Tooltip>
-            </TooltipProvider>
-          </TableHead>
-        ))}
-      </TableRow>
-    </TableHeader>
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+    </TooltipProvider>
   );
 };
