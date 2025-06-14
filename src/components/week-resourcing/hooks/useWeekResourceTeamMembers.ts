@@ -23,7 +23,7 @@ export const useWeekResourceTeamMembers = () => {
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, location, weekly_capacity, role')
+        .select('id, first_name, last_name, email, location, weekly_capacity, role, avatar_url')
         .eq('company_id', company.id)
         .not('role', 'is', null); // Only get profiles with roles (actual team members)
         
@@ -42,6 +42,7 @@ export const useWeekResourceTeamMembers = () => {
         email: member.email || '',
         location: member.location || null,
         weekly_capacity: member.weekly_capacity || 40,
+        avatar_url: member.avatar_url || null,
         status: 'active'
       })) || [];
     },
@@ -76,6 +77,7 @@ export const useWeekResourceTeamMembers = () => {
         email: member.email || '',
         location: member.location || null,
         weekly_capacity: member.weekly_capacity || 40,
+        avatar_url: null, // Pre-registered members don't have avatars yet
         status: 'pre_registered'
       }));
     },
