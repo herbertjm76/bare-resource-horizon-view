@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { NameCell } from './cells/NameCell';
@@ -43,6 +42,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   }, [member.id]);
 
   const isExpanded = viewMode === 'expanded';
+  const isCompact = !isExpanded;
   const weeklyCapacity = member.weekly_capacity || 40;
   const totalUsedHours = getMemberTotal(member.id);
   const projectCount = getProjectCount(member.id);
@@ -141,24 +141,29 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
     );
   }
 
-  // Compact View
+  // --- Compact View: ULTRACOMPACT ---
   return (
-    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'} hover:bg-blue-50/70 transition-all duration-200 h-12 border-b border-gray-100`}>
+    <TableRow
+      className={
+        `resource-table-row-compact ${memberIndex % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'}
+        hover:bg-blue-50/80 transition-all duration-150 h-8 min-h-0`
+      }
+      style={{ fontSize: 12, minHeight: 28, height: 28, lineHeight: 1 }}
+    >
       {/* Name Cell */}
-      <TableCell className="border-r border-gray-200 px-3 py-2 name-column">
-        <NameCell member={member} />
+      <TableCell className="border-r border-gray-200 px-1 py-0.5 name-column min-w-[100px] max-w-[140px] overflow-hidden text-ellipsis whitespace-nowrap">
+        <NameCell member={member} compact />
       </TableCell>
       {/* Project Count */}
-      <TableCell className="text-center border-r border-gray-200 px-2 py-2 count-column">
-        <span className="inline-flex items-center justify-center w-8 h-8 bg-slate-500 text-white rounded-md font-bold text-xs shadow-sm">
-          {projectCount}
-        </span>
+      <TableCell className="text-center border-r border-gray-200 px-0.5 py-0.5 count-column">
+        <span className="inline-flex items-center justify-center w-6 h-6 bg-slate-500 text-white rounded-sm font-semibold text-[11px] shadow-sm">{projectCount}</span>
       </TableCell>
-      {/* Utilization: Large bar */}
-      <TableCell className="text-center border-r border-gray-200 px-3 py-2 utilization-column">
+      {/* Utilization: Compact Progress Bar */}
+      <TableCell className="text-center border-r border-gray-200 px-1 py-0.5 utilization-column min-w-[72px] max-w-[100px]">
         <LongCapacityBar
           totalUsedHours={totalUsedHours}
           totalCapacity={weeklyCapacity}
+          compact // Pass prop for compact!
         />
       </TableCell>
       {/* Leave Badge Cells + editable Other */}
@@ -168,21 +173,26 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         otherLeave={displayedOtherLeave}
         remarks={remarks}
         leaveDays={leaveDays}
-        className="px-2 py-2"
+        className="px-0.5 py-0.5"
         editableOther={editableOtherLeave}
         onOtherLeaveChange={v => {
           setOtherLeave(v);
           if (onOtherLeaveEdit) onOtherLeaveEdit(member.id, v);
         }}
+        compact // Pass compact prop!
       />
       {/* Project Cells */}
       {projects.map((project) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
         return (
-          <TableCell key={project.id} className="text-center border-r border-gray-200 px-1 py-2 project-column">
+          <TableCell
+            key={project.id}
+            className="text-center border-r border-gray-200 px-0.5 py-0.5 project-column"
+            style={{ width: 30, minWidth: 30, maxWidth: 36 }}
+          >
             {hours > 0 && (
-              <span className="inline-flex items-center justify-center w-8 h-8 bg-emerald-500 text-white rounded-md font-bold text-xs shadow-sm hover:bg-emerald-600 transition-colors duration-200">
+              <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-sm font-semibold text-[11px] hover:bg-emerald-600 transition-colors duration-100">
                 {hours}
               </span>
             )}

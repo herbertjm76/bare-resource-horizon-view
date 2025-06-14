@@ -1,4 +1,3 @@
-
 /* Resource Table View Modes - Enhanced Design */
 
 /* Compact View (Default) - Improved Aesthetics */
@@ -286,5 +285,93 @@
     font-size: 11px;
     min-width: 60px;
     height: 28px;
+  }
+}
+
+/* --- MAKE COMPACT VIEW EVEN MORE COMPACT --- */
+
+/* Target even tighter spacing for compact */
+.resource-table-row-compact td,
+.resource-table-row-compact .name-column,
+.resource-table-row-compact .count-column,
+.resource-table-row-compact .utilization-column,
+.resource-table-row-compact .leave-column,
+.resource-table-row-compact .project-column {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+  font-size: 11px;
+  min-height: 20px;
+  height: 24px;
+  line-height: 1;
+}
+
+.resource-table-row-compact {
+  min-height: 24px !important;
+  height: 28px !important;
+  font-size: 11px;
+}
+
+.resource-table-row-compact .avatar {
+  width: 22px !important;
+  height: 22px !important;
+}
+.resource-table-row-compact .name-cell-label {
+  font-size: 12px !important;
+  max-width: 76px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.resource-table-row-compact .badge,
+.resource-table-row-compact .badge-outline {
+  min-width: 16px !important;
+  height: 22px !important;
+  font-size: 10px !important;
+  padding: 0 3px !important;
+  line-height: 1.2;
+}
+
+.resource-table-row-compact .project-column span {
+  min-width: 22px;
+  max-width: 32px;
+  height: 22px;
+  font-size: 11px;
+  border-radius: 4px;
+  padding: 0 3px !important;
+}
+
+.resource-table-row-compact .utilization-column,
+.resource-table-row-compact .leave-column {
+  min-width: 50px;
+  max-width: 80px;
+}
+.resource-table-row-compact .utilization-column .long-bar {
+  min-width: 40px !important;
+  height: 13px !important;
+}
+
+.resource-table-row-compact .compact-leave-badge {
+  padding: 0 2px;
+  min-width: 16px !important;
+  height: 20px !important;
+  font-size: 10px !important;
+}
+
+@media (max-width: 640px) {
+  .resource-table-row-compact td {
+    font-size: 10px !important;
+    min-width: 16px !important;
+    padding-left: 1.5px !important;
+    padding-right: 1.5px !important;
+  }
+  .resource-table-row-compact .utilization-column {
+    min-width: 36px !important;
+    max-width: 44px !important;
+  }
+  .resource-table-row-compact .leave-column,
+  .resource-table-row-compact .project-column {
+    min-width: 24px !important;
+    max-width: 34px !important;
   }
 }
