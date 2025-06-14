@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -83,8 +82,22 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         selectedWeek={selectedWeek}
       />
       
-      {/* Simplified single container for the table */}
-      <Card className="overflow-hidden">
+      {/* Remove Card wrapper for compact view, keep it for expanded */}
+      {viewMode === 'expanded' ? (
+        <Card className="overflow-hidden">
+          <NewResourceTable 
+            members={members}
+            projects={projects}
+            allocationMap={allocationMap}
+            annualLeaveData={annualLeaveData}
+            holidaysData={holidaysData}
+            getMemberTotal={getMemberTotal}
+            getProjectCount={getProjectCount}
+            getWeeklyLeave={getWeeklyLeave}
+            viewMode={viewMode}
+          />
+        </Card>
+      ) : (
         <NewResourceTable 
           members={members}
           projects={projects}
@@ -96,7 +109,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
           getWeeklyLeave={getWeeklyLeave}
           viewMode={viewMode}
         />
-      </Card>
+      )}
     </div>
   );
 };
