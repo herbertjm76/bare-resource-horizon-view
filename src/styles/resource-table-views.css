@@ -22,6 +22,80 @@
   padding: 0.25rem;
 }
 
+/* Fixed column widths for compact view */
+.resource-table-compact .name-column {
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
+}
+
+.resource-table-compact .count-column {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+}
+
+.resource-table-compact .total-column {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+.resource-table-compact .utilization-column {
+  width: auto;
+  min-width: 120px;
+  flex: 1;
+}
+
+.resource-table-compact .leave-column {
+  width: 70px;
+  min-width: 70px;
+  max-width: 70px;
+}
+
+.resource-table-compact .other-leave-column {
+  width: 50px;
+  min-width: 50px;
+  max-width: 50px;
+}
+
+.resource-table-compact .remarks-column {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+}
+
+.resource-table-compact .project-column {
+  width: 35px;
+  min-width: 35px;
+  max-width: 35px;
+}
+
+/* Utilization pill styling for compact view */
+.resource-table-compact .utilization-pill {
+  height: 28px;
+  min-height: 28px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+}
+
+/* Table container for horizontal scrolling */
+.resource-table-compact-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.resource-table-compact-container table {
+  min-width: 100%;
+  table-layout: auto;
+}
+
 /* Expanded View */
 .resource-table-expanded {
   font-size: 14px;

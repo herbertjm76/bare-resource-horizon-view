@@ -75,7 +75,11 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       );
     }
     
-    return <NameCell member={member} />;
+    return (
+      <TableCell className={`border-r ${cellPadding} ${textSize} name-column`}>
+        <NameCell member={member} />
+      </TableCell>
+    );
   };
 
   // Enhanced utilization cell for expanded view
@@ -96,16 +100,35 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       );
     }
     
-    return <CapacityBarCell totalUsedHours={totalUsedHours} totalCapacity={weeklyCapacity} />;
+    // Compact view - show tall pill with percentage inside
+    return (
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize} utilization-column`}>
+        <span className={`utilization-pill ${
+          utilizationPercentage > 100 
+            ? 'bg-gradient-to-br from-red-100 to-red-200 text-red-700 border border-red-300'
+            : utilizationPercentage > 80
+            ? 'bg-gradient-to-br from-yellow-100 to-yellow-200 text-yellow-700 border border-yellow-300'
+            : 'bg-gradient-to-br from-green-100 to-green-200 text-green-700 border border-green-300'
+        } shadow-sm`}>
+          {utilizationPercentage}%
+        </span>
+      </TableCell>
+    );
   };
 
   return (
     <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 ${rowHeight}`}>
       {renderNameCell()}
       
-      <ProjectCountCell projectCount={projectCount} />
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'count-column'}`}>
+        <span className={`inline-flex items-center justify-center rounded-full font-medium ${
+          isExpanded ? 'w-10 h-7 text-sm' : 'w-8 h-6 text-xs'
+        } bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 border border-blue-200 shadow-sm`}>
+          {projectCount}
+        </span>
+      </TableCell>
       
-      <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'total-column'}`}>
         <span className={`inline-flex items-center justify-center rounded-full font-medium ${
           isExpanded ? 'w-10 h-7 text-sm' : 'w-8 h-6 text-xs'
         } bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 border border-blue-200 shadow-sm`}>
@@ -120,19 +143,23 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       
       {renderUtilizationCell()}
       
-      <ReadOnlyLeaveCell 
-        value={annualLeave} 
-        leaveDays={leaveDays}
-        leaveType="Annual Leave"
-      />
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'leave-column'}`}>
+        <ReadOnlyLeaveCell 
+          value={annualLeave} 
+          leaveDays={leaveDays}
+          leaveType="Annual Leave"
+        />
+      </TableCell>
       
-      <ReadOnlyLeaveCell 
-        value={holidayHours} 
-        leaveDays={[]}
-        leaveType="Holiday"
-      />
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'leave-column'}`}>
+        <ReadOnlyLeaveCell 
+          value={holidayHours} 
+          leaveDays={[]}
+          leaveType="Holiday"
+        />
+      </TableCell>
       
-      <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'other-leave-column'}`}>
         <span className={`inline-flex items-center justify-center rounded font-medium ${
           isExpanded ? 'w-8 h-7 text-sm' : 'w-6 h-5 text-xs'
         } bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 border border-gray-200 shadow-sm`}>
@@ -140,7 +167,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         </span>
       </TableCell>
       
-      <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'remarks-column'}`}>
         <span className={`inline-flex items-center justify-center rounded font-medium ${
           isExpanded ? 'px-3 h-7 text-sm' : 'px-2 h-5 text-xs'
         } bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 border border-gray-200 shadow-sm`}>
@@ -153,7 +180,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         const hours = allocationMap.get(allocationKey) || 0;
         
         return (
-          <TableCell key={project.id} className={`text-center border-r ${cellPadding} ${textSize}`}>
+          <TableCell key={project.id} className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'project-column'}`}>
             {hours > 0 && (
               <span className={`inline-flex items-center justify-center rounded font-medium ${
                 isExpanded ? 'w-8 h-7 text-sm' : 'w-6 h-5 text-xs'

@@ -22,23 +22,23 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
   return (
     <TableHeader>
       <TableRow className={`bg-[#6465F0] hover:bg-[#6465F0] ${headerHeight}`}>
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 sticky left-0 z-20 bg-[#6465F0] min-w-[120px] max-w-[150px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 sticky left-0 z-20 bg-[#6465F0] ${isExpanded ? 'min-w-[120px] max-w-[150px]' : 'name-column'} ${headerPadding} ${headerTextSize}`}>
           TEAM MEMBER
         </TableHead>
         
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'count-column'} ${headerPadding} ${headerTextSize}`}>
           COUNT
         </TableHead>
         
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'total-column'} ${headerPadding} ${headerTextSize}`}>
           TOTAL
         </TableHead>
         
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[80px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[80px]' : 'utilization-column'} ${headerPadding} ${headerTextSize}`}>
           UTILIZATION
         </TableHead>
         
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'leave-column'} ${headerPadding} ${headerTextSize}`}>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -53,7 +53,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </TooltipProvider>
         </TableHead>
         
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'leave-column'} ${headerPadding} ${headerTextSize}`}>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -68,16 +68,16 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </TooltipProvider>
         </TableHead>
         
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'other-leave-column'} ${headerPadding} ${headerTextSize}`}>
           OTHER LEAVE
         </TableHead>
         
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'remarks-column'} ${headerPadding} ${headerTextSize}`}>
           REMARKS
         </TableHead>
         
         {projects.map((project) => (
-          <TableHead key={project.id} className={`text-white font-bold text-center border-r border-white/20 min-w-[40px] max-w-[40px] ${isExpanded ? 'p-2' : 'p-1'}`}>
+          <TableHead key={project.id} className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[40px] max-w-[40px]' : 'project-column'} ${isExpanded ? 'p-2' : 'p-1'}`}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>

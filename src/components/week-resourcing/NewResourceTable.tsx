@@ -39,8 +39,12 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     ? 'resource-table-expanded' 
     : 'resource-table-compact';
 
+  const containerClasses = viewMode === 'compact'
+    ? 'resource-table-compact-container'
+    : 'overflow-x-auto';
+
   return (
-    <div className="overflow-x-auto">
+    <div className={containerClasses}>
       <Table className={tableClasses}>
         <NewResourceTableHeader projects={projects} viewMode={viewMode} />
         <TableBody>
