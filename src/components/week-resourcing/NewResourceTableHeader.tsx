@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { TableHeader, TableRow, TableHead } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 interface NewResourceTableHeaderProps {
   projects: any[];
@@ -25,10 +26,32 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
         </TableHead>
         
         <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-          AL
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">AL</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-sm font-medium">
+                  Annual Leave hours for this week
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </TableHead>
         <TableHead className="w-12 text-center border-r font-semibold" style={{ backgroundColor: '#6465F0', color: 'white' }}>
-          HO
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">HO</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-sm font-medium">
+                  Public Holiday hours for this week
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </TableHead>
         <TableHead className="w-12 text-center border-r-4 border-gray-400 font-semibold" style={{ backgroundColor: '#6465F0', color: 'white' }}>
           OL
@@ -43,22 +66,34 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({ 
               style={{ backgroundColor: '#6465F0', color: 'white' }}
             >
               {project && !project.isEmpty && (
-                <div className="absolute inset-0 flex items-center justify-center p-1">
-                  <div 
-                    className="project-code-text text-xs font-bold whitespace-nowrap"
-                    style={{
-                      transform: 'rotate(-90deg)',
-                      transformOrigin: 'center',
-                      width: '60px',
-                      height: '60px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    {project.project_code || project.code || `P${idx + 1}`}
-                  </div>
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="absolute inset-0 flex items-center justify-center p-1">
+                        <div 
+                          className="project-code-text text-xs font-bold whitespace-nowrap cursor-help"
+                          style={{
+                            transform: 'rotate(-90deg)',
+                            transformOrigin: 'center',
+                            width: '60px',
+                            height: '60px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white'
+                          }}
+                        >
+                          {project.project_code || project.code || `P${idx + 1}`}
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="text-sm font-medium">
+                        {project.name || project.project_name || `Project ${idx + 1}`}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </TableHead>
           );

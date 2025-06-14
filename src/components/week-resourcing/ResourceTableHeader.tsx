@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { TableHeader, TableRow, TableHead } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 
 interface ResourceTableHeaderProps {
   projects: any[];
@@ -16,8 +17,34 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
         
         <TableHead className="w-32 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>Capacity</TableHead>
         
-        <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>AL</TableHead>
-        <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>HO</TableHead>
+        <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">AL</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-sm font-medium">
+                  Annual Leave hours for this week
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </TableHead>
+        <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-help">HO</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-sm font-medium">
+                  Public Holiday hours for this week
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </TableHead>
         <TableHead className="w-12 text-center border-r-4 border-gray-400 non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>OL</TableHead>
         
         {projects.map((project, idx) => {
@@ -28,22 +55,34 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
               style={{ backgroundColor: '#6465F0', color: 'white' }}
             >
               {!project.isEmpty && (
-                <div className="absolute inset-0 flex items-center justify-center p-1">
-                  <div 
-                    className="project-code-text text-xs font-bold whitespace-nowrap"
-                    style={{
-                      transform: 'rotate(-90deg)',
-                      transformOrigin: 'center',
-                      width: '60px',
-                      height: '60px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    {project.code || `P${idx + 1}`}
-                  </div>
-                </div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="absolute inset-0 flex items-center justify-center p-1">
+                        <div 
+                          className="project-code-text text-xs font-bold whitespace-nowrap cursor-help"
+                          style={{
+                            transform: 'rotate(-90deg)',
+                            transformOrigin: 'center',
+                            width: '60px',
+                            height: '60px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white'
+                          }}
+                        >
+                          {project.code || `P${idx + 1}`}
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="text-sm font-medium">
+                        {project.name || project.project_name || `Project ${idx + 1}`}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
             </TableHead>
           );
