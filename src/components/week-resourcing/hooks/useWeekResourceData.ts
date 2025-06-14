@@ -77,12 +77,14 @@ export const useWeekResourceData = (weekStartDate: string, filters: any) => {
   }, []);
 
   const isLoading = isLoadingMembers || isLoadingProjects || isLoadingLeave;
+  const error = membersError || null;
 
   return {
     members,
     projects,
     allocations: comprehensiveWeeklyAllocations,
     isLoading,
+    error,
     allocationMap,
     getMemberTotal,
     getProjectCount,

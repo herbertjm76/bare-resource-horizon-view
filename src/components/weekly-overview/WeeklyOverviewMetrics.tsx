@@ -18,7 +18,8 @@ export const useWeeklyOverviewMetrics = ({ selectedWeek }: WeeklyOverviewMetrics
     projects,
     members,
     allocations,
-    isLoading: isLoadingResourceData
+    isLoading: isLoadingResourceData,
+    error: resourceDataError
   } = useWeekResourceData(weekStartDate, { office: "all", searchTerm: "" });
 
   const {
@@ -89,6 +90,6 @@ export const useWeeklyOverviewMetrics = ({ selectedWeek }: WeeklyOverviewMetrics
   return {
     metrics,
     isLoading,
-    error: null // Add error property to match expected interface
+    error: resourceDataError
   };
 };
