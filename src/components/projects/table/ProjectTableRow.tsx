@@ -45,6 +45,20 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
 
   const projectArea = getAreaByCountry(project.country);
 
+  // Get the current stage name from office stages
+  const getCurrentStageName = () => {
+    if (!project.current_stage) return 'None';
+    const stage = office_stages.find(s => s.id === project.current_stage);
+    return stage ? stage.name : project.current_stage;
+  };
+
+  // Get the current stage color
+  const getCurrentStageColor = () => {
+    if (!project.current_stage) return '#E5DEFF';
+    const stage = office_stages.find(s => s.id === project.current_stage);
+    return stage?.color || stageColorMap[project.current_stage] || '#E5DEFF';
+  };
+
   return (
     <>
       <TableRow 
@@ -98,11 +112,11 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           <span
             className="inline-block px-2 py-1 rounded text-xs"
             style={{
-              backgroundColor: stageColorMap[project.current_stage] || "#E5DEFF",
+              backgroundColor: getCurrentStageColor(),
               color: "#212172"
             }}
           >
-            {project.current_stage || 'None'}
+            {getCurrentStageName()}
           </span>
         </TableCell>
         

@@ -4,6 +4,7 @@ import { ProjectBasicInfo } from './components/ProjectBasicInfo';
 import { ProjectManagerSelect } from './components/ProjectManagerSelect';
 import { ProjectLocationInfo } from './components/ProjectLocationInfo';
 import { ProjectStagesSelector } from './components/ProjectStagesSelector';
+import { ProjectCurrentStageSelector } from './components/ProjectCurrentStageSelector';
 import { RateCalculatorNew } from './components/RateCalculatorNew';
 import { ProjectProfitRate } from './components/ProjectProfitRate';
 import { ProjectResourceOverview } from './components/ProjectResourceOverview';
@@ -166,6 +167,13 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         stages={form.stages}
         officeStages={officeStages}
         onChange={(stages) => onChange("stages", stages)}
+      />
+
+      <ProjectCurrentStageSelector
+        currentStage={form.current_stage}
+        selectedStages={form.stages}
+        officeStages={officeStages}
+        onChange={(stageId) => onChange("current_stage", stageId)}
       />
 
       {/* Add resource allocations section if project ID exists */}

@@ -109,6 +109,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
         isDataLoaded={isDataLoaded}
         onClose={onClose}
         onSubmit={onSubmit}
+        projectId={loadedProject?.id}
       />
     </Dialog>
   );

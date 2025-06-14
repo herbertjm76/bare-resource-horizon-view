@@ -11,6 +11,7 @@ interface ProjectInfoTabContentProps {
   officeStages: Array<{ id: string; name: string; color?: string }>;
   updateStageApplicability: (stageId: string, isChecked: boolean) => void;
   handleChange: (key: string, value: any) => void;
+  projectId?: string;
 }
 
 export const ProjectInfoTabContent: React.FC<ProjectInfoTabContentProps> = ({
@@ -21,6 +22,7 @@ export const ProjectInfoTabContent: React.FC<ProjectInfoTabContentProps> = ({
   officeStages,
   updateStageApplicability,
   handleChange,
+  projectId,
 }) => {
   return (
     <TabsContent value="info" className="mt-0 space-y-6">
@@ -38,6 +40,7 @@ export const ProjectInfoTabContent: React.FC<ProjectInfoTabContentProps> = ({
           { label: "On hold", value: "On Hold" }
         ]}
         onChange={handleChange}
+        projectId={projectId}
       />
     </TabsContent>
   );

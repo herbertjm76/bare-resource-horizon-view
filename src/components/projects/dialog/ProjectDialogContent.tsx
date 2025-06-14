@@ -49,6 +49,7 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
             officeStages={officeStages}
             updateStageApplicability={updateStageApplicability}
             handleChange={handleChange}
+            projectId={projectId}
           />
         </ScrollArea>
       </TabsContent>
