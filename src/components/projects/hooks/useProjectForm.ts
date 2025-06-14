@@ -17,8 +17,8 @@ export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any
     formErrors, 
     setFormErrors, 
     isLoading, 
-    setIsLoading, 
-    isDataLoaded 
+    setIsLoading
+    // REMOVED: isDataLoaded
   } = useFormState(project, officeStages, refetchSignal);
   
   const { updateStageFee, updateStageApplicability } = useStageManagement(form, setForm);
@@ -96,13 +96,14 @@ export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any
     formErrors,
     handleChange: (key: keyof typeof form, value: any) => {
       console.log(`handleChange: ${String(key)} =`, value);
-      
+
+      // FIX: index with key as string
       setForm(prev => ({ ...prev, [key]: value }));
-      
-      if (formErrors[key]) {
+
+      if (formErrors[key as string]) {
         setFormErrors(prev => {
           const newErrors = {...prev};
-          delete newErrors[key];
+          delete newErrors[key as string];
           return newErrors;
         });
       }
@@ -147,8 +148,7 @@ export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any
       }
     },
     updateStageFee,
-    updateStageApplicability,
-    isDataLoaded
+    updateStageApplicability
+    // REMOVED: isDataLoaded
   };
 };
-

@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import type { FormState } from "./types/projectTypes";
+// FIXED import path:
+import type { FormState } from "../types/projectTypes";
 import { supabase } from "@/integrations/supabase/client";
 import React from "react";
 
