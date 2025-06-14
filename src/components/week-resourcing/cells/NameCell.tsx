@@ -75,7 +75,7 @@ export const NameCell: React.FC<NameCellProps> = ({ member }) => {
               </div>
             </div>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent side="bottom" align="start" sideOffset={5}>
             {memberTooltip}
           </TooltipContent>
         </Tooltip>
