@@ -63,7 +63,6 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
   const [resourceAllocations, setResourceAllocations] = useState<any[]>([]);
   const [isLoadingResources, setIsLoadingResources] = useState<boolean>(false);
-  const { toast } = useToast();
 
   // Fetch resource allocations for the selected week
   useEffect(() => {
@@ -108,7 +107,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
     };
     
     fetchResourceAllocations();
-  }, [projectId, selectedWeek, toast]);
+  }, [projectId, selectedWeek]);
 
   return (
     <div className="space-y-4 py-4">
