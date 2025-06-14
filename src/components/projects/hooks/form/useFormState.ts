@@ -5,13 +5,23 @@ import type { FormState } from "../types/projectTypes";
 import { supabase } from "@/integrations/supabase/client";
 import React from "react";
 
-// Add refetchSignal to support reload when changed; default to null for compatibility
+/**
+ * Loads and persists all stage fees using stageId as the key, not stageName.
+ * Accepts officeStages as argument for name-to-id lookups.
+ */
 export const useFormState = (project: any, officeStages: any = [], refetchSignal: any = null) => {
   const [formErrors, setFormErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // Find the mapping from stage name to stage id
+  const stageNameToId: Record<string, string> = {};
+  if (Array.isArray(officeStages)) {
+    officeStages.forEach((stage: any) => {
+      stageNameToId[stage.name] = stage.id;
+    });
+  }
+
   // This effect will rerun when refetchSignal changes, reloading the state if needed.
-  // Make initialStages and all internal state reload on refetchSignal.
   // Initialize the stages array from the project data
   const initialStages = Array.isArray(project.stages) ? project.stages : [];
 
@@ -19,7 +29,7 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
   console.log('useFormState - initializing with project:', project);
   console.log('useFormState - initialStages:', initialStages);
 
-  // Create a record of stage selections for easier lookup
+  // Create a record of stage selections for easier lookup (by id)
   const initialStageSelections: Record<string, boolean> = {};
   initialStages.forEach((stageId: string) => {
     initialStageSelections[stageId] = true;
@@ -87,18 +97,17 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
       if (projectStages) {
         const stageFees: Record<string, any> = {};
 
-        // For each project stage, get or initialize its fee data
         for (const stage of projectStages) {
-          // Get the corresponding office stage name
-          const officeStageName = stage.stage_name;
+          // Use stage.id as the key
+          const stageId = stageNameToId[stage.stage_name] || stage.id; // fallback to stage.id if not found
 
           // Get fee data for this stage
           const { data: feeData } = await supabase
             .from('project_fees')
             .select('*')
             .eq('project_id', project.id)
-            .eq('stage_id', stage.id)
-            .single();
+            .eq('stage_id', stageId)
+            .maybeSingle();
 
           // Calculate invoice age if we have an invoice date
           const invoiceDate = feeData?.invoice_date ? new Date(feeData.invoice_date) : null;
@@ -114,21 +123,15 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
           let billingMonth = null;
           if (feeData?.billing_month) {
             try {
-              // Try to parse the billing month which might be in different formats
               billingMonth = new Date(feeData.billing_month);
-              if (isNaN(billingMonth.getTime())) {
-                billingMonth = null;
-              }
+              if (isNaN(billingMonth.getTime())) billingMonth = null;
             } catch (error) {
               console.error('Error parsing billing month:', error);
               billingMonth = null;
             }
           }
 
-          // Find the office stage ID that matches this stage name
-          // This would require office stages to be available, but since we removed that dependency,
-          // we'll need to match by stage name directly
-          stageFees[stage.stage_name] = {
+          stageFees[stageId] = {
             fee: feeData?.fee?.toString() || stage.fee?.toString() || '',
             billingMonth: billingMonth || (stage.billing_month ? new Date(stage.billing_month) : null),
             status: feeData?.invoice_status || stage.invoice_status || 'Not Billed',
@@ -147,7 +150,7 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
     };
 
     loadProjectFees();
-  }, [project?.id, refetchSignal]);
+  }, [project?.id, refetchSignal, officeStages]);
 
   return {
     form,

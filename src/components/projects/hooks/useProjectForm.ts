@@ -1,4 +1,3 @@
-
 import { useCompany } from '@/context/CompanyContext';
 import { useFormState } from './form/useFormState';
 import { useFormOptions } from './form/useFormOptions';
@@ -10,7 +9,7 @@ export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any
   const { company } = useCompany();
   const { managers, countries, offices, officeStages } = useFormOptions(company, isOpen);
   
-  // Add refetchSignal as an argument to useFormState
+  // Pass officeStages for proper mapping in useFormState!
   const { 
     form, 
     setForm, 
