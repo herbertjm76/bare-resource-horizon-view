@@ -1,3 +1,4 @@
+
 import React from "react";
 
 interface LongCapacityBarProps {
@@ -41,11 +42,14 @@ export const LongCapacityBar: React.FC<LongCapacityBarProps> = ({
               style={{ borderTopRightRadius: 4, borderBottomRightRadius: 4, opacity: 0.20 }}
             />
           )}
-          {/* Text overlay inside the bar */}
+          {/* Text overlay inside the bar with white text and shadow for better readability */}
           <div className="absolute inset-0 flex items-center justify-center">
             <span 
-              className="font-semibold text-white text-xs mix-blend-difference select-none"
-              style={{ fontSize: 11 }}
+              className="font-bold text-white text-xs select-none"
+              style={{ 
+                fontSize: 11,
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.3)'
+              }}
             >
               {rate}%
             </span>
