@@ -14,40 +14,81 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
 }) => {
   const isExpanded = viewMode === 'expanded';
   
-  const headerPadding = isExpanded ? 'py-4 px-4' : 'py-2 px-2';
+  const headerPadding = isExpanded ? 'py-4 px-4' : 'py-3 px-2';
   const headerTextSize = isExpanded ? 'text-sm' : 'text-xs';
-  const headerHeight = isExpanded ? 'h-16' : 'h-12';
+  const headerHeight = isExpanded ? 'h-16' : 'h-14';
 
   return (
     <TableHeader>
       <TableRow className={`bg-[#6465F0] hover:bg-[#6465F0] ${headerHeight}`}>
         {/* TEAM MEMBER */}
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 sticky left-0 z-20 bg-[#6465F0] min-w-[120px] max-w-[150px] ${headerPadding} ${headerTextSize}`}>
-          TEAM MEMBER
+        <TableHead className={`text-white font-bold text-left border-r border-white/20 sticky left-0 z-20 bg-[#6465F0] min-w-[140px] max-w-[180px] ${headerPadding} ${headerTextSize}`}>
+          {isExpanded ? 'TEAM MEMBER' : 'NAME'}
         </TableHead>
 
+        {/* Project Count - Only in compact, moved to second position */}
+        {!isExpanded && (
+          <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[50px] max-w-[60px] ${headerPadding} ${headerTextSize}`}>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="cursor-pointer"># PROJ</span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="text-sm font-medium">
+                    Number of projects assigned
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </TableHead>
+        )}
+
+        {/* Total Hours - Third position in compact */}
+        {!isExpanded && (
+          <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] max-w-[70px] ${headerPadding} ${headerTextSize}`}>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="cursor-pointer">TOTAL</span>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="text-sm font-medium">
+                    Total project hours allocated
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </TableHead>
+        )}
+
         {/* Utilization */}
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[80px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[80px]' : 'min-w-[90px]'} ${headerPadding} ${headerTextSize}`}>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-pointer">UTILIZATION</span>
+                <span className="cursor-pointer">{isExpanded ? 'UTILIZATION' : 'CAPACITY'}</span>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="text-sm font-medium">
-                  % of weekly capacity used<br />Color: <span className="text-green-600">Good</span>, <span className="text-yellow-600">Caution</span>, <span className="text-red-600">High</span>
+                  {isExpanded 
+                    ? '% of weekly capacity used\nColor: Good (Green), Caution (Yellow), High (Red)'
+                    : 'Weekly capacity utilization bar\nShows allocated vs available hours'
+                  }
                 </div>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </TableHead>
 
-        {/* Total */}
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
-          TOTAL
-        </TableHead>
+        {/* Total - Only in expanded */}
+        {isExpanded && (
+          <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
+            TOTAL
+          </TableHead>
+        )}
 
-        {/* Vertical project block separator (expanded only, for design) */}
+        {/* Vertical project block separator (expanded only) */}
         {isExpanded && (
           <TableHead
             className="project-block-sep-header"
@@ -67,9 +108,8 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           <TableHead
             key={project.id}
             className={`
-              text-white font-bold text-center border-r border-white/20 min-w-[40px] max-w-[40px]
-              ${isExpanded ? 'p-2 project-col-header-expanded' : 'p-1'}
-              ${isExpanded ? 'bg-gradient-to-b from-[#6465F0] via-[#7879f8]/60 to-[#f3f4fd]' : ''}
+              text-white font-bold text-center border-r border-white/20 
+              ${isExpanded ? 'min-w-[40px] max-w-[40px] p-2 project-col-header-expanded bg-gradient-to-b from-[#6465F0] via-[#7879f8]/60 to-[#f3f4fd]' : 'min-w-[32px] max-w-[36px] p-1'}
             `}
             style={isExpanded && idx === 0 ? { borderLeft: 'none' } : undefined}
           >
@@ -81,14 +121,14 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
                     style={{
                       writingMode: 'vertical-lr',
                       textOrientation: 'mixed',
-                      height: isExpanded ? '100px' : '80px',
+                      height: isExpanded ? '100px' : '70px',
                       transform: 'rotate(180deg)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: isExpanded ? '0.875rem' : '0.75rem',
+                      fontSize: isExpanded ? '0.875rem' : '0.7rem',
                       fontWeight: '600',
-                      padding: isExpanded ? '0.5rem' : '0.25rem',
+                      padding: isExpanded ? '0.5rem' : '0.2rem',
                       color: 'white'
                     }}
                   >
@@ -105,17 +145,19 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           </TableHead>
         ))}
 
-        {/* Project Count */}
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
-          COUNT
-        </TableHead>
+        {/* Project Count - Only in expanded */}
+        {isExpanded && (
+          <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
+            COUNT
+          </TableHead>
+        )}
         
         {/* Annual Leave */}
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'min-w-[45px]'} ${headerPadding} ${headerTextSize}`}>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-pointer">ANNUAL LEAVE</span>
+                <span className="cursor-pointer">{isExpanded ? 'ANNUAL LEAVE' : 'AL'}</span>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="text-sm font-medium">
@@ -127,11 +169,11 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
         </TableHead>
 
         {/* Holiday */}
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'min-w-[45px]'} ${headerPadding} ${headerTextSize}`}>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-pointer">HOLIDAY</span>
+                <span className="cursor-pointer">{isExpanded ? 'HOLIDAY' : 'HOL'}</span>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="text-sm font-medium">
@@ -143,13 +185,35 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
         </TableHead>
         
         {/* Other Leave */}
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
-          OTHER LEAVE
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'min-w-[45px]'} ${headerPadding} ${headerTextSize}`}>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-pointer">{isExpanded ? 'OTHER LEAVE' : 'OTH'}</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-sm font-medium">
+                  Other leave types for this week
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </TableHead>
 
         {/* Remarks */}
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
-          REMARKS
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'min-w-[50px]'} ${headerPadding} ${headerTextSize}`}>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="cursor-pointer">{isExpanded ? 'REMARKS' : 'REM'}</span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <div className="text-sm font-medium">
+                  Additional notes and remarks
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </TableHead>
       </TableRow>
     </TableHeader>
