@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
-import { NameCell } from '../cells/NameCell';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { MultiLeaveBadgeCell } from './MultiLeaveBadgeCell';
 import { LongCapacityBar } from '../LongCapacityBar';
 import { RowData, useRowData } from './RowUtilsHooks';
@@ -28,7 +29,34 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
     displayedOtherLeave,
     remarks,
     handleOtherLeaveChange
-  } = useRowData(member, props);
+  } = useRowData(member, { projects, allocationMap, ...props }); // Pass needed objects to useRowData
+
+  // Helpers for compact avatar and name
+  const getUserInitials = (): string => {
+    if (!member) return '??';
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+  const getMemberDisplayName = (): string => {
+    if (!member) return 'Unknown';
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed';
+  };
+  const getAvatarUrl = (): string | undefined => {
+    if (!member) return undefined;
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
+  const memberTooltip = (
+    <div className="space-y-1 text-xs">
+      <p className="font-semibold">{getMemberDisplayName()}</p>
+      {member.role && <p>Role: {member.role}</p>}
+      {member.department && <p>Department: {member.department}</p>}
+      {member.location && <p>Location: {member.location}</p>}
+      {member.weekly_capacity && <p>Weekly Capacity: {member.weekly_capacity}h</p>}
+      {member.email && <p>Email: {member.email}</p>}
+    </div>
+  );
 
   return (
     <TableRow
@@ -38,9 +66,42 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
       }
       style={{ fontSize: 12, minHeight: 28, height: 28, lineHeight: 1 }}
     >
-      {/* Name Cell */}
-      <TableCell className="border-r border-gray-200 px-1 py-0.5 name-column min-w-[100px] max-w-[140px] overflow-hidden text-ellipsis whitespace-nowrap">
-        <NameCell member={member} compact />
+      {/* Team Member consolidated cell */}
+      <TableCell
+        className="border-r border-gray-200 px-1 py-0.5 name-column min-w-[120px] max-w-[120px] w-[120px] overflow-hidden text-ellipsis whitespace-nowrap"
+        style={{ width: 120, minWidth: 120, maxWidth: 120, background: 'inherit', zIndex: 5 }}
+      >
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1 text-xs cursor-pointer" title={getMemberDisplayName()}>
+                <Avatar className="h-5 w-5 min-w-[20px] min-h-[20px]">
+                  <AvatarImage 
+                    src={getAvatarUrl()} 
+                    alt={getMemberDisplayName()}
+                  />
+                  <AvatarFallback className="bg-[#6465F0] text-white text-[10px]">
+                    {getUserInitials()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="truncate flex-1 name-cell-label max-w-[90px]">
+                  <span className="text-[11px]">
+                    {member.first_name?.substring(0, 1)}. {member.last_name}
+                  </span>
+                </div>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent 
+              side="right" 
+              align="start" 
+              sideOffset={8}
+              className="z-[200] max-w-xs"
+              avoidCollisions={true}
+            >
+              {memberTooltip}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TableCell>
       
       {/* Project Count */}
@@ -93,3 +154,4 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
     </TableRow>
   );
 };
+
