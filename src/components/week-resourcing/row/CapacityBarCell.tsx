@@ -7,16 +7,14 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/comp
 interface CapacityBarCellProps {
   totalUsedHours: number;
   totalCapacity: number;
-  className?: string;
 }
 
 export const CapacityBarCell: React.FC<CapacityBarCellProps> = ({
   totalUsedHours,
-  totalCapacity,
-  className
+  totalCapacity
 }) => {
   return (
-    <TableCell className={`text-center border-r ${className || 'p-1'}`}>
+    <TableCell className="text-center border-r p-1">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
