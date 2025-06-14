@@ -5,6 +5,7 @@ import { NameCell } from './cells/NameCell';
 import { ProjectCountCell } from './cells/ProjectCountCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
 import { ReadOnlyLeaveCell } from './cells/ReadOnlyLeaveCell';
+import { Badge } from '@/components/ui/badge';
 
 interface NewResourceTableRowProps {
   member: any;
@@ -34,7 +35,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   const isExpanded = viewMode === 'expanded';
   const cellPadding = isExpanded ? 'py-3 px-3' : 'py-1 px-1';
   const textSize = isExpanded ? 'text-sm' : 'text-xs';
-  const rowHeight = isExpanded ? 'h-14' : 'h-10';
+  const rowHeight = isExpanded ? 'h-16' : 'h-10';
 
   const weeklyCapacity = member.weekly_capacity || 40;
   const totalUsedHours = getMemberTotal(member.id);
@@ -45,21 +46,41 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
 
   const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0;
 
+  // Enhanced member name cell for expanded view
+  const renderNameCell = () => {
+    if (isExpanded) {
+      return (
+        <TableCell className={`border-r ${cellPadding} ${textSize} min-w-[150px]`}>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <NameCell member={member} />
+            </div>
+            <div className="flex flex-wrap gap-1 text-xs text-gray-500">
+              {member.office_location && (
+                <Badge variant="outline" className="text-xs px-1 py-0">
+                  {member.office_location}
+                </Badge>
+              )}
+              <Badge variant="outline" className="text-xs px-1 py-0">
+                {weeklyCapacity}h capacity
+              </Badge>
+              {member.department && (
+                <Badge variant="outline" className="text-xs px-1 py-0">
+                  {member.department}
+                </Badge>
+              )}
+            </div>
+          </div>
+        </TableCell>
+      );
+    }
+    
+    return <NameCell member={member} />;
+  };
+
   return (
     <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 ${rowHeight}`}>
-      <NameCell member={member} />
-      
-      <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
-        {member.office_location || '-'}
-      </TableCell>
-      
-      <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
-        <span className={`inline-flex items-center justify-center rounded-full font-medium ${
-          isExpanded ? 'w-10 h-7 text-sm' : 'w-8 h-6 text-xs'
-        } bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 border border-gray-200 shadow-sm`}>
-          {weeklyCapacity}h
-        </span>
-      </TableCell>
+      {renderNameCell()}
       
       <ProjectCountCell projectCount={projectCount} />
       
@@ -69,6 +90,11 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         } bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 border border-blue-200 shadow-sm`}>
           {totalUsedHours}h
         </span>
+        {isExpanded && (
+          <div className="text-xs text-gray-500 mt-1">
+            of {weeklyCapacity}h
+          </div>
+        )}
       </TableCell>
       
       <CapacityBarCell
@@ -111,11 +137,18 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         return (
           <TableCell key={project.id} className={`text-center border-r ${cellPadding} ${textSize}`}>
             {hours > 0 && (
-              <span className={`inline-flex items-center justify-center rounded font-medium ${
-                isExpanded ? 'w-8 h-7 text-sm' : 'w-6 h-5 text-xs'
-              } bg-gradient-to-br from-green-100 to-emerald-100 text-green-700 border border-green-200 shadow-sm`}>
-                {hours}
-              </span>
+              <div className="flex flex-col items-center">
+                <span className={`inline-flex items-center justify-center rounded font-medium ${
+                  isExpanded ? 'w-8 h-7 text-sm' : 'w-6 h-5 text-xs'
+                } bg-gradient-to-br from-green-100 to-emerald-100 text-green-700 border border-green-200 shadow-sm`}>
+                  {hours}
+                </span>
+                {isExpanded && hours > 0 && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    {Math.round((hours / weeklyCapacity) * 100)}%
+                  </div>
+                )}
+              </div>
             )}
           </TableCell>
         );

@@ -27,14 +27,6 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
         </TableHead>
         
         <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
-          OFFICE
-        </TableHead>
-        
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
-          CAPACITY
-        </TableHead>
-        
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 min-w-[60px] ${headerPadding} ${headerTextSize}`}>
           COUNT
         </TableHead>
         

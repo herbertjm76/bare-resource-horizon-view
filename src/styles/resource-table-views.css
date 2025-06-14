@@ -34,7 +34,7 @@
 
 .resource-table-expanded td {
   padding: 12px 8px;
-  height: 56px;
+  height: 64px;
 }
 
 .resource-table-expanded .project-code-header {
@@ -66,4 +66,23 @@
 .resource-table-compact .avatar {
   width: 24px;
   height: 24px;
+}
+
+/* Enhanced member cell styling for expanded view */
+.resource-table-expanded .member-info-expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resource-table-expanded .member-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.resource-table-expanded .allocation-percentage {
+  font-size: 10px;
+  color: #6b7280;
+  margin-top: 2px;
 }
