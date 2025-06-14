@@ -27,18 +27,18 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
     return '#6b7280'; // gray - low utilization
   };
 
-  // Get text color for the available hours number
-  const getTextColor = () => {
-    if (availableHours < 0) return 'text-red-600 font-bold'; // Bold red for negative (over capacity)
-    if (utilizationRate === 0) return 'text-gray-400'; // faint for 0%
+  // Get text color for the percentage based on utilization
+  const getPercentageTextColor = () => {
+    if (utilizationRate > 100) return 'text-red-600 font-bold'; // Bold red for over 100%
     if (utilizationRate >= 95) return 'text-green-600 font-semibold';
     if (utilizationRate >= 80) return 'text-orange-600 font-semibold';
     if (utilizationRate >= 50) return 'text-blue-600 font-semibold';
+    if (utilizationRate === 0) return 'text-gray-400'; // faint for 0%
     return 'text-gray-600 font-semibold';
   };
 
   const utilizationColor = getUtilizationColor();
-  const textColor = getTextColor();
+  const percentageTextColor = getPercentageTextColor();
 
   console.log(`CapacityBar calculation for ${totalCapacity}h weekly capacity:`, {
     totalCapacity,
@@ -67,14 +67,9 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
           </div>
         </div>
         
-        {/* Percentage text next to the bar */}
-        <span className="text-[10px] font-medium text-gray-600 min-w-[20px]">
+        {/* Percentage text with color coding */}
+        <span className={cn("text-[10px] font-medium min-w-[25px]", percentageTextColor)}>
           {utilizationRate}%
-        </span>
-        
-        {/* Available hours number with color coding - show negative if over capacity */}
-        <span className={cn("text-xs font-medium", textColor)}>
-          {availableHours}
         </span>
       </div>
     </div>
