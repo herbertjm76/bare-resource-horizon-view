@@ -15,7 +15,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
 }) => {
   const isExpanded = viewMode === 'expanded';
   
-  const headerPadding = isExpanded ? 'py-4 px-4' : 'py-2 px-2';
+  const headerPadding = isExpanded ? 'py-4 px-4' : 'py-2 px-1';
   const headerTextSize = isExpanded ? 'text-sm' : 'text-xs';
   const headerHeight = isExpanded ? 'h-16' : 'h-12';
 
@@ -23,11 +23,11 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
     <TableHeader>
       <TableRow className={`bg-[#6465F0] hover:bg-[#6465F0] ${headerHeight}`}>
         <TableHead className={`text-white font-bold text-center border-r border-white/20 sticky left-0 z-20 bg-[#6465F0] ${isExpanded ? 'min-w-[120px] max-w-[150px]' : 'name-column'} ${headerPadding} ${headerTextSize}`}>
-          TEAM MEMBER
+          TEAM
         </TableHead>
         
         <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'count-column'} ${headerPadding} ${headerTextSize}`}>
-          COUNT
+          #
         </TableHead>
         
         <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[80px]' : 'utilization-column'} ${headerPadding} ${headerTextSize}`}>
@@ -39,7 +39,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-pointer">LEAVE SUMMARY</span>
+                <span className="cursor-pointer">LEAVE</span>
               </TooltipTrigger>
               <TooltipContent>
                 <div className="text-sm font-medium space-y-1">

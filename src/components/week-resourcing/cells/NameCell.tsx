@@ -6,9 +6,10 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/comp
 
 interface NameCellProps {
   member: any;
+  compact?: boolean;
 }
 
-export const NameCell: React.FC<NameCellProps> = ({ member }) => {
+export const NameCell: React.FC<NameCellProps> = ({ member, compact = false }) => {
   // Helper to get user initials
   const getUserInitials = (): string => {
     if (!member) return '??';
@@ -47,6 +48,46 @@ export const NameCell: React.FC<NameCellProps> = ({ member }) => {
   );
 
   const avatarUrl = getAvatarUrl();
+
+  if (compact) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="flex items-center gap-1 text-xs cursor-pointer" title={getMemberDisplayName()}>
+              <Avatar className="h-5 w-5">
+                <AvatarImage 
+                  src={avatarUrl} 
+                  alt={getMemberDisplayName()}
+                  onError={() => {
+                    console.log('NameCell - Avatar image failed to load:', avatarUrl);
+                  }}
+                  onLoad={() => {
+                    console.log('NameCell - Avatar image loaded successfully:', avatarUrl);
+                  }}
+                />
+                <AvatarFallback className="bg-[#6465F0] text-white text-[10px]">
+                  {getUserInitials()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="truncate flex-1 name-cell-label">
+                <span className="text-[11px]">{member.first_name?.substring(0, 1)}. {member.last_name}</span>
+              </div>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent 
+            side="right" 
+            align="start" 
+            sideOffset={8}
+            className="z-[200] max-w-xs"
+            avoidCollisions={true}
+          >
+            {memberTooltip}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
 
   return (
     <TableCell className="font-medium border-r bg-white sticky left-0 z-10 min-w-[120px] max-w-[150px]">
