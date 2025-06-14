@@ -10,7 +10,7 @@ type Project = Database['public']['Tables']['projects']['Row'];
 
 export const useProjects = () => {
   const { company, loading: companyLoading } = useCompany();
-  
+
   useEffect(() => {
     console.log('useProjects hook effect triggered', { 
       hasCompany: !!company,
@@ -30,7 +30,7 @@ export const useProjects = () => {
       console.log('Fetching projects data for company:', company.id);
       
       try {
-        // Define fields to select based on the actual schema
+        // Select projects with deterministic ordering
         const { data, error } = await supabase
           .from('projects')
           .select(`
@@ -46,7 +46,8 @@ export const useProjects = () => {
             project_manager:profiles(id, first_name, last_name, avatar_url),
             office:offices(id, name, country)
           `)
-          .eq('company_id', company.id);
+          .eq('company_id', company.id)
+          .order('created_at', { ascending: true });   // <--- Added order here
 
         if (error) {
           console.error('Error fetching projects:', error);
@@ -98,3 +99,4 @@ export const useProjects = () => {
     refetch
   };
 };
+
