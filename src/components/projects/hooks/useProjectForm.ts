@@ -5,10 +5,12 @@ import { useFormOptions } from './form/useFormOptions';
 import { useStageManagement } from './form/useStageManagement';
 import { useEffect } from 'react';
 
-export const useProjectForm = (project: any, isOpen: boolean) => {
+// Accept a third refetchSignal argument, defaulting to null for backward compatibility.
+export const useProjectForm = (project: any, isOpen: boolean, refetchSignal: any = null) => {
   const { company } = useCompany();
   const { managers, countries, offices, officeStages } = useFormOptions(company, isOpen);
   
+  // Add refetchSignal as an argument to useFormState
   const { 
     form, 
     setForm, 
@@ -17,7 +19,7 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     isLoading, 
     setIsLoading, 
     isDataLoaded 
-  } = useFormState(project, officeStages);
+  } = useFormState(project, officeStages, refetchSignal);
   
   const { updateStageFee, updateStageApplicability } = useStageManagement(form, setForm);
 
@@ -149,3 +151,4 @@ export const useProjectForm = (project: any, isOpen: boolean) => {
     isDataLoaded
   };
 };
+
