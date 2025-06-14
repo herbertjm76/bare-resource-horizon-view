@@ -12,7 +12,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   totalCapacity
 }) => {
   // Calculate utilization percentage based on actual used hours vs total capacity
-  const utilizationPercentage = totalCapacity > 0 ? Math.min(100, Math.max(0, (totalUsedHours / totalCapacity) * 100)) : 0;
+  const utilizationPercentage = totalCapacity > 0 ? (totalUsedHours / totalCapacity) * 100 : 0;
   const utilizationRate = Math.round(utilizationPercentage);
   
   // Calculate available hours - can be negative if over capacity
@@ -56,7 +56,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
           <div 
             className="w-12 h-3 rounded-full border border-gray-300 overflow-hidden bg-gray-100"
           >
-            {/* Fill bar that grows left-to-right */}
+            {/* Fill bar that can exceed 100% by showing overflow */}
             <div 
               className="h-full transition-all duration-300 rounded-full"
               style={{
@@ -64,10 +64,19 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
                 backgroundColor: utilizationColor
               }} 
             />
+            {/* Show overflow indicator if over 100% */}
+            {utilizationPercentage > 100 && (
+              <div 
+                className="absolute top-0 right-0 h-full w-1 bg-red-500"
+                style={{
+                  transform: 'translateX(50%)'
+                }}
+              />
+            )}
           </div>
         </div>
         
-        {/* Percentage text with color coding */}
+        {/* Percentage text with color coding - show actual percentage */}
         <span className={cn("text-[10px] font-medium min-w-[25px]", percentageTextColor)}>
           {utilizationRate}%
         </span>
