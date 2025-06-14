@@ -77,16 +77,16 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     );
   }
 
-  // Compact view with proper wrapping and centering
+  // Compact view with tighter wrapping and centering
   return (
-    <div className="w-full flex justify-center">
+    <div className="w-full flex justify-center overflow-x-auto">
       <div 
         ref={containerRef}
         className="resource-table-compact-container"
         style={{
           width: `${tableWidth}px`,
-          maxWidth: '100%',
-          overflowX: 'auto'
+          minWidth: `${tableWidth}px`,
+          maxWidth: `${tableWidth}px`
         }}
       >
         <Table 
