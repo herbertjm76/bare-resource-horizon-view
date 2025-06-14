@@ -12,55 +12,55 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
   projects
 }) => {
   return (
-    <TooltipProvider>
-      <TableHeader>
-        <TableRow className="bg-[#6465F0] hover:bg-[#6465F0]">
-          <TableHead className="text-white font-bold text-center border-r border-white/20 sticky left-0 z-20 bg-[#6465F0] min-w-[120px] max-w-[150px]">
-            TEAM MEMBER
-          </TableHead>
-          
-          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
-            OFFICE
-          </TableHead>
-          
-          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
-            CAPACITY
-          </TableHead>
-          
-          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
-            COUNT
-          </TableHead>
-          
-          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
-            TOTAL
-          </TableHead>
-          
-          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[80px]">
-            UTILIZATION
-          </TableHead>
-          
-          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
-            ANNUAL LEAVE
-          </TableHead>
-          
-          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
-            HOLIDAY
-          </TableHead>
-          
-          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
-            OTHER LEAVE
-          </TableHead>
-          
-          <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
-            REMARKS
-          </TableHead>
-          
-          {projects.map((project) => (
-            <TableHead key={project.id} className="text-white font-bold text-center border-r border-white/20 min-w-[40px] max-w-[40px] p-1">
+    <TableHeader>
+      <TableRow className="bg-[#6465F0] hover:bg-[#6465F0]">
+        <TableHead className="text-white font-bold text-center border-r border-white/20 sticky left-0 z-20 bg-[#6465F0] min-w-[120px] max-w-[150px]">
+          TEAM MEMBER
+        </TableHead>
+        
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+          OFFICE
+        </TableHead>
+        
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+          CAPACITY
+        </TableHead>
+        
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+          COUNT
+        </TableHead>
+        
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+          TOTAL
+        </TableHead>
+        
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[80px]">
+          UTILIZATION
+        </TableHead>
+        
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+          ANNUAL LEAVE
+        </TableHead>
+        
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+          HOLIDAY
+        </TableHead>
+        
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+          OTHER LEAVE
+        </TableHead>
+        
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+          REMARKS
+        </TableHead>
+        
+        {projects.map((project) => (
+          <TableHead key={project.id} className="text-white font-bold text-center border-r border-white/20 min-w-[40px] max-w-[40px] p-1">
+            <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div 
-                    className="project-code-header cursor-help"
+                    className="project-code-header cursor-help text-white"
                     style={{
                       writingMode: 'vertical-lr',
                       textOrientation: 'mixed',
@@ -71,7 +71,8 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
                       justifyContent: 'center',
                       fontSize: '0.75rem',
                       fontWeight: '600',
-                      padding: '0.25rem'
+                      padding: '0.25rem',
+                      color: 'white'
                     }}
                   >
                     {project.code}
@@ -83,10 +84,10 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
                   </div>
                 </TooltipContent>
               </Tooltip>
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-    </TooltipProvider>
+            </TooltipProvider>
+          </TableHead>
+        ))}
+      </TableRow>
+    </TableHeader>
   );
 };
