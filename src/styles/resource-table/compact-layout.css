@@ -1,4 +1,5 @@
 
+
 /* Compact View - Layout and Basic Styling */
 
 .resource-table-compact {
@@ -63,12 +64,11 @@
 /* Enhanced Table Container - Centered and properly sized with rounded corners */
 .resource-table-compact-container {
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 20px; /* increased for more card-like look */
+  border-radius: 20px;
   padding: 3px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   overflow-x: auto;
-  margin: 0 auto;
-  display: block;
+  display: inline-block;
 }
 
 /* Visually round the table itself so cells do not overhang the container corners */
@@ -76,7 +76,7 @@
   background: white;
   border-radius: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
-  overflow: hidden; /* prevent cell background spill-out */
+  overflow: hidden;
 }
 
 /* --- Corner Styles --- */
@@ -114,14 +114,7 @@
   border-bottom-left-radius: 16px;
 }
 
-/* Center the compact table container - Simple centering within div */
-.compact-table-wrapper {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 20px;
-}
+/* Remove the wrapper class - centering handled by parent component */
 
 /* Smooth transitions for dynamic behavior */
 .resource-table-compact,
@@ -129,3 +122,4 @@
 .resource-table-compact td {
   transition: width 0.2s ease-in-out;
 }
+

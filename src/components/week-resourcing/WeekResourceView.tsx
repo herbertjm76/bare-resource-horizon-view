@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -82,7 +83,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         selectedWeek={selectedWeek}
       />
       
-      {/* Remove Card wrapper for compact view, keep it for expanded */}
+      {/* Apply centering wrapper only for compact view */}
       {viewMode === 'expanded' ? (
         <Card className="overflow-hidden">
           <NewResourceTable 
@@ -98,17 +99,19 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
           />
         </Card>
       ) : (
-        <NewResourceTable 
-          members={members}
-          projects={projects}
-          allocationMap={allocationMap}
-          annualLeaveData={annualLeaveData}
-          holidaysData={holidaysData}
-          getMemberTotal={getMemberTotal}
-          getProjectCount={getProjectCount}
-          getWeeklyLeave={getWeeklyLeave}
-          viewMode={viewMode}
-        />
+        <div className="w-full flex justify-center">
+          <NewResourceTable 
+            members={members}
+            projects={projects}
+            allocationMap={allocationMap}
+            annualLeaveData={annualLeaveData}
+            holidaysData={holidaysData}
+            getMemberTotal={getMemberTotal}
+            getProjectCount={getProjectCount}
+            getWeeklyLeave={getWeeklyLeave}
+            viewMode={viewMode}
+          />
+        </div>
       )}
     </div>
   );

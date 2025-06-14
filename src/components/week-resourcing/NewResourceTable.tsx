@@ -77,47 +77,45 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     );
   }
 
-  // Compact view - wrap in centering container
+  // Compact view - container is now inline-block and will be centered by parent
   return (
-    <div className="compact-table-wrapper">
-      <div 
-        ref={containerRef}
-        className="resource-table-compact-container"
+    <div 
+      ref={containerRef}
+      className="resource-table-compact-container"
+      style={{
+        width: `${tableWidth}px`,
+        minWidth: `${tableWidth}px`,
+        maxWidth: `${tableWidth}px`
+      }}
+    >
+      <Table 
+        ref={tableRef}
+        className="resource-table-compact"
         style={{
           width: `${tableWidth}px`,
           minWidth: `${tableWidth}px`,
-          maxWidth: `${tableWidth}px`
+          tableLayout: 'fixed'
         }}
       >
-        <Table 
-          ref={tableRef}
-          className="resource-table-compact"
-          style={{
-            width: `${tableWidth}px`,
-            minWidth: `${tableWidth}px`,
-            tableLayout: 'fixed'
-          }}
-        >
-          <NewResourceTableHeader projects={projects} viewMode={viewMode} />
-          <TableBody>
-            {members.map((member, index) => (
-              <NewResourceTableRow
-                key={member.id}
-                member={member}
-                memberIndex={index}
-                projects={projects}
-                allocationMap={allocationMap}
-                annualLeaveData={annualLeaveData}
-                holidaysData={holidaysData}
-                getMemberTotal={getMemberTotal}
-                getProjectCount={getProjectCount}
-                getWeeklyLeave={getWeeklyLeave}
-                viewMode={viewMode}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+        <NewResourceTableHeader projects={projects} viewMode={viewMode} />
+        <TableBody>
+          {members.map((member, index) => (
+            <NewResourceTableRow
+              key={member.id}
+              member={member}
+              memberIndex={index}
+              projects={projects}
+              allocationMap={allocationMap}
+              annualLeaveData={annualLeaveData}
+              holidaysData={holidaysData}
+              getMemberTotal={getMemberTotal}
+              getProjectCount={getProjectCount}
+              getWeeklyLeave={getWeeklyLeave}
+              viewMode={viewMode}
+            />
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 };
