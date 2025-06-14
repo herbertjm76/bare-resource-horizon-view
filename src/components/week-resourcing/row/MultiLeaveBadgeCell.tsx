@@ -1,146 +1,168 @@
-import React, { useState } from "react";
-import { TableCell } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
+
+import React, { useState } from 'react';
+import { TableCell } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { EnhancedTooltip } from '../EnhancedTooltip';
 
 interface MultiLeaveBadgeCellProps {
   annualLeave: number;
   holidayHours: number;
   otherLeave: number;
-  remarks?: string;
-  leaveDays?: Array<{ date: string; hours: number }>;
+  remarks: string;
+  leaveDays: Array<{ date: string; hours: number }>;
   className?: string;
   editableOther?: boolean;
   onOtherLeaveChange?: (value: number) => void;
-  compact?: boolean; // NEW
+  compact?: boolean;
 }
 
 export const MultiLeaveBadgeCell: React.FC<MultiLeaveBadgeCellProps> = ({
   annualLeave,
   holidayHours,
-  otherLeave = 0,
-  remarks = "",
+  otherLeave,
+  remarks,
+  leaveDays,
   className = "",
   editableOther = false,
   onOtherLeaveChange,
-  compact = false
+  compact = false,
 }) => {
-  const [editMode, setEditMode] = useState(false);
-  const [localOther, setLocalOther] = useState(otherLeave.toString());
+  const [isEditing, setIsEditing] = useState(false);
+  const [localValue, setLocalValue] = useState(otherLeave.toString());
 
-  const handleOtherBlur = () => {
-    const parsed = Math.max(0, parseFloat(localOther) || 0);
-    setEditMode(false);
-    if (onOtherLeaveChange) onOtherLeaveChange(parsed);
+  const handleOtherLeaveEdit = () => {
+    if (editableOther) {
+      setIsEditing(true);
+      setLocalValue(otherLeave.toString());
+    }
   };
 
-  // use "badge-compact" style when compact
-  const badgeClass = compact
-    ? "w-6 h-6 flex items-center justify-center text-[11px] font-bold px-0 py-0 border border-2"
-    : "w-10 h-8 flex items-center justify-center text-base font-bold px-1 py-0 border-2";
-  const badgeLabelClass = compact
-    ? "text-[9px] mt-0.5 leading-none font-normal h-3 truncate max-w-[40px]"
-    : "text-[10px] mt-0.5 font-medium";
+  const handleOtherLeaveBlur = () => {
+    setIsEditing(false);
+    const numValue = parseFloat(localValue) || 0;
+    if (onOtherLeaveChange) {
+      onOtherLeaveChange(numValue);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleOtherLeaveBlur();
+    }
+  };
+
+  // Build consolidated leave text
+  const segments = [
+    `A: ${annualLeave}h`,
+    `H: ${holidayHours}h`,
+    `O: ${otherLeave}h`
+  ];
+  const leaveStr = segments.join(' ');
+  const text = remarks ? `${leaveStr} | ${remarks}` : leaveStr;
+
+  if (compact) {
+    return (
+      <TableCell className={`text-center border-r border-gray-200 leave-column ${className}`}>
+        <EnhancedTooltip
+          type="total"
+          totalUsedHours={annualLeave + holidayHours + otherLeave}
+          weeklyCapacity={annualLeave + holidayHours + otherLeave}
+          annualLeave={annualLeave}
+          holidayHours={holidayHours}
+          leaveDays={leaveDays}
+        >
+          <div className="flex flex-col items-center gap-0.5">
+            <div className="flex gap-0.5">
+              {annualLeave > 0 && (
+                <Badge variant="outline" className="compact-leave-badge bg-blue-50 text-blue-700 border-blue-200">
+                  A:{annualLeave}
+                </Badge>
+              )}
+              {holidayHours > 0 && (
+                <Badge variant="outline" className="compact-leave-badge bg-yellow-50 text-yellow-700 border-yellow-200">
+                  H:{holidayHours}
+                </Badge>
+              )}
+              {(otherLeave > 0 || editableOther) && (
+                editableOther && isEditing ? (
+                  <Input
+                    type="number"
+                    value={localValue}
+                    onChange={(e) => setLocalValue(e.target.value)}
+                    onBlur={handleOtherLeaveBlur}
+                    onKeyPress={handleKeyPress}
+                    className="w-8 h-4 text-[9px] p-0 text-center"
+                    autoFocus
+                  />
+                ) : (
+                  <Badge 
+                    variant="outline" 
+                    className={`compact-leave-badge bg-purple-50 text-purple-700 border-purple-200 ${editableOther ? 'cursor-pointer hover:bg-purple-100' : ''}`}
+                    onClick={handleOtherLeaveEdit}
+                  >
+                    O:{otherLeave}
+                  </Badge>
+                )
+              )}
+            </div>
+          </div>
+        </EnhancedTooltip>
+      </TableCell>
+    );
+  }
 
   return (
-    <TableCell className={cn("text-center border-r border-gray-200", className)} style={compact ? { minWidth: 52, padding: 0 } : {}}>
-      <div className={cn("flex flex-col gap-1 items-center", compact ? "min-w-[52px]" : "")}>
-        <div className={cn("flex gap-1 items-end", compact ? "" : "gap-2")}>
-          {/* Annual Leave */}
-          <div className="flex flex-col items-center">
-            <Badge
-              variant="outline"
-              className={cn(badgeClass, "text-blue-700 border-blue-200 bg-blue-50", compact && "min-w-[20px]")}
-            >
-              {annualLeave}
-            </Badge>
-            <span className={cn(badgeLabelClass, "text-blue-700")}>A</span>
-          </div>
-          {/* Holiday Leave */}
-          <div className="flex flex-col items-center">
-            <Badge
-              variant="outline"
-              className={cn(badgeClass, "text-yellow-700 border-yellow-200 bg-yellow-50", compact && "min-w-[20px]")}
-            >
-              {holidayHours}
-            </Badge>
-            <span className={cn(badgeLabelClass, "text-yellow-700")}>H</span>
-          </div>
-          {/* Other Leave */}
-          <div className="flex flex-col items-center">
-            {!editableOther || !onOtherLeaveChange ? (
-              <>
-                <Badge
-                  variant="outline"
-                  className={cn(badgeClass, "text-purple-700 border-purple-200 bg-purple-50", compact && "min-w-[20px]")}
-                >
-                  {otherLeave}
-                </Badge>
-                <span className={cn(badgeLabelClass, "text-purple-700")}>O</span>
-              </>
-            ) : editMode ? (
-              <>
+    <TableCell className={`text-center border-r border-gray-200 ${className}`}>
+      <EnhancedTooltip
+        type="total"
+        totalUsedHours={annualLeave + holidayHours + otherLeave}
+        weeklyCapacity={annualLeave + holidayHours + otherLeave}
+        annualLeave={annualLeave}
+        holidayHours={holidayHours}
+        leaveDays={leaveDays}
+      >
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-wrap gap-1 justify-center">
+            {annualLeave > 0 && (
+              <Badge variant="outline" className="text-xs px-2 py-1 bg-blue-50 text-blue-700 border-blue-200">
+                Annual: {annualLeave}h
+              </Badge>
+            )}
+            {holidayHours > 0 && (
+              <Badge variant="outline" className="text-xs px-2 py-1 bg-yellow-50 text-yellow-700 border-yellow-200">
+                Holiday: {holidayHours}h
+              </Badge>
+            )}
+            {(otherLeave > 0 || editableOther) && (
+              editableOther && isEditing ? (
                 <Input
-                  autoFocus
                   type="number"
-                  value={localOther}
-                  min={0}
-                  max={40}
-                  step={0.5}
-                  className={cn(
-                    badgeClass,
-                    "border-purple-300 focus:border-purple-500"
-                  )}
-                  style={{
-                    width: compact ? 24 : 40,
-                    height: compact ? 24 : 32,
-                    padding: 0,
-                    textAlign: "center",
-                    fontSize: 11
-                  }}
-                  onChange={e => setLocalOther(e.target.value.replace(/[^0-9.]/g, ""))}
-                  onBlur={handleOtherBlur}
-                  onKeyDown={e => {
-                    if (e.key === "Enter") {
-                      (e.target as HTMLInputElement).blur();
-                    }
-                  }}
+                  value={localValue}
+                  onChange={(e) => setLocalValue(e.target.value)}
+                  onBlur={handleOtherLeaveBlur}
+                  onKeyPress={handleKeyPress}
+                  className="w-16 h-8 text-xs text-center"
+                  autoFocus
                 />
-                <span className={cn(badgeLabelClass, "text-purple-700")}>O</span>
-              </>
-            ) : (
-              <>
-                <button
-                  className="focus:outline-none"
-                  tabIndex={0}
-                  onClick={() => setEditMode(true)}
-                  aria-label="Edit other leave"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    padding: 0,
-                    margin: 0,
-                    width: compact ? 24 : 40,
-                    height: compact ? 24 : 32
-                  }}
+              ) : (
+                <Badge 
+                  variant="outline" 
+                  className={`text-xs px-2 py-1 bg-purple-50 text-purple-700 border-purple-200 ${editableOther ? 'cursor-pointer hover:bg-purple-100' : ''}`}
+                  onClick={handleOtherLeaveEdit}
                 >
-                  <Badge
-                    variant="outline"
-                    className={cn(badgeClass, "text-purple-700 border-purple-200 bg-purple-50 hover:bg-purple-100 cursor-pointer transition")}
-                  >
-                    {otherLeave}
-                  </Badge>
-                </button>
-                <span className={cn(badgeLabelClass, "text-purple-700")}>O</span>
-              </>
+                  Other: {otherLeave}h
+                </Badge>
+              )
             )}
           </div>
+          {remarks && (
+            <Badge variant="outline" className="text-xs px-2 py-0.5 bg-gray-50 text-gray-600 border-gray-200 max-w-[200px] truncate">
+              {remarks}
+            </Badge>
+          )}
         </div>
-        {remarks && !compact && (
-          <span className="text-xs text-gray-500 mt-1 truncate max-w-[128px]">{remarks}</span>
-        )}
-      </div>
+      </EnhancedTooltip>
     </TableCell>
   );
 };
