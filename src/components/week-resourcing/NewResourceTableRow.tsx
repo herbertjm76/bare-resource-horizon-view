@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { NameCell } from './cells/NameCell';
@@ -6,6 +5,7 @@ import { ProjectCountCell } from './cells/ProjectCountCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
 import { ReadOnlyLeaveCell } from './cells/ReadOnlyLeaveCell';
 import { Badge } from '@/components/ui/badge';
+import { EnhancedTooltip } from './EnhancedTooltip';
 
 interface NewResourceTableRowProps {
   member: any;
@@ -45,6 +45,16 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   const leaveDays = getWeeklyLeave(member.id);
 
   const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0;
+
+  // Helper to get project meta for advanced tooltips
+  const getProjectBreakdown = (project: any, hours: number) => ({
+    projectName: project.name,
+    projectCode: project.code,
+    projectStage: project.current_stage || project.stage,
+    projectFee: project.fee,
+    hours: hours,
+    isActive: !!(hours > 0)
+  });
 
   // Enhanced member name cell for expanded view
   const renderNameCell = () => {
@@ -87,15 +97,26 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
     if (isExpanded) {
       return (
         <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
-          <span className={`inline-flex items-center justify-center rounded-full font-bold px-4 py-2 text-base ${
-            utilizationPercentage > 100 
-              ? 'bg-gradient-to-br from-red-100 to-red-200 text-red-700 border border-red-300'
-              : utilizationPercentage > 80
-              ? 'bg-gradient-to-br from-yellow-100 to-yellow-200 text-yellow-700 border border-yellow-300'
-              : 'bg-gradient-to-br from-green-100 to-green-200 text-green-700 border border-green-300'
-          } shadow-sm`}>
-            {utilizationPercentage}%
-          </span>
+          <EnhancedTooltip
+            type="utilization"
+            member={member}
+            utilizationPercentage={utilizationPercentage}
+            totalUsedHours={totalUsedHours}
+            weeklyCapacity={weeklyCapacity}
+            annualLeave={annualLeave}
+            holidayHours={holidayHours}
+            leaveDays={leaveDays}
+          >
+            <span className={`inline-flex items-center justify-center rounded-full font-bold px-4 py-2 text-base ${
+              utilizationPercentage > 100 
+                ? 'bg-gradient-to-br from-red-100 to-red-200 text-red-700 border border-red-300'
+                : utilizationPercentage > 80
+                ? 'bg-gradient-to-br from-yellow-100 to-yellow-200 text-yellow-700 border border-yellow-300'
+                : 'bg-gradient-to-br from-green-100 to-green-200 text-green-700 border border-green-300'
+            } shadow-sm`}>
+              {utilizationPercentage}%
+            </span>
+          </EnhancedTooltip>
         </TableCell>
       );
     }
@@ -116,18 +137,35 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
     );
   };
 
-  return (
-    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 ${rowHeight}`}>
-      {renderNameCell()}
-      
-      <TableCell className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'count-column'}`}>
-        <span className={`inline-flex items-center justify-center rounded-full font-medium ${
-          isExpanded ? 'w-10 h-7 text-sm' : 'w-8 h-6 text-xs'
-        } bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 border border-blue-200 shadow-sm`}>
-          {projectCount}
-        </span>
-      </TableCell>
-      
+  // Enhanced total used hours cell for expanded
+  const renderTotalCell = () => {
+    if (isExpanded) {
+      return (
+        <TableCell className={`text-center border-r ${cellPadding} ${textSize}`}>
+          <EnhancedTooltip
+            type="total"
+            member={member}
+            totalUsedHours={totalUsedHours}
+            weeklyCapacity={weeklyCapacity}
+            annualLeave={annualLeave}
+            holidayHours={holidayHours}
+            leaveDays={leaveDays}
+          >
+            <span className={`inline-flex items-center justify-center rounded-full font-medium ${
+              isExpanded ? 'w-10 h-7 text-sm' : 'w-8 h-6 text-xs'
+            } bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 border border-blue-200 shadow-sm`}>
+              {totalUsedHours}h
+            </span>
+            <div className="text-xs text-gray-500 mt-1">
+              of {weeklyCapacity}h
+            </div>
+          </EnhancedTooltip>
+        </TableCell>
+      );
+    }
+    
+    // Compact view - show tall pill with percentage inside
+    return (
       <TableCell className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'total-column'}`}>
         <span className={`inline-flex items-center justify-center rounded-full font-medium ${
           isExpanded ? 'w-10 h-7 text-sm' : 'w-8 h-6 text-xs'
@@ -140,6 +178,22 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           </div>
         )}
       </TableCell>
+    );
+  };
+
+  return (
+    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-gray-100 ${rowHeight}`}>
+      {renderNameCell()}
+      
+      <TableCell className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'count-column'}`}>
+        <span className={`inline-flex items-center justify-center rounded-full font-medium ${
+          isExpanded ? 'w-10 h-7 text-sm' : 'w-8 h-6 text-xs'
+        } bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 border border-blue-200 shadow-sm`}>
+          {projectCount}
+        </span>
+      </TableCell>
+      
+      {renderTotalCell()}
       
       {renderUtilizationCell()}
       
@@ -178,7 +232,26 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
       {projects.map((project) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
-        
+        // In expanded mode, provide strategic project-level tooltip
+        if(isExpanded) {
+          return (
+            <TableCell key={project.id} className={`text-center border-r ${cellPadding} ${textSize}`}>
+              <EnhancedTooltip
+                type="project"
+                projectBreakdown={getProjectBreakdown(project, hours)}
+              >
+                {hours > 0 && (
+                  <span className={`inline-flex items-center justify-center rounded font-medium ${
+                    isExpanded ? 'w-8 h-7 text-sm' : 'w-6 h-5 text-xs'
+                  } bg-gradient-to-br from-green-100 to-emerald-100 text-green-700 border border-green-200 shadow-sm`}>
+                    {hours}
+                  </span>
+                )}
+              </EnhancedTooltip>
+            </TableCell>
+          );
+        }
+        // ... keep compact view (unchanged) ...
         return (
           <TableCell key={project.id} className={`text-center border-r ${cellPadding} ${textSize} ${isExpanded ? '' : 'project-column'}`}>
             {hours > 0 && (
