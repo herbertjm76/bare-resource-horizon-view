@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { TableCell } from '@/components/ui/table';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface NameCellProps {
@@ -8,9 +9,29 @@ interface NameCellProps {
 }
 
 export const NameCell: React.FC<NameCellProps> = ({ member }) => {
+  // Helper to get user initials
+  const getUserInitials = (): string => {
+    if (!member) return '??';
+    const firstName = member.first_name || '';
+    const lastName = member.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  // Helper to get avatar URL safely
+  const getAvatarUrl = (): string | undefined => {
+    if (!member) return undefined;
+    return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
+  };
+
+  // Helper to get member display name
+  const getMemberDisplayName = (): string => {
+    if (!member) return 'Unknown';
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed';
+  };
+
   const memberTooltip = (
     <div className="space-y-1 text-xs">
-      <p className="font-semibold">{member.first_name} {member.last_name}</p>
+      <p className="font-semibold">{getMemberDisplayName()}</p>
       {member.role && <p>Role: {member.role}</p>}
       {member.department && <p>Department: {member.department}</p>}
       {member.location && <p>Location: {member.location}</p>}
@@ -23,9 +44,17 @@ export const NameCell: React.FC<NameCellProps> = ({ member }) => {
     <TableCell className="font-medium border-r bg-white sticky left-0 z-10 min-w-[120px] max-w-[150px] shadow-[2px_0_4px_rgba(0,0,0,0.1)]">
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="truncate px-2 text-sm" title={`${member.first_name} ${member.last_name}`}>
-            <span className="hidden sm:inline">{member.first_name} {member.last_name}</span>
-            <span className="sm:hidden">{member.first_name.substring(0, 1)}. {member.last_name}</span>
+          <div className="flex items-center gap-2 px-2 text-sm" title={getMemberDisplayName()}>
+            <Avatar className="h-6 w-6">
+              <AvatarImage src={getAvatarUrl()} alt={getMemberDisplayName()} />
+              <AvatarFallback className="bg-[#6465F0] text-white text-xs">
+                {getUserInitials()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="truncate flex-1">
+              <span className="hidden sm:inline">{getMemberDisplayName()}</span>
+              <span className="sm:hidden">{member.first_name?.substring(0, 1)}. {member.last_name}</span>
+            </div>
           </div>
         </TooltipTrigger>
         <TooltipContent>
