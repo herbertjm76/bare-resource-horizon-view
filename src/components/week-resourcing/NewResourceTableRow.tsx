@@ -4,9 +4,43 @@ import { TableRow, TableCell } from "@/components/ui/table";
 import { NameCell } from './cells/NameCell';
 import { ProjectCountCell } from './cells/ProjectCountCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
-import { ReadOnlyLeaveCell } from './cells/ReadOnlyLeaveCell';
 import { Badge } from '@/components/ui/badge';
 import { EnhancedTooltip } from './EnhancedTooltip';
+
+// New helper for LeaveSummaryCell
+const LeaveSummaryCell = ({
+  annualLeave,
+  holidayHours,
+  otherLeave = 0,
+  remarks = "",
+  leaveDays = [],
+  className = "",
+}: {
+  annualLeave: number,
+  holidayHours: number,
+  otherLeave?: number,
+  remarks?: string,
+  leaveDays?: Array<{ date:string, hours:number }>,
+  className?: string
+}) => (
+  <TableCell className={`text-center border-r border-gray-200 ${className}`}>
+    <EnhancedTooltip
+      type="total"
+      totalUsedHours={annualLeave + holidayHours + (otherLeave || 0)}
+      weeklyCapacity={annualLeave + holidayHours + (otherLeave || 0)}
+      annualLeave={annualLeave}
+      holidayHours={holidayHours}
+      leaveDays={leaveDays}
+    >
+      <span className="inline-flex items-center text-xs bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 rounded border border-gray-200 font-medium shadow-sm px-2 py-1 gap-2">
+        <span>
+          A: {annualLeave || 0}h H: {holidayHours || 0}h O: {otherLeave || 0}h
+        </span>
+        {remarks && <span className="text-gray-500 truncate max-w-[80px]">| {remarks}</span>}
+      </span>
+    </EnhancedTooltip>
+  </TableCell>
+);
 
 interface NewResourceTableRowProps {
   member: any;
@@ -19,6 +53,7 @@ interface NewResourceTableRowProps {
   getProjectCount: (memberId: string) => number;
   getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
   viewMode?: 'compact' | 'expanded';
+  // (optional) other leave and remarks data could be passed here if available in future
 }
 
 export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
@@ -40,6 +75,10 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   const annualLeave = annualLeaveData[member.id] || 0;
   const holidayHours = holidaysData[member.id] || 0;
   const leaveDays = getWeeklyLeave(member.id);
+
+  // Not yet tracked: other leave and remarks, so set to 0 / blank by default
+  const otherLeave = 0;
+  const remarks = "";
 
   const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0;
 
@@ -64,10 +103,9 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   });
 
   if (isExpanded) {
-    // Expanded view with enhanced layout
     return (
       <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors duration-200 h-20 border-b`}>
-        {/* Enhanced Name Cell for Expanded */}
+        {/* Name Cell */}
         <TableCell className="border-r border-gray-200 px-4 py-3 min-w-[180px]">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-3">
@@ -91,14 +129,14 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           </div>
         </TableCell>
         
-        {/* Project Count - Expanded */}
+        {/* Project Count */}
         <TableCell className="text-center border-r border-gray-200 px-3 py-3">
           <div className="inline-flex items-center justify-center w-12 h-8 bg-slate-100 text-slate-700 rounded-lg font-semibold text-sm border border-slate-200">
             {projectCount}
           </div>
         </TableCell>
         
-        {/* Utilization - Expanded with Total below */}
+        {/* Utilization */}
         <TableCell className="text-center border-r border-gray-200 px-3 py-3">
           <EnhancedTooltip
             type="utilization"
@@ -121,36 +159,17 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           </EnhancedTooltip>
         </TableCell>
         
-        {/* Leave cells - Expanded */}
-        <TableCell className="text-center border-r border-gray-200 px-3 py-3">
-          <ReadOnlyLeaveCell 
-            value={annualLeave} 
-            leaveDays={leaveDays}
-            leaveType="Annual Leave"
-          />
-        </TableCell>
-        
-        <TableCell className="text-center border-r border-gray-200 px-3 py-3">
-          <ReadOnlyLeaveCell 
-            value={holidayHours} 
-            leaveDays={[]}
-            leaveType="Holiday"
-          />
-        </TableCell>
-        
-        <TableCell className="text-center border-r border-gray-200 px-3 py-3">
-          <span className="inline-flex items-center justify-center w-8 h-7 bg-gray-100 text-gray-600 rounded-md text-sm">
-            -
-          </span>
-        </TableCell>
-        
-        <TableCell className="text-center border-r border-gray-200 px-3 py-3">
-          <span className="inline-flex items-center justify-center px-3 h-7 bg-gray-100 text-gray-600 rounded-md text-sm">
-            -
-          </span>
-        </TableCell>
-        
-        {/* Project allocation cells - Expanded */}
+        {/* NEW: Leave Summary column */}
+        <LeaveSummaryCell
+          annualLeave={annualLeave}
+          holidayHours={holidayHours}
+          otherLeave={otherLeave}
+          remarks={remarks}
+          leaveDays={leaveDays}
+          className="px-3 py-3"
+        />
+
+        {/* Project allocation cells */}
         {projects.map((project) => {
           const allocationKey = `${member.id}:${project.id}`;
           const hours = allocationMap.get(allocationKey) || 0;
@@ -173,58 +192,39 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
     );
   }
 
-  // Redesigned Compact View with better aesthetics
+  // Compact View
   return (
     <TableRow className={`${memberIndex % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'} hover:bg-blue-50/70 transition-all duration-200 h-12 border-b border-gray-100`}>
-      {/* Name Cell - Compact */}
+      {/* Name Cell */}
       <TableCell className="border-r border-gray-200 px-3 py-2 name-column">
         <NameCell member={member} />
       </TableCell>
       
-      {/* Project Count - Compact */}
+      {/* Project Count */}
       <TableCell className="text-center border-r border-gray-200 px-2 py-2 count-column">
         <span className="inline-flex items-center justify-center w-8 h-8 bg-slate-500 text-white rounded-md font-bold text-xs shadow-sm">
           {projectCount}
         </span>
       </TableCell>
       
-      {/* Utilization - Compact with elongated pill */}
+      {/* Utilization */}
       <TableCell className="text-center border-r border-gray-200 px-3 py-2 utilization-column">
         <span className={`utilization-pill-elongated inline-flex items-center justify-center rounded-full font-bold text-sm shadow-md transition-all duration-200 hover:scale-105 ${getUtilizationStyle()}`}>
           {utilizationPercentage}%
         </span>
       </TableCell>
       
-      {/* Leave Cells - Compact */}
-      <TableCell className="text-center border-r border-gray-200 px-2 py-2 leave-column">
-        <ReadOnlyLeaveCell 
-          value={annualLeave} 
-          leaveDays={leaveDays}
-          leaveType="Annual Leave"
-        />
-      </TableCell>
+      {/* NEW: Leave Summary column */}
+      <LeaveSummaryCell
+        annualLeave={annualLeave}
+        holidayHours={holidayHours}
+        otherLeave={otherLeave}
+        remarks={remarks}
+        leaveDays={leaveDays}
+        className="px-2 py-2"
+      />
       
-      <TableCell className="text-center border-r border-gray-200 px-2 py-2 leave-column">
-        <ReadOnlyLeaveCell 
-          value={holidayHours} 
-          leaveDays={[]}
-          leaveType="Holiday"
-        />
-      </TableCell>
-      
-      <TableCell className="text-center border-r border-gray-200 px-2 py-2 other-leave-column">
-        <span className="inline-flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-600 rounded-md text-xs">
-          -
-        </span>
-      </TableCell>
-      
-      <TableCell className="text-center border-r border-gray-200 px-2 py-2 remarks-column">
-        <span className="inline-flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-600 rounded-md text-xs">
-          -
-        </span>
-      </TableCell>
-      
-      {/* Project Cells - Compact with improved styling */}
+      {/* Project Cells */}
       {projects.map((project) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;

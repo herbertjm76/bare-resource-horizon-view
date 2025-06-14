@@ -34,44 +34,34 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
           UTILIZATION
         </TableHead>
         
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'leave-column'} ${headerPadding} ${headerTextSize}`}>
+        {/* Consolidated Leave Summary column */}
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[130px]' : 'leave-column'} ${headerPadding} ${headerTextSize}`}>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="cursor-pointer">ANNUAL LEAVE</span>
+                <span className="cursor-pointer">LEAVE SUMMARY</span>
               </TooltipTrigger>
               <TooltipContent>
-                <div className="text-sm font-medium">
-                  Annual Leave hours for this week
+                <div className="text-sm font-medium space-y-1">
+                  <div><b>A:</b> Annual Leave hours</div>
+                  <div><b>H:</b> Holiday hours</div>
+                  <div><b>O:</b> Other Leave</div>
+                  <div><b>|</b> separates leave types from remarks (if present).</div>
+                  <div>Example: <code>A: 8h H: 4h O: 0h | Needs approval</code></div>
                 </div>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </TableHead>
         
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'leave-column'} ${headerPadding} ${headerTextSize}`}>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="cursor-pointer">HOLIDAY</span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <div className="text-sm font-medium">
-                  Public Holiday hours for this week
-                </div>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+        {/* Remove original 3x leave, remarks columns here */}
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'other-leave-column'} ${headerPadding} ${headerTextSize} hidden`}>
+          {/* Place holder for removed column */}
         </TableHead>
-        
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'other-leave-column'} ${headerPadding} ${headerTextSize}`}>
-          OTHER LEAVE
+        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'remarks-column'} ${headerPadding} ${headerTextSize} hidden`}>
+          {/* Place holder for removed column */}
         </TableHead>
-        
-        <TableHead className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[60px]' : 'remarks-column'} ${headerPadding} ${headerTextSize}`}>
-          REMARKS
-        </TableHead>
-        
+
         {projects.map((project) => (
           <TableHead key={project.id} className={`text-white font-bold text-center border-r border-white/20 ${isExpanded ? 'min-w-[40px] max-w-[40px]' : 'project-column'} ${isExpanded ? 'p-2' : 'p-1'}`}>
             <TooltipProvider>
