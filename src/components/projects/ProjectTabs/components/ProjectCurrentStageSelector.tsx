@@ -23,24 +23,33 @@ export const ProjectCurrentStageSelector: React.FC<ProjectCurrentStageSelectorPr
   console.log('ProjectCurrentStageSelector - selectedStages:', selectedStages);
   console.log('ProjectCurrentStageSelector - availableStages:', availableStages);
 
+  // Handle the onChange to convert "none" back to empty string for the database
+  const handleStageChange = (value: string) => {
+    const actualValue = value === "none" ? "" : value;
+    onChange(actualValue);
+  };
+
+  // Convert empty string to "none" for the select component
+  const selectValue = currentStage || "none";
+
   return (
     <div className="space-y-2">
       <Label htmlFor="current-stage">Current Stage</Label>
       <Select 
-        value={currentStage || ''} 
-        onValueChange={onChange}
+        value={selectValue} 
+        onValueChange={handleStageChange}
       >
         <SelectTrigger id="current-stage">
           <SelectValue placeholder="Select current stage" />
         </SelectTrigger>
         <SelectContent>
           {availableStages.length === 0 ? (
-            <SelectItem value="" disabled>
+            <SelectItem value="disabled" disabled>
               No stages selected for this project
             </SelectItem>
           ) : (
             <>
-              <SelectItem value="">No current stage</SelectItem>
+              <SelectItem value="none">No current stage</SelectItem>
               {availableStages.map((stage) => (
                 <SelectItem key={stage.id} value={stage.id}>
                   <div className="flex items-center gap-2">

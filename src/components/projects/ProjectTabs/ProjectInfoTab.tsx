@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { ProjectBasicInfo } from './components/ProjectBasicInfo';
 import { ProjectManagerSelect } from './components/ProjectManagerSelect';
@@ -12,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useRateCalculator } from '../hooks/useRateCalculator';
 import { format, startOfWeek } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface ProjectForm {
   code: string;
