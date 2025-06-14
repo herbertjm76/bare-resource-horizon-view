@@ -27,9 +27,9 @@
 
 /* Fixed Column Widths - Compact */
 .resource-table-compact .name-column {
-  width: 160px;
-  min-width: 160px;
-  max-width: 160px;
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
   position: sticky;
   left: 0;
   background: inherit;
@@ -48,9 +48,9 @@
 }
 
 .resource-table-compact .leave-column {
-  width: 33px;
-  min-width: 33px;
-  max-width: 33px;
+  width: 150px;
+  min-width: 150px;
+  max-width: 150px;
 }
 
 .resource-table-compact .other-leave-column {
@@ -154,10 +154,14 @@
 }
 
 .resource-table-row-compact .name-cell-label {
-  font-size: 12px !important;
-  max-width: 50px;
+  font-size: 15px !important;
+  max-width: 140px;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.2;
+  max-height: 2.4em;
 }
 
 .resource-table-row-compact .badge,
@@ -198,9 +202,9 @@
 
 /* Updated specific width overrides for ultra-compact mode */
 .resource-table-row-compact .name-column {
-  width: 160px !important;
-  min-width: 160px !important;
-  max-width: 160px !important;
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
 }
 
 .resource-table-row-compact .count-column {
@@ -210,7 +214,18 @@
 }
 
 .resource-table-row-compact .leave-column {
-  width: 33px !important;
-  min-width: 33px !important;
-  max-width: 33px !important;
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+}
+
+/* Rotated text for project count header */
+.resource-table-compact .count-column-header {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  padding: 8px 4px;
+  font-size: 11px;
+  font-weight: 700;
 }
