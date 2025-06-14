@@ -74,21 +74,32 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-1 w-full text-xs cursor-pointer" title={getMemberDisplayName()}>
-                <Avatar className="h-5 w-5 min-w-[20px] min-h-[20px]" >
+              <div
+                className="flex items-center w-full gap-2 cursor-pointer"
+                style={{ width: '100%', minWidth: 0, height: '26px' }}
+                title={getMemberDisplayName()}
+              >
+                <Avatar className="h-6 w-6 min-w-[24px] min-h-[24px]" >
                   <AvatarImage 
                     src={getAvatarUrl()} 
                     alt={getMemberDisplayName()}
                   />
-                  <AvatarFallback className="bg-[#6465F0] text-white text-[10px]">
+                  <AvatarFallback className="bg-[#6465F0] text-white text-[11px]">
                     {getUserInitials()}
                   </AvatarFallback>
                 </Avatar>
-                <div className="truncate flex-1 name-cell-label max-w-[90px]" style={{maxWidth: '92px'}}>
-                  <span className="text-[11px] truncate block w-full">
-                    {getMemberDisplayName()}
-                  </span>
-                </div>
+                <span
+                  className="truncate font-semibold"
+                  style={{
+                    fontSize: '13px',
+                    lineHeight: '1.1',
+                    maxWidth: 'calc(100% - 32px)', // Leave space for avatar
+                    display: 'block',
+                  }}
+                  data-testid="compact-full-name"
+                >
+                  {getMemberDisplayName()}
+                </span>
               </div>
             </TooltipTrigger>
             <TooltipContent 
