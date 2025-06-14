@@ -54,7 +54,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
       <TableRow className="border-b-2 border-gray-300" style={{ backgroundColor: '#6465F0' }}>
         {/* Team Member - 180px fixed */}
         <TableHead 
-          className="font-bold border-r border-gray-200 px-2 py-2 name-column"
+          className="font-bold border-r border-gray-200 px-2 py-2 name-column rounded-tl-xl"
           style={{ width: 180, minWidth: 180, maxWidth: 180, backgroundColor: '#6465F0', color: 'white' }}
         >
           <div className="text-center text-xs leading-tight">
@@ -87,7 +87,7 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
 
         {/* Project Count - 35px fixed with rotated text */}
         <TableHead 
-          className="text-center font-bold border-r border-gray-200 count-column count-column-header relative"
+          className={`text-center font-bold border-r border-gray-200 count-column count-column-header relative ${projects.length === 0 ? 'rounded-tr-xl' : ''}`}
           style={{ width: 35, minWidth: 35, maxWidth: 35, backgroundColor: '#6465F0', color: 'white' }}
         >
           <div 
@@ -105,10 +105,10 @@ export const NewResourceTableHeader: React.FC<NewResourceTableHeaderProps> = ({
         </TableHead>
         
         {/* Project columns - all 35px fixed with rotated text */}
-        {projects.map((project) => (
+        {projects.map((project, index) => (
           <TableHead
             key={project.id}
-            className="text-center font-bold border-r border-gray-200 px-1 py-2 project-column project-code-header relative"
+            className={`text-center font-bold border-r border-gray-200 px-1 py-2 project-column project-code-header relative ${index === projects.length - 1 ? 'rounded-tr-xl' : ''}`}
             style={{ width: 35, minWidth: 35, maxWidth: 35, backgroundColor: '#6465F0', color: 'white' }}
           >
             <div 
