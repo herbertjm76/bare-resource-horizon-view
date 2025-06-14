@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { TableRow, TableCell } from "@/components/ui/table";
 import { NameCell } from './cells/NameCell';
@@ -5,57 +6,7 @@ import { ProjectCountCell } from './cells/ProjectCountCell';
 import { CapacityBarCell } from './row/CapacityBarCell';
 import { Badge } from '@/components/ui/badge';
 import { EnhancedTooltip } from './EnhancedTooltip';
-
-// Option 5: Stacked Badges for LeaveSummaryCell
-const LeaveSummaryCell = ({
-  annualLeave,
-  holidayHours,
-  otherLeave = 0,
-  remarks = "",
-  leaveDays = [],
-  className = "",
-}: {
-  annualLeave: number,
-  holidayHours: number,
-  otherLeave?: number,
-  remarks?: string,
-  leaveDays?: Array<{ date:string, hours:number }>,
-  className?: string
-}) => (
-  <TableCell className={`text-center border-r border-gray-200 ${className}`}>
-    <EnhancedTooltip
-      type="total"
-      totalUsedHours={annualLeave + holidayHours + (otherLeave || 0)}
-      weeklyCapacity={annualLeave + holidayHours + (otherLeave || 0)}
-      annualLeave={annualLeave}
-      holidayHours={holidayHours}
-      leaveDays={leaveDays}
-    >
-      <div className="flex flex-col items-center space-y-1 min-w-[58px]">
-        {/* Annual Leave */}
-        <Badge variant="info" className="w-fit px-2 py-0.5 shadow-sm">
-          A: {annualLeave || 0}h
-        </Badge>
-        {/* Holiday Leave */}
-        <Badge variant="warning" className="w-fit px-2 py-0.5 shadow-sm">
-          H: {holidayHours || 0}h
-        </Badge>
-        {/* Other Leave, show only if value > 0 */}
-        {otherLeave > 0 && (
-          <Badge variant="brand" className="w-fit px-2 py-0.5 shadow-sm">
-            O: {otherLeave}h
-          </Badge>
-        )}
-        {/* Remarks, show if present */}
-        {remarks && (
-          <Badge variant="outline" className="w-fit px-2 py-0.5 mt-1 text-gray-500 border-gray-300 truncate max-w-[96px]">
-            {remarks}
-          </Badge>
-        )}
-      </div>
-    </EnhancedTooltip>
-  </TableCell>
-);
+import { LeaveProgressBarCell } from './row/LeaveProgressBarCell';
 
 interface NewResourceTableRowProps {
   member: any;
@@ -68,7 +19,6 @@ interface NewResourceTableRowProps {
   getProjectCount: (memberId: string) => number;
   getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
   viewMode?: 'compact' | 'expanded';
-  // (optional) other leave and remarks data could be passed here if available in future
 }
 
 export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
@@ -97,7 +47,6 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
 
   const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0;
 
-  // Enhanced styling for compact view
   const getUtilizationStyle = () => {
     if (utilizationPercentage > 100) {
       return 'bg-red-500 text-white border-red-600 shadow-red-200';
@@ -174,8 +123,8 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
           </EnhancedTooltip>
         </TableCell>
         
-        {/* Leave Summary column (Stacked Badges style) */}
-        <LeaveSummaryCell
+        {/* Leave Summary column (Progress Bar style) */}
+        <LeaveProgressBarCell
           annualLeave={annualLeave}
           holidayHours={holidayHours}
           otherLeave={otherLeave}
@@ -229,8 +178,8 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
         </span>
       </TableCell>
       
-      {/* Leave Summary column (Stacked Badges style) */}
-      <LeaveSummaryCell
+      {/* Leave Summary column (Progress Bar style) */}
+      <LeaveProgressBarCell
         annualLeave={annualLeave}
         holidayHours={holidayHours}
         otherLeave={otherLeave}
