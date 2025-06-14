@@ -75,7 +75,13 @@ export const NameCell: React.FC<NameCellProps> = ({ member }) => {
               </div>
             </div>
           </TooltipTrigger>
-          <TooltipContent side="bottom" align="start" sideOffset={5}>
+          <TooltipContent 
+            side="right" 
+            align="start" 
+            sideOffset={8}
+            className="z-[200] max-w-xs"
+            avoidCollisions={true}
+          >
             {memberTooltip}
           </TooltipContent>
         </Tooltip>
