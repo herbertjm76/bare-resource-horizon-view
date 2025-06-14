@@ -2,6 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { NewProjectDialog } from "./NewProjectDialog";
+import { ExcelImportDialog } from "./ExcelImportDialog";
 import { Edit, Trash2 } from "lucide-react";
 
 interface ProjectsToolbarProps {
@@ -19,6 +20,12 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
   selectedCount,
   onBulkDelete
 }) => {
+  const handleImportComplete = () => {
+    if (onProjectCreated) {
+      onProjectCreated();
+    }
+  };
+
   return (
     <div className="flex items-center gap-2">
       <Button 
@@ -41,6 +48,7 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
           Delete ({selectedCount})
         </Button>
       )}
+      <ExcelImportDialog onImportComplete={handleImportComplete} />
       <NewProjectDialog onProjectCreated={onProjectCreated} />
     </div>
   );
