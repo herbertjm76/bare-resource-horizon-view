@@ -114,19 +114,13 @@
   border-bottom-left-radius: 16px;
 }
 
-/* Center the compact table container - Enhanced centering */
+/* Center the compact table container - Simple centering within div */
 .compact-table-wrapper {
-  width: 100vw;
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 0 20px;
-  box-sizing: border-box;
+  padding: 20px;
 }
 
 /* Smooth transitions for dynamic behavior */
