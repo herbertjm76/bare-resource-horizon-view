@@ -37,21 +37,23 @@ export const EditableProjectField: React.FC<EditableFieldProps> = ({
           <SelectValue placeholder="Select..." />
         </SelectTrigger>
         <SelectContent>
-          {options.map((option) => (
-            <SelectItem 
-              key={option.value} 
-              value={option.value}
-            >
-              <div 
-                className="px-2 py-0.5 rounded w-full"
-                style={{
-                  backgroundColor: option.color || "#E5DEFF"
-                }}
+          {options
+            .filter(option => option.value !== "") // Prevent empty string values
+            .map((option) => (
+              <SelectItem 
+                key={option.value} 
+                value={option.value}
               >
-                {option.label}
-              </div>
-            </SelectItem>
-          ))}
+                <div 
+                  className="px-2 py-0.5 rounded w-full"
+                  style={{
+                    backgroundColor: option.color || "#E5DEFF"
+                  }}
+                >
+                  {option.label}
+                </div>
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     );

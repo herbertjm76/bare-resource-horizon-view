@@ -33,9 +33,11 @@ export const ProjectLocationInfo: React.FC<ProjectLocationInfoProps> = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="none">Select a country</SelectItem>
-            {countries.map((country) => (
-              <SelectItem key={country} value={country}>{country}</SelectItem>
-            ))}
+            {countries
+              .filter((c) => c && c !== "")
+              .map((country) => (
+                <SelectItem key={country} value={country}>{country}</SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>
@@ -49,11 +51,13 @@ export const ProjectLocationInfo: React.FC<ProjectLocationInfoProps> = ({
           </SelectTrigger>
           <SelectContent className="bg-white">
             {offices.length > 0 ? (
-              offices.map((office) => (
-                <SelectItem key={office.id} value={office.id}>
-                  {office.emoji ? `${office.emoji} ` : ''}{office.city}, {office.country}
-                </SelectItem>
-              ))
+              offices
+                .filter((office) => office.id && office.id !== "")
+                .map((office) => (
+                  <SelectItem key={office.id} value={office.id}>
+                    {office.emoji ? `${office.emoji} ` : ''}{office.city}, {office.country}
+                  </SelectItem>
+                ))
             ) : (
               <SelectItem value="no-options" disabled>No offices available</SelectItem>
             )}

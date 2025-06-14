@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { FilterButton } from '@/components/resources/filters/FilterButton';
 import { Button } from '@/components/ui/button';
@@ -103,10 +102,12 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
                   <SelectValue placeholder="Select department" />
                 </SelectTrigger>
                 <SelectContent>
-                  {departments.map(dept => (
-                    <SelectItem key={dept} value={dept}>
-                      {dept}
-                    </SelectItem>
+                  {departments
+                    .filter(dept => dept && dept !== "")
+                    .map(dept => (
+                      <SelectItem key={dept} value={dept}>
+                        {dept}
+                      </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -124,10 +125,12 @@ export const TeamAnnualLeaveFilters: React.FC<TeamAnnualLeaveFiltersProps> = ({
                   <SelectValue placeholder="Select location" />
                 </SelectTrigger>
                 <SelectContent>
-                  {locations.map(location => (
-                    <SelectItem key={location} value={location}>
-                      {location}
-                    </SelectItem>
+                  {locations
+                    .filter(location => location && location !== "")
+                    .map(location => (
+                      <SelectItem key={location} value={location}>
+                        {location}
+                      </SelectItem>
                   ))}
                 </SelectContent>
               </Select>

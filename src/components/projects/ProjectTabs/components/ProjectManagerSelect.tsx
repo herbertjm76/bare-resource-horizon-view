@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -27,11 +26,13 @@ export const ProjectManagerSelect: React.FC<ProjectManagerSelectProps> = ({
         <SelectContent>
           <SelectItem value="none">Select a project manager</SelectItem>
           <SelectItem value="not_assigned">Not Assigned</SelectItem>
-          {managers.map((manager) => (
-            <SelectItem key={manager.id} value={manager.id}>
-              {manager.name}
-            </SelectItem>
-          ))}
+          {managers
+            .filter(m => m.id && m.id !== "") // Prevent empty string value
+            .map((manager) => (
+              <SelectItem key={manager.id} value={manager.id}>
+                {manager.name}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     </div>

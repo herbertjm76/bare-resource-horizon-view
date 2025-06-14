@@ -54,11 +54,13 @@ export const WeeklyResourceFilters: React.FC<WeeklyResourceFiltersProps> = ({
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Offices</SelectItem>
-          {officeLocations.map(office => (
-            <SelectItem key={office.id} value={office.code}>
-              {office.code} - {office.city}, {office.country}
-            </SelectItem>
-          ))}
+          {officeLocations
+            .filter(office => office.code && office.code !== "")
+            .map(office => (
+              <SelectItem key={office.id} value={office.code}>
+                {office.code} - {office.city}, {office.country}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     </div>
