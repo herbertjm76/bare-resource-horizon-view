@@ -3,6 +3,8 @@
 
 .resource-table-compact {
   font-size: 13px;
+  width: 100%;
+  table-layout: auto;
 }
 
 .resource-table-compact th {
@@ -25,11 +27,10 @@
   padding: 0.375rem;
 }
 
-/* Fixed Column Widths - Compact */
+/* Dynamic Column Widths - Compact */
 .resource-table-compact .name-column {
-  width: 180px;
   min-width: 180px;
-  max-width: 180px;
+  width: 180px;
   position: sticky;
   left: 0;
   background: inherit;
@@ -37,38 +38,82 @@
 }
 
 .resource-table-compact .count-column {
-  width: 35px;
   min-width: 35px;
-  max-width: 35px;
+  width: 35px;
 }
 
 .resource-table-compact .utilization-column {
-  flex: 1;
   min-width: 120px;
+  width: auto;
+  flex-grow: 1;
 }
 
 .resource-table-compact .leave-column {
-  width: 150px;
   min-width: 150px;
-  max-width: 150px;
+  width: 150px;
 }
 
 .resource-table-compact .other-leave-column {
-  width: 50px;
   min-width: 50px;
-  max-width: 50px;
+  width: 50px;
 }
 
 .resource-table-compact .remarks-column {
-  width: 50px;
   min-width: 50px;
-  max-width: 50px;
+  width: 50px;
 }
 
 .resource-table-compact .project-column {
-  width: 35px;
   min-width: 35px;
-  max-width: 35px;
+  width: 35px;
+}
+
+/* Enhanced Table Container for Dynamic Behavior */
+.resource-table-compact-container {
+  width: 100%;
+  overflow-x: auto;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  padding: 2px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.resource-table-compact-container table {
+  min-width: fit-content;
+  width: 100%;
+  table-layout: auto;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Dynamic width calculation based on content */
+@media (min-width: 768px) {
+  .resource-table-compact-container {
+    overflow-x: visible;
+  }
+  
+  .resource-table-compact-container table {
+    width: 100%;
+  }
+  
+  .resource-table-compact .utilization-column {
+    width: auto;
+    flex-grow: 1;
+  }
+}
+
+/* Horizontal scroll when content exceeds viewport */
+@media (max-width: 767px) {
+  .resource-table-compact-container {
+    overflow-x: auto;
+  }
+  
+  .resource-table-compact-container table {
+    min-width: 900px;
+    width: auto;
+  }
 }
 
 /* Enhanced Utilization Pill - Compact */
@@ -202,27 +247,23 @@
 
 /* Updated specific width overrides for ultra-compact mode */
 .resource-table-row-compact .name-column {
-  width: 180px !important;
   min-width: 180px !important;
-  max-width: 180px !important;
+  width: 180px !important;
 }
 
 .resource-table-row-compact .count-column {
-  width: 35px !important;
   min-width: 35px !important;
-  max-width: 35px !important;
+  width: 35px !important;
 }
 
 .resource-table-row-compact .leave-column {
-  width: 150px !important;
   min-width: 150px !important;
-  max-width: 150px !important;
+  width: 150px !important;
 }
 
 .resource-table-row-compact .project-column {
-  width: 35px !important;
   min-width: 35px !important;
-  max-width: 35px !important;
+  width: 35px !important;
 }
 
 /* Rotated text for project count header and project headers */
@@ -244,4 +285,25 @@
   white-space: nowrap;
   font-size: 10px;
   font-weight: 700;
+}
+
+/* Dynamic table behavior */
+.dynamic-table-container {
+  width: 100%;
+  position: relative;
+}
+
+.dynamic-table-container.has-horizontal-scroll {
+  overflow-x: auto;
+}
+
+.dynamic-table-container.fits-viewport {
+  overflow-x: visible;
+}
+
+/* Smooth transitions for dynamic behavior */
+.resource-table-compact,
+.resource-table-compact th,
+.resource-table-compact td {
+  transition: width 0.2s ease-in-out;
 }
