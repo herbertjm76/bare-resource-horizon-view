@@ -64,43 +64,43 @@ export const predefinedInsights: InsightData[] = [
 
 export const getRandomPositions = (): CardPosition[] => [
   { 
-    top: "-50px", 
-    left: "12%", 
-    transform: "translateY(-50%) rotate(-1.5deg)",
-    scale: 1.1
-  },
-  { 
-    top: "-45px", 
-    right: "15%", 
-    transform: "translateY(-50%) rotate(2deg)",
+    top: "-40px", 
+    left: "8%", 
+    transform: "translateY(-50%) rotate(-1deg)",
     scale: 0.9
   },
   { 
-    top: "20%", 
-    left: "-160px", 
-    transform: "translateX(-100%) rotate(1deg)",
-    scale: 1.2
+    top: "-35px", 
+    right: "12%", 
+    transform: "translateY(-50%) rotate(1.5deg)",
+    scale: 0.85
   },
   { 
-    top: "60%", 
-    right: "-140px", 
-    transform: "translateY(-50%) translateX(100%) rotate(-1.5deg)",
+    top: "25%", 
+    left: "-120px", 
+    transform: "translateX(-100%) rotate(0.5deg)",
+    scale: 0.95
+  },
+  { 
+    top: "65%", 
+    right: "-110px", 
+    transform: "translateY(-50%) translateX(100%) rotate(-1deg)",
     scale: 0.8
   },
   { 
-    bottom: "-90px", 
-    left: "8%", 
-    transform: "translateY(50%) rotate(1.5deg)",
-    scale: 1.0
+    bottom: "-65px", 
+    left: "15%", 
+    transform: "translateY(50%) rotate(1deg)",
+    scale: 0.88
   },
   { 
-    bottom: "-85px", 
-    right: "20%", 
-    transform: "translateY(50%) rotate(-2deg)",
-    scale: 0.95
+    bottom: "-60px", 
+    right: "18%", 
+    transform: "translateY(50%) rotate(-1.5deg)",
+    scale: 0.92
   }
 ];
 
 export const animationDelays = [
-  "0s", "0.4s", "0.8s", "1.2s", "1.6s", "2.0s"
+  "0s", "0.3s", "0.6s", "0.9s", "1.2s", "1.5s"
 ];
