@@ -1,3 +1,4 @@
+
 import React from "react";
 import { getAllInsights } from "@/components/dashboard/insights/utils/insightAggregator";
 import {
@@ -11,7 +12,17 @@ import {
   Users,
 } from "lucide-react";
 
-// ICONS: only use icons present in allowed list
+// Custom color palette, based on uploaded circles and site indicators
+const circleColorMap = {
+  purple: "#8f88ff",
+  yellow: "#fee086",
+  coral: "#ee9090",
+  blue: "#5ca7fa",
+  green: "#8adb7d",     // site secondary greenish, for 'success'
+  orange: "#feb265",     // friendly warning
+  gray: "#9198af",       // muted
+};
+
 const iconMap = {
   info: Info,
   critical: CircleX,
@@ -23,49 +34,54 @@ const iconMap = {
   down: ArrowDown,
 };
 
+/**
+ * Map insight types ("critical", etc.) to circle indicator colors in line with your screenshot
+ * (blue: info, yellow: warn, coral: crit, purple: default, green: success)
+ */
+const colorMap = {
+  critical: { 
+    iconBg: circleColorMap.coral, 
+    text: "text-[#d23451]",         // deeper for text
+    number: "text-[#d23451]", 
+  },
+  warning: { 
+    iconBg: circleColorMap.yellow, 
+    text: "text-[#a07c30]",
+    number: "text-[#a07c30]",
+  },
+  success: { 
+    iconBg: circleColorMap.green, 
+    text: "text-[#39945d]",
+    number: "text-[#39945d]",
+  },
+  info: { 
+    iconBg: circleColorMap.purple, 
+    text: "text-[#7a69f1]", // vivid purple
+    number: "text-[#7a69f1]",
+  },
+  // For rare types
+  default: { 
+    iconBg: circleColorMap.gray, 
+    text: "text-[#43474f]",     
+    number: "text-[#43474f]",
+  },
+};
+
 interface FloatingInsightCardsProps {
   utilizationRate: number;
   teamSize: number;
   activeProjects: number;
   timeRange: "week" | "month" | "quarter" | "year";
-  scale?: number; // NEW: allow passing a scale prop
+  scale?: number;
 }
 
-// Enhanced color mapping with background colors for icons
-const colorMap = {
-  critical: { 
-    iconBg: "bg-red-500", 
-    text: "text-red-600", 
-    number: "text-red-600" 
-  },
-  warning: { 
-    iconBg: "bg-yellow-500", 
-    text: "text-yellow-600", 
-    number: "text-yellow-600" 
-  },
-  success: { 
-    iconBg: "bg-green-500", 
-    text: "text-green-600", 
-    number: "text-green-600" 
-  },
-  info: { 
-    iconBg: "bg-blue-500", 
-    text: "text-blue-600", 
-    number: "text-blue-600" 
-  },
-};
-
-// Extract number/KPI from insight or fall back to demo metrics
 function getInsightKPI(
   insight: any,
   { utilizationRate, teamSize, activeProjects }: { utilizationRate: number; teamSize: number; activeProjects: number }
 ) {
-  // Look for % or # in strings (very basic extraction)
   const { description, title, category } = insight;
   const kpiMatch = description?.match(/(\d+(\.\d+)?%?)/)?.[0];
   if (kpiMatch) return kpiMatch;
-
-  // Fallback: map common titles to hero metrics
   if (title?.toLowerCase().includes("utilization")) return utilizationRate + "%";
   if (title?.toLowerCase().includes("team")) return teamSize;
   if (title?.toLowerCase().includes("project")) return activeProjects;
@@ -74,56 +90,39 @@ function getInsightKPI(
   return "—";
 }
 
-// Generate descriptive text based on insight
 function getDescriptiveText(insight: any, kpi: string) {
   const { title, description, type } = insight;
-  
-  // Create descriptive text based on the insight
-  if (type === "critical" && title?.toLowerCase().includes("utilization")) {
-    return "Team overbooked";
-  }
-  if (type === "warning" && title?.toLowerCase().includes("capacity")) {
-    return "Capacity stretched";
-  }
-  if (type === "success" && title?.toLowerCase().includes("project")) {
-    return "Projects on track";
-  }
-  if (title?.toLowerCase().includes("team") || title?.toLowerCase().includes("member")) {
-    return "Active team members";
-  }
-  if (title?.toLowerCase().includes("project")) {
-    return "Active projects";
-  }
-  if (title?.toLowerCase().includes("utilization")) {
-    return "Team utilization";
-  }
-  
-  // Fallback to a shortened version of the title
+  if (type === "critical" && title?.toLowerCase().includes("utilization")) return "Team overbooked";
+  if (type === "warning" && title?.toLowerCase().includes("capacity")) return "Capacity stretched";
+  if (type === "success" && title?.toLowerCase().includes("project")) return "Projects on track";
+  if (title?.toLowerCase().includes("team") || title?.toLowerCase().includes("member")) return "Active team members";
+  if (title?.toLowerCase().includes("project")) return "Active projects";
+  if (title?.toLowerCase().includes("utilization")) return "Team utilization";
   return title?.length > 20 ? title.substring(0, 20) + "..." : title || "Metric";
 }
 
-// Positioned around the image border and extending outward
+// Neatly around image border: points distributed at corners/mid-edges
 const floatingPositions = [
-  // Top edge
-  { top: "-8px", left: "15%", transform: "translateY(-100%)" },
-  { top: "-8px", right: "20%", transform: "translateY(-100%)" },
-  
-  // Left edge  
-  { top: "25%", left: "-8px", transform: "translateX(-100%)" },
-  { bottom: "30%", left: "-8px", transform: "translateX(-100%)" },
-  
-  // Right edge
-  { top: "20%", right: "-8px", transform: "translateX(100%)" },
-  { bottom: "25%", right: "-8px", transform: "translateX(100%)" },
-  
-  // Bottom edge
-  { bottom: "-8px", left: "25%", transform: "translateY(100%)" },
-  { bottom: "-8px", right: "15%", transform: "translateY(100%)" },
+  // Top left
+  { top: "-32px", left: "0", transform: "translateY(-100%)" },
+  // Top center
+  { top: "-32px", left: "50%", transform: "translate(-50%, -100%)" },
+  // Top right
+  { top: "-32px", right: "0", transform: "translateY(-100%)" },
+  // Right center
+  { top: "50%", right: "-30px", transform: "translateY(-50%) translateX(100%)" },
+  // Bottom right
+  { bottom: "-32px", right: "0", transform: "translateY(100%)" },
+  // Bottom center
+  { bottom: "-32px", left: "50%", transform: "translate(-50%, 100%)" },
+  // Bottom left
+  { bottom: "-32px", left: "0", transform: "translateY(100%)" },
+  // Left center
+  { top: "50%", left: "-30px", transform: "translateY(-50%) translateX(-100%)" },
 ];
-
-// Enhanced animation delays for more staggered effect
+// More gently staggered delays
 const animationDelays = [
-  "0s", "0.4s", "0.8s", "1.2s", "1.6s", "2.0s", "2.4s", "2.8s"
+  "0s", "0.2s", "0.4s", "0.6s", "0.8s", "1.0s", "1.2s", "1.4s"
 ];
 
 export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
@@ -131,24 +130,19 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   teamSize,
   activeProjects,
   timeRange,
-  scale = 1, // Default to 1x if not provided
+  scale = 1.0,
 }) => {
   let insights: any[] = [];
   try {
-    // Get insights from multiple time ranges for more variety
     const timeRanges: any[] = ["week", "month", "quarter", "year"];
     const all: any[] = [];
     for (let r of timeRanges) {
       all.push(...getAllInsights(utilizationRate, teamSize, activeProjects, r));
     }
-    
-    // Remove duplicates by title
     insights = all.filter(
       (insight, idx, arr) =>
         arr.findIndex((i) => i.title === insight.title) === idx
     );
-    
-    // If we have fewer than 8 insights, repeat some with slight variations
     if (insights.length < 8) {
       const additional = [];
       let i = 0;
@@ -165,103 +159,77 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
       }
       insights = [...insights, ...additional];
     }
-    
-    // Take exactly 8 insights for better coverage around the image
     insights = insights.slice(0, 8);
   } catch {
     return null;
   }
 
-  // Props to pass for extracting KPI numbers
   const heroMetrics = { utilizationRate, teamSize, activeProjects };
 
+  // Anim tweaks: softer float, lighter drop
   return (
     <>
       <style>{`
-        @keyframes floatBig {
+        @keyframes floatSoft {
           0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-20px) scale(1.02); }
+          50% { transform: translateY(-12px) scale(1.015); }
         }
-        @keyframes floatReverse {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(15px) scale(0.98); }
+        @keyframes pulseLight {
+          0%, 100% { box-shadow: 0 2px 18px 0 rgba(120,100,240,0.10);}
+          50% { box-shadow: 0 8px 30px 0 rgba(120,100,240,0.14);}
         }
-        @keyframes floatSlow {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-12px) rotate(1deg); }
-        }
-        @keyframes pulse {
-          0%, 100% { box-shadow: 0 4px 32px 0 rgba(120, 100, 240, 0.13); }
-          50% { box-shadow: 0 8px 40px 0 rgba(120, 100, 240, 0.25); }
-        }
-        .float-animation {
-          animation: floatBig 2.5s ease-in-out infinite, pulse 3s ease-in-out infinite;
-        }
-        .float-animation-reverse {
-          animation: floatReverse 3s ease-in-out infinite, pulse 3.5s ease-in-out infinite;
-        }
-        .float-slow {
-          animation: floatSlow 3.5s ease-in-out infinite, pulse 4s ease-in-out infinite;
+        .float-soft {
+          animation: floatSoft 2.4s ease-in-out infinite, pulseLight 3s ease-in-out infinite;
         }
       `}</style>
       {insights.map((insight, idx) => {
-        // Icon/type/color
         const Icon = iconMap[insight.type] ?? Info;
-        const colors = colorMap[insight.type] || colorMap.info;
-
-        // KPI and descriptive text
+        const colors = colorMap[insight.type] || colorMap.default;
         const kpi = getInsightKPI(insight, { utilizationRate, teamSize, activeProjects });
         const descriptiveText = getDescriptiveText(insight, kpi);
 
-        // Different animation classes for variety
-        const animationClass = idx % 3 === 0 ? 'float-animation' : 
-                             idx % 3 === 1 ? 'float-animation-reverse' : 
-                             'float-slow';
-
         const position = floatingPositions[idx] || floatingPositions[0];
 
-        // New: apply scaling transform and adjust size-related classes
+        // scale set to 1.2 in Hero
+        // style: clean white card, shadow, circle bg for icon, centered
         return (
           <div
             key={insight.title + idx}
-            className={`absolute z-30 transition-all duration-500 
-              hover:scale-110 hover:z-40 rounded-2xl bg-white/95 backdrop-blur border border-gray-100 
-              flex items-center gap-3 px-3 py-3 ${animationClass}`}
+            className="absolute z-30 transition-all duration-500 hover:scale-105 hover:z-40 rounded-2xl bg-white/95 backdrop-blur border border-gray-100 flex items-center gap-3 px-4 py-3 float-soft shadow-md"
             style={{
               ...position,
               animationDelay: animationDelays[idx],
-              // Scaling the card and positioning
               transform: `scale(${scale}) ${position.transform ? position.transform : ''}`,
-              width: `${11 * scale}rem`, // base 44 = 11rem, scaled
-              minHeight: `${3.5 * scale}rem`, // base min-h-14 = 3.5rem, scaled
+              width: `${11 * scale}rem`,
+              minHeight: `${3.8 * scale}rem`,
+              boxShadow: "0 2px 26px 0 rgba(140,120,250,0.07)", // very soft
+              pointerEvents: 'auto',
             }}
           >
-            {/* Colored Icon Background */}
+            {/* Circular Colored Icon */}
             <div
-              className={`flex items-center justify-center flex-shrink-0 rounded-xl`}
+              className="flex items-center justify-center rounded-xl"
               style={{
-                width: `${2.5 * scale}rem`, // base w-10 = 2.5rem
-                height: `${2.5 * scale}rem`,
-                background: colors.iconBg.includes("bg-") ? undefined : colors.iconBg, // fallback
+                width: `${2.6 * scale}rem`,
+                height: `${2.6 * scale}rem`,
+                background: colors.iconBg,
+                marginLeft: '0.1rem'
               }}
-              // Maintain bg-* Tailwind classes for color
-              // Add original color + allow style override with custom bg if needed
             >
               <Icon 
                 className="text-white"
                 style={{
-                  width: `${1.25 * scale}rem`, // base w-5 = 1.25rem
-                  height: `${1.25 * scale}rem`,
+                  width: `${1.4 * scale}rem`,
+                  height: `${1.4 * scale}rem`,
                 }}
               />
             </div>
-            {/* Content */}
-            <div className="flex flex-col min-w-0 flex-1" style={{marginLeft: `${0.5 * scale}rem`}}>
+            <div className="flex flex-col min-w-0 flex-1 pl-1" style={{marginLeft: `${0.3 * scale}rem`}}>
               <div
                 className={`${colors.number} font-bold leading-tight`}
                 style={{
-                  fontSize: `${1.25 * scale}rem`, // base text-xl = 1.25rem
-                  lineHeight: 1.2,
+                  fontSize: `${1.27 * scale}rem`,
+                  lineHeight: 1.21,
                 }}
               >
                 {kpi}
@@ -269,7 +237,7 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
               <div
                 className="text-xs text-gray-600 leading-tight"
                 style={{
-                  fontSize: `${0.75 * scale}rem`,
+                  fontSize: `${0.80 * scale}rem`,
                 }}
               >
                 {descriptiveText}

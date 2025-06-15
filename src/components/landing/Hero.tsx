@@ -94,8 +94,8 @@ const Hero = () => {
             <AnimatedSection animation="fadeInRight" delay={600}>
               <div 
                 ref={floatingRef}
-                className="relative w-full max-w-[72rem]" // Increase from max-w-3xl (48rem) to 72rem (1.5x)
-                style={{ minHeight: 480 }} // increased minimum height to ensure vertical space for larger image/cards
+                className="relative w-full max-w-[72rem]"
+                style={{ minHeight: 480 }}
               >
                 {/* Main Dashboard Image - Full Width */}
                 <div className="relative group">
@@ -103,7 +103,7 @@ const Hero = () => {
                     <img 
                       src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
                       alt="Rolling Availability Calendar and Burn Meter Dashboard" 
-                      className="w-full rounded-2xl shadow-2xl transition-transform duration-500 hover:scale-110 max-h-[480px]" // 1.5x larger than 320px
+                      className="w-full rounded-2xl shadow-2xl transition-transform duration-500 hover:scale-110 max-h-[480px]" 
                     />
                   </div>
                 </div>
@@ -114,7 +114,7 @@ const Hero = () => {
                     teamSize={12}
                     activeProjects={15}
                     timeRange="month"
-                    scale={1.5} // NEW PROP to increase size
+                    scale={1.2} // Set to 1.2x per new requirement
                   />
                 )}
               </div>
@@ -127,4 +127,3 @@ const Hero = () => {
 };
 
 export default Hero;
-
