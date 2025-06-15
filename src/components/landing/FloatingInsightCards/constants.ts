@@ -33,12 +33,12 @@ export const predefinedInsights: InsightData[] = [
     hasSubtitle: true
   },
   {
-    title: "September Capacity",
-    kpi: "85%",
+    title: "85% Utilization",
+    kpi: "",
     description: "Well utilized",
     icon: Target,
     color: "blue",
-    hasSubtitle: true
+    hasSubtitle: false
   },
   {
     title: "Fee burn this month: 87%",
@@ -93,13 +93,13 @@ export const getRandomPositions = (): CardPosition[] => [
   },
   { 
     bottom: "-80px", 
-    left: "5%", 
+    left: "-10%", 
     transform: "translateY(50%) rotate(1deg)",
     scale: 1.05
   },
   { 
     bottom: "-80px", 
-    right: "15%", 
+    right: "60%", 
     transform: "translateY(50%) rotate(-1deg)",
     scale: 0.9
   }
