@@ -102,19 +102,28 @@ function getDescriptiveText(insight: any, kpi: string) {
   return title?.length > 20 ? title.substring(0, 20) + "..." : title || "Metric";
 }
 
-// Updated positioning for 6 insights with better distribution
+// Positioned around the image border and extending outward
 const floatingPositions = [
-  { top: "8%", left: "3%" },
-  { top: "12%", right: "6%" },
-  { top: "30%", left: "1%" },
-  { top: "38%", right: "8%" },
-  { bottom: "20%", left: "5%" },
-  { bottom: "12%", right: "3%" },
+  // Top edge
+  { top: "-8px", left: "15%", transform: "translateY(-100%)" },
+  { top: "-8px", right: "20%", transform: "translateY(-100%)" },
+  
+  // Left edge  
+  { top: "25%", left: "-8px", transform: "translateX(-100%)" },
+  { bottom: "30%", left: "-8px", transform: "translateX(-100%)" },
+  
+  // Right edge
+  { top: "20%", right: "-8px", transform: "translateX(100%)" },
+  { bottom: "25%", right: "-8px", transform: "translateX(100%)" },
+  
+  // Bottom edge
+  { bottom: "-8px", left: "25%", transform: "translateY(100%)" },
+  { bottom: "-8px", right: "15%", transform: "translateY(100%)" },
 ];
 
 // Enhanced animation delays for more staggered effect
 const animationDelays = [
-  "0s", "0.4s", "0.8s", "1.2s", "1.6s", "2.0s"
+  "0s", "0.4s", "0.8s", "1.2s", "1.6s", "2.0s", "2.4s", "2.8s"
 ];
 
 export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
@@ -138,11 +147,11 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
         arr.findIndex((i) => i.title === insight.title) === idx
     );
     
-    // If we have fewer than 6 insights, repeat some with slight variations
-    if (insights.length < 6) {
+    // If we have fewer than 8 insights, repeat some with slight variations
+    if (insights.length < 8) {
       const additional = [];
       let i = 0;
-      while (additional.length + insights.length < 6) {
+      while (additional.length + insights.length < 8) {
         const baseInsight = insights[i % insights.length];
         additional.push({
           ...baseInsight,
@@ -156,8 +165,8 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
       insights = [...insights, ...additional];
     }
     
-    // Take exactly 6 insights
-    insights = insights.slice(0, 6);
+    // Take exactly 8 insights for better coverage around the image
+    insights = insights.slice(0, 8);
   } catch {
     return null;
   }
@@ -214,30 +223,32 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
                              idx % 3 === 1 ? 'float-animation-reverse' : 
                              'float-slow';
 
+        const position = floatingPositions[idx] || floatingPositions[0];
+
         return (
           <div
             key={insight.title + idx}
-            className={`absolute z-20 w-48 min-h-16 transition-all duration-500
-              hover:scale-110 hover:z-30 rounded-2xl bg-white/95 border border-gray-100 
-              flex items-center gap-3 px-4 py-3 ${animationClass}`}
+            className={`absolute z-30 w-44 min-h-14 transition-all duration-500
+              hover:scale-110 hover:z-40 rounded-2xl bg-white/95 backdrop-blur border border-gray-100 
+              flex items-center gap-3 px-3 py-3 ${animationClass}`}
             style={{
-              ...floatingPositions[idx],
+              ...position,
               animationDelay: animationDelays[idx],
             }}
           >
             {/* Colored Icon Background */}
-            <div className={`w-12 h-12 ${colors.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
-              <Icon className="w-6 h-6 text-white" />
+            <div className={`w-10 h-10 ${colors.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+              <Icon className="w-5 h-5 text-white" />
             </div>
             
             {/* Content */}
             <div className="flex flex-col min-w-0 flex-1">
               {/* Large Number/KPI */}
-              <div className={`text-2xl font-bold ${colors.number} leading-tight`}>
+              <div className={`text-xl font-bold ${colors.number} leading-tight`}>
                 {kpi}
               </div>
               {/* Descriptive Text */}
-              <div className="text-sm text-gray-600 leading-tight">
+              <div className="text-xs text-gray-600 leading-tight">
                 {descriptiveText}
               </div>
             </div>
