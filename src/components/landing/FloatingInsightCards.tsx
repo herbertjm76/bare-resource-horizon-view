@@ -146,14 +146,14 @@ const getRandomPositions = () => [
     scale: 0.75
   },
   { 
-    bottom: "-100px", 
-    left: "15%", 
+    bottom: "-120px", 
+    left: "10%", 
     transform: "translateY(100%) rotate(1deg)",
     scale: 1.05
   },
   { 
-    bottom: "-80px", 
-    right: "40%", 
+    bottom: "-100px", 
+    right: "25%", 
     transform: "translateY(100%) rotate(-1deg)",
     scale: 0.9
   }
@@ -215,7 +215,7 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
               ...position,
               animationDelay: animationDelays[idx],
               transform: `scale(${cardScale}) ${position.transform || ''}`,
-              width: isOneLiner ? `${8 * cardScale}rem` : `${10 * cardScale}rem`,
+              width: isOneLiner ? `${12 * cardScale}rem` : `${10 * cardScale}rem`,
               minHeight: isOneLiner ? `${3 * cardScale}rem` : `${4 * cardScale}rem`,
               pointerEvents: 'auto',
               padding: isOneLiner ? `${0.75 * cardScale}rem` : `${1 * cardScale}rem`
@@ -231,7 +231,7 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
                     strokeWidth={2.5}
                   />
                 </div>
-                <div className={`text-xs font-semibold ${styles.numberColor} leading-tight truncate`}>
+                <div className={`text-xs font-semibold ${styles.numberColor} leading-tight flex-1`}>
                   {insight.title}
                 </div>
               </div>
