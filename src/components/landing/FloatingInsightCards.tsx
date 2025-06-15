@@ -67,54 +67,54 @@ const insightStyles = {
   }
 };
 
-// Updated insights with two types - some with subtitles, some one-liners
+// Updated insights with your specified content
 const predefinedInsights = [
   {
-    title: "Department Utilization",
-    kpi: "200%",
-    description: "Over capacity",
+    title: "Project Overrun Alert",
+    kpi: "3 projects",
+    description: "Behind schedule",
     icon: AlertTriangle,
     color: "red",
     hasSubtitle: true
   },
   {
-    title: "Active Projects",
-    kpi: "15",
-    description: "In progress",
+    title: "Available Next Week",
+    kpi: "8 staff",
+    description: "Ready for projects",
+    icon: Users,
+    color: "green",
+    hasSubtitle: true
+  },
+  {
+    title: "September Capacity",
+    kpi: "85%",
+    description: "Well utilized",
     icon: Target,
-    color: "purple",
+    color: "blue",
     hasSubtitle: true
   },
   {
-    title: "Project-Resource Ratio",
-    kpi: "1.25:1",
-    description: "Consider hiring",
-    icon: UserPlus,
-    color: "orange",
-    hasSubtitle: true
-  },
-  {
-    title: "Next Quarter: Low",
+    title: "Fee burn this month: 87%",
     kpi: "",
     description: "",
-    icon: TrendingUp,
-    color: "blue",
+    icon: DollarSign,
+    color: "orange",
     hasSubtitle: false
   },
   {
-    title: "Available Staff: 12",
+    title: "Projects completed: 12",
     kpi: "",
     description: "",
-    icon: Users,
+    icon: CheckCircle2,
     color: "green",
     hasSubtitle: false
   },
   {
-    title: "Peak Month: High Impact",
+    title: "Peak period: Oct-Nov",
     kpi: "",
     description: "",
     icon: Calendar,
-    color: "pink",
+    color: "purple",
     hasSubtitle: false
   }
 ];
