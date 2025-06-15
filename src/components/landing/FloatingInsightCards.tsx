@@ -113,41 +113,41 @@ const predefinedInsights = [
   }
 ];
 
-// Adjusted positioning to stay within frame bounds
+// Updated positioning - top two cards overlap more with graphics, better spacing to prevent overlaps
 const getRandomPositions = () => [
   { 
-    top: "-80px", 
-    left: "8%", 
-    transform: "translateY(-100%) rotate(-2deg)",
-    scale: 0.9
+    top: "-40px", 
+    left: "18%", 
+    transform: "translateY(-50%) rotate(-2deg)",
+    scale: 1.1
   },
   { 
-    top: "-60px", 
-    right: "12%", 
-    transform: "translateY(-100%) rotate(1deg)",
-    scale: 1.0
-  },
-  { 
-    top: "15%", 
-    left: "-120px", 
-    transform: "translateX(-100%) rotate(-1deg)",
+    top: "-30px", 
+    right: "8%", 
+    transform: "translateY(-50%) rotate(1deg)",
     scale: 0.85
   },
   { 
-    top: "45%", 
-    right: "-100px", 
+    top: "25%", 
+    left: "-140px", 
+    transform: "translateX(-100%) rotate(-1deg)",
+    scale: 1.3
+  },
+  { 
+    top: "55%", 
+    right: "-120px", 
     transform: "translateY(-50%) translateX(100%) rotate(2deg)",
+    scale: 0.75
+  },
+  { 
+    bottom: "-80px", 
+    left: "25%", 
+    transform: "translateY(100%) rotate(1deg)",
     scale: 1.05
   },
   { 
-    bottom: "-70px", 
-    left: "15%", 
-    transform: "translateY(100%) rotate(1deg)",
-    scale: 0.95
-  },
-  { 
-    bottom: "-50px", 
-    right: "20%", 
+    bottom: "-60px", 
+    right: "30%", 
     transform: "translateY(100%) rotate(-1deg)",
     scale: 0.9
   }
