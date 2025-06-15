@@ -1,47 +1,35 @@
 
 import {
-  TrendingUp,
-  Users,
-  Clock,
-  Target,
-  CheckCircle2,
-  AlertTriangle,
-  Activity,
-  BarChart3,
-  DollarSign,
   Calendar,
-  UserPlus,
-  Briefcase,
+  Users,
+  TrendingUp,
+  AlertTriangle,
+  Clock,
+  BarChart3,
+  Target,
+  DollarSign,
 } from "lucide-react";
 import { InsightData, CardPosition } from "./types";
 
 export const predefinedInsights: InsightData[] = [
   {
-    title: "Project Overrun Alert",
-    kpi: "3 projects",
+    title: "Real-time Availability",
+    kpi: "8 staff free",
+    description: "Next week capacity",
+    icon: Users,
+    color: "emerald",
+    hasSubtitle: true
+  },
+  {
+    title: "Project Overruns",
+    kpi: "3 alerts",
     description: "Behind schedule",
     icon: AlertTriangle,
     color: "red",
     hasSubtitle: true
   },
   {
-    title: "Available Next Week",
-    kpi: "8 staff",
-    description: "Ready for projects",
-    icon: Users,
-    color: "green",
-    hasSubtitle: true
-  },
-  {
-    title: "85% Utilization",
-    kpi: "",
-    description: "Well utilized",
-    icon: Target,
-    color: "blue",
-    hasSubtitle: false
-  },
-  {
-    title: "Fee burn this month: 87%",
+    title: "87% Fee Burn Rate",
     kpi: "",
     description: "",
     icon: DollarSign,
@@ -49,62 +37,70 @@ export const predefinedInsights: InsightData[] = [
     hasSubtitle: false
   },
   {
-    title: "Projects completed: 12",
+    title: "Team Utilization: 85%",
     kpi: "",
     description: "",
-    icon: CheckCircle2,
-    color: "green",
+    icon: Target,
+    color: "blue",
     hasSubtitle: false
   },
   {
-    title: "Peak period: Oct-Nov",
+    title: "Peak Season Alert",
+    kpi: "Oct-Dec",
+    description: "High demand period",
+    icon: TrendingUp,
+    color: "purple",
+    hasSubtitle: true
+  },
+  {
+    title: "15 Active Projects",
     kpi: "",
     description: "",
-    icon: Calendar,
-    color: "purple",
+    icon: BarChart3,
+    color: "teal",
     hasSubtitle: false
   }
 ];
 
 export const getRandomPositions = (): CardPosition[] => [
   { 
-    top: "-40px", 
-    left: "18%", 
-    transform: "translateY(-50%) rotate(-2deg)",
+    top: "-50px", 
+    left: "12%", 
+    transform: "translateY(-50%) rotate(-1.5deg)",
     scale: 1.1
   },
   { 
-    top: "-30px", 
-    right: "8%", 
-    transform: "translateY(-50%) rotate(1deg)",
-    scale: 0.85
-  },
-  { 
-    top: "25%", 
-    left: "-140px", 
-    transform: "translateX(-100%) rotate(-1deg)",
-    scale: 1.3
-  },
-  { 
-    top: "55%", 
-    right: "-120px", 
-    transform: "translateY(-50%) translateX(100%) rotate(2deg)",
-    scale: 0.75
-  },
-  { 
-    bottom: "-80px", 
-    left: "-10%", 
-    transform: "translateY(50%) rotate(1deg)",
-    scale: 1.05
-  },
-  { 
-    bottom: "-80px", 
-    right: "60%", 
-    transform: "translateY(50%) rotate(-1deg)",
+    top: "-45px", 
+    right: "15%", 
+    transform: "translateY(-50%) rotate(2deg)",
     scale: 0.9
+  },
+  { 
+    top: "20%", 
+    left: "-160px", 
+    transform: "translateX(-100%) rotate(1deg)",
+    scale: 1.2
+  },
+  { 
+    top: "60%", 
+    right: "-140px", 
+    transform: "translateY(-50%) translateX(100%) rotate(-1.5deg)",
+    scale: 0.8
+  },
+  { 
+    bottom: "-90px", 
+    left: "8%", 
+    transform: "translateY(50%) rotate(1.5deg)",
+    scale: 1.0
+  },
+  { 
+    bottom: "-85px", 
+    right: "20%", 
+    transform: "translateY(50%) rotate(-2deg)",
+    scale: 0.95
   }
 ];
 
 export const animationDelays = [
-  "0s", "0.3s", "0.6s", "0.9s", "1.2s", "1.5s"
+  "0s", "0.4s", "0.8s", "1.2s", "1.6s", "2.0s"
 ];

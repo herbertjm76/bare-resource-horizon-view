@@ -4,69 +4,70 @@ import { InsightStyles } from "./types";
 export const insightStyles: Record<string, InsightStyles> = {
   blue: {
     bg: "bg-white",
-    iconBg: "bg-blue-600",
+    iconBg: "bg-blue-500",
     iconColor: "text-white",
-    textColor: "text-gray-700",
+    textColor: "text-slate-700",
     numberColor: "text-blue-600",
-    shadow: "shadow-lg shadow-blue-200/30"
+    shadow: "shadow-lg shadow-blue-100/40"
   },
   purple: {
     bg: "bg-white",
-    iconBg: "bg-purple-600",
+    iconBg: "bg-purple-500",
     iconColor: "text-white",
-    textColor: "text-gray-700",
+    textColor: "text-slate-700",
     numberColor: "text-purple-600",
-    shadow: "shadow-lg shadow-purple-200/30"
+    shadow: "shadow-lg shadow-purple-100/40"
   },
-  green: {
+  emerald: {
     bg: "bg-white",
-    iconBg: "bg-green-600",
+    iconBg: "bg-emerald-500",
     iconColor: "text-white",
-    textColor: "text-gray-700",
-    numberColor: "text-green-600",
-    shadow: "shadow-lg shadow-green-200/30"
+    textColor: "text-slate-700",
+    numberColor: "text-emerald-600",
+    shadow: "shadow-lg shadow-emerald-100/40"
   },
   orange: {
     bg: "bg-white",
-    iconBg: "bg-orange-600",
+    iconBg: "bg-orange-500",
     iconColor: "text-white",
-    textColor: "text-gray-700",
+    textColor: "text-slate-700",
     numberColor: "text-orange-600",
-    shadow: "shadow-lg shadow-orange-200/30"
-  },
-  pink: {
-    bg: "bg-white",
-    iconBg: "bg-pink-600",
-    iconColor: "text-white",
-    textColor: "text-gray-700",
-    numberColor: "text-pink-600",
-    shadow: "shadow-lg shadow-pink-200/30"
+    shadow: "shadow-lg shadow-orange-100/40"
   },
   red: {
     bg: "bg-white",
-    iconBg: "bg-red-600",
+    iconBg: "bg-red-500",
     iconColor: "text-white",
-    textColor: "text-gray-700",
+    textColor: "text-slate-700",
     numberColor: "text-red-600",
-    shadow: "shadow-lg shadow-red-200/30"
+    shadow: "shadow-lg shadow-red-100/40"
+  },
+  teal: {
+    bg: "bg-white",
+    iconBg: "bg-teal-500",
+    iconColor: "text-white",
+    textColor: "text-slate-700",
+    numberColor: "text-teal-600",
+    shadow: "shadow-lg shadow-teal-100/40"
   }
 };
 
 export const globalStyles = `
   @keyframes floatGently {
     0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
+    50% { transform: translateY(-6px); }
   }
-  @keyframes shimmer {
+  @keyframes cardGlow {
     0% { box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
-    50% { box-shadow: 0 12px 35px rgba(0,0,0,0.15); }
+    50% { box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
     100% { box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
   }
   .insight-card {
-    animation: floatGently 4s ease-in-out infinite, shimmer 5s ease-in-out infinite;
+    animation: floatGently 3.5s ease-in-out infinite, cardGlow 4s ease-in-out infinite;
   }
   .insight-card:hover {
-    transform: scale(1.15) !important;
+    transform: scale(1.05) !important;
     z-index: 50 !important;
+    transition: transform 0.3s ease-out;
   }
 `;
