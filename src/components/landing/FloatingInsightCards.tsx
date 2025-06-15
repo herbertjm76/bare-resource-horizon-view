@@ -67,53 +67,59 @@ const insightStyles = {
   }
 };
 
-// Updated insights based on user requirements
+// Updated insights with two types - some with subtitles, some one-liners
 const predefinedInsights = [
   {
     title: "Department Utilization",
     kpi: "200%",
     description: "Over capacity",
     icon: AlertTriangle,
-    color: "red"
+    color: "red",
+    hasSubtitle: true
   },
   {
     title: "Active Projects",
     kpi: "15",
     description: "In progress",
     icon: Target,
-    color: "purple"
+    color: "purple",
+    hasSubtitle: true
   },
   {
     title: "Project-Resource Ratio",
     kpi: "1.25:1",
     description: "Consider hiring",
     icon: UserPlus,
-    color: "orange"
+    color: "orange",
+    hasSubtitle: true
   },
   {
-    title: "Next Quarter",
-    kpi: "Low",
-    description: "Resourcing needed",
+    title: "Next Quarter: Low",
+    kpi: "",
+    description: "",
     icon: TrendingUp,
-    color: "blue"
+    color: "blue",
+    hasSubtitle: false
   },
   {
-    title: "Available Staff",
-    kpi: "12",
-    description: "Ready for projects",
+    title: "Available Staff: 12",
+    kpi: "",
+    description: "",
     icon: Users,
-    color: "green"
+    color: "green",
+    hasSubtitle: false
   },
   {
-    title: "Peak Month Ahead",
-    kpi: "High",
-    description: "Annual leave impact",
+    title: "Peak Month: High Impact",
+    kpi: "",
+    description: "",
     icon: Calendar,
-    color: "pink"
+    color: "pink",
+    hasSubtitle: false
   }
 ];
 
-// Updated positioning - top two cards overlap more with graphics, better spacing to prevent overlaps
+// Fixed positioning - better spacing to prevent overlaps, especially at bottom
 const getRandomPositions = () => [
   { 
     top: "-40px", 
@@ -140,14 +146,14 @@ const getRandomPositions = () => [
     scale: 0.75
   },
   { 
-    bottom: "-80px", 
-    left: "25%", 
+    bottom: "-100px", 
+    left: "15%", 
     transform: "translateY(100%) rotate(1deg)",
     scale: 1.05
   },
   { 
-    bottom: "-60px", 
-    right: "30%", 
+    bottom: "-80px", 
+    right: "40%", 
     transform: "translateY(100%) rotate(-1deg)",
     scale: 0.9
   }
@@ -199,40 +205,57 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
         const styles = insightStyles[insight.color as keyof typeof insightStyles];
         const position = positions[idx];
         const cardScale = position.scale * scale;
+        const isOneLiner = !insight.hasSubtitle;
 
         return (
           <div
             key={insight.title + idx}
-            className={`absolute z-30 insight-card ${styles.bg} backdrop-blur-sm border border-gray-200/60 rounded-2xl p-4 transition-all duration-500 hover:scale-125 hover:z-50 ${styles.shadow}`}
+            className={`absolute z-30 insight-card ${styles.bg} backdrop-blur-sm border border-gray-200/60 rounded-2xl transition-all duration-500 hover:scale-125 hover:z-50 ${styles.shadow}`}
             style={{
               ...position,
               animationDelay: animationDelays[idx],
               transform: `scale(${cardScale}) ${position.transform || ''}`,
-              width: `${10 * cardScale}rem`,
-              minHeight: `${4 * cardScale}rem`,
+              width: isOneLiner ? `${8 * cardScale}rem` : `${10 * cardScale}rem`,
+              minHeight: isOneLiner ? `${3 * cardScale}rem` : `${4 * cardScale}rem`,
               pointerEvents: 'auto',
+              padding: isOneLiner ? `${0.75 * cardScale}rem` : `${1 * cardScale}rem`
             }}
           >
-            <div className="flex items-center gap-3">
-              {/* Icon with circular background */}
-              <div className={`flex items-center justify-center rounded-full ${styles.iconBg} p-2.5 shadow-sm`}>
-                <Icon 
-                  className={`${styles.iconColor}`}
-                  size={Math.round(20 * cardScale)}
-                  strokeWidth={2.5}
-                />
-              </div>
-              
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className={`text-xl font-bold ${styles.numberColor} leading-tight mb-1`}>
-                  {insight.kpi}
+            {isOneLiner ? (
+              // One-liner layout
+              <div className="flex items-center gap-2">
+                <div className={`flex items-center justify-center rounded-full ${styles.iconBg} p-1.5 shadow-sm flex-shrink-0`}>
+                  <Icon 
+                    className={`${styles.iconColor}`}
+                    size={Math.round(16 * cardScale)}
+                    strokeWidth={2.5}
+                  />
                 </div>
-                <div className={`text-xs ${styles.textColor} leading-tight font-medium`}>
-                  {insight.description}
+                <div className={`text-xs font-semibold ${styles.numberColor} leading-tight truncate`}>
+                  {insight.title}
                 </div>
               </div>
-            </div>
+            ) : (
+              // Two-line layout with subtitle
+              <div className="flex items-center gap-3">
+                <div className={`flex items-center justify-center rounded-full ${styles.iconBg} p-2.5 shadow-sm`}>
+                  <Icon 
+                    className={`${styles.iconColor}`}
+                    size={Math.round(20 * cardScale)}
+                    strokeWidth={2.5}
+                  />
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  <div className={`text-xl font-bold ${styles.numberColor} leading-tight mb-1`}>
+                    {insight.kpi}
+                  </div>
+                  <div className={`text-xs ${styles.textColor} leading-tight font-medium`}>
+                    {insight.description}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         );
       })}
