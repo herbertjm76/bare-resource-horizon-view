@@ -12,139 +12,136 @@ import FAQ from '../components/landing/FAQ';
 import SignUpSection from '../components/landing/SignUpSection';
 import FooterCTA from '../components/landing/FooterCTA';
 import SocialProof from '../components/landing/SocialProof';
-import { Cpu, Wifi, Lock, Battery } from 'lucide-react';
+import { TrendingUp, Zap, Shield, Clock, Users, Target } from 'lucide-react';
 
 // Main landing page design for /bento
 const IndexBento = () => (
-  <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+  <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
     <Navbar />
 
-    {/* Bento-style Hero Section */}
-    <section className="pt-24 md:pt-32 pb-14 md:pb-24 relative">
-      <div className="max-w-7xl mx-auto px-2 md:px-6">
-        {/* Authentic Bento Grid Layout */}
-        <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-4 min-h-[80vh]">
+    {/* Enhanced Bento-style Hero Section */}
+    <section className="pt-24 md:pt-32 pb-16 md:pb-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/30"></div>
+      <div className="max-w-7xl mx-auto px-4 md:px-6 relative">
+        {/* Sophisticated Bento Grid Layout */}
+        <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-3 md:gap-4 min-h-[85vh]">
           
-          {/* Unified Studio Calendar - Large tile */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-4 row-span-2 bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-6 flex flex-col justify-between border border-blue-200/50 shadow-lg animate-fade-in">
+          {/* Main Hero Message - Central focus */}
+          <div className="col-span-2 md:col-span-4 lg:col-span-6 row-span-3 bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 rounded-2xl md:rounded-3xl p-6 md:p-8 flex flex-col justify-center items-center text-center relative overflow-hidden shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-purple-600/20"></div>
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-sm text-white/90 mb-6">
+                <Zap className="w-4 h-4 text-yellow-400" />
+                Used by 1000+ studios worldwide
+              </div>
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                Stop Resource <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Chaos</span>
+              </h1>
+              <p className="text-lg md:text-xl text-slate-200 mb-8 max-w-lg mx-auto leading-relaxed">
+                See every project, person, and deadline in one intelligent dashboard. Never overbook or miss a deadline again.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('signup');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-8 rounded-xl text-lg font-semibold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
+                >
+                  Start Free Trial
+                </button>
+                <button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold py-4 px-8 rounded-xl hover:bg-white/20 transition-all duration-200 flex items-center gap-2 justify-center">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polygon points="10,8 16,12 10,16" fill="currentColor" /></svg>
+                  Watch Demo (2 min)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Instant Problem Solving */}
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-4 md:p-6 flex flex-col justify-center items-center text-center text-white shadow-lg">
+            <Target className="w-8 h-8 md:w-12 md:h-12 mb-3 opacity-90" />
+            <h3 className="text-lg md:text-2xl font-bold mb-2">Spot Bottlenecks</h3>
+            <p className="text-sm md:text-base opacity-90">Before they kill your projects</p>
+          </div>
+
+          {/* ROI Focused */}
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-4 md:p-6 flex flex-col justify-center items-center text-center text-white shadow-lg">
+            <TrendingUp className="w-8 h-8 md:w-12 md:h-12 mb-3" />
+            <h3 className="text-2xl md:text-4xl font-bold mb-1">23%</h3>
+            <p className="text-sm md:text-base opacity-90">Average profit increase</p>
+          </div>
+
+          {/* Speed & Efficiency */}
+          <div className="col-span-2 md:col-span-3 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 md:p-6 flex items-center gap-4 text-white shadow-lg">
+            <Clock className="w-10 h-10 md:w-16 md:h-16 text-blue-400 flex-shrink-0" />
             <div>
-              <h3 className="text-sm font-medium text-blue-600 mb-2">Unified Studio Calendar</h3>
-              <p className="text-2xl font-bold text-gray-900 mb-4">One dashboard for all bookings</p>
-            </div>
-            <img 
-              src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
-              alt="Studio Calendar" 
-              className="w-full h-32 object-cover rounded-xl shadow-md"
-              loading="lazy"
-            />
-          </div>
-
-          {/* 3x Faster - Number emphasis */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-violet-50 to-violet-100 rounded-3xl p-6 flex flex-col justify-center items-center text-center border border-violet-200/50 shadow-lg animate-fade-in">
-            <p className="text-xs text-violet-600 mb-2">Up to</p>
-            <h2 className="text-6xl font-extrabold text-violet-700 mb-2">3x</h2>
-            <p className="text-sm font-medium text-violet-600">faster schedule updates</p>
-          </div>
-
-          {/* Resource Planning Brand - Main hero */}
-          <div className="col-span-2 md:col-span-3 lg:col-span-5 row-span-3 bg-white rounded-3xl p-8 flex flex-col justify-center items-center text-center border border-purple-200/50 shadow-xl animate-fade-in">
-            <img
-              src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
-              alt="Resource Planning Dashboard"
-              className="w-full max-w-md h-40 object-cover rounded-2xl shadow-lg mb-6"
-              loading="eager"
-            />
-            <h1 className="text-4xl lg:text-6xl font-extrabold tracking-tight text-purple-700 mb-4">
-              Resource Planning <span className="text-brand-primary">for Studios</span>
-            </h1>
-            <p className="text-lg text-gray-600 mb-6 max-w-md">
-              Spot bottlenecks, balance workloads, and plan projects with confidence.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => {
-                  const el = document.getElementById('signup');
-                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-                className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white py-3 px-8 rounded-xl text-lg font-bold shadow hover:opacity-90 transition"
-              >
-                Start Free Trial
-              </button>
-              <button className="bg-white border border-purple-300 text-purple-700 font-semibold py-3 px-8 rounded-xl hover:bg-purple-50 transition flex items-center gap-2 justify-center">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><polygon points="10,8 16,12 10,16" fill="currentColor" /></svg>
-                Watch Demo
-              </button>
+              <h3 className="text-xl md:text-2xl font-bold mb-1">5 hours saved</h3>
+              <p className="text-sm md:text-base text-slate-300">per week on resource planning</p>
             </div>
           </div>
 
-          {/* Instant Alerts */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-pink-50 to-pink-100 rounded-3xl p-6 flex flex-col justify-center items-center text-center border border-pink-200/50 shadow-lg animate-fade-in">
-            <h3 className="text-4xl font-extrabold text-pink-600 mb-2">Instant</h3>
-            <p className="text-sm font-medium text-pink-600">availability insights</p>
-            <div className="mt-4 w-8 h-8 bg-pink-500 rounded-full animate-pulse"></div>
-          </div>
-
-          {/* Tomorrow's Capacity */}
-          <div className="col-span-1 md:col-span-2 bg-gradient-to-br from-green-50 to-green-100 rounded-3xl p-6 flex flex-col justify-center items-center text-center border border-green-200/50 shadow-lg animate-fade-in">
-            <h3 className="text-5xl font-extrabold text-green-600 mb-2">110%</h3>
-            <p className="text-xs font-medium text-green-600 mb-1">Tomorrow's Capacity</p>
-            <p className="text-xs text-green-500">See risk before it hits</p>
-          </div>
-
-          {/* Excel Import with icon */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-3xl p-6 flex flex-col justify-between border border-yellow-200/50 shadow-lg animate-fade-in">
+          {/* Visual Dashboard Preview */}
+          <div className="col-span-2 md:col-span-3 lg:col-span-4 row-span-2 bg-white rounded-2xl p-4 md:p-6 flex flex-col justify-between border border-slate-200 shadow-lg">
             <div>
-              <h3 className="text-sm font-medium text-yellow-600 mb-2">Import from Excel</h3>
-              <h2 className="text-3xl font-bold text-yellow-700 mb-1">10 min</h2>
-              <p className="text-xs text-yellow-600">to get started</p>
+              <h3 className="text-lg md:text-xl font-semibold text-slate-800 mb-3">Live Resource Dashboard</h3>
+              <img 
+                src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
+                alt="Resource Planning Dashboard" 
+                className="w-full h-32 md:h-40 object-cover rounded-xl shadow-md border border-slate-100"
+                loading="eager"
+              />
             </div>
-            <img 
-              src="/lovable-uploads/3865e409-9078-4560-94f4-6eb9e546d8c1.png" 
-              alt="Excel" 
-              className="w-12 h-12 rounded-lg self-end"
-              loading="lazy"
-            />
-          </div>
-
-          {/* Budget Tracking */}
-          <div className="col-span-2 md:col-span-3 bg-gradient-to-br from-orange-50 to-orange-100 rounded-3xl p-6 flex flex-col justify-center border border-orange-200/50 shadow-lg animate-fade-in">
-            <h3 className="text-lg font-bold text-orange-600 mb-2">Budget Won't Escape</h3>
-            <p className="text-sm text-orange-500">Live fee tracking & alerts</p>
-            <div className="mt-4 flex space-x-2">
-              <div className="w-3 h-3 bg-orange-400 rounded-full"></div>
-              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-              <div className="w-3 h-3 bg-orange-600 rounded-full"></div>
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex -space-x-2">
+                <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white"></div>
+                <div className="w-8 h-8 bg-green-500 rounded-full border-2 border-white"></div>
+                <div className="w-8 h-8 bg-purple-500 rounded-full border-2 border-white"></div>
+                <div className="w-8 h-8 bg-slate-400 rounded-full border-2 border-white flex items-center justify-center text-xs text-white font-semibold">+12</div>
+              </div>
+              <span className="text-sm text-slate-600">Real-time collaboration</span>
             </div>
           </div>
 
-          {/* Secure Platform */}
-          <div className="col-span-1 md:col-span-2 bg-gradient-to-br from-red-50 to-red-100 rounded-3xl p-6 flex flex-col justify-center items-center text-center border border-red-200/50 shadow-lg animate-fade-in">
-            <Lock className="w-12 h-12 text-red-500 mb-3" />
-            <h3 className="text-sm font-bold text-red-600 mb-1">Secure</h3>
-            <p className="text-xs text-red-500">Enterprise-grade</p>
+          {/* Security & Trust */}
+          <div className="col-span-1 md:col-span-2 bg-gradient-to-br from-slate-100 to-slate-200 rounded-2xl p-4 md:p-6 flex flex-col justify-center items-center text-center shadow-lg">
+            <Shield className="w-8 h-8 md:w-12 md:h-12 text-slate-700 mb-3" />
+            <h3 className="text-lg font-semibold text-slate-800 mb-1">Enterprise</h3>
+            <p className="text-sm text-slate-600">Security & SOC2</p>
           </div>
 
-          {/* 20+ Integrations */}
-          <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-sky-50 to-sky-100 rounded-3xl p-6 flex flex-col justify-center items-center text-center border border-sky-200/50 shadow-lg animate-fade-in">
-            <h2 className="text-4xl font-extrabold text-sky-600 mb-2">20+</h2>
-            <p className="text-sm font-medium text-sky-600 mb-1">Integrations</p>
-            <p className="text-xs text-sky-500">Works with your tools</p>
-            <Wifi className="w-6 h-6 text-sky-400 mt-2" />
+          {/* Quick Setup */}
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-4 md:p-6 flex flex-col justify-center items-center text-center text-white shadow-lg">
+            <div className="text-2xl md:text-4xl font-bold mb-2">10 min</div>
+            <h3 className="text-sm md:text-base font-semibold mb-1">Setup Time</h3>
+            <p className="text-xs md:text-sm opacity-90">Import from Excel/CSV</p>
           </div>
 
-          {/* Cloud Performance */}
-          <div className="col-span-2 md:col-span-3 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-3xl p-6 flex flex-col justify-center border border-indigo-200/50 shadow-lg animate-fade-in">
-            <h3 className="text-lg font-bold text-indigo-600 mb-2">Industry-leading performance</h3>
-            <p className="text-sm text-indigo-500 mb-3">Powered by cloud architecture</p>
-            <Cpu className="w-8 h-8 text-indigo-400" />
+          {/* Team Collaboration */}
+          <div className="col-span-2 md:col-span-3 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl p-4 md:p-6 flex items-center gap-4 text-white shadow-lg">
+            <Users className="w-10 h-10 md:w-16 md:h-16 flex-shrink-0" />
+            <div>
+              <h3 className="text-xl md:text-2xl font-bold mb-1">Unlimited Team</h3>
+              <p className="text-sm md:text-base opacity-90">No per-seat pricing ever</p>
+            </div>
           </div>
 
-          {/* 24/7 Support */}
-          <div className="col-span-1 md:col-span-2 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-3xl p-6 flex flex-col justify-center items-center text-center border border-emerald-200/50 shadow-lg animate-fade-in">
-            <div className="bg-emerald-400 text-white px-3 py-1 rounded-full text-sm font-bold mb-3">24/7</div>
-            <h3 className="text-sm font-bold text-emerald-600 mb-1">Support</h3>
-            <p className="text-xs text-emerald-500">Always here to help</p>
-            <Battery className="w-6 h-6 text-emerald-400 mt-2" />
+          {/* Integration Power */}
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl p-4 md:p-6 flex flex-col justify-center items-center text-center text-white shadow-lg">
+            <div className="text-2xl md:text-3xl font-bold mb-2">50+</div>
+            <h3 className="text-sm md:text-base font-semibold mb-1">Integrations</h3>
+            <p className="text-xs md:text-sm opacity-90">Works with your tools</p>
+          </div>
+
+          {/* Success Metric */}
+          <div className="col-span-2 md:col-span-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-4 md:p-6 flex items-center justify-between text-white shadow-lg">
+            <div>
+              <h3 className="text-xl md:text-2xl font-bold mb-1">98% Uptime</h3>
+              <p className="text-sm md:text-base opacity-90">Enterprise reliability</p>
+            </div>
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-white/20 rounded-full flex items-center justify-center">
+              <div className="w-3 h-3 bg-green-300 rounded-full animate-pulse"></div>
+            </div>
           </div>
 
         </div>
@@ -153,13 +150,13 @@ const IndexBento = () => (
 
     {/* Sticky CTA for mobile */}
     <div className="fixed inset-x-0 bottom-0 z-40 md:hidden transition-all duration-200">
-      <div className="bg-white/95 border-t border-gray-200 px-4 py-3 flex justify-center items-center shadow-2xl">
+      <div className="bg-white/95 backdrop-blur-sm border-t border-slate-200 px-4 py-3 flex justify-center items-center shadow-2xl">
         <button
           onClick={() => {
             const el = document.getElementById('signup');
             if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
-          className="w-full bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white py-3 rounded-xl text-lg font-bold shadow ring-2 ring-purple-200 hover:opacity-90 transition"
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
         >
           Start Free Trial
         </button>
