@@ -1,4 +1,3 @@
-
 import React from "react";
 import { getAllInsights } from "@/components/dashboard/insights/utils/insightAggregator";
 import {
@@ -29,6 +28,7 @@ interface FloatingInsightCardsProps {
   teamSize: number;
   activeProjects: number;
   timeRange: "week" | "month" | "quarter" | "year";
+  scale?: number; // NEW: allow passing a scale prop
 }
 
 // Enhanced color mapping with background colors for icons
@@ -131,6 +131,7 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   teamSize,
   activeProjects,
   timeRange,
+  scale = 1, // Default to 1x if not provided
 }) => {
   let insights: any[] = [];
   try {
@@ -181,30 +182,24 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
           0%, 100% { transform: translateY(0px) scale(1); }
           50% { transform: translateY(-20px) scale(1.02); }
         }
-        
         @keyframes floatReverse {
           0%, 100% { transform: translateY(0px) scale(1); }
           50% { transform: translateY(15px) scale(0.98); }
         }
-        
         @keyframes floatSlow {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           50% { transform: translateY(-12px) rotate(1deg); }
         }
-        
         @keyframes pulse {
           0%, 100% { box-shadow: 0 4px 32px 0 rgba(120, 100, 240, 0.13); }
           50% { box-shadow: 0 8px 40px 0 rgba(120, 100, 240, 0.25); }
         }
-        
         .float-animation {
           animation: floatBig 2.5s ease-in-out infinite, pulse 3s ease-in-out infinite;
         }
-        
         .float-animation-reverse {
           animation: floatReverse 3s ease-in-out infinite, pulse 3.5s ease-in-out infinite;
         }
-        
         .float-slow {
           animation: floatSlow 3.5s ease-in-out infinite, pulse 4s ease-in-out infinite;
         }
@@ -215,7 +210,7 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
         const colors = colorMap[insight.type] || colorMap.info;
 
         // KPI and descriptive text
-        const kpi = getInsightKPI(insight, heroMetrics);
+        const kpi = getInsightKPI(insight, { utilizationRate, teamSize, activeProjects });
         const descriptiveText = getDescriptiveText(insight, kpi);
 
         // Different animation classes for variety
@@ -225,30 +220,58 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
 
         const position = floatingPositions[idx] || floatingPositions[0];
 
+        // New: apply scaling transform and adjust size-related classes
         return (
           <div
             key={insight.title + idx}
-            className={`absolute z-30 w-44 min-h-14 transition-all duration-500
+            className={`absolute z-30 transition-all duration-500 
               hover:scale-110 hover:z-40 rounded-2xl bg-white/95 backdrop-blur border border-gray-100 
               flex items-center gap-3 px-3 py-3 ${animationClass}`}
             style={{
               ...position,
               animationDelay: animationDelays[idx],
+              // Scaling the card and positioning
+              transform: `scale(${scale}) ${position.transform ? position.transform : ''}`,
+              width: `${11 * scale}rem`, // base 44 = 11rem, scaled
+              minHeight: `${3.5 * scale}rem`, // base min-h-14 = 3.5rem, scaled
             }}
           >
             {/* Colored Icon Background */}
-            <div className={`w-10 h-10 ${colors.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
-              <Icon className="w-5 h-5 text-white" />
+            <div
+              className={`flex items-center justify-center flex-shrink-0 rounded-xl`}
+              style={{
+                width: `${2.5 * scale}rem`, // base w-10 = 2.5rem
+                height: `${2.5 * scale}rem`,
+                background: colors.iconBg.includes("bg-") ? undefined : colors.iconBg, // fallback
+              }}
+              // Maintain bg-* Tailwind classes for color
+              // Add original color + allow style override with custom bg if needed
+            >
+              <Icon 
+                className="text-white"
+                style={{
+                  width: `${1.25 * scale}rem`, // base w-5 = 1.25rem
+                  height: `${1.25 * scale}rem`,
+                }}
+              />
             </div>
-            
             {/* Content */}
-            <div className="flex flex-col min-w-0 flex-1">
-              {/* Large Number/KPI */}
-              <div className={`text-xl font-bold ${colors.number} leading-tight`}>
+            <div className="flex flex-col min-w-0 flex-1" style={{marginLeft: `${0.5 * scale}rem`}}>
+              <div
+                className={`${colors.number} font-bold leading-tight`}
+                style={{
+                  fontSize: `${1.25 * scale}rem`, // base text-xl = 1.25rem
+                  lineHeight: 1.2,
+                }}
+              >
                 {kpi}
               </div>
-              {/* Descriptive Text */}
-              <div className="text-xs text-gray-600 leading-tight">
+              <div
+                className="text-xs text-gray-600 leading-tight"
+                style={{
+                  fontSize: `${0.75 * scale}rem`,
+                }}
+              >
                 {descriptiveText}
               </div>
             </div>
