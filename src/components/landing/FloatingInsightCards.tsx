@@ -31,12 +31,28 @@ interface FloatingInsightCardsProps {
   timeRange: "week" | "month" | "quarter" | "year";
 }
 
-// Demo color mapping and number extraction
+// Enhanced color mapping with background colors for icons
 const colorMap = {
-  critical: "text-red-500",
-  warning: "text-yellow-500",
-  success: "text-green-500",
-  info: "text-indigo-500",
+  critical: { 
+    iconBg: "bg-red-500", 
+    text: "text-red-600", 
+    number: "text-red-600" 
+  },
+  warning: { 
+    iconBg: "bg-yellow-500", 
+    text: "text-yellow-600", 
+    number: "text-yellow-600" 
+  },
+  success: { 
+    iconBg: "bg-green-500", 
+    text: "text-green-600", 
+    number: "text-green-600" 
+  },
+  info: { 
+    iconBg: "bg-blue-500", 
+    text: "text-blue-600", 
+    number: "text-blue-600" 
+  },
 };
 
 // Extract number/KPI from insight or fall back to demo metrics
@@ -58,30 +74,49 @@ function getInsightKPI(
   return "—";
 }
 
-// Remove phrases/descriptions, keep succinct titles (max 3 words)
-function getShortLabel(title: string) {
-  // Usually these are short enough
-  if (title.length <= 22) return title;
-  // Take first 3 words of the title as label
-  const parts = title.split(" ");
-  return parts.slice(0, 3).join(" ");
+// Generate descriptive text based on insight
+function getDescriptiveText(insight: any, kpi: string) {
+  const { title, description, type } = insight;
+  
+  // Create descriptive text based on the insight
+  if (type === "critical" && title?.toLowerCase().includes("utilization")) {
+    return "Team overbooked";
+  }
+  if (type === "warning" && title?.toLowerCase().includes("capacity")) {
+    return "Capacity stretched";
+  }
+  if (type === "success" && title?.toLowerCase().includes("project")) {
+    return "Projects on track";
+  }
+  if (title?.toLowerCase().includes("team") || title?.toLowerCase().includes("member")) {
+    return "Active team members";
+  }
+  if (title?.toLowerCase().includes("project")) {
+    return "Active projects";
+  }
+  if (title?.toLowerCase().includes("utilization")) {
+    return "Team utilization";
+  }
+  
+  // Fallback to a shortened version of the title
+  return title?.length > 20 ? title.substring(0, 20) + "..." : title || "Metric";
 }
 
 const floatingPositions = [
-  { top: "2%", left: "43%" },
-  { top: "12%", right: "14%" },
-  { top: "22%", left: "13%" },
-  { top: "28%", right: "6%" },
-  { bottom: "10%", left: "18%" },
-  { bottom: "14%", right: "11%" },
-  { top: "55%", left: "34%" },
-  { bottom: "2%", left: "48%" },
-  { top: "45%", right: "3%" },
+  { top: "8%", left: "5%" },
+  { top: "15%", right: "8%" },
+  { top: "35%", left: "2%" },
+  { top: "45%", right: "12%" },
+  { bottom: "25%", left: "8%" },
+  { bottom: "15%", right: "5%" },
+  { top: "60%", left: "45%" },
+  { bottom: "8%", left: "35%" },
+  { top: "25%", right: "2%" },
 ];
 
-// Animation delays for staggered effect
+// Enhanced animation delays for more staggered effect
 const animationDelays = [
-  "0s", "0.2s", "0.4s", "0.6s", "0.8s", "1.0s", "1.2s", "1.4s", "1.6s"
+  "0s", "0.3s", "0.6s", "0.9s", "1.2s", "1.5s", "1.8s", "2.1s", "2.4s"
 ];
 
 export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
@@ -121,36 +156,46 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   return (
     <>
       <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
+        @keyframes floatBig {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-20px) scale(1.02); }
         }
         
         @keyframes floatReverse {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(8px); }
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(15px) scale(0.98); }
+        }
+        
+        @keyframes floatSlow {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-12px) rotate(1deg); }
+        }
+        
+        @keyframes pulse {
+          0%, 100% { box-shadow: 0 4px 32px 0 rgba(120, 100, 240, 0.13); }
+          50% { box-shadow: 0 8px 40px 0 rgba(120, 100, 240, 0.25); }
         }
         
         .float-animation {
-          animation: float 3s ease-in-out infinite;
+          animation: floatBig 2.5s ease-in-out infinite, pulse 3s ease-in-out infinite;
         }
         
         .float-animation-reverse {
-          animation: floatReverse 3.5s ease-in-out infinite;
+          animation: floatReverse 3s ease-in-out infinite, pulse 3.5s ease-in-out infinite;
         }
         
         .float-slow {
-          animation: float 4s ease-in-out infinite;
+          animation: floatSlow 3.5s ease-in-out infinite, pulse 4s ease-in-out infinite;
         }
       `}</style>
       {insights.map((insight, idx) => {
         // Icon/type/color
         const Icon = iconMap[insight.type] ?? Info;
-        const color = colorMap[insight.type] || colorMap.info;
+        const colors = colorMap[insight.type] || colorMap.info;
 
-        // Condensed KPI + label
-        const number = getInsightKPI(insight, heroMetrics);
-        const shortLabel = getShortLabel(insight.title);
+        // KPI and descriptive text
+        const kpi = getInsightKPI(insight, heroMetrics);
+        const descriptiveText = getDescriptiveText(insight, kpi);
 
         // Different animation classes for variety
         const animationClass = idx % 3 === 0 ? 'float-animation' : 
@@ -160,27 +205,29 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
         return (
           <div
             key={insight.title + idx}
-            className={`absolute z-20 w-40 min-h-20 transition-transform duration-300
-              hover:scale-105 shadow-lg rounded-xl bg-white/95 border border-gray-100 flex flex-col items-center
-              justify-center px-2 py-2 ${animationClass}`}
+            className={`absolute z-20 w-48 min-h-16 transition-all duration-500
+              hover:scale-110 hover:z-30 rounded-2xl bg-white/95 border border-gray-100 
+              flex items-center gap-3 px-4 py-3 ${animationClass}`}
             style={{
               ...floatingPositions[idx],
-              boxShadow: "0 4px 32px 0 rgba(120, 100, 240, 0.13)",
-              pointerEvents: "auto",
               animationDelay: animationDelays[idx],
             }}
           >
-            {/* Icon */}
-            <div className="mb-1 flex items-center justify-center">
-              <Icon className={`w-7 h-7 ${color} drop-shadow`} />
+            {/* Colored Icon Background */}
+            <div className={`w-12 h-12 ${colors.iconBg} rounded-xl flex items-center justify-center flex-shrink-0`}>
+              <Icon className="w-6 h-6 text-white" />
             </div>
-            {/* Big Number */}
-            <div className="font-bold text-2xl md:text-3xl text-gray-900 mb-1 text-center">
-              {number}
-            </div>
-            {/* Short Label */}
-            <div className="text-xs font-semibold text-gray-500 text-center truncate px-1">
-              {shortLabel}
+            
+            {/* Content */}
+            <div className="flex flex-col min-w-0 flex-1">
+              {/* Large Number/KPI */}
+              <div className={`text-2xl font-bold ${colors.number} leading-tight`}>
+                {kpi}
+              </div>
+              {/* Descriptive Text */}
+              <div className="text-sm text-gray-600 leading-tight">
+                {descriptiveText}
+              </div>
             </div>
           </div>
         );
