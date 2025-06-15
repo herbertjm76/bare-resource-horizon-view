@@ -1,3 +1,4 @@
+
 import React from "react";
 import { getAllInsights } from "@/components/dashboard/insights/utils/insightAggregator";
 import {
@@ -78,6 +79,11 @@ const floatingPositions = [
   { top: "45%", right: "3%" },
 ];
 
+// Animation delays for staggered effect
+const animationDelays = [
+  "0s", "0.2s", "0.4s", "0.6s", "0.8s", "1.0s", "1.2s", "1.4s", "1.6s"
+];
+
 export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   utilizationRate,
   teamSize,
@@ -114,6 +120,29 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
 
   return (
     <>
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes floatReverse {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(8px); }
+        }
+        
+        .float-animation {
+          animation: float 3s ease-in-out infinite;
+        }
+        
+        .float-animation-reverse {
+          animation: floatReverse 3.5s ease-in-out infinite;
+        }
+        
+        .float-slow {
+          animation: float 4s ease-in-out infinite;
+        }
+      `}</style>
       {insights.map((insight, idx) => {
         // Icon/type/color
         const Icon = iconMap[insight.type] ?? Info;
@@ -123,17 +152,22 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
         const number = getInsightKPI(insight, heroMetrics);
         const shortLabel = getShortLabel(insight.title);
 
+        // Different animation classes for variety
+        const animationClass = idx % 3 === 0 ? 'float-animation' : 
+                             idx % 3 === 1 ? 'float-animation-reverse' : 
+                             'float-slow';
+
         return (
           <div
             key={insight.title + idx}
             className={`absolute z-20 w-40 min-h-20 transition-transform duration-300
               hover:scale-105 shadow-lg rounded-xl bg-white/95 border border-gray-100 flex flex-col items-center
-              justify-center
-              px-2 py-2`}
+              justify-center px-2 py-2 ${animationClass}`}
             style={{
               ...floatingPositions[idx],
               boxShadow: "0 4px 32px 0 rgba(120, 100, 240, 0.13)",
               pointerEvents: "auto",
+              animationDelay: animationDelays[idx],
             }}
           >
             {/* Icon */}

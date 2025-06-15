@@ -1,4 +1,3 @@
-
 import Navbar from '../components/landing/Navbar';
 import Footer from '../components/landing/Footer';
 import Hero from '../components/landing/Hero';
@@ -58,14 +57,13 @@ const IndexBento = () => (
             <div className="text-sm text-gray-400 mt-4">No credit card required • 2-min setup</div>
           </div>
           {/* Right: Dashboard Image and Floating Insight Cards */}
-          <div className="w-full md:w-2/3 flex justify-center items-center relative h-[430px] md:h-[470px]">
-            {/* Dashboard Image centered */}
-            <div className="relative z-10 min-w-[320px] max-w-lg w-[85vw] md:w-[420px] rounded-3xl shadow-2xl overflow-hidden bg-white/45 border border-brand-primary/10">
+          <div className="w-full md:w-2/3 flex justify-center items-center relative h-[500px] md:h-[600px] px-4 md:px-8">
+            {/* Dashboard Image centered and larger */}
+            <div className="relative z-10 w-full h-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden bg-white/45 border border-brand-primary/10">
               <img
                 src={HERO_DASHBOARD_SRC}
                 alt="Dashboard screenshot"
-                className="object-contain w-full h-full rounded-3xl shadow-2xl"
-                style={{ minHeight: 270, maxHeight: 430 }}
+                className="object-cover w-full h-full rounded-3xl shadow-2xl"
               />
             </div>
             {/* 9 Floating insight cards, absolutely positioned */}
