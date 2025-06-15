@@ -20,11 +20,11 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative pt-20 bg-gradient-to-br from-[#6E59A5] via-[#895CF7] to-[#E64FC4] overflow-hidden min-h-screen">
+    <div className="relative pt-20 bg-gradient-to-br from-[#6E59A5] via-[#895CF7] to-[#E64FC4] overflow-hidden min-h-[70vh]">
       <GradientOrbs />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative z-10">
-        <div className="grid lg:grid-cols-12 gap-8 items-center min-h-[70vh]">
+        <div className="grid lg:grid-cols-12 gap-8 items-center">
           {/* Left Column - Text Content (1/3) */}
           <div className="lg:col-span-4 space-y-8">
             <div className="space-y-6">
