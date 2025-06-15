@@ -30,7 +30,6 @@ const Hero = () => {
         flex items-center
         pt-8
       "
-      // Height updated to fixed 800px on all breakpoints
     >
       <GradientOrbs />
 
@@ -50,6 +49,14 @@ const Hero = () => {
                 <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-white leading-tight">
                   Resource Planning Software for Design Studios
                 </h1>
+              </AnimatedSection>
+
+              <AnimatedSection animation="fadeInUp" delay={500}>
+                <p className="text-lg text-white/90 leading-relaxed">
+                  Balance capacity. <span className="text-pink-300">Spot bottlenecks.</span> <span className="text-blue-300">Deliver on time.</span>
+                  <br />
+                  Visualize people & projects in one space—clarity for your whole team.
+                </p>
               </AnimatedSection>
               
               <AnimatedSection animation="fadeInUp" delay={600}>
@@ -114,7 +121,7 @@ const Hero = () => {
                     teamSize={12}
                     activeProjects={15}
                     timeRange="month"
-                    scale={1.2} // Set to 1.2x per new requirement
+                    scale={1.2}
                   />
                 )}
               </div>
