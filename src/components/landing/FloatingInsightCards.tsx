@@ -1,6 +1,5 @@
 
 import React from "react";
-import { getAllInsights } from "@/components/dashboard/insights/utils/insightAggregator";
 import {
   TrendingUp,
   Users,
@@ -10,62 +9,130 @@ import {
   AlertTriangle,
   Activity,
   BarChart3,
+  DollarSign,
+  Calendar,
 } from "lucide-react";
 
-// Refined color palette for better visual appeal
+// Updated color palette to match the reference image
 const insightStyles = {
-  critical: {
-    bg: "bg-gradient-to-br from-red-500 to-red-600",
-    iconBg: "bg-red-100",
-    iconColor: "text-red-600",
-    textColor: "text-red-700",
-    numberColor: "text-red-600",
-    shadow: "shadow-red-200/50"
-  },
-  warning: {
-    bg: "bg-gradient-to-br from-amber-500 to-orange-500",
-    iconBg: "bg-amber-100",
-    iconColor: "text-amber-600",
-    textColor: "text-amber-700",
-    numberColor: "text-amber-600",
-    shadow: "shadow-amber-200/50"
-  },
-  success: {
-    bg: "bg-gradient-to-br from-emerald-500 to-green-600",
-    iconBg: "bg-emerald-100",
-    iconColor: "text-emerald-600",
-    textColor: "text-emerald-700",
-    numberColor: "text-emerald-600",
-    shadow: "shadow-emerald-200/50"
-  },
-  info: {
-    bg: "bg-gradient-to-br from-blue-500 to-indigo-600",
+  blue: {
+    bg: "bg-white",
     iconBg: "bg-blue-100",
     iconColor: "text-blue-600",
-    textColor: "text-blue-700",
-    numberColor: "text-blue-600",
-    shadow: "shadow-blue-200/50"
-  },
-  default: {
-    bg: "bg-gradient-to-br from-gray-500 to-slate-600",
-    iconBg: "bg-gray-100",
-    iconColor: "text-gray-600",
     textColor: "text-gray-700",
-    numberColor: "text-gray-600",
-    shadow: "shadow-gray-200/50"
+    numberColor: "text-blue-600",
+    shadow: "shadow-lg shadow-blue-200/30"
+  },
+  purple: {
+    bg: "bg-white",
+    iconBg: "bg-purple-100",
+    iconColor: "text-purple-600",
+    textColor: "text-gray-700",
+    numberColor: "text-purple-600",
+    shadow: "shadow-lg shadow-purple-200/30"
+  },
+  green: {
+    bg: "bg-white",
+    iconBg: "bg-green-100",
+    iconColor: "text-green-600",
+    textColor: "text-gray-700",
+    numberColor: "text-green-600",
+    shadow: "shadow-lg shadow-green-200/30"
+  },
+  orange: {
+    bg: "bg-white",
+    iconBg: "bg-orange-100",
+    iconColor: "text-orange-600",
+    textColor: "text-gray-700",
+    numberColor: "text-orange-600",
+    shadow: "shadow-lg shadow-orange-200/30"
+  },
+  pink: {
+    bg: "bg-white",
+    iconBg: "bg-pink-100",
+    iconColor: "text-pink-600",
+    textColor: "text-gray-700",
+    numberColor: "text-pink-600",
+    shadow: "shadow-lg shadow-pink-200/30"
   }
 };
 
-const iconMap = {
-  critical: AlertTriangle,
-  warning: Clock,
-  success: CheckCircle2,
-  info: TrendingUp,
-  users: Users,
-  target: Target,
-  activity: Activity,
-  chart: BarChart3,
-};
+// Predefined insights matching the reference image plus 2 additional
+const predefinedInsights = [
+  {
+    title: "Team Utilization",
+    kpi: "87%",
+    description: "Current capacity",
+    icon: Users,
+    color: "blue"
+  },
+  {
+    title: "Active Projects",
+    kpi: "15",
+    description: "In progress",
+    icon: Target,
+    color: "purple"
+  },
+  {
+    title: "Team Members",
+    kpi: "12",
+    description: "Available staff",
+    icon: Users,
+    color: "green"
+  },
+  {
+    title: "Revenue Growth",
+    kpi: "+23%",
+    description: "This quarter",
+    icon: TrendingUp,
+    color: "orange"
+  },
+  {
+    title: "Project Efficiency",
+    kpi: "94%",
+    description: "On-time delivery",
+    icon: CheckCircle2,
+    color: "pink"
+  }
+];
+
+// Random positioning with more varied placement and sizes
+const getRandomPositions = () => [
+  { 
+    top: "-120px", 
+    left: "5%", 
+    transform: "translateY(-100%) rotate(-3deg)",
+    scale: 0.9
+  },
+  { 
+    top: "-80px", 
+    right: "8%", 
+    transform: "translateY(-100%) rotate(2deg)",
+    scale: 1.1
+  },
+  { 
+    top: "10%", 
+    left: "-160px", 
+    transform: "translateX(-100%) rotate(-2deg)",
+    scale: 0.85
+  },
+  { 
+    top: "45%", 
+    right: "-140px", 
+    transform: "translateY(-50%) translateX(100%) rotate(1deg)",
+    scale: 1.05
+  },
+  { 
+    bottom: "-100px", 
+    left: "20%", 
+    transform: "translateY(100%) rotate(3deg)",
+    scale: 0.95
+  }
+];
+
+const animationDelays = [
+  "0s", "0.4s", "0.8s", "1.2s", "1.6s"
+];
 
 interface FloatingInsightCardsProps {
   utilizationRate: number;
@@ -75,55 +142,6 @@ interface FloatingInsightCardsProps {
   scale?: number;
 }
 
-function getInsightKPI(
-  insight: any,
-  { utilizationRate, teamSize, activeProjects }: { utilizationRate: number; teamSize: number; activeProjects: number }
-) {
-  const { description, title, category } = insight;
-  const kpiMatch = description?.match(/(\d+(\.\d+)?%?)/)?.[0];
-  if (kpiMatch) return kpiMatch;
-  if (title?.toLowerCase().includes("utilization")) return utilizationRate + "%";
-  if (title?.toLowerCase().includes("team")) return teamSize;
-  if (title?.toLowerCase().includes("project")) return activeProjects;
-  if (category?.toLowerCase().includes("team")) return teamSize;
-  if (category?.toLowerCase().includes("project")) return activeProjects;
-  return "—";
-}
-
-function getDescriptiveText(insight: any) {
-  const { title, type } = insight;
-  if (type === "critical" && title?.toLowerCase().includes("utilization")) return "Team overbooked";
-  if (type === "warning" && title?.toLowerCase().includes("capacity")) return "Capacity stretched";
-  if (type === "success" && title?.toLowerCase().includes("project")) return "Projects on track";
-  if (title?.toLowerCase().includes("team") || title?.toLowerCase().includes("member")) return "Active members";
-  if (title?.toLowerCase().includes("project")) return "Active projects";
-  if (title?.toLowerCase().includes("utilization")) return "Team utilization";
-  return title?.length > 18 ? title.substring(0, 18) + "..." : title || "Metric";
-}
-
-// Better positioned cards that don't overlap the image
-const floatingPositions = [
-  // Top area - above image
-  { top: "-80px", left: "10%", transform: "translateY(-100%)" },
-  { top: "-80px", right: "10%", transform: "translateY(-100%)" },
-  
-  // Left side - positioned to not overlap
-  { top: "15%", left: "-140px", transform: "translateX(-100%)" },
-  { top: "50%", left: "-140px", transform: "translateY(-50%) translateX(-100%)" },
-  
-  // Right side - positioned to not overlap  
-  { top: "15%", right: "-140px", transform: "translateX(100%)" },
-  { top: "50%", right: "-140px", transform: "translateY(-50%) translateX(100%)" },
-  
-  // Bottom area - below image
-  { bottom: "-80px", left: "15%", transform: "translateY(100%)" },
-  { bottom: "-80px", right: "15%", transform: "translateY(100%)" },
-];
-
-const animationDelays = [
-  "0s", "0.3s", "0.6s", "0.9s", "1.2s", "1.5s", "1.8s", "2.1s"
-];
-
 export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   utilizationRate,
   teamSize,
@@ -131,90 +149,64 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   timeRange,
   scale = 1.0,
 }) => {
-  let insights: any[] = [];
-  try {
-    const timeRanges: any[] = ["week", "month", "quarter", "year"];
-    const all: any[] = [];
-    for (let r of timeRanges) {
-      all.push(...getAllInsights(utilizationRate, teamSize, activeProjects, r));
-    }
-    insights = all.filter(
-      (insight, idx, arr) =>
-        arr.findIndex((i) => i.title === insight.title) === idx
-    );
-    if (insights.length < 8) {
-      const additional = [];
-      let i = 0;
-      while (additional.length + insights.length < 8) {
-        const baseInsight = insights[i % insights.length];
-        additional.push({
-          ...baseInsight,
-          title: baseInsight.title + " Trend",
-          description: baseInsight.description.replace(/(\d+)/, (match) => 
-            String(Math.max(1, parseInt(match) + Math.floor(Math.random() * 10) - 5))
-          )
-        });
-        i++;
-      }
-      insights = [...insights, ...additional];
-    }
-    insights = insights.slice(0, 8);
-  } catch {
-    return null;
-  }
+  const positions = getRandomPositions();
 
   return (
     <>
       <style>{`
         @keyframes floatGently {
           0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
+          50% { transform: translateY(-10px); }
         }
         @keyframes shimmer {
-          0% { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-          50% { box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
-          100% { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+          0% { box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+          50% { box-shadow: 0 12px 35px rgba(0,0,0,0.15); }
+          100% { box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
         }
         .insight-card {
-          animation: floatGently 3s ease-in-out infinite, shimmer 4s ease-in-out infinite;
+          animation: floatGently 4s ease-in-out infinite, shimmer 5s ease-in-out infinite;
+        }
+        .insight-card:hover {
+          transform: scale(1.15) !important;
+          z-index: 50 !important;
         }
       `}</style>
-      {insights.map((insight, idx) => {
-        const Icon = iconMap[insight.type] || iconMap.info;
-        const styles = insightStyles[insight.type] || insightStyles.default;
-        const kpi = getInsightKPI(insight, { utilizationRate, teamSize, activeProjects });
-        const descriptiveText = getDescriptiveText(insight);
-        const position = floatingPositions[idx] || floatingPositions[0];
+      {predefinedInsights.map((insight, idx) => {
+        const Icon = insight.icon;
+        const styles = insightStyles[insight.color as keyof typeof insightStyles];
+        const position = positions[idx];
+        const cardScale = position.scale * scale;
 
         return (
           <div
             key={insight.title + idx}
-            className={`absolute z-30 insight-card bg-white backdrop-blur-sm border border-white/40 rounded-xl p-4 transition-all duration-300 hover:scale-110 hover:z-40 ${styles.shadow}`}
+            className={`absolute z-30 insight-card ${styles.bg} backdrop-blur-sm border border-gray-200/60 rounded-2xl p-5 transition-all duration-500 hover:scale-125 hover:z-50 ${styles.shadow}`}
             style={{
               ...position,
               animationDelay: animationDelays[idx],
-              transform: `scale(${scale}) ${position.transform || ''}`,
-              width: `${10 * scale}rem`,
-              minHeight: `${4 * scale}rem`,
+              transform: `scale(${cardScale}) ${position.transform || ''}`,
+              width: `${11 * cardScale}rem`,
+              minHeight: `${4.5 * cardScale}rem`,
               pointerEvents: 'auto',
             }}
           >
-            <div className="flex items-center gap-3">
-              {/* Icon with gradient background */}
-              <div className={`flex items-center justify-center rounded-full ${styles.iconBg} p-2`}>
+            <div className="flex items-center gap-4">
+              {/* Icon with circular background */}
+              <div className={`flex items-center justify-center rounded-full ${styles.iconBg} p-3 shadow-sm`}>
                 <Icon 
                   className={`${styles.iconColor}`}
-                  size={Math.round(20 * scale)}
+                  size={Math.round(22 * cardScale)}
+                  strokeWidth={2.5}
                 />
               </div>
               
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className={`text-2xl font-bold ${styles.numberColor} leading-tight`}>
-                  {kpi}
+                <div className={`text-2xl font-bold ${styles.numberColor} leading-tight mb-1`}>
+                  {insight.kpi}
                 </div>
-                <div className={`text-xs ${styles.textColor} leading-tight mt-1`}>
-                  {descriptiveText}
+                <div className={`text-sm ${styles.textColor} leading-tight font-medium`}>
+                  {insight.description}
                 </div>
               </div>
             </div>
