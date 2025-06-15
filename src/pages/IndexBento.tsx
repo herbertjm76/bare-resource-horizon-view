@@ -1,3 +1,4 @@
+
 import Navbar from '../components/landing/Navbar';
 import Footer from '../components/landing/Footer';
 import Hero from '../components/landing/Hero';
@@ -22,13 +23,13 @@ const IndexBento = () => (
     <section className="pt-24 md:pt-32 pb-16 md:pb-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-brand-primary/15 via-white/90 to-pink-100/40 pointer-events-none"></div>
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
-        <div className="flex flex-col md:flex-row gap-10 md:gap-0 min-h-[80vh] items-center">
-          {/* Left: Hero Content */}
-          <div className="w-full md:w-1/3 flex flex-col justify-center items-start md:items-start text-left space-y-7 md:pr-6">
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-8 min-h-[80vh] items-center">
+          {/* Left: Hero Content - 1/3 width */}
+          <div className="w-full lg:w-1/3 flex flex-col justify-center items-start text-left space-y-7 lg:pr-8">
             <div className="inline-flex items-center gap-2 bg-white/30 backdrop-blur px-4 py-2 rounded-full text-sm text-brand-primary font-medium mb-4">
               1,000+ studios elevated
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-brand-primary leading-tight font-sans tracking-tight drop-shadow">
+            <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold text-brand-primary leading-tight font-sans tracking-tight drop-shadow">
               End Resource <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-500 to-blue-300">Chaos</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-700 mb-3 max-w-lg">
@@ -56,17 +57,17 @@ const IndexBento = () => (
             </div>
             <div className="text-sm text-gray-400 mt-4">No credit card required • 2-min setup</div>
           </div>
-          {/* Right: Dashboard Image and Floating Insight Cards */}
-          <div className="w-full md:w-2/3 flex justify-center items-center relative h-[500px] md:h-[600px] px-4 md:px-8">
+          {/* Right: Dashboard Image and Floating Insight Cards - 2/3 width */}
+          <div className="w-full lg:w-2/3 flex justify-center items-center relative h-[600px] lg:h-[700px] xl:h-[750px] px-4 lg:px-0">
             {/* Dashboard Image centered and larger */}
-            <div className="relative z-10 w-full h-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden bg-white/45 border border-brand-primary/10">
+            <div className="relative z-10 w-full h-full max-w-5xl xl:max-w-6xl rounded-3xl shadow-2xl overflow-hidden bg-white/45 border border-brand-primary/10">
               <img
                 src={HERO_DASHBOARD_SRC}
                 alt="Dashboard screenshot"
                 className="object-cover w-full h-full rounded-3xl shadow-2xl"
               />
             </div>
-            {/* 9 Floating insight cards, absolutely positioned */}
+            {/* 5-6 Floating insight cards, absolutely positioned */}
             <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 21 }}>
               <FloatingInsightCards
                 utilizationRate={88}
@@ -80,7 +81,7 @@ const IndexBento = () => (
       </div>
     </section>
     {/* Sticky CTA for mobile */}
-    <div className="fixed inset-x-0 bottom-0 z-40 md:hidden transition-all duration-200">
+    <div className="fixed inset-x-0 bottom-0 z-40 lg:hidden transition-all duration-200">
       <div className="bg-white/95 backdrop-blur-sm border-t border-slate-200 px-4 py-3 flex justify-center items-center shadow-2xl">
         <button
           onClick={() => {

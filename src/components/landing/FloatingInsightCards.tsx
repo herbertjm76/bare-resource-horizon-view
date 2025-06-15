@@ -102,21 +102,19 @@ function getDescriptiveText(insight: any, kpi: string) {
   return title?.length > 20 ? title.substring(0, 20) + "..." : title || "Metric";
 }
 
+// Updated positioning for 6 insights with better distribution
 const floatingPositions = [
-  { top: "8%", left: "5%" },
-  { top: "15%", right: "8%" },
-  { top: "35%", left: "2%" },
-  { top: "45%", right: "12%" },
-  { bottom: "25%", left: "8%" },
-  { bottom: "15%", right: "5%" },
-  { top: "60%", left: "45%" },
-  { bottom: "8%", left: "35%" },
-  { top: "25%", right: "2%" },
+  { top: "8%", left: "3%" },
+  { top: "12%", right: "6%" },
+  { top: "30%", left: "1%" },
+  { top: "38%", right: "8%" },
+  { bottom: "20%", left: "5%" },
+  { bottom: "12%", right: "3%" },
 ];
 
 // Enhanced animation delays for more staggered effect
 const animationDelays = [
-  "0s", "0.3s", "0.6s", "0.9s", "1.2s", "1.5s", "1.8s", "2.1s", "2.4s"
+  "0s", "0.4s", "0.8s", "1.2s", "1.6s", "2.0s"
 ];
 
 export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
@@ -127,25 +125,39 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
 }) => {
   let insights: any[] = [];
   try {
+    // Get insights from multiple time ranges for more variety
     const timeRanges: any[] = ["week", "month", "quarter", "year"];
     const all: any[] = [];
     for (let r of timeRanges) {
       all.push(...getAllInsights(utilizationRate, teamSize, activeProjects, r));
     }
+    
+    // Remove duplicates by title
     insights = all.filter(
       (insight, idx, arr) =>
         arr.findIndex((i) => i.title === insight.title) === idx
     );
-    if (insights.length < 9) {
-      const repeat = [];
+    
+    // If we have fewer than 6 insights, repeat some with slight variations
+    if (insights.length < 6) {
+      const additional = [];
       let i = 0;
-      while (repeat.length + insights.length < 9) {
-        repeat.push(insights[i % insights.length]);
+      while (additional.length + insights.length < 6) {
+        const baseInsight = insights[i % insights.length];
+        additional.push({
+          ...baseInsight,
+          title: baseInsight.title + " Trend",
+          description: baseInsight.description.replace(/(\d+)/, (match) => 
+            String(Math.max(1, parseInt(match) + Math.floor(Math.random() * 10) - 5))
+          )
+        });
         i++;
       }
-      insights = [...insights, ...repeat];
+      insights = [...insights, ...additional];
     }
-    insights = insights.slice(0, 9);
+    
+    // Take exactly 6 insights
+    insights = insights.slice(0, 6);
   } catch {
     return null;
   }
