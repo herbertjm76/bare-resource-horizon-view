@@ -11,6 +11,8 @@ import {
   BarChart3,
   DollarSign,
   Calendar,
+  UserPlus,
+  Briefcase,
 } from "lucide-react";
 
 // Updated color palette to match the reference image
@@ -54,17 +56,25 @@ const insightStyles = {
     textColor: "text-gray-700",
     numberColor: "text-pink-600",
     shadow: "shadow-lg shadow-pink-200/30"
+  },
+  red: {
+    bg: "bg-white",
+    iconBg: "bg-red-100",
+    iconColor: "text-red-600",
+    textColor: "text-gray-700",
+    numberColor: "text-red-600",
+    shadow: "shadow-lg shadow-red-200/30"
   }
 };
 
-// Predefined insights matching the reference image plus 2 additional
+// Updated insights based on user requirements
 const predefinedInsights = [
   {
-    title: "Team Utilization",
-    kpi: "87%",
-    description: "Current capacity",
-    icon: Users,
-    color: "blue"
+    title: "Department Utilization",
+    kpi: "200%",
+    description: "Over capacity",
+    icon: AlertTriangle,
+    color: "red"
   },
   {
     title: "Active Projects",
@@ -74,64 +84,77 @@ const predefinedInsights = [
     color: "purple"
   },
   {
-    title: "Team Members",
+    title: "Project-Resource Ratio",
+    kpi: "1.25:1",
+    description: "Consider hiring",
+    icon: UserPlus,
+    color: "orange"
+  },
+  {
+    title: "Next Quarter",
+    kpi: "Low",
+    description: "Resourcing needed",
+    icon: TrendingUp,
+    color: "blue"
+  },
+  {
+    title: "Available Staff",
     kpi: "12",
-    description: "Available staff",
+    description: "Ready for projects",
     icon: Users,
     color: "green"
   },
   {
-    title: "Revenue Growth",
-    kpi: "+23%",
-    description: "This quarter",
-    icon: TrendingUp,
-    color: "orange"
-  },
-  {
-    title: "Project Efficiency",
-    kpi: "94%",
-    description: "On-time delivery",
-    icon: CheckCircle2,
+    title: "Peak Month Ahead",
+    kpi: "High",
+    description: "Annual leave impact",
+    icon: Calendar,
     color: "pink"
   }
 ];
 
-// Random positioning with more varied placement and sizes
+// Adjusted positioning to stay within frame bounds
 const getRandomPositions = () => [
   { 
-    top: "-120px", 
-    left: "5%", 
-    transform: "translateY(-100%) rotate(-3deg)",
+    top: "-80px", 
+    left: "8%", 
+    transform: "translateY(-100%) rotate(-2deg)",
     scale: 0.9
   },
   { 
-    top: "-80px", 
-    right: "8%", 
-    transform: "translateY(-100%) rotate(2deg)",
-    scale: 1.1
+    top: "-60px", 
+    right: "12%", 
+    transform: "translateY(-100%) rotate(1deg)",
+    scale: 1.0
   },
   { 
-    top: "10%", 
-    left: "-160px", 
-    transform: "translateX(-100%) rotate(-2deg)",
+    top: "15%", 
+    left: "-120px", 
+    transform: "translateX(-100%) rotate(-1deg)",
     scale: 0.85
   },
   { 
     top: "45%", 
-    right: "-140px", 
-    transform: "translateY(-50%) translateX(100%) rotate(1deg)",
+    right: "-100px", 
+    transform: "translateY(-50%) translateX(100%) rotate(2deg)",
     scale: 1.05
   },
   { 
-    bottom: "-100px", 
-    left: "20%", 
-    transform: "translateY(100%) rotate(3deg)",
+    bottom: "-70px", 
+    left: "15%", 
+    transform: "translateY(100%) rotate(1deg)",
     scale: 0.95
+  },
+  { 
+    bottom: "-50px", 
+    right: "20%", 
+    transform: "translateY(100%) rotate(-1deg)",
+    scale: 0.9
   }
 ];
 
 const animationDelays = [
-  "0s", "0.4s", "0.8s", "1.2s", "1.6s"
+  "0s", "0.3s", "0.6s", "0.9s", "1.2s", "1.5s"
 ];
 
 interface FloatingInsightCardsProps {
@@ -156,7 +179,7 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
       <style>{`
         @keyframes floatGently {
           0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
+          50% { transform: translateY(-8px); }
         }
         @keyframes shimmer {
           0% { box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
@@ -180,32 +203,32 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
         return (
           <div
             key={insight.title + idx}
-            className={`absolute z-30 insight-card ${styles.bg} backdrop-blur-sm border border-gray-200/60 rounded-2xl p-5 transition-all duration-500 hover:scale-125 hover:z-50 ${styles.shadow}`}
+            className={`absolute z-30 insight-card ${styles.bg} backdrop-blur-sm border border-gray-200/60 rounded-2xl p-4 transition-all duration-500 hover:scale-125 hover:z-50 ${styles.shadow}`}
             style={{
               ...position,
               animationDelay: animationDelays[idx],
               transform: `scale(${cardScale}) ${position.transform || ''}`,
-              width: `${11 * cardScale}rem`,
-              minHeight: `${4.5 * cardScale}rem`,
+              width: `${10 * cardScale}rem`,
+              minHeight: `${4 * cardScale}rem`,
               pointerEvents: 'auto',
             }}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {/* Icon with circular background */}
-              <div className={`flex items-center justify-center rounded-full ${styles.iconBg} p-3 shadow-sm`}>
+              <div className={`flex items-center justify-center rounded-full ${styles.iconBg} p-2.5 shadow-sm`}>
                 <Icon 
                   className={`${styles.iconColor}`}
-                  size={Math.round(22 * cardScale)}
+                  size={Math.round(20 * cardScale)}
                   strokeWidth={2.5}
                 />
               </div>
               
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className={`text-2xl font-bold ${styles.numberColor} leading-tight mb-1`}>
+                <div className={`text-xl font-bold ${styles.numberColor} leading-tight mb-1`}>
                   {insight.kpi}
                 </div>
-                <div className={`text-sm ${styles.textColor} leading-tight font-medium`}>
+                <div className={`text-xs ${styles.textColor} leading-tight font-medium`}>
                   {insight.description}
                 </div>
               </div>
