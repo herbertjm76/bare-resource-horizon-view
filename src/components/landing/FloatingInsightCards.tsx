@@ -1,26 +1,72 @@
-
 import React from "react";
 import { getAllInsights } from "@/components/dashboard/insights/utils/insightAggregator";
-import { Info, CircleCheck, CircleX, CirclePlus, CircleMinus, ArrowUp, ArrowDown, FilePlus, FileX } from "lucide-react";
+import {
+  Info,
+  CircleCheck,
+  CircleX,
+  CirclePlus,
+  CircleMinus,
+  ArrowUp,
+  ArrowDown,
+  Users,
+} from "lucide-react";
 
-// Available icons mapping to best-match Lucide icons in landing visuals
+// ICONS: only use icons present in allowed list
 const iconMap = {
   info: Info,
   critical: CircleX,
   warning: CircleMinus,
   success: CircleCheck,
+  users: Users,
+  plus: CirclePlus,
+  up: ArrowUp,
+  down: ArrowDown,
 };
 
 interface FloatingInsightCardsProps {
-  // Realistic utilization/size/project values for insight generation
   utilizationRate: number;
   teamSize: number;
   activeProjects: number;
   timeRange: "week" | "month" | "quarter" | "year";
 }
 
+// Demo color mapping and number extraction
+const colorMap = {
+  critical: "text-red-500",
+  warning: "text-yellow-500",
+  success: "text-green-500",
+  info: "text-indigo-500",
+};
+
+// Extract number/KPI from insight or fall back to demo metrics
+function getInsightKPI(
+  insight: any,
+  { utilizationRate, teamSize, activeProjects }: { utilizationRate: number; teamSize: number; activeProjects: number }
+) {
+  // Look for % or # in strings (very basic extraction)
+  const { description, title, category } = insight;
+  const kpiMatch = description?.match(/(\d+(\.\d+)?%?)/)?.[0];
+  if (kpiMatch) return kpiMatch;
+
+  // Fallback: map common titles to hero metrics
+  if (title?.toLowerCase().includes("utilization")) return utilizationRate + "%";
+  if (title?.toLowerCase().includes("team")) return teamSize;
+  if (title?.toLowerCase().includes("project")) return activeProjects;
+  if (category?.toLowerCase().includes("team")) return teamSize;
+  if (category?.toLowerCase().includes("project")) return activeProjects;
+  return "—";
+}
+
+// Remove phrases/descriptions, keep succinct titles (max 3 words)
+function getShortLabel(title: string) {
+  // Usually these are short enough
+  if (title.length <= 22) return title;
+  // Take first 3 words of the title as label
+  const parts = title.split(" ");
+  return parts.slice(0, 3).join(" ");
+}
+
 const floatingPositions = [
-  // These percentages position the cards roughly around a dashboard image.
   { top: "2%", left: "43%" },
   { top: "12%", right: "14%" },
   { top: "22%", left: "13%" },
@@ -36,24 +82,19 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   utilizationRate,
   teamSize,
   activeProjects,
-  timeRange
+  timeRange,
 }) => {
-  // We use getAllInsights to get a list (sorted) of all insight types, not just top 3.
-  // We'll use round-robin of insight-generating logic (for demo purposes).
   let insights: any[] = [];
   try {
-    // Simulate calling for 4 different ranges and combining results uniquely.
     const timeRanges: any[] = ["week", "month", "quarter", "year"];
     const all: any[] = [];
     for (let r of timeRanges) {
       all.push(...getAllInsights(utilizationRate, teamSize, activeProjects, r));
     }
-    // Remove duplicates by title.
     insights = all.filter(
       (insight, idx, arr) =>
         arr.findIndex((i) => i.title === insight.title) === idx
     );
-    // We want 9, if fewer, duplicate up to fill.
     if (insights.length < 9) {
       const repeat = [];
       let i = 0;
@@ -68,41 +109,44 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
     return null;
   }
 
+  // Props to pass for extracting KPI numbers
+  const heroMetrics = { utilizationRate, teamSize, activeProjects };
+
   return (
     <>
       {insights.map((insight, idx) => {
-        // Use color scheme and shadow to float over dashboard image
+        // Icon/type/color
         const Icon = iconMap[insight.type] ?? Info;
+        const color = colorMap[insight.type] || colorMap.info;
+
+        // Condensed KPI + label
+        const number = getInsightKPI(insight, heroMetrics);
+        const shortLabel = getShortLabel(insight.title);
+
         return (
           <div
             key={insight.title + idx}
-            className={`absolute z-20 w-56 max-w-xs min-h-14 transition-transform duration-300 
-              hover:scale-105 shadow-lg rounded-xl bg-white/90 border border-gray-200
-            `}
+            className={`absolute z-20 w-40 min-h-20 transition-transform duration-300
+              hover:scale-105 shadow-lg rounded-xl bg-white/95 border border-gray-100 flex flex-col items-center
+              justify-center
+              px-2 py-2`}
             style={{
               ...floatingPositions[idx],
               boxShadow: "0 4px 32px 0 rgba(120, 100, 240, 0.13)",
               pointerEvents: "auto",
             }}
           >
-            <div className="flex p-3 gap-2 items-start">
-              <div className="shrink-0 mt-1">
-                <Icon className="w-5 h-5"
-                  color={
-                    insight.type === "critical"
-                      ? "#f87171"
-                      : insight.type === "warning"
-                      ? "#eab308"
-                      : insight.type === "success"
-                      ? "#22c55e"
-                      : "#6366f1"
-                  }
-                />
-              </div>
-              <div>
-                <div className="font-semibold text-sm text-gray-900 mb-0.5">{insight.title}</div>
-                <div className="text-xs text-gray-500">{insight.description}</div>
-              </div>
+            {/* Icon */}
+            <div className="mb-1 flex items-center justify-center">
+              <Icon className={`w-7 h-7 ${color} drop-shadow`} />
+            </div>
+            {/* Big Number */}
+            <div className="font-bold text-2xl md:text-3xl text-gray-900 mb-1 text-center">
+              {number}
+            </div>
+            {/* Short Label */}
+            <div className="text-xs font-semibold text-gray-500 text-center truncate px-1">
+              {shortLabel}
             </div>
           </div>
         );
