@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -27,6 +26,7 @@ import FinancialOverview from "./pages/FinancialOverview";
 import ProjectProfitDashboard from "./pages/ProjectProfitDashboard";
 import ProjectBilling from "./pages/ProjectBilling";
 import AgingInvoices from "./pages/AgingInvoices";
+import IndexBento from "./pages/IndexBento";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +39,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/bento" element={<IndexBento />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
