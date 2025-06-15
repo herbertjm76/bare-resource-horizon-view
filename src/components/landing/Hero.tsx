@@ -25,12 +25,12 @@ const Hero = () => {
         relative 
         bg-gradient-to-br from-[#6E59A5] via-[#895CF7] to-[#E64FC4] 
         overflow-hidden
-        h-[380px] sm:h-[410px] lg:h-[440px] 
+        h-[800px] sm:h-[800px] lg:h-[800px] 
         min-h-0
         flex items-center
         pt-8
       "
-      // Removed min-h-[70vh], set to fixed h-[440px] (responsive)
+      // Height updated to fixed 800px on all breakpoints
     >
       <GradientOrbs />
 
