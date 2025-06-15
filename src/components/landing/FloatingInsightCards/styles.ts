@@ -4,48 +4,48 @@ import { InsightStyles } from "./types";
 export const insightStyles: Record<string, InsightStyles> = {
   blue: {
     bg: "bg-white",
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
+    iconBg: "bg-blue-600",
+    iconColor: "text-white",
     textColor: "text-gray-700",
     numberColor: "text-blue-600",
     shadow: "shadow-lg shadow-blue-200/30"
   },
   purple: {
     bg: "bg-white",
-    iconBg: "bg-purple-100",
-    iconColor: "text-purple-600",
+    iconBg: "bg-purple-600",
+    iconColor: "text-white",
     textColor: "text-gray-700",
     numberColor: "text-purple-600",
     shadow: "shadow-lg shadow-purple-200/30"
   },
   green: {
     bg: "bg-white",
-    iconBg: "bg-green-100",
-    iconColor: "text-green-600",
+    iconBg: "bg-green-600",
+    iconColor: "text-white",
     textColor: "text-gray-700",
     numberColor: "text-green-600",
     shadow: "shadow-lg shadow-green-200/30"
   },
   orange: {
     bg: "bg-white",
-    iconBg: "bg-orange-100",
-    iconColor: "text-orange-600",
+    iconBg: "bg-orange-600",
+    iconColor: "text-white",
     textColor: "text-gray-700",
     numberColor: "text-orange-600",
     shadow: "shadow-lg shadow-orange-200/30"
   },
   pink: {
     bg: "bg-white",
-    iconBg: "bg-pink-100",
-    iconColor: "text-pink-600",
+    iconBg: "bg-pink-600",
+    iconColor: "text-white",
     textColor: "text-gray-700",
     numberColor: "text-pink-600",
     shadow: "shadow-lg shadow-pink-200/30"
   },
   red: {
     bg: "bg-white",
-    iconBg: "bg-red-100",
-    iconColor: "text-red-600",
+    iconBg: "bg-red-600",
+    iconColor: "text-white",
     textColor: "text-gray-700",
     numberColor: "text-red-600",
     shadow: "shadow-lg shadow-red-200/30"
