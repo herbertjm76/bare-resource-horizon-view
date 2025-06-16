@@ -1,3 +1,4 @@
+
 import { TrendingUp, Users, Calendar, Clock, Target, CheckCircle } from "lucide-react";
 import { InsightData, CardPosition } from "./types";
 
@@ -50,7 +51,7 @@ export const predefinedInsights: InsightData[] = [
   }
 ];
 
-// Positioning to keep cards within the dashboard illustration bounds like the reference image
+// Positioning cards to extend beyond the main visual area for dynamic effect
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -61,29 +62,29 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Tablet positioning - keeping cards closer to center within dashboard bounds
+    // Tablet positioning - extending beyond dashboard bounds
     return [
-      // Top left - within dashboard area
-      { top: '18%', left: '8%', scale: 0.75, transform: 'rotate(-2deg)' },
-      // Top right - within dashboard area
-      { top: '15%', right: '12%', scale: 0.8, transform: 'rotate(1deg)' },
-      // Bottom left - within dashboard area
-      { bottom: '20%', left: '10%', scale: 0.75, transform: 'rotate(-1deg)' },
-      // Bottom right - within dashboard area
-      { bottom: '25%', right: '15%', scale: 0.8, transform: 'rotate(2deg)' }
+      // Far top left - extending beyond
+      { top: '5%', left: '2%', scale: 0.7, transform: 'rotate(-3deg)' },
+      // Far top right - extending beyond
+      { top: '8%', right: '1%', scale: 0.75, transform: 'rotate(2deg)' },
+      // Far bottom left - extending beyond
+      { bottom: '10%', left: '1%', scale: 0.7, transform: 'rotate(-2deg)' },
+      // Far bottom right - extending beyond
+      { bottom: '5%', right: '3%', scale: 0.75, transform: 'rotate(3deg)' }
     ];
   }
   
-  // Desktop positioning - matching reference image exactly, keeping within dashboard bounds
+  // Desktop positioning - cards extending well beyond the main visual area
   return [
-    // Top left area - positioned within the dashboard illustration
-    { top: '20%', left: '8%', scale: 0.85, transform: 'rotate(-2deg)' },
-    // Top right area - positioned within the dashboard illustration
-    { top: '18%', right: '10%', scale: 0.9, transform: 'rotate(1deg)' },
-    // Bottom left area - positioned within the dashboard illustration
-    { bottom: '25%', left: '12%', scale: 0.8, transform: 'rotate(-1deg)' },
-    // Bottom right area - positioned within the dashboard illustration
-    { bottom: '30%', right: '15%', scale: 0.85, transform: 'rotate(2deg)' }
+    // Far top left - well outside the dashboard area
+    { top: '8%', left: '1%', scale: 0.8, transform: 'rotate(-3deg)' },
+    // Far top right - well outside the dashboard area
+    { top: '12%', right: '2%', scale: 0.85, transform: 'rotate(2deg)' },
+    // Far bottom left - well outside the dashboard area
+    { bottom: '15%', left: '2%', scale: 0.75, transform: 'rotate(-2deg)' },
+    // Far bottom right - well outside the dashboard area
+    { bottom: '8%', right: '1%', scale: 0.8, transform: 'rotate(3deg)' }
   ];
 };
 
