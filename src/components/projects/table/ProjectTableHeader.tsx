@@ -25,33 +25,27 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
         {office_stages.map((stage) => (
           <TableHead 
             key={stage.id}
-            className="text-center px-3 py-4 min-w-[80px]"
+            className="text-center px-2 py-4 min-w-[100px]"
             style={{ backgroundColor: '#6465F0' }}
           >
             <div className="flex flex-col items-center justify-center h-full">
               <div 
-                className="w-8 h-8 rounded-lg flex items-center justify-center mb-1"
+                className="px-3 py-2 rounded-lg flex items-center justify-center"
                 style={{ 
                   backgroundColor: stage.color || '#E5DEFF',
                   border: '1px solid rgba(255, 255, 255, 0.2)'
                 }}
               >
                 <span 
-                  className="text-xs font-semibold"
+                  className="text-xs font-semibold whitespace-nowrap"
                   style={{ 
                     color: '#212172',
                     fontSize: '11px'
                   }}
                 >
-                  {stage.name.charAt(0).toUpperCase()}
+                  {stage.name}
                 </span>
               </div>
-              <span 
-                className="text-white whitespace-nowrap text-xs font-medium"
-                style={{ fontSize: '11px' }}
-              >
-                {stage.name}
-              </span>
             </div>
           </TableHead>
         ))}
