@@ -62,13 +62,15 @@ export const InsightCard: React.FC<InsightCardProps> = ({
             </div>
             <div className="flex-1 min-w-0">
               <div className={`text-sm font-bold ${styles.numberColor} leading-tight truncate`}>
-                {insight.kpi}
+                {insight.kpi || insight.title}
               </div>
             </div>
           </div>
-          <div className={`text-xs ${styles.textColor} font-medium pl-7 leading-tight`}>
-            {insight.description}
-          </div>
+          {insight.description && (
+            <div className={`text-xs ${styles.textColor} font-medium pl-7 leading-tight`}>
+              {insight.description}
+            </div>
+          )}
         </div>
       )}
     </div>
