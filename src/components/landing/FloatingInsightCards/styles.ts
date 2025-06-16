@@ -18,6 +18,14 @@ export const insightStyles: Record<string, InsightStyles> = {
     numberColor: "text-purple-600",
     shadow: "shadow-md shadow-purple-100/30"
   },
+  green: {
+    bg: "bg-white",
+    iconBg: "bg-green-500",
+    iconColor: "text-white",
+    textColor: "text-slate-600",
+    numberColor: "text-green-600",
+    shadow: "shadow-md shadow-green-100/30"
+  },
   emerald: {
     bg: "bg-white",
     iconBg: "bg-emerald-500",
@@ -25,6 +33,14 @@ export const insightStyles: Record<string, InsightStyles> = {
     textColor: "text-slate-600",
     numberColor: "text-emerald-600",
     shadow: "shadow-md shadow-emerald-100/30"
+  },
+  yellow: {
+    bg: "bg-white",
+    iconBg: "bg-yellow-500",
+    iconColor: "text-white",
+    textColor: "text-slate-600",
+    numberColor: "text-yellow-600",
+    shadow: "shadow-md shadow-yellow-100/30"
   },
   orange: {
     bg: "bg-white",

@@ -17,9 +17,16 @@ export const InsightCard: React.FC<InsightCardProps> = ({
   scale,
 }) => {
   const Icon = insight.icon;
-  const styles = insightStyles[insight.color as keyof typeof insightStyles];
+  const styles = insightStyles[insight.color as keyof typeof insightStyles] || insightStyles.blue;
   const cardScale = position.scale * scale;
   const isOneLiner = !insight.hasSubtitle;
+
+  console.log("InsightCard rendering:", {
+    title: insight.title,
+    color: insight.color,
+    stylesFound: !!styles,
+    hasSubtitle: insight.hasSubtitle
+  });
 
   return (
     <div
