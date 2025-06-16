@@ -1,4 +1,3 @@
-
 import { TrendingUp, Users, Calendar, Clock, Target, CheckCircle } from "lucide-react";
 import { InsightData, CardPosition } from "./types";
 
@@ -51,7 +50,7 @@ export const predefinedInsights: InsightData[] = [
   }
 ];
 
-// Positioning to match the reference image locations
+// Positioning to keep cards within the dashboard illustration bounds like the reference image
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -62,29 +61,29 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Tablet positioning - matching reference image proportions
+    // Tablet positioning - keeping cards closer to center within dashboard bounds
     return [
-      // Top left area (utilization card)
-      { top: '12%', left: '4%', scale: 0.8, transform: 'rotate(-2deg)' },
-      // Top right area (trend chart)
-      { top: '8%', right: '5%', scale: 0.85, transform: 'rotate(1deg)' },
-      // Bottom left area (projects in progress)
-      { bottom: '12%', left: '6%', scale: 0.8, transform: 'rotate(-1deg)' },
-      // Bottom right area (on track status)
-      { bottom: '15%', right: '8%', scale: 0.85, transform: 'rotate(2deg)' }
+      // Top left - within dashboard area
+      { top: '18%', left: '8%', scale: 0.75, transform: 'rotate(-2deg)' },
+      // Top right - within dashboard area
+      { top: '15%', right: '12%', scale: 0.8, transform: 'rotate(1deg)' },
+      // Bottom left - within dashboard area
+      { bottom: '20%', left: '10%', scale: 0.75, transform: 'rotate(-1deg)' },
+      // Bottom right - within dashboard area
+      { bottom: '25%', right: '15%', scale: 0.8, transform: 'rotate(2deg)' }
     ];
   }
   
-  // Desktop positioning - matching reference image exactly
+  // Desktop positioning - matching reference image exactly, keeping within dashboard bounds
   return [
-    // Top left area (87% utilization card position)
-    { top: '15%', left: '3%', scale: 0.9, transform: 'rotate(-2deg)' },
-    // Top right area (trend chart position)
-    { top: '10%', right: '4%', scale: 0.95, transform: 'rotate(1deg)' },
-    // Bottom left area (15 projects card position)
-    { bottom: '18%', left: '5%', scale: 0.85, transform: 'rotate(-1deg)' },
-    // Bottom right area (on track status position)
-    { bottom: '20%', right: '6%', scale: 0.9, transform: 'rotate(2deg)' }
+    // Top left area - positioned within the dashboard illustration
+    { top: '20%', left: '8%', scale: 0.85, transform: 'rotate(-2deg)' },
+    // Top right area - positioned within the dashboard illustration
+    { top: '18%', right: '10%', scale: 0.9, transform: 'rotate(1deg)' },
+    // Bottom left area - positioned within the dashboard illustration
+    { bottom: '25%', left: '12%', scale: 0.8, transform: 'rotate(-1deg)' },
+    // Bottom right area - positioned within the dashboard illustration
+    { bottom: '30%', right: '15%', scale: 0.85, transform: 'rotate(2deg)' }
   ];
 };
 
