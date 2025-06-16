@@ -44,10 +44,19 @@ export const CountriesTab = () => {
       setIsSubmitting(true);
       let success = false;
       
+      // Convert form values to match the expected API format
+      const areaData = {
+        code: values.code,
+        country: values.country,
+        region: values.region || "",
+        city: values.city || "",
+        color: values.color,
+      };
+      
       if (editingArea) {
-        success = await updateArea(editingArea.id, values);
+        success = await updateArea(editingArea.id, areaData);
       } else {
-        success = await addArea(values);
+        success = await addArea(areaData);
       }
 
       if (success) {

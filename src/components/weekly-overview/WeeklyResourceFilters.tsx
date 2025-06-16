@@ -55,7 +55,7 @@ export const WeeklyResourceFilters: React.FC<WeeklyResourceFiltersProps> = ({
         <SelectContent>
           <SelectItem value="all">All Offices</SelectItem>
           {officeLocations
-            .filter(office => office.code && office.code !== "")
+            .filter(office => office.code && office.code.trim() !== "")
             .map(office => (
               <SelectItem key={office.id} value={office.code}>
                 {office.code} - {office.city}, {office.country}
