@@ -51,7 +51,7 @@ export const predefinedInsights: InsightData[] = [
   }
 ];
 
-// Balanced positioning inspired by the reference image
+// Distributed positioning around the edges
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -62,28 +62,32 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Tablet positioning with better balance and spacing
+    // Tablet positioning - 4 cards distributed around edges
     return [
-      { top: '6%', left: '4%', scale: 0.8, transform: 'rotate(-3deg)' },
-      { top: '12%', right: '6%', scale: 0.85, transform: 'rotate(2deg)' },
-      { bottom: '35%', left: '8%', scale: 0.75, transform: 'rotate(-2deg)' },
-      { bottom: '18%', right: '10%', scale: 0.8, transform: 'rotate(3deg)' },
-      { top: '42%', left: '2%', scale: 0.7, transform: 'rotate(1deg)' },
-      { top: '58%', right: '4%', scale: 0.75, transform: 'rotate(-2deg)' }
+      // Top left
+      { top: '8%', left: '3%', scale: 0.85, transform: 'rotate(-2deg)' },
+      // Lower right  
+      { bottom: '25%', right: '4%', scale: 0.8, transform: 'rotate(2deg)' },
+      // Bottom left edge
+      { bottom: '8%', left: '6%', scale: 0.75, transform: 'rotate(-1deg)' },
+      // Bottom right edge
+      { bottom: '6%', right: '8%', scale: 0.8, transform: 'rotate(1deg)' }
     ];
   }
   
-  // Desktop positioning with improved balance matching reference image
+  // Desktop positioning - distributed around all edges
   return [
-    { top: '8%', left: '4%', scale: 0.9, transform: 'rotate(-3deg)' },
-    { top: '6%', right: '8%', scale: 0.95, transform: 'rotate(2deg)' },
-    { bottom: '38%', left: '3%', scale: 0.85, transform: 'rotate(-2deg)' },
-    { bottom: '22%', right: '6%', scale: 0.9, transform: 'rotate(3deg)' },
-    { top: '32%', left: '1%', scale: 0.8, transform: 'rotate(1deg)' },
-    { top: '48%', right: '2%', scale: 0.85, transform: 'rotate(-2deg)' }
+    // Top left
+    { top: '10%', left: '2%', scale: 0.9, transform: 'rotate(-3deg)' },
+    // Lower right (middle-right area)
+    { bottom: '30%', right: '3%', scale: 0.85, transform: 'rotate(2deg)' },
+    // Bottom left edge
+    { bottom: '8%', left: '5%', scale: 0.8, transform: 'rotate(-1deg)' },
+    // Bottom right edge
+    { bottom: '6%', right: '6%', scale: 0.85, transform: 'rotate(1deg)' }
   ];
 };
 
 export const getRandomAnimationDelays = (): string[] => {
-  return ['0.8s', '1.2s', '1.6s', '2.0s', '2.4s', '2.8s'];
+  return ['0.8s', '1.2s', '1.6s', '2.0s'];
 };

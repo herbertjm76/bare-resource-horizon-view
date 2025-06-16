@@ -25,10 +25,13 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
     return null;
   }
 
+  // Only render 4 cards to match the new distributed layout
+  const cardsToShow = predefinedInsights.slice(0, 4);
+
   return (
     <>
       <style>{globalStyles}</style>
-      {predefinedInsights.slice(0, positions.length).map((insight, idx) => {
+      {cardsToShow.map((insight, idx) => {
         console.log("Rendering insight:", insight.title, "hasSubtitle:", insight.hasSubtitle);
         return (
           <InsightCard
