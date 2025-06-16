@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,8 +48,8 @@ export const StagesTab: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { company } = useCompany();
-  const [currentStage, setCurrentStage] = useState('');
-  const [editCurrentStage, setEditCurrentStage] = useState('');
+  const [currentStage, setCurrentStage] = useState('none');
+  const [editCurrentStage, setEditCurrentStage] = useState('none');
   const [availableStages, setAvailableStages] = useState<string[]>([]);
 
   React.useEffect(() => {
@@ -112,7 +113,7 @@ export const StagesTab: React.FC = () => {
           color: newColor,
           order_index: nextOrderIndex,
           company_id: company.id,
-          current_stage: currentStage || null
+          current_stage: currentStage === 'none' ? null : currentStage
         })
         .select();
       
@@ -122,7 +123,7 @@ export const StagesTab: React.FC = () => {
         setStages([...stages, data[0]]);
         setNewStage('');
         setNewColor(defaultStageColor);
-        setCurrentStage('');
+        setCurrentStage('none');
         setDialogOpen(false);
         toast.success('Stage added successfully');
       }
@@ -141,7 +142,7 @@ export const StagesTab: React.FC = () => {
         .update({
           name: editName.trim(),
           color: editColor,
-          current_stage: editCurrentStage || null
+          current_stage: editCurrentStage === 'none' ? null : editCurrentStage
         })
         .eq('id', editId);
       
@@ -153,7 +154,7 @@ export const StagesTab: React.FC = () => {
               ...stage, 
               name: editName.trim(), 
               color: editColor,
-              current_stage: editCurrentStage || null
+              current_stage: editCurrentStage === 'none' ? null : editCurrentStage
             }
           : stage
       ));
@@ -191,7 +192,7 @@ export const StagesTab: React.FC = () => {
     setEditId(stage.id);
     setEditName(stage.name);
     setEditColor(stage.color || defaultStageColor);
-    setEditCurrentStage(stage.current_stage || '');
+    setEditCurrentStage(stage.current_stage || 'none');
     setEditDialogOpen(true);
   };
 
@@ -278,7 +279,7 @@ export const StagesTab: React.FC = () => {
                   <SelectValue placeholder="Select current stage" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {availableStages.map((stageName) => (
                     <SelectItem key={stageName} value={stageName}>
                       {stageName}
@@ -330,7 +331,7 @@ export const StagesTab: React.FC = () => {
                   <SelectValue placeholder="Select current stage" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {availableStages.map((stageName) => (
                     <SelectItem key={stageName} value={stageName}>
                       {stageName}
