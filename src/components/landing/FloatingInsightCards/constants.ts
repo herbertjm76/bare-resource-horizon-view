@@ -88,15 +88,15 @@ export const getRandomPositions = (): CardPosition[] => [
     scale: 0.8
   },
   { 
-    bottom: "-65px", 
+    bottom: "-20px", 
     left: "15%", 
-    transform: "translateY(50%) rotate(1deg)",
+    transform: "translateY(30%) rotate(1deg)",
     scale: 0.88
   },
   { 
-    bottom: "-60px", 
+    bottom: "-20px", 
     right: "18%", 
-    transform: "translateY(50%) rotate(-1.5deg)",
+    transform: "translateY(30%) rotate(-1.5deg)",
     scale: 0.92
   }
 ];
