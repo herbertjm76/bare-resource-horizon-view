@@ -27,14 +27,14 @@ export const ProjectLocationInfo: React.FC<ProjectLocationInfoProps> = ({
         <Label htmlFor="country" className="flex items-center gap-1">
           <MapPin className="w-4 h-4" />Country
         </Label>
-        <Select value={country} onValueChange={onCountryChange} required>
+        <Select value={country || "no_country"} onValueChange={(value) => onCountryChange(value === "no_country" ? "" : value)} required>
           <SelectTrigger>
             <SelectValue placeholder="Select a country" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">Select a country</SelectItem>
+            <SelectItem value="no_country">Select a country</SelectItem>
             {countries
-              .filter((c) => c && c !== "")
+              .filter((c) => c && c.trim() !== "")
               .map((country) => (
                 <SelectItem key={country} value={country}>{country}</SelectItem>
               ))}
@@ -45,21 +45,24 @@ export const ProjectLocationInfo: React.FC<ProjectLocationInfoProps> = ({
         <Label htmlFor="office" className="flex items-center gap-1">
           <Building className="w-4 h-4" />Office
         </Label>
-        <Select value={office} onValueChange={onOfficeChange} required>
+        <Select value={office || "no_office"} onValueChange={(value) => onOfficeChange(value === "no_office" ? "" : value)} required>
           <SelectTrigger>
             <SelectValue placeholder="Select an office" />
           </SelectTrigger>
           <SelectContent className="bg-white">
             {offices.length > 0 ? (
-              offices
-                .filter((office) => office.id && office.id !== "")
-                .map((office) => (
-                  <SelectItem key={office.id} value={office.id}>
-                    {office.emoji ? `${office.emoji} ` : ''}{office.city}, {office.country}
-                  </SelectItem>
-                ))
+              <>
+                <SelectItem value="no_office">Select an office</SelectItem>
+                {offices
+                  .filter((office) => office.id && office.id.trim() !== "")
+                  .map((office) => (
+                    <SelectItem key={office.id} value={office.id}>
+                      {office.emoji ? `${office.emoji} ` : ''}{office.city}, {office.country}
+                    </SelectItem>
+                  ))}
+              </>
             ) : (
-              <SelectItem value="no-options" disabled>No offices available</SelectItem>
+              <SelectItem value="no_office_available" disabled>No offices available</SelectItem>
             )}
           </SelectContent>
         </Select>
