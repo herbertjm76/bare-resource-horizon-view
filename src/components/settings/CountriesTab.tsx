@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -23,6 +24,8 @@ export const CountriesTab = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingArea, setEditingArea] = useState<ProjectArea | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
   const { areas, loading, addArea, updateArea, deleteArea } = useProjectAreas();
 
   const form = useForm<ProjectAreaFormValues>({
@@ -41,7 +44,6 @@ export const CountriesTab = () => {
       setIsSubmitting(true);
       let success = false;
       
-      // Convert form values to match the expected API format
       const areaData = {
         code: values.code,
         country: values.country,
@@ -87,6 +89,26 @@ export const CountriesTab = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedAreas.length === 0) return;
+    
+    if (window.confirm(`Are you sure you want to delete ${selectedAreas.length} project area(s)?`)) {
+      for (const areaId of selectedAreas) {
+        await deleteArea(areaId);
+      }
+      setSelectedAreas([]);
+      setEditMode(false);
+    }
+  };
+
+  const handleSelectArea = (areaId: string) => {
+    setSelectedAreas(prev => 
+      prev.includes(areaId) 
+        ? prev.filter(id => id !== areaId)
+        : [...prev, areaId]
+    );
+  };
+
   const handleOpenChange = (open: boolean) => {
     setShowForm(open);
     if (!open) {
@@ -123,20 +145,50 @@ export const CountriesTab = () => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle>Project Areas</CardTitle>
-        <Button 
-          size="sm" 
-          onClick={handleAddNew}
-          disabled={showForm}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Area
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            size="sm" 
+            variant={editMode ? "secondary" : "outline"}
+            onClick={() => {
+              setEditMode(!editMode);
+              setSelectedAreas([]);
+            }}
+            disabled={showForm}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            {editMode ? "Done" : "Edit"}
+          </Button>
+          <Button 
+            size="sm" 
+            onClick={handleAddNew}
+            disabled={showForm}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Area
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
             Manage project areas or countries where your company operates. These can be used to categorize and organize your projects.
           </div>
+          
+          {editMode && selectedAreas.length > 0 && (
+            <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+              <span className="text-sm text-muted-foreground">
+                {selectedAreas.length} area(s) selected
+              </span>
+              <Button 
+                size="sm" 
+                variant="destructive"
+                onClick={handleBulkDelete}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete Selected
+              </Button>
+            </div>
+          )}
           
           <ProjectAreaForm
             open={showForm}
@@ -151,6 +203,9 @@ export const CountriesTab = () => {
             areas={areas}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            editMode={editMode}
+            selectedAreas={selectedAreas}
+            onSelectArea={handleSelectArea}
           />
         </div>
       </CardContent>

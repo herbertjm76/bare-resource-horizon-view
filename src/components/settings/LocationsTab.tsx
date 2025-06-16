@@ -1,283 +1,174 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Edit, Trash2, Loader2 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus, Edit, Trash2, Check, X } from "lucide-react";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
-import { allCountries } from "@/lib/countries";
-import CountrySelect from "@/components/ui/CountrySelect";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { ItemActions } from './common/ItemActions';
+import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
-const customIconList = [
-  "❤️", "🧡", "💛", "💚", "💙", "💜", "🩷", "🤍", "🖤", "🤎",
-  "🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "🟤", "⚫", "⚪",
-  "⬛", "⬜", "🟦", "🟩", "🟨", "🟧", "🟪", "🟫",
-  "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐸",
-  "🍏", "🍎", "🍐", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🍒", "🥝", "🍍", "🥭", "🥥",
-  "🥦", "🥒", "🥕", "🌽", "🍆", "🥔", "🍠", "🧅", "🧄", "🌶️", "🥬", "🍄", "🥗",
-  "🚕", "🚗", "🚙", "🚌", "🚎", "🏎️", "🚓", "🚑", "🚒", "🚐", "🚚", "🚛", "🚜", "🏍️", "🛵", "🚲", "🛴", "🚂", "✈️", "🚀", "🚁"
-];
-
-const flagEmoji = (countryCode: string) =>
-  countryCode && countryCode.length === 2
-    ? String.fromCodePoint(...[...countryCode.toUpperCase()].map(c => 127397 + c.charCodeAt(0)))
-    : null;
-
-const formSchema = z.object({
-  city: z.string().min(1, "City is required"),
-  code: z.string().length(2, "Country code is required"),
-  country: z.string().min(1, "Country is required"),
-  emoji: z.string().optional()
-});
-type LocationFormValues = z.infer<typeof formSchema>;
-
-type Location = {
-  id: string;
+interface LocationFormData {
+  code: string;
   city: string;
   country: string;
-  code: string;
-  emoji?: string;
-  company_id: string;
-};
+  emoji: string;
+}
 
 export const LocationsTab = () => {
-  const { locations, setLocations, loading: contextLoading } = useOfficeSettings();
+  const { locations, setLocations, loading } = useOfficeSettings();
   const { company } = useCompany();
-  const [open, setOpen] = useState(false);
-  const [editingLocation, setEditingLocation] = useState<Location | null>(null);
   const [editMode, setEditMode] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [pickerTargetId, setPickerTargetId] = useState<string | null>(null);
-
-  const fetchLocations = async () => {
-    if (!company) return;
-    
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('office_locations')
-        .select('*')
-        .eq('company_id', company.id);
-        
-      if (error) throw error;
-      
-      console.log("Fetched locations:", data);
-      if (data) {
-        setLocations(data);
-      }
-    } catch (error) {
-      console.error("Error fetching locations:", error);
-      toast.error("Failed to load locations");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (company) {
-      fetchLocations();
-    }
-  }, [company]);
-
-  const form = useForm<LocationFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      city: "",
-      code: "",
-      country: "",
-      emoji: "",
-    }
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [editingLocation, setEditingLocation] = useState<any>(null);
+  const [formData, setFormData] = useState<LocationFormData>({
+    code: '',
+    city: '',
+    country: '',
+    emoji: ''
   });
 
-  const handleEdit = (location: Location) => {
-    setEditingLocation(location);
-    form.reset({
-      city: location.city,
-      code: location.code,
-      country: location.country,
-      emoji: location.emoji || "",
-    });
-    setOpen(true);
-  };
-
-  const handleSelect = (id: string) => {
-    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  };
-
-  const handleDeleteLocation = async (id: string) => {
-    if (!company) {
-      toast.error('No company selected');
+  const handleSubmit = async () => {
+    if (!company || !formData.code || !formData.city || !formData.country) {
+      toast.error('Please fill in all required fields');
       return;
     }
-    
+
+    try {
+      if (editingLocation) {
+        const { error } = await supabase
+          .from('office_locations')
+          .update(formData)
+          .eq('id', editingLocation.id);
+
+        if (error) throw error;
+
+        setLocations(locations.map(loc => 
+          loc.id === editingLocation.id ? { ...loc, ...formData } : loc
+        ));
+        toast.success('Location updated successfully');
+      } else {
+        const { data, error } = await supabase
+          .from('office_locations')
+          .insert([{ ...formData, company_id: company.id }])
+          .select();
+
+        if (error) throw error;
+
+        if (data && data[0]) {
+          setLocations([...locations, data[0]]);
+          toast.success('Location added successfully');
+        }
+      }
+
+      setShowForm(false);
+      setEditingLocation(null);
+      setFormData({ code: '', city: '', country: '', emoji: '' });
+    } catch (error: any) {
+      toast.error(`Error saving location: ${error.message}`);
+    }
+  };
+
+  const handleEdit = (location: any) => {
+    setEditingLocation(location);
+    setFormData({
+      code: location.code,
+      city: location.city,
+      country: location.country,
+      emoji: location.emoji || ''
+    });
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this location?')) return;
+
     try {
       const { error } = await supabase
         .from('office_locations')
         .delete()
         .eq('id', id);
-      
+
       if (error) throw error;
-      
-      setLocations(locations.filter(location => location.id !== id));
+
+      setLocations(locations.filter(loc => loc.id !== id));
       toast.success('Location deleted successfully');
-    } catch (error) {
-      console.error('Error deleting location:', error);
-      toast.error('Failed to delete location');
+    } catch (error: any) {
+      toast.error(`Error deleting location: ${error.message}`);
     }
   };
 
   const handleBulkDelete = async () => {
-    if (!company || selected.length === 0) return;
+    if (selectedLocations.length === 0) return;
     
-    setLoading(true);
+    if (!confirm(`Are you sure you want to delete ${selectedLocations.length} location(s)?`)) return;
+
     try {
       const { error } = await supabase
         .from('office_locations')
         .delete()
-        .in('id', selected);
-        
+        .in('id', selectedLocations);
+
       if (error) throw error;
-      
-      setLocations(locations.filter(row => !selected.includes(row.id)));
-      setSelected([]);
+
+      setLocations(locations.filter(loc => !selectedLocations.includes(loc.id)));
+      setSelectedLocations([]);
       setEditMode(false);
-      toast.success("Locations deleted successfully");
-    } catch (error) {
-      console.error("Error deleting locations:", error);
-      toast.error("Failed to delete locations");
-    } finally {
-      setLoading(false);
+      toast.success('Locations deleted successfully');
+    } catch (error: any) {
+      toast.error(`Error deleting locations: ${error.message}`);
     }
   };
 
-  const onOpenChange = (open: boolean) => {
-    setOpen(open);
-    if (!open) {
-      form.reset();
-      setEditingLocation(null);
-    }
+  const handleSelectLocation = (locationId: string) => {
+    setSelectedLocations(prev => 
+      prev.includes(locationId) 
+        ? prev.filter(id => id !== locationId)
+        : [...prev, locationId]
+    );
   };
 
-  const openPicker = (id: string) => {
-    setPickerTargetId(id);
-    setPickerOpen(true);
-  };
-
-  const handlePickerSelect = async (emoji: string) => {
-    if (!pickerTargetId || !company) {
-      setPickerOpen(false);
-      return;
-    }
-    
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from('office_locations')
-        .update({ emoji })
-        .eq('id', pickerTargetId);
-        
-      if (error) throw error;
-      
-      setLocations(
-        locations.map(loc =>
-          loc.id === pickerTargetId
-            ? { ...loc, emoji }
-            : loc
-        )
-      );
-      toast.success("Icon updated successfully");
-    } catch (error) {
-      console.error("Error updating location icon:", error);
-      toast.error("Failed to update icon");
-    } finally {
-      setLoading(false);
-      setPickerOpen(false);
-      setPickerTargetId(null);
-    }
-  };
-
-  const onSubmit = async (values: LocationFormValues) => {
-    if (!company) {
-      console.error("No company selected");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const flag = flagEmoji(values.code) || "";
-      
-      const locationData = {
-        city: values.city,
-        code: values.code,
-        country: values.country,
-        emoji: flag,
-        company_id: company.id
-      };
-
-      if (editingLocation) {
-        const { error } = await supabase
-          .from('office_locations')
-          .update(locationData)
-          .eq('id', editingLocation.id);
-          
-        if (error) throw error;
-        
-        setLocations(locations.map(row => 
-          row.id === editingLocation.id 
-            ? { ...locationData, id: editingLocation.id } 
-            : row
-        ));
-        toast.success("Location updated successfully");
-      } else {
-        const { data, error } = await supabase
-          .from('office_locations')
-          .insert(locationData)
-          .select();
-          
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-          setLocations([...locations, data[0]]);
-          toast.success("Location added successfully");
-        }
-      }
-    } catch (error) {
-      console.error("Error saving location:", error);
-      toast.error("Failed to save location");
-    } finally {
-      setLoading(false);
-      setOpen(false);
-      form.reset();
-      setEditingLocation(null);
-    }
-  };
-
-  const isLoading = loading || contextLoading;
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center">
+            <div className="text-muted-foreground">Loading locations...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
-        <CardTitle>Locations</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle>Office Locations</CardTitle>
         <div className="flex gap-2">
-          <Button size="sm" onClick={() => setOpen(true)}>
+          <Button 
+            size="sm" 
+            variant={editMode ? "secondary" : "outline"}
+            onClick={() => {
+              setEditMode(!editMode);
+              setSelectedLocations([]);
+            }}
+            disabled={showForm}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            {editMode ? "Done" : "Edit"}
+          </Button>
+          <Button 
+            size="sm" 
+            onClick={() => {
+              setEditingLocation(null);
+              setFormData({ code: '', city: '', country: '', emoji: '' });
+              setShowForm(true);
+            }}
+            disabled={showForm}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Add Location
           </Button>
@@ -285,138 +176,138 @@ export const LocationsTab = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="text-sm text-muted-foreground mb-4">
-            Manage your office locations. Each location consists of a city and a country.
+          <div className="text-sm text-muted-foreground">
+            Define office locations where your team members are based.
           </div>
-          
-          {isLoading ? (
-            <div className="flex justify-center items-center p-8">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+
+          {editMode && selectedLocations.length > 0 && (
+            <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+              <span className="text-sm text-muted-foreground">
+                {selectedLocations.length} location(s) selected
+              </span>
+              <Button 
+                size="sm" 
+                variant="destructive"
+                onClick={handleBulkDelete}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete Selected
+              </Button>
             </div>
-          ) : locations.length > 0 ? (
-            <div className="grid gap-4">
-              {locations.map((row) => (
-                <div
-                  key={row.id}
-                  className="flex items-center justify-between p-3 border rounded-md group hover:bg-accent/50 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      className="text-2xl focus:outline-none hover:scale-110 transition-transform"
-                      title="Click to change icon"
-                      onClick={() => openPicker(row.id)}
-                    >
-                      {row.emoji || flagEmoji(row.code)}
-                    </button>
-                    <span className="font-medium">
-                      {row.city}, {row.country} 
-                      <span className="text-xs text-muted-foreground ml-1">({row.code})</span>
-                    </span>
-                  </div>
-                  
-                  <ItemActions 
-                    onDelete={() => handleDeleteLocation(row.id)}
-                    showDelete={true}
-                    onEdit={() => handleEdit(row)}
+          )}
+
+          {showForm && (
+            <div className="border rounded-lg p-4 space-y-4">
+              <h3 className="font-medium">
+                {editingLocation ? 'Edit Location' : 'Add New Location'}
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Code</label>
+                  <Input
+                    value={formData.code}
+                    onChange={(e) => setFormData({...formData, code: e.target.value})}
+                    placeholder="e.g., NYC"
                   />
                 </div>
-              ))}
+                <div>
+                  <label className="text-sm font-medium">Emoji</label>
+                  <Input
+                    value={formData.emoji}
+                    onChange={(e) => setFormData({...formData, emoji: e.target.value})}
+                    placeholder="🏙️"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">City</label>
+                  <Input
+                    value={formData.city}
+                    onChange={(e) => setFormData({...formData, city: e.target.value})}
+                    placeholder="New York"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Country</label>
+                  <Input
+                    value={formData.country}
+                    onChange={(e) => setFormData({...formData, country: e.target.value})}
+                    placeholder="United States"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleSubmit}>
+                  {editingLocation ? 'Update' : 'Add'} Location
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditingLocation(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {locations.length === 0 && !showForm ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No office locations defined yet. Click "Add Location" to create your first location.
             </div>
           ) : (
-            <div className="text-center p-4 border rounded-md border-dashed">
-              No locations added yet. Click "Add Location" to get started.
+            <div className="space-y-2">
+              {locations.map((location) => (
+                <div
+                  key={location.id}
+                  className={`group flex items-center justify-between p-4 border rounded-lg transition-all duration-200 ${
+                    editMode ? 'hover:bg-accent/30' : 'hover:border-[#6E59A5]/20 hover:bg-[#6E59A5]/5'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {editMode && (
+                      <Checkbox
+                        checked={selectedLocations.includes(location.id)}
+                        onCheckedChange={() => handleSelectLocation(location.id)}
+                      />
+                    )}
+                    <div className="flex items-center gap-2">
+                      {location.emoji && <span>{location.emoji}</span>}
+                      <div>
+                        <div className="font-medium">{location.code}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {location.city}, {location.country}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {!editMode && (
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => handleEdit(location)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => handleDelete(location.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>
       </CardContent>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>{editingLocation ? 'Edit' : 'Add'} Location</DialogTitle>
-            <DialogDescription>
-              Choose a country (searchable), specify city. The icon defaults to the country flag. You can change this to any icon/emoji after creation.
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Country</FormLabel>
-                    <FormControl>
-                      <CountrySelect
-                        value={form.watch("country")}
-                        onChange={(countryName: string, code?: string) => {
-                          form.setValue("country", countryName);
-                          form.setValue("code", code || "");
-                        }}
-                        placeholder="Search or select country"
-                        majorCountries={["United States", "United Kingdom", "Canada", "Germany", "France", "India", "China", "Australia", "Japan", "Brazil"]}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="city"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>City</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., New York" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {form.watch("code") && (
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-semibold">Icon:</span>
-                  <span className="text-2xl">{flagEmoji(form.watch("code"))}</span>
-                  <span className="text-xs text-muted-foreground">
-                    (Icon defaults to the country flag. Can be changed after creation.)
-                  </span>
-                </div>
-              )}
-              <DialogFooter>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                  {editingLocation ? 'Update' : 'Add'} Location
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
-      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Choose an Icon or Emoji</DialogTitle>
-            <DialogDescription>
-              Click an icon or emoji below to set as icon for this location.
-              <br />Flags are not available for icon changes.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid grid-cols-8 gap-3 py-2 max-h-56 overflow-y-auto">
-            {customIconList.map(emoji => (
-              <button
-                key={emoji}
-                className="text-2xl p-2 rounded hover:scale-110 transition-all bg-muted"
-                type="button"
-                onClick={() => handlePickerSelect(emoji)}
-                aria-label={emoji}
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
     </Card>
   );
 };

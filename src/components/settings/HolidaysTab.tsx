@@ -1,3 +1,9 @@
 
-// Re-export from new path to maintain backward compatibility
-export { HolidaysTab } from './holidays/HolidaysTab';
+import React from 'react';
+import { HolidaysTab as HolidaysTabComponent } from './holidays/HolidaysTab';
+
+export const HolidaysTab = () => {
+  return <HolidaysTabComponent />;
+};
+
+export default HolidaysTab;

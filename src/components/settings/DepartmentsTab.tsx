@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash, Check, X } from "lucide-react";
+import { Plus, Trash, Check, X, Edit, Trash2 } from "lucide-react";
 import { useCompany } from "@/context/CompanyContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useOfficeSettings } from "@/context/officeSettings";
+import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const DepartmentsTab = () => {
   const { company } = useCompany();
@@ -17,13 +18,14 @@ export const DepartmentsTab = () => {
   const [editingName, setEditingName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
 
   const handleAddDepartment = async () => {
     if (!company || !newDepartmentName.trim()) return;
 
     setIsSubmitting(true);
     try {
-      // Use type assertion to bypass TypeScript checking
       const { data, error } = await (supabase
         .from('office_departments' as any)
         .insert([
@@ -59,7 +61,6 @@ export const DepartmentsTab = () => {
 
     setIsSubmitting(true);
     try {
-      // Use type assertion to bypass TypeScript checking
       const { error } = await (supabase
         .from('office_departments' as any)
         .delete()
@@ -76,12 +77,36 @@ export const DepartmentsTab = () => {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (selectedDepartments.length === 0) return;
+    
+    if (!confirm(`Are you sure you want to delete ${selectedDepartments.length} department(s)?`)) return;
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await (supabase
+        .from('office_departments' as any)
+        .delete()
+        .in("id", selectedDepartments) as any);
+
+      if (error) throw error;
+
+      setDepartments(departments.filter((dept) => !selectedDepartments.includes(dept.id)));
+      setSelectedDepartments([]);
+      setEditMode(false);
+      toast.success("Departments deleted successfully");
+    } catch (error: any) {
+      toast.error(`Error deleting departments: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleUpdateDepartment = async (id: string) => {
     if (!editingName.trim()) return;
 
     setIsSubmitting(true);
     try {
-      // Use type assertion to bypass TypeScript checking
       const { error } = await (supabase
         .from('office_departments' as any)
         .update({ name: editingName.trim() })
@@ -103,6 +128,14 @@ export const DepartmentsTab = () => {
     }
   };
 
+  const handleSelectDepartment = (departmentId: string) => {
+    setSelectedDepartments(prev => 
+      prev.includes(departmentId) 
+        ? prev.filter(id => id !== departmentId)
+        : [...prev, departmentId]
+    );
+  };
+
   const startEditing = (id: string, name: string) => {
     setEditingId(id);
     setEditingName(name);
@@ -120,16 +153,30 @@ export const DepartmentsTab = () => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-xl font-semibold">Departments</CardTitle>
-        {!isAdding && (
+        <div className="flex gap-2">
           <Button
-            onClick={() => setIsAdding(true)}
             size="sm"
-            className="h-8"
+            variant={editMode ? "secondary" : "outline"}
+            onClick={() => {
+              setEditMode(!editMode);
+              setSelectedDepartments([]);
+            }}
+            disabled={isAdding || editingId !== null}
           >
-            <Plus className="h-4 w-4 mr-1" />
-            Add Department
+            <Edit className="h-4 w-4 mr-2" />
+            {editMode ? "Done" : "Edit"}
           </Button>
-        )}
+          {!isAdding && (
+            <Button
+              onClick={() => setIsAdding(true)}
+              size="sm"
+              className="h-8"
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Add Department
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         {isAdding && (
@@ -162,6 +209,23 @@ export const DepartmentsTab = () => {
           </div>
         )}
 
+        {editMode && selectedDepartments.length > 0 && (
+          <div className="flex items-center gap-2 p-3 bg-muted rounded-lg mb-4">
+            <span className="text-sm text-muted-foreground">
+              {selectedDepartments.length} department(s) selected
+            </span>
+            <Button 
+              size="sm" 
+              variant="destructive"
+              onClick={handleBulkDelete}
+              disabled={isSubmitting}
+            >
+              <Trash2 className="h-4 w-4 mr-1" />
+              Delete Selected
+            </Button>
+          </div>
+        )}
+
         {departments.length === 0 && !isAdding && (
           <p className="text-muted-foreground py-4 text-center">
             No departments have been created yet.
@@ -172,7 +236,9 @@ export const DepartmentsTab = () => {
           {departments.map((department) => (
             <div
               key={department.id}
-              className="flex items-center justify-between p-3 bg-muted/40 rounded-md"
+              className={`flex items-center justify-between p-3 rounded-md transition-all duration-200 ${
+                editMode ? 'bg-muted/40 hover:bg-accent/30' : 'bg-muted/40'
+              }`}
             >
               {editingId === department.id ? (
                 <div className="flex items-center gap-2 flex-1">
@@ -200,25 +266,35 @@ export const DepartmentsTab = () => {
                 </div>
               ) : (
                 <>
-                  <span>{department.name}</span>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      onClick={() => startEditing(department.id, department.name)}
-                      variant="ghost"
-                      size="sm"
-                      disabled={isSubmitting}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      onClick={() => handleDeleteDepartment(department.id)}
-                      variant="ghost"
-                      size="sm"
-                      disabled={isSubmitting}
-                    >
-                      <Trash className="h-4 w-4 text-red-500" />
-                    </Button>
+                  <div className="flex items-center gap-3">
+                    {editMode && (
+                      <Checkbox
+                        checked={selectedDepartments.includes(department.id)}
+                        onCheckedChange={() => handleSelectDepartment(department.id)}
+                      />
+                    )}
+                    <span>{department.name}</span>
                   </div>
+                  {!editMode && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => startEditing(department.id, department.name)}
+                        variant="ghost"
+                        size="sm"
+                        disabled={isSubmitting}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        onClick={() => handleDeleteDepartment(department.id)}
+                        variant="ghost"
+                        size="sm"
+                        disabled={isSubmitting}
+                      >
+                        <Trash className="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  )}
                 </>
               )}
             </div>
