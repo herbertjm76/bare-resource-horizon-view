@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
@@ -93,7 +94,7 @@ const Hero = () => {
             <AnimatedSection animation="fadeInRight" delay={600}>
               <div ref={floatingRef} className="relative w-full max-w-4xl mx-auto" style={{
               minHeight: 400,
-              transform: 'scale(0.85)'
+              transform: 'scale(0.80)'
             }}>
                 {/* Main Dashboard Image */}
                 <div className="relative group">
@@ -116,7 +117,7 @@ const Hero = () => {
           <div className="block sm:hidden w-full mt-6">
             <AnimatedSection animation="fadeInUp" delay={600}>
               <div className="bg-white/20 backdrop-blur-lg p-3 rounded-2xl shadow-xl border border-white/30" style={{
-              transform: 'scale(0.85)'
+              transform: 'scale(0.80)'
             }}>
                 <img src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" alt="Rolling Availability Calendar and Burn Meter Dashboard" className="w-full rounded-xl shadow-lg aspect-square object-cover" style={{
                 transform: 'scale(0.90)'
