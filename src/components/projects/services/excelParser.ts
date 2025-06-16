@@ -19,7 +19,7 @@ export class ExcelParser {
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
           
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
           
           if (jsonData.length === 0) {
             reject(new Error('Excel file is empty'));
@@ -29,7 +29,7 @@ export class ExcelParser {
           const headers = jsonData[0] as string[];
           const rows = jsonData.slice(1).filter(row => 
             Array.isArray(row) && row.some(cell => cell !== null && cell !== undefined && cell !== '')
-          );
+          ) as any[][];
           
           resolve({ headers, data: rows });
         } catch (error) {
