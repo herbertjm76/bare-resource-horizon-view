@@ -100,9 +100,12 @@ export const globalStyles = `
     animation: floatGently3 2.7s ease-in-out infinite, cardGlow3 3.9s ease-in-out infinite;
   }
   
+  .insight-card {
+    transition: transform 0.2s ease-out, z-index 0.2s ease-out !important;
+  }
+  
   .insight-card:hover {
     transform: scale(1.05) !important;
     z-index: 50 !important;
-    transition: transform 0.2s ease-out;
   }
 `;
