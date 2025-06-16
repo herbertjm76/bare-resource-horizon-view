@@ -62,29 +62,29 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Tablet positioning - extending beyond dashboard bounds with much smaller scale
+    // Tablet positioning - extending beyond dashboard bounds
     return [
       // Far top left - extending beyond
-      { top: '5%', left: '2%', scale: 0.05, transform: 'rotate(-3deg)' },
+      { top: '5%', left: '2%', scale: 0.7, transform: 'rotate(-3deg)' },
       // Far top right - extending beyond
-      { top: '8%', right: '1%', scale: 0.05, transform: 'rotate(2deg)' },
+      { top: '8%', right: '1%', scale: 0.75, transform: 'rotate(2deg)' },
       // Far bottom left - extending beyond
-      { bottom: '10%', left: '1%', scale: 0.05, transform: 'rotate(-2deg)' },
+      { bottom: '10%', left: '1%', scale: 0.7, transform: 'rotate(-2deg)' },
       // Far bottom right - extending beyond
-      { bottom: '5%', right: '3%', scale: 0.05, transform: 'rotate(3deg)' }
+      { bottom: '5%', right: '3%', scale: 0.75, transform: 'rotate(3deg)' }
     ];
   }
   
-  // Desktop positioning - cards extending well beyond the main visual area with much smaller scale
+  // Desktop positioning - cards extending well beyond the main visual area
   return [
     // Far top left - well outside the dashboard area
-    { top: '8%', left: '1%', scale: 0.05, transform: 'rotate(-3deg)' },
+    { top: '8%', left: '1%', scale: 0.8, transform: 'rotate(-3deg)' },
     // Far top right - well outside the dashboard area
-    { top: '12%', right: '2%', scale: 0.05, transform: 'rotate(2deg)' },
+    { top: '12%', right: '2%', scale: 0.85, transform: 'rotate(2deg)' },
     // Far bottom left - well outside the dashboard area
-    { bottom: '15%', left: '2%', scale: 0.05, transform: 'rotate(-2deg)' },
+    { bottom: '15%', left: '2%', scale: 0.75, transform: 'rotate(-2deg)' },
     // Far bottom right - well outside the dashboard area
-    { bottom: '8%', right: '1%', scale: 0.05, transform: 'rotate(3deg)' }
+    { bottom: '8%', right: '1%', scale: 0.8, transform: 'rotate(3deg)' }
   ];
 };
 
