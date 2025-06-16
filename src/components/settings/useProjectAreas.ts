@@ -36,7 +36,19 @@ export const useProjectAreas = () => {
       }
 
       console.log('Project areas fetched:', data);
-      setAreas(data || []);
+      
+      // Transform database data to match ProjectArea interface
+      const transformedAreas: ProjectArea[] = (data || []).map(area => ({
+        id: area.id,
+        code: area.code,
+        country: area.name, // Use 'name' from DB as 'country' in interface
+        region: '', // Default empty region since DB doesn't have this field
+        city: '', // Default empty city since DB doesn't have this field
+        color: area.color || '#E5DEFF',
+        company_id: area.company_id
+      }));
+      
+      setAreas(transformedAreas);
     } catch (err) {
       console.error('Unexpected error fetching project areas:', err);
       setError('An unexpected error occurred');
@@ -55,12 +67,18 @@ export const useProjectAreas = () => {
     try {
       console.log('Adding project area:', area);
       
+      // Transform ProjectArea data to match database schema
+      const dbData = {
+        code: area.code,
+        name: area.country, // Use 'country' from interface as 'name' in DB
+        color: area.color || '#E5DEFF',
+        company_id: company.id,
+        emoji: null
+      };
+      
       const { data, error: insertError } = await supabase
         .from('project_areas')
-        .insert([{
-          ...area,
-          company_id: company.id
-        }])
+        .insert([dbData])
         .select()
         .single();
 
@@ -90,9 +108,15 @@ export const useProjectAreas = () => {
     try {
       console.log('Updating project area:', id, updates);
       
+      // Transform ProjectArea data to match database schema
+      const dbUpdates: any = {};
+      if (updates.code) dbUpdates.code = updates.code;
+      if (updates.country) dbUpdates.name = updates.country; // Use 'country' from interface as 'name' in DB
+      if (updates.color) dbUpdates.color = updates.color;
+      
       const { error: updateError } = await supabase
         .from('project_areas')
-        .update(updates)
+        .update(dbUpdates)
         .eq('id', id)
         .eq('company_id', company.id);
 

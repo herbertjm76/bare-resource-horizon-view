@@ -1,109 +1,74 @@
 
 import React from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { ProjectArea } from "./projectAreaTypes";
-import { ItemActions } from './common/ItemActions';
+import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
 import { getDefaultColor } from './utils/colorUtils';
 
 interface ProjectAreaListProps {
   areas: ProjectArea[];
-  loading: boolean;
-  error: any;
-  editMode: boolean;
-  selected: string[];
   onEdit: (area: ProjectArea) => void;
-  onSelect?: (id: string) => void;
-  onBulkDelete?: () => void;
+  onDelete: (area: ProjectArea) => void;
 }
 
 const ProjectAreaList = ({ 
   areas,
-  loading,
-  error,
-  editMode,
-  selected,
   onEdit,
-  onSelect,
-  onBulkDelete
+  onDelete
 }: ProjectAreaListProps) => {
+  if (areas.length === 0) {
+    return (
+      <div className="text-center py-6 text-muted-foreground">
+        No project areas defined yet.
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
-      {loading ? (
-        <div className="text-center py-6">Loading areas...</div>
-      ) : error ? (
-        <div className="text-center py-6 text-red-500">Error: {error.message}</div>
-      ) : areas.length === 0 ? (
-        <div className="text-center py-6 text-muted-foreground">No project areas defined yet.</div>
-      ) : (
-        <div className="space-y-2">
-          {areas.map((area) => (
-            <div
-              key={area.id}
-              className={cn(
-                "group flex items-center justify-between p-4 border rounded-lg transition-colors",
-                "hover:border-[#6E59A5]/20 hover:bg-[#6E59A5]/5",
-                editMode && "cursor-pointer"
-              )}
-              onClick={() => editMode && onSelect && onSelect(area.id)}
+    <div className="space-y-2">
+      {areas.map((area) => (
+        <div
+          key={area.id}
+          className="group flex items-center justify-between p-4 border rounded-lg transition-colors hover:border-[#6E59A5]/20 hover:bg-[#6E59A5]/5"
+        >
+          <div className="flex items-center gap-3">
+            <div 
+              className="text-white font-bold px-2 py-1 rounded text-xs uppercase"
+              style={{ 
+                backgroundColor: getDefaultColor(area.color) 
+              }}
             >
-              <div className="flex items-center gap-4">
-                {editMode && onSelect && (
-                  <Checkbox
-                    checked={selected.includes(area.id)}
-                    onCheckedChange={() => onSelect(area.id)}
-                    id={area.id}
-                  />
-                )}
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="text-white font-bold px-2 py-1 rounded text-xs uppercase"
-                    style={{ 
-                      backgroundColor: getDefaultColor(area.color) 
-                    }}
-                  >
-                    {area.code}
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="font-medium text-[#6E59A5]">{area.country}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {area.city ? `${area.city}, ` : ''}{area.region} 
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                {editMode ? (
-                  <Checkbox
-                    checked={selected.includes(area.id)}
-                    onCheckedChange={() => onSelect(area.id)}
-                    id={area.id}
-                  />
-                ) : (
-                  <ItemActions 
-                    onEdit={() => onEdit(area)}
-                    onDelete={() => onSelect && onSelect(area.id)}
-                  />
-                )}
-              </div>
+              {area.code}
             </div>
-          ))}
-          {editMode && selected.length > 0 && onBulkDelete && (
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              onClick={onBulkDelete}
-              className="ml-auto block"
+            <div className="flex flex-col">
+              <div className="font-medium text-[#6E59A5]">{area.country}</div>
+              {area.region && (
+                <div className="text-sm text-muted-foreground">
+                  {area.city ? `${area.city}, ` : ''}{area.region} 
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onEdit(area)}
             >
-              Delete Selected
+              <Pencil className="h-4 w-4" />
             </Button>
-          )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDelete(area)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-      )}
+      ))}
     </div>
   );
 };
 
 export default ProjectAreaList;
-
