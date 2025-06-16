@@ -56,7 +56,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations, company }) => {
           // Get coordinates for each office location
           const locationCoords = locations.map(location => {
             const coords = getCoordinatesForLocation(location.city, location.country);
-            console.log(`Mapping ${location.city}, ${location.country} to:`, coords);
+            console.log(`Mapping ${location.city}, ${location.country} to coordinates:`, coords);
             return { ...location, lat: coords.lat, lng: coords.lng };
           });
 
@@ -150,6 +150,8 @@ const getCoordinatesForLocation = (city: string, country: string) => {
   const cityOnly = city.toLowerCase();
   const countryOnly = country.toLowerCase();
 
+  console.log(`Looking up coordinates for: "${cityKey}" (city: "${cityOnly}", country: "${countryOnly}")`);
+
   // Comprehensive city coordinates mapping
   const cityCoords: { [key: string]: { lat: number; lng: number } } = {
     // Major cities with country for precision
@@ -223,6 +225,18 @@ const getCoordinatesForLocation = (city: string, country: string) => {
     'bogotá, colombia': { lat: 4.7110, lng: -74.0721 },
     'caracas, venezuela': { lat: 10.4806, lng: -66.9036 },
     
+    // Vietnam cities
+    'ho chi minh city, vietnam': { lat: 10.8231, lng: 106.6297 },
+    'hanoi, vietnam': { lat: 21.0285, lng: 105.8542 },
+    'da nang, vietnam': { lat: 16.0544, lng: 108.2022 },
+    'can tho, vietnam': { lat: 10.0452, lng: 105.7469 },
+    'hai phong, vietnam': { lat: 20.8449, lng: 106.6881 },
+    'bien hoa, vietnam': { lat: 10.9447, lng: 106.8229 },
+    'hue, vietnam': { lat: 16.4637, lng: 107.5909 },
+    'nha trang, vietnam': { lat: 12.2388, lng: 109.1967 },
+    'vung tau, vietnam': { lat: 10.3460, lng: 107.0843 },
+    'quy nhon, vietnam': { lat: 13.7563, lng: 109.2297 },
+    
     // City-only fallbacks (less precise)
     'new york': { lat: 40.7128, lng: -74.0060 },
     'london': { lat: 51.5074, lng: -0.1278 },
@@ -263,16 +277,21 @@ const getCoordinatesForLocation = (city: string, country: string) => {
     'hyderabad': { lat: 17.3850, lng: 78.4867 },
     'chennai': { lat: 13.0827, lng: 80.2707 },
     'kolkata': { lat: 22.5726, lng: 88.3639 },
-    'cairo': { lat: 30.0444, lng: 31.2357 }
+    'cairo': { lat: 30.0444, lng: 31.2357 },
+    'ho chi minh city': { lat: 10.8231, lng: 106.6297 },
+    'hanoi': { lat: 21.0285, lng: 105.8542 },
+    'da nang': { lat: 16.0544, lng: 108.2022 }
   };
 
   // Try exact match first (city, country)
   if (cityCoords[cityKey]) {
+    console.log(`Found exact match for "${cityKey}":`, cityCoords[cityKey]);
     return cityCoords[cityKey];
   }
 
   // Try city-only match
   if (cityCoords[cityOnly]) {
+    console.log(`Found city-only match for "${cityOnly}":`, cityCoords[cityOnly]);
     return cityCoords[cityOnly];
   }
 
@@ -326,16 +345,18 @@ const getCoordinatesForLocation = (city: string, country: string) => {
     'chile': { lat: -33.4489, lng: -70.6693 }, // Santiago
     'peru': { lat: -12.0464, lng: -77.0428 }, // Lima
     'colombia': { lat: 4.7110, lng: -74.0721 }, // Bogotá
-    'venezuela': { lat: 10.4806, lng: -66.9036 } // Caracas
+    'venezuela': { lat: 10.4806, lng: -66.9036 }, // Caracas
+    'vietnam': { lat: 21.0285, lng: 105.8542 } // Hanoi
   };
 
   // Use country fallback
   if (countryCoords[countryOnly]) {
+    console.log(`Found country fallback for "${countryOnly}":`, countryCoords[countryOnly]);
     return countryCoords[countryOnly];
   }
 
   // Ultimate fallback - return a default location (London)
-  console.warn(`No coordinates found for ${city}, ${country}. Using default location.`);
+  console.warn(`No coordinates found for "${city}, ${country}". Using default location (London).`);
   return { lat: 51.5074, lng: -0.1278 };
 };
 
