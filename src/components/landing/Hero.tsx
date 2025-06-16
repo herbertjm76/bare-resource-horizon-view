@@ -108,7 +108,8 @@ const Hero = () => {
                     <img 
                       src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
                       alt="Rolling Availability Calendar and Burn Meter Dashboard" 
-                      className="w-full rounded-2xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover" 
+                      className="w-full rounded-2xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover"
+                      style={{ transform: 'scale(0.95)' }}
                     />
                   </div>
                 </div>
@@ -136,7 +137,8 @@ const Hero = () => {
                 <img 
                   src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
                   alt="Rolling Availability Calendar and Burn Meter Dashboard" 
-                  className="w-full rounded-xl shadow-lg aspect-square object-cover" 
+                  className="w-full rounded-xl shadow-lg aspect-square object-cover"
+                  style={{ transform: 'scale(0.95)' }}
                 />
               </div>
             </AnimatedSection>
