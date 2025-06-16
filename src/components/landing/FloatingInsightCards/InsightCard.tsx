@@ -35,19 +35,19 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         ...position,
         animationDelay,
         transform: `scale(${cardScale}) ${position.transform || ''}`,
-        width: `${7 * cardScale}rem`,
-        height: `${7 * cardScale}rem`,
-        padding: `${Math.max(0.75, 1.2 * cardScale)}rem`,
+        width: `${3.5 * cardScale}rem`,
+        height: `${3.5 * cardScale}rem`,
+        padding: `${Math.max(0.2, 0.6 * cardScale)}rem`,
         pointerEvents: 'auto',
         // Enhanced shadow and backdrop for better depth and visibility
-        boxShadow: `0 12px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)`,
-        backdropFilter: 'blur(20px)',
+        boxShadow: `0 6px 20px rgba(0,0,0,0.15), 0 2px 6px rgba(0,0,0,0.1)`,
+        backdropFilter: 'blur(10px)',
         // Perfect square aspect ratio
         aspectRatio: '1/1',
-        maxWidth: '180px',
-        maxHeight: '180px',
-        minWidth: '140px',
-        minHeight: '140px',
+        maxWidth: '60px',
+        maxHeight: '60px',
+        minWidth: '40px',
+        minHeight: '40px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -55,34 +55,34 @@ export const InsightCard: React.FC<InsightCardProps> = ({
     >
       {isOneLiner ? (
         // Square layout for one-liner cards
-        <div className="flex flex-col items-center gap-3 text-center w-full">
-          <div className={`flex items-center justify-center rounded-xl ${styles.iconBg} p-3 shadow-lg`} style={{ aspectRatio: '1/1' }}>
+        <div className="flex flex-col items-center gap-1 text-center w-full">
+          <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-1 shadow-sm`} style={{ aspectRatio: '1/1' }}>
             <Icon 
               className={`${styles.iconColor}`}
-              size={Math.max(18, Math.round(20 * cardScale))}
+              size={Math.max(8, Math.round(10 * cardScale))}
               strokeWidth={2.5}
             />
           </div>
-          <div className={`text-sm font-bold ${styles.numberColor} leading-tight`}>
+          <div className={`text-xs font-bold ${styles.numberColor} leading-tight`} style={{ fontSize: `${Math.max(6, 8 * cardScale)}px` }}>
             {insight.title}
           </div>
         </div>
       ) : (
         // Square layout for two-line cards
-        <div className="flex flex-col items-center gap-3 text-center w-full h-full justify-center">
-          <div className={`flex items-center justify-center rounded-xl ${styles.iconBg} p-3 shadow-lg`} style={{ aspectRatio: '1/1' }}>
+        <div className="flex flex-col items-center gap-1 text-center w-full h-full justify-center">
+          <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-1 shadow-sm`} style={{ aspectRatio: '1/1' }}>
             <Icon 
               className={`${styles.iconColor}`}
-              size={Math.max(18, Math.round(22 * cardScale))}
+              size={Math.max(8, Math.round(12 * cardScale))}
               strokeWidth={2.5}
             />
           </div>
-          <div className="space-y-1">
-            <div className={`text-base font-bold ${styles.numberColor} leading-tight`}>
+          <div className="space-y-0.5">
+            <div className={`text-xs font-bold ${styles.numberColor} leading-tight`} style={{ fontSize: `${Math.max(6, 10 * cardScale)}px` }}>
               {insight.kpi || insight.title}
             </div>
             {insight.description && (
-              <div className={`text-sm ${styles.textColor} font-medium leading-tight opacity-90`}>
+              <div className={`text-xs ${styles.textColor} font-medium leading-tight opacity-90`} style={{ fontSize: `${Math.max(5, 8 * cardScale)}px` }}>
                 {insight.description}
               </div>
             )}
