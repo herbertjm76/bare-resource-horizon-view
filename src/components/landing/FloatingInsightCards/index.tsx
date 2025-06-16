@@ -1,7 +1,7 @@
 
 import React from "react";
 import { FloatingInsightCardsProps } from "./types";
-import { predefinedInsights, getRandomPositions, animationDelays } from "./constants";
+import { predefinedInsights, getRandomPositions, getRandomAnimationDelays } from "./constants";
 import { globalStyles } from "./styles";
 import { InsightCard } from "./InsightCard";
 
@@ -13,6 +13,7 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   scale = 1.0,
 }) => {
   const positions = getRandomPositions();
+  const animationDelays = getRandomAnimationDelays();
 
   return (
     <>

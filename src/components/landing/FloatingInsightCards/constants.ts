@@ -101,6 +101,14 @@ export const getRandomPositions = (): CardPosition[] => [
   }
 ];
 
-export const animationDelays = [
-  "0s", "0.3s", "0.6s", "0.9s", "1.2s", "1.5s"
-];
+// Generate random, staggered animation delays
+export const getRandomAnimationDelays = (): string[] => {
+  const baseDelays = [0.2, 0.8, 1.4, 2.1, 2.7, 3.5];
+  const randomizedDelays = baseDelays.map(delay => {
+    // Add random variation of ±0.3 seconds to each delay
+    const variation = (Math.random() - 0.5) * 0.6;
+    return Math.max(0, delay + variation);
+  });
+  
+  return randomizedDelays.map(delay => `${delay.toFixed(1)}s`);
+};
