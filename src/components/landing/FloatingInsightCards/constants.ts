@@ -51,7 +51,7 @@ export const predefinedInsights: InsightData[] = [
   }
 ];
 
-// Distributed positioning around the edges
+// Positioning to match the reference image locations
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -62,29 +62,29 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Tablet positioning - 4 cards distributed around edges
+    // Tablet positioning - matching reference image proportions
     return [
-      // Top left
-      { top: '8%', left: '3%', scale: 0.85, transform: 'rotate(-2deg)' },
-      // Lower right  
-      { bottom: '25%', right: '4%', scale: 0.8, transform: 'rotate(2deg)' },
-      // Bottom left edge
-      { bottom: '8%', left: '6%', scale: 0.75, transform: 'rotate(-1deg)' },
-      // Bottom right edge
-      { bottom: '6%', right: '8%', scale: 0.8, transform: 'rotate(1deg)' }
+      // Top left area (utilization card)
+      { top: '12%', left: '4%', scale: 0.8, transform: 'rotate(-2deg)' },
+      // Top right area (trend chart)
+      { top: '8%', right: '5%', scale: 0.85, transform: 'rotate(1deg)' },
+      // Bottom left area (projects in progress)
+      { bottom: '12%', left: '6%', scale: 0.8, transform: 'rotate(-1deg)' },
+      // Bottom right area (on track status)
+      { bottom: '15%', right: '8%', scale: 0.85, transform: 'rotate(2deg)' }
     ];
   }
   
-  // Desktop positioning - distributed around all edges
+  // Desktop positioning - matching reference image exactly
   return [
-    // Top left
-    { top: '10%', left: '2%', scale: 0.9, transform: 'rotate(-3deg)' },
-    // Lower right (middle-right area)
-    { bottom: '30%', right: '3%', scale: 0.85, transform: 'rotate(2deg)' },
-    // Bottom left edge
-    { bottom: '8%', left: '5%', scale: 0.8, transform: 'rotate(-1deg)' },
-    // Bottom right edge
-    { bottom: '6%', right: '6%', scale: 0.85, transform: 'rotate(1deg)' }
+    // Top left area (87% utilization card position)
+    { top: '15%', left: '3%', scale: 0.9, transform: 'rotate(-2deg)' },
+    // Top right area (trend chart position)
+    { top: '10%', right: '4%', scale: 0.95, transform: 'rotate(1deg)' },
+    // Bottom left area (15 projects card position)
+    { bottom: '18%', left: '5%', scale: 0.85, transform: 'rotate(-1deg)' },
+    // Bottom right area (on track status position)
+    { bottom: '20%', right: '6%', scale: 0.9, transform: 'rotate(2deg)' }
   ];
 };
 
