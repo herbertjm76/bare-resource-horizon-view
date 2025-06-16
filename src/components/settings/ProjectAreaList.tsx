@@ -3,6 +3,7 @@ import React from 'react';
 import { ProjectArea } from './projectAreaTypes';
 import { Checkbox } from "@/components/ui/checkbox";
 import { ItemActions } from './common/ItemActions';
+import { GripVertical } from 'lucide-react';
 
 interface ProjectAreaListProps {
   areas: ProjectArea[];
@@ -11,6 +12,7 @@ interface ProjectAreaListProps {
   editMode?: boolean;
   selectedAreas?: string[];
   onSelectArea?: (areaId: string) => void;
+  onReorder?: (draggedId: string, targetId: string) => void;
 }
 
 export const ProjectAreaList: React.FC<ProjectAreaListProps> = ({
@@ -19,8 +21,30 @@ export const ProjectAreaList: React.FC<ProjectAreaListProps> = ({
   onDelete,
   editMode = false,
   selectedAreas = [],
-  onSelectArea
+  onSelectArea,
+  onReorder
 }) => {
+  const [draggedItem, setDraggedItem] = React.useState<ProjectArea | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, area: ProjectArea) => {
+    setDraggedItem(area);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, targetArea: ProjectArea) => {
+    e.preventDefault();
+    
+    if (!draggedItem || draggedItem.id === targetArea.id || !onReorder) return;
+    
+    onReorder(draggedItem.id, targetArea.id);
+    setDraggedItem(null);
+  };
+
   if (areas.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -37,13 +61,22 @@ export const ProjectAreaList: React.FC<ProjectAreaListProps> = ({
           className={`group flex items-center justify-between p-4 border rounded-lg transition-all duration-200 ${
             editMode ? 'hover:bg-accent/30' : 'hover:border-[#6E59A5]/20 hover:bg-[#6E59A5]/5'
           }`}
+          draggable={editMode}
+          onDragStart={(e) => handleDragStart(e, area)}
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, area)}
         >
           <div className="flex items-center gap-3">
             {editMode && onSelectArea && (
-              <Checkbox
-                checked={selectedAreas.includes(area.id)}
-                onCheckedChange={() => onSelectArea(area.id)}
-              />
+              <>
+                <Checkbox
+                  checked={selectedAreas.includes(area.id)}
+                  onCheckedChange={() => onSelectArea(area.id)}
+                />
+                {onReorder && (
+                  <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+                )}
+              </>
             )}
             <div
               className="w-4 h-4 rounded border"

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -126,6 +125,8 @@ export const HolidaysTab = () => {
   const handleBulkDelete = async () => {
     if (!selected.length || !company) return;
     
+    if (!confirm(`Are you sure you want to delete ${selected.length} holiday(s)?`)) return;
+    
     setLoading(true);
     const success = await deleteHolidays(selected);
     
@@ -168,15 +169,33 @@ export const HolidaysTab = () => {
     setOpen(false);
   };
 
+  const handleAddNew = () => {
+    setEditingHoliday(null);
+    setOpen(true);
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Office Holidays</CardTitle>
         <div className="flex gap-2">
-          <Button size="sm" variant={editMode ? "secondary" : "outline"} onClick={() => setEditMode(em => !em)} disabled={loading}>
-            <Edit className="h-4 w-4 mr-2" /> Edit
+          <Button 
+            size="sm" 
+            variant={editMode ? "secondary" : "outline"} 
+            onClick={() => {
+              setEditMode(!editMode);
+              setSelected([]);
+            }}
+            disabled={loading || open}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            {editMode ? "Done" : "Edit"}
           </Button>
-          <Button size="sm" onClick={() => setOpen(true)} disabled={loading}>
+          <Button 
+            size="sm" 
+            onClick={handleAddNew}
+            disabled={loading || open}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Add Holiday
           </Button>
@@ -187,17 +206,21 @@ export const HolidaysTab = () => {
           <div className="text-sm text-muted-foreground mb-4">
             Manage office holidays and closures. You can assign holidays to multiple office locations.
           </div>
-          {editMode && (
-            <div className="flex items-center gap-2 mb-2">
+          
+          {editMode && selected.length > 0 && (
+            <div className="flex items-center gap-2 p-3 bg-muted rounded-lg mb-4">
+              <span className="text-sm text-muted-foreground">
+                {selected.length} holiday(s) selected
+              </span>
               <Button
                 variant="destructive"
                 size="sm"
-                disabled={selected.length === 0 || loading}
+                disabled={loading}
                 onClick={handleBulkDelete}
               >
-                <Trash2 className="h-4 w-4 mr-1" /> Delete Selected
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete Selected
               </Button>
-              <span className="text-xs text-muted-foreground">{selected.length} selected</span>
             </div>
           )}
           

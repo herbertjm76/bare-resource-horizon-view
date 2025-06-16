@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,7 +25,7 @@ export const CountriesTab = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
-  const { areas, loading, addArea, updateArea, deleteArea } = useProjectAreas();
+  const { areas, loading, addArea, updateArea, deleteArea, reorderAreas } = useProjectAreas();
 
   const form = useForm<ProjectAreaFormValues>({
     resolver: zodResolver(projectAreaFormSchema),
@@ -129,6 +128,26 @@ export const CountriesTab = () => {
     setShowForm(true);
   };
 
+  const handleReorder = async (draggedId: string, targetId: string) => {
+    const draggedIndex = areas.findIndex(area => area.id === draggedId);
+    const targetIndex = areas.findIndex(area => area.id === targetId);
+
+    if (draggedIndex === -1 || targetIndex === -1) return;
+
+    // Reorder locally first for immediate feedback
+    const newAreas = [...areas];
+    const [draggedArea] = newAreas.splice(draggedIndex, 1);
+    newAreas.splice(targetIndex, 0, draggedArea);
+
+    try {
+      await reorderAreas(newAreas);
+      toast.success('Project areas reordered successfully');
+    } catch (error) {
+      console.error('Error reordering areas:', error);
+      toast.error('Failed to reorder project areas');
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -206,6 +225,7 @@ export const CountriesTab = () => {
             editMode={editMode}
             selectedAreas={selectedAreas}
             onSelectArea={handleSelectArea}
+            onReorder={handleReorder}
           />
         </div>
       </CardContent>
