@@ -56,7 +56,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
       {isOneLiner ? (
         // Square layout for one-liner cards
         <div className="flex flex-col items-center gap-2 text-center w-full">
-          <div className={`flex items-center justify-center rounded-xl ${styles.iconBg} p-2 shadow-lg`}>
+          <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-2 shadow-lg`} style={{ aspectRatio: '1/1' }}>
             <Icon 
               className={`${styles.iconColor}`}
               size={Math.max(16, Math.round(18 * cardScale))}
@@ -70,7 +70,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
       ) : (
         // Square layout for two-line cards
         <div className="flex flex-col items-center gap-2 text-center w-full h-full justify-center">
-          <div className={`flex items-center justify-center rounded-xl ${styles.iconBg} p-2 shadow-lg`}>
+          <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-2 shadow-lg`} style={{ aspectRatio: '1/1' }}>
             <Icon 
               className={`${styles.iconColor}`}
               size={Math.max(16, Math.round(20 * cardScale))}
