@@ -12,7 +12,7 @@ export interface ProjectArea {
 export interface ProjectAreaFormValues {
   code: string;
   country: string;
-  region?: string;
-  city?: string;
+  region: string;
+  city: string;
   color: string;
 }

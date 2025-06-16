@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,14 +8,14 @@ import { z } from "zod";
 import ProjectAreaForm from './ProjectAreaForm';
 import ProjectAreaList from './ProjectAreaList';
 import { useProjectAreas } from './useProjectAreas';
-import { ProjectArea } from './projectAreaTypes';
+import { ProjectArea, ProjectAreaFormValues } from './projectAreaTypes';
 import { toast } from 'sonner';
 
 const projectAreaFormSchema = z.object({
   code: z.string().min(1, "Code is required"),
   country: z.string().min(1, "Country is required"),
-  region: z.string().optional().default(""),
-  city: z.string().optional().default(""),
+  region: z.string().default(""),
+  city: z.string().default(""),
   color: z.string().min(1, "Color is required"),
 });
 
