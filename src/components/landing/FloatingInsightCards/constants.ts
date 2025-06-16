@@ -1,5 +1,5 @@
 
-import { TrendingUp, Users, Calendar, DollarSign, Target, CheckCircle } from "lucide-react";
+import { TrendingUp, Users, Calendar, Clock, Target, CheckCircle } from "lucide-react";
 import { InsightData, CardPosition } from "./types";
 
 export const predefinedInsights: InsightData[] = [
@@ -34,11 +34,11 @@ export const predefinedInsights: InsightData[] = [
     hasSubtitle: false
   },
   {
-    title: "$127K Revenue Pipeline",
-    kpi: "$127K",
-    description: "Next 30 days",
-    icon: DollarSign,
-    color: "yellow",
+    title: "Average Project: 3.2 Weeks",
+    kpi: "3.2 weeks",
+    description: "Delivery time",
+    icon: Clock,
+    color: "teal",
     hasSubtitle: true
   },
   {
@@ -51,7 +51,7 @@ export const predefinedInsights: InsightData[] = [
   }
 ];
 
-// Mobile-safe positions that stay within viewport bounds
+// Improved balanced positioning for floating cards
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -62,25 +62,25 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Conservative positioning for tablets
+    // Balanced positioning for tablets with more spacing
     return [
-      { top: '5%', left: '5%', scale: 0.7, transform: 'rotate(-2deg)' },
-      { top: '15%', right: '5%', scale: 0.8, transform: 'rotate(1deg)' },
-      { bottom: '25%', left: '8%', scale: 0.75, transform: 'rotate(-1deg)' },
-      { bottom: '15%', right: '8%', scale: 0.7, transform: 'rotate(2deg)' },
-      { top: '35%', left: '2%', scale: 0.65, transform: 'rotate(1deg)' },
-      { top: '45%', right: '2%', scale: 0.7, transform: 'rotate(-1deg)' }
+      { top: '8%', left: '3%', scale: 0.75, transform: 'rotate(-2deg)' },
+      { top: '18%', right: '5%', scale: 0.8, transform: 'rotate(1deg)' },
+      { bottom: '35%', left: '6%', scale: 0.7, transform: 'rotate(-1deg)' },
+      { bottom: '20%', right: '8%', scale: 0.75, transform: 'rotate(2deg)' },
+      { top: '45%', left: '1%', scale: 0.65, transform: 'rotate(1deg)' },
+      { top: '55%', right: '3%', scale: 0.7, transform: 'rotate(-1deg)' }
     ];
   }
   
-  // Desktop positioning with better boundaries
+  // Desktop positioning with improved balance and spacing
   return [
-    { top: '8%', left: '2%', scale: 0.85, transform: 'rotate(-3deg)' },
-    { top: '12%', right: '5%', scale: 0.9, transform: 'rotate(2deg)' },
-    { bottom: '30%', left: '5%', scale: 0.8, transform: 'rotate(-2deg)' },
-    { bottom: '20%', right: '8%', scale: 0.85, transform: 'rotate(1deg)' },
-    { top: '40%', left: '-2%', scale: 0.75, transform: 'rotate(2deg)' },
-    { top: '50%', right: '2%', scale: 0.8, transform: 'rotate(-1deg)' }
+    { top: '10%', left: '3%', scale: 0.85, transform: 'rotate(-2deg)' },
+    { top: '8%', right: '6%', scale: 0.9, transform: 'rotate(1deg)' },
+    { bottom: '40%', left: '2%', scale: 0.8, transform: 'rotate(-1deg)' },
+    { bottom: '25%', right: '4%', scale: 0.85, transform: 'rotate(2deg)' },
+    { top: '35%', left: '1%', scale: 0.75, transform: 'rotate(1deg)' },
+    { top: '50%', right: '1%', scale: 0.8, transform: 'rotate(-2deg)' }
   ];
 };
 
