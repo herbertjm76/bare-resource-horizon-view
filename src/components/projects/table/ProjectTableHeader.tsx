@@ -25,12 +25,20 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
         {office_stages.map((stage) => (
           <TableHead 
             key={stage.id}
+            className="text-center px-3 py-4 min-w-[80px]"
             style={{
               backgroundColor: '#6465F0',
-              color: 'white'
+              color: 'white',
+              fontSize: '13px',
+              fontWeight: '600',
+              lineHeight: '1.2'
             }}
           >
-            {stage.name}
+            <div className="flex flex-col items-center justify-center h-full">
+              <span className="whitespace-nowrap">
+                {stage.name}
+              </span>
+            </div>
           </TableHead>
         ))}
         {editMode && <TableHead className="w-24" style={{ backgroundColor: '#6465F0', color: 'white' }}>Actions</TableHead>}
