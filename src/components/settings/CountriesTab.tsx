@@ -19,8 +19,6 @@ const projectAreaFormSchema = z.object({
   color: z.string().min(1, "Color is required"),
 });
 
-export type ProjectAreaFormValues = z.infer<typeof projectAreaFormSchema>;
-
 export const CountriesTab = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingArea, setEditingArea] = useState<ProjectArea | null>(null);
