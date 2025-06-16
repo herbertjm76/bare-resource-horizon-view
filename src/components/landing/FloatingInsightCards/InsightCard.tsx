@@ -29,8 +29,10 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         animationDelay,
         transform: `scale(${cardScale}) ${position.transform || ''}`,
         width: isOneLiner ? `${9 * cardScale}rem` : `${8.5 * cardScale}rem`,
-        padding: `${0.6 * cardScale}rem`,
-        pointerEvents: 'auto'
+        padding: `${Math.max(0.4, 0.6 * cardScale)}rem`,
+        pointerEvents: 'auto',
+        // Ensure cards don't overflow on smaller screens
+        maxWidth: '200px'
       }}
     >
       {isOneLiner ? (
@@ -39,7 +41,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           <div className={`flex items-center justify-center rounded-md ${styles.iconBg} p-1.5 shadow-sm flex-shrink-0`}>
             <Icon 
               className={`${styles.iconColor}`}
-              size={Math.round(14 * cardScale)}
+              size={Math.max(12, Math.round(14 * cardScale))}
               strokeWidth={2.5}
             />
           </div>
@@ -54,17 +56,17 @@ export const InsightCard: React.FC<InsightCardProps> = ({
             <div className={`flex items-center justify-center rounded-md ${styles.iconBg} p-1.5 shadow-sm flex-shrink-0`}>
               <Icon 
                 className={`${styles.iconColor}`}
-                size={Math.round(15 * cardScale)}
+                size={Math.max(12, Math.round(15 * cardScale))}
                 strokeWidth={2.5}
               />
             </div>
             <div className="flex-1 min-w-0">
-              <div className={`text-sm font-bold ${styles.numberColor} leading-tight`}>
+              <div className={`text-sm font-bold ${styles.numberColor} leading-tight truncate`}>
                 {insight.kpi}
               </div>
             </div>
           </div>
-          <div className={`text-xs ${styles.textColor} font-medium pl-7`}>
+          <div className={`text-xs ${styles.textColor} font-medium pl-7 leading-tight`}>
             {insight.description}
           </div>
         </div>

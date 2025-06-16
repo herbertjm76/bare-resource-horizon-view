@@ -15,10 +15,15 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
   const positions = getRandomPositions();
   const animationDelays = getRandomAnimationDelays();
 
+  // Don't render anything if no positions (mobile)
+  if (positions.length === 0) {
+    return null;
+  }
+
   return (
     <>
       <style>{globalStyles}</style>
-      {predefinedInsights.map((insight, idx) => (
+      {predefinedInsights.slice(0, positions.length).map((insight, idx) => (
         <InsightCard
           key={insight.title + idx}
           insight={insight}

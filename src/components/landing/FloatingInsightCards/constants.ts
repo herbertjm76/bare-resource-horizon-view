@@ -1,114 +1,89 @@
 
-import {
-  Calendar,
-  Users,
-  TrendingUp,
-  AlertTriangle,
-  Clock,
-  BarChart3,
-  Target,
-  DollarSign,
-} from "lucide-react";
+import { TrendingUp, Users, Calendar, DollarSign, Target, CheckCircle } from "lucide-react";
 import { InsightData, CardPosition } from "./types";
 
 export const predefinedInsights: InsightData[] = [
   {
-    title: "Real-time Availability",
-    kpi: "8 staff free",
-    description: "Next week capacity",
-    icon: Users,
-    color: "emerald",
-    hasSubtitle: true
-  },
-  {
-    title: "Project Overruns",
-    kpi: "3 alerts",
-    description: "Behind schedule",
-    icon: AlertTriangle,
-    color: "red",
-    hasSubtitle: true
-  },
-  {
-    title: "87% Fee Burn Rate",
-    kpi: "",
-    description: "",
-    icon: DollarSign,
-    color: "orange",
-    hasSubtitle: false
-  },
-  {
-    title: "Team Utilization: 85%",
-    kpi: "",
-    description: "",
-    icon: Target,
-    color: "blue",
-    hasSubtitle: false
-  },
-  {
-    title: "Peak Season Alert",
-    kpi: "Oct-Dec",
-    description: "High demand period",
+    title: "87% Team Utilization",
+    kpi: "87%",
+    description: "Optimal capacity",
     icon: TrendingUp,
-    color: "purple",
+    color: "green",
+    hasSubtitle: true
+  },
+  {
+    title: "12 Active Team Members",
+    kpi: "12",
+    description: "Available resources",
+    icon: Users,
+    color: "blue",
     hasSubtitle: true
   },
   {
     title: "15 Active Projects",
-    kpi: "",
-    description: "",
-    icon: BarChart3,
-    color: "teal",
+    kpi: "15",
+    description: "In progress",
+    icon: Target,
+    color: "purple",
+    hasSubtitle: true
+  },
+  {
+    title: "On Track This Month",
+    icon: CheckCircle,
+    color: "green",
     hasSubtitle: false
+  },
+  {
+    title: "$127K Revenue Pipeline",
+    kpi: "$127K",
+    description: "Next 30 days",
+    icon: DollarSign,
+    color: "yellow",
+    hasSubtitle: true
+  },
+  {
+    title: "Peak Capacity: Dec 15",
+    kpi: "Dec 15",
+    description: "Next bottleneck",
+    icon: Calendar,
+    color: "orange",
+    hasSubtitle: true
   }
 ];
 
-export const getRandomPositions = (): CardPosition[] => [
-  { 
-    top: "-40px", 
-    left: "8%", 
-    transform: "translateY(-50%) rotate(-1deg)",
-    scale: 0.9
-  },
-  { 
-    top: "-35px", 
-    right: "12%", 
-    transform: "translateY(-50%) rotate(1.5deg)",
-    scale: 0.85
-  },
-  { 
-    top: "25%", 
-    left: "-120px", 
-    transform: "translateX(-100%) rotate(0.5deg)",
-    scale: 0.95
-  },
-  { 
-    top: "65%", 
-    right: "-110px", 
-    transform: "translateY(-50%) translateX(100%) rotate(-1deg)",
-    scale: 0.8
-  },
-  { 
-    bottom: "-20px", 
-    left: "15%", 
-    transform: "translateY(30%) rotate(0deg)",
-    scale: 0.88
-  },
-  { 
-    bottom: "-20px", 
-    right: "18%", 
-    transform: "translateY(30%) rotate(0deg)",
-    scale: 0.92
-  }
-];
-
-// Generate random, staggered animation delays
-export const getRandomAnimationDelays = (): string[] => {
-  const baseDelays = [0.2, 0.8, 1.4, 2.1, 2.7, 3.5];
-  const randomizedDelays = baseDelays.map(delay => {
-    // Add random variation of ±0.3 seconds to each delay
-    const variation = (Math.random() - 0.5) * 0.6;
-    return Math.max(0, delay + variation);
-  });
+// Mobile-safe positions that stay within viewport bounds
+export const getRandomPositions = (): CardPosition[] => {
+  const isMobile = window.innerWidth < 640;
+  const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
   
-  return randomizedDelays.map(delay => `${delay.toFixed(1)}s`);
+  if (isMobile) {
+    // Don't show floating cards on mobile
+    return [];
+  }
+  
+  if (isTablet) {
+    // Conservative positioning for tablets
+    return [
+      { top: '5%', left: '5%', scale: 0.7, transform: 'rotate(-2deg)' },
+      { top: '15%', right: '5%', scale: 0.8, transform: 'rotate(1deg)' },
+      { bottom: '25%', left: '8%', scale: 0.75, transform: 'rotate(-1deg)' },
+      { bottom: '15%', right: '8%', scale: 0.7, transform: 'rotate(2deg)' },
+      { top: '35%', left: '2%', scale: 0.65, transform: 'rotate(1deg)' },
+      { top: '45%', right: '2%', scale: 0.7, transform: 'rotate(-1deg)' }
+    ];
+  }
+  
+  // Desktop positioning with better boundaries
+  return [
+    { top: '8%', left: '2%', scale: 0.85, transform: 'rotate(-3deg)' },
+    { top: '12%', right: '5%', scale: 0.9, transform: 'rotate(2deg)' },
+    { bottom: '30%', left: '5%', scale: 0.8, transform: 'rotate(-2deg)' },
+    { bottom: '20%', right: '8%', scale: 0.85, transform: 'rotate(1deg)' },
+    { top: '40%', left: '-2%', scale: 0.75, transform: 'rotate(2deg)' },
+    { top: '50%', right: '2%', scale: 0.8, transform: 'rotate(-1deg)' }
+  ];
+};
+
+export const getRandomAnimationDelays = (): string[] => {
+  return ['0.8s', '1.2s', '1.6s', '2.0s', '2.4s', '2.8s'];
 };
