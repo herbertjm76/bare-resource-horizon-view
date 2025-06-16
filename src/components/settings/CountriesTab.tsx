@@ -15,8 +15,8 @@ import { toast } from 'sonner';
 const projectAreaFormSchema = z.object({
   code: z.string().min(1, "Code is required"),
   country: z.string().min(1, "Country is required"),
-  region: z.string().optional(),
-  city: z.string().optional(),
+  region: z.string().optional().default(""),
+  city: z.string().optional().default(""),
   color: z.string().min(1, "Color is required"),
 });
 
