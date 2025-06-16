@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, Download } from 'lucide-react';
 
 interface ColumnMappingInterfaceProps {
   headers: string[];
@@ -19,7 +19,9 @@ const PROJECT_FIELDS = [
   { value: 'country', label: 'Country', required: false },
   { value: 'current_stage', label: 'Current Stage', required: false },
   { value: 'target_profit_percentage', label: 'Target Profit %', required: false },
-  { value: 'currency', label: 'Currency', required: false }
+  { value: 'currency', label: 'Currency', required: false },
+  { value: 'project_manager_name', label: 'Project Manager Name', required: false },
+  { value: 'office_name', label: 'Office Name', required: false }
 ];
 
 export const ColumnMappingInterface: React.FC<ColumnMappingInterfaceProps> = ({
@@ -31,10 +33,26 @@ export const ColumnMappingInterface: React.FC<ColumnMappingInterfaceProps> = ({
   const [mapping, setMapping] = useState<Record<string, string>>({});
 
   const handleMappingChange = (columnIndex: string, projectField: string) => {
-    setMapping(prev => ({
-      ...prev,
-      [columnIndex]: projectField
-    }));
+    setMapping(prev => {
+      const newMapping = { ...prev };
+      
+      // If selecting "skip", remove this column from mapping
+      if (projectField === 'skip') {
+        delete newMapping[columnIndex];
+        return newMapping;
+      }
+      
+      // Remove any existing mapping for this field (prevent duplicates)
+      Object.keys(newMapping).forEach(key => {
+        if (newMapping[key] === projectField) {
+          delete newMapping[key];
+        }
+      });
+      
+      // Add new mapping
+      newMapping[columnIndex] = projectField;
+      return newMapping;
+    });
   };
 
   const handleComplete = () => {
@@ -54,6 +72,36 @@ export const ColumnMappingInterface: React.FC<ColumnMappingInterfaceProps> = ({
     onMappingComplete(mapping);
   };
 
+  const downloadTemplate = () => {
+    // Create a simple CSV template
+    const templateHeaders = PROJECT_FIELDS.map(field => 
+      field.required ? `${field.label} *` : field.label
+    ).join(',');
+    
+    const sampleRow = [
+      'PROJ-001',
+      'Sample Project Name',
+      'Planning',
+      'United States',
+      'Discovery',
+      '15',
+      'USD',
+      'John Doe',
+      'New York Office'
+    ].join(',');
+    
+    const csvContent = `${templateHeaders}\n${sampleRow}`;
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'project_import_template.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const getFieldLabel = (fieldValue: string) => {
     return PROJECT_FIELDS.find(f => f.value === fieldValue)?.label || fieldValue;
   };
@@ -64,8 +112,19 @@ export const ColumnMappingInterface: React.FC<ColumnMappingInterfaceProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="text-sm text-gray-600">
-        Map your Excel columns to project fields. Required fields are marked with an asterisk (*).
+      <div className="flex items-center justify-between">
+        <div className="text-sm text-gray-600">
+          Map your Excel columns to project fields. Required fields are marked with an asterisk (*).
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={downloadTemplate}
+          className="flex items-center gap-2"
+        >
+          <Download className="h-4 w-4" />
+          Download Template
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -84,24 +143,26 @@ export const ColumnMappingInterface: React.FC<ColumnMappingInterfaceProps> = ({
                   <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
                 </div>
                 <Select
-                  value={mapping[index.toString()] || ''}
+                  value={mapping[index.toString()] || 'skip'}
                   onValueChange={(value) => handleMappingChange(index.toString(), value)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select field..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">-- Skip this column --</SelectItem>
+                    <SelectItem value="skip">-- Skip this column --</SelectItem>
                     {PROJECT_FIELDS.map(field => (
                       <SelectItem 
                         key={field.value} 
                         value={field.value}
                         disabled={isFieldMapped(field.value) && mapping[index.toString()] !== field.value}
                       >
-                        {field.label}{field.required ? ' *' : ''}
-                        {isFieldMapped(field.value) && mapping[index.toString()] === field.value && (
-                          <Check className="h-4 w-4 ml-2 text-green-600" />
-                        )}
+                        <div className="flex items-center gap-2">
+                          {field.label}{field.required ? ' *' : ''}
+                          {isFieldMapped(field.value) && mapping[index.toString()] === field.value && (
+                            <Check className="h-4 w-4 text-green-600" />
+                          )}
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -144,8 +205,12 @@ export const ColumnMappingInterface: React.FC<ColumnMappingInterfaceProps> = ({
                       <tr key={rowIndex} className="border-b">
                         {row.map((cell, cellIndex) => (
                           <td key={cellIndex} className="p-2 text-gray-700">
-                            {String(cell || '').substring(0, 50)}
-                            {String(cell || '').length > 50 ? '...' : ''}
+                            <div className={`${
+                              mapping[cellIndex.toString()] ? 'bg-blue-50 border border-blue-200 rounded px-2 py-1' : ''
+                            }`}>
+                              {String(cell || '').substring(0, 50)}
+                              {String(cell || '').length > 50 ? '...' : ''}
+                            </div>
                           </td>
                         ))}
                       </tr>

@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Upload, FileSpreadsheet } from 'lucide-react';
+import { Upload, FileSpreadsheet, Download } from 'lucide-react';
 import { ExcelProcessor } from './services/ExcelProcessor';
 import { ColumnMappingInterface } from './ColumnMappingInterface';
 import { ImportProgressTracker } from './ImportProgressTracker';
@@ -30,6 +30,7 @@ export const ExcelImportDialog: React.FC<ExcelImportDialogProps> = ({
   const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
   const [importProgress, setImportProgress] = useState(0);
   const [importErrors, setImportErrors] = useState<string[]>([]);
+  const [importWarnings, setImportWarnings] = useState<string[]>([]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -63,18 +64,39 @@ export const ExcelImportDialog: React.FC<ExcelImportDialogProps> = ({
       });
 
       setImportErrors(result.errors);
+      setImportWarnings(result.warnings || []);
       
       if (result.success) {
         setCurrentStep('complete');
         toast.success(`Successfully imported ${result.successCount} projects`);
         onImportComplete();
       } else {
-        toast.error('Import completed with errors');
+        setCurrentStep('complete');
+        if (result.successCount > 0) {
+          toast.warning(`Imported ${result.successCount} projects with ${result.errors.length} errors`);
+        } else {
+          toast.error('Import failed');
+        }
       }
     } catch (error) {
       toast.error('Import failed');
       console.error('Import error:', error);
     }
+  };
+
+  const downloadTemplate = () => {
+    const processor = new ExcelProcessor();
+    const csvContent = processor.generateTemplate();
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'project_import_template.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Template downloaded successfully');
   };
 
   const resetDialog = () => {
@@ -84,6 +106,7 @@ export const ExcelImportDialog: React.FC<ExcelImportDialogProps> = ({
     setColumnMapping({});
     setImportProgress(0);
     setImportErrors([]);
+    setImportWarnings([]);
   };
 
   const handleClose = () => {
@@ -110,7 +133,18 @@ export const ExcelImportDialog: React.FC<ExcelImportDialogProps> = ({
         {currentStep === 'upload' && (
           <div className="space-y-4">
             <div className="text-sm text-gray-600 mb-4">
-              Upload an Excel file containing project data. The file should include columns for project information like name, code, status, etc.
+              Upload an Excel file containing project data. For best results, use our template or ensure your columns match the expected format.
+            </div>
+            
+            <div className="flex justify-center mb-4">
+              <Button
+                variant="outline"
+                onClick={downloadTemplate}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download Template
+              </Button>
             </div>
             
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
@@ -118,11 +152,11 @@ export const ExcelImportDialog: React.FC<ExcelImportDialogProps> = ({
               <div className="space-y-2">
                 <p className="text-lg font-medium">Upload Excel File</p>
                 <p className="text-sm text-gray-500">
-                  Supported formats: .xlsx, .xls
+                  Supported formats: .xlsx, .xls, .csv
                 </p>
                 <input
                   type="file"
-                  accept=".xlsx,.xls"
+                  accept=".xlsx,.xls,.csv"
                   onChange={handleFileUpload}
                   className="hidden"
                   id="excel-upload"
@@ -153,31 +187,38 @@ export const ExcelImportDialog: React.FC<ExcelImportDialogProps> = ({
           <ImportProgressTracker
             progress={importProgress}
             errors={importErrors}
+            warnings={importWarnings}
           />
         )}
 
         {currentStep === 'complete' && (
           <div className="space-y-4">
             <div className="text-center py-8">
-              <div className="text-green-600 text-lg font-semibold mb-2">
+              <div className={`text-lg font-semibold mb-2 ${
+                importErrors.length > 0 ? 'text-red-600' : 
+                importWarnings.length > 0 ? 'text-yellow-600' : 'text-green-600'
+              }`}>
                 Import Complete!
               </div>
               <p className="text-gray-600">
-                Your projects have been successfully imported.
+                Your projects have been processed.
               </p>
-              {importErrors.length > 0 && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm">
-                  <p className="font-medium text-yellow-800">
-                    {importErrors.length} rows had issues:
-                  </p>
-                  <ul className="mt-2 text-left text-yellow-700">
-                    {importErrors.slice(0, 5).map((error, index) => (
-                      <li key={index}>• {error}</li>
-                    ))}
-                    {importErrors.length > 5 && (
-                      <li>• And {importErrors.length - 5} more...</li>
-                    )}
-                  </ul>
+              {(importErrors.length > 0 || importWarnings.length > 0) && (
+                <div className="mt-4 space-y-2">
+                  {importErrors.length > 0 && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded text-sm">
+                      <p className="font-medium text-red-800">
+                        {importErrors.length} rows had errors
+                      </p>
+                    </div>
+                  )}
+                  {importWarnings.length > 0 && (
+                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded text-sm">
+                      <p className="font-medium text-yellow-800">
+                        {importWarnings.length} rows had warnings
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
