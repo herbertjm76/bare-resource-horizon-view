@@ -3,7 +3,8 @@ import React from 'react';
 import { ProjectArea } from './projectAreaTypes';
 import { Checkbox } from "@/components/ui/checkbox";
 import { ItemActions } from './common/ItemActions';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Edit } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 
 interface ProjectAreaListProps {
   areas: ProjectArea[];
@@ -91,7 +92,18 @@ export const ProjectAreaList: React.FC<ProjectAreaListProps> = ({
               </div>
             </div>
           </div>
-          {!editMode && (
+          
+          {editMode ? (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onEdit(area)}
+              className="h-8 px-3"
+            >
+              <Edit className="h-4 w-4 mr-1" />
+              Edit
+            </Button>
+          ) : (
             <ItemActions 
               onEdit={() => onEdit(area)}
               onDelete={() => onDelete(area)}
