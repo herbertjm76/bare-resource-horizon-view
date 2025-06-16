@@ -3,39 +3,75 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import ProjectAreaForm from './ProjectAreaForm';
 import ProjectAreaList from './ProjectAreaList';
 import { useProjectAreas } from './useProjectAreas';
 import { ProjectArea } from './projectAreaTypes';
 import { toast } from 'sonner';
 
+const projectAreaFormSchema = z.object({
+  code: z.string().min(1, "Code is required"),
+  country: z.string().min(1, "Country is required"),
+  region: z.string().optional(),
+  city: z.string().optional(),
+  color: z.string().min(1, "Color is required"),
+});
+
+export type ProjectAreaFormValues = z.infer<typeof projectAreaFormSchema>;
+
 export const CountriesTab = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingArea, setEditingArea] = useState<ProjectArea | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { areas, loading, addArea, updateArea, deleteArea } = useProjectAreas();
 
-  const handleSubmit = async (data: Omit<ProjectArea, 'id' | 'created_at' | 'updated_at'>) => {
+  const form = useForm<ProjectAreaFormValues>({
+    resolver: zodResolver(projectAreaFormSchema),
+    defaultValues: {
+      code: "",
+      country: "",
+      region: "",
+      city: "",
+      color: "#E5DEFF",
+    },
+  });
+
+  const handleSubmit = async (values: ProjectAreaFormValues) => {
     try {
+      setIsSubmitting(true);
       let success = false;
       
       if (editingArea) {
-        success = await updateArea(editingArea.id, data);
+        success = await updateArea(editingArea.id, values);
       } else {
-        success = await addArea(data);
+        success = await addArea(values);
       }
 
       if (success) {
         setShowForm(false);
         setEditingArea(null);
+        form.reset();
       }
     } catch (error) {
       console.error('Error in handleSubmit:', error);
       toast.error('An error occurred while saving the project area');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleEdit = (area: ProjectArea) => {
     setEditingArea(area);
+    form.reset({
+      code: area.code,
+      country: area.country,
+      region: area.region || "",
+      city: area.city || "",
+      color: area.color || "#E5DEFF",
+    });
     setShowForm(true);
   };
 
@@ -45,9 +81,24 @@ export const CountriesTab = () => {
     }
   };
 
-  const handleCancel = () => {
-    setShowForm(false);
+  const handleOpenChange = (open: boolean) => {
+    setShowForm(open);
+    if (!open) {
+      setEditingArea(null);
+      form.reset();
+    }
+  };
+
+  const handleAddNew = () => {
     setEditingArea(null);
+    form.reset({
+      code: "",
+      country: "",
+      region: "",
+      city: "",
+      color: "#E5DEFF",
+    });
+    setShowForm(true);
   };
 
   if (loading) {
@@ -68,7 +119,7 @@ export const CountriesTab = () => {
         <CardTitle>Project Areas</CardTitle>
         <Button 
           size="sm" 
-          onClick={() => setShowForm(true)}
+          onClick={handleAddNew}
           disabled={showForm}
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -81,13 +132,14 @@ export const CountriesTab = () => {
             Manage project areas or countries where your company operates. These can be used to categorize and organize your projects.
           </div>
           
-          {showForm && (
-            <ProjectAreaForm
-              onSubmit={handleSubmit}
-              onCancel={handleCancel}
-              initialData={editingArea}
-            />
-          )}
+          <ProjectAreaForm
+            open={showForm}
+            loading={isSubmitting}
+            editing={editingArea}
+            form={form}
+            onSubmit={handleSubmit}
+            onOpenChange={handleOpenChange}
+          />
           
           <ProjectAreaList
             areas={areas}
