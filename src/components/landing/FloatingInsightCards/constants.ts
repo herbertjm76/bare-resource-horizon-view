@@ -51,7 +51,7 @@ export const predefinedInsights: InsightData[] = [
   }
 ];
 
-// Improved balanced positioning for floating cards
+// Balanced positioning inspired by the reference image
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -62,25 +62,25 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Balanced positioning for tablets with more spacing
+    // Tablet positioning with better balance and spacing
     return [
-      { top: '8%', left: '3%', scale: 0.75, transform: 'rotate(-2deg)' },
-      { top: '18%', right: '5%', scale: 0.8, transform: 'rotate(1deg)' },
-      { bottom: '35%', left: '6%', scale: 0.7, transform: 'rotate(-1deg)' },
-      { bottom: '20%', right: '8%', scale: 0.75, transform: 'rotate(2deg)' },
-      { top: '45%', left: '1%', scale: 0.65, transform: 'rotate(1deg)' },
-      { top: '55%', right: '3%', scale: 0.7, transform: 'rotate(-1deg)' }
+      { top: '6%', left: '4%', scale: 0.8, transform: 'rotate(-3deg)' },
+      { top: '12%', right: '6%', scale: 0.85, transform: 'rotate(2deg)' },
+      { bottom: '35%', left: '8%', scale: 0.75, transform: 'rotate(-2deg)' },
+      { bottom: '18%', right: '10%', scale: 0.8, transform: 'rotate(3deg)' },
+      { top: '42%', left: '2%', scale: 0.7, transform: 'rotate(1deg)' },
+      { top: '58%', right: '4%', scale: 0.75, transform: 'rotate(-2deg)' }
     ];
   }
   
-  // Desktop positioning with improved balance and spacing
+  // Desktop positioning with improved balance matching reference image
   return [
-    { top: '10%', left: '3%', scale: 0.85, transform: 'rotate(-2deg)' },
-    { top: '8%', right: '6%', scale: 0.9, transform: 'rotate(1deg)' },
-    { bottom: '40%', left: '2%', scale: 0.8, transform: 'rotate(-1deg)' },
-    { bottom: '25%', right: '4%', scale: 0.85, transform: 'rotate(2deg)' },
-    { top: '35%', left: '1%', scale: 0.75, transform: 'rotate(1deg)' },
-    { top: '50%', right: '1%', scale: 0.8, transform: 'rotate(-2deg)' }
+    { top: '8%', left: '4%', scale: 0.9, transform: 'rotate(-3deg)' },
+    { top: '6%', right: '8%', scale: 0.95, transform: 'rotate(2deg)' },
+    { bottom: '38%', left: '3%', scale: 0.85, transform: 'rotate(-2deg)' },
+    { bottom: '22%', right: '6%', scale: 0.9, transform: 'rotate(3deg)' },
+    { top: '32%', left: '1%', scale: 0.8, transform: 'rotate(1deg)' },
+    { top: '48%', right: '2%', scale: 0.85, transform: 'rotate(-2deg)' }
   ];
 };
 
