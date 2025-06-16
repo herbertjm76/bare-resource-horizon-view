@@ -22,6 +22,7 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
     importProgress,
     importErrors,
     importWarnings,
+    importSuggestions,
     handleFileUpload,
     handleMappingComplete,
     downloadTemplate,
@@ -53,6 +54,7 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
           progress={importProgress}
           errors={importErrors}
           warnings={importWarnings}
+          suggestions={importSuggestions}
         />
       );
 
@@ -61,6 +63,7 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
         <ImportCompleteStep
           importErrors={importErrors}
           importWarnings={importWarnings}
+          importSuggestions={importSuggestions}
           onClose={onClose}
         />
       );

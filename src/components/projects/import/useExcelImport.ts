@@ -13,6 +13,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
   const [importProgress, setImportProgress] = useState(0);
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const [importWarnings, setImportWarnings] = useState<string[]>([]);
+  const [importSuggestions, setImportSuggestions] = useState<string[]>([]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -47,6 +48,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
 
       setImportErrors(result.errors);
       setImportWarnings(result.warnings || []);
+      setImportSuggestions(result.suggestions || []);
       
       if (result.success) {
         setCurrentStep('complete');
@@ -89,6 +91,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
     setImportProgress(0);
     setImportErrors([]);
     setImportWarnings([]);
+    setImportSuggestions([]);
   };
 
   return {
@@ -98,6 +101,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
     importProgress,
     importErrors,
     importWarnings,
+    importSuggestions,
     handleFileUpload,
     handleMappingComplete,
     downloadTemplate,
