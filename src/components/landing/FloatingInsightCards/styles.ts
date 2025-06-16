@@ -81,6 +81,10 @@ export const globalStyles = `
     100% { box-shadow: 0 5px 18px rgba(0,0,0,0.07); }
   }
   
+  .insight-card {
+    transition: transform 0.2s ease-out, z-index 0.2s ease-out !important;
+  }
+  
   .insight-card:nth-child(1) {
     animation: floatGently1 3.2s ease-in-out infinite, cardGlow1 3.8s ease-in-out infinite;
   }
@@ -100,12 +104,9 @@ export const globalStyles = `
     animation: floatGently3 2.7s ease-in-out infinite, cardGlow3 3.9s ease-in-out infinite;
   }
   
-  .insight-card {
-    transition: transform 0.2s ease-out, z-index 0.2s ease-out !important;
-  }
-  
   .insight-card:hover {
     transform: scale(1.05) !important;
     z-index: 50 !important;
+    animation-play-state: paused !important;
   }
 `;
