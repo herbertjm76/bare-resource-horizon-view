@@ -37,7 +37,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         transform: `scale(${cardScale}) ${position.transform || ''}`,
         width: `${12 * cardScale}rem`,
         height: `${6 * cardScale}rem`,
-        padding: `${Math.max(0.75, 1.2 * cardScale)}rem`,
+        padding: '2rem',
         pointerEvents: 'auto',
         // Enhanced shadow and backdrop for better depth and visibility
         boxShadow: `0 12px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)`,
@@ -59,11 +59,11 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-2.5 shadow-lg flex-shrink-0`}>
             <Icon 
               className={`${styles.iconColor}`}
-              size={Math.max(16, Math.round(18 * cardScale))}
+              size={Math.max(18, Math.round(20 * cardScale))}
               strokeWidth={2.5}
             />
           </div>
-          <div className={`text-sm font-bold ${styles.numberColor} leading-tight flex-1`}>
+          <div className={`text-base font-bold ${styles.numberColor} leading-tight flex-1`}>
             {insight.title}
           </div>
         </div>
@@ -73,16 +73,16 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-2.5 shadow-lg flex-shrink-0`}>
             <Icon 
               className={`${styles.iconColor}`}
-              size={Math.max(16, Math.round(20 * cardScale))}
+              size={Math.max(18, Math.round(22 * cardScale))}
               strokeWidth={2.5}
             />
           </div>
           <div className="flex-1 min-w-0">
-            <div className={`text-base font-bold ${styles.numberColor} leading-tight mb-1`}>
+            <div className={`text-lg font-bold ${styles.numberColor} leading-tight mb-1`}>
               {insight.kpi || insight.title}
             </div>
             {insight.description && (
-              <div className={`text-xs ${styles.textColor} font-medium leading-tight opacity-90`}>
+              <div className={`text-sm ${styles.textColor} font-medium leading-tight opacity-90`}>
                 {insight.description}
               </div>
             )}
