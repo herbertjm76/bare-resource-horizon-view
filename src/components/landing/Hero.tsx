@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
@@ -99,9 +98,9 @@ const Hero = () => {
                 {/* Main Dashboard Image */}
                 <div className="relative group">
                   <div className="bg-white/20 backdrop-blur-lg p-4 sm:p-6 rounded-3xl shadow-2xl border border-white/30 transition-all duration-700 hover:scale-105 hover:shadow-3xl group-hover:bg-white/25 px-0 py-0">
-                    <img src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" alt="Rolling Availability Calendar and Burn Meter Dashboard" className="w-full rounded-2xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover" style={{
+                    <img src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" alt="Rolling Availability Calendar and Burn Meter Dashboard" style={{
                     transform: 'scale(0.90)'
-                  }} />
+                  }} className="w-full rounded-2xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover" />
                   </div>
                 </div>
                 
