@@ -51,7 +51,7 @@ export const predefinedInsights: InsightData[] = [
   }
 ];
 
-// Positioning cards to extend beyond the main visual area for dynamic effect
+// Positioning cards to overlap outside the image div margins
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -62,32 +62,36 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Tablet positioning - extending beyond dashboard bounds
+    // Tablet positioning - overlapping the image margins
     return [
-      // Far top left - extending beyond
-      { top: '5%', left: '2%', scale: 0.7, transform: 'rotate(-3deg)' },
-      // Far top right - extending beyond
-      { top: '8%', right: '1%', scale: 0.75, transform: 'rotate(2deg)' },
-      // Far bottom left - extending beyond
-      { bottom: '10%', left: '1%', scale: 0.7, transform: 'rotate(-2deg)' },
-      // Far bottom right - extending beyond
-      { bottom: '5%', right: '3%', scale: 0.75, transform: 'rotate(3deg)' }
+      // Top left - overlapping from outside
+      { top: '15%', left: '-5%', scale: 0.7, transform: 'rotate(-2deg)' },
+      // Top right - overlapping from outside
+      { top: '10%', right: '-8%', scale: 0.75, transform: 'rotate(3deg)' },
+      // Bottom left - overlapping from outside
+      { bottom: '20%', left: '-3%', scale: 0.7, transform: 'rotate(-1deg)' },
+      // Bottom right - overlapping from outside
+      { bottom: '15%', right: '-6%', scale: 0.75, transform: 'rotate(2deg)' }
     ];
   }
   
-  // Desktop positioning - cards extending well beyond the main visual area
+  // Desktop positioning - cards overlapping the image div margins
   return [
-    // Far top left - well outside the dashboard area
-    { top: '8%', left: '1%', scale: 0.8, transform: 'rotate(-3deg)' },
-    // Far top right - well outside the dashboard area
-    { top: '12%', right: '2%', scale: 0.85, transform: 'rotate(2deg)' },
-    // Far bottom left - well outside the dashboard area
-    { bottom: '15%', left: '2%', scale: 0.75, transform: 'rotate(-2deg)' },
-    // Far bottom right - well outside the dashboard area
-    { bottom: '8%', right: '1%', scale: 0.8, transform: 'rotate(3deg)' }
+    // Top left - extending from outside the image area
+    { top: '10%', left: '-8%', scale: 0.8, transform: 'rotate(-2deg)' },
+    // Top right - extending from outside the image area
+    { top: '5%', right: '-10%', scale: 0.85, transform: 'rotate(3deg)' },
+    // Bottom left - extending from outside the image area
+    { bottom: '25%', left: '-6%', scale: 0.75, transform: 'rotate(-1deg)' },
+    // Bottom right - extending from outside the image area
+    { bottom: '20%', right: '-8%', scale: 0.8, transform: 'rotate(2deg)' },
+    // Middle left - overlapping the left margin
+    { top: '40%', left: '-4%', scale: 0.7, transform: 'rotate(-3deg)' },
+    // Middle right - overlapping the right margin
+    { top: '50%', right: '-5%', scale: 0.75, transform: 'rotate(1deg)' }
   ];
 };
 
 export const getRandomAnimationDelays = (): string[] => {
-  return ['0.8s', '1.2s', '1.6s', '2.0s'];
+  return ['0.8s', '1.2s', '1.6s', '2.0s', '2.4s', '2.8s'];
 };

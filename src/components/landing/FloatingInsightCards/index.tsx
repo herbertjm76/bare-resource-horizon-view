@@ -25,8 +25,8 @@ export const FloatingInsightCards: React.FC<FloatingInsightCardsProps> = ({
     return null;
   }
 
-  // Only render 4 cards to match the new distributed layout
-  const cardsToShow = predefinedInsights.slice(0, 4);
+  // Show up to 6 cards for the new distributed layout
+  const cardsToShow = predefinedInsights.slice(0, Math.min(positions.length, 6));
 
   return (
     <>
