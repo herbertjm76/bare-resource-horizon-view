@@ -1,22 +1,22 @@
 
-import { TrendingUp, Users, Calendar, Clock, Target, CheckCircle } from "lucide-react";
+import { TrendingUp, Users, Calendar, Clock, Target, CheckCircle, AlertTriangle, DollarSign, UserCheck, Zap } from "lucide-react";
 import { InsightData, CardPosition } from "./types";
 
 export const predefinedInsights: InsightData[] = [
   {
-    title: "87% Team Utilization",
-    kpi: "87%",
-    description: "Optimal capacity",
-    icon: TrendingUp,
-    color: "green",
+    title: "150% Capacity Alert",
+    kpi: "150%",
+    description: "Sarah is overbooked",
+    icon: AlertTriangle,
+    color: "red",
     hasSubtitle: true
   },
   {
-    title: "12 Active Team Members",
-    kpi: "12",
-    description: "Available resources",
-    icon: Users,
-    color: "blue",
+    title: "Peak Leave Week",
+    kpi: "6 members",
+    description: "Away next week",
+    icon: Calendar,
+    color: "orange",
     hasSubtitle: true
   },
   {
@@ -28,24 +28,24 @@ export const predefinedInsights: InsightData[] = [
     hasSubtitle: true
   },
   {
-    title: "On Track This Month",
-    icon: CheckCircle,
+    title: "5 Available Resources",
+    kpi: "5 people",
+    description: "Ready for allocation",
+    icon: UserCheck,
     color: "green",
-    hasSubtitle: false
-  },
-  {
-    title: "Average Project: 3.2 Weeks",
-    kpi: "3.2 weeks",
-    description: "Delivery time",
-    icon: Clock,
-    color: "teal",
     hasSubtitle: true
   },
   {
-    title: "Peak Capacity: Dec 15",
-    kpi: "Dec 15",
-    description: "Next bottleneck",
-    icon: Calendar,
+    title: "Team Overload Warning",
+    icon: Zap,
+    color: "red",
+    hasSubtitle: false
+  },
+  {
+    title: "Fee Burn Alert!",
+    kpi: "85%",
+    description: "Budget consumed",
+    icon: DollarSign,
     color: "orange",
     hasSubtitle: true
   }

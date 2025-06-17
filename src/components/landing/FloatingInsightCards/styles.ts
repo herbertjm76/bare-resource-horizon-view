@@ -1,4 +1,3 @@
-
 import { InsightStyles } from "./types";
 
 export const insightStyles: Record<string, InsightStyles> = {
