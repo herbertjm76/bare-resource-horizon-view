@@ -18,9 +18,11 @@ export const useCitySelect = (country: string, onChange: (value: string) => void
   
   // Debug logging to see what's happening
   console.log('useCitySelect: Current country:', country);
-  console.log('useCitySelect: Available countries in data:', Object.keys(CITIES_BY_COUNTRY));
-  console.log('useCitySelect: Suggested cities:', suggestedCities);
+  console.log('useCitySelect: Country is truthy?', !!country);
+  console.log('useCitySelect: Available countries in data:', Object.keys(CITIES_BY_COUNTRY).slice(0, 10)); // Show first 10
+  console.log('useCitySelect: Suggested cities for country:', suggestedCities.slice(0, 5)); // Show first 5
   console.log('useCitySelect: Search term:', searchTerm);
+  console.log('useCitySelect: Dropdown open?', open);
 
   // Filter cities based on search term - improved logic
   let displayedCities: string[];
@@ -96,11 +98,15 @@ export const useCitySelect = (country: string, onChange: (value: string) => void
   };
 
   const handleToggleOpen = () => {
-    if (country) {
+    console.log('useCitySelect: handleToggleOpen called');
+    console.log('useCitySelect: Country for toggle:', country);
+    console.log('useCitySelect: Country is truthy for toggle?', !!country);
+    
+    if (country && country.trim() !== '') {
       console.log('useCitySelect: Toggling dropdown, current open state:', open);
       setOpen(!open);
     } else {
-      console.log('useCitySelect: Cannot open dropdown, no country selected');
+      console.log('useCitySelect: Cannot open dropdown, no country selected. Country value:', JSON.stringify(country));
     }
   };
 

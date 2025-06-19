@@ -13,6 +13,14 @@ export const CitySelect: React.FC<CitySelectProps> = ({
   placeholder,
   className
 }) => {
+  console.log('CitySelect: Received props:', {
+    value,
+    country,
+    disabled,
+    placeholder,
+    className
+  });
+
   const {
     open,
     searchTerm,
@@ -23,6 +31,13 @@ export const CitySelect: React.FC<CitySelectProps> = ({
     handleClose,
     setSearchTerm
   } = useCitySelect(country, onChange);
+
+  console.log('CitySelect: Hook returned:', {
+    open,
+    searchTerm,
+    displayedCitiesCount: displayedCities.length,
+    firstFewCities: displayedCities.slice(0, 3)
+  });
 
   return (
     <div className="relative">
@@ -36,7 +51,7 @@ export const CitySelect: React.FC<CitySelectProps> = ({
       />
 
       {open && country && (
-        <div className="absolute z-50 w-full mt-2 bg-background border border-muted rounded-md shadow-xl">
+        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-xl">
           <Command>
             <CommandInput 
               placeholder="Search or enter city name..." 
@@ -50,7 +65,7 @@ export const CitySelect: React.FC<CitySelectProps> = ({
                   <CommandItem
                     key={city}
                     value={city}
-                    className="cursor-pointer"
+                    className="cursor-pointer hover:bg-gray-100"
                     onSelect={() => handleCitySelect(city)}
                   >
                     <span>{city}</span>
@@ -60,11 +75,11 @@ export const CitySelect: React.FC<CitySelectProps> = ({
                 <CommandEmpty>
                   {searchTerm ? (
                     <div className="p-2">
-                      <div className="text-sm text-muted-foreground mb-2">
+                      <div className="text-sm text-gray-600 mb-2">
                         No cities found. Press Enter to add "{searchTerm}"
                       </div>
                       <button
-                        className="text-sm text-primary hover:underline"
+                        className="text-sm text-blue-600 hover:underline"
                         onClick={() => handleCitySelect(searchTerm)}
                       >
                         Add "{searchTerm}"

@@ -27,8 +27,10 @@ export const LocationForm: React.FC<LocationFormProps> = ({
   onSubmit,
   onCancel
 }) => {
+  console.log('LocationForm: Current formData:', formData);
+
   const handleCountryChange = (countryName: string, code?: string, flag?: string) => {
-    console.log('Country changed:', { countryName, code, flag });
+    console.log('LocationForm: Country changed:', { countryName, code, flag });
     setFormData({
       ...formData,
       country: countryName,
@@ -39,7 +41,7 @@ export const LocationForm: React.FC<LocationFormProps> = ({
   };
 
   const handleCityChange = (cityName: string) => {
-    console.log('City changed:', cityName);
+    console.log('LocationForm: City changed:', cityName);
     setFormData({
       ...formData,
       city: cityName
@@ -47,7 +49,7 @@ export const LocationForm: React.FC<LocationFormProps> = ({
   };
 
   const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('Code changed:', e.target.value);
+    console.log('LocationForm: Code changed:', e.target.value);
     setFormData({
       ...formData,
       code: e.target.value
@@ -74,16 +76,22 @@ export const LocationForm: React.FC<LocationFormProps> = ({
             onChange={handleCountryChange}
             placeholder="Select country"
           />
+          <div className="text-xs text-gray-500 mt-1">
+            Current country: "{formData.country}" (length: {formData.country.length})
+          </div>
         </div>
         <div>
           <label className="text-sm font-medium">City <span className="text-red-500">*</span></label>
           <CitySelect
-            key={formData.country} // Force re-render when country changes
+            key={`${formData.country}-${Date.now()}`} // Force re-render when country changes
             value={formData.city}
             onChange={handleCityChange}
             country={formData.country}
             placeholder="Select or enter city"
           />
+          <div className="text-xs text-gray-500 mt-1">
+            Country passed to CitySelect: "{formData.country}" | City: "{formData.city}"
+          </div>
         </div>
         <div>
           <label className="text-sm font-medium">Code <span className="text-red-500">*</span></label>
