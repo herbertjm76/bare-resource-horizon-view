@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, Plus } from "lucide-react";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
-import { RoleForm } from './RoleForm';
+import { AddRoleDialog } from './AddRoleDialog';
 import { BulkOperations } from './BulkOperations';
 import { RoleList } from './RoleList';
 import { useRoleOperations } from './useRoleOperations';
@@ -60,10 +60,9 @@ export const RolesTab = () => {
           <Button 
             size="sm" 
             onClick={handleAddNew}
-            variant={showAddForm ? "secondary" : "default"}
           >
             <Plus className="h-4 w-4 mr-2" />
-            {showAddForm ? "Cancel" : "Add Role"}
+            Add Role
           </Button>
         </div>
       </CardHeader>
@@ -80,16 +79,16 @@ export const RolesTab = () => {
             />
           )}
 
-          {showAddForm && (
-            <RoleForm
-              newRoleName={newRoleName}
-              setNewRoleName={setNewRoleName}
-              onSubmit={handleSubmit}
-              editingRole={editingRole}
-              isSubmitting={isSubmitting}
-              onCancel={handleCancel}
-            />
-          )}
+          <AddRoleDialog
+            open={showAddForm}
+            onOpenChange={(open) => !open && handleCancel()}
+            newRoleName={newRoleName}
+            setNewRoleName={setNewRoleName}
+            onSubmit={handleSubmit}
+            editingRole={editingRole}
+            isSubmitting={isSubmitting}
+            onCancel={handleCancel}
+          />
 
           <RoleList
             roles={roles}

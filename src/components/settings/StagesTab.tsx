@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, Plus } from "lucide-react";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
-import {StageForm } from './stages/StageForm';
+import { AddStageDialog } from './stages/AddStageDialog';
 import { BulkOperations } from './stages/BulkOperations';
 import { StageList } from './stages/StageList';
 import { useStageOperations } from './stages/useStageOperations';
@@ -62,10 +62,9 @@ export const StagesTab = () => {
           <Button 
             size="sm" 
             onClick={handleAddNew}
-            variant={showAddForm ? "secondary" : "default"}
           >
             <Plus className="h-4 w-4 mr-2" />
-            {showAddForm ? "Cancel" : "Add Stage"}
+            Add Stage
           </Button>
         </div>
       </CardHeader>
@@ -82,18 +81,18 @@ export const StagesTab = () => {
             />
           )}
 
-          {showAddForm && (
-            <StageForm
-              newStageName={newStageName}
-              setNewStageName={setNewStageName}
-              newStageColor={newStageColor}
-              setNewStageColor={setNewStageColor}
-              onSubmit={handleSubmit}
-              editingStage={editingStage}
-              isSubmitting={isSubmitting}
-              onCancel={handleCancel}
-            />
-          )}
+          <AddStageDialog
+            open={showAddForm}
+            onOpenChange={(open) => !open && handleCancel()}
+            newStageName={newStageName}
+            setNewStageName={setNewStageName}
+            newStageColor={newStageColor}
+            setNewStageColor={setNewStageColor}
+            onSubmit={handleSubmit}
+            editingStage={editingStage}
+            isSubmitting={isSubmitting}
+            onCancel={handleCancel}
+          />
 
           <StageList
             stages={office_stages}

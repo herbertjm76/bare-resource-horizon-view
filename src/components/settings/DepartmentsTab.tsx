@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Edit, Plus } from "lucide-react";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
-import { DepartmentForm } from './departments/DepartmentForm';
+import { AddDepartmentDialog } from './departments/AddDepartmentDialog';
 import { BulkOperations } from './departments/BulkOperations';
 import { DepartmentList } from './departments/DepartmentList';
 import { useDepartmentOperations } from './departments/useDepartmentOperations';
@@ -60,10 +60,9 @@ export const DepartmentsTab = () => {
           <Button 
             size="sm" 
             onClick={handleAddNew}
-            variant={showAddForm ? "secondary" : "default"}
           >
             <Plus className="h-4 w-4 mr-2" />
-            {showAddForm ? "Cancel" : "Add Department"}
+            Add Department
           </Button>
         </div>
       </CardHeader>
@@ -80,16 +79,16 @@ export const DepartmentsTab = () => {
             />
           )}
 
-          {showAddForm && (
-            <DepartmentForm
-              newDepartmentName={newDepartmentName}
-              setNewDepartmentName={setNewDepartmentName}
-              onSubmit={handleSubmit}
-              editingDepartment={editingDepartment}
-              isSubmitting={isSubmitting}
-              onCancel={handleCancel}
-            />
-          )}
+          <AddDepartmentDialog
+            open={showAddForm}
+            onOpenChange={(open) => !open && handleCancel()}
+            newDepartmentName={newDepartmentName}
+            setNewDepartmentName={setNewDepartmentName}
+            onSubmit={handleSubmit}
+            editingDepartment={editingDepartment}
+            isSubmitting={isSubmitting}
+            onCancel={handleCancel}
+          />
 
           <DepartmentList
             departments={departments}

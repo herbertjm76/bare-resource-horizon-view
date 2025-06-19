@@ -54,40 +54,44 @@ export const ProjectAreaList: React.FC<ProjectAreaListProps> = ({
       {areas.map((area) => (
         <Card
           key={area.id}
-          className="p-4 cursor-move"
-          draggable
-          onDragStart={(e) => handleDragStart(e, area.id)}
-          onDrop={(e) => handleDrop(e, area.id)}
-          onDragOver={handleDragOver}
+          className={`p-4 ${editMode ? 'cursor-move' : ''}`}
+          draggable={editMode}
+          onDragStart={(e) => editMode && handleDragStart(e, area.id)}
+          onDrop={(e) => editMode && handleDrop(e, area.id)}
+          onDragOver={editMode ? handleDragOver : undefined}
         >
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2 flex-1">
               {editMode && (
-                <Checkbox
-                  checked={selectedAreas.includes(area.id)}
-                  onCheckedChange={() => onSelectArea(area.id)}
-                />
+                <>
+                  <Checkbox
+                    checked={selectedAreas.includes(area.id)}
+                    onCheckedChange={() => onSelectArea(area.id)}
+                  />
+                  <GripVertical className="h-4 w-4 text-muted-foreground" />
+                </>
               )}
-              <GripVertical className="h-4 w-4 text-muted-foreground" />
             </div>
-            <div className="flex gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onEdit(area)}
-              >
-                <Edit className="h-3 w-3" />
-                <span className="sr-only">Edit</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onDelete(area)}
-              >
-                <Trash2 className="h-3 w-3" />
-                <span className="sr-only">Delete</span>
-              </Button>
-            </div>
+            {editMode && (
+              <div className="flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit(area)}
+                >
+                  <Edit className="h-3 w-3" />
+                  <span className="sr-only">Edit</span>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDelete(area)}
+                >
+                  <Trash2 className="h-3 w-3" />
+                  <span className="sr-only">Delete</span>
+                </Button>
+              </div>
+            )}
           </div>
           
           <div className="mt-2">
