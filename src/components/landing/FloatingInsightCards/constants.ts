@@ -4,36 +4,28 @@ import { InsightData, CardPosition } from "./types";
 
 export const predefinedInsights: InsightData[] = [
   {
-    title: "150% Capacity Alert",
-    kpi: "150%",
-    description: "Sarah is overbooked",
+    title: "Sarah 150% Overbooked",
     icon: AlertTriangle,
     color: "red",
-    hasSubtitle: true
+    hasSubtitle: false
   },
   {
-    title: "Peak Leave Week",
-    kpi: "6 members",
-    description: "Away next week",
+    title: "6 People Away Next Week",
     icon: Calendar,
     color: "orange",
-    hasSubtitle: true
+    hasSubtitle: false
   },
   {
     title: "15 Active Projects",
-    kpi: "15",
-    description: "In progress",
     icon: Target,
     color: "purple",
-    hasSubtitle: true
+    hasSubtitle: false
   },
   {
     title: "5 Available Resources",
-    kpi: "5 people",
-    description: "Ready for allocation",
     icon: UserCheck,
     color: "green",
-    hasSubtitle: true
+    hasSubtitle: false
   },
   {
     title: "Team Overload Warning",
@@ -42,16 +34,14 @@ export const predefinedInsights: InsightData[] = [
     hasSubtitle: false
   },
   {
-    title: "Fee Burn Alert!",
-    kpi: "85%",
-    description: "Budget consumed",
+    title: "85% Budget Burned",
     icon: DollarSign,
     color: "orange",
-    hasSubtitle: true
+    hasSubtitle: false
   }
 ];
 
-// Redesigned positioning for better visual balance with the main image
+// More asymmetrical positioning that extends outside the image frame
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -62,30 +52,31 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Tablet positioning - closer to image with better balance
+    // Tablet positioning - more asymmetrical and extending outside
     return [
-      // Top area - balanced on both sides
-      { top: '8%', left: '2%', scale: 0.6, transform: 'rotate(-1deg)' },
-      { top: '12%', right: '1%', scale: 0.65, transform: 'rotate(2deg)' },
-      // Bottom area - symmetrical placement
-      { bottom: '15%', left: '1%', scale: 0.6, transform: 'rotate(1deg)' },
-      { bottom: '18%', right: '2%', scale: 0.65, transform: 'rotate(-2deg)' }
+      // Top area - asymmetrical placement
+      { top: '5%', left: '-8%', scale: 0.55, transform: 'rotate(-2deg)' },
+      { top: '15%', right: '-12%', scale: 0.6, transform: 'rotate(3deg)' },
+      // Middle area - off-center placement
+      { top: '40%', left: '-15%', scale: 0.58, transform: 'rotate(1deg)' },
+      // Bottom area - irregular spacing
+      { bottom: '10%', right: '-10%', scale: 0.62, transform: 'rotate(-1deg)' }
     ];
   }
   
-  // Desktop positioning - better integration with the image
+  // Desktop positioning - highly asymmetrical with overlap outside image
   return [
-    // Top tier - balanced distribution
-    { top: '5%', left: '3%', scale: 0.7, transform: 'rotate(-1deg)' },
-    { top: '8%', right: '2%', scale: 0.75, transform: 'rotate(2deg)' },
+    // Top tier - scattered placement extending beyond frame
+    { top: '2%', left: '-12%', scale: 0.65, transform: 'rotate(-2deg)' },
+    { top: '18%', right: '-15%', scale: 0.7, transform: 'rotate(3deg)' },
     
-    // Middle tier - side placement for depth
-    { top: '35%', left: '1%', scale: 0.65, transform: 'rotate(-2deg)' },
-    { top: '45%', right: '0%', scale: 0.7, transform: 'rotate(1deg)' },
+    // Middle tier - irregular positioning outside frame
+    { top: '32%', left: '-18%', scale: 0.6, transform: 'rotate(-1deg)' },
+    { top: '55%', right: '-8%', scale: 0.68, transform: 'rotate(2deg)' },
     
-    // Bottom tier - completing the frame
-    { bottom: '20%', left: '2%', scale: 0.68, transform: 'rotate(1deg)' },
-    { bottom: '25%', right: '1%', scale: 0.72, transform: 'rotate(-1deg)' }
+    // Bottom tier - asymmetrical completion extending beyond boundaries
+    { bottom: '25%', left: '-10%', scale: 0.63, transform: 'rotate(1deg)' },
+    { bottom: '8%', right: '-20%', scale: 0.72, transform: 'rotate(-2deg)' }
   ];
 };
 
