@@ -64,6 +64,31 @@ export const CITIES_BY_COUNTRY: Record<string, string[]> = {
     "Kobe", "Kawasaki", "Kyoto", "Saitama", "Hiroshima", "Sendai",
     "Kitakyushu", "Chiba", "Sakai", "Niigata", "Hamamatsu", "Kumamoto"
   ],
+  "Philippines": [
+    "Manila", "Quezon City", "Davao", "Caloocan", "Cebu City", "Zamboanga",
+    "Taguig", "Antipolo", "Pasig", "Cagayan de Oro", "Paranaque", "Dasmarinas",
+    "Las Pinas", "Makati", "Bacoor", "General Santos", "Muntinlupa", "Marikina"
+  ],
+  "Thailand": [
+    "Bangkok", "Nonthaburi", "Nakhon Ratchasima", "Chiang Mai", "Hat Yai",
+    "Udon Thani", "Pak Kret", "Khon Kaen", "Nakhon Si Thammarat", "Rayong"
+  ],
+  "Vietnam": [
+    "Ho Chi Minh City", "Hanoi", "Da Nang", "Hai Phong", "Can Tho",
+    "Bien Hoa", "Hue", "Nha Trang", "Buon Ma Thuot", "Vung Tau"
+  ],
+  "Malaysia": [
+    "Kuala Lumpur", "George Town", "Ipoh", "Shah Alam", "Petaling Jaya",
+    "Klang", "Johor Bahru", "Subang Jaya", "Kuching", "Kota Kinabalu"
+  ],
+  "Indonesia": [
+    "Jakarta", "Surabaya", "Bandung", "Bekasi", "Medan", "Tangerang",
+    "Depok", "Semarang", "Palembang", "Makassar", "South Tangerang", "Batam"
+  ],
+  "South Korea": [
+    "Seoul", "Busan", "Incheon", "Daegu", "Daejeon", "Gwangju",
+    "Suwon", "Ulsan", "Changwon", "Goyang", "Yongin", "Seongnam"
+  ],
   "Brazil": [
     "São Paulo", "Rio de Janeiro", "Brasília", "Salvador", "Fortaleza",
     "Belo Horizonte", "Manaus", "Curitiba", "Recife", "Goiânia",
@@ -104,5 +129,29 @@ export const CITIES_BY_COUNTRY: Record<string, string[]> = {
   "Venezuela": [
     "Caracas", "Maracaibo", "Valencia", "Barquisimeto", "Maracay", "Ciudad Guayana",
     "San Cristóbal", "Maturín", "Ciudad Bolívar", "Cumá"
+  ],
+  "Russia": [
+    "Moscow", "Saint Petersburg", "Novosibirsk", "Yekaterinburg", "Nizhny Novgorod",
+    "Kazan", "Chelyabinsk", "Omsk", "Samara", "Rostov-on-Don"
+  ],
+  "Poland": [
+    "Warsaw", "Krakow", "Lodz", "Wroclaw", "Poznan", "Gdansk",
+    "Szczecin", "Bydgoszcz", "Lublin", "Katowice"
+  ],
+  "Turkey": [
+    "Istanbul", "Ankara", "Izmir", "Bursa", "Antalya", "Adana",
+    "Konya", "Gaziantep", "Mersin", "Diyarbakir"
+  ],
+  "Egypt": [
+    "Cairo", "Alexandria", "Giza", "Shubra El Kheima", "Port Said",
+    "Suez", "Luxor", "Mansoura", "El Mahalla El Kubra", "Tanta"
+  ],
+  "Nigeria": [
+    "Lagos", "Kano", "Ibadan", "Abuja", "Port Harcourt", "Benin City",
+    "Maiduguri", "Zaria", "Aba", "Jos"
+  ],
+  "Kenya": [
+    "Nairobi", "Mombasa", "Nakuru", "Eldoret", "Kisumu", "Thika",
+    "Malindi", "Kitale", "Garissa", "Kakamega"
   ]
 };
