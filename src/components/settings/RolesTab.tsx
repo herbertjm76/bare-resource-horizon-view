@@ -1,231 +1,238 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Plus, Pencil, Trash } from "lucide-react";
-import { Role, useOfficeSettings } from "@/context/OfficeSettingsContext";
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { useCompany } from '@/context/CompanyContext';
-import { ItemActions } from './common/ItemActions';
-
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  code: z.string().min(1, "Code is required"),
-});
+import { Plus, Edit, Trash2 } from "lucide-react";
+import { useOfficeSettings } from "@/context/OfficeSettingsContext";
+import { useCompany } from "@/context/CompanyContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const RolesTab = () => {
   const { roles, setRoles, loading } = useOfficeSettings();
   const { company } = useCompany();
-  const [open, setOpen] = useState(false);
-  const [editingRole, setEditingRole] = useState<Role | null>(null);
+  const [editingRole, setEditingRole] = useState<any>(null);
+  const [newRoleName, setNewRoleName] = useState("");
+  const [editMode, setEditMode] = useState(false);
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      code: "",
-    },
-  });
+  const handleSubmit = async () => {
+    if (!newRoleName.trim() || !company) return;
 
-  useEffect(() => {
-    if (company) {
-      console.log("RolesTab - Company ID:", company.id);
-      console.log("RolesTab - Roles:", roles);
+    setIsSubmitting(true);
+    try {
+      if (editingRole) {
+        const { data, error } = await supabase
+          .from('office_roles')
+          .update({ name: newRoleName.trim() })
+          .eq('id', editingRole.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        setRoles(roles.map(role => 
+          role.id === editingRole.id ? data : role
+        ));
+        toast.success('Role updated successfully');
+      } else {
+        const { data, error } = await supabase
+          .from('office_roles')
+          .insert([{
+            name: newRoleName.trim(),
+            company_id: company.id
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        setRoles([...roles, data]);
+        toast.success('Role added successfully');
+      }
+
+      setNewRoleName("");
+      setEditingRole(null);
+    } catch (error) {
+      console.error('Error saving role:', error);
+      toast.error('Failed to save role');
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [company, roles]);
-
-  const handleEditRole = (role: Role) => {
-    setEditingRole(role);
-    form.reset({
-      name: role.name,
-      code: role.code,
-    });
-    setOpen(true);
   };
 
-  const handleDeleteRole = async (id: string) => {
-    if (!company) {
-      toast.error('No company selected');
-      return;
-    }
-    
+  const handleEdit = (role: any) => {
+    setEditingRole(role);
+    setNewRoleName(role.name);
+  };
+
+  const handleDelete = async (role: any) => {
+    if (!confirm('Are you sure you want to delete this role?')) return;
+
     try {
       const { error } = await supabase
         .from('office_roles')
         .delete()
-        .eq('id', id);
-      
+        .eq('id', role.id);
+
       if (error) throw error;
-      
-      setRoles(roles.filter(role => role.id !== id));
+
+      setRoles(roles.filter(r => r.id !== role.id));
       toast.success('Role deleted successfully');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error deleting role:', error);
       toast.error('Failed to delete role');
     }
   };
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!company) {
-      toast.error('No company selected');
-      return;
-    }
+  const handleBulkDelete = async () => {
+    if (selectedRoles.length === 0) return;
+    
+    if (!confirm(`Are you sure you want to delete ${selectedRoles.length} role(s)?`)) return;
 
     try {
-      if (editingRole) {
-        // Update existing role
-        const { error } = await supabase
-          .from('office_roles')
-          .update({
-            name: values.name,
-            code: values.code,
-          })
-          .eq('id', editingRole.id);
-        
-        if (error) throw error;
-        
-        setRoles(roles.map(role => 
-          role.id === editingRole.id 
-            ? { ...role, name: values.name, code: values.code }
-            : role
-        ));
-        toast.success('Role updated successfully');
-      } else {
-        // Create new role - add company_id
-        const { data, error } = await supabase
-          .from('office_roles')
-          .insert([
-            {
-              name: values.name,
-              code: values.code,
-              company_id: company.id
-            }
-          ])
-          .select();
-        
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setRoles([...roles, data[0]]);
-        }
-        toast.success('Role created successfully');
-      }
-      
-      setOpen(false);
-      form.reset();
-      setEditingRole(null);
-    } catch (error: any) {
-      console.error('Error saving role:', error);
-      toast.error('Failed to save role');
+      const { error } = await supabase
+        .from('office_roles')
+        .delete()
+        .in('id', selectedRoles);
+
+      if (error) throw error;
+
+      setRoles(roles.filter(role => !selectedRoles.includes(role.id)));
+      setSelectedRoles([]);
+      setEditMode(false);
+      toast.success('Roles deleted successfully');
+    } catch (error) {
+      console.error('Error deleting roles:', error);
+      toast.error('Failed to delete roles');
     }
   };
+
+  const handleSelectRole = (roleId: string) => {
+    setSelectedRoles(prev => 
+      prev.includes(roleId) 
+        ? prev.filter(id => id !== roleId)
+        : [...prev, roleId]
+    );
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center">
+            <div className="text-muted-foreground">Loading roles...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle>Roles</CardTitle>
-        <Button onClick={() => {
-          form.reset({ name: "", code: "" });
-          setEditingRole(null);
-          setOpen(true);
-        }} size="sm">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Role
-        </Button>
+        <CardTitle>Team Roles</CardTitle>
+        <div className="flex gap-2">
+          <Button 
+            size="sm" 
+            variant={editMode ? "secondary" : "outline"}
+            onClick={() => {
+              setEditMode(!editMode);
+              setSelectedRoles([]);
+            }}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            {editMode ? "Done" : "Edit"}
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
-        {loading ? (
-          <div className="text-center py-4">Loading roles...</div>
-        ) : roles.length === 0 ? (
-          <div className="text-center py-4 text-muted-foreground">
-            No roles defined yet. Click "Add Role" to create your first role.
+        <div className="space-y-4">
+          <div className="text-sm text-muted-foreground">
+            Define roles that team members can be assigned to within your organization.
           </div>
-        ) : (
-          <div className="grid gap-4">
-            {roles.map((role) => (
-              <div
-                key={role.id}
-                className="group flex items-center justify-between p-4 border rounded-lg hover:border-[#6E59A5]/20 hover:bg-[#6E59A5]/5 transition-all duration-200"
+          
+          {editMode && selectedRoles.length > 0 && (
+            <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+              <span className="text-sm text-muted-foreground">
+                {selectedRoles.length} role(s) selected
+              </span>
+              <Button 
+                size="sm" 
+                variant="destructive"
+                onClick={handleBulkDelete}
               >
-                <div>
-                  <div className="font-medium">{role.name}</div>
-                  <div className="text-sm text-muted-foreground">Code: {role.code}</div>
-                </div>
-                <ItemActions 
-                  onEdit={() => handleEditRole(role)}
-                  onDelete={() => handleDeleteRole(role.id)}
-                />
-              </div>
-            ))}
-          </div>
-        )}
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete Selected
+              </Button>
+            </div>
+          )}
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{editingRole ? "Edit Role" : "Add Role"}</DialogTitle>
-              <DialogDescription>
-                {editingRole
-                  ? "Update the role details below."
-                  : "Fill in the details for the new role."}
-              </DialogDescription>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., Project Manager" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="code"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Code</FormLabel>
-                      <FormControl>
-                        <Input placeholder="e.g., PM" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <DialogFooter>
-                  <Button type="submit">
-                    {editingRole ? "Save Changes" : "Add Role"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Enter role name..."
+              value={newRoleName}
+              onChange={(e) => setNewRoleName(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
+            />
+            <Button onClick={handleSubmit} disabled={isSubmitting || !newRoleName.trim()}>
+              <Plus className="h-4 w-4 mr-2" />
+              {editingRole ? 'Update' : 'Add'} Role
+            </Button>
+            {editingRole && (
+              <Button variant="outline" onClick={() => {
+                setEditingRole(null);
+                setNewRoleName("");
+              }}>
+                Cancel
+              </Button>
+            )}
+          </div>
+
+          {roles.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No roles defined yet. Add your first role above.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+              {roles.map((role) => (
+                <Card key={role.id} className="p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {editMode && (
+                        <input
+                          type="checkbox"
+                          checked={selectedRoles.includes(role.id)}
+                          onChange={() => handleSelectRole(role.id)}
+                          className="rounded"
+                        />
+                      )}
+                      <span className="font-medium text-sm">{role.name}</span>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEdit(role)}
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(role)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

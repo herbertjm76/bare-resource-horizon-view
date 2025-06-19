@@ -1,79 +1,89 @@
 
 import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash, Check, X, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
+import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useOfficeSettings } from "@/context/OfficeSettingsContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 
 export const DepartmentsTab = () => {
-  const { company } = useCompany();
   const { departments, setDepartments, loading } = useOfficeSettings();
+  const { company } = useCompany();
+  const [editingDepartment, setEditingDepartment] = useState<any>(null);
   const [newDepartmentName, setNewDepartmentName] = useState("");
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingName, setEditingName] = useState("");
-  const [isAdding, setIsAdding] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleAddDepartment = async () => {
-    if (!company || !newDepartmentName.trim()) return;
+  const handleSubmit = async () => {
+    if (!newDepartmentName.trim() || !company) return;
 
     setIsSubmitting(true);
     try {
-      const { data, error } = await (supabase
-        .from('office_departments' as any)
-        .insert([
-          {
+      if (editingDepartment) {
+        const { data, error } = await supabase
+          .from('office_departments')
+          .update({ name: newDepartmentName.trim() })
+          .eq('id', editingDepartment.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        setDepartments(departments.map(dept => 
+          dept.id === editingDepartment.id ? data : dept
+        ));
+        toast.success('Department updated successfully');
+      } else {
+        const { data, error } = await supabase
+          .from('office_departments')
+          .insert([{
             name: newDepartmentName.trim(),
-            company_id: company.id,
-          },
-        ])
-        .select() as any);
+            company_id: company.id
+          }])
+          .select()
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
 
-      if (data && data[0]) {
-        setDepartments([...departments, {
-          id: data[0].id,
-          name: data[0].name,
-          company_id: data[0].company_id,
-        }]);
+        setDepartments([...departments, data]);
+        toast.success('Department added successfully');
       }
-      
+
       setNewDepartmentName("");
-      setIsAdding(false);
-      toast.success("Department added successfully");
-    } catch (error: any) {
-      toast.error(`Error adding department: ${error.message}`);
+      setEditingDepartment(null);
+    } catch (error) {
+      console.error('Error saving department:', error);
+      toast.error('Failed to save department');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleDeleteDepartment = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this department?")) return;
+  const handleEdit = (department: any) => {
+    setEditingDepartment(department);
+    setNewDepartmentName(department.name);
+  };
 
-    setIsSubmitting(true);
+  const handleDelete = async (department: any) => {
+    if (!confirm('Are you sure you want to delete this department?')) return;
+
     try {
-      const { error } = await (supabase
-        .from('office_departments' as any)
+      const { error } = await supabase
+        .from('office_departments')
         .delete()
-        .eq("id", id) as any);
+        .eq('id', department.id);
 
       if (error) throw error;
 
-      setDepartments(departments.filter((dept) => dept.id !== id));
-      toast.success("Department deleted successfully");
-    } catch (error: any) {
-      toast.error(`Error deleting department: ${error.message}`);
-    } finally {
-      setIsSubmitting(false);
+      setDepartments(departments.filter(d => d.id !== department.id));
+      toast.success('Department deleted successfully');
+    } catch (error) {
+      console.error('Error deleting department:', error);
+      toast.error('Failed to delete department');
     }
   };
 
@@ -82,225 +92,150 @@ export const DepartmentsTab = () => {
     
     if (!confirm(`Are you sure you want to delete ${selectedDepartments.length} department(s)?`)) return;
 
-    setIsSubmitting(true);
     try {
-      const { error } = await (supabase
-        .from('office_departments' as any)
+      const { error } = await supabase
+        .from('office_departments')
         .delete()
-        .in("id", selectedDepartments) as any);
+        .in('id', selectedDepartments);
 
       if (error) throw error;
 
-      setDepartments(departments.filter((dept) => !selectedDepartments.includes(dept.id)));
+      setDepartments(departments.filter(dept => !selectedDepartments.includes(dept.id)));
       setSelectedDepartments([]);
       setEditMode(false);
-      toast.success("Departments deleted successfully");
-    } catch (error: any) {
-      toast.error(`Error deleting departments: ${error.message}`);
-    } finally {
-      setIsSubmitting(false);
+      toast.success('Departments deleted successfully');
+    } catch (error) {
+      console.error('Error deleting departments:', error);
+      toast.error('Failed to delete departments');
     }
   };
 
-  const handleUpdateDepartment = async (id: string) => {
-    if (!editingName.trim()) return;
-
-    setIsSubmitting(true);
-    try {
-      const { error } = await (supabase
-        .from('office_departments' as any)
-        .update({ name: editingName.trim() })
-        .eq("id", id) as any);
-
-      if (error) throw error;
-
-      setDepartments(
-        departments.map((dept) =>
-          dept.id === id ? { ...dept, name: editingName.trim() } : dept
-        )
-      );
-      setEditingId(null);
-      toast.success("Department updated successfully");
-    } catch (error: any) {
-      toast.error(`Error updating department: ${error.message}`);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleSelectDepartment = (departmentId: string) => {
+  const handleSelectDepartment = (deptId: string) => {
     setSelectedDepartments(prev => 
-      prev.includes(departmentId) 
-        ? prev.filter(id => id !== departmentId)
-        : [...prev, departmentId]
+      prev.includes(deptId) 
+        ? prev.filter(id => id !== deptId)
+        : [...prev, deptId]
     );
-  };
-
-  const startEditing = (id: string, name: string) => {
-    setEditingId(id);
-    setEditingName(name);
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-8">
-        <p className="text-muted-foreground">Loading departments...</p>
-      </div>
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center">
+            <div className="text-muted-foreground">Loading departments...</div>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-xl font-semibold">Departments</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle>Departments</CardTitle>
         <div className="flex gap-2">
-          <Button
-            size="sm"
+          <Button 
+            size="sm" 
             variant={editMode ? "secondary" : "outline"}
             onClick={() => {
               setEditMode(!editMode);
               setSelectedDepartments([]);
             }}
-            disabled={isAdding || editingId !== null}
           >
             <Edit className="h-4 w-4 mr-2" />
             {editMode ? "Done" : "Edit"}
           </Button>
-          {!isAdding && (
-            <Button
-              onClick={() => setIsAdding(true)}
-              size="sm"
-              className="h-8"
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              Add Department
-            </Button>
-          )}
         </div>
       </CardHeader>
       <CardContent>
-        {isAdding && (
-          <div className="flex items-center gap-2 mb-4">
+        <div className="space-y-4">
+          <div className="text-sm text-muted-foreground">
+            Define organizational departments to categorize team members and projects.
+          </div>
+          
+          {editMode && selectedDepartments.length > 0 && (
+            <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+              <span className="text-sm text-muted-foreground">
+                {selectedDepartments.length} department(s) selected
+              </span>
+              <Button 
+                size="sm" 
+                variant="destructive"
+                onClick={handleBulkDelete}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete Selected
+              </Button>
+            </div>
+          )}
+
+          <div className="flex gap-2">
             <Input
-              placeholder="Enter department name"
+              placeholder="Enter department name..."
               value={newDepartmentName}
               onChange={(e) => setNewDepartmentName(e.target.value)}
-              className="flex-1"
-              disabled={isSubmitting}
+              onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
             />
-            <Button
-              onClick={handleAddDepartment}
-              size="sm"
-              disabled={!newDepartmentName.trim() || isSubmitting}
-            >
-              <Check className="h-4 w-4" />
+            <Button onClick={handleSubmit} disabled={isSubmitting || !newDepartmentName.trim()}>
+              <Plus className="h-4 w-4 mr-2" />
+              {editingDepartment ? 'Update' : 'Add'} Department
             </Button>
-            <Button
-              onClick={() => {
-                setIsAdding(false);
+            {editingDepartment && (
+              <Button variant="outline" onClick={() => {
+                setEditingDepartment(null);
                 setNewDepartmentName("");
-              }}
-              variant="outline"
-              size="sm"
-              disabled={isSubmitting}
-            >
-              <X className="h-4 w-4" />
-            </Button>
+              }}>
+                Cancel
+              </Button>
+            )}
           </div>
-        )}
 
-        {editMode && selectedDepartments.length > 0 && (
-          <div className="flex items-center gap-2 p-3 bg-muted rounded-lg mb-4">
-            <span className="text-sm text-muted-foreground">
-              {selectedDepartments.length} department(s) selected
-            </span>
-            <Button 
-              size="sm" 
-              variant="destructive"
-              onClick={handleBulkDelete}
-              disabled={isSubmitting}
-            >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Delete Selected
-            </Button>
-          </div>
-        )}
-
-        {departments.length === 0 && !isAdding && (
-          <p className="text-muted-foreground py-4 text-center">
-            No departments have been created yet.
-          </p>
-        )}
-
-        <div className="space-y-2">
-          {departments.map((department) => (
-            <div
-              key={department.id}
-              className={`flex items-center justify-between p-3 rounded-md transition-all duration-200 ${
-                editMode ? 'bg-muted/40 hover:bg-accent/30' : 'bg-muted/40'
-              }`}
-            >
-              {editingId === department.id ? (
-                <div className="flex items-center gap-2 flex-1">
-                  <Input
-                    value={editingName}
-                    onChange={(e) => setEditingName(e.target.value)}
-                    className="flex-1"
-                    disabled={isSubmitting}
-                  />
-                  <Button
-                    onClick={() => handleUpdateDepartment(department.id)}
-                    size="sm"
-                    disabled={!editingName.trim() || isSubmitting}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    onClick={() => setEditingId(null)}
-                    variant="outline"
-                    size="sm"
-                    disabled={isSubmitting}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center gap-3">
-                    {editMode && (
-                      <Checkbox
-                        checked={selectedDepartments.includes(department.id)}
-                        onCheckedChange={() => handleSelectDepartment(department.id)}
-                      />
-                    )}
-                    <span>{department.name}</span>
-                  </div>
-                  {!editMode && (
+          {departments.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No departments defined yet. Add your first department above.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+              {departments.map((department) => (
+                <Card key={department.id} className="p-3">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
+                      {editMode && (
+                        <input
+                          type="checkbox"
+                          checked={selectedDepartments.includes(department.id)}
+                          onChange={() => handleSelectDepartment(department.id)}
+                          className="rounded"
+                        />
+                      )}
+                      <span className="font-medium text-sm">{department.name}</span>
+                    </div>
+                    <div className="flex gap-1">
                       <Button
-                        onClick={() => startEditing(department.id, department.name)}
                         variant="ghost"
                         size="sm"
-                        disabled={isSubmitting}
+                        onClick={() => handleEdit(department)}
                       >
-                        Edit
+                        <Edit className="h-3 w-3" />
                       </Button>
                       <Button
-                        onClick={() => handleDeleteDepartment(department.id)}
                         variant="ghost"
                         size="sm"
-                        disabled={isSubmitting}
+                        onClick={() => handleDelete(department)}
                       >
-                        <Trash className="h-4 w-4 text-red-500" />
+                        <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
-                  )}
-                </>
-              )}
+                  </div>
+                </Card>
+              ))}
             </div>
-          ))}
+          )}
         </div>
       </CardContent>
     </Card>
   );
 };
+
+export default DepartmentsTab;
