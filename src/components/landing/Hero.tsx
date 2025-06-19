@@ -113,7 +113,11 @@ const Hero = () => {
                       transform: 'scale(0.92)'
                     }} 
                     className="w-full rounded-3xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover"
+                    onLoadedData={() => {
+                      console.log('Dashboard demo video loaded successfully');
+                    }}
                     onError={(e) => {
+                      console.warn('Video failed to load, falling back to static image');
                       // Fallback to image if video fails to load
                       const target = e.target as HTMLVideoElement;
                       const fallbackImg = document.createElement('img');
@@ -124,6 +128,7 @@ const Hero = () => {
                       target.parentNode?.replaceChild(fallbackImg, target);
                     }}
                   >
+                    {/* Multiple source formats for better browser compatibility */}
                     <source src="/dashboard-demo.mp4" type="video/mp4" />
                     <source src="/dashboard-demo.webm" type="video/webm" />
                     {/* Fallback for browsers that don't support video */}
@@ -161,6 +166,7 @@ const Hero = () => {
                 style={{
                   transform: 'scale(0.90)'
                 }} 
+                loading="lazy"
               />
             </AnimatedSection>
           </div>
