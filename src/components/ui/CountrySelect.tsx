@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Command, CommandInput, CommandList, CommandItem, CommandEmpty } from "@/components/ui/command";
-import { allCountries } from "@/lib/countries"; // Updated import
+import { allCountries } from "@/lib/countries";
 import { cn } from "@/lib/utils";
 
 export interface CountrySelectProps {
   value: string;
-  onChange: (value: string, code?: string) => void;
+  onChange: (value: string, code?: string, flag?: string) => void;
   disabled?: boolean;
   placeholder?: string;
   className?: string;
@@ -16,13 +16,15 @@ export interface CountrySelectProps {
 // These are typical "major" countries people select most
 const DEFAULT_MAJOR_COUNTRIES = [
   "United States",
-  "United Kingdom",
+  "United Kingdom", 
   "Canada",
+  "Australia",
   "Germany",
   "France",
+  "Netherlands",
+  "Singapore",
   "India",
   "China",
-  "Australia",
   "Japan",
   "Brazil"
 ];
@@ -76,6 +78,12 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
 
+  const handleCountrySelect = (country: typeof allCountries[0]) => {
+    onChange(country.name, country.code, country.flag);
+    setOpen(false);
+    setSearchTerm("");
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -91,9 +99,12 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span className={value ? "text-foreground" : "text-muted-foreground"}>
-          {value ? selected?.name : (placeholder || "Select country")}
-        </span>
+        <div className="flex items-center gap-2">
+          {selected?.flag && <span className="text-base">{selected.flag}</span>}
+          <span className={value ? "text-foreground" : "text-muted-foreground"}>
+            {value ? selected?.name : (placeholder || "Select country")}
+          </span>
+        </div>
         <svg className="h-4 w-4 ml-2 opacity-60" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M6 9l6 6 6-6" />
         </svg>
@@ -116,13 +127,12 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
                       key={country.code}
                       value={country.name}
                       className="cursor-pointer"
-                      onSelect={() => {
-                        onChange(country.name, country.code);
-                        setOpen(false);
-                        setSearchTerm("");
-                      }}
+                      onSelect={() => handleCountrySelect(country)}
                     >
-                      {country.name}
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{country.flag}</span>
+                        <span>{country.name}</span>
+                      </div>
                     </CommandItem>
                   ))}
                   <div className="border-t my-1" />
@@ -131,20 +141,21 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
               )}
               {/* Show filtered list if searching */}
               {displayedCountries.length > 0 ? (
-                displayedCountries.map((country) => (
-                  <CommandItem
-                    key={country.code}
-                    value={country.name}
-                    className="cursor-pointer"
-                    onSelect={() => {
-                      onChange(country.name, country.code);
-                      setOpen(false);
-                      setSearchTerm("");
-                    }}
-                  >
-                    {country.name}
-                  </CommandItem>
-                ))
+                displayedCountries
+                  .filter(country => !searchTerm || !majorCountries.includes(country.name))
+                  .map((country) => (
+                    <CommandItem
+                      key={country.code}
+                      value={country.name}
+                      className="cursor-pointer"
+                      onSelect={() => handleCountrySelect(country)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">{country.flag}</span>
+                        <span>{country.name}</span>
+                      </div>
+                    </CommandItem>
+                  ))
               ) : (
                 <CommandEmpty>No countries found.</CommandEmpty>
               )}

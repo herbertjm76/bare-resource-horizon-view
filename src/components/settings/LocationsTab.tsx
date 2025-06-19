@@ -9,6 +9,7 @@ import { useCompany } from "@/context/CompanyContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CountrySelect } from "@/components/ui/CountrySelect";
 
 interface LocationFormData {
   code: string;
@@ -131,6 +132,15 @@ export const LocationsTab = () => {
     );
   };
 
+  const handleCountryChange = (countryName: string, code?: string, flag?: string) => {
+    setFormData(prev => ({
+      ...prev,
+      country: countryName,
+      // Auto-populate emoji with country flag if emoji field is empty or if it was a flag emoji
+      emoji: (!prev.emoji || prev.emoji.match(/[\u{1F1E6}-\u{1F1FF}]{2}/u)) ? (flag || '') : prev.emoji
+    }));
+  };
+
   if (loading) {
     return (
       <Card>
@@ -177,7 +187,7 @@ export const LocationsTab = () => {
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
-            Define office locations where your team members are based.
+            Define office locations where your team members are based. Select a country to automatically populate the flag emoji.
           </div>
 
           {editMode && selectedLocations.length > 0 && (
@@ -203,7 +213,7 @@ export const LocationsTab = () => {
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium">Code</label>
+                  <label className="text-sm font-medium">Code <span className="text-red-500">*</span></label>
                   <Input
                     value={formData.code}
                     onChange={(e) => setFormData({...formData, code: e.target.value})}
@@ -211,7 +221,10 @@ export const LocationsTab = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Emoji</label>
+                  <label className="text-sm font-medium">
+                    Emoji 
+                    <span className="text-xs text-muted-foreground ml-1">(auto-filled from country)</span>
+                  </label>
                   <Input
                     value={formData.emoji}
                     onChange={(e) => setFormData({...formData, emoji: e.target.value})}
@@ -219,7 +232,7 @@ export const LocationsTab = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">City</label>
+                  <label className="text-sm font-medium">City <span className="text-red-500">*</span></label>
                   <Input
                     value={formData.city}
                     onChange={(e) => setFormData({...formData, city: e.target.value})}
@@ -227,11 +240,11 @@ export const LocationsTab = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Country</label>
-                  <Input
+                  <label className="text-sm font-medium">Country <span className="text-red-500">*</span></label>
+                  <CountrySelect
                     value={formData.country}
-                    onChange={(e) => setFormData({...formData, country: e.target.value})}
-                    placeholder="United States"
+                    onChange={handleCountryChange}
+                    placeholder="Select country"
                   />
                 </div>
               </div>
@@ -273,7 +286,7 @@ export const LocationsTab = () => {
                       />
                     )}
                     <div className="flex items-center gap-2">
-                      {location.emoji && <span>{location.emoji}</span>}
+                      {location.emoji && <span className="text-lg">{location.emoji}</span>}
                       <div>
                         <div className="font-medium">{location.code}</div>
                         <div className="text-sm text-muted-foreground">

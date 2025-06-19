@@ -21,3 +21,4 @@ export { asianCountries } from './asia';
 export { americanCountries } from './americas';
 export { africanCountries } from './africa';
 export { oceaniaCountries } from './oceania';
+export * from './utils';
