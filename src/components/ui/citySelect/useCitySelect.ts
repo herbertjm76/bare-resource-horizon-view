@@ -22,7 +22,7 @@ export const useCitySelect = (country: string, onChange: (value: string) => void
   console.log('useCitySelect: Suggested cities:', suggestedCities);
   console.log('useCitySelect: Search term:', searchTerm);
 
-  // Filter cities based on search term - make search case-insensitive and more flexible
+  // Filter cities based on search term - improved logic
   let displayedCities: string[];
   if (searchTerm) {
     const term = searchTerm.toLowerCase().trim();
@@ -33,20 +33,43 @@ export const useCitySelect = (country: string, onChange: (value: string) => void
       city.toLowerCase().includes(term)
     );
     
-    // If no cities found in selected country and search term might be a country name,
-    // show cities from countries that match the search term
+    console.log('useCitySelect: Cities found in current country:', filteredCities);
+    
+    // If no cities found in selected country, search across all countries
     if (filteredCities.length === 0) {
+      console.log('useCitySelect: No cities found in current country, searching all countries');
+      
+      // Search for cities across all countries
+      const allCities: string[] = [];
+      Object.entries(CITIES_BY_COUNTRY).forEach(([countryName, cities]) => {
+        cities.forEach(city => {
+          if (city.toLowerCase().includes(term)) {
+            allCities.push(city);
+          }
+        });
+      });
+      
+      // Also check if the search term matches a country name and include its cities
       const matchingCountries = Object.keys(CITIES_BY_COUNTRY).filter(countryName =>
         countryName.toLowerCase().includes(term)
       );
       
-      console.log('useCitySelect: No cities found in current country, checking matching countries:', matchingCountries);
+      console.log('useCitySelect: Matching countries:', matchingCountries);
       
       if (matchingCountries.length > 0) {
-        // Show cities from the first matching country
-        filteredCities = CITIES_BY_COUNTRY[matchingCountries[0]] || [];
-        console.log('useCitySelect: Using cities from matching country:', matchingCountries[0], filteredCities);
+        // Add cities from matching countries
+        matchingCountries.forEach(matchingCountry => {
+          const countryCities = CITIES_BY_COUNTRY[matchingCountry] || [];
+          countryCities.forEach(city => {
+            if (!allCities.includes(city)) {
+              allCities.push(city);
+            }
+          });
+        });
       }
+      
+      filteredCities = allCities;
+      console.log('useCitySelect: All matching cities found:', filteredCities);
     }
     
     displayedCities = filteredCities;
