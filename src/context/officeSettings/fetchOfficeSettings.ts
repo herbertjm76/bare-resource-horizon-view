@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Role, Location, Rate, Department, ProjectStage } from './types';
 import { toast } from 'sonner';
@@ -15,10 +14,10 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
   console.log("Fetching settings for company:", companyId);
   
   try {
-    // Fetch roles data
+    // Fetch roles data with timestamps
     const { data: rolesData, error: rolesError } = await supabase
       .from('office_roles')
-      .select('id, name, code, company_id')
+      .select('id, name, code, company_id, created_at, updated_at')
       .eq('company_id', companyId);
 
     if (rolesError) throw rolesError;
@@ -83,7 +82,9 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
           id: r.id,
           name: r.name,
           code: r.code,
-          company_id: (r.company_id ?? companyId).toString()
+          company_id: (r.company_id ?? companyId).toString(),
+          created_at: r.created_at,
+          updated_at: r.updated_at
         }))
       : [];
 
