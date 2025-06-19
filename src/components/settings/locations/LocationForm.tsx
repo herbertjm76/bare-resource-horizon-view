@@ -28,18 +28,29 @@ export const LocationForm: React.FC<LocationFormProps> = ({
   onCancel
 }) => {
   const handleCountryChange = (countryName: string, code?: string, flag?: string) => {
+    console.log('Country changed:', { countryName, code, flag });
     setFormData({
       ...formData,
       country: countryName,
       emoji: flag || '',
-      city: '' // Reset city when country changes
+      city: '', // Reset city when country changes
+      code: '' // Reset code when country changes for consistency
     });
   };
 
   const handleCityChange = (cityName: string) => {
+    console.log('City changed:', cityName);
     setFormData({
       ...formData,
       city: cityName
+    });
+  };
+
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('Code changed:', e.target.value);
+    setFormData({
+      ...formData,
+      code: e.target.value
     });
   };
 
@@ -67,6 +78,7 @@ export const LocationForm: React.FC<LocationFormProps> = ({
         <div>
           <label className="text-sm font-medium">City <span className="text-red-500">*</span></label>
           <CitySelect
+            key={formData.country} // Force re-render when country changes
             value={formData.city}
             onChange={handleCityChange}
             country={formData.country}
@@ -77,7 +89,7 @@ export const LocationForm: React.FC<LocationFormProps> = ({
           <label className="text-sm font-medium">Code <span className="text-red-500">*</span></label>
           <Input
             value={formData.code}
-            onChange={(e) => setFormData({...formData, code: e.target.value})}
+            onChange={handleCodeChange}
             placeholder="e.g., NYC, LON, TKY"
           />
         </div>

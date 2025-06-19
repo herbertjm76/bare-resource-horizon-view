@@ -6,6 +6,12 @@ export const useCitySelect = (country: string, onChange: (value: string) => void
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Reset state when country changes
+  useEffect(() => {
+    setOpen(false);
+    setSearchTerm("");
+  }, [country]);
+
   // Get suggested cities for the selected country
   const suggestedCities = country ? CITIES_BY_COUNTRY[country] || [] : [];
 
@@ -36,7 +42,9 @@ export const useCitySelect = (country: string, onChange: (value: string) => void
   };
 
   const handleToggleOpen = () => {
-    setOpen(!open);
+    if (country) {
+      setOpen(!open);
+    }
   };
 
   const handleClose = () => {
