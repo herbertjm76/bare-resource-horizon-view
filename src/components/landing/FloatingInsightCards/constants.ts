@@ -1,5 +1,5 @@
 
-import { TrendingUp, Users, Calendar, Clock, Target, CheckCircle, AlertTriangle, DollarSign, UserCheck, Zap } from "lucide-react";
+import { AlertTriangle, UserCheck, Calendar } from "lucide-react";
 import { InsightData, CardPosition } from "./types";
 
 export const predefinedInsights: InsightData[] = [
@@ -10,38 +10,20 @@ export const predefinedInsights: InsightData[] = [
     hasSubtitle: false
   },
   {
-    title: "6 People Away Next Week",
-    icon: Calendar,
-    color: "orange",
-    hasSubtitle: false
-  },
-  {
-    title: "15 Active Projects Running",
-    icon: Target,
-    color: "purple",
-    hasSubtitle: false
-  },
-  {
     title: "5 Available Resources",
     icon: UserCheck,
     color: "green",
     hasSubtitle: false
   },
   {
-    title: "Team Overload Warning",
-    icon: Zap,
-    color: "red",
-    hasSubtitle: false
-  },
-  {
-    title: "85% Budget Burned",
-    icon: DollarSign,
+    title: "6 People Away Next Week",
+    icon: Calendar,
     color: "orange",
     hasSubtitle: false
   }
 ];
 
-// Balanced asymmetrical positioning with better visual hierarchy
+// Positioning to match the reference image exactly
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -52,34 +34,28 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Tablet positioning - strategic asymmetrical placement
+    // Tablet positioning - matching reference image layout
     return [
-      // Top tier - creating visual flow
-      { top: '8%', left: '-10%', scale: 0.65, transform: 'rotate(-1.5deg)' },
-      { top: '20%', right: '-12%', scale: 0.7, transform: 'rotate(2deg)' },
-      // Middle tier - balanced asymmetry
-      { top: '45%', left: '-14%', scale: 0.68, transform: 'rotate(0.5deg)' },
-      // Bottom tier - completing the composition
-      { bottom: '15%', right: '-8%', scale: 0.72, transform: 'rotate(-1deg)' }
+      // Top left - "Sarah 150% Overbooked" (red alert card)
+      { top: '12%', left: '-15%', scale: 0.75, transform: 'rotate(-2deg)' },
+      // Top right - "5 Available Resources" (green card)
+      { top: '18%', right: '-12%', scale: 0.7, transform: 'rotate(1.5deg)' },
+      // Bottom right - "6 People Away Next Week" (orange card)
+      { bottom: '20%', right: '-8%', scale: 0.72, transform: 'rotate(-1deg)' }
     ];
   }
   
-  // Desktop positioning - sophisticated asymmetrical composition
+  // Desktop positioning - exactly matching the reference image
   return [
-    // Top tier - establishing visual hierarchy
-    { top: '5%', left: '-8%', scale: 0.7, transform: 'rotate(-1.5deg)' },
-    { top: '22%', right: '-10%', scale: 0.75, transform: 'rotate(2deg)' },
-    
-    // Middle tier - creating visual balance
-    { top: '38%', left: '-12%', scale: 0.68, transform: 'rotate(-0.5deg)' },
-    { top: '58%', right: '-6%', scale: 0.73, transform: 'rotate(1.5deg)' },
-    
-    // Bottom tier - completing the visual story
-    { bottom: '28%', left: '-6%', scale: 0.69, transform: 'rotate(0.8deg)' },
-    { bottom: '12%', right: '-14%', scale: 0.76, transform: 'rotate(-1.2deg)' }
+    // Top left - "Sarah 150% Overbooked" (red alert card like "110% Capacity")
+    { top: '8%', left: '-12%', scale: 0.8, transform: 'rotate(-2deg)' },
+    // Top right - "5 Available Resources" (green card like "3 Weeks Free")
+    { top: '15%', right: '-10%', scale: 0.75, transform: 'rotate(1.5deg)' },
+    // Bottom right - "6 People Away Next Week" (orange card like "75% Fee Burn Alert")
+    { bottom: '18%', right: '-8%', scale: 0.78, transform: 'rotate(-1deg)' }
   ];
 };
 
 export const getRandomAnimationDelays = (): string[] => {
-  return ['0.8s', '1.2s', '1.6s', '2.0s', '2.4s', '2.8s'];
+  return ['0.8s', '1.2s', '1.6s'];
 };
