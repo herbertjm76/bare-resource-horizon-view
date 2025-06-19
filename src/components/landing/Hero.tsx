@@ -98,7 +98,7 @@ const Hero = () => {
             <AnimatedSection animation="fadeInRight" delay={600}>
               <div ref={floatingRef} className="relative w-full max-w-4xl mx-auto" style={{
                 minHeight: 400,
-                transform: 'scale(0.85)' // Slightly increased scale for better balance with smaller cards
+                transform: 'scale(0.88)' // Optimized scale for better balance with improved cards
               }}>
                 {/* Main Dashboard Image */}
                 <div className="relative group">
@@ -107,7 +107,7 @@ const Hero = () => {
                       src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
                       alt="Rolling Availability Calendar and Burn Meter Dashboard" 
                       style={{
-                        transform: 'scale(0.90)'
+                        transform: 'scale(0.92)'
                       }} 
                       className="w-full rounded-2xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover" 
                     />
@@ -122,7 +122,7 @@ const Hero = () => {
                       teamSize={12} 
                       activeProjects={15} 
                       timeRange="month" 
-                      scale={1.0} // Reset to 1.0 since we've adjusted card sizes directly
+                      scale={0.95} // Slightly reduced to balance with larger card sizes
                     />
                   </div>
                 )}

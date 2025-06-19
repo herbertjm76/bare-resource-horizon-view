@@ -29,39 +29,39 @@ export const InsightCard: React.FC<InsightCardProps> = ({
 
   return (
     <div
-      className={`absolute z-30 insight-card ${styles.bg} backdrop-blur-md border border-white/40 rounded-xl transition-all duration-300 hover:scale-110 hover:z-50 ${styles.shadow}`}
+      className={`absolute z-30 insight-card ${styles.bg} backdrop-blur-md border border-white/40 rounded-2xl transition-all duration-300 hover:scale-110 hover:z-50 ${styles.shadow}`}
       style={{
         ...position,
         animationDelay,
         transform: `scale(${cardScale}) ${position.transform || ''}`,
-        width: `${9 * cardScale}rem`, // Slightly reduced for one-liners
-        height: `${4 * cardScale}rem`, // Reduced height for one-line content
-        padding: '1.2rem', // Reduced padding for compact look
+        width: `${14 * cardScale}rem`, // Increased width for better readability
+        height: `${6 * cardScale}rem`, // Increased height for proper text spacing
+        padding: '1.5rem', // Better padding for content
         pointerEvents: 'auto',
-        // Enhanced shadow and backdrop for better depth and visibility
-        boxShadow: `0 8px 32px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08)`,
-        backdropFilter: 'blur(16px)',
-        // Optimized aspect ratio for one-liners
-        aspectRatio: '2.25/1',
-        maxWidth: '180px', // Reduced for one-liner content
-        maxHeight: '80px',
-        minWidth: '140px', // Minimum readable size
-        minHeight: '62px',
+        // Enhanced visual depth
+        boxShadow: `0 12px 40px rgba(0,0,0,0.15), 0 6px 16px rgba(0,0,0,0.10)`,
+        backdropFilter: 'blur(20px)',
+        // Better aspect ratio for readability
+        aspectRatio: '2.3/1',
+        maxWidth: '280px', // Increased for better text display
+        maxHeight: '120px',
+        minWidth: '220px', // Increased minimum size
+        minHeight: '95px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-start'
       }}
     >
-      {/* Single line layout for all cards */}
-      <div className="flex items-center gap-2.5 w-full">
-        <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-1.5 shadow-lg flex-shrink-0`}>
+      {/* Improved layout with better spacing */}
+      <div className="flex items-center gap-3.5 w-full">
+        <div className={`flex items-center justify-center rounded-xl ${styles.iconBg} p-2.5 shadow-lg flex-shrink-0`}>
           <Icon 
             className={`${styles.iconColor}`}
-            size={Math.max(14, Math.round(16 * cardScale))}
+            size={Math.max(18, Math.round(20 * cardScale))}
             strokeWidth={2.5}
           />
         </div>
-        <div className={`text-xs font-bold ${styles.numberColor} leading-tight flex-1 line-clamp-1`}>
+        <div className={`text-sm font-bold ${styles.numberColor} leading-tight flex-1`}>
           {insight.title}
         </div>
       </div>

@@ -16,7 +16,7 @@ export const predefinedInsights: InsightData[] = [
     hasSubtitle: false
   },
   {
-    title: "15 Active Projects",
+    title: "15 Active Projects Running",
     icon: Target,
     color: "purple",
     hasSubtitle: false
@@ -41,7 +41,7 @@ export const predefinedInsights: InsightData[] = [
   }
 ];
 
-// More asymmetrical positioning that extends outside the image frame
+// Balanced asymmetrical positioning with better visual hierarchy
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -52,31 +52,31 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Tablet positioning - more asymmetrical and extending outside
+    // Tablet positioning - strategic asymmetrical placement
     return [
-      // Top area - asymmetrical placement
-      { top: '5%', left: '-8%', scale: 0.55, transform: 'rotate(-2deg)' },
-      { top: '15%', right: '-12%', scale: 0.6, transform: 'rotate(3deg)' },
-      // Middle area - off-center placement
-      { top: '40%', left: '-15%', scale: 0.58, transform: 'rotate(1deg)' },
-      // Bottom area - irregular spacing
-      { bottom: '10%', right: '-10%', scale: 0.62, transform: 'rotate(-1deg)' }
+      // Top tier - creating visual flow
+      { top: '8%', left: '-10%', scale: 0.65, transform: 'rotate(-1.5deg)' },
+      { top: '20%', right: '-12%', scale: 0.7, transform: 'rotate(2deg)' },
+      // Middle tier - balanced asymmetry
+      { top: '45%', left: '-14%', scale: 0.68, transform: 'rotate(0.5deg)' },
+      // Bottom tier - completing the composition
+      { bottom: '15%', right: '-8%', scale: 0.72, transform: 'rotate(-1deg)' }
     ];
   }
   
-  // Desktop positioning - highly asymmetrical with overlap outside image
+  // Desktop positioning - sophisticated asymmetrical composition
   return [
-    // Top tier - scattered placement extending beyond frame
-    { top: '2%', left: '-12%', scale: 0.65, transform: 'rotate(-2deg)' },
-    { top: '18%', right: '-15%', scale: 0.7, transform: 'rotate(3deg)' },
+    // Top tier - establishing visual hierarchy
+    { top: '5%', left: '-8%', scale: 0.7, transform: 'rotate(-1.5deg)' },
+    { top: '22%', right: '-10%', scale: 0.75, transform: 'rotate(2deg)' },
     
-    // Middle tier - irregular positioning outside frame
-    { top: '32%', left: '-18%', scale: 0.6, transform: 'rotate(-1deg)' },
-    { top: '55%', right: '-8%', scale: 0.68, transform: 'rotate(2deg)' },
+    // Middle tier - creating visual balance
+    { top: '38%', left: '-12%', scale: 0.68, transform: 'rotate(-0.5deg)' },
+    { top: '58%', right: '-6%', scale: 0.73, transform: 'rotate(1.5deg)' },
     
-    // Bottom tier - asymmetrical completion extending beyond boundaries
-    { bottom: '25%', left: '-10%', scale: 0.63, transform: 'rotate(1deg)' },
-    { bottom: '8%', right: '-20%', scale: 0.72, transform: 'rotate(-2deg)' }
+    // Bottom tier - completing the visual story
+    { bottom: '28%', left: '-6%', scale: 0.69, transform: 'rotate(0.8deg)' },
+    { bottom: '12%', right: '-14%', scale: 0.76, transform: 'rotate(-1.2deg)' }
   ];
 };
 
