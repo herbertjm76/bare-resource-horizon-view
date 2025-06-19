@@ -23,7 +23,7 @@ const DEFAULT_MAJOR_COUNTRIES = [
   "France",
   "Netherlands",
   "Singapore",
-  "India",
+  "India", // Added India to popular countries
   "China",
   "Japan",
   "Brazil"
@@ -54,15 +54,13 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
     .filter(c => !majorCountries.includes(c.name))
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  // Search both lists and combine - search result always on top
+  // Search both lists and combine - show ALL matching countries when searching
   let displayedCountries: typeof allCountries;
   if (searchTerm) {
     const term = searchTerm.toLowerCase();
-    displayedCountries = [
-      ...allCountries
-        .filter(c => c.name.toLowerCase().includes(term) || c.code.toLowerCase().includes(term))
-        .sort((a, b) => a.name.localeCompare(b.name)),
-    ];
+    displayedCountries = allCountries
+      .filter(c => c.name.toLowerCase().includes(term) || c.code.toLowerCase().includes(term))
+      .sort((a, b) => a.name.localeCompare(b.name));
   } else {
     displayedCountries = [...majorList, ...otherCountries];
   }
@@ -118,7 +116,7 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
               onValueChange={setSearchTerm}
             />
             <CommandList className="max-h-64 overflow-auto">
-              {/* Show Major Countries group if not searching */}
+              {/* Show Popular Countries group if not searching */}
               {!searchTerm && (
                 <>
                   <div className="px-2 py-1 text-xs uppercase text-muted-foreground">Popular</div>
@@ -139,10 +137,10 @@ export const CountrySelect: React.FC<CountrySelectProps> = ({
                   <div className="px-2 py-1 text-xs uppercase text-muted-foreground">All countries</div>
                 </>
               )}
-              {/* Show filtered list if searching */}
+              {/* Show all filtered countries when searching OR other countries when not searching */}
               {displayedCountries.length > 0 ? (
                 displayedCountries
-                  .filter(country => !searchTerm || !majorCountries.includes(country.name))
+                  .filter(country => searchTerm || !majorCountries.includes(country.name)) // Only filter out majors if NOT searching
                   .map((country) => (
                     <CommandItem
                       key={country.code}
