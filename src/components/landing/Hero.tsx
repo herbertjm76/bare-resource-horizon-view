@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
@@ -93,51 +92,23 @@ const Hero = () => {
             </AnimatedSection>
           </div>
           
-          {/* Dashboard Video with Floating Cards - Hidden on mobile, visible on tablet+ */}
+          {/* Dashboard Image with Floating Cards - Hidden on mobile, visible on tablet+ */}
           <div className="hidden sm:block lg:col-span-8 relative">
             <AnimatedSection animation="fadeInRight" delay={600}>
               <div ref={floatingRef} className="relative w-full max-w-4xl mx-auto" style={{
                 minHeight: 400,
                 transform: 'scale(0.88)' // Optimized scale for better balance with improved cards
               }}>
-                {/* Main Dashboard Video - Clean container without outline */}
+                {/* Main Dashboard Image - Clean container without outline */}
                 <div className="relative group">
-                  <video 
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="metadata"
-                    poster="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
+                  <img 
+                    src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
+                    alt="Rolling Availability Calendar and Burn Meter Dashboard" 
                     style={{
                       transform: 'scale(0.92)'
                     }} 
-                    className="w-full rounded-3xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover"
-                    onLoadedData={() => {
-                      console.log('Dashboard demo video loaded successfully');
-                    }}
-                    onError={(e) => {
-                      console.warn('Video failed to load, falling back to static image');
-                      // Fallback to image if video fails to load
-                      const target = e.target as HTMLVideoElement;
-                      const fallbackImg = document.createElement('img');
-                      fallbackImg.src = "/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png";
-                      fallbackImg.alt = "Rolling Availability Calendar and Burn Meter Dashboard";
-                      fallbackImg.className = target.className;
-                      fallbackImg.style.cssText = target.style.cssText;
-                      target.parentNode?.replaceChild(fallbackImg, target);
-                    }}
-                  >
-                    {/* Multiple source formats for better browser compatibility */}
-                    <source src="/dashboard-demo.mp4" type="video/mp4" />
-                    <source src="/dashboard-demo.webm" type="video/webm" />
-                    {/* Fallback for browsers that don't support video */}
-                    <img 
-                      src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
-                      alt="Rolling Availability Calendar and Burn Meter Dashboard"
-                      className="w-full rounded-3xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover"
-                    />
-                  </video>
+                    className="w-full rounded-3xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover" 
+                  />
                 </div>
                 
                 {/* Floating Insight Cards - Only visible on larger screens */}
@@ -156,7 +127,7 @@ const Hero = () => {
             </AnimatedSection>
           </div>
 
-          {/* Mobile-only Dashboard Preview - Static Image for Performance */}
+          {/* Mobile-only Dashboard Preview */}
           <div className="block sm:hidden w-full mt-6">
             <AnimatedSection animation="fadeInUp" delay={600}>
               <img 
@@ -166,7 +137,6 @@ const Hero = () => {
                 style={{
                   transform: 'scale(0.90)'
                 }} 
-                loading="lazy"
               />
             </AnimatedSection>
           </div>
