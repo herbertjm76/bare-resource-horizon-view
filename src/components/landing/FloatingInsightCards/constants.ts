@@ -51,7 +51,7 @@ export const predefinedInsights: InsightData[] = [
   }
 ];
 
-// Positioning cards to overlap outside the image div margins
+// Redesigned positioning for better visual balance with the main image
 export const getRandomPositions = (): CardPosition[] => {
   const isMobile = window.innerWidth < 640;
   const isTablet = window.innerWidth >= 640 && window.innerWidth < 1024;
@@ -62,33 +62,30 @@ export const getRandomPositions = (): CardPosition[] => {
   }
   
   if (isTablet) {
-    // Tablet positioning - overlapping the image margins
+    // Tablet positioning - closer to image with better balance
     return [
-      // Top left - overlapping from outside
-      { top: '15%', left: '-5%', scale: 0.7, transform: 'rotate(-2deg)' },
-      // Top right - overlapping from outside
-      { top: '10%', right: '-8%', scale: 0.75, transform: 'rotate(3deg)' },
-      // Bottom left - overlapping from outside
-      { bottom: '20%', left: '-3%', scale: 0.7, transform: 'rotate(-1deg)' },
-      // Bottom right - overlapping from outside
-      { bottom: '15%', right: '-6%', scale: 0.75, transform: 'rotate(2deg)' }
+      // Top area - balanced on both sides
+      { top: '8%', left: '2%', scale: 0.6, transform: 'rotate(-1deg)' },
+      { top: '12%', right: '1%', scale: 0.65, transform: 'rotate(2deg)' },
+      // Bottom area - symmetrical placement
+      { bottom: '15%', left: '1%', scale: 0.6, transform: 'rotate(1deg)' },
+      { bottom: '18%', right: '2%', scale: 0.65, transform: 'rotate(-2deg)' }
     ];
   }
   
-  // Desktop positioning - cards overlapping the image div margins
+  // Desktop positioning - better integration with the image
   return [
-    // Top left - extending from outside the image area
-    { top: '10%', left: '-8%', scale: 0.8, transform: 'rotate(-2deg)' },
-    // Top right - extending from outside the image area
-    { top: '5%', right: '-10%', scale: 0.85, transform: 'rotate(3deg)' },
-    // Bottom left - extending from outside the image area
-    { bottom: '25%', left: '-6%', scale: 0.75, transform: 'rotate(-1deg)' },
-    // Bottom right - extending from outside the image area
-    { bottom: '20%', right: '-8%', scale: 0.8, transform: 'rotate(2deg)' },
-    // Middle left - overlapping the left margin
-    { top: '40%', left: '-4%', scale: 0.7, transform: 'rotate(-3deg)' },
-    // Middle right - overlapping the right margin
-    { top: '50%', right: '-5%', scale: 0.75, transform: 'rotate(1deg)' }
+    // Top tier - balanced distribution
+    { top: '5%', left: '3%', scale: 0.7, transform: 'rotate(-1deg)' },
+    { top: '8%', right: '2%', scale: 0.75, transform: 'rotate(2deg)' },
+    
+    // Middle tier - side placement for depth
+    { top: '35%', left: '1%', scale: 0.65, transform: 'rotate(-2deg)' },
+    { top: '45%', right: '0%', scale: 0.7, transform: 'rotate(1deg)' },
+    
+    // Bottom tier - completing the frame
+    { bottom: '20%', left: '2%', scale: 0.68, transform: 'rotate(1deg)' },
+    { bottom: '25%', right: '1%', scale: 0.72, transform: 'rotate(-1deg)' }
   ];
 };
 

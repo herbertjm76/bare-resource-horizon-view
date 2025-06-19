@@ -1,14 +1,17 @@
+
 import React from 'react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { GradientOrbs } from '@/components/common/VisualElements';
 import { PlayCircle, Calendar } from 'lucide-react';
 import FloatingInsightCards from './FloatingInsightCards';
+
 const Hero = () => {
   const {
     elementRef: floatingRef,
     isVisible: floatingVisible
   } = useScrollAnimation();
+
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -18,7 +21,9 @@ const Hero = () => {
       });
     }
   };
-  return <div className="
+
+  return (
+    <div className="
         relative 
         bg-gradient-to-br from-[#6E59A5] via-[#895CF7] to-[#E64FC4] 
         overflow-hidden
@@ -92,22 +97,35 @@ const Hero = () => {
           <div className="hidden sm:block lg:col-span-8 relative">
             <AnimatedSection animation="fadeInRight" delay={600}>
               <div ref={floatingRef} className="relative w-full max-w-4xl mx-auto" style={{
-              minHeight: 400,
-              transform: 'scale(0.80)'
-            }}>
+                minHeight: 400,
+                transform: 'scale(0.85)' // Slightly increased scale for better balance with smaller cards
+              }}>
                 {/* Main Dashboard Image */}
                 <div className="relative group">
                   <div className="bg-white/20 backdrop-blur-lg p-4 sm:p-6 rounded-3xl shadow-2xl border border-white/30 transition-all duration-700 hover:scale-105 hover:shadow-3xl group-hover:bg-white/25 px-0 py-0">
-                    <img src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" alt="Rolling Availability Calendar and Burn Meter Dashboard" style={{
-                    transform: 'scale(0.90)'
-                  }} className="w-full rounded-2xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover" />
+                    <img 
+                      src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
+                      alt="Rolling Availability Calendar and Burn Meter Dashboard" 
+                      style={{
+                        transform: 'scale(0.90)'
+                      }} 
+                      className="w-full rounded-2xl shadow-2xl transition-transform duration-500 hover:scale-105 aspect-square object-cover" 
+                    />
                   </div>
                 </div>
                 
                 {/* Floating Insight Cards - Only visible on larger screens */}
-                {floatingVisible && <div className="hidden lg:block">
-                    <FloatingInsightCards utilizationRate={87} teamSize={12} activeProjects={15} timeRange="month" scale={0.9} />
-                  </div>}
+                {floatingVisible && (
+                  <div className="hidden lg:block">
+                    <FloatingInsightCards 
+                      utilizationRate={87} 
+                      teamSize={12} 
+                      activeProjects={15} 
+                      timeRange="month" 
+                      scale={1.0} // Reset to 1.0 since we've adjusted card sizes directly
+                    />
+                  </div>
+                )}
               </div>
             </AnimatedSection>
           </div>
@@ -116,16 +134,23 @@ const Hero = () => {
           <div className="block sm:hidden w-full mt-6">
             <AnimatedSection animation="fadeInUp" delay={600}>
               <div className="bg-white/20 backdrop-blur-lg p-3 rounded-2xl shadow-xl border border-white/30" style={{
-              transform: 'scale(0.80)'
-            }}>
-                <img src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" alt="Rolling Availability Calendar and Burn Meter Dashboard" className="w-full rounded-xl shadow-lg aspect-square object-cover" style={{
-                transform: 'scale(0.90)'
-              }} />
+                transform: 'scale(0.80)'
+              }}>
+                <img 
+                  src="/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png" 
+                  alt="Rolling Availability Calendar and Burn Meter Dashboard" 
+                  className="w-full rounded-xl shadow-lg aspect-square object-cover" 
+                  style={{
+                    transform: 'scale(0.90)'
+                  }} 
+                />
               </div>
             </AnimatedSection>
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Hero;

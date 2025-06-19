@@ -35,19 +35,19 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         ...position,
         animationDelay,
         transform: `scale(${cardScale}) ${position.transform || ''}`,
-        width: `${12 * cardScale}rem`,
-        height: `${6 * cardScale}rem`,
-        padding: '2rem',
+        width: `${10 * cardScale}rem`, // Reduced from 12rem for better proportion
+        height: `${5 * cardScale}rem`,  // Reduced from 6rem for better proportion
+        padding: '1.5rem', // Reduced from 2rem for better balance
         pointerEvents: 'auto',
         // Enhanced shadow and backdrop for better depth and visibility
-        boxShadow: `0 12px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1)`,
-        backdropFilter: 'blur(20px)',
-        // Rectangular aspect ratio
+        boxShadow: `0 8px 32px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.08)`,
+        backdropFilter: 'blur(16px)',
+        // Rectangular aspect ratio - optimized for better visual balance
         aspectRatio: '2/1',
-        maxWidth: '240px',
-        maxHeight: '120px',
-        minWidth: '180px',
-        minHeight: '90px',
+        maxWidth: '200px',  // Reduced from 240px
+        maxHeight: '100px', // Reduced from 120px
+        minWidth: '160px',  // Reduced from 180px
+        minHeight: '80px',  // Reduced from 90px
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-start'
@@ -55,34 +55,34 @@ export const InsightCard: React.FC<InsightCardProps> = ({
     >
       {isOneLiner ? (
         // Horizontal layout for one-liner cards
-        <div className="flex items-center gap-4 w-full">
-          <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-2.5 shadow-lg flex-shrink-0`}>
+        <div className="flex items-center gap-3 w-full">
+          <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-2 shadow-lg flex-shrink-0`}>
             <Icon 
               className={`${styles.iconColor}`}
-              size={Math.max(18, Math.round(20 * cardScale))}
+              size={Math.max(16, Math.round(18 * cardScale))}
               strokeWidth={2.5}
             />
           </div>
-          <div className={`text-base font-bold ${styles.numberColor} leading-tight flex-1`}>
+          <div className={`text-sm font-bold ${styles.numberColor} leading-tight flex-1`}>
             {insight.title}
           </div>
         </div>
       ) : (
         // Horizontal layout for two-line cards
-        <div className="flex items-center gap-4 w-full">
-          <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-2.5 shadow-lg flex-shrink-0`}>
+        <div className="flex items-center gap-3 w-full">
+          <div className={`flex items-center justify-center rounded-lg ${styles.iconBg} p-2 shadow-lg flex-shrink-0`}>
             <Icon 
               className={`${styles.iconColor}`}
-              size={Math.max(18, Math.round(22 * cardScale))}
+              size={Math.max(16, Math.round(20 * cardScale))}
               strokeWidth={2.5}
             />
           </div>
           <div className="flex-1 min-w-0">
-            <div className={`text-lg font-bold ${styles.numberColor} leading-tight mb-1`}>
+            <div className={`text-base font-bold ${styles.numberColor} leading-tight mb-1`}>
               {insight.kpi || insight.title}
             </div>
             {insight.description && (
-              <div className={`text-sm ${styles.textColor} font-medium leading-tight opacity-90`}>
+              <div className={`text-xs ${styles.textColor} font-medium leading-tight opacity-90`}>
                 {insight.description}
               </div>
             )}
