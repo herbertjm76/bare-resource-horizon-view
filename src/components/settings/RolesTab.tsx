@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,10 @@ export const RolesTab = () => {
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const generateRoleCode = (name: string) => {
+    return name.toLowerCase().replace(/\s+/g, '_');
+  };
+
   const handleSubmit = async () => {
     if (!newRoleName.trim() || !company) return;
 
@@ -26,7 +29,10 @@ export const RolesTab = () => {
       if (editingRole) {
         const { data, error } = await supabase
           .from('office_roles')
-          .update({ name: newRoleName.trim() })
+          .update({ 
+            name: newRoleName.trim(),
+            code: generateRoleCode(newRoleName.trim())
+          })
           .eq('id', editingRole.id)
           .select()
           .single();
@@ -42,6 +48,7 @@ export const RolesTab = () => {
           .from('office_roles')
           .insert([{
             name: newRoleName.trim(),
+            code: generateRoleCode(newRoleName.trim()),
             company_id: company.id
           }])
           .select()

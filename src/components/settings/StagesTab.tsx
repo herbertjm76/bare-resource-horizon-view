@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,11 @@ export const StagesTab = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedStages, setSelectedStages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const getNextOrderIndex = () => {
+    if (office_stages.length === 0) return 0;
+    return Math.max(...office_stages.map(stage => stage.order_index || 0)) + 1;
+  };
 
   const handleSubmit = async () => {
     if (!newStageName.trim() || !company) return;
@@ -48,7 +52,8 @@ export const StagesTab = () => {
           .insert([{
             name: newStageName.trim(),
             color: newStageColor,
-            company_id: company.id
+            company_id: company.id,
+            order_index: getNextOrderIndex()
           }])
           .select()
           .single();
@@ -186,8 +191,8 @@ export const StagesTab = () => {
               onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
             />
             <ColorPicker
-              color={newStageColor}
-              onChange={setNewStageColor}
+              selectedColor={newStageColor}
+              onColorChange={setNewStageColor}
             />
             <Button onClick={handleSubmit} disabled={isSubmitting || !newStageName.trim()}>
               <Plus className="h-4 w-4 mr-2" />
