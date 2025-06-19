@@ -5,9 +5,20 @@ export const CITIES_BY_COUNTRY: Record<string, string[]> = {
     "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", 
     "San Antonio", "San Diego", "Dallas", "San Jose", "Austin", "Jacksonville",
     "San Francisco", "Seattle", "Denver", "Washington", "Boston", "Las Vegas",
-    "Portland", "Miami", "Atlanta", "Minneapolis"
+    "Portland", "Miami", "Atlanta", "Minneapolis", "Detroit", "Nashville"
+  ],
+  "USA": [ // Alternative name
+    "New York", "Los Angeles", "Chicago", "Houston", "Phoenix", "Philadelphia", 
+    "San Antonio", "San Diego", "Dallas", "San Jose", "Austin", "Jacksonville",
+    "San Francisco", "Seattle", "Denver", "Washington", "Boston", "Las Vegas",
+    "Portland", "Miami", "Atlanta", "Minneapolis", "Detroit", "Nashville"
   ],
   "United Kingdom": [
+    "London", "Birmingham", "Manchester", "Glasgow", "Liverpool", "Bristol",
+    "Sheffield", "Leeds", "Edinburgh", "Leicester", "Coventry", "Bradford",
+    "Cardiff", "Belfast", "Nottingham", "Hull", "Newcastle", "Stoke-on-Trent"
+  ],
+  "UK": [ // Alternative name
     "London", "Birmingham", "Manchester", "Glasgow", "Liverpool", "Bristol",
     "Sheffield", "Leeds", "Edinburgh", "Leicester", "Coventry", "Bradford",
     "Cardiff", "Belfast", "Nottingham", "Hull", "Newcastle", "Stoke-on-Trent"
@@ -57,5 +68,41 @@ export const CITIES_BY_COUNTRY: Record<string, string[]> = {
     "São Paulo", "Rio de Janeiro", "Brasília", "Salvador", "Fortaleza",
     "Belo Horizonte", "Manaus", "Curitiba", "Recife", "Goiânia",
     "Belém", "Porto Alegre", "Guarulhos", "Campinas", "São Luís", "São Gonçalo"
+  ],
+  "Italy": [
+    "Rome", "Milan", "Naples", "Turin", "Palermo", "Genoa", "Bologna",
+    "Florence", "Bari", "Catania", "Venice", "Verona", "Messina", "Padua"
+  ],
+  "Spain": [
+    "Madrid", "Barcelona", "Valencia", "Seville", "Zaragoza", "Málaga",
+    "Murcia", "Palma", "Las Palmas", "Bilbao", "Alicante", "Córdoba"
+  ],
+  "Mexico": [
+    "Mexico City", "Guadalajara", "Monterrey", "Puebla", "Tijuana", "León",
+    "Juárez", "Torreón", "Querétaro", "San Luis Potosí", "Mérida", "Mexicali"
+  ],
+  "South Africa": [
+    "Johannesburg", "Cape Town", "Durban", "Pretoria", "Port Elizabeth",
+    "Bloemfontein", "East London", "Nelspruit", "Polokwane", "Kimberley"
+  ],
+  "Argentina": [
+    "Buenos Aires", "Córdoba", "Rosario", "Mendoza", "La Plata", "Tucumán",
+    "Mar del Plata", "Salta", "Santa Fe", "San Juan"
+  ],
+  "Chile": [
+    "Santiago", "Valparaíso", "Concepción", "La Serena", "Antofagasta",
+    "Temuco", "Rancagua", "Talca", "Arica", "Chillán"
+  ],
+  "Colombia": [
+    "Bogotá", "Medellín", "Cali", "Barranquilla", "Cartagena", "Cúcuta",
+    "Bucaramanga", "Pereira", "Santa Marta", "Ibagué"
+  ],
+  "Peru": [
+    "Lima", "Arequipa", "Trujillo", "Chiclayo", "Huancayo", "Piura",
+    "Iquitos", "Cusco", "Chimbote", "Tacna"
+  ],
+  "Venezuela": [
+    "Caracas", "Maracaibo", "Valencia", "Barquisimeto", "Maracay", "Ciudad Guayana",
+    "San Cristóbal", "Maturín", "Ciudad Bolívar", "Cumá"
   ]
 };
