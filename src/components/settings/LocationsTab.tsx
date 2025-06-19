@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CountrySelect } from "@/components/ui/CountrySelect";
+import { CitySelect } from "@/components/ui/CitySelect";
 
 interface LocationFormData {
   code: string;
@@ -136,8 +136,15 @@ export const LocationsTab = () => {
     setFormData(prev => ({
       ...prev,
       country: countryName,
-      // Auto-populate emoji with country flag if emoji field is empty or if it was a flag emoji
-      emoji: (!prev.emoji || prev.emoji.match(/[\u{1F1E6}-\u{1F1FF}]{2}/u)) ? (flag || '') : prev.emoji
+      emoji: flag || '',
+      city: '' // Reset city when country changes
+    }));
+  };
+
+  const handleCityChange = (cityName: string) => {
+    setFormData(prev => ({
+      ...prev,
+      city: cityName
     }));
   };
 
@@ -187,7 +194,7 @@ export const LocationsTab = () => {
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
-            Define office locations where your team members are based. Select a country to automatically populate the flag emoji.
+            Define office locations where your team members are based. Select a country first, then choose from suggested cities.
           </div>
 
           {editMode && selectedLocations.length > 0 && (
@@ -211,40 +218,30 @@ export const LocationsTab = () => {
               <h3 className="font-medium">
                 {editingLocation ? 'Edit Location' : 'Add New Location'}
               </h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium">Code <span className="text-red-500">*</span></label>
-                  <Input
-                    value={formData.code}
-                    onChange={(e) => setFormData({...formData, code: e.target.value})}
-                    placeholder="e.g., NYC"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">
-                    Emoji 
-                    <span className="text-xs text-muted-foreground ml-1">(auto-filled from country)</span>
-                  </label>
-                  <Input
-                    value={formData.emoji}
-                    onChange={(e) => setFormData({...formData, emoji: e.target.value})}
-                    placeholder="🏙️"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium">City <span className="text-red-500">*</span></label>
-                  <Input
-                    value={formData.city}
-                    onChange={(e) => setFormData({...formData, city: e.target.value})}
-                    placeholder="New York"
-                  />
-                </div>
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <label className="text-sm font-medium">Country <span className="text-red-500">*</span></label>
                   <CountrySelect
                     value={formData.country}
                     onChange={handleCountryChange}
                     placeholder="Select country"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">City <span className="text-red-500">*</span></label>
+                  <CitySelect
+                    value={formData.city}
+                    onChange={handleCityChange}
+                    country={formData.country}
+                    placeholder="Select or enter city"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Code <span className="text-red-500">*</span></label>
+                  <Input
+                    value={formData.code}
+                    onChange={(e) => setFormData({...formData, code: e.target.value})}
+                    placeholder="e.g., NYC, LON, TKY"
                   />
                 </div>
               </div>
