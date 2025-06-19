@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Role } from './types';
-import { generateRoleCode } from './utils';
 
 export const useRoleOperations = (
   roles: Role[],
@@ -15,6 +14,7 @@ export const useRoleOperations = (
   const [editMode, setEditMode] = useState(false);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const handleSubmit = async () => {
     if (!newRoleName.trim() || !companyId) return;
@@ -24,10 +24,7 @@ export const useRoleOperations = (
       if (editingRole) {
         const { data, error } = await supabase
           .from('office_roles')
-          .update({ 
-            name: newRoleName.trim(),
-            code: generateRoleCode(newRoleName.trim())
-          })
+          .update({ name: newRoleName.trim() })
           .eq('id', editingRole.id)
           .select()
           .single();
@@ -43,7 +40,7 @@ export const useRoleOperations = (
           .from('office_roles')
           .insert([{
             name: newRoleName.trim(),
-            code: generateRoleCode(newRoleName.trim()),
+            code: newRoleName.trim().toLowerCase().replace(/\s+/g, '_'),
             company_id: companyId
           }])
           .select()
@@ -57,6 +54,7 @@ export const useRoleOperations = (
 
       setNewRoleName("");
       setEditingRole(null);
+      setShowAddForm(false);
     } catch (error) {
       console.error('Error saving role:', error);
       toast.error('Failed to save role');
@@ -68,6 +66,7 @@ export const useRoleOperations = (
   const handleEdit = (role: Role) => {
     setEditingRole(role);
     setNewRoleName(role.name);
+    setShowAddForm(true);
   };
 
   const handleDelete = async (role: Role) => {
@@ -123,11 +122,25 @@ export const useRoleOperations = (
   const handleCancel = () => {
     setEditingRole(null);
     setNewRoleName("");
+    setShowAddForm(false);
   };
 
   const toggleEditMode = () => {
     setEditMode(!editMode);
     setSelectedRoles([]);
+    if (!editMode) {
+      setShowAddForm(false);
+      setEditingRole(null);
+      setNewRoleName("");
+    }
+  };
+
+  const handleAddNew = () => {
+    setShowAddForm(!showAddForm);
+    if (!showAddForm) {
+      setEditingRole(null);
+      setNewRoleName("");
+    }
   };
 
   return {
@@ -137,12 +150,14 @@ export const useRoleOperations = (
     editMode,
     selectedRoles,
     isSubmitting,
+    showAddForm,
     handleSubmit,
     handleEdit,
     handleDelete,
     handleBulkDelete,
     handleSelectRole,
     handleCancel,
-    toggleEditMode
+    toggleEditMode,
+    handleAddNew
   };
 };

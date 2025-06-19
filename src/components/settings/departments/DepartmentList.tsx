@@ -46,22 +46,24 @@ export const DepartmentList: React.FC<DepartmentListProps> = ({
               )}
               <span className="font-medium text-sm">{department.name}</span>
             </div>
-            <div className="flex gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onEdit(department)}
-              >
-                <Edit className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onDelete(department)}
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
-            </div>
+            {editMode && (
+              <div className="flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onEdit(department)}
+                >
+                  <Edit className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDelete(department)}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
           </div>
         </Card>
       ))}

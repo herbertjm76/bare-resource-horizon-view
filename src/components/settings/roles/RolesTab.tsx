@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import { Edit, Plus } from "lucide-react";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
 import { RoleForm } from './RoleForm';
@@ -21,13 +21,15 @@ export const RolesTab = () => {
     editMode,
     selectedRoles,
     isSubmitting,
+    showAddForm,
     handleSubmit,
     handleEdit,
     handleDelete,
     handleBulkDelete,
     handleSelectRole,
     handleCancel,
-    toggleEditMode
+    toggleEditMode,
+    handleAddNew
   } = useRoleOperations(roles, setRoles, company?.id);
 
   if (loading) {
@@ -55,6 +57,14 @@ export const RolesTab = () => {
             <Edit className="h-4 w-4 mr-2" />
             {editMode ? "Done" : "Edit"}
           </Button>
+          <Button 
+            size="sm" 
+            onClick={handleAddNew}
+            variant={showAddForm ? "secondary" : "default"}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {showAddForm ? "Cancel" : "Add Role"}
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -70,14 +80,16 @@ export const RolesTab = () => {
             />
           )}
 
-          <RoleForm
-            newRoleName={newRoleName}
-            setNewRoleName={setNewRoleName}
-            onSubmit={handleSubmit}
-            editingRole={editingRole}
-            isSubmitting={isSubmitting}
-            onCancel={handleCancel}
-          />
+          {showAddForm && (
+            <RoleForm
+              newRoleName={newRoleName}
+              setNewRoleName={setNewRoleName}
+              onSubmit={handleSubmit}
+              editingRole={editingRole}
+              isSubmitting={isSubmitting}
+              onCancel={handleCancel}
+            />
+          )}
 
           <RoleList
             roles={roles}

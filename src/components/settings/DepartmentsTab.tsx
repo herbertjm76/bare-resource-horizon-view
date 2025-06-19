@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import { Edit, Plus } from "lucide-react";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
 import { DepartmentForm } from './departments/DepartmentForm';
@@ -21,13 +21,15 @@ export const DepartmentsTab = () => {
     editMode,
     selectedDepartments,
     isSubmitting,
+    showAddForm,
     handleSubmit,
     handleEdit,
     handleDelete,
     handleBulkDelete,
     handleSelectDepartment,
     handleCancel,
-    toggleEditMode
+    toggleEditMode,
+    handleAddNew
   } = useDepartmentOperations(departments, setDepartments, company?.id);
 
   if (loading) {
@@ -55,6 +57,14 @@ export const DepartmentsTab = () => {
             <Edit className="h-4 w-4 mr-2" />
             {editMode ? "Done" : "Edit"}
           </Button>
+          <Button 
+            size="sm" 
+            onClick={handleAddNew}
+            variant={showAddForm ? "secondary" : "default"}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {showAddForm ? "Cancel" : "Add Department"}
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -70,14 +80,16 @@ export const DepartmentsTab = () => {
             />
           )}
 
-          <DepartmentForm
-            newDepartmentName={newDepartmentName}
-            setNewDepartmentName={setNewDepartmentName}
-            onSubmit={handleSubmit}
-            editingDepartment={editingDepartment}
-            isSubmitting={isSubmitting}
-            onCancel={handleCancel}
-          />
+          {showAddForm && (
+            <DepartmentForm
+              newDepartmentName={newDepartmentName}
+              setNewDepartmentName={setNewDepartmentName}
+              onSubmit={handleSubmit}
+              editingDepartment={editingDepartment}
+              isSubmitting={isSubmitting}
+              onCancel={handleCancel}
+            />
+          )}
 
           <DepartmentList
             departments={departments}

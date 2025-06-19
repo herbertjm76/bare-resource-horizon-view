@@ -14,6 +14,7 @@ export const useDepartmentOperations = (
   const [editMode, setEditMode] = useState(false);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const handleSubmit = async () => {
     if (!newDepartmentName.trim() || !companyId) return;
@@ -52,6 +53,7 @@ export const useDepartmentOperations = (
 
       setNewDepartmentName("");
       setEditingDepartment(null);
+      setShowAddForm(false);
     } catch (error) {
       console.error('Error saving department:', error);
       toast.error('Failed to save department');
@@ -63,6 +65,7 @@ export const useDepartmentOperations = (
   const handleEdit = (department: Department) => {
     setEditingDepartment(department);
     setNewDepartmentName(department.name);
+    setShowAddForm(true);
   };
 
   const handleDelete = async (department: Department) => {
@@ -118,11 +121,25 @@ export const useDepartmentOperations = (
   const handleCancel = () => {
     setEditingDepartment(null);
     setNewDepartmentName("");
+    setShowAddForm(false);
   };
 
   const toggleEditMode = () => {
     setEditMode(!editMode);
     setSelectedDepartments([]);
+    if (!editMode) {
+      setShowAddForm(false);
+      setEditingDepartment(null);
+      setNewDepartmentName("");
+    }
+  };
+
+  const handleAddNew = () => {
+    setShowAddForm(!showAddForm);
+    if (!showAddForm) {
+      setEditingDepartment(null);
+      setNewDepartmentName("");
+    }
   };
 
   return {
@@ -132,12 +149,14 @@ export const useDepartmentOperations = (
     editMode,
     selectedDepartments,
     isSubmitting,
+    showAddForm,
     handleSubmit,
     handleEdit,
     handleDelete,
     handleBulkDelete,
     handleSelectDepartment,
     handleCancel,
-    toggleEditMode
+    toggleEditMode,
+    handleAddNew
   };
 };

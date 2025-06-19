@@ -2,10 +2,10 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit } from "lucide-react";
+import { Edit, Plus } from "lucide-react";
 import { useOfficeSettings } from "@/context/OfficeSettingsContext";
 import { useCompany } from "@/context/CompanyContext";
-import { StageForm } from './stages/StageForm';
+import {StageForm } from './stages/StageForm';
 import { BulkOperations } from './stages/BulkOperations';
 import { StageList } from './stages/StageList';
 import { useStageOperations } from './stages/useStageOperations';
@@ -23,13 +23,15 @@ export const StagesTab = () => {
     editMode,
     selectedStages,
     isSubmitting,
+    showAddForm,
     handleSubmit,
     handleEdit,
     handleDelete,
     handleBulkDelete,
     handleSelectStage,
     handleCancel,
-    toggleEditMode
+    toggleEditMode,
+    handleAddNew
   } = useStageOperations(office_stages, setOfficeStages, company?.id);
 
   if (loading) {
@@ -57,12 +59,20 @@ export const StagesTab = () => {
             <Edit className="h-4 w-4 mr-2" />
             {editMode ? "Done" : "Edit"}
           </Button>
+          <Button 
+            size="sm" 
+            onClick={handleAddNew}
+            variant={showAddForm ? "secondary" : "default"}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            {showAddForm ? "Cancel" : "Add Stage"}
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
-            Define project stages that represent different phases of your project workflow.
+            Define project stages to track progress and organize work phases.
           </div>
           
           {editMode && (
@@ -72,16 +82,18 @@ export const StagesTab = () => {
             />
           )}
 
-          <StageForm
-            newStageName={newStageName}
-            setNewStageName={setNewStageName}
-            newStageColor={newStageColor}
-            setNewStageColor={setNewStageColor}
-            onSubmit={handleSubmit}
-            editingStage={editingStage}
-            isSubmitting={isSubmitting}
-            onCancel={handleCancel}
-          />
+          {showAddForm && (
+            <StageForm
+              newStageName={newStageName}
+              setNewStageName={setNewStageName}
+              newStageColor={newStageColor}
+              setNewStageColor={setNewStageColor}
+              onSubmit={handleSubmit}
+              editingStage={editingStage}
+              isSubmitting={isSubmitting}
+              onCancel={handleCancel}
+            />
+          )}
 
           <StageList
             stages={office_stages}

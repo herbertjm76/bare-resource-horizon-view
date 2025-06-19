@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { ProjectStage } from "@/context/officeSettings/types";
 
 export const useStageOperations = (
-  office_stages: ProjectStage[],
-  setOfficeStages: (stages: ProjectStage[]) => void,
+  stages: ProjectStage[],
+  setStages: (stages: ProjectStage[]) => void,
   companyId: string | undefined
 ) => {
   const [editingStage, setEditingStage] = useState<ProjectStage | null>(null);
@@ -15,11 +15,7 @@ export const useStageOperations = (
   const [editMode, setEditMode] = useState(false);
   const [selectedStages, setSelectedStages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const getNextOrderIndex = () => {
-    if (office_stages.length === 0) return 0;
-    return Math.max(...office_stages.map(stage => stage.order_index || 0)) + 1;
-  };
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const handleSubmit = async () => {
     if (!newStageName.trim() || !companyId) return;
@@ -39,7 +35,7 @@ export const useStageOperations = (
 
         if (error) throw error;
 
-        setOfficeStages(office_stages.map(stage => 
+        setStages(stages.map(stage => 
           stage.id === editingStage.id ? data : stage
         ));
         toast.success('Stage updated successfully');
@@ -50,20 +46,21 @@ export const useStageOperations = (
             name: newStageName.trim(),
             color: newStageColor,
             company_id: companyId,
-            order_index: getNextOrderIndex()
+            order_index: stages.length
           }])
           .select()
           .single();
 
         if (error) throw error;
 
-        setOfficeStages([...office_stages, data]);
+        setStages([...stages, data]);
         toast.success('Stage added successfully');
       }
 
       setNewStageName("");
       setNewStageColor("#E5DEFF");
       setEditingStage(null);
+      setShowAddForm(false);
     } catch (error) {
       console.error('Error saving stage:', error);
       toast.error('Failed to save stage');
@@ -76,6 +73,7 @@ export const useStageOperations = (
     setEditingStage(stage);
     setNewStageName(stage.name);
     setNewStageColor(stage.color || "#E5DEFF");
+    setShowAddForm(true);
   };
 
   const handleDelete = async (stage: ProjectStage) => {
@@ -89,7 +87,7 @@ export const useStageOperations = (
 
       if (error) throw error;
 
-      setOfficeStages(office_stages.filter(s => s.id !== stage.id));
+      setStages(stages.filter(s => s.id !== stage.id));
       toast.success('Stage deleted successfully');
     } catch (error) {
       console.error('Error deleting stage:', error);
@@ -110,7 +108,7 @@ export const useStageOperations = (
 
       if (error) throw error;
 
-      setOfficeStages(office_stages.filter(stage => !selectedStages.includes(stage.id)));
+      setStages(stages.filter(stage => !selectedStages.includes(stage.id)));
       setSelectedStages([]);
       setEditMode(false);
       toast.success('Stages deleted successfully');
@@ -132,11 +130,27 @@ export const useStageOperations = (
     setEditingStage(null);
     setNewStageName("");
     setNewStageColor("#E5DEFF");
+    setShowAddForm(false);
   };
 
   const toggleEditMode = () => {
     setEditMode(!editMode);
     setSelectedStages([]);
+    if (!editMode) {
+      setShowAddForm(false);
+      setEditingStage(null);
+      setNewStageName("");
+      setNewStageColor("#E5DEFF");
+    }
+  };
+
+  const handleAddNew = () => {
+    setShowAddForm(!showAddForm);
+    if (!showAddForm) {
+      setEditingStage(null);
+      setNewStageName("");
+      setNewStageColor("#E5DEFF");
+    }
   };
 
   return {
@@ -148,12 +162,14 @@ export const useStageOperations = (
     editMode,
     selectedStages,
     isSubmitting,
+    showAddForm,
     handleSubmit,
     handleEdit,
     handleDelete,
     handleBulkDelete,
     handleSelectStage,
     handleCancel,
-    toggleEditMode
+    toggleEditMode,
+    handleAddNew
   };
 };
