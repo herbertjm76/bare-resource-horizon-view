@@ -39,18 +39,18 @@ export const SidebarNavigation: React.FC = () => {
                       asChild
                       tooltip={collapsed ? item.title : undefined}
                       className={cn(
-                        "flex items-center text-sm rounded-lg transition-all duration-200 group",
+                        "flex items-center text-sm rounded-lg transition-all duration-200 group w-full",
                         isActive 
                           ? "bg-[#6F4BF6] text-white shadow-md border border-[#5D3FD3]" 
                           : "text-indigo-100 hover:bg-indigo-800/50 hover:text-white",
                         collapsed 
-                          ? "justify-center px-0 py-2 h-10 w-10 mx-auto" 
+                          ? "justify-center p-2 h-10" 
                           : "justify-start px-3 py-2"
                       )}
                     >
                       <Link to={item.url} className={cn(
-                        "flex items-center",
-                        collapsed ? "justify-center w-full" : ""
+                        "flex items-center w-full",
+                        collapsed ? "justify-center" : ""
                       )}>
                         <Icon className={cn(
                           "h-5 w-5 transition-colors duration-200",
