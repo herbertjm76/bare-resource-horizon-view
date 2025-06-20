@@ -10,63 +10,70 @@ import { RatesTab } from '@/components/settings/RatesTab';
 import { HolidaysTab } from '@/components/settings/HolidaysTab';
 import { DepartmentsTab } from '@/components/settings/DepartmentsTab';
 
-const tabBarClass =
-  "w-full mb-6 overflow-x-auto scrollbar-hide flex gap-1 rounded-none bg-transparent p-1";
-
 export const OfficeSettingsTabs: React.FC = () => {
   return (
     <Tabs defaultValue="locations" className="w-full">
-      <TabsList className={tabBarClass}>
-        <TabsTrigger value="locations" className="flex items-center gap-2 min-w-max px-3 py-2 h-auto whitespace-nowrap">
+      <TabsList className="w-full mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-1 h-auto bg-transparent p-1 rounded-lg">
+        <TabsTrigger 
+          value="locations" 
+          className="flex items-center gap-2 px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+        >
           <MapPin className="h-4 w-4 flex-shrink-0" />
-          <span className="text-xs sm:text-sm">
-            <span className="sm:hidden">Locations</span>
-            <span className="hidden sm:inline">Office Locations</span>
-          </span>
+          <span className="hidden xs:inline sm:hidden lg:inline">Office Locations</span>
+          <span className="xs:hidden sm:inline lg:hidden">Locations</span>
         </TabsTrigger>
-        <TabsTrigger value="areas" className="flex items-center gap-2 min-w-max px-3 py-2 h-auto whitespace-nowrap">
+        
+        <TabsTrigger 
+          value="areas" 
+          className="flex items-center gap-2 px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+        >
           <Folder className="h-4 w-4 flex-shrink-0" />
-          <span className="text-xs sm:text-sm">
-            <span className="sm:hidden">Areas</span>
-            <span className="hidden sm:inline">Project Areas</span>
-          </span>
+          <span className="hidden xs:inline sm:hidden lg:inline">Project Areas</span>
+          <span className="xs:hidden sm:inline lg:hidden">Areas</span>
         </TabsTrigger>
-        <TabsTrigger value="stages" className="flex items-center gap-2 min-w-max px-3 py-2 h-auto whitespace-nowrap">
+        
+        <TabsTrigger 
+          value="stages" 
+          className="flex items-center gap-2 px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+        >
           <Layers className="h-4 w-4 flex-shrink-0" />
-          <span className="text-xs sm:text-sm">
-            <span className="sm:hidden">Stages</span>
-            <span className="hidden sm:inline">Stages</span>
-          </span>
+          <span>Stages</span>
         </TabsTrigger>
-        <TabsTrigger value="departments" className="flex items-center gap-2 min-w-max px-3 py-2 h-auto whitespace-nowrap">
+        
+        <TabsTrigger 
+          value="departments" 
+          className="flex items-center gap-2 px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+        >
           <Building className="h-4 w-4 flex-shrink-0" />
-          <span className="text-xs sm:text-sm">
-            <span className="sm:hidden">Depts</span>
-            <span className="hidden sm:inline">Departments</span>
-          </span>
+          <span className="hidden xs:inline">Departments</span>
+          <span className="xs:hidden">Depts</span>
         </TabsTrigger>
-        <TabsTrigger value="roles" className="flex items-center gap-2 min-w-max px-3 py-2 h-auto whitespace-nowrap">
+        
+        <TabsTrigger 
+          value="roles" 
+          className="flex items-center gap-2 px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+        >
           <Briefcase className="h-4 w-4 flex-shrink-0" />
-          <span className="text-xs sm:text-sm">
-            <span className="sm:hidden">Roles</span>
-            <span className="hidden sm:inline">Roles</span>
-          </span>
+          <span>Roles</span>
         </TabsTrigger>
-        <TabsTrigger value="rates" className="flex items-center gap-2 min-w-max px-3 py-2 h-auto whitespace-nowrap">
+        
+        <TabsTrigger 
+          value="rates" 
+          className="flex items-center gap-2 px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+        >
           <Currency className="h-4 w-4 flex-shrink-0" />
-          <span className="text-xs sm:text-sm">
-            <span className="sm:hidden">Rates</span>
-            <span className="hidden sm:inline">Rates</span>
-          </span>
+          <span>Rates</span>
         </TabsTrigger>
-        <TabsTrigger value="holidays" className="flex items-center gap-2 min-w-max px-3 py-2 h-auto whitespace-nowrap">
+        
+        <TabsTrigger 
+          value="holidays" 
+          className="flex items-center gap-2 px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+        >
           <Calendar className="h-4 w-4 flex-shrink-0" />
-          <span className="text-xs sm:text-sm">
-            <span className="sm:hidden">Holidays</span>
-            <span className="hidden sm:inline">Holidays</span>
-          </span>
+          <span>Holidays</span>
         </TabsTrigger>
       </TabsList>
+      
       <div className="mt-6">
         <TabsContent value="locations">
           <LocationsTab />
