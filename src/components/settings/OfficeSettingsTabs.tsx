@@ -15,8 +15,12 @@ const tabBarClass =
 
 export const OfficeSettingsTabs: React.FC = () => {
   return (
-    <Tabs defaultValue="areas" className="w-full">
+    <Tabs defaultValue="locations" className="w-full">
       <TabsList className={tabBarClass + " flex sm:grid"}>
+        <TabsTrigger value="locations" className="flex items-center gap-2 min-w-max px-4 h-10">
+          <MapPin className="h-4 w-4" />
+          <span className="hidden xs:inline">Office Locations</span>
+        </TabsTrigger>
         <TabsTrigger value="areas" className="flex items-center gap-2 min-w-max px-4 h-10">
           <Folder className="h-4 w-4" />
           <span className="hidden xs:inline">Project Areas</span>
@@ -24,10 +28,6 @@ export const OfficeSettingsTabs: React.FC = () => {
         <TabsTrigger value="stages" className="flex items-center gap-2 min-w-max px-4 h-10">
           <Layers className="h-4 w-4" />
           <span className="hidden xs:inline">Stages</span>
-        </TabsTrigger>
-        <TabsTrigger value="locations" className="flex items-center gap-2 min-w-max px-4 h-10">
-          <MapPin className="h-4 w-4" />
-          <span className="hidden xs:inline">Locations</span>
         </TabsTrigger>
         <TabsTrigger value="departments" className="flex items-center gap-2 min-w-max px-4 h-10">
           <Building className="h-4 w-4" />
@@ -47,14 +47,14 @@ export const OfficeSettingsTabs: React.FC = () => {
         </TabsTrigger>
       </TabsList>
       <div className="mt-6">
+        <TabsContent value="locations">
+          <LocationsTab />
+        </TabsContent>
         <TabsContent value="areas">
           <CountriesTab />
         </TabsContent>
         <TabsContent value="stages">
           <StagesTab />
-        </TabsContent>
-        <TabsContent value="locations">
-          <LocationsTab />
         </TabsContent>
         <TabsContent value="departments">
           <DepartmentsTab />
