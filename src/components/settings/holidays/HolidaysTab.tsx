@@ -3,8 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useCompany } from "@/context/CompanyContext";
-import { HolidayList } from "./HolidayList";
 import { HolidayDialog } from "./HolidayDialog";
+import { HolidayViewToggle } from "./HolidayViewToggle";
+import { HolidayMonthNavigation } from "./HolidayMonthNavigation";
+import { HolidayMonthlyList } from "./HolidayMonthlyList";
+import { HolidayCalendarView } from "./HolidayCalendarView";
 import { fetchHolidays, createHoliday, updateHoliday, deleteHolidays } from "./HolidayService";
 import { Holiday, HolidayFormValues } from "./types";
 
@@ -41,6 +44,8 @@ export const HolidaysTab = () => {
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [view, setView] = useState<'list' | 'calendar'>('list');
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const { company } = useCompany();
 
   useEffect(() => {
@@ -179,6 +184,7 @@ export const HolidaysTab = () => {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Office Holidays</CardTitle>
         <div className="flex gap-2">
+          <HolidayViewToggle view={view} onViewChange={setView} />
           <Button 
             size="sm" 
             variant={editMode ? "secondary" : "outline"} 
@@ -206,6 +212,11 @@ export const HolidaysTab = () => {
           <div className="text-sm text-muted-foreground mb-4">
             Manage office holidays and closures. You can assign holidays to multiple office locations.
           </div>
+
+          <HolidayMonthNavigation 
+            currentMonth={currentMonth}
+            onMonthChange={setCurrentMonth}
+          />
           
           {editMode && selected.length > 0 && (
             <div className="flex items-center gap-2 p-3 bg-muted rounded-lg mb-4">
@@ -224,14 +235,22 @@ export const HolidaysTab = () => {
             </div>
           )}
           
-          <HolidayList 
-            holidays={consolidatedHolidays}
-            selected={selected}
-            editMode={editMode}
-            onEdit={handleEdit}
-            onSelect={handleSelect}
-            loading={loading}
-          />
+          {view === 'list' ? (
+            <HolidayMonthlyList
+              holidays={consolidatedHolidays}
+              selectedMonth={currentMonth}
+              selected={selected}
+              editMode={editMode}
+              onEdit={handleEdit}
+              onSelect={handleSelect}
+              loading={loading}
+            />
+          ) : (
+            <HolidayCalendarView
+              holidays={consolidatedHolidays}
+              selectedMonth={currentMonth}
+            />
+          )}
         </div>
       </CardContent>
 
