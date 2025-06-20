@@ -20,7 +20,7 @@ export const StandardLayout: React.FC<StandardLayoutProps> = ({
   title
 }) => {
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider defaultOpen={true}>
       <div className={`w-full min-h-screen flex ${className}`}>
         <AppSidebar />
         <SidebarInset className="flex-1 flex flex-col min-w-0 max-w-full">
