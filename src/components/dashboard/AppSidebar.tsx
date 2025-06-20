@@ -11,7 +11,10 @@ import { SidebarNavigation } from './SidebarNavigation';
 
 export const AppSidebar: React.FC = () => {
   return (
-    <Sidebar className="bg-gradient-to-b from-[#6F4BF6] to-purple-700 text-white border-[#6F4BF6]">
+    <Sidebar 
+      collapsible="icon" 
+      className="bg-gradient-to-b from-[#6F4BF6] to-purple-700 text-white border-[#6F4BF6]"
+    >
       <SidebarHeader className="p-0">
         <SidebarLogo />
       </SidebarHeader>

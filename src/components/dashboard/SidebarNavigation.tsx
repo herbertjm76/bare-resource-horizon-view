@@ -37,19 +37,20 @@ export const SidebarNavigation: React.FC = () => {
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton
                       asChild
+                      tooltip={collapsed ? item.title : undefined}
                       className={cn(
                         "flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 group",
                         isActive 
                           ? "bg-[#6F4BF6] text-white shadow-md border border-[#5D3FD3]" 
                           : "text-indigo-100 hover:bg-indigo-800/50 hover:text-white",
-                        collapsed ? "justify-center" : "justify-start"
+                        collapsed ? "justify-center px-2" : "justify-start"
                       )}
                     >
                       <Link to={item.url}>
                         <Icon className={cn(
                           "h-5 w-5 transition-colors duration-200",
                           isActive ? "text-white" : "text-indigo-200 group-hover:text-white",
-                          collapsed ? "" : "mr-3"
+                          collapsed ? "mr-0" : "mr-3"
                         )} />
                         {!collapsed && (
                           <span className="font-medium">{item.title}</span>
