@@ -16,12 +16,12 @@ export const SidebarLogo = () => {
             variant="ghost" 
             size="icon" 
             onClick={toggleSidebar} 
-            className="text-indigo-100 hover:bg-indigo-800/40 hover:text-white h-8 w-8 rounded-none flex items-center justify-center transition-all duration-200"
+            className="text-indigo-100 hover:bg-indigo-800/40 hover:text-white h-8 w-8 p-0 flex items-center justify-center transition-all duration-200"
           >
             <img 
               src="/lovable-uploads/ed04e6a3-39d3-470c-8f3f-7b02984281bc.png" 
               alt="BareResource Logo" 
-              className="w-[17.2px] h-[17.2px] opacity-90 hover:opacity-100 transition-opacity" 
+              className="w-[16px] h-[16px] opacity-90 hover:opacity-100 transition-opacity" 
             />
           </Button>
         </div>
