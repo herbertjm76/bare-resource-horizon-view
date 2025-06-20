@@ -27,14 +27,44 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
     
     if (show) {
       // Include all days (weekdays + weekends)
-      updatedDays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+      updatedDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     } else {
-      // Only include weekdays (Monday to Friday)
-      updatedDays = ['mon', 'tue', 'wed', 'thu', 'fri'];
+      // Only include weekdays based on week start preference
+      if (weekStartsOnSunday) {
+        // Sunday start: weekdays are Sun, Mon, Tue, Wed, Thu (Fri, Sat are weekends)
+        updatedDays = ['sun', 'mon', 'tue', 'wed', 'thu'];
+      } else {
+        // Monday start: weekdays are Mon, Tue, Wed, Thu, Fri (Sat, Sun are weekends)
+        updatedDays = ['mon', 'tue', 'wed', 'thu', 'fri'];
+      }
     }
     
     // Update both the weekend toggle and selected days
     onToggleWeekends(show);
+    onSelectedDaysChange(updatedDays);
+  };
+
+  // Handler for week start change - update selected days accordingly
+  const handleWeekStartChange = (startsOnSunday: boolean) => {
+    onWeekStartChange(startsOnSunday);
+    
+    // Update selected days based on current weekend setting and new week start
+    let updatedDays: string[];
+    
+    if (showWeekends) {
+      // Show all days regardless of week start
+      updatedDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    } else {
+      // Only show weekdays based on new week start preference
+      if (startsOnSunday) {
+        // Sunday start: weekdays are Sun, Mon, Tue, Wed, Thu
+        updatedDays = ['sun', 'mon', 'tue', 'wed', 'thu'];
+      } else {
+        // Monday start: weekdays are Mon, Tue, Wed, Thu, Fri
+        updatedDays = ['mon', 'tue', 'wed', 'thu', 'fri'];
+      }
+    }
+    
     onSelectedDaysChange(updatedDays);
   };
 
@@ -60,9 +90,21 @@ export const DisplayOptions: React.FC<DisplayOptionsProps> = ({
         <Switch 
           id="week-start" 
           checked={weekStartsOnSunday} 
-          onCheckedChange={onWeekStartChange}
+          onCheckedChange={handleWeekStartChange}
         />
       </div>
+      
+      {weekStartsOnSunday && (
+        <div className="text-xs text-gray-600 bg-blue-50 p-2 rounded">
+          <strong>Sunday Week:</strong> Weekdays are S-M-T-W-Th, Weekends are F-Sa
+        </div>
+      )}
+      
+      {!weekStartsOnSunday && (
+        <div className="text-xs text-gray-600 bg-green-50 p-2 rounded">
+          <strong>Monday Week:</strong> Weekdays are M-T-W-Th-F, Weekends are Sa-S
+        </div>
+      )}
     </div>
   );
 };

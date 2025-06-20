@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { format, addDays, isWeekend, isSunday, eachDayOfInterval, addWeeks } from 'date-fns';
+import { format, addDays, isWeekend, isSunday, eachDayOfInterval, addWeeks, startOfWeek } from 'date-fns';
 import { DayInfo } from '../grid/types';
 
 interface DisplayOptions {
@@ -39,20 +39,51 @@ const getSingleLetterDay = (date: Date): string => {
   return dayNames[date.getDay()];
 };
 
+// Check if a day is weekend based on week start preference
+const isWeekendDay = (date: Date, weekStartsOnSunday: boolean): boolean => {
+  const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
+  
+  if (weekStartsOnSunday) {
+    // If week starts on Sunday, weekend is Friday (5) and Saturday (6)
+    return dayOfWeek === 5 || dayOfWeek === 6;
+  } else {
+    // If week starts on Monday, weekend is Saturday (6) and Sunday (0)
+    return dayOfWeek === 0 || dayOfWeek === 6;
+  }
+};
+
 export const useGridDays = (
   startDate: Date,
   periodToShow: number,
   displayOptions: DisplayOptions
 ): DayInfo[] => {
   return useMemo(() => {
-    // Use the provided startDate directly instead of calculating from month start
+    // Adjust start date based on week start preference
+    let adjustedStartDate: Date;
+    if (displayOptions.weekStartsOnSunday) {
+      // Week starts on Sunday (day 0)
+      adjustedStartDate = startOfWeek(startDate, { weekStartsOn: 0 });
+    } else {
+      // Week starts on Monday (day 1)
+      adjustedStartDate = startOfWeek(startDate, { weekStartsOn: 1 });
+    }
+    
     // Convert periodToShow from weeks to days for eachDayOfInterval
     const daysToAdd = periodToShow * 7;
-    const endDate = addDays(startDate, daysToAdd - 1);
+    const endDate = addDays(adjustedStartDate, daysToAdd - 1);
     
     let allDays = eachDayOfInterval({
-      start: startDate,
+      start: adjustedStartDate,
       end: endDate
+    });
+    
+    console.log('Grid days debug:', {
+      weekStartsOnSunday: displayOptions.weekStartsOnSunday,
+      originalStartDate: startDate,
+      adjustedStartDate,
+      selectedDays: displayOptions.selectedDays,
+      showWeekends: displayOptions.showWeekends,
+      totalDays: allDays.length
     });
     
     // Filter days based on display options
@@ -61,9 +92,17 @@ export const useGridDays = (
       const dayOfWeek = getDayOfWeek(day, displayOptions.weekStartsOnSunday);
       const dayId = dayOfWeekToId(dayOfWeek, displayOptions.weekStartsOnSunday);
       
+      // Check if this day is a weekend based on our week start preference
+      const isWeekendForThisSystem = isWeekendDay(day, displayOptions.weekStartsOnSunday);
+      
+      console.log(`Day ${format(day, 'EEE')} (${dayId}):`, {
+        isWeekendForThisSystem,
+        isInSelectedDays: displayOptions.selectedDays.includes(dayId),
+        showWeekends: displayOptions.showWeekends
+      });
+      
       // Weekend handling - ensure weekends are shown if showWeekends is true
-      // This should override the selectedDays filter for weekend days
-      if (isWeekend(day)) {
+      if (isWeekendForThisSystem) {
         return displayOptions.showWeekends && displayOptions.selectedDays.includes(dayId);
       }
       
@@ -73,7 +112,8 @@ export const useGridDays = (
     
     return allDays.map((day, index, days) => {
       const dayOfWeek = getDayOfWeek(day, displayOptions.weekStartsOnSunday);
-      const isLastDayOfWeek = dayOfWeek === (displayOptions.weekStartsOnSunday ? 6 : 6);
+      const lastDayOfWeek = displayOptions.weekStartsOnSunday ? 6 : 6; // Saturday is always last day
+      const isLastDayOfWeek = dayOfWeek === lastDayOfWeek;
       
       // Check if next day is in a different week or if this is the last day
       const isEndOfWeek = isLastDayOfWeek || index === days.length - 1 || 
@@ -84,7 +124,7 @@ export const useGridDays = (
         label: format(day, 'd'), // Day of month
         dayName: getSingleLetterDay(day), // Single letter day name
         monthLabel: format(day, 'MMM'), // Short month name
-        isWeekend: isWeekend(day),
+        isWeekend: isWeekendDay(day, displayOptions.weekStartsOnSunday),
         isSunday: isSunday(day),
         isFirstOfMonth: day.getDate() === 1,
         isEndOfWeek: isEndOfWeek

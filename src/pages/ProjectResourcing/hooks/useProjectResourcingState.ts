@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useMemo } from 'react';
 import { format, subWeeks, startOfWeek } from 'date-fns';
 
@@ -23,7 +22,7 @@ export const useProjectResourcingState = () => {
   
   const [displayOptions, setDisplayOptions] = useState({
     showWeekends: false, // Default to not showing weekends
-    selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri'], // Default to weekdays only
+    selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri'], // Default to weekdays only (Monday start)
     weekStartsOnSunday: false // Default: week starts on Monday
   });
 
@@ -47,22 +46,60 @@ export const useProjectResourcingState = () => {
       [option]: value
     }));
     
-    // Ensure weekend toggle and selectedDays stay in sync
+    // Handle special cases for week start and weekend changes
     if (option === 'showWeekends') {
       const showWeekends = value as boolean;
+      const currentWeekStartsOnSunday = displayOptions.weekStartsOnSunday;
       
       if (showWeekends) {
-        // Show all days (weekdays + weekends)
+        // Show all days
         setDisplayOptions(prev => ({
           ...prev,
-          selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+          selectedDays: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
         }));
       } else {
-        // Show only weekdays
+        // Show only weekdays based on current week start preference
+        if (currentWeekStartsOnSunday) {
+          // Sunday start: weekdays are Sun, Mon, Tue, Wed, Thu
+          setDisplayOptions(prev => ({
+            ...prev,
+            selectedDays: ['sun', 'mon', 'tue', 'wed', 'thu']
+          }));
+        } else {
+          // Monday start: weekdays are Mon, Tue, Wed, Thu, Fri
+          setDisplayOptions(prev => ({
+            ...prev,
+            selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri']
+          }));
+        }
+      }
+    }
+    
+    if (option === 'weekStartsOnSunday') {
+      const startsOnSunday = value as boolean;
+      const currentShowWeekends = displayOptions.showWeekends;
+      
+      if (currentShowWeekends) {
+        // If showing weekends, keep all days
         setDisplayOptions(prev => ({
           ...prev,
-          selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri']
+          selectedDays: ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
         }));
+      } else {
+        // Update weekdays based on new week start preference
+        if (startsOnSunday) {
+          // Sunday start: weekdays are Sun, Mon, Tue, Wed, Thu
+          setDisplayOptions(prev => ({
+            ...prev,
+            selectedDays: ['sun', 'mon', 'tue', 'wed', 'thu']
+          }));
+        } else {
+          // Monday start: weekdays are Mon, Tue, Wed, Thu, Fri
+          setDisplayOptions(prev => ({
+            ...prev,
+            selectedDays: ['mon', 'tue', 'wed', 'thu', 'fri']
+          }));
+        }
       }
     }
   };
@@ -72,16 +109,18 @@ export const useProjectResourcingState = () => {
   };
   
   const handleMonthChange = useCallback((date: Date) => {
-    // When user selects a date, we need to convert it to the Monday of that week
-    // to maintain consistency with our week-based system
-    const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+    // When user selects a date, we need to convert it to the start of that week
+    // based on the current week start preference
+    const weekStartsOn = displayOptions.weekStartsOnSunday ? 0 : 1;
+    const weekStart = startOfWeek(date, { weekStartsOn });
     setSelectedMonth(weekStart);
-  }, []);
+  }, [displayOptions.weekStartsOnSunday]);
 
-  // Calculate the actual start date for the grid (should be Monday of selected week)
+  // Calculate the actual start date for the grid based on week start preference
   const gridStartDate = useMemo(() => {
-    return startOfWeek(selectedMonth, { weekStartsOn: 1 });
-  }, [selectedMonth]);
+    const weekStartsOn = displayOptions.weekStartsOnSunday ? 0 : 1;
+    return startOfWeek(selectedMonth, { weekStartsOn });
+  }, [selectedMonth, displayOptions.weekStartsOnSunday]);
 
   // Format the month label
   const monthLabel = useMemo(() => {
