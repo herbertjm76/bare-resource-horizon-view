@@ -50,24 +50,6 @@ export const HolidayMonthlyView: React.FC<HolidayMonthlyViewProps> = ({
       .join(", ");
   };
 
-  const getMonthGradient = (monthIndex: number) => {
-    const brandGradients = [
-      'from-brand-primary to-purple-600',    // January
-      'from-purple-500 to-pink-500',         // February  
-      'from-emerald-500 to-teal-500',        // March
-      'from-orange-500 to-amber-500',        // April
-      'from-red-500 to-pink-500',            // May
-      'from-pink-500 to-rose-500',           // June
-      'from-yellow-500 to-orange-500',       // July
-      'from-indigo-500 to-brand-primary',    // August
-      'from-teal-500 to-cyan-500',           // September
-      'from-cyan-500 to-blue-500',           // October
-      'from-emerald-500 to-green-500',       // November
-      'from-violet-500 to-brand-primary'     // December
-    ];
-    return brandGradients[monthIndex];
-  };
-
   if (loading) {
     return (
       <div className="text-center p-6">
@@ -99,9 +81,12 @@ export const HolidayMonthlyView: React.FC<HolidayMonthlyViewProps> = ({
       {monthsWithHolidays.map(({ month, index, holidays: monthHolidays }) => (
         <Card key={month} className="h-fit border-2" style={{ borderColor: colors.brand.border }}>
           <CardHeader className="pb-2 p-3">
-            <CardTitle className={`text-center text-white py-2 px-3 rounded-md bg-gradient-to-r ${getMonthGradient(index)} text-sm font-semibold`}>
+            <CardTitle 
+              className="text-center text-gray-700 py-2 px-3 rounded-md text-sm font-semibold"
+              style={{ backgroundColor: '#EFF4FF' }}
+            >
               {month}
-              <span className="ml-2 bg-white/20 rounded-full px-2 py-0.5 text-xs">
+              <span className="ml-2 bg-white/60 rounded-full px-2 py-0.5 text-xs">
                 {monthHolidays.length}
               </span>
             </CardTitle>
