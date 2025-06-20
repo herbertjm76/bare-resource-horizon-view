@@ -1,13 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { useCompany } from "@/context/CompanyContext";
 import { HolidayDialog } from "./HolidayDialog";
-import { HolidayViewToggle } from "./HolidayViewToggle";
 import { HolidayYearNavigation } from "./HolidayYearNavigation";
-import { HolidayYearlyList } from "./HolidayYearlyList";
-import { HolidayYearlyCalendar } from "./HolidayYearlyCalendar";
+import { HolidayMonthlyView } from "./HolidayMonthlyView";
 import { fetchHolidays, createHoliday, updateHoliday, deleteHolidays } from "./HolidayService";
 import { Holiday, HolidayFormValues } from "./types";
 
@@ -44,7 +43,6 @@ export const HolidaysTab = () => {
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [view, setView] = useState<'list' | 'calendar'>('list');
   const [currentYear, setCurrentYear] = useState(new Date());
   const { company } = useCompany();
 
@@ -184,7 +182,6 @@ export const HolidaysTab = () => {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
         <CardTitle>Office Holidays</CardTitle>
         <div className="flex gap-2">
-          <HolidayViewToggle view={view} onViewChange={setView} />
           <Button 
             size="sm" 
             variant={editMode ? "secondary" : "outline"} 
@@ -235,22 +232,15 @@ export const HolidaysTab = () => {
             </div>
           )}
           
-          {view === 'list' ? (
-            <HolidayYearlyList
-              holidays={consolidatedHolidays}
-              selectedYear={currentYear}
-              selected={selected}
-              editMode={editMode}
-              onEdit={handleEdit}
-              onSelect={handleSelect}
-              loading={loading}
-            />
-          ) : (
-            <HolidayYearlyCalendar
-              holidays={consolidatedHolidays}
-              selectedYear={currentYear}
-            />
-          )}
+          <HolidayMonthlyView
+            holidays={consolidatedHolidays}
+            selectedYear={currentYear}
+            selected={selected}
+            editMode={editMode}
+            onEdit={handleEdit}
+            onSelect={handleSelect}
+            loading={loading}
+          />
         </div>
       </CardContent>
 
