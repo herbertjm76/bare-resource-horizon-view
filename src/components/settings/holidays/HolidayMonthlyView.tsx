@@ -2,9 +2,11 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit } from "lucide-react";
 import { format, isSameMonth, isSameYear } from 'date-fns';
 import { Holiday } from './types';
+import { useOfficeSettings } from '@/context/officeSettings';
+import { colors } from '@/styles/colors';
 
 interface HolidayMonthlyViewProps {
   holidays: Holiday[];
@@ -25,9 +27,11 @@ export const HolidayMonthlyView: React.FC<HolidayMonthlyViewProps> = ({
   onSelect,
   loading
 }) => {
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+  const { locations } = useOfficeSettings();
+  
+  const shortMonths = [
+    'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+    'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
   ];
 
   const getMonthHolidays = (monthIndex: number) => {
@@ -37,108 +41,122 @@ export const HolidayMonthlyView: React.FC<HolidayMonthlyViewProps> = ({
     );
   };
 
-  const getMonthColor = (monthIndex: number) => {
-    const colors = [
-      'from-blue-400 to-blue-500',    // January
-      'from-purple-400 to-purple-500', // February  
-      'from-green-400 to-green-500',   // March
-      'from-orange-400 to-orange-500', // April
-      'from-red-400 to-red-500',       // May
-      'from-pink-400 to-pink-500',     // June
-      'from-yellow-400 to-yellow-500', // July
-      'from-indigo-400 to-indigo-500', // August
-      'from-teal-400 to-teal-500',     // September
-      'from-cyan-400 to-cyan-500',     // October
-      'from-emerald-400 to-emerald-500', // November
-      'from-violet-400 to-violet-500'  // December
+  const getOfficeNames = (officeIds: string[]) => {
+    return officeIds
+      .map(id => {
+        const location = locations.find(loc => loc.id === id);
+        return location ? `${location.emoji} ${location.city}` : id;
+      })
+      .join(", ");
+  };
+
+  const getMonthGradient = (monthIndex: number) => {
+    const brandGradients = [
+      'from-brand-primary to-purple-600',    // January
+      'from-purple-500 to-pink-500',         // February  
+      'from-emerald-500 to-teal-500',        // March
+      'from-orange-500 to-amber-500',        // April
+      'from-red-500 to-pink-500',            // May
+      'from-pink-500 to-rose-500',           // June
+      'from-yellow-500 to-orange-500',       // July
+      'from-indigo-500 to-brand-primary',    // August
+      'from-teal-500 to-cyan-500',           // September
+      'from-cyan-500 to-blue-500',           // October
+      'from-emerald-500 to-green-500',       // November
+      'from-violet-500 to-brand-primary'     // December
     ];
-    return colors[monthIndex];
+    return brandGradients[monthIndex];
   };
 
   if (loading) {
     return (
-      <div className="text-center p-8">
+      <div className="text-center p-6">
         <div className="text-muted-foreground">Loading holidays...</div>
       </div>
     );
   }
 
+  // Filter out months with no holidays
+  const monthsWithHolidays = shortMonths
+    .map((month, index) => ({ month, index, holidays: getMonthHolidays(index) }))
+    .filter(({ holidays }) => holidays.length > 0);
+
+  if (monthsWithHolidays.length === 0) {
+    return (
+      <div className="text-center p-8 border rounded-lg border-dashed">
+        <div className="text-muted-foreground">
+          No holidays in {format(selectedYear, 'yyyy')}
+        </div>
+        <div className="text-sm text-muted-foreground mt-1">
+          Click "Add Holiday" to create holidays for this year.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {months.map((month, monthIndex) => {
-        const monthHolidays = getMonthHolidays(monthIndex);
-        const hasHolidays = monthHolidays.length > 0;
-        
-        return (
-          <Card key={month} className="h-fit">
-            <CardHeader className="pb-3">
-              <CardTitle className={`text-center text-white py-3 rounded-lg bg-gradient-to-r ${getMonthColor(monthIndex)}`}>
-                {month}
-                {hasHolidays && (
-                  <span className="ml-2 bg-white/20 rounded-full px-2 py-1 text-xs">
-                    {monthHolidays.length}
-                  </span>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {hasHolidays ? (
-                <div className="space-y-3">
-                  {monthHolidays.map((holiday) => (
-                    <div 
-                      key={holiday.id}
-                      className={`p-3 rounded-lg border transition-colors ${
-                        editMode 
-                          ? 'cursor-pointer hover:bg-gray-50' 
-                          : 'bg-gray-50'
-                      } ${
-                        selected.includes(holiday.id) ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-                      }`}
-                      onClick={() => editMode && onSelect(holiday.id)}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-sm font-semibold text-gray-600">
-                              {format(holiday.date, 'M/dd')}
-                            </span>
-                            <span className="text-sm font-medium text-gray-900">
-                              {holiday.name}
-                            </span>
-                          </div>
-                          {holiday.offices && holiday.offices.length > 0 && (
-                            <div className="text-xs text-gray-500">
-                              {holiday.offices.length} office{holiday.offices.length !== 1 ? 's' : ''}
-                            </div>
-                          )}
-                        </div>
-                        
-                        {!editMode && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEdit(holiday);
-                            }}
-                            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
-                          >
-                            <Edit className="h-3 w-3" />
-                          </Button>
-                        )}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {monthsWithHolidays.map(({ month, index, holidays: monthHolidays }) => (
+        <Card key={month} className="h-fit border-2" style={{ borderColor: colors.brand.border }}>
+          <CardHeader className="pb-2 p-3">
+            <CardTitle className={`text-center text-white py-2 px-3 rounded-md bg-gradient-to-r ${getMonthGradient(index)} text-sm font-semibold`}>
+              {month}
+              <span className="ml-2 bg-white/20 rounded-full px-2 py-0.5 text-xs">
+                {monthHolidays.length}
+              </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 p-3">
+            <div className="space-y-2">
+              {monthHolidays.map((holiday) => (
+                <div 
+                  key={holiday.id}
+                  className={`p-2 rounded-md border transition-colors ${
+                    editMode 
+                      ? 'cursor-pointer hover:bg-gray-50' 
+                      : 'bg-gray-50/50'
+                  } ${
+                    selected.includes(holiday.id) ? 'ring-2 ring-brand-primary bg-brand-violet-light' : ''
+                  }`}
+                  onClick={() => editMode && onSelect(holiday.id)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-semibold" style={{ color: colors.brand.primary }}>
+                          {format(holiday.date, 'M/dd')}
+                        </span>
+                        <span className="text-sm font-medium text-gray-900 truncate">
+                          {holiday.name}
+                        </span>
                       </div>
+                      {holiday.offices && holiday.offices.length > 0 && (
+                        <div className="text-xs text-gray-600 truncate">
+                          {getOfficeNames(holiday.offices)}
+                        </div>
+                      )}
                     </div>
-                  ))}
+                    
+                    {!editMode && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(holiday);
+                        }}
+                        className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
+                      >
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <div className="text-sm">No holidays in {month}</div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };
