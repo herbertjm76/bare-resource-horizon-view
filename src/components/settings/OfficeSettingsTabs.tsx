@@ -5,7 +5,7 @@ import { Folder, Layers, MapPin, Briefcase, Currency, Calendar, Building } from 
 import { CountriesTab } from '@/components/settings/CountriesTab';
 import { StagesTab } from '@/components/settings/StagesTab';
 import { LocationsTab } from '@/components/settings/LocationsTab';
-import { RolesTab } from '@/components/settings/RolesTab';
+import { RolesTab } from '@/components/settings/roles/RolesTab';
 import { RatesTab } from '@/components/settings/RatesTab';
 import { HolidaysTab } from '@/components/settings/HolidaysTab';
 import { DepartmentsTab } from '@/components/settings/DepartmentsTab';
