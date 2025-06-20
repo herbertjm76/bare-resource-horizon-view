@@ -3,7 +3,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus } from "lucide-react";
+import { Plus, Edit } from "lucide-react";
 import { Role } from './types';
 
 interface AddRoleDialogProps {
@@ -62,7 +62,11 @@ export const AddRoleDialog: React.FC<AddRoleDialogProps> = ({
               onClick={onSubmit} 
               disabled={isSubmitting || !newRoleName.trim()}
             >
-              <Plus className="h-4 w-4 mr-2" />
+              {editingRole ? (
+                <Edit className="h-4 w-4 mr-2" />
+              ) : (
+                <Plus className="h-4 w-4 mr-2" />
+              )}
               {editingRole ? 'Update' : 'Add'} Role
             </Button>
           </div>

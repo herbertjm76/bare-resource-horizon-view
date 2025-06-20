@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Role } from './types';
+import { generateRoleCode } from './utils';
 
 export const useRoleOperations = (
   roles: Role[],
@@ -24,7 +25,10 @@ export const useRoleOperations = (
       if (editingRole) {
         const { data, error } = await supabase
           .from('office_roles')
-          .update({ name: newRoleName.trim() })
+          .update({ 
+            name: newRoleName.trim(),
+            code: generateRoleCode(newRoleName.trim())
+          })
           .eq('id', editingRole.id)
           .select()
           .single();
@@ -40,7 +44,7 @@ export const useRoleOperations = (
           .from('office_roles')
           .insert([{
             name: newRoleName.trim(),
-            code: newRoleName.trim().toLowerCase().replace(/\s+/g, '_'),
+            code: generateRoleCode(newRoleName.trim()),
             company_id: companyId
           }])
           .select()
