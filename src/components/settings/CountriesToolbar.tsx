@@ -23,15 +23,16 @@ const CountriesToolbar: React.FC<CountriesToolbarProps> = ({
       onClick={() => setEditMode(em => !em)}
       disabled={disabled}
     >
-      <Edit className="h-4 w-4 mr-2" /> {editMode ? "Done" : "Edit"}
+      <Edit className="h-4 w-4 md:mr-2" />
+      <span className="hidden md:inline">{editMode ? "Done" : "Edit"}</span>
     </Button>
     <Button 
       size="sm" 
       onClick={() => setOpen(true)}
       disabled={disabled}
     >
-      <Plus className="h-4 w-4 mr-2" />
-      Add Area
+      <Plus className="h-4 w-4 md:mr-2" />
+      <span className="hidden md:inline">Add Area</span>
     </Button>
   </div>
 );

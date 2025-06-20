@@ -54,15 +54,15 @@ export const DepartmentsTab = () => {
             variant={editMode ? "secondary" : "outline"}
             onClick={toggleEditMode}
           >
-            <Edit className="h-4 w-4 mr-2" />
-            {editMode ? "Done" : "Edit"}
+            <Edit className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">{editMode ? "Done" : "Edit"}</span>
           </Button>
           <Button 
             size="sm" 
             onClick={handleAddNew}
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Department
+            <Plus className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">Add Department</span>
           </Button>
         </div>
       </CardHeader>

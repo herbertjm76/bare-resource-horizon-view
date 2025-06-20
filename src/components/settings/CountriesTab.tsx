@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -174,16 +175,16 @@ export const CountriesTab = () => {
             }}
             disabled={showForm}
           >
-            <Edit className="h-4 w-4 mr-2" />
-            {editMode ? "Done" : "Edit"}
+            <Edit className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">{editMode ? "Done" : "Edit"}</span>
           </Button>
           <Button 
             size="sm" 
             onClick={handleAddNew}
             disabled={showForm}
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Area
+            <Plus className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">Add Area</span>
           </Button>
         </div>
       </CardHeader>

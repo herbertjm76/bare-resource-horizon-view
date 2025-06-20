@@ -69,8 +69,8 @@ export const RatesTab = () => {
             setEditingRate(null);
             setOpen(true);
           }} className="h-9">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Rate
+            <Plus className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">Add Rate</span>
           </Button>
         </CardHeader>
         <CardContent>

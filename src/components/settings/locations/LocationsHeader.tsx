@@ -27,16 +27,16 @@ export const LocationsHeader: React.FC<LocationsHeaderProps> = ({
           onClick={onToggleEditMode}
           disabled={showForm}
         >
-          <Edit className="h-4 w-4 mr-2" />
-          {editMode ? "Done" : "Edit"}
+          <Edit className="h-4 w-4 md:mr-2" />
+          <span className="hidden md:inline">{editMode ? "Done" : "Edit"}</span>
         </Button>
         <Button 
           size="sm" 
           onClick={onAddLocation}
           disabled={showForm}
         >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Location
+          <Plus className="h-4 w-4 md:mr-2" />
+          <span className="hidden md:inline">Add Location</span>
         </Button>
       </div>
     </CardHeader>

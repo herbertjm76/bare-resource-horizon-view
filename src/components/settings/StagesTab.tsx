@@ -56,15 +56,15 @@ export const StagesTab = () => {
             variant={editMode ? "secondary" : "outline"}
             onClick={toggleEditMode}
           >
-            <Edit className="h-4 w-4 mr-2" />
-            {editMode ? "Done" : "Edit"}
+            <Edit className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">{editMode ? "Done" : "Edit"}</span>
           </Button>
           <Button 
             size="sm" 
             onClick={handleAddNew}
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Stage
+            <Plus className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">Add Stage</span>
           </Button>
         </div>
       </CardHeader>

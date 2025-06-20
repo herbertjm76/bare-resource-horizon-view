@@ -191,16 +191,16 @@ export const HolidaysTab = () => {
             }}
             disabled={loading || open}
           >
-            <Edit className="h-4 w-4 mr-2" />
-            {editMode ? "Done" : "Edit"}
+            <Edit className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">{editMode ? "Done" : "Edit"}</span>
           </Button>
           <Button 
             size="sm" 
             onClick={handleAddNew}
             disabled={loading || open}
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Holiday
+            <Plus className="h-4 w-4 md:mr-2" />
+            <span className="hidden md:inline">Add Holiday</span>
           </Button>
         </div>
       </CardHeader>
