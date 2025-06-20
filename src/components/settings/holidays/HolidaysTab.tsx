@@ -5,9 +5,9 @@ import { Plus, Edit, Trash2 } from "lucide-react";
 import { useCompany } from "@/context/CompanyContext";
 import { HolidayDialog } from "./HolidayDialog";
 import { HolidayViewToggle } from "./HolidayViewToggle";
-import { HolidayMonthNavigation } from "./HolidayMonthNavigation";
-import { HolidayMonthlyList } from "./HolidayMonthlyList";
-import { HolidayCalendarView } from "./HolidayCalendarView";
+import { HolidayYearNavigation } from "./HolidayYearNavigation";
+import { HolidayYearlyList } from "./HolidayYearlyList";
+import { HolidayYearlyCalendar } from "./HolidayYearlyCalendar";
 import { fetchHolidays, createHoliday, updateHoliday, deleteHolidays } from "./HolidayService";
 import { Holiday, HolidayFormValues } from "./types";
 
@@ -45,7 +45,7 @@ export const HolidaysTab = () => {
   const [selected, setSelected] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<'list' | 'calendar'>('list');
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentYear, setCurrentYear] = useState(new Date());
   const { company } = useCompany();
 
   useEffect(() => {
@@ -213,9 +213,9 @@ export const HolidaysTab = () => {
             Manage office holidays and closures. You can assign holidays to multiple office locations.
           </div>
 
-          <HolidayMonthNavigation 
-            currentMonth={currentMonth}
-            onMonthChange={setCurrentMonth}
+          <HolidayYearNavigation 
+            currentYear={currentYear}
+            onYearChange={setCurrentYear}
           />
           
           {editMode && selected.length > 0 && (
@@ -236,9 +236,9 @@ export const HolidaysTab = () => {
           )}
           
           {view === 'list' ? (
-            <HolidayMonthlyList
+            <HolidayYearlyList
               holidays={consolidatedHolidays}
-              selectedMonth={currentMonth}
+              selectedYear={currentYear}
               selected={selected}
               editMode={editMode}
               onEdit={handleEdit}
@@ -246,9 +246,9 @@ export const HolidaysTab = () => {
               loading={loading}
             />
           ) : (
-            <HolidayCalendarView
+            <HolidayYearlyCalendar
               holidays={consolidatedHolidays}
-              selectedMonth={currentMonth}
+              selectedYear={currentYear}
             />
           )}
         </div>
