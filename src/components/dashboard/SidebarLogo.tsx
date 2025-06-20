@@ -1,20 +1,12 @@
 
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import { useSidebar } from "@/components/ui/sidebar";
 
-interface SidebarLogoProps {
-  collapsed: boolean;
-  toggleSidebar: () => void;
-}
-
-export const SidebarLogo = ({
-  collapsed,
-  toggleSidebar
-}: SidebarLogoProps) => {
-  const handleToggle = () => {
-    console.log("Toggle sidebar called, current state:", collapsed ? "collapsed" : "expanded");
-    toggleSidebar();
-  };
+export const SidebarLogo = () => {
+  const { state, toggleSidebar } = useSidebar();
+  const collapsed = state === "collapsed";
 
   return (
     <div className="flex items-center justify-between h-[48px] border-b border-indigo-600 px-4 bg-gradient-to-r from-[#6F4BF6] to-purple-700">
@@ -28,7 +20,7 @@ export const SidebarLogo = ({
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={handleToggle} 
+            onClick={toggleSidebar} 
             className="text-indigo-100 hover:bg-indigo-800/40 hover:text-white h-12 w-12 rounded-none flex items-center justify-center z-20 ml-auto transition-all duration-200"
           >
             <ChevronRight className="h-6 w-6" />
@@ -47,7 +39,7 @@ export const SidebarLogo = ({
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={handleToggle} 
+            onClick={toggleSidebar} 
             className="text-indigo-100 hover:bg-indigo-800/40 hover:text-white h-12 w-12 rounded-none flex items-center justify-center transition-all duration-200"
           >
             <ChevronLeft className="h-6 w-6" />

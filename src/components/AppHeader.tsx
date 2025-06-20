@@ -4,24 +4,20 @@ import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon, LogOut, Menu } from "lucide-react";
+import { User as UserIcon, LogOut } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { DateDisplay } from "@/components/ui/date-display";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 
-interface AppHeaderProps {
-  onMenuToggle?: () => void;
-  sidebarCollapsed?: boolean;
-}
-
-export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle, sidebarCollapsed = true }) => {
+export const AppHeader: React.FC = () => {
   const { company } = useCompany();
   const [user, setUser] = React.useState<User | null>(null);
   const [loading, setLoading] = React.useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { state } = useSidebar();
 
   React.useEffect(() => {
     let authSubscription: { unsubscribe: () => void } | null = null;
@@ -48,25 +44,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onMenuToggle, sidebarColla
   };
 
   return (
-    <header className="w-full bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-30 h-16">
-      {/* Container that handles sidebar margin dynamically */}
-      <div className={cn(
-        "h-full px-4 py-2 flex items-center justify-between transition-all duration-300",
-        !isMobile && !sidebarCollapsed && "md:ml-[280px]",
-        !isMobile && sidebarCollapsed && "md:ml-16"
-      )}>
-        {/* Left side - Mobile hamburger menu + Date display */}
+    <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-30 h-16">
+      <div className="h-full px-4 py-2 flex items-center justify-between">
+        {/* Left side - Sidebar trigger + Date display */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          {isMobile && onMenuToggle && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onMenuToggle}
-              className="p-2 text-gray-600 hover:bg-gray-100 flex-shrink-0"
-            >
-              <Menu className="h-5 w-5" />
-            </Button>
-          )}
+          <SidebarTrigger className="p-2 text-gray-600 hover:bg-gray-100" />
           <div className="min-w-0">
             <DateDisplay 
               showIcon={true}
