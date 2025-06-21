@@ -16,6 +16,7 @@ export interface PendingMember extends Omit<Invite, 'first_name' | 'last_name'> 
   fullName?: string;
   first_name?: string; // Adding first_name as optional explicitly
   last_name?: string; // Adding last_name as optional explicitly
+  avatar_url?: string; // Adding avatar_url as optional for pending members
 }
 
 export type InvitationType = 'email_invite' | 'pre_registered';
