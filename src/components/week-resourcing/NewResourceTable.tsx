@@ -28,8 +28,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   viewMode
 }) => {
   const tableClassName = viewMode === 'compact' 
-    ? 'resource-table-compact' 
-    : 'resource-table-expanded';
+    ? 'resource-table-compact weekly-table' 
+    : 'resource-table-expanded weekly-table';
 
   const containerClassName = viewMode === 'compact'
     ? 'resource-table-compact-container'

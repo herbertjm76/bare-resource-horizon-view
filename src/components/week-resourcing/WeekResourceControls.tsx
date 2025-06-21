@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Calendar, Filter, RotateCcw, LayoutGrid, LayoutList } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Filter, RotateCcw, LayoutGrid, LayoutList, FileDown, ChevronDown, FileText } from 'lucide-react';
 import { addWeeks, subWeeks, format, startOfWeek, addDays, isToday, isSameWeek } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
@@ -9,6 +10,15 @@ import { Badge } from '@/components/ui/badge';
 import { FilterButton } from '@/components/resources/filters/FilterButton';
 import { AdvancedFilters } from '@/components/resources/filters/AdvancedFilters';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { toast } from 'sonner';
+import { utils, writeFile } from 'xlsx';
+import { exportToPDF } from '../weekly-overview/utils/exportToPDF';
 
 interface WeekResourceControlsProps {
   selectedWeek: Date;
@@ -34,6 +44,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
 }) => {
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   
   const handlePreviousWeek = () => {
     setSelectedWeek(subWeeks(selectedWeek, 1));
@@ -85,6 +96,71 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
   const mondayOfSelected = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const sundayOfSelected = addDays(mondayOfSelected, 6);
   const weekRangeDisplay = `${format(mondayOfSelected, 'MMM d')} - ${format(sundayOfSelected, 'MMM d')}`;
+
+  // Export functions
+  const handleExportToExcel = () => {
+    setIsExporting(true);
+    
+    setTimeout(() => {
+      try {
+        // Get the table element (supporting both class names for flexibility)
+        const table = document.querySelector('.resource-table-compact, .resource-table-expanded, .enhanced-weekly-table');
+        
+        if (!table) {
+          toast.error('Could not find table data');
+          setIsExporting(false);
+          return;
+        }
+        
+        // Create worksheet from table
+        const ws = utils.table_to_sheet(table);
+        
+        // Create workbook and add worksheet
+        const wb = utils.book_new();
+        utils.book_append_sheet(wb, ws, 'Weekly Resource Planning');
+        
+        // Generate file name
+        const fileName = `Weekly_Resource_Planning_${weekLabel.replace(/\s+/g, '_')}.xlsx`;
+        
+        // Write file and trigger download
+        writeFile(wb, fileName);
+        
+        // Show success message
+        toast.success('Export successful', { 
+          description: `Exported to ${fileName}` 
+        });
+      } catch (error) {
+        console.error('Export failed:', error);
+        toast.error('Export failed', { 
+          description: 'An error occurred while exporting the data.'
+        });
+      } finally {
+        setIsExporting(false);
+      }
+    }, 100);
+  };
+
+  const handleExportToPDF = async () => {
+    setIsExporting(true);
+    
+    try {
+      await exportToPDF(selectedWeek, weekLabel);
+      toast.success('PDF Export successful', { 
+        description: `Weekly resource planning exported to PDF`
+      });
+    } catch (error) {
+      console.error('PDF Export failed:', error);
+      toast.error('PDF Export failed', { 
+        description: 'An error occurred while exporting to PDF.'
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+  
+  const handlePrint = () => {
+    window.print();
+  };
 
   return (
     <div className="space-y-3">
@@ -202,7 +278,7 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
           </Button>
         </div>
         
-        {/* Filter controls and view toggle */}
+        {/* Filter controls, view toggle, and export */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* View Mode Toggle */}
           {onViewModeChange && (
@@ -263,6 +339,41 @@ export const WeekResourceControls: React.FC<WeekResourceControlsProps> = ({
               />
             </PopoverContent>
           </Popover>
+
+          {/* Export dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="px-4 flex items-center gap-1" disabled={isExporting}>
+                <FileDown className="h-4 w-4 mr-1" />
+                <span>{isExporting ? 'Exporting...' : 'Export'}</span>
+                <ChevronDown className="h-4 w-4 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-white">
+              <DropdownMenuItem 
+                onClick={handleExportToPDF}
+                disabled={isExporting}
+                className="cursor-pointer"
+              >
+                <FileText className="h-4 w-4 mr-2" />
+                Export to PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={handleExportToExcel}
+                disabled={isExporting}
+                className="cursor-pointer"
+              >
+                <FileDown className="h-4 w-4 mr-2" />
+                Export to Excel
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={handlePrint}
+                className="cursor-pointer"
+              >
+                Print View
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           {/* Clear filters - enhanced visibility */}
           {activeFilterCount > 0 && (
