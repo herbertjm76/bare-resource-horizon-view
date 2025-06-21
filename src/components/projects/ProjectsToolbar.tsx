@@ -5,7 +5,6 @@ import { NewProjectDialog } from "./NewProjectDialog";
 import { ExcelImportDialog } from "./ExcelImportDialog";
 import { Edit, Trash2, Upload, Plus } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ProjectsToolbarProps {
   onProjectCreated?: () => void;
@@ -13,6 +12,7 @@ interface ProjectsToolbarProps {
   setEditMode: (mode: boolean) => void;
   selectedCount: number;
   onBulkDelete?: () => void;
+  iconOnly?: boolean;
 }
 
 const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({ 
@@ -20,10 +20,9 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
   editMode,
   setEditMode,
   selectedCount,
-  onBulkDelete
+  onBulkDelete,
+  iconOnly = false
 }) => {
-  const isMobile = useIsMobile();
-  
   const handleImportComplete = () => {
     if (onProjectCreated) {
       onProjectCreated();
@@ -37,12 +36,12 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
           <TooltipTrigger asChild>
             <Button 
               variant={editMode ? "secondary" : "outline"}
-              size={isMobile ? "icon" : "sm"}
+              size={iconOnly ? "icon" : "sm"}
               className="mr-2"
               onClick={() => setEditMode(!editMode)}
             >
               <Edit className="h-4 w-4" />
-              {!isMobile && <span className="ml-1">{editMode ? "Done" : "Edit"}</span>}
+              {!iconOnly && <span className="ml-1">{editMode ? "Done" : "Edit"}</span>}
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -55,12 +54,12 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
             <TooltipTrigger asChild>
               <Button 
                 variant="destructive"
-                size={isMobile ? "icon" : "sm"}
+                size={iconOnly ? "icon" : "sm"}
                 className="mr-2"
                 onClick={onBulkDelete}
               >
                 <Trash2 className="h-4 w-4" />
-                {!isMobile && <span className="ml-1">Delete ({selectedCount})</span>}
+                {!iconOnly && <span className="ml-1">Delete ({selectedCount})</span>}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -77,10 +76,10 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
                 trigger={
                   <Button 
                     variant="outline" 
-                    size={isMobile ? "icon" : "sm"}
+                    size={iconOnly ? "icon" : "sm"}
                   >
                     <Upload className="h-4 w-4" />
-                    {!isMobile && <span className="ml-1">Import Excel</span>}
+                    {!iconOnly && <span className="ml-1">Import Excel</span>}
                   </Button>
                 }
               />
@@ -99,10 +98,10 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
                 trigger={
                   <Button 
                     variant="default" 
-                    size={isMobile ? "icon" : "sm"}
+                    size={iconOnly ? "icon" : "sm"}
                   >
                     <Plus className="h-4 w-4" />
-                    {!isMobile && <span className="ml-1">New Project</span>}
+                    {!iconOnly && <span className="ml-1">New Project</span>}
                   </Button>
                 }
               />

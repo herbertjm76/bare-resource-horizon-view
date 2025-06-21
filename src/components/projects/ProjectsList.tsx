@@ -1,10 +1,10 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ProjectsToolbar from './ProjectsToolbar';
 import ProjectsTable from './ProjectsTable';
 import { useProjects } from '@/hooks/useProjects';
 import { ProjectFilters } from './ProjectFilters';
+import { FilterPopover } from '@/components/filters/FilterPopover';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -17,6 +17,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const ProjectsList = () => {
   const { projects, isLoading, error, refetch } = useProjects();
@@ -42,6 +49,13 @@ export const ProjectsList = () => {
     });
   }, [projects, filters]);
 
+  // Extract unique values for filters
+  const statuses = [...new Set(projects.map(p => p.status))];
+  const countries = [...new Set(projects.map(p => p.country).filter(Boolean))];
+  const offices = [...new Set(projects.map(p => p.office?.name).filter(Boolean))];
+
+  const activeFiltersCount = Object.values(filters).filter(value => value && value !== '').length;
+
   const handleProjectCreated = () => {
     refetch();
   };
@@ -59,6 +73,18 @@ export const ProjectsList = () => {
         ? prev.filter(id => id !== projectId)
         : [...prev, projectId]
     );
+  };
+
+  const handleFilterChange = (value: string, filterKey: string) => {
+    const newFilters = {
+      ...filters,
+      [filterKey]: value === "all" ? "" : value
+    };
+    setFilters(newFilters);
+  };
+
+  const handleClearAllFilters = () => {
+    setFilters({});
   };
 
   const deleteProject = async (projectId: string) => {
@@ -134,14 +160,81 @@ export const ProjectsList = () => {
             <p className="text-sm text-muted-foreground">
               View and manage all your ongoing projects. Use the filters below to narrow down the list by status, country, or office.
             </p>
-            <div className="mt-4">
+            <div className="mt-4 flex items-center gap-2">
               <ProjectsToolbar 
                 onProjectCreated={handleProjectCreated}
                 editMode={editMode}
                 setEditMode={handleToggleEditMode}
                 selectedCount={selectedProjects.length}
                 onBulkDelete={handleBulkDelete}
+                iconOnly={true}
               />
+              <FilterPopover
+                activeFiltersCount={activeFiltersCount}
+                onClearFilters={handleClearAllFilters}
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Status</label>
+                    <Select 
+                      onValueChange={(value) => handleFilterChange(value, 'status')}
+                      value={filters.status || "all"}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Filter by Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        {statuses.map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Country</label>
+                    <Select 
+                      onValueChange={(value) => handleFilterChange(value, 'country')}
+                      value={filters.country || "all"}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Filter by Country" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Countries</SelectItem>
+                        {countries.map((country) => (
+                          <SelectItem key={country} value={country}>
+                            {country}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">Office</label>
+                    <Select 
+                      onValueChange={(value) => handleFilterChange(value, 'office')}
+                      value={filters.office || "all"}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Filter by Office" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Offices</SelectItem>
+                        {offices.map((office) => (
+                          <SelectItem key={office} value={office}>
+                            {office}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </FilterPopover>
             </div>
           </div>
           
@@ -158,14 +251,18 @@ export const ProjectsList = () => {
               setEditMode={handleToggleEditMode}
               selectedCount={selectedProjects.length}
               onBulkDelete={handleBulkDelete}
+              iconOnly={false}
             />
           </div>
         </CardHeader>
         <CardContent>
-          <ProjectFilters 
-            onFilterChange={setFilters} 
-            currentFilters={filters}
-          />
+          {/* Desktop filters - only show on desktop */}
+          <div className="hidden lg:block">
+            <ProjectFilters 
+              onFilterChange={setFilters} 
+              currentFilters={filters}
+            />
+          </div>
           <ProjectsTable 
             projects={filteredProjects} 
             loading={isLoading} 
