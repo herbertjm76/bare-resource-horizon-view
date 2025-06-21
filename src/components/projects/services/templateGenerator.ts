@@ -4,12 +4,12 @@ export class TemplateGenerator {
     const headers = [
       'Project Code *',
       'Project Name *',
-      'Status',
-      'Country',
-      'Target Profit %',
-      'Currency',
-      'Project Manager Name',
-      'Office Name'
+      'Status (optional)',
+      'Country (optional)',
+      'Target Profit % (optional)',
+      'Currency (optional)',
+      'Project Manager Name (optional)',
+      'Office Name (optional)'
     ];
 
     const sampleData = [
@@ -23,6 +23,17 @@ export class TemplateGenerator {
       'New York Office'
     ];
 
-    return `${headers.join(',')}\n${sampleData.join(',')}`;
+    const minimalSampleData = [
+      'PROJ-002',
+      'Minimal Project Example',
+      '',
+      '',
+      '',
+      '',
+      '',
+      ''
+    ];
+
+    return `${headers.join(',')}\n${sampleData.join(',')}\n${minimalSampleData.join(',')}`;
   }
 }
