@@ -26,7 +26,7 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
       {/* Add Resource column */}
       <td className={`sticky-left-12 ${rowBgClass} z-10 p-2 hover:bg-gray-50`} colSpan={daysCount + 1}>
         <Button 
-          variant="outline" 
+          variant="default"
           size="sm" 
           className="flex items-center text-xs ml-4"
           onClick={onAddResource}

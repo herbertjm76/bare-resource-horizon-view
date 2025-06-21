@@ -50,7 +50,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
 
   return (
     <div className="flex items-center justify-center w-full">
-      <div className="flex-1 flex justify-center items-center gap-2">
+      <div className="flex-1 flex justify-center items-center gap-1">
         {/* Horizontal progress bar */}
         <div className="relative">
           <div 
@@ -76,8 +76,8 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
           </div>
         </div>
         
-        {/* Percentage text with color coding - show actual percentage */}
-        <span className={cn("text-[10px] font-medium min-w-[25px]", percentageTextColor)}>
+        {/* Percentage text with color coding - smaller size to fit better */}
+        <span className={cn("text-[9px] font-medium min-w-[20px] text-center", percentageTextColor)}>
           {utilizationRate}%
         </span>
       </div>
