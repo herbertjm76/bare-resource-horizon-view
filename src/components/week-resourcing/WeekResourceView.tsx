@@ -90,11 +90,14 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             members={members}
             projects={projects}
             allocationMap={allocationMap}
-            annualLeaveData={annualLeaveData}
-            holidaysData={holidaysData}
+            annualLeaveData={annualLeaveData || []}
+            holidaysData={holidaysData || []}
             getMemberTotal={getMemberTotal}
             getProjectCount={getProjectCount}
-            getWeeklyLeave={getWeeklyLeave}
+            getWeeklyLeave={(memberId: string) => {
+              const leaveHours = getWeeklyLeave(memberId);
+              return typeof leaveHours === 'number' ? leaveHours : 0;
+            }}
             viewMode={viewMode}
           />
         </Card>
@@ -104,11 +107,14 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             members={members}
             projects={projects}
             allocationMap={allocationMap}
-            annualLeaveData={annualLeaveData}
-            holidaysData={holidaysData}
+            annualLeaveData={annualLeaveData || []}
+            holidaysData={holidaysData || []}
             getMemberTotal={getMemberTotal}
             getProjectCount={getProjectCount}
-            getWeeklyLeave={getWeeklyLeave}
+            getWeeklyLeave={(memberId: string) => {
+              const leaveHours = getWeeklyLeave(memberId);
+              return typeof leaveHours === 'number' ? leaveHours : 0;
+            }}
             viewMode={viewMode}
           />
         </div>
