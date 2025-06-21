@@ -14,13 +14,13 @@ export const StandardizedBadge: React.FC<StandardizedBadgeProps> = ({
   className = '',
   style
 }) => {
-  const baseClasses = "text-xs font-medium px-2.5 py-1 rounded-full";
+  const baseClasses = "text-xs font-medium px-2.5 py-1";
   
   const variantClasses = {
-    default: "ml-auto bg-gray-100 text-gray-500 border border-gray-200",
-    countdown: "ml-auto bg-gray-100 text-gray-500 border border-gray-200",
-    status: "bg-gray-100 text-gray-500 border border-gray-200",
-    count: "ml-auto bg-gray-100 text-gray-500 border border-gray-200"
+    default: "ml-auto bg-gray-100 text-gray-500 border border-gray-200 rounded-full",
+    countdown: "ml-auto bg-gray-100 text-gray-500 border border-gray-200 rounded-full",
+    status: "bg-gray-100 text-gray-500 border border-gray-200", // No default rounding for status variant
+    count: "ml-auto bg-gray-100 text-gray-500 border border-gray-200 rounded-full"
   };
 
   return (
