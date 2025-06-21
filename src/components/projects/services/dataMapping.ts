@@ -1,4 +1,3 @@
-
 import type { MappedProject } from './types';
 
 export class DataMapping {
