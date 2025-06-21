@@ -53,6 +53,15 @@ export const usePendingMemberService = (companyId: string | undefined) => {
     try {
       console.log('Creating pending member:', memberData);
 
+      // Get the current authenticated user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        console.error('Error getting current user:', userError);
+        toast.error('Authentication required to create pre-registered member');
+        return false;
+      }
+
       const { error } = await supabase
         .from('invites')
         .insert({
@@ -67,7 +76,8 @@ export const usePendingMemberService = (companyId: string | undefined) => {
           weekly_capacity: memberData.weekly_capacity || 40,
           invitation_type: 'pre_registered',
           status: 'pending',
-          code: Math.random().toString(36).substring(2, 15)
+          code: Math.random().toString(36).substring(2, 15),
+          created_by: user.id // Add the required created_by field
         });
 
       if (error) {
