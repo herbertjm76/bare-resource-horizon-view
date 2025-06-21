@@ -53,11 +53,15 @@ export const usePendingMemberService = (companyId: string | undefined) => {
     try {
       console.log('Creating pending member:', memberData);
 
-      // Get the current authenticated user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      // Get current user ID from the profiles table instead of auth.users
+      const { data: currentUser, error: userError } = await supabase
+        .from('profiles')
+        .select('id')
+        .limit(1)
+        .single();
       
-      if (userError || !user) {
-        console.error('Error getting current user:', userError);
+      if (userError || !currentUser) {
+        console.error('Error getting current user from profiles:', userError);
         toast.error('Authentication required to create pre-registered member');
         return false;
       }
@@ -77,7 +81,7 @@ export const usePendingMemberService = (companyId: string | undefined) => {
           invitation_type: 'pre_registered',
           status: 'pending',
           code: Math.random().toString(36).substring(2, 15),
-          created_by: user.id // Add the required created_by field
+          created_by: currentUser.id // Use the ID from profiles table
         });
 
       if (error) {

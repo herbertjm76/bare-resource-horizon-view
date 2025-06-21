@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Profile, PendingMember } from '@/components/dashboard/types';
 import { toast } from 'sonner';
@@ -24,20 +23,9 @@ export const useTeamMembers = (companyId: string | undefined) => {
     try {
       console.log('Starting avatar upload process...');
       
-      // Get current user session to ensure we're authenticated
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError || !session) {
-        console.error('No valid session for avatar upload:', sessionError);
-        toast.error('Authentication required for avatar upload');
-        return null;
-      }
-
-      console.log('User session validated, proceeding with upload...');
-
-      // Generate a unique filename using timestamp and user ID
+      // Generate a unique filename using timestamp only (no user ID needed)
       const fileExt = file.name.split('.').pop();
-      const fileName = `avatar-${session.user.id}-${Date.now()}.${fileExt}`;
+      const fileName = `avatar-${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
       const filePath = fileName; // Store directly in avatars bucket root
 
       console.log('Uploading avatar to:', filePath);
