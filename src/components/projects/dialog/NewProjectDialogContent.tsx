@@ -27,7 +27,7 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
     updateStageApplicability,
     updateStageFee,
     handleChange
-  } = useProjectForm();
+  } = useProjectForm(null, true, null); // Fixed: Added required arguments
 
   const handleFormSubmit = async () => {
     if (!company?.id) return false;
