@@ -18,27 +18,27 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
           TEAM MEMBER
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
           OFFICE
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
           CAPACITY
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
           COUNT
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
           TOTAL
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[80px]">
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[80px] bg-[#6465F0]">
           UTILIZATION
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -53,7 +53,7 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
           </TooltipProvider>
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -68,16 +68,16 @@ export const WeeklyResourceHeader: React.FC<WeeklyResourceHeaderProps> = ({
           </TooltipProvider>
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
           OTHER LEAVE
         </TableHead>
         
-        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px]">
+        <TableHead className="text-white font-bold text-center border-r border-white/20 min-w-[60px] bg-[#6465F0]">
           REMARKS
         </TableHead>
         
         {projects.map((project) => (
-          <TableHead key={project.id} className="text-white font-bold text-center border-r border-white/20 min-w-[40px] max-w-[40px] p-1">
+          <TableHead key={project.id} className="text-white font-bold text-center border-r border-white/20 min-w-[40px] max-w-[40px] p-1 bg-[#6465F0]">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
