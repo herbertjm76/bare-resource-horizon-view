@@ -40,29 +40,29 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
       <div className="overflow-x-auto">
         <Table className={`${tableClassName} min-w-full`}>
           <TableHeader>
-            <TableRow className="bg-slate-50 border-b-2 border-slate-200">
-              <TableHead className="w-12 text-center font-semibold text-slate-700 sticky left-0 bg-slate-50 z-10">
+            <TableRow className="bg-[#6465F0] hover:bg-[#6465F0] border-b-2 border-slate-200">
+              <TableHead className="w-12 text-center font-semibold text-white sticky left-0 bg-[#6465F0] z-10">
                 #
               </TableHead>
-              <TableHead className="w-48 font-semibold text-slate-700 sticky left-12 bg-slate-50 z-10">
+              <TableHead className="w-48 font-semibold text-white sticky left-12 bg-[#6465F0] z-10">
                 Team Member
               </TableHead>
-              <TableHead className="w-20 text-center font-semibold text-slate-700">
+              <TableHead className="w-20 text-center font-semibold text-white bg-[#6465F0]">
                 Capacity
               </TableHead>
-              <TableHead className="w-20 text-center font-semibold text-slate-700">
+              <TableHead className="w-20 text-center font-semibold text-white bg-[#6465F0]">
                 Leave
               </TableHead>
-              <TableHead className="w-20 text-center font-semibold text-slate-700">
+              <TableHead className="w-20 text-center font-semibold text-white bg-[#6465F0]">
                 Projects
               </TableHead>
-              <TableHead className="w-20 text-center font-semibold text-slate-700">
+              <TableHead className="w-20 text-center font-semibold text-white bg-[#6465F0]">
                 Total
               </TableHead>
               {projects.map((project) => (
                 <TableHead 
                   key={project.id} 
-                  className="w-16 text-center font-semibold text-slate-700 border-l border-slate-200"
+                  className="w-16 text-center font-semibold text-white border-l border-white/20 bg-[#6465F0]"
                   title={project.name}
                 >
                   <div className="truncate text-xs">

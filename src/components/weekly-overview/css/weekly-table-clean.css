@@ -25,11 +25,11 @@
 
 /* Header Styling - Unified Brand Purple */
 .enhanced-weekly-table thead {
-  background: #6F4BF6;
+  background: #6465F0;
 }
 
 .enhanced-weekly-table thead th {
-  background: #6F4BF6 !important;
+  background: #6465F0 !important;
   color: white !important;
   padding: 12px 8px;
   font-weight: 600;
@@ -43,7 +43,7 @@
 
 /* First column header - Name column */
 .enhanced-weekly-table thead th:first-child {
-  background: #6F4BF6 !important;
+  background: #6465F0 !important;
   color: white !important;
   position: sticky;
   left: 0;
@@ -99,11 +99,11 @@
 
 /* Office header rows */
 .enhanced-weekly-table .office-header-row {
-  background: #6F4BF6 !important;
+  background: #6465F0 !important;
 }
 
 .enhanced-weekly-table .office-header-row td {
-  background: #6F4BF6 !important;
+  background: #6465F0 !important;
   color: white !important;
   font-weight: 600;
   padding: 12px 8px;

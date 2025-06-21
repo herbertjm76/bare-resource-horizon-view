@@ -10,14 +10,14 @@ interface ResourceTableHeaderProps {
 
 export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projects, showRemarks = false }) => {
   return (
-    <TableHeader className="sticky top-0 z-10 bg-white border-b">
-      <TableRow className="h-20" style={{ backgroundColor: '#6465F0' }}>
-        <TableHead className="w-48 max-w-48 min-w-32 border-r sticky left-0 z-20 non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>Name</TableHead>
-        <TableHead className="w-16 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>#</TableHead>
+    <TableHeader className="sticky top-0 z-10 bg-[#6465F0] border-b">
+      <TableRow className="h-20 bg-[#6465F0] hover:bg-[#6465F0]">
+        <TableHead className="w-48 max-w-48 min-w-32 border-r sticky left-0 z-20 non-project-column bg-[#6465F0] text-white">Name</TableHead>
+        <TableHead className="w-16 text-center border-r non-project-column bg-[#6465F0] text-white">#</TableHead>
         
-        <TableHead className="w-32 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>Capacity</TableHead>
+        <TableHead className="w-32 text-center border-r non-project-column bg-[#6465F0] text-white">Capacity</TableHead>
         
-        <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
+        <TableHead className="w-12 text-center border-r non-project-column bg-[#6465F0] text-white">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -31,7 +31,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
             </Tooltip>
           </TooltipProvider>
         </TableHead>
-        <TableHead className="w-12 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>
+        <TableHead className="w-12 text-center border-r non-project-column bg-[#6465F0] text-white">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -45,14 +45,13 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
             </Tooltip>
           </TooltipProvider>
         </TableHead>
-        <TableHead className="w-12 text-center border-r-4 border-gray-400 non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>OL</TableHead>
+        <TableHead className="w-12 text-center border-r-4 border-gray-400 non-project-column bg-[#6465F0] text-white">OL</TableHead>
         
         {projects.map((project, idx) => {
           return (
             <TableHead 
               key={project.id} 
-              className="w-10 text-center project-header relative"
-              style={{ backgroundColor: '#6465F0', color: 'white' }}
+              className="w-10 text-center project-header relative bg-[#6465F0]"
             >
               {!project.isEmpty && (
                 <TooltipProvider>
@@ -69,6 +68,9 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
+                            fontSize: '0.75rem',
+                            fontWeight: '600',
+                            padding: '0.25rem',
                             color: 'white'
                           }}
                         >
@@ -89,7 +91,7 @@ export const ResourceTableHeader: React.FC<ResourceTableHeaderProps> = ({ projec
         })}
         
         {showRemarks && (
-          <TableHead className="w-40 text-center border-r non-project-column" style={{ backgroundColor: '#6465F0', color: 'white' }}>Remarks</TableHead>
+          <TableHead className="w-40 text-center border-r non-project-column bg-[#6465F0] text-white">Remarks</TableHead>
         )}
       </TableRow>
     </TableHeader>
