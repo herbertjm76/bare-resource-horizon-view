@@ -40,26 +40,44 @@ export const SidebarNavigation: React.FC = () => {
                       tooltip={collapsed ? item.title : undefined}
                       isActive={isActive}
                       className={cn(
-                        "flex items-center text-sm rounded-lg transition-all duration-200 group",
+                        "flex items-center text-sm rounded-lg transition-all duration-300 group relative overflow-hidden",
                         isActive 
-                          ? "bg-[#6465F0] text-white shadow-md border border-[#5D3FD3]" 
-                          : "text-indigo-100 hover:bg-indigo-800/50 hover:text-white",
+                          ? "bg-white/10 text-white shadow-lg border border-white/20 backdrop-blur-sm" 
+                          : "text-indigo-100 hover:bg-indigo-800/30 hover:text-white hover:backdrop-blur-sm",
                         collapsed 
                           ? "justify-center p-2 h-10 w-10 mx-auto" 
                           : "justify-start px-3 py-2 w-full"
                       )}
+                      style={isActive ? {
+                        background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
+                        boxShadow: '0 8px 32px rgba(100, 101, 240, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                      } : {}}
                     >
                       <Link to={item.url} className={cn(
                         "flex items-center",
                         collapsed ? "justify-center w-full h-full" : "w-full"
                       )}>
                         <Icon className={cn(
-                          "h-5 w-5 transition-colors duration-200",
-                          isActive ? "text-white" : "text-indigo-200 group-hover:text-white",
+                          "h-5 w-5 transition-all duration-300",
+                          isActive ? "text-white drop-shadow-sm" : "text-indigo-200 group-hover:text-white",
                           collapsed ? "mr-0" : "mr-3"
                         )} />
                         {!collapsed && (
-                          <span className="font-medium">{item.title}</span>
+                          <span className={cn(
+                            "font-medium transition-all duration-300",
+                            isActive ? "text-white drop-shadow-sm" : ""
+                          )}>{item.title}</span>
+                        )}
+                        {isActive && (
+                          <div 
+                            className="absolute inset-0 rounded-lg opacity-20"
+                            style={{
+                              background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)',
+                              animation: 'shimmer 2s ease-in-out infinite alternate'
+                            }}
+                          />
                         )}
                       </Link>
                     </SidebarMenuButton>
@@ -73,6 +91,12 @@ export const SidebarNavigation: React.FC = () => {
           )}
         </SidebarGroup>
       ))}
+      <style jsx>{`
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
     </nav>
   );
 };
