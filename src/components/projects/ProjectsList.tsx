@@ -129,8 +129,8 @@ export const ProjectsList = () => {
     <>      
       <Card className="border shadow-sm">
         <CardHeader className="flex flex-col space-y-4 pb-6">
-          {/* Mobile/Tablet Layout: Paragraph on first row */}
-          <div className="block md:hidden">
+          {/* Mobile/Tablet Layout: Paragraph on first row, buttons on second row */}
+          <div className="block lg:hidden">
             <p className="text-sm text-muted-foreground">
               View and manage all your ongoing projects. Use the filters below to narrow down the list by status, country, or office.
             </p>
@@ -146,7 +146,7 @@ export const ProjectsList = () => {
           </div>
           
           {/* Desktop Layout: Original side-by-side layout */}
-          <div className="hidden md:flex flex-row items-center justify-between space-y-0">
+          <div className="hidden lg:flex flex-row items-center justify-between space-y-0">
             <div>
               <p className="text-sm text-muted-foreground mb-1">
                 View and manage all your ongoing projects. Use the filters below to narrow down the list by status, country, or office.
