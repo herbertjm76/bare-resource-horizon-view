@@ -53,10 +53,32 @@ export const EnhancedWeeklyResourceTable: React.FC<EnhancedWeeklyResourceTablePr
         };
       });
 
+      // Calculate total project hours
+      const totalProjectHours = projectAllocations.reduce((sum, project) => sum + project.hours, 0);
+
       return {
+        // Original properties
+        projectCount: projectAllocations.filter(p => p.hours > 0).length,
+        projectHours: totalProjectHours,
+        vacationHours: 0,
+        generalOfficeHours: 0,
+        marketingHours: 0,
+        publicHolidayHours: 0,
+        medicalLeaveHours: 0,
+        annualLeaveHours: 0,
+        otherLeaveHours: 0,
+        remarks: '',
+        
+        // Enhanced properties
+        id: memberId,
+        annualLeave: 0,
+        publicHoliday: 0,
+        vacationLeave: 0,
+        medicalLeave: 0,
+        others: 0,
+        projects: projectAllocations.filter(p => p.hours > 0).map(p => p.projectCode),
         projectAllocations,
-        annualLeave: 0, // This would come from annual leave data
-        remarks: ''
+        resourcedHours: totalProjectHours
       };
     };
 
