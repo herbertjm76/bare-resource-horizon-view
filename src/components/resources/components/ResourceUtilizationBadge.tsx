@@ -23,19 +23,19 @@ export const ResourceUtilizationBadge: React.FC<ResourceUtilizationBadgeProps> =
   
   const colors = getUtilizationColor(roundedUtilization);
   
-  // Determine text size and padding based on size prop
+  // Determine text size and padding based on size prop - using rounded square shape
   let sizeClasses = '';
   
   switch(size) {
     case 'xs':
-      sizeClasses = 'text-[10px] py-0 px-1 h-4';
+      sizeClasses = 'text-[10px] py-0 px-1 h-4 rounded';
       break;
     case 'sm':
-      sizeClasses = 'text-xs py-0 px-1 h-4';
+      sizeClasses = 'text-xs py-0 px-1 h-4 rounded';
       break;
     case 'md':
     default:
-      sizeClasses = 'text-xs py-0.5 px-2 h-5';
+      sizeClasses = 'text-xs py-0.5 px-2 h-5 rounded';
       break;
   }
   

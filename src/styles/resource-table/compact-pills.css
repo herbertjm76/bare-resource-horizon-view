@@ -1,14 +1,14 @@
 
 /* Compact View - Utilization Pills and Animations */
 
-/* Enhanced Utilization Pill - Compact */
+/* Enhanced Utilization Pill - Compact - Rounded Square */
 .resource-table-compact .utilization-pill {
   height: 32px;
   min-height: 32px;
   padding: 8px 16px;
   font-size: 13px;
   font-weight: 700;
-  border-radius: 16px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -19,14 +19,14 @@
   overflow: hidden;
 }
 
-/* Elongated Pill for Compact View */
+/* Elongated Rounded Square for Compact View */
 .resource-table-compact .utilization-pill-elongated {
   height: 28px;
   min-height: 28px;
   padding: 6px 20px;
   font-size: 12px;
   font-weight: 700;
-  border-radius: 20px;
+  border-radius: 6px;
   display: inline-flex;
   align-items: center;
   justify-content: center;

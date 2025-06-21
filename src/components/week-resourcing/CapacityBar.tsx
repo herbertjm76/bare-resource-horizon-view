@@ -54,11 +54,11 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
         {/* Horizontal progress bar */}
         <div className="relative">
           <div 
-            className="w-12 h-3 rounded-full border border-gray-300 overflow-hidden bg-gray-100"
+            className="w-12 h-3 rounded border border-gray-300 overflow-hidden bg-gray-100"
           >
             {/* Fill bar that can exceed 100% by showing overflow */}
             <div 
-              className="h-full transition-all duration-300 rounded-full"
+              className="h-full transition-all duration-300 rounded"
               style={{
                 width: `${Math.min(100, utilizationPercentage)}%`,
                 backgroundColor: utilizationColor
