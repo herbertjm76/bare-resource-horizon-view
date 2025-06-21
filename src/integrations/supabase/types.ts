@@ -1213,6 +1213,10 @@ export type Database = {
           burn_rate: number
         }[]
       }
+      get_current_user_company_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_user_company_id: {
         Args: { user_id: string }
         Returns: string
