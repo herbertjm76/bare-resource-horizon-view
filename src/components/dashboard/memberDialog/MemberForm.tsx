@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import PersonalInfoFields from './PersonalInfoFields';
 import ContactInfoFields from './ContactInfoFields';
 import RoleSelectField from './RoleSelectField';
 import OrganizationFields from './OrganizationFields';
+import { AvatarUploadField } from './AvatarUploadField';
 import { MemberFormData } from './types';
 
 interface MemberFormProps {
@@ -14,7 +15,9 @@ interface MemberFormProps {
   onClose: () => void;
   isEditing: boolean;
   isLoading?: boolean;
-  onSubmit: (data: MemberFormData) => void;
+  onSubmit: (data: MemberFormData & { avatarFile?: File | null; avatarPreviewUrl?: string | null }) => void;
+  currentAvatarUrl?: string;
+  memberName?: string;
 }
 
 const MemberForm: React.FC<MemberFormProps> = ({ 
@@ -22,13 +25,40 @@ const MemberForm: React.FC<MemberFormProps> = ({
   onClose, 
   isEditing,
   isLoading = false,
-  onSubmit
+  onSubmit,
+  currentAvatarUrl,
+  memberName
 }) => {
-  const { register, handleSubmit, setValue, control, formState: { errors } } = form;
+  const { register, handleSubmit, setValue, control, formState: { errors }, watch } = form;
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
+
+  const firstName = watch('first_name');
+  const lastName = watch('last_name');
+  const displayName = `${firstName || ''} ${lastName || ''}`.trim() || memberName || 'Team Member';
+
+  const handleAvatarChange = (file: File | null, previewUrl: string | null) => {
+    setAvatarFile(file);
+    setAvatarPreviewUrl(previewUrl);
+  };
+
+  const handleFormSubmit = (data: MemberFormData) => {
+    onSubmit({
+      ...data,
+      avatarFile,
+      avatarPreviewUrl
+    });
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       <div className="grid gap-4">
+        <AvatarUploadField
+          currentAvatarUrl={currentAvatarUrl}
+          onImageChange={handleAvatarChange}
+          memberName={displayName}
+        />
+        
         <PersonalInfoFields register={register} errors={errors} />
         <ContactInfoFields register={register} errors={errors} />
         <RoleSelectField 

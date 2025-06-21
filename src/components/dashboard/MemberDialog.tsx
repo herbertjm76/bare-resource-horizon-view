@@ -11,7 +11,7 @@ interface MemberDialogProps {
   isOpen: boolean;
   onClose: () => void;
   member: TeamMember | null;
-  onSave: (data: Partial<Profile | PendingMember>) => Promise<boolean>;
+  onSave: (data: Partial<Profile | PendingMember> & { avatarFile?: File | null }) => Promise<boolean>;
   title: string;
   isLoading?: boolean;
 }
@@ -75,14 +75,18 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
     }
   }, [member, reset]);
 
-  const handleFormSubmit = async (data: MemberFormData) => {
+  const handleFormSubmit = async (data: MemberFormData & { avatarFile?: File | null; avatarPreviewUrl?: string | null }) => {
     const isPending = isPendingMember(member);
     
     // Create a consistent data structure for both profile and pending member
-    const formData: Partial<Profile | PendingMember> = {
+    const formData: Partial<Profile | PendingMember> & { avatarFile?: File | null } = {
       ...data,
-      id: member?.id
+      id: member?.id,
+      avatarFile: data.avatarFile
     };
+    
+    // Remove avatar-related fields from the main data object as they're handled separately
+    delete (formData as any).avatarPreviewUrl;
     
     // If editing a pending member, ensure the proper flags are set
     if (isPending) {
@@ -97,11 +101,20 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
     return success;
   };
 
+  const getCurrentAvatarUrl = () => {
+    return member?.avatar_url || undefined;
+  };
+
+  const getMemberName = () => {
+    if (!member) return undefined;
+    return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Team Member';
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
       if (!open) onClose();
     }}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
@@ -117,6 +130,8 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
             isEditing={!!member}
             isLoading={isLoading}
             onSubmit={handleFormSubmit}
+            currentAvatarUrl={getCurrentAvatarUrl()}
+            memberName={getMemberName()}
           />
         </OfficeSettingsProvider>
       </DialogContent>
