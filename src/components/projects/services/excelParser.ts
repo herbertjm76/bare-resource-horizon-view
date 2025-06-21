@@ -31,7 +31,11 @@ export class ExcelParser {
             Array.isArray(row) && row.some(cell => cell !== null && cell !== undefined && cell !== '')
           ) as any[][];
           
-          resolve({ headers, data: rows });
+          resolve({ 
+            headers, 
+            data: rows,
+            rowCount: rows.length
+          });
         } catch (error) {
           reject(error);
         }
