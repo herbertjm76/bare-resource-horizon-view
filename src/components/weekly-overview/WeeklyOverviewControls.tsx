@@ -35,20 +35,23 @@ export const WeeklyOverviewControls: React.FC<WeeklyOverviewControlsProps> = ({
         />
       </div>
       
-      {/* Filters */}
-      <div className="flex-1 max-w-xs border rounded-md p-2">
-        <WeeklyResourceFilters 
-          filters={filters}
-          onFilterChange={handleFilterChange}
-        />
-      </div>
-      
-      {/* Export button */}
-      <div className="flex items-center">
-        <WeeklyActionButtons 
-          selectedWeek={selectedWeek}
-          weekLabel={weekLabel}
-        />
+      {/* Right side controls - Filters and Export */}
+      <div className="flex items-center gap-4 ml-auto">
+        {/* Filters */}
+        <div className="flex-1 max-w-xs border rounded-md p-2">
+          <WeeklyResourceFilters 
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
+        </div>
+        
+        {/* Export button */}
+        <div className="flex items-center">
+          <WeeklyActionButtons 
+            selectedWeek={selectedWeek}
+            weekLabel={weekLabel}
+          />
+        </div>
       </div>
     </div>
   );
