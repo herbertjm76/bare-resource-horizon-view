@@ -7,10 +7,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { FileDown, ChevronDown } from 'lucide-react';
+import { FileDown, ChevronDown, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { saveAs } from 'file-saver';
 import { utils, writeFile } from 'xlsx';
+import { exportToPDF } from '../utils/exportToPDF';
 
 interface WeeklyActionButtonsProps {
   selectedWeek: Date;
@@ -64,6 +65,24 @@ export const WeeklyActionButtons: React.FC<WeeklyActionButtonsProps> = ({
       }
     }, 100);
   };
+
+  const handleExportToPDF = async () => {
+    setIsExporting(true);
+    
+    try {
+      await exportToPDF(selectedWeek, weekLabel);
+      toast.success('PDF Export successful', { 
+        description: `Weekly overview exported to PDF`
+      });
+    } catch (error) {
+      console.error('PDF Export failed:', error);
+      toast.error('PDF Export failed', { 
+        description: 'An error occurred while exporting to PDF.'
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
   
   const handlePrint = () => {
     window.print();
@@ -72,18 +91,27 @@ export const WeeklyActionButtons: React.FC<WeeklyActionButtonsProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="px-4 flex items-center gap-1">
+        <Button variant="outline" className="px-4 flex items-center gap-1" disabled={isExporting}>
           <FileDown className="h-4 w-4 mr-1" />
-          <span>Export</span>
+          <span>{isExporting ? 'Exporting...' : 'Export'}</span>
           <ChevronDown className="h-4 w-4 ml-1" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="bg-background">
         <DropdownMenuItem 
+          onClick={handleExportToPDF}
+          disabled={isExporting}
+          className="cursor-pointer"
+        >
+          <FileText className="h-4 w-4 mr-2" />
+          Export to PDF
+        </DropdownMenuItem>
+        <DropdownMenuItem 
           onClick={handleExportToExcel}
           disabled={isExporting}
           className="cursor-pointer"
         >
+          <FileDown className="h-4 w-4 mr-2" />
           Export to Excel
         </DropdownMenuItem>
         <DropdownMenuItem 
