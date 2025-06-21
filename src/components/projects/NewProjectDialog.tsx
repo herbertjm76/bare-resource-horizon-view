@@ -1,139 +1,43 @@
 
-import React, { useState } from "react";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-import { useCompany } from '@/context/CompanyContext';
-import { Tabs } from "@/components/ui/tabs";
-import { ProjectDialogContent } from "./dialog/ProjectDialogContent";
-import { ProjectDialogTabs } from "./dialog/ProjectDialogTabs";
-import { ProjectDialogActions } from "./dialog/ProjectDialogActions";
-import { useNewProjectFormState } from "./dialog/NewProjectFormState";
-import { submitNewProject } from "./dialog/NewProjectSubmit";
-import { useFormOptions } from './hooks/form/useFormOptions';
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { ProjectDialogContent } from './dialog/ProjectDialogContent';
 
-const statusOptions = [
-  { label: "Not started", value: "Planning" },
-  { label: "On-going", value: "In Progress" },
-  { label: "Completed", value: "Complete" },
-  { label: "On hold", value: "On Hold" },
-];
+interface NewProjectDialogProps {
+  onProjectCreated?: () => void;
+  trigger?: React.ReactNode;
+}
 
-export const NewProjectDialog: React.FC<{ onProjectCreated?: () => void }> = ({ onProjectCreated }) => {
+export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({ 
+  onProjectCreated,
+  trigger 
+}) => {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("info");
-  const { company } = useCompany();
-  
-  const {
-    form,
-    setForm,
-    isLoading,
-    setIsLoading,
-    isDataLoaded,
-    handleChange
-  } = useNewProjectFormState();
 
-  const { managers, countries, offices, officeStages } = useFormOptions(company, open);
-
-  const handleTabChange = (tab: string) => {
-    if (!company?.id) return;
-    
-    if (tab === "stageFees" && !form.stages.length) {
-      return;
+  const handleProjectCreated = () => {
+    setOpen(false);
+    if (onProjectCreated) {
+      onProjectCreated();
     }
-    setActiveTab(tab);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!company?.id) return;
-    
-    setIsLoading(true);
-    const success = await submitNewProject(form, company.id, officeStages, onProjectCreated);
-    if (success) {
-      setOpen(false);
-      setForm({
-        code: "",
-        name: "",
-        manager: "",
-        country: "",
-        profit: "",
-        avgRate: "",
-        currency: "USD",
-        status: "",
-        office: "",
-        current_stage: "",
-        stages: [],
-        stageFees: {},
-        stageApplicability: {}
-      });
-      setActiveTab("info");
-    }
-    setIsLoading(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="default">
-          <PlusCircle className="h-4 w-4 mr-2" />
-          New Project
-        </Button>
+        {trigger || (
+          <Button variant="default" size="sm">
+            <Plus className="h-4 w-4 mr-2" />
+            New Project
+          </Button>
+        )}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0">
-        <DialogHeader className="px-6 py-4 border-b">
-          <DialogTitle className="text-xl">Add New Project</DialogTitle>
-        </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-col flex-1 overflow-hidden">
-            <div className="px-6 pt-4">
-              <ProjectDialogTabs activeTab={activeTab} onTabChange={handleTabChange} />
-            </div>
-            
-            <ProjectDialogContent
-              form={form}
-              managers={managers}
-              countries={countries}
-              offices={offices}
-              officeStages={officeStages}
-              handleChange={handleChange}
-              isDataLoaded={isDataLoaded}
-              updateStageApplicability={(stageId: string, isChecked: boolean) => {
-                setForm(prev => ({
-                  ...prev,
-                  stageApplicability: {
-                    ...prev.stageApplicability,
-                    [stageId]: isChecked
-                  }
-                }));
-              }}
-              updateStageFee={(stageId: string, data: any) => {
-                setForm(prev => ({
-                  ...prev,
-                  stageFees: {
-                    ...prev.stageFees,
-                    [stageId]: {
-                      ...prev.stageFees[stageId],
-                      ...data
-                    }
-                  }
-                }));
-              }}
-            />
-            
-            <ProjectDialogActions
-              isLoading={isLoading}
-              onClose={() => setOpen(false)}
-            />
-          </Tabs>
-        </form>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <ProjectDialogContent 
+          mode="create" 
+          onSuccess={handleProjectCreated}
+        />
       </DialogContent>
     </Dialog>
   );
