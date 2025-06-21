@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
-import { ProjectDialogContent } from './dialog/ProjectDialogContent';
+import { NewProjectDialogContent } from './dialog/NewProjectDialogContent';
 
 interface NewProjectDialogProps {
   onProjectCreated?: () => void;
@@ -34,10 +34,7 @@ export const NewProjectDialog: React.FC<NewProjectDialogProps> = ({
         )}
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <ProjectDialogContent 
-          mode="create" 
-          onSuccess={handleProjectCreated}
-        />
+        <NewProjectDialogContent onSuccess={handleProjectCreated} />
       </DialogContent>
     </Dialog>
   );
