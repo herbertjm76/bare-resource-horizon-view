@@ -20,11 +20,21 @@ export const useTeamMembers = (companyId: string | undefined) => {
   /**
    * Upload avatar image to Supabase Storage
    */
-  const uploadAvatar = async (file: File, memberId: string): Promise<string | null> => {
+  const uploadAvatar = async (file: File): Promise<string | null> => {
     try {
+      // Get current user session to ensure we're authenticated
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        console.error('No valid session for avatar upload:', sessionError);
+        toast.error('Authentication required for avatar upload');
+        return null;
+      }
+
+      // Generate a unique filename using timestamp and user ID
       const fileExt = file.name.split('.').pop();
-      const fileName = `${memberId}-${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const fileName = `avatar-${session.user.id}-${Date.now()}.${fileExt}`;
+      const filePath = fileName; // Store directly in avatars bucket root
 
       console.log('Uploading avatar to:', filePath);
 
@@ -32,7 +42,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
         .from('avatars')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false
+          upsert: true // Allow overwriting existing files
         });
 
       if (error) {
@@ -75,8 +85,8 @@ export const useTeamMembers = (companyId: string | undefined) => {
       let avatarUrl = memberDataWithoutFile.avatar_url;
 
       // Upload avatar if provided
-      if (avatarFile && memberData.id) {
-        const uploadedUrl = await uploadAvatar(avatarFile, memberData.id);
+      if (avatarFile) {
+        const uploadedUrl = await uploadAvatar(avatarFile);
         if (uploadedUrl) {
           avatarUrl = uploadedUrl;
         }
