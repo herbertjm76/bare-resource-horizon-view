@@ -128,19 +128,38 @@ export const ProjectsList = () => {
   return (
     <>      
       <Card className="border shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6">
-          <div>
-            <p className="text-sm text-muted-foreground mb-1">
+        <CardHeader className="flex flex-col space-y-4 pb-6">
+          {/* Mobile/Tablet Layout: Paragraph on first row */}
+          <div className="block md:hidden">
+            <p className="text-sm text-muted-foreground">
               View and manage all your ongoing projects. Use the filters below to narrow down the list by status, country, or office.
             </p>
+            <div className="mt-4">
+              <ProjectsToolbar 
+                onProjectCreated={handleProjectCreated}
+                editMode={editMode}
+                setEditMode={handleToggleEditMode}
+                selectedCount={selectedProjects.length}
+                onBulkDelete={handleBulkDelete}
+              />
+            </div>
           </div>
-          <ProjectsToolbar 
-            onProjectCreated={handleProjectCreated}
-            editMode={editMode}
-            setEditMode={handleToggleEditMode}
-            selectedCount={selectedProjects.length}
-            onBulkDelete={handleBulkDelete}
-          />
+          
+          {/* Desktop Layout: Original side-by-side layout */}
+          <div className="hidden md:flex flex-row items-center justify-between space-y-0">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">
+                View and manage all your ongoing projects. Use the filters below to narrow down the list by status, country, or office.
+              </p>
+            </div>
+            <ProjectsToolbar 
+              onProjectCreated={handleProjectCreated}
+              editMode={editMode}
+              setEditMode={handleToggleEditMode}
+              selectedCount={selectedProjects.length}
+              onBulkDelete={handleBulkDelete}
+            />
+          </div>
         </CardHeader>
         <CardContent>
           <ProjectFilters 
