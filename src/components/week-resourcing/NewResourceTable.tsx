@@ -3,7 +3,6 @@ import React from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { NewResourceRow } from './NewResourceRow';
 import { NewResourceSummaryRow } from './NewResourceSummaryRow';
-import './resource-table.css';
 
 interface NewResourceTableProps {
   members: any[];

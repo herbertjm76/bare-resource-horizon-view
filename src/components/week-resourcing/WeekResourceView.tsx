@@ -90,8 +90,8 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             members={members}
             projects={projects}
             allocationMap={allocationMap}
-            annualLeaveData={annualLeaveData || []}
-            holidaysData={holidaysData || []}
+            annualLeaveData={Array.isArray(annualLeaveData) ? annualLeaveData : []}
+            holidaysData={Array.isArray(holidaysData) ? holidaysData : []}
             getMemberTotal={getMemberTotal}
             getProjectCount={getProjectCount}
             getWeeklyLeave={(memberId: string) => {
@@ -107,8 +107,8 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             members={members}
             projects={projects}
             allocationMap={allocationMap}
-            annualLeaveData={annualLeaveData || []}
-            holidaysData={holidaysData || []}
+            annualLeaveData={Array.isArray(annualLeaveData) ? annualLeaveData : []}
+            holidaysData={Array.isArray(holidaysData) ? holidaysData : []}
             getMemberTotal={getMemberTotal}
             getProjectCount={getProjectCount}
             getWeeklyLeave={(memberId: string) => {

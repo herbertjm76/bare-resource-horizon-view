@@ -35,3 +35,9 @@ export interface ImportResult {
   warnings: string[];
   suggestions: string[];
 }
+
+export interface ExcelParseResult {
+  data: any[][];
+  headers: string[];
+  rowCount: number;
+}
