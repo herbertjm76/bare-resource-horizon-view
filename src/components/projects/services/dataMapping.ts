@@ -76,7 +76,7 @@ export class DataMapping {
                        officeName.includes(country);
               });
               if (office) {
-                project.office_id = office.id;
+                project.temp_office_location_id = office.id;
                 project.country = office.country;
               }
             }
@@ -131,20 +131,9 @@ export class DataMapping {
         project.currency = 'USD';
       }
 
-      // Handle office assignment - create a minimal setup if no office data
-      if (!project.office_id && !project.country) {
-        // Don't set a default office - let the user assign later
+      // Handle country - set default if not provided
+      if (!project.country) {
         project.country = 'Unknown';
-      }
-
-      // If we have a country but no office, try to find a matching office
-      if (!project.office_id && project.country && project.country !== 'Unknown' && offices && offices.length > 0) {
-        const defaultOffice = offices.find(o => 
-          o.country.toLowerCase() === project.country!.toLowerCase()
-        );
-        if (defaultOffice) {
-          project.office_id = defaultOffice.id;
-        }
       }
 
     } catch (error) {

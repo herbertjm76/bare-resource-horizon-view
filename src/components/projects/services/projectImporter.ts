@@ -38,7 +38,10 @@ export class ProjectImporter {
       // Get validation context data
       const validationContext = await this.getValidationContext(companyId);
 
-      console.log(`Starting import of ${total} rows for company ${companyId}`);
+      // Ensure we have a default office for the company
+      const defaultOfficeId = await this.ensureDefaultOffice(companyId);
+
+      console.log(`Starting import of ${total} rows for company ${companyId} with default office ${defaultOfficeId}`);
 
       for (let i = 0; i < data.length; i++) {
         const row = data[i];
@@ -77,7 +80,7 @@ export class ProjectImporter {
             suggestions.push(...validationResult.suggestions);
           }
 
-          await this.insertProject(projectData);
+          await this.insertProject(projectData, defaultOfficeId);
           successCount++;
           console.log(`Successfully inserted project for row ${i + 2}`);
           
@@ -112,6 +115,48 @@ export class ProjectImporter {
         warnings,
         suggestions
       };
+    }
+  }
+
+  private static async ensureDefaultOffice(companyId: string): Promise<string> {
+    try {
+      // First, try to get an existing office
+      let { data: offices, error: officesError } = await supabase
+        .from('offices')
+        .select('id')
+        .limit(1);
+
+      if (officesError) {
+        console.error('Error fetching offices:', officesError);
+      }
+
+      if (offices && offices.length > 0) {
+        console.log('Using existing office:', offices[0].id);
+        return offices[0].id;
+      }
+
+      // No offices exist, create a default one
+      console.log('No offices found, creating default office');
+      const { data: newOffice, error: createOfficeError } = await supabase
+        .from('offices')
+        .insert({
+          name: 'Default Office',
+          country: 'Unknown'
+        })
+        .select('id')
+        .single();
+
+      if (createOfficeError) {
+        console.error('Error creating default office:', createOfficeError);
+        throw new Error('Failed to create default office');
+      }
+
+      console.log('Created default office:', newOffice.id);
+      return newOffice.id;
+
+    } catch (error) {
+      console.error('Error ensuring default office:', error);
+      throw new Error(`Failed to setup default office: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -165,13 +210,21 @@ export class ProjectImporter {
     }
   }
 
-  private static async insertProject(projectData: any): Promise<void> {
+  private static async insertProject(projectData: any, defaultOfficeId: string): Promise<void> {
     try {
       console.log('Inserting project:', projectData);
 
+      // Ensure office_id is set - use default if not already set
+      const finalProjectData = {
+        ...projectData,
+        office_id: defaultOfficeId
+      };
+
+      console.log('Final project data with office_id:', finalProjectData);
+
       const { error } = await supabase
         .from('projects')
-        .insert(projectData);
+        .insert(finalProjectData);
 
       if (error) {
         console.error('Database insert error:', error);
