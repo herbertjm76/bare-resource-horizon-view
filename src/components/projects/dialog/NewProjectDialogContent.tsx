@@ -5,6 +5,8 @@ import { ProjectDialogContent } from './ProjectDialogContent';
 import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProjectDialogActions } from './ProjectDialogActions';
+import { submitNewProject } from './NewProjectSubmit';
+import { useCompany } from '@/context/CompanyContext';
 
 interface NewProjectDialogContentProps {
   onSuccess?: () => void;
@@ -13,22 +15,42 @@ interface NewProjectDialogContentProps {
 export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = ({
   onSuccess
 }) => {
+  const { company } = useCompany();
   const {
     form,
+    isLoading,
+    setIsLoading,
     managers,
     countries,
     offices,
     officeStages,
     updateStageApplicability,
     updateStageFee,
-    handleChange,
-    isDataLoaded,
-    handleSubmit
+    handleChange
   } = useProjectForm();
 
   const handleFormSubmit = async () => {
-    const success = await handleSubmit();
-    if (success && onSuccess) {
+    if (!company?.id) return false;
+    
+    setIsLoading(true);
+    try {
+      const success = await submitNewProject(
+        form,
+        company.id,
+        officeStages,
+        onSuccess
+      );
+      return success;
+    } catch (error) {
+      console.error('Error submitting project:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (onSuccess) {
       onSuccess();
     }
   };
@@ -54,12 +76,16 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
           updateStageApplicability={updateStageApplicability}
           updateStageFee={updateStageFee}
           handleChange={handleChange}
-          isDataLoaded={isDataLoaded}
+          isDataLoaded={true}
           onSuccess={onSuccess}
         />
       </Tabs>
 
-      <ProjectDialogActions onSubmit={handleFormSubmit} />
+      <ProjectDialogActions 
+        isLoading={isLoading}
+        onClose={handleClose}
+        onSubmit={handleFormSubmit}
+      />
     </>
   );
 };
