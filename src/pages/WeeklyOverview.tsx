@@ -63,14 +63,14 @@ const WeeklyOverview = () => {
     enabled: !!company?.id,
   });
 
-  // Fetch team members
+  // Fetch team members (using profiles table)
   const { data: members = [] } = useQuery({
-    queryKey: ['team-members', company?.id],
+    queryKey: ['profiles', company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
       
       const { data, error } = await supabase
-        .from('team_members')
+        .from('profiles')
         .select('*')
         .eq('company_id', company.id)
         .order('first_name');
