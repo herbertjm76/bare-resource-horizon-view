@@ -15,8 +15,7 @@ import {
   DollarSign,
   TrendingUp,
   Receipt,
-  Clock,
-  CalendarDays
+  Clock
 } from "lucide-react"
 
 export const navigationItems = [
@@ -32,11 +31,6 @@ export const navigationItems = [
         title: "Weekly Overview",
         url: "/weekly-overview",
         icon: Calendar,
-      },
-      {
-        title: "Weekly Resource Planning",
-        url: "/weekly-resource-planning",
-        icon: CalendarDays,
       },
     ],
   },

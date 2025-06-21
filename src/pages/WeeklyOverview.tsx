@@ -1,26 +1,17 @@
 
 import React, { useState } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
-import { WeeklyOverviewControls } from '@/components/weekly-overview/WeeklyOverviewControls';
-import { EnhancedWeeklyResourceTable } from '@/components/weekly-overview/EnhancedWeeklyResourceTable';
-import { startOfWeek, format, addWeeks, subWeeks } from 'date-fns';
-import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
+import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
+import { startOfWeek, format } from 'date-fns';
 import { Toaster } from 'sonner';
 import { Calendar } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useCompany } from '@/context/CompanyContext';
 
 const WeeklyOverview = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
   const [filters, setFilters] = useState({
     office: "all",
-    country: "all",
-    manager: "all",
     searchTerm: ""
   });
-
-  const { company } = useCompany();
 
   // Get Monday of the current week
   const weekStart = startOfWeek(selectedWeek, {
@@ -36,68 +27,6 @@ const WeeklyOverview = () => {
       [key]: value
     }));
   };
-
-  const handlePreviousWeek = () => {
-    setSelectedWeek(subWeeks(selectedWeek, 1));
-  };
-
-  const handleNextWeek = () => {
-    setSelectedWeek(addWeeks(selectedWeek, 1));
-  };
-
-  // Fetch projects
-  const { data: projects = [] } = useQuery({
-    queryKey: ['projects', company?.id],
-    queryFn: async () => {
-      if (!company?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('company_id', company.id)
-        .order('name');
-      
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!company?.id,
-  });
-
-  // Fetch team members (using profiles table)
-  const { data: members = [] } = useQuery({
-    queryKey: ['profiles', company?.id],
-    queryFn: async () => {
-      if (!company?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('company_id', company.id)
-        .order('first_name');
-      
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!company?.id,
-  });
-
-  // Fetch allocations for the selected week
-  const { data: allocations = [] } = useQuery({
-    queryKey: ['weekly-allocations', company?.id, format(weekStart, 'yyyy-MM-dd')],
-    queryFn: async () => {
-      if (!company?.id) return [];
-      
-      const { data, error } = await supabase
-        .from('project_resource_allocations')
-        .select('*')
-        .eq('company_id', company.id)
-        .eq('week_start_date', format(weekStart, 'yyyy-MM-dd'));
-      
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!company?.id,
-  });
   
   return (
     <StandardLayout>
@@ -110,28 +39,13 @@ const WeeklyOverview = () => {
           </h1>
         </div>
         
-        <OfficeSettingsProvider>
-          <WeeklyOverviewControls
-            selectedWeek={selectedWeek}
-            handlePreviousWeek={handlePreviousWeek}
-            handleNextWeek={handleNextWeek}
-            weekLabel={weekLabel}
-            filters={{
-              office: filters.office
-            }}
-            handleFilterChange={handleFilterChange}
-          />
-          
-          <EnhancedWeeklyResourceTable
-            projects={projects}
-            members={members}
-            allocations={allocations}
-            selectedWeek={selectedWeek}
-            filters={{
-              office: filters.office
-            }}
-          />
-        </OfficeSettingsProvider>
+        <WeekResourceView
+          selectedWeek={selectedWeek}
+          setSelectedWeek={setSelectedWeek}
+          weekLabel={weekLabel}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+        />
       </div>
       <Toaster position="top-right" />
     </StandardLayout>
