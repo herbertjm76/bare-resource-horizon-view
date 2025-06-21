@@ -22,6 +22,8 @@ export const useTeamMembers = (companyId: string | undefined) => {
    */
   const uploadAvatar = async (file: File): Promise<string | null> => {
     try {
+      console.log('Starting avatar upload process...');
+      
       // Get current user session to ensure we're authenticated
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
@@ -30,6 +32,8 @@ export const useTeamMembers = (companyId: string | undefined) => {
         toast.error('Authentication required for avatar upload');
         return null;
       }
+
+      console.log('User session validated, proceeding with upload...');
 
       // Generate a unique filename using timestamp and user ID
       const fileExt = file.name.split('.').pop();
@@ -86,9 +90,13 @@ export const useTeamMembers = (companyId: string | undefined) => {
 
       // Upload avatar if provided
       if (avatarFile) {
+        console.log('Avatar file detected, uploading...');
         const uploadedUrl = await uploadAvatar(avatarFile);
         if (uploadedUrl) {
           avatarUrl = uploadedUrl;
+          console.log('Avatar uploaded, URL:', uploadedUrl);
+        } else {
+          console.log('Avatar upload failed');
         }
       }
 
@@ -97,6 +105,8 @@ export const useTeamMembers = (companyId: string | undefined) => {
         ...memberDataWithoutFile,
         avatar_url: avatarUrl
       };
+      
+      console.log('Final member data prepared:', finalMemberData);
       
       // Enhanced detection of pending members - debugging output
       const hasPendingFlag = 'isPending' in finalMemberData && finalMemberData.isPending === true;
@@ -114,18 +124,23 @@ export const useTeamMembers = (companyId: string | undefined) => {
       let success = false;
 
       if (isEditing && finalMemberData.id) {
+        console.log('Performing update operation...');
         if (isPendingMember) {
           // Update existing pending member
+          console.log('Updating pending member...');
           success = await updatePendingMember(finalMemberData as Partial<PendingMember>);
         } else {
           // Update existing active member
+          console.log('Updating active member...');
           success = await updateActiveMember(finalMemberData as Partial<Profile>);
         }
       } else {
         // Create new pre-registered member
+        console.log('Creating new pending member...');
         success = await createPendingMember(finalMemberData as Partial<PendingMember>);
       }
       
+      console.log('Save operation result:', success);
       return success;
     } catch (error: any) {
       console.error('Error saving team member:', error);
@@ -147,6 +162,7 @@ export const useTeamMembers = (companyId: string | undefined) => {
 
     try {
       setIsDeleting(true);
+      console.log('Deleting member:', memberId, 'isPending:', isPending);
       
       let success = false;
       

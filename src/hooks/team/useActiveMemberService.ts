@@ -1,125 +1,78 @@
 
-import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Profile } from '@/components/dashboard/types';
 import { toast } from 'sonner';
-import { Database } from '@/integrations/supabase/types';
-import { useMemberPermissions } from './useMemberPermissions';
+import { Profile } from '@/components/dashboard/types';
 
-// Define the user role type based on the database enum
-type UserRole = Database['public']['Enums']['user_role'];
-
-/**
- * Service for managing active team members in the profiles table
- */
 export const useActiveMemberService = (companyId: string | undefined) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { checkUserPermissions } = useMemberPermissions();
-
-  /**
-   * Update an existing active team member
-   */
-  const updateActiveMember = async (memberData: Partial<Profile>) => {
-    if (!companyId) {
-      toast.error('Company ID is required');
+  const updateActiveMember = async (memberData: Partial<Profile>): Promise<boolean> => {
+    if (!companyId || !memberData.id) {
+      console.error('Company ID and member ID are required');
       return false;
     }
 
     try {
-      setIsLoading(true);
+      console.log('Updating active member:', memberData.id, memberData);
 
-      // Check user permissions
-      const hasPermission = await checkUserPermissions();
-      if (!hasPermission) return false;
-
-      console.log('Updating active member in profiles table:', memberData);
-      
-      // Extract only the fields we need to update in the profiles table
-      const updateData = {
-        first_name: memberData.first_name,
-        last_name: memberData.last_name,
-        department: memberData.department,
-        location: memberData.location,
-        job_title: memberData.job_title,
-        weekly_capacity: memberData.weekly_capacity,
-        role: memberData.role as UserRole, // Cast to ensure correct type
-        updated_at: new Date().toISOString()
-      };
-      
-      // IMPORTANT: Do not update email in the profiles table as this would cause
-      // inconsistency with the auth.users table that we cannot directly update
-      
-      console.log('Update data being sent to profiles table:', updateData);
-      console.log('User ID for update:', memberData.id);
-      
+      // Only update the profiles table, never touch auth.users
       const { error } = await supabase
         .from('profiles')
-        .update(updateData)
+        .update({
+          first_name: memberData.first_name,
+          last_name: memberData.last_name,
+          email: memberData.email,
+          role: memberData.role,
+          department: memberData.department,
+          location: memberData.location,
+          job_title: memberData.job_title,
+          weekly_capacity: memberData.weekly_capacity,
+          avatar_url: memberData.avatar_url,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', memberData.id)
-        .eq('company_id', companyId);  // Add company_id check for security
+        .eq('company_id', companyId);
 
       if (error) {
         console.error('Error updating active member:', error);
-        toast.error(`Failed to update member: ${error.message}`);
-        return false;
+        throw error;
       }
-      
-      console.log('Successfully updated active member');
+
       toast.success('Team member updated successfully');
       return true;
     } catch (error: any) {
-      console.error('Error updating active member:', error);
+      console.error('Error in updateActiveMember:', error);
       toast.error(error.message || 'Failed to update team member');
       return false;
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  /**
-   * Delete an active team member
-   */
-  const deleteActiveMember = async (memberId: string) => {
+  const deleteActiveMember = async (memberId: string): Promise<boolean> => {
     if (!companyId) {
-      toast.error('Company ID is required');
+      console.error('Company ID is required');
       return false;
     }
 
     try {
-      setIsLoading(true);
-      
-      // Check user permissions
-      const hasPermission = await checkUserPermissions();
-      if (!hasPermission) return false;
-      
-      console.log('Deleting active member from profiles table:', memberId);
-      // Delete from profiles table
+      // Only delete from profiles table
       const { error } = await supabase
         .from('profiles')
         .delete()
         .eq('id', memberId)
-        .eq('company_id', companyId); // Add company_id check for security
-        
+        .eq('company_id', companyId);
+
       if (error) {
-        console.error('Error deleting from profiles:', error);
-        toast.error(`Failed to delete member: ${error.message}`);
-        return false;
+        console.error('Error deleting active member:', error);
+        throw error;
       }
-      
-      console.log('Successfully deleted from profiles table');
+
       return true;
     } catch (error: any) {
-      console.error('Error deleting active member:', error);
-      toast.error(error.message || 'Failed to delete team member');
-      return false;
-    } finally {
-      setIsLoading(false);
+      console.error('Error in deleteActiveMember:', error);
+      throw error;
     }
   };
 
   return {
     updateActiveMember,
-    deleteActiveMember,
-    isLoading
+    deleteActiveMember
   };
 };
