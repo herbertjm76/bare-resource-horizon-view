@@ -326,6 +326,17 @@
   background-color: rgba(0, 0, 0, 0.01);
 }
 
+/* Sidebar Shimmer Animation */
+.sidebar-shimmer {
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%);
+  animation: sidebar-shimmer 2s ease-in-out infinite alternate;
+}
+
+@keyframes sidebar-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 640px) {
   .enhanced-table-scroll {

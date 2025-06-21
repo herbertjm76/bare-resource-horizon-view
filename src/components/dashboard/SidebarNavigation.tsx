@@ -72,11 +72,7 @@ export const SidebarNavigation: React.FC = () => {
                         )}
                         {isActive && (
                           <div 
-                            className="absolute inset-0 rounded-lg opacity-20"
-                            style={{
-                              background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.1) 100%)',
-                              animation: 'shimmer 2s ease-in-out infinite alternate'
-                            }}
+                            className="absolute inset-0 rounded-lg opacity-20 sidebar-shimmer"
                           />
                         )}
                       </Link>
@@ -91,12 +87,6 @@ export const SidebarNavigation: React.FC = () => {
           )}
         </SidebarGroup>
       ))}
-      <style jsx>{`
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-      `}</style>
     </nav>
   );
 };
