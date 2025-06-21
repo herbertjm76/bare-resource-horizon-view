@@ -1,3 +1,4 @@
+
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TabsContent } from "@/components/ui/tabs";
@@ -16,6 +17,7 @@ interface ProjectDialogContentProps {
   handleChange: (key: string, value: any) => void;
   isDataLoaded: boolean;
   projectId?: string;
+  onSuccess?: () => void;
 }
 
 export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
@@ -28,7 +30,8 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
   updateStageFee,
   handleChange,
   isDataLoaded,
-  projectId
+  projectId,
+  onSuccess
 }) => {
   // Fetch financial metrics for existing projects
   // const { data: financialMetrics, isLoading: isLoadingMetrics } = useProjectFinancialMetrics(

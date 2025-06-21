@@ -7,13 +7,11 @@ import { ImportCompleteStep } from './ImportCompleteStep';
 import { useExcelImport } from './useExcelImport';
 
 interface ImportDialogContentProps {
-  onImportComplete: () => void;
-  onClose: () => void;
+  onComplete: () => void;
 }
 
 export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
-  onImportComplete,
-  onClose
+  onComplete
 }) => {
   const {
     currentStep,
@@ -27,7 +25,7 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
     handleMappingComplete,
     downloadTemplate,
     setCurrentStep
-  } = useExcelImport(onImportComplete);
+  } = useExcelImport(onComplete);
 
   switch (currentStep) {
     case 'upload':
@@ -64,7 +62,7 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
           importErrors={importErrors}
           importWarnings={importWarnings}
           importSuggestions={importSuggestions}
-          onClose={onClose}
+          onClose={onComplete}
         />
       );
 
