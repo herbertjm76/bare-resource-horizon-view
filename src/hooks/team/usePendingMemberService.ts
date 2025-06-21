@@ -53,18 +53,16 @@ export const usePendingMemberService = (companyId: string | undefined) => {
     try {
       console.log('Creating pending member:', memberData);
 
-      // Get current user ID from the profiles table instead of auth.users
-      const { data: currentUser, error: userError } = await supabase
-        .from('profiles')
-        .select('id')
-        .limit(1)
-        .single();
+      // Get current user session to get the user ID
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
-      if (userError || !currentUser) {
-        console.error('Error getting current user from profiles:', userError);
+      if (sessionError || !sessionData?.session?.user) {
+        console.error('Error getting current user session:', sessionError);
         toast.error('Authentication required to create pre-registered member');
         return false;
       }
+
+      const currentUserId = sessionData.session.user.id;
 
       const { error } = await supabase
         .from('invites')
@@ -81,7 +79,7 @@ export const usePendingMemberService = (companyId: string | undefined) => {
           invitation_type: 'pre_registered',
           status: 'pending',
           code: Math.random().toString(36).substring(2, 15),
-          created_by: currentUser.id // Use the ID from profiles table
+          created_by: currentUserId // Use the ID from session
         });
 
       if (error) {

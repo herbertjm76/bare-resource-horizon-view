@@ -17,13 +17,20 @@ export const useTeamData = (companyId?: string) => {
     try {
       setIsLoading(true);
 
-      // Fetch team members
+      console.log('Fetching team data for company:', companyId);
+
+      // Fetch team members from profiles table only
       const { data: membersData, error: membersError } = await supabase
         .from('profiles')
         .select('*')
         .eq('company_id', companyId);
 
-      if (membersError) throw membersError;
+      if (membersError) {
+        console.error('Error fetching team members:', membersError);
+        throw membersError;
+      }
+
+      console.log('Team members fetched:', membersData?.length || 0);
 
       // Fetch pre-registered members from invites table
       const { data: invitesData, error: invitesError } = await supabase
@@ -33,7 +40,12 @@ export const useTeamData = (companyId?: string) => {
         .eq('status', 'pending')
         .eq('invitation_type', 'pre_registered');
 
-      if (invitesError) throw invitesError;
+      if (invitesError) {
+        console.error('Error fetching pre-registered members:', invitesError);
+        throw invitesError;
+      }
+
+      console.log('Pre-registered members fetched:', invitesData?.length || 0);
 
       setTeamMembers(membersData || []);
       setPreRegisteredMembers(invitesData || []);

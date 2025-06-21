@@ -13,7 +13,7 @@ export const useMemberPermissions = () => {
   
   /**
    * Checks if the current user has permission to manage team members
-   * Uses session metadata to avoid potential RLS policy recursion issues
+   * Uses only the profiles table to avoid auth.users access issues
    */
   const checkUserPermissions = useCallback(async () => {
     try {
@@ -22,7 +22,7 @@ export const useMemberPermissions = () => {
       
       console.log('Checking user permissions...');
       
-      // Get user session to check permissions
+      // Get user session first
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
@@ -39,61 +39,28 @@ export const useMemberPermissions = () => {
         return { hasPermission: false, error: 'No active session found' };
       }
       
-      // Extract user metadata directly from the session
-      const user = sessionData.session.user;
-      const userId = user.id;
-      
+      const userId = sessionData.session.user.id;
       console.log('Current user ID:', userId);
       
-      // Check if user has admin/owner role using session metadata first
-      // This avoids having to query the profiles table which can cause RLS recursion
-      let userRole = null;
-      
-      // Try to get role from session metadata if available
-      if (user.app_metadata && user.app_metadata.role) {
-        userRole = user.app_metadata.role;
-        console.log('Found role in app_metadata:', userRole);
-      } else if (user.user_metadata && user.user_metadata.role) {
-        userRole = user.user_metadata.role;
-        console.log('Found role in user_metadata:', userRole);
-      }
-      
-      // If we have the role in metadata, use it
-      if (userRole) {
-        const canManage = userRole === 'admin' || userRole === 'owner';
-        setHasPermission(canManage);
-        
-        if (!canManage) {
-          setPermissionError('Insufficient permissions');
-          return { hasPermission: false, error: 'User does not have sufficient permissions' };
-        }
-        
-        return { hasPermission: true, error: null };
-      }
-      
-      // As a fallback, we'll perform a direct, simplified query with an alternative approach
-      // This direct query avoids the risk of recursion in RLS policies
+      // Query only the profiles table to get role information
       try {
-        // Only query id and role to minimize data and reduce risk of RLS recursion
-        const { data: roleData, error: roleError } = await supabase
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .select('role')
+          .select('role, company_id')
           .eq('id', userId)
           .maybeSingle();
         
-        if (roleError) {
-          console.error('Error checking user role:', roleError.message);
-          // Fall back to another authorization method if available
-          // For now, we'll deny access
-          setPermissionError(roleError.message);
+        if (profileError) {
+          console.error('Error checking user profile:', profileError.message);
+          setPermissionError(profileError.message);
           setHasPermission(false);
-          return { hasPermission: false, error: `Error checking user role: ${roleError.message}` };
+          return { hasPermission: false, error: `Error checking user profile: ${profileError.message}` };
         }
         
-        if (roleData) {
-          console.log('User role from direct query:', roleData.role);
+        if (profileData) {
+          console.log('User profile from query:', profileData);
           
-          const canManage = roleData.role === 'admin' || roleData.role === 'owner';
+          const canManage = profileData.role === 'admin' || profileData.role === 'owner';
           
           setHasPermission(canManage);
           
@@ -105,14 +72,14 @@ export const useMemberPermissions = () => {
           
           return { hasPermission: true, error: null };
         } else {
-          console.error('No role information found');
-          setPermissionError('No role information found');
+          console.error('No profile found for user');
+          setPermissionError('No profile found');
           setHasPermission(false);
-          return { hasPermission: false, error: 'No role information found' };
+          return { hasPermission: false, error: 'No profile found' };
         }
       } catch (queryError: any) {
-        console.error('Error in role query:', queryError.message);
-        setPermissionError(`Role query error: ${queryError.message}`);
+        console.error('Error in profile query:', queryError.message);
+        setPermissionError(`Profile query error: ${queryError.message}`);
         setHasPermission(false);
         return { hasPermission: false, error: queryError.message };
       }
