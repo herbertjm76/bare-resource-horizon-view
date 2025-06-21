@@ -42,7 +42,7 @@ export const SidebarNavigation: React.FC = () => {
                       className={cn(
                         "flex items-center text-sm rounded-lg transition-all duration-200 group",
                         isActive 
-                          ? "bg-white/20 text-white shadow-md border border-white/30" 
+                          ? "bg-[#6465F0] text-white shadow-md border border-[#5D3FD3]" 
                           : "text-indigo-100 hover:bg-indigo-800/50 hover:text-white",
                         collapsed 
                           ? "justify-center p-2 h-10 w-10 mx-auto" 
