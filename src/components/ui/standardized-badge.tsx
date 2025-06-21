@@ -14,7 +14,7 @@ export const StandardizedBadge: React.FC<StandardizedBadgeProps> = ({
   className = '',
   style
 }) => {
-  const baseClasses = "text-xs font-medium px-2.5 py-1";
+  const baseClasses = "text-xs font-medium px-2.5 py-1 flex items-center justify-center";
   
   const variantClasses = {
     default: "ml-auto bg-gray-100 text-gray-500 border border-gray-200 rounded-full",
