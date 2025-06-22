@@ -15,6 +15,7 @@ interface NewResourceTableRowProps {
   getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
   viewMode?: 'compact' | 'expanded';
   onOtherLeaveEdit?: (memberId: string, value: number) => void;
+  selectedWeek?: Date;
 }
 
 export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
@@ -29,6 +30,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   getWeeklyLeave,
   viewMode = 'compact',
   onOtherLeaveEdit,
+  selectedWeek = new Date(),
 }) => {
   const sharedProps = {
     member,
@@ -41,6 +43,7 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
     getProjectCount,
     getWeeklyLeave,
     onOtherLeaveEdit,
+    selectedWeek,
   };
 
   if (viewMode === 'expanded') {

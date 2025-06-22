@@ -6,9 +6,13 @@ import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/comp
 import { MultiLeaveBadgeCell } from './MultiLeaveBadgeCell';
 import { LongCapacityBar } from '../LongCapacityBar';
 import { RowData, useRowData } from './RowUtilsHooks';
+import { EnhancedUtilizationTooltip } from '../tooltips/EnhancedUtilizationTooltip';
+import { ProjectCellTooltip } from '../tooltips/ProjectCellTooltip';
+import { useDetailedWeeklyAllocations } from '../hooks/useDetailedWeeklyAllocations';
 
 interface CompactRowViewProps extends RowData {
   viewMode: 'compact';
+  selectedWeek?: Date;
 }
 
 export const CompactRowView: React.FC<CompactRowViewProps> = ({
@@ -16,6 +20,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
   memberIndex,
   projects,
   allocationMap,
+  selectedWeek = new Date(),
   ...props
 }) => {
   const {
@@ -31,6 +36,10 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
     handleOtherLeaveChange
   } = useRowData(member, { projects, allocationMap, ...props });
 
+  // Fetch detailed allocations for enhanced tooltips
+  const { data: detailedAllocations } = useDetailedWeeklyAllocations(selectedWeek, [member.id]);
+  const memberDetailedData = detailedAllocations?.[member.id];
+
   // Helpers for compact avatar and name
   const getUserInitials = (): string => {
     if (!member) return '??';
@@ -38,10 +47,12 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
     const lastName = member.last_name || '';
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
+  
   const getMemberDisplayName = (): string => {
     if (!member) return 'Unknown';
     return `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed';
   };
+  
   const getAvatarUrl = (): string | undefined => {
     if (!member) return undefined;
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
@@ -76,61 +87,18 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
   // Utilization percentage for detailed tooltip
   const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0;
 
-  const utilizationTooltip = (
-    <div className="space-y-2">
-      <div className="font-bold mb-2 text-[#6465F0]">
-        {getMemberDisplayName()} — Utilization Details
-      </div>
-      <div className="flex flex-col gap-1 text-xs">
-        <div>
-          <span className="font-semibold">Utilization:</span> {utilizationPercentage}%
-        </div>
-        <div>
-          <span className="font-semibold">Total Used:</span> {totalUsedHours}h / {weeklyCapacity}h
-        </div>
-        <div>
-          <span className="font-semibold">Project Hours:</span> {totalProjectHours}h
-        </div>
-        <div>
-          <span className="font-semibold">Annual Leave:</span> {annualLeave}h
-        </div>
-        <div>
-          <span className="font-semibold">Holiday Hours:</span> {holidayHours}h
-        </div>
-        <div>
-          <span className="font-semibold">Other Leave:</span> {displayedOtherLeave}h
-        </div>
-        
-        {/* Project breakdown */}
-        {memberProjectAllocations.length > 0 && (
-          <div className="mt-2 pt-2 border-t border-gray-200">
-            <div className="font-semibold mb-1">Project Allocations:</div>
-            {memberProjectAllocations.map(({ project, hours }) => (
-              <div key={project.id} className="flex justify-between items-center">
-                <span className="text-gray-600">
-                  {project.code ? `${project.code} - ${project.name}` : project.name}
-                </span>
-                <span className="font-medium">{hours}h</span>
-              </div>
-            ))}
-            <div className="flex justify-between items-center font-medium mt-1 pt-1 border-t border-gray-100">
-              <span>Total Projects:</span>
-              <span>{totalProjectHours}h</span>
-            </div>
-          </div>
-        )}
-
-        <div className="text-gray-500 mt-1">
-          <span>Strategic insight:</span> <br />
-          {utilizationPercentage > 100
-            ? "Overallocation risk! Review project loads or adjust capacity."
-            : utilizationPercentage < 60
-            ? "Low utilization. Consider re-assigning or rebalancing workload."
-            : "Healthy workload distribution this week."}
-        </div>
-      </div>
-    </div>
-  );
+  // Enhanced utilization tooltip data
+  const enhancedUtilizationData = {
+    memberName: getMemberDisplayName(),
+    selectedWeek,
+    totalUsedHours,
+    weeklyCapacity,
+    utilizationPercentage,
+    annualLeave,
+    holidayHours,
+    otherLeave: displayedOtherLeave,
+    projects: memberDetailedData?.projects || []
+  };
 
   // Annual leave only tooltip (no hours display)
   const annualLeaveTooltip = (
@@ -211,7 +179,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
         </TooltipProvider>
       </TableCell>
       
-      {/* Utilization: 200px fixed Progress Bar with detailed tooltip */}
+      {/* Utilization: 200px fixed Progress Bar with enhanced detailed tooltip */}
       <TableCell 
         className="text-center border-r border-gray-200 px-1 py-0.5 utilization-column bg-gradient-to-r from-emerald-50 to-green-50"
         style={{ width: 200, minWidth: 200, maxWidth: 200 }}
@@ -228,9 +196,11 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
               </div>
             </TooltipTrigger>
             <TooltipContent 
-              className="z-[250] max-w-sm px-3 py-2 bg-white border border-gray-200 shadow-xl"
+              className="z-[250] max-w-lg px-3 py-2 bg-white border border-gray-200 shadow-xl"
+              side="top"
+              align="center"
             >
-              {utilizationTooltip}
+              <EnhancedUtilizationTooltip {...enhancedUtilizationData} />
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -277,10 +247,12 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
         </span>
       </TableCell>
       
-      {/* Project Cells - all 35px fixed */}
+      {/* Project Cells - all 35px fixed with enhanced tooltips */}
       {projects.map((project) => {
         const allocationKey = `${member.id}:${project.id}`;
         const hours = allocationMap.get(allocationKey) || 0;
+        const projectDetailedData = memberDetailedData?.projects.find(p => p.project_id === project.id);
+        
         return (
           <TableCell
             key={project.id}
@@ -288,9 +260,29 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
             style={{ width: 35, minWidth: 35, maxWidth: 35 }}
           >
             {hours > 0 && (
-              <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-sm font-semibold text-[11px] hover:bg-emerald-600 transition-colors duration-100">
-                {hours}
-              </span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-sm font-semibold text-[11px] hover:bg-emerald-600 transition-colors duration-100 cursor-pointer">
+                      {hours}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent 
+                    className="z-[250] max-w-xs px-3 py-2 bg-white border border-gray-200 shadow-xl"
+                    side="top"
+                    align="center"
+                  >
+                    <ProjectCellTooltip
+                      projectName={project.name}
+                      projectCode={project.code}
+                      memberName={getMemberDisplayName()}
+                      selectedWeek={selectedWeek}
+                      totalHours={hours}
+                      dailyBreakdown={projectDetailedData?.daily_breakdown}
+                    />
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </TableCell>
         );
