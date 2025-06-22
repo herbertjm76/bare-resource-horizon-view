@@ -32,17 +32,6 @@ export const useTeamData = (companyId?: string) => {
 
       console.log('Team members fetched:', membersData?.length || 0);
 
-      // Update Rob Night's avatar if he exists in the data
-      const updatedMembersData = membersData?.map(member => {
-        if (member.first_name === 'Rob' && member.last_name === 'Night') {
-          return {
-            ...member,
-            avatar_url: '/lovable-uploads/a408b88c-6a1d-4e6d-aa32-a365c2c434ce.png'
-          };
-        }
-        return member;
-      }) || [];
-
       // Fetch pre-registered members from invites table
       const { data: invitesData, error: invitesError } = await supabase
         .from('invites')
@@ -58,19 +47,8 @@ export const useTeamData = (companyId?: string) => {
 
       console.log('Pre-registered members fetched:', invitesData?.length || 0);
 
-      // Update Rob Night's avatar if he exists in the pre-registered data
-      const updatedInvitesData = invitesData?.map(invite => {
-        if (invite.first_name === 'Rob' && invite.last_name === 'Night') {
-          return {
-            ...invite,
-            avatar_url: '/lovable-uploads/a408b88c-6a1d-4e6d-aa32-a365c2c434ce.png'
-          };
-        }
-        return invite;
-      }) || [];
-
-      setTeamMembers(updatedMembersData);
-      setPreRegisteredMembers(updatedInvitesData);
+      setTeamMembers(membersData || []);
+      setPreRegisteredMembers(invitesData || []);
     } catch (error) {
       console.error('Error fetching team data:', error);
       toast.error('Failed to load team data');

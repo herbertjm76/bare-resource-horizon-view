@@ -94,6 +94,7 @@ export type Database = {
         Row: {
           accepted_at: string | null
           accepted_by: string | null
+          avatar_url: string | null
           code: string
           company_id: string
           created_at: string
@@ -108,11 +109,13 @@ export type Database = {
           location: string | null
           role: string | null
           status: string
+          updated_at: string | null
           weekly_capacity: number | null
         }
         Insert: {
           accepted_at?: string | null
           accepted_by?: string | null
+          avatar_url?: string | null
           code: string
           company_id: string
           created_at?: string
@@ -127,11 +130,13 @@ export type Database = {
           location?: string | null
           role?: string | null
           status?: string
+          updated_at?: string | null
           weekly_capacity?: number | null
         }
         Update: {
           accepted_at?: string | null
           accepted_by?: string | null
+          avatar_url?: string | null
           code?: string
           company_id?: string
           created_at?: string
@@ -146,6 +151,7 @@ export type Database = {
           location?: string | null
           role?: string | null
           status?: string
+          updated_at?: string | null
           weekly_capacity?: number | null
         }
         Relationships: [
