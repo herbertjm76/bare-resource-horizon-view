@@ -69,10 +69,10 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   };
 
   const getAvatarUrl = (member: TeamMember): string | undefined => {
-    // For pending members (pre-registered), check if they have avatar_url property
+    // For pending members (pre-registered), access avatar_url from the member object directly
     if ('isPending' in member && member.isPending) {
-      // Cast to any to access avatar_url property which exists on invites
-      return (member as any).avatar_url || undefined;
+      console.log('Getting avatar for pending member:', member.first_name, member.last_name, 'Avatar URL:', member.avatar_url);
+      return member.avatar_url || undefined;
     }
     // For active members (Profile type), access avatar_url directly
     return 'avatar_url' in member ? member.avatar_url : undefined;
@@ -107,85 +107,90 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {teamMembers.map((member) => (
-            <tr key={member.id} className="hover:bg-gray-50">
-              {editMode && ['owner', 'admin'].includes(userRole) && (
+          {teamMembers.map((member) => {
+            const avatarUrl = getAvatarUrl(member);
+            console.log('Rendering member:', member.first_name, member.last_name, 'Avatar URL:', avatarUrl);
+            
+            return (
+              <tr key={member.id} className="hover:bg-gray-50">
+                {editMode && ['owner', 'admin'].includes(userRole) && (
+                  <td className="px-4 py-3">
+                    <Checkbox
+                      checked={selectedMembers.includes(member.id)}
+                      onCheckedChange={(checked) => handleSelectMember(member.id, checked as boolean)}
+                    />
+                  </td>
+                )}
                 <td className="px-4 py-3">
-                  <Checkbox
-                    checked={selectedMembers.includes(member.id)}
-                    onCheckedChange={(checked) => handleSelectMember(member.id, checked as boolean)}
-                  />
-                </td>
-              )}
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={getAvatarUrl(member)} />
-                    <AvatarFallback className="bg-brand-violet text-white">
-                      {getUserInitials(member)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium text-gray-900">
-                      {`${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed'}
-                    </div>
-                    <div className="text-sm text-gray-500 flex items-center gap-1">
-                      <Mail className="h-3 w-3" />
-                      {member.email}
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={avatarUrl} />
+                      <AvatarFallback className="bg-brand-violet text-white">
+                        {getUserInitials(member)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {`${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed'}
+                      </div>
+                      <div className="text-sm text-gray-500 flex items-center gap-1">
+                        <Mail className="h-3 w-3" />
+                        {member.email}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </td>
-              <td className="px-4 py-3">
-                <Badge className={`${getRoleBadgeColor(member.role)} border`}>
-                  {member.role?.charAt(0).toUpperCase() + member.role?.slice(1) || 'Member'}
-                </Badge>
-              </td>
-              <td className="px-4 py-3">
-                <span className="text-sm text-gray-900">
-                  {member.department || '-'}
-                </span>
-              </td>
-              <td className="px-4 py-3">
-                <span className="text-sm text-gray-900">
-                  {member.location || '-'}
-                </span>
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  {/* Everyone can view insights now - this is the MVP feature */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleViewMember(member.id)}
-                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </Button>
-                  {editMode && ['owner', 'admin'].includes(userRole) && (
-                    <>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onEditMember(member)}
-                        className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onDeleteMember(member.id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
+                </td>
+                <td className="px-4 py-3">
+                  <Badge className={`${getRoleBadgeColor(member.role)} border`}>
+                    {member.role?.charAt(0).toUpperCase() + member.role?.slice(1) || 'Member'}
+                  </Badge>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-sm text-gray-900">
+                    {member.department || '-'}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-sm text-gray-900">
+                    {member.location || '-'}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    {/* Everyone can view insights now - this is the MVP feature */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleViewMember(member.id)}
+                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    {editMode && ['owner', 'admin'].includes(userRole) && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onEditMember(member)}
+                          className="text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onDeleteMember(member.id)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
