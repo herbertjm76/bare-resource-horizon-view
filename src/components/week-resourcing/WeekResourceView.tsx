@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Filter, X, Calendar, Users, Clock, TrendingUp } from 'lucide-react';
 import { WeekStartSelector } from '@/components/workload/WeekStartSelector';
 import { NewResourceTable } from './NewResourceTable';
-import { useWeekResourceData } from './hooks/useWeekResourceData';
+import { useStreamlinedWeekResourceData } from './hooks/useStreamlinedWeekResourceData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, isThisWeek } from 'date-fns';
 
@@ -51,7 +51,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     otherLeaveData,
     updateOtherLeave,
     error
-  } = useWeekResourceData(selectedWeek, stableFilters);
+  } = useStreamlinedWeekResourceData(selectedWeek, stableFilters);
 
   // Filter members based on search term - make this more stable
   const filteredMembers = useMemo(() => {
@@ -138,19 +138,6 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       availableHours
     };
   }, [filteredMembers, getMemberTotal]);
-
-  // Debug logging - but only when not loading to reduce noise
-  if (!isLoading) {
-    console.log('WeekResourceView stable render:', {
-      allMembers: allMembers?.length || 0,
-      filteredMembers: filteredMembers?.length || 0,
-      projects: projects?.length || 0,
-      allocationMapSize: allocationMap?.size || 0,
-      selectedWeek: format(selectedWeek, 'yyyy-MM-dd'),
-      hasGetMemberTotal: !!getMemberTotal,
-      hasGetProjectCount: !!getProjectCount
-    });
-  }
 
   if (error) {
     return (
@@ -285,12 +272,12 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       <Card className="border-none shadow-sm">
         <CardContent className="p-0">
           <NewResourceTable 
-            members={filteredMembers || []}
-            projects={projects || []}
-            allocationMap={allocationMap || new Map()}
-            annualLeaveData={annualLeaveData || {}}
-            holidaysData={holidaysData || {}}
-            otherLeaveData={otherLeaveData || {}}
+            members={filteredMembers}
+            projects={projects}
+            allocationMap={allocationMap}
+            annualLeaveData={annualLeaveData}
+            holidaysData={holidaysData}
+            otherLeaveData={otherLeaveData}
             getMemberTotal={getMemberTotal}
             getProjectCount={getProjectCount}
             getWeeklyLeave={getWeeklyLeave}

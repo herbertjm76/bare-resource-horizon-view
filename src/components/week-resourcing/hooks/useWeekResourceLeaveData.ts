@@ -2,115 +2,97 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { format, addDays, startOfWeek, endOfWeek } from 'date-fns';
+import { startOfWeek, endOfWeek, addDays } from 'date-fns';
 
-interface UseWeekResourceLeaveDataProps {
+interface UseWeekResourceLeaveDataOptions {
   weekStartDate: string;
   memberIds: string[];
+  enabled?: boolean;
 }
 
-export const useWeekResourceLeaveData = ({ weekStartDate, memberIds }: UseWeekResourceLeaveDataProps) => {
+export const useWeekResourceLeaveData = ({ 
+  weekStartDate, 
+  memberIds,
+  enabled = true 
+}: UseWeekResourceLeaveDataOptions) => {
   const { company } = useCompany();
 
-  // Fetch annual leave data
-  const { data: annualLeaveData, isLoading: isLoadingAnnualLeave } = useQuery({
-    queryKey: ['week-annual-leave', weekStartDate, company?.id, memberIds],
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['week-resource-leave-data', company?.id, weekStartDate, memberIds],
     queryFn: async () => {
-      if (!company?.id || memberIds.length === 0) return {};
+      if (!company?.id || memberIds.length === 0) {
+        console.log('Skipping leave data fetch - no company or members');
+        return { annualLeaveData: {}, holidaysData: {} };
+      }
 
+      console.log('Fetching leave data for week:', weekStartDate, 'members:', memberIds.length);
+
+      // Calculate week end date
       const weekStart = new Date(weekStartDate);
-      const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+      const weekEnd = addDays(weekStart, 6);
+      const weekEndString = weekEnd.toISOString().split('T')[0];
 
-      console.log('Fetching annual leave for week:', weekStartDate);
-
-      const { data, error } = await supabase
+      // Fetch annual leave data
+      const { data: annualLeaveRaw, error: annualLeaveError } = await supabase
         .from('annual_leaves')
         .select('member_id, date, hours')
         .eq('company_id', company.id)
         .in('member_id', memberIds)
-        .gte('date', format(weekStart, 'yyyy-MM-dd'))
-        .lte('date', format(weekEnd, 'yyyy-MM-dd'));
+        .gte('date', weekStartDate)
+        .lte('date', weekEndString);
 
-      if (error) {
-        console.error('Error fetching annual leave:', error);
-        return {};
+      if (annualLeaveError) {
+        console.error('Error fetching annual leave:', annualLeaveError);
+        throw annualLeaveError;
       }
 
-      // Aggregate hours by member
-      const leaveByMember: Record<string, number> = {};
-      data?.forEach(leave => {
-        if (!leaveByMember[leave.member_id]) {
-          leaveByMember[leave.member_id] = 0;
-        }
-        leaveByMember[leave.member_id] += Number(leave.hours) || 0;
-      });
-
-      console.log('Annual leave data processed:', leaveByMember);
-      return leaveByMember;
-    },
-    enabled: !!company?.id && memberIds.length > 0
-  });
-
-  // Fetch office holidays data
-  const { data: holidaysData, isLoading: isLoadingHolidays } = useQuery({
-    queryKey: ['week-office-holidays', weekStartDate, company?.id],
-    queryFn: async () => {
-      if (!company?.id) return {};
-
-      const weekStart = new Date(weekStartDate);
-      const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-
-      console.log('Fetching office holidays for week:', weekStartDate);
-
-      const { data, error } = await supabase
+      // Fetch office holidays
+      const { data: holidaysRaw, error: holidaysError } = await supabase
         .from('office_holidays')
-        .select('date, end_date, name')
+        .select('date, name, end_date')
         .eq('company_id', company.id)
-        .or(`date.lte.${format(weekEnd, 'yyyy-MM-dd')},end_date.gte.${format(weekStart, 'yyyy-MM-dd')}`);
+        .gte('date', weekStartDate)
+        .lte('date', weekEndString);
 
-      if (error) {
-        console.error('Error fetching office holidays:', error);
-        return {};
+      if (holidaysError) {
+        console.error('Error fetching holidays:', holidaysError);
+        throw holidaysError;
       }
 
-      // Calculate holiday hours for each member
-      const holidaysByMember: Record<string, number> = {};
-      
-      data?.forEach(holiday => {
-        const startDate = new Date(holiday.date);
-        const endDate = holiday.end_date ? new Date(holiday.end_date) : startDate;
-        
-        // Calculate days that fall within the week
-        let holidayHours = 0;
-        const currentDate = new Date(Math.max(startDate.getTime(), weekStart.getTime()));
-        const endLimit = new Date(Math.min(endDate.getTime(), weekEnd.getTime()));
-        
-        while (currentDate <= endLimit) {
-          // Skip weekends (Saturday = 6, Sunday = 0)
-          if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) {
-            holidayHours += 8; // Standard 8-hour holiday
-          }
-          currentDate.setDate(currentDate.getDate() + 1);
+      // Process annual leave data
+      const annualLeaveData: Record<string, number> = {};
+      annualLeaveRaw?.forEach(leave => {
+        if (!annualLeaveData[leave.member_id]) {
+          annualLeaveData[leave.member_id] = 0;
         }
-        
-        // Apply to all members
-        memberIds.forEach(memberId => {
-          if (!holidaysByMember[memberId]) {
-            holidaysByMember[memberId] = 0;
-          }
-          holidaysByMember[memberId] += holidayHours;
-        });
+        annualLeaveData[leave.member_id] += leave.hours || 0;
       });
 
-      console.log('Office holidays data processed:', holidaysByMember);
-      return holidaysByMember;
+      // Process holidays data - assuming 8 hours per holiday day for all members
+      const holidaysData: Record<string, number> = {};
+      if (holidaysRaw && holidaysRaw.length > 0) {
+        const totalHolidayHours = holidaysRaw.length * 8; // 8 hours per holiday
+        memberIds.forEach(memberId => {
+          holidaysData[memberId] = totalHolidayHours;
+        });
+      }
+
+      console.log('Successfully fetched leave data - Annual leave entries:', annualLeaveRaw?.length || 0, 'Holidays:', holidaysRaw?.length || 0);
+
+      return {
+        annualLeaveData,
+        holidaysData
+      };
     },
-    enabled: !!company?.id && memberIds.length > 0
+    enabled: !!company?.id && memberIds.length > 0 && enabled,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
   });
 
   return {
-    annualLeaveData: annualLeaveData || {},
-    holidaysData: holidaysData || {},
-    isLoading: isLoadingAnnualLeave || isLoadingHolidays
+    annualLeaveData: data?.annualLeaveData || {},
+    holidaysData: data?.holidaysData || {},
+    isLoading,
+    error
   };
 };

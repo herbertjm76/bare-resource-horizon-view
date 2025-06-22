@@ -1,113 +1,91 @@
 
-import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { format, startOfWeek } from 'date-fns';
 import { useCompany } from '@/context/CompanyContext';
+import { toast } from 'sonner';
 
-export const useWeeklyOtherLeaveData = (weekStartDate: string, memberIds: string[]) => {
-  const [otherLeaveData, setOtherLeaveData] = useState<Record<string, number>>({});
-  const [isLoading, setIsLoading] = useState(false);
+export const useWeeklyOtherLeaveData = (
+  weekStartDate: string, 
+  memberIds: string[],
+  enabled: boolean = true
+) => {
   const { company } = useCompany();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!company?.id || memberIds.length === 0) {
-      setOtherLeaveData({});
-      return;
-    }
-
-    const fetchOtherLeaveData = async () => {
-      setIsLoading(true);
-      
-      try {
-        const { data, error } = await supabase
-          .from('weekly_other_leave')
-          .select('member_id, hours')
-          .eq('company_id', company.id)
-          .eq('week_start_date', weekStartDate)
-          .in('member_id', memberIds);
-
-        if (error) {
-          console.error('Error fetching weekly other leave:', error);
-          return;
-        }
-
-        const otherLeaveMap: Record<string, number> = {};
-        data?.forEach(leave => {
-          otherLeaveMap[leave.member_id] = (otherLeaveMap[leave.member_id] || 0) + (leave.hours || 0);
-        });
-
-        setOtherLeaveData(otherLeaveMap);
-      } catch (error) {
-        console.error('Error in fetchOtherLeaveData:', error);
-      } finally {
-        setIsLoading(false);
+  const { data: otherLeaveData = {}, isLoading, error } = useQuery({
+    queryKey: ['weekly-other-leave', company?.id, weekStartDate, memberIds],
+    queryFn: async () => {
+      if (!company?.id || memberIds.length === 0) {
+        console.log('Skipping other leave data fetch - no company or members');
+        return {};
       }
-    };
 
-    fetchOtherLeaveData();
-  }, [company?.id, weekStartDate, memberIds]);
+      console.log('Fetching other leave data for week:', weekStartDate, 'members:', memberIds.length);
 
-  const updateOtherLeave = async (memberId: string, hours: number, notes?: string) => {
-    if (!company?.id) return false;
-
-    try {
-      // First, check if a record exists for this member and week
-      const { data: existingData, error: selectError } = await supabase
+      const { data, error } = await supabase
         .from('weekly_other_leave')
-        .select('id, hours')
-        .eq('member_id', memberId)
+        .select('member_id, hours, leave_type, notes')
         .eq('company_id', company.id)
         .eq('week_start_date', weekStartDate)
+        .in('member_id', memberIds);
+
+      if (error) {
+        console.error('Error fetching other leave data:', error);
+        throw error;
+      }
+
+      // Convert to map for easy lookup
+      const otherLeaveMap: Record<string, number> = {};
+      data?.forEach(leave => {
+        otherLeaveMap[leave.member_id] = leave.hours || 0;
+      });
+
+      console.log('Successfully fetched other leave data:', data?.length || 0, 'entries');
+
+      return otherLeaveMap;
+    },
+    enabled: !!company?.id && memberIds.length > 0 && enabled,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    cacheTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  const updateOtherLeaveMutation = useMutation({
+    mutationFn: async ({ memberId, hours }: { memberId: string; hours: number }) => {
+      if (!company?.id) throw new Error('No company ID');
+
+      const { data, error } = await supabase
+        .from('weekly_other_leave')
+        .upsert({
+          member_id: memberId,
+          company_id: company.id,
+          week_start_date: weekStartDate,
+          hours: hours,
+          leave_type: 'other'
+        })
+        .select()
         .single();
 
-      if (selectError && selectError.code !== 'PGRST116') {
-        console.error('Error checking existing other leave:', selectError);
-        return false;
-      }
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      // Invalidate the query to refetch data
+      queryClient.invalidateQueries({ 
+        queryKey: ['weekly-other-leave', company?.id, weekStartDate] 
+      });
+    },
+    onError: (error) => {
+      console.error('Error updating other leave:', error);
+      toast.error('Failed to update other leave');
+    }
+  });
 
-      if (existingData) {
-        // Update existing record
-        const { error: updateError } = await supabase
-          .from('weekly_other_leave')
-          .update({ 
-            hours: hours,
-            notes: notes,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', existingData.id);
-
-        if (updateError) {
-          console.error('Error updating other leave:', updateError);
-          return false;
-        }
-      } else if (hours > 0) {
-        // Create new record only if hours > 0
-        const { error: insertError } = await supabase
-          .from('weekly_other_leave')
-          .insert({
-            member_id: memberId,
-            company_id: company.id,
-            week_start_date: weekStartDate,
-            hours: hours,
-            leave_type: 'other',
-            notes: notes
-          });
-
-        if (insertError) {
-          console.error('Error inserting other leave:', insertError);
-          return false;
-        }
-      }
-
-      // Update local state
-      setOtherLeaveData(prev => ({
-        ...prev,
-        [memberId]: hours
-      }));
-
+  const updateOtherLeave = async (memberId: string, hours: number) => {
+    try {
+      await updateOtherLeaveMutation.mutateAsync({ memberId, hours });
       return true;
     } catch (error) {
-      console.error('Error in updateOtherLeave:', error);
+      console.error('Failed to update other leave:', error);
       return false;
     }
   };
@@ -115,6 +93,7 @@ export const useWeeklyOtherLeaveData = (weekStartDate: string, memberIds: string
   return {
     otherLeaveData,
     isLoading,
+    error,
     updateOtherLeave
   };
 };
