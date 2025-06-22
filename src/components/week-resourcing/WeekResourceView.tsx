@@ -92,7 +92,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     filters.searchTerm ? 'search' : ''
   ].filter(Boolean).length, [filters.office, filters.searchTerm]);
 
-  // Calculate weekly metrics with memoization
+  // Calculate weekly metrics with proper hour summation
   const metrics = useMemo(() => {
     if (!filteredMembers || filteredMembers.length === 0 || !getMemberTotal) {
       return {
@@ -114,6 +114,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       const weeklyCapacity = member.weekly_capacity || 40;
       totalCapacity += weeklyCapacity;
 
+      // Get the total hours for this member for the selected week
       const memberTotal = getMemberTotal(member.id);
       totalAllocated += memberTotal;
 
@@ -222,7 +223,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
               <div>
                 <p className="text-sm font-medium">Week Utilization</p>
                 <p className="text-2xl font-bold">{metrics.utilizationRate}%</p>
-                <p className="text-xs text-gray-500">{metrics.totalAllocated}h / {metrics.totalCapacity}h</p>
+                <p className="text-xs text-gray-500">{Math.round(metrics.totalAllocated)}h / {metrics.totalCapacity}h</p>
               </div>
             </div>
           </CardContent>

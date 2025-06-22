@@ -24,10 +24,23 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
 
   const getTotalHours = () => {
     let total = 0;
+    // Sum all hours from the allocation map
     allocationMap.forEach(hours => {
       total += hours;
     });
     return total;
+  };
+
+  const getGrandTotalMembers = () => {
+    // Count unique members who have any allocations
+    const membersWithAllocations = new Set<string>();
+    allocationMap.forEach((hours, key) => {
+      if (hours > 0) {
+        const [memberId] = key.split(':');
+        membersWithAllocations.add(memberId);
+      }
+    });
+    return membersWithAllocations.size;
   };
 
   return (
@@ -36,28 +49,28 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         T
       </TableCell>
       <TableCell className="sticky left-12 bg-slate-100 z-10">
-        Total
+        Weekly Total
       </TableCell>
       <TableCell className="text-center">
-        -
+        —
       </TableCell>
       <TableCell className="text-center">
-        -
+        {getGrandTotalMembers()} / {members.length}
       </TableCell>
-      <TableCell className="text-center">
-        {members.length}
+      <TableCell className="text-center font-bold text-lg">
+        {getTotalHours()}h
       </TableCell>
-      <TableCell className="text-center">
-        {getTotalHours()}
-      </TableCell>
-      {projects.map((project) => (
-        <TableCell 
-          key={project.id} 
-          className="text-center border-l border-slate-200"
-        >
-          {getProjectTotal(project.id) || '—'}
-        </TableCell>
-      ))}
+      {projects.map((project) => {
+        const projectTotal = getProjectTotal(project.id);
+        return (
+          <TableCell 
+            key={project.id} 
+            className="text-center border-l border-slate-200 font-bold"
+          >
+            {projectTotal > 0 ? `${projectTotal}h` : '—'}
+          </TableCell>
+        );
+      })}
     </TableRow>
   );
 };

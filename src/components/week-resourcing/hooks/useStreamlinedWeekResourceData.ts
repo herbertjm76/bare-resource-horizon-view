@@ -64,31 +64,35 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     shouldFetchData
   );
 
-  // Create stable allocation map
+  // Create stable allocation map - this is the key fix for proper hour summation
   const allocationMap = useMemo(() => {
     const map = new Map<string, number>();
     if (comprehensiveWeeklyAllocations.length > 0) {
       comprehensiveWeeklyAllocations.forEach(allocation => {
         const key = `${allocation.resource_id}:${allocation.project_id}`;
-        map.set(key, allocation.hours || 0);
+        const currentHours = map.get(key) || 0;
+        // Sum up hours for the same resource-project combination in the same week
+        map.set(key, currentHours + (allocation.hours || 0));
       });
     }
     return map;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Create stable member totals map
+  // Create stable member totals map - sum all hours for each member across all projects
   const memberTotalsMap = useMemo(() => {
     const totalsMap = new Map<string, number>();
     if (comprehensiveWeeklyAllocations.length > 0) {
       comprehensiveWeeklyAllocations.forEach(allocation => {
-        const current = totalsMap.get(allocation.resource_id) || 0;
-        totalsMap.set(allocation.resource_id, current + (allocation.hours || 0));
+        const memberId = allocation.resource_id;
+        const current = totalsMap.get(memberId) || 0;
+        // Sum all hours for this member across all projects for this week
+        totalsMap.set(memberId, current + (allocation.hours || 0));
       });
     }
     return totalsMap;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Create stable project count map
+  // Create stable project count map - count unique projects per member
   const projectCountMap = useMemo(() => {
     const projectSetsMap = new Map<string, Set<string>>();
     
@@ -178,8 +182,11 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     projectsCount: projects?.length || 0,
     allocationsCount: comprehensiveWeeklyAllocations?.length || 0,
     allocationMapSize: allocationMap.size,
+    memberTotalsMapSize: memberTotalsMap.size,
     isLoading,
-    shouldFetchData
+    shouldFetchData,
+    // Log sample member totals for debugging
+    sampleMemberTotals: Array.from(memberTotalsMap.entries()).slice(0, 3)
   });
 
   return result;
