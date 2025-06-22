@@ -1,5 +1,5 @@
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useState } from 'react';
 
 export interface RowData {
   member: any;
@@ -18,78 +18,38 @@ export interface RowData {
 }
 
 export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberIndex'>) => {
-  // Create stable references for member data to prevent re-renders
-  const memberId = useMemo(() => member?.id || '', [member?.id]);
-  const memberCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
+  const [editableOtherLeave, setEditableOtherLeave] = useState(0);
   
-  // Memoize calculated values to prevent unnecessary re-renders
-  const weeklyCapacity = memberCapacity;
-  
-  const totalUsedHours = useMemo(() => 
-    props.getMemberTotal(memberId), 
-    [props.getMemberTotal, memberId]
-  );
-  
-  const projectCount = useMemo(() => 
-    props.getProjectCount(memberId), 
-    [props.getProjectCount, memberId]
-  );
-  
-  const annualLeave = useMemo(() => 
-    props.annualLeaveData[memberId] || 0, 
-    [props.annualLeaveData, memberId]
-  );
-  
-  const holidayHours = useMemo(() => 
-    props.holidaysData[memberId] || 0, 
-    [props.holidaysData, memberId]
-  );
-  
-  const otherLeave = useMemo(() => 
-    props.otherLeaveData?.[memberId] || 0, 
-    [props.otherLeaveData, memberId]
-  );
-  
-  const leaveDays = useMemo(() => 
-    props.getWeeklyLeave(memberId), 
-    [props.getWeeklyLeave, memberId]
-  );
+  const weeklyCapacity = member?.weekly_capacity || 40;
+  const totalUsedHours = props.getMemberTotal(member?.id || '');
+  const projectCount = props.getProjectCount(member?.id || '');
+  const annualLeave = props.annualLeaveData[member?.id || ''] || 0;
+  const holidayHours = props.holidaysData[member?.id || ''] || 0;
+  const otherLeave = props.otherLeaveData?.[member?.id || ''] || 0;
+  const leaveDays = props.getWeeklyLeave(member?.id || '');
   
   // Use the actual other leave data as the displayed value
   const displayedOtherLeave = otherLeave;
   
-  // Check if other leave editing is available
-  const editableOtherLeave = useMemo(() => 
-    typeof props.updateOtherLeave === "function", 
-    [props.updateOtherLeave]
-  );
-  
-  const remarks = useMemo(() => '', []);
+  const remarks = useMemo(() => {
+    // This could be extended to include actual remarks from the database
+    return '';
+  }, []);
 
-  const handleOtherLeaveChange = useCallback(async (value: number) => {
-    if (props.updateOtherLeave && memberId) {
-      const success = await props.updateOtherLeave(memberId, value);
-      if (!success) {
-        console.error('Failed to update other leave');
+  const handleOtherLeaveChange = async (value: number) => {
+    if (props.updateOtherLeave && member?.id) {
+      const success = await props.updateOtherLeave(member.id, value);
+      if (success) {
+        setEditableOtherLeave(value);
       }
     }
     
-    if (props.onOtherLeaveEdit && memberId) {
-      props.onOtherLeaveEdit(memberId, value);
+    if (props.onOtherLeaveEdit && member?.id) {
+      props.onOtherLeaveEdit(member.id, value);
     }
-  }, [props.updateOtherLeave, props.onOtherLeaveEdit, memberId]);
+  };
 
-  const getProjectBreakdown = useCallback((project: any, hours: number) => ({
-    projectName: project.name,
-    projectCode: project.code,
-    projectStage: project.current_stage || project.stage,
-    projectFee: project.fee,
-    hours: hours,
-    isActive: !!(hours > 0)
-  }), []);
-
-  // Return a completely stable object to prevent re-renders
-  return useMemo(() => ({
+  return {
     weeklyCapacity,
     totalUsedHours,
     projectCount,
@@ -97,23 +57,9 @@ export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberI
     holidayHours,
     otherLeave,
     leaveDays,
-    displayedOtherLeave,
     editableOtherLeave,
-    remarks,
-    handleOtherLeaveChange,
-    getProjectBreakdown
-  }), [
-    weeklyCapacity,
-    totalUsedHours,
-    projectCount,
-    annualLeave,
-    holidayHours,
-    otherLeave,
-    leaveDays,
     displayedOtherLeave,
-    editableOtherLeave,
     remarks,
-    handleOtherLeaveChange,
-    getProjectBreakdown
-  ]);
+    handleOtherLeaveChange
+  };
 };

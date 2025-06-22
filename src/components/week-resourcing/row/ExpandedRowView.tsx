@@ -19,13 +19,10 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
   allocationMap,
   annualLeaveData,
   holidaysData,
-  otherLeaveData,
   getMemberTotal,
   getProjectCount,
   getWeeklyLeave,
-  updateOtherLeave,
   onOtherLeaveEdit,
-  selectedWeek,
 }) => {
   const {
     weeklyCapacity,
@@ -34,8 +31,8 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
     annualLeave,
     holidayHours,
     leaveDays,
-    displayedOtherLeave,
     editableOtherLeave,
+    displayedOtherLeave,
     remarks,
     handleOtherLeaveChange,
     getProjectBreakdown
@@ -44,17 +41,11 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
     allocationMap,
     annualLeaveData,
     holidaysData,
-    otherLeaveData,
     getMemberTotal,
     getProjectCount,
     getWeeklyLeave,
-    updateOtherLeave,
     onOtherLeaveEdit,
-    selectedWeek,
   });
-
-  // Check if other leave editing is available
-  const canEditOtherLeave = typeof updateOtherLeave === "function";
 
   return (
     <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors duration-200 h-20 border-b`}>
@@ -82,6 +73,11 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
         </div>
       </TableCell>
       
+      {/* Project Count */}
+      <TableCell className="text-center border-r border-gray-200 px-3 py-3">
+        {projectCount}
+      </TableCell>
+      
       {/* Utilization: Larger Progress Bar */}
       <TableCell className="text-center border-r border-gray-200 px-3 py-3">
         <LongCapacityBar
@@ -98,14 +94,9 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
         remarks={remarks}
         leaveDays={leaveDays}
         className="px-3 py-3"
-        editableOther={canEditOtherLeave}
+        editableOther={editableOtherLeave}
         onOtherLeaveChange={handleOtherLeaveChange}
       />
-      
-      {/* Project Count */}
-      <TableCell className="text-center border-r border-gray-200 px-3 py-3">
-        {projectCount}
-      </TableCell>
       
       {/* Project allocation cells */}
       {projects.map((project) => {

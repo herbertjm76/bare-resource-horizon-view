@@ -1,5 +1,5 @@
 
-import { useMemo, useCallback } from 'react';
+import { useMemo } from 'react';
 import { useWeekResourceTeamMembers } from './useWeekResourceTeamMembers';
 import { useWeekResourceProjects } from './useWeekResourceProjects';
 import { useComprehensiveAllocations } from './useComprehensiveAllocations';
@@ -9,8 +9,8 @@ import { useWeeklyOtherLeaveData } from './useWeeklyOtherLeaveData';
 import { format } from 'date-fns';
 
 export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
-  // Convert Date to string format for API calls - memoize to prevent unnecessary changes
-  const weekStartDate = useMemo(() => format(selectedWeek, 'yyyy-MM-dd'), [selectedWeek]);
+  // Convert Date to string format for API calls
+  const weekStartDate = format(selectedWeek, 'yyyy-MM-dd');
   
   // Fetch team members
   const { members, loadingMembers: isLoadingMembers, membersError } = useWeekResourceTeamMembers();
@@ -18,7 +18,7 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
   // Fetch projects
   const { data: projects = [], isLoading: isLoadingProjects } = useWeekResourceProjects({ filters });
   
-  // Extract member IDs for allocations and leave data - memoize to prevent unnecessary changes
+  // Extract member IDs for allocations and leave data
   const memberIds = useMemo(() => members?.map(member => member.id) || [], [members]);
   
   // Fetch allocations
@@ -50,7 +50,7 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     updateOtherLeave 
   } = useWeeklyOtherLeaveData(weekStartDate, memberIds);
 
-  // Create allocation map - memoize to prevent unnecessary recalculations
+  // Create allocation map
   const allocationMap = useMemo(() => {
     const map = new Map<string, number>();
     comprehensiveWeeklyAllocations.forEach(allocation => {
@@ -60,42 +60,43 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     return map;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Create stable references for callback functions to prevent re-renders
-  const stableAllocations = useMemo(() => comprehensiveWeeklyAllocations, [comprehensiveWeeklyAllocations]);
-  const stableWeeklyLeaveDetails = useMemo(() => weeklyLeaveDetails, [weeklyLeaveDetails]);
+  // Calculate member totals
+  const getMemberTotal = useMemo(() => {
+    return (memberId: string) => {
+      let total = 0;
+      comprehensiveWeeklyAllocations.forEach(allocation => {
+        if (allocation.resource_id === memberId) {
+          total += allocation.hours || 0;
+        }
+      });
+      return total;
+    };
+  }, [comprehensiveWeeklyAllocations]);
 
-  // Calculate member totals - memoize the function to prevent unnecessary re-renders
-  const getMemberTotal = useCallback((memberId: string) => {
-    let total = 0;
-    stableAllocations.forEach(allocation => {
-      if (allocation.resource_id === memberId) {
-        total += allocation.hours || 0;
-      }
-    });
-    return total;
-  }, [stableAllocations]);
+  // Calculate project count per member
+  const getProjectCount = useMemo(() => {
+    return (memberId: string) => {
+      const uniqueProjects = new Set<string>();
+      comprehensiveWeeklyAllocations.forEach(allocation => {
+        if (allocation.resource_id === memberId && (allocation.hours || 0) > 0) {
+          uniqueProjects.add(allocation.project_id);
+        }
+      });
+      return uniqueProjects.size;
+    };
+  }, [comprehensiveWeeklyAllocations]);
 
-  // Calculate project count per member - memoize the function
-  const getProjectCount = useCallback((memberId: string) => {
-    const uniqueProjects = new Set<string>();
-    stableAllocations.forEach(allocation => {
-      if (allocation.resource_id === memberId && (allocation.hours || 0) > 0) {
-        uniqueProjects.add(allocation.project_id);
-      }
-    });
-    return uniqueProjects.size;
-  }, [stableAllocations]);
-
-  // Create a proper getWeeklyLeave function - memoize to prevent unnecessary re-renders
-  const getWeeklyLeave = useCallback((memberId: string): Array<{ date: string; hours: number }> => {
-    return stableWeeklyLeaveDetails[memberId] || [];
-  }, [stableWeeklyLeaveDetails]);
+  // Create a proper getWeeklyLeave function that returns the expected array format
+  const getWeeklyLeave = useMemo(() => {
+    return (memberId: string): Array<{ date: string; hours: number }> => {
+      return weeklyLeaveDetails[memberId] || [];
+    };
+  }, [weeklyLeaveDetails]);
 
   const isLoading = isLoadingMembers || isLoadingProjects || isLoadingLeave || isLoadingOtherLeave;
   const error = membersError || null;
 
-  // Return a stable object to prevent unnecessary re-renders
-  return useMemo(() => ({
+  return {
     allMembers: members || [],
     projects,
     allocations: comprehensiveWeeklyAllocations,
@@ -109,19 +110,5 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     holidaysData,
     otherLeaveData,
     updateOtherLeave
-  }), [
-    members,
-    projects,
-    comprehensiveWeeklyAllocations,
-    isLoading,
-    error,
-    allocationMap,
-    getMemberTotal,
-    getProjectCount,
-    getWeeklyLeave,
-    annualLeaveData,
-    holidaysData,
-    otherLeaveData,
-    updateOtherLeave
-  ]);
+  };
 };

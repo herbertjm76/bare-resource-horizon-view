@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
-import { OptimizedWeekResourceView } from '@/components/week-resourcing/OptimizedWeekResourceView';
+import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
 import { startOfWeek, format } from 'date-fns';
 import { Toaster } from 'sonner';
 import { Calendar } from 'lucide-react';
@@ -50,7 +50,7 @@ const WeeklyOverview = () => {
         </div>
       </div>
 
-      <OptimizedWeekResourceView
+      <WeekResourceView
         selectedWeek={selectedWeek}
         setSelectedWeek={setSelectedWeek}
         onWeekChange={handleWeekChange}
