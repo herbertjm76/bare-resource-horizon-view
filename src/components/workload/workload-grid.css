@@ -1,5 +1,5 @@
 
-/* Workload Grid Styles - Similar to Project Resourcing */
+/* Workload Grid Styles - Matching Project Resourcing Format */
 
 .workload-grid-table {
   border-collapse: separate;
@@ -21,9 +21,9 @@
   background: white;
 }
 
-/* Header styles */
+/* Header styles - matching Project Resourcing */
 .workload-grid-header {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: #6465F0;
   color: white;
   font-weight: 600;
   text-align: center;
@@ -32,6 +32,8 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  border-right: 1px solid rgba(156, 163, 175, 0.6);
+  border-bottom: 1px solid rgba(156, 163, 175, 0.8);
 }
 
 .workload-grid-header.member-column {
@@ -41,33 +43,22 @@
   min-width: 200px;
   text-align: left;
   padding-left: 16px;
+  border-right: 2px solid rgba(156, 163, 175, 0.8);
 }
 
 .workload-grid-header.week-column {
-  min-width: 50px;
-  max-width: 50px;
-  width: 50px;
+  min-width: 30px;
+  max-width: 30px;
+  width: 30px;
   height: 80px;
   padding: 4px 2px;
   position: relative;
-  overflow: hidden;
-}
-
-/* Rotated week header text */
-.workload-grid-header.week-column > div {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) rotate(-90deg);
-  white-space: nowrap;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 1.2;
+  overflow: visible;
 }
 
 .workload-grid-header.total-column {
   min-width: 100px;
-  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  background: #7c3aed;
 }
 
 /* Row styles */
@@ -76,21 +67,18 @@
   transition: background-color 0.15s ease;
 }
 
-.workload-grid-row:nth-child(even) {
-  background-color: #f9fafb;
-}
-
 .workload-grid-row:hover {
-  background-color: #f3f4f6;
+  background-color: #f3f4f6 !important;
 }
 
-/* Cell styles */
+/* Cell styles - matching Project Resourcing */
 .workload-grid-cell {
   padding: 4px;
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid rgba(156, 163, 175, 0.6);
   text-align: center;
   vertical-align: middle;
   height: 50px;
+  border-bottom: 1px solid rgba(156, 163, 175, 0.6);
 }
 
 .workload-grid-cell.member-cell {
@@ -101,13 +89,13 @@
   text-align: left;
   padding: 12px 16px;
   min-width: 200px;
-  border-right: 2px solid #d1d5db;
+  border-right: 2px solid rgba(156, 163, 175, 0.8);
 }
 
 .workload-grid-cell.week-cell {
-  min-width: 50px;
-  max-width: 50px;
-  width: 50px;
+  min-width: 30px;
+  max-width: 30px;
+  width: 30px;
   padding: 2px;
 }
 
@@ -115,35 +103,6 @@
   background-color: #f8fafc;
   font-weight: 600;
   border-right: none;
-}
-
-/* Compact square workload pills */
-.workload-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 40px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 600;
-  color: white;
-  cursor: help;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.workload-pill:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-}
-
-.workload-pill.empty {
-  background: #f3f4f6;
-  color: #9ca3af;
-  border: 1px solid #d1d5db;
-  box-shadow: none;
 }
 
 /* Member info styling */
@@ -193,6 +152,13 @@
   border-color: #bbf7d0;
 }
 
+/* Sticky column positioning */
+.sticky-left-0 {
+  position: sticky;
+  left: 0;
+  z-index: 20;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .workload-grid-container {
@@ -211,22 +177,16 @@
   }
   
   .workload-grid-header.week-column {
-    min-width: 45px;
-    max-width: 45px;
-    width: 45px;
+    min-width: 28px;
+    max-width: 28px;
+    width: 28px;
     height: 75px;
   }
   
   .workload-grid-cell.week-cell {
-    min-width: 45px;
-    max-width: 45px;
-    width: 45px;
-  }
-  
-  .workload-pill {
-    width: 40px;
-    height: 36px;
-    font-size: 9px;
+    min-width: 28px;
+    max-width: 28px;
+    width: 28px;
   }
   
   .member-avatar {
@@ -239,7 +199,7 @@
   }
 }
 
-/* Scrollbar styling */
+/* Scrollbar styling - matching Project Resourcing */
 .workload-grid-container::-webkit-scrollbar {
   height: 12px;
 }

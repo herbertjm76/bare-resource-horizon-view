@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -54,32 +55,81 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
   return (
     <TooltipProvider>
       <div className="workload-grid-container">
-        <table className="workload-grid-table">
+        <table 
+          className="workload-grid-table enhanced-resource-table" 
+          style={{
+            minWidth: `${200 + (weekStartDates.length * 30) + 100}px`,
+            width: '100%'
+          }}
+        >
           <thead>
-            <tr>
-              <th className="workload-grid-header member-column">
+            <tr style={{ backgroundColor: '#6465F0' }}>
+              {/* Team Member column */}
+              <th 
+                className="workload-grid-header member-column sticky-left-0 z-20"
+                style={{ backgroundColor: '#6465F0' }}
+              >
                 Team Member
               </th>
               
-              {weekStartDates.map((week) => (
-                <th 
-                  key={week.key} 
-                  className="workload-grid-header week-column"
-                >
-                  <div>
-                    {format(week.date, 'MMM d')}
-                  </div>
-                </th>
-              ))}
+              {/* Week columns - matching Project Resourcing format */}
+              {weekStartDates.map((week, index) => {
+                const isFirstOfMonth = week.date.getDate() <= 7;
+                const isNewMonth = index === 0 || weekStartDates[index - 1].date.getMonth() !== week.date.getMonth();
+                
+                return (
+                  <th 
+                    key={week.key}
+                    className="workload-grid-header week-column text-center text-xs font-semibold text-white py-2 px-1 relative"
+                    style={{ 
+                      width: '30px', 
+                      minWidth: '30px',
+                      backgroundColor: '#6465F0',
+                      borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined
+                    }}
+                  >
+                    <div className="flex flex-col items-center h-full">
+                      {isNewMonth ? (
+                        <>
+                          <span className="text-[10px] font-bold uppercase leading-none text-yellow-200 mb-1">
+                            {format(week.date, 'MMM')}
+                          </span>
+                          <div className="flex flex-col items-center justify-end gap-0.5 flex-1">
+                            <span className="text-[10px] opacity-90 uppercase leading-none font-medium">
+                              W
+                            </span>
+                            <span className="text-sm font-bold leading-none">
+                              {format(week.date, 'd')}
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex flex-col items-center justify-end gap-0.5 h-full pt-4">
+                          <span className="text-[10px] opacity-90 uppercase leading-none font-medium">
+                            W
+                          </span>
+                          <span className="text-sm font-bold leading-none">
+                            {format(week.date, 'd')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </th>
+                );
+              })}
               
-              <th className="workload-grid-header total-column">
+              {/* Total Utilization column */}
+              <th 
+                className="workload-grid-header total-column"
+                style={{ backgroundColor: '#7c3aed' }}
+              >
                 Total Utilization
               </th>
             </tr>
           </thead>
           
           <tbody>
-            {members.map((member) => {
+            {members.map((member, memberIndex) => {
               const memberWeeklyData = weeklyWorkloadData[member.id] || {};
               const weeklyCapacity = member.weekly_capacity || 40;
               
@@ -93,8 +143,11 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
               const utilizationPercent = totalCapacity > 0 ? Math.round((totalHours / totalCapacity) * 100) : 0;
               
               return (
-                <tr key={member.id} className="workload-grid-row">
-                  <td className="workload-grid-cell member-cell">
+                <tr 
+                  key={member.id} 
+                  className={`workload-grid-row ${memberIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} border-b border-gray-200`}
+                >
+                  <td className="workload-grid-cell member-cell sticky-left-0 bg-inherit z-5 border-r-2 border-gray-300">
                     <div className="member-info">
                       <Avatar className="member-avatar">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
@@ -115,7 +168,12 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
                     return (
                       <td 
                         key={week.key}
-                        className="workload-grid-cell week-cell"
+                        className="workload-grid-cell week-cell text-center border-r border-gray-200"
+                        style={{ 
+                          width: '30px', 
+                          minWidth: '30px',
+                          padding: '2px'
+                        }}
                       >
                         {weekHours > 0 && weekData ? (
                           <WorkloadTooltip
@@ -129,20 +187,25 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
                             memberName={`${member.first_name} ${member.last_name}`}
                             date={format(week.date, 'MMM d, yyyy')}
                           >
-                            <div className={getWorkloadPillClass(weekHours, weeklyCapacity)}>
-                              {weekHours}h
+                            <div 
+                              className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-semibold text-white cursor-help transition-all duration-200 hover:scale-110"
+                              style={{
+                                backgroundColor: weekHours >= weeklyCapacity ? '#ef4444' : weekHours >= weeklyCapacity * 0.8 ? '#f97316' : '#3b82f6'
+                              }}
+                            >
+                              {weekHours}
                             </div>
                           </WorkloadTooltip>
                         ) : (
-                          <div className="workload-pill empty">
-                            0h
+                          <div className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium text-gray-400 bg-gray-100">
+                            0
                           </div>
                         )}
                       </td>
                     );
                   })}
                   
-                  <td className="workload-grid-cell total-cell">
+                  <td className="workload-grid-cell total-cell bg-gray-50 font-semibold">
                     <div className={getUtilizationBadgeClass(utilizationPercent)}>
                       {utilizationPercent}%
                     </div>
