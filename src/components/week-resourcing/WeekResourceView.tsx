@@ -39,6 +39,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     getMemberAllocation,
     getMemberTotal,
     getProjectCount,
+    getWeeklyLeave,
     allocationMap
   } = useWeeklyResourceData(selectedWeek, filters);
 
@@ -239,8 +240,15 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         </CardHeader>
         <CardContent className="p-0">
           <NewResourceTable 
-            selectedWeek={selectedWeek}
-            filters={filters}
+            members={allMembers || []}
+            projects={projects || []}
+            allocationMap={allocationMap}
+            annualLeaveData={[]}
+            holidaysData={[]}
+            getMemberTotal={getMemberTotal}
+            getProjectCount={getProjectCount}
+            getWeeklyLeave={getWeeklyLeave}
+            viewMode="compact"
           />
         </CardContent>
       </Card>
