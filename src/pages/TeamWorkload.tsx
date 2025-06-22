@@ -84,7 +84,7 @@ const TeamWorkload = () => {
         activeFilter={activeFilter}
         filterValue={filterValue}
         searchQuery={searchQuery}
-        setActiveFilter={setActiveFilter}
+        setActiveFilter={(filter: string) => setActiveFilter(filter as any)}
         setFilterValue={setFilterValue}
         setSearchQuery={setSearchQuery}
         clearFilters={clearFilters}

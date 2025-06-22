@@ -105,12 +105,14 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
 
     // Process annual leave
     weeklyLeaveData.forEach(({ weekKey, leaveDetails }) => {
-      leaveDetails.forEach(leave => {
-        const memberId = leave.member_id;
-        if (processedData[memberId] && processedData[memberId][weekKey]) {
-          processedData[memberId][weekKey].annualLeave += leave.hours || 0;
-        }
-      });
+      if (Array.isArray(leaveDetails)) {
+        leaveDetails.forEach(leave => {
+          const memberId = leave.member_id;
+          if (processedData[memberId] && processedData[memberId][weekKey]) {
+            processedData[memberId][weekKey].annualLeave += leave.hours || 0;
+          }
+        });
+      }
     });
 
     // Process office holidays

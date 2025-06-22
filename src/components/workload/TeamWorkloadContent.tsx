@@ -133,13 +133,13 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
                   <SelectValue placeholder="Filter by..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Members</SelectItem>
+                  <SelectItem value="all">All Members</SelectItem>
                   <SelectItem value="department">Department</SelectItem>
                   <SelectItem value="location">Location</SelectItem>
                 </SelectContent>
               </Select>
 
-              {activeFilter && (
+              {activeFilter && activeFilter !== "all" && (
                 <Select value={filterValue} onValueChange={setFilterValue}>
                   <SelectTrigger className="w-32 h-8">
                     <SelectValue placeholder="Select..." />
