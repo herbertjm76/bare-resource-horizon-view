@@ -1,4 +1,3 @@
-
 import React, { memo, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, X, Calendar, Users, Clock, TrendingUp } from 'lucide-react';
 import { WeekStartSelector } from '@/components/workload/WeekStartSelector';
 import { StableNewResourceTable } from './StableNewResourceTable';
-import { useStableWeekResourceData } from './hooks/useStableWeekResourceData';
+import { useOptimizedWeekResourceData } from './hooks/useOptimizedWeekResourceData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 
@@ -152,7 +151,7 @@ export const OptimizedWeekResourceView: React.FC<OptimizedWeekResourceViewProps>
     otherLeaveData,
     updateOtherLeave,
     error
-  } = useStableWeekResourceData(selectedWeek, filters);
+  } = useOptimizedWeekResourceData(selectedWeek, filters);
 
   const handleWeekChange = useCallback((date: Date) => {
     setSelectedWeek(date);
