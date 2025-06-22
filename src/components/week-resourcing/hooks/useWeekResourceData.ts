@@ -9,78 +9,90 @@ import { useWeeklyOtherLeaveData } from './useWeeklyOtherLeaveData';
 import { format } from 'date-fns';
 
 export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
-  // Convert Date to string format for API calls
+  // Convert Date to string format for API calls - make this stable
   const weekStartDate = useMemo(() => format(selectedWeek, 'yyyy-MM-dd'), [selectedWeek]);
   
   // Fetch team members
   const { members, loadingMembers: isLoadingMembers, membersError } = useWeekResourceTeamMembers();
   
-  // Fetch projects
+  // Fetch projects with stable filters
   const { data: projects = [], isLoading: isLoadingProjects } = useWeekResourceProjects({ filters });
   
-  // Extract member IDs for allocations and leave data
-  const memberIds = useMemo(() => members?.map(member => member.id) || [], [members]);
+  // Create stable member IDs array
+  const memberIds = useMemo(() => {
+    if (!members || members.length === 0) return [];
+    return members.map(member => member.id);
+  }, [members]);
   
-  // Fetch allocations
+  // Only fetch allocations and leave data when we have member IDs
+  const shouldFetchData = memberIds.length > 0;
+  
+  // Fetch allocations only when we have members
   const { comprehensiveWeeklyAllocations = [] } = useComprehensiveAllocations({ 
     weekStartDate, 
-    memberIds 
+    memberIds: shouldFetchData ? memberIds : []
   });
   
-  // Fetch leave data
+  // Fetch leave data only when we have members
   const { 
     annualLeaveData = {}, 
     holidaysData = {}, 
     isLoading: isLoadingLeave 
   } = useWeekResourceLeaveData({ 
     weekStartDate, 
-    memberIds 
+    memberIds: shouldFetchData ? memberIds : []
   });
 
-  // Fetch detailed leave data for proper formatting
+  // Fetch detailed leave data only when we have members
   const { weeklyLeaveDetails = {} } = useWeeklyLeaveDetails({ 
     weekStartDate, 
-    memberIds 
+    memberIds: shouldFetchData ? memberIds : []
   });
 
-  // Fetch other leave data with update functionality
+  // Fetch other leave data only when we have members
   const { 
     otherLeaveData = {}, 
     isLoading: isLoadingOtherLeave,
     updateOtherLeave 
-  } = useWeeklyOtherLeaveData(weekStartDate, memberIds);
+  } = useWeeklyOtherLeaveData(weekStartDate, shouldFetchData ? memberIds : []);
 
-  // Create allocation map with stable reference
+  // Create stable allocation map
   const allocationMap = useMemo(() => {
     const map = new Map<string, number>();
-    comprehensiveWeeklyAllocations.forEach(allocation => {
-      const key = `${allocation.resource_id}:${allocation.project_id}`;
-      map.set(key, allocation.hours || 0);
-    });
+    if (comprehensiveWeeklyAllocations.length > 0) {
+      comprehensiveWeeklyAllocations.forEach(allocation => {
+        const key = `${allocation.resource_id}:${allocation.project_id}`;
+        map.set(key, allocation.hours || 0);
+      });
+    }
     return map;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Create stable member totals map to avoid recalculation
+  // Create stable member totals map
   const memberTotalsMap = useMemo(() => {
     const totalsMap = new Map<string, number>();
-    comprehensiveWeeklyAllocations.forEach(allocation => {
-      const current = totalsMap.get(allocation.resource_id) || 0;
-      totalsMap.set(allocation.resource_id, current + (allocation.hours || 0));
-    });
+    if (comprehensiveWeeklyAllocations.length > 0) {
+      comprehensiveWeeklyAllocations.forEach(allocation => {
+        const current = totalsMap.get(allocation.resource_id) || 0;
+        totalsMap.set(allocation.resource_id, current + (allocation.hours || 0));
+      });
+    }
     return totalsMap;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Create stable project count map to avoid recalculation - FIXED
+  // Create stable project count map
   const projectCountMap = useMemo(() => {
     const projectSetsMap = new Map<string, Set<string>>();
     
-    comprehensiveWeeklyAllocations.forEach(allocation => {
-      if ((allocation.hours || 0) > 0) {
-        const current = projectSetsMap.get(allocation.resource_id) || new Set<string>();
-        current.add(allocation.project_id);
-        projectSetsMap.set(allocation.resource_id, current);
-      }
-    });
+    if (comprehensiveWeeklyAllocations.length > 0) {
+      comprehensiveWeeklyAllocations.forEach(allocation => {
+        if ((allocation.hours || 0) > 0) {
+          const current = projectSetsMap.get(allocation.resource_id) || new Set<string>();
+          current.add(allocation.project_id);
+          projectSetsMap.set(allocation.resource_id, current);
+        }
+      });
+    }
     
     // Convert sets to counts
     const finalCountMap = new Map<string, number>();
@@ -91,29 +103,33 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     return finalCountMap;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Calculate member totals with stable callback using the pre-calculated map
+  // Stable callback functions
   const getMemberTotal = useCallback((memberId: string) => {
     return memberTotalsMap.get(memberId) || 0;
   }, [memberTotalsMap]);
 
-  // Calculate project count per member with stable callback using the pre-calculated map
   const getProjectCount = useCallback((memberId: string) => {
     return projectCountMap.get(memberId) || 0;
   }, [projectCountMap]);
 
-  // Create a proper getWeeklyLeave function with stable callback
   const getWeeklyLeave = useCallback((memberId: string): Array<{ date: string; hours: number }> => {
     return weeklyLeaveDetails[memberId] || [];
   }, [weeklyLeaveDetails]);
 
-  const isLoading = isLoadingMembers || isLoadingProjects || isLoadingLeave || isLoadingOtherLeave;
+  // Consolidate loading state - only show loading if members are loading OR if we have members but other data is still loading
+  const isLoading = useMemo(() => {
+    if (isLoadingMembers || isLoadingProjects) return true;
+    if (shouldFetchData && (isLoadingLeave || isLoadingOtherLeave)) return true;
+    return false;
+  }, [isLoadingMembers, isLoadingProjects, shouldFetchData, isLoadingLeave, isLoadingOtherLeave]);
+
   const error = membersError || null;
 
-  // Return memoized object to prevent unnecessary rerenders
-  return useMemo(() => ({
+  // Return stable object with all computed values
+  const result = useMemo(() => ({
     allMembers: members || [],
-    projects,
-    allocations: comprehensiveWeeklyAllocations,
+    projects: projects || [],
+    allocations: comprehensiveWeeklyAllocations || [],
     isLoading,
     error,
     allocationMap,
@@ -139,4 +155,21 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     otherLeaveData,
     updateOtherLeave
   ]);
+
+  // Debug logging
+  console.log('useWeekResourceData hook:', {
+    weekStartDate,
+    membersCount: members?.length || 0,
+    memberIds: memberIds.length,
+    shouldFetchData,
+    allocationsCount: comprehensiveWeeklyAllocations.length,
+    allocationMapSize: allocationMap.size,
+    isLoadingMembers,
+    isLoadingProjects,
+    isLoadingLeave,
+    isLoadingOtherLeave,
+    finalIsLoading: isLoading
+  });
+
+  return result;
 };

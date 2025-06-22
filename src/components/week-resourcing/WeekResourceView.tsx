@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,34 +53,36 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     error
   } = useWeekResourceData(selectedWeek, stableFilters);
 
-  // Filter members based on search term
+  // Filter members based on search term - make this more stable
   const filteredMembers = useMemo(() => {
-    if (!allMembers) return [];
-    
-    let filtered = allMembers;
-    
-    // Apply search filter
-    if (stableFilters.searchTerm) {
-      const searchLower = stableFilters.searchTerm.toLowerCase();
-      filtered = filtered.filter(member => {
-        const fullName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
-        const email = (member.email || '').toLowerCase();
-        return fullName.includes(searchLower) || email.includes(searchLower);
-      });
+    if (!allMembers || allMembers.length === 0) {
+      return [];
     }
     
-    console.log('Filtered members:', filtered.length, 'from', allMembers.length);
+    // Apply search filter
+    if (!stableFilters.searchTerm) {
+      return allMembers;
+    }
+    
+    const searchLower = stableFilters.searchTerm.toLowerCase();
+    const filtered = allMembers.filter(member => {
+      const fullName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
+      const email = (member.email || '').toLowerCase();
+      return fullName.includes(searchLower) || email.includes(searchLower);
+    });
+    
     return filtered;
   }, [allMembers, stableFilters.searchTerm]);
 
-  const handleWeekChange = useMemo(() => (date: Date) => {
+  // Stable callback functions
+  const handleWeekChange = useCallback((date: Date) => {
     setSelectedWeek(date);
     if (onWeekChange) {
       onWeekChange(date);
     }
   }, [setSelectedWeek, onWeekChange]);
 
-  const clearFilters = useMemo(() => () => {
+  const clearFilters = useCallback(() => {
     onFilterChange('office', 'all');
     onFilterChange('searchTerm', '');
   }, [onFilterChange]);
@@ -92,7 +94,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
 
   // Calculate weekly metrics with memoization
   const metrics = useMemo(() => {
-    if (!filteredMembers || filteredMembers.length === 0) {
+    if (!filteredMembers || filteredMembers.length === 0 || !getMemberTotal) {
       return {
         totalCapacity: 0,
         totalAllocated: 0,
@@ -137,15 +139,18 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     };
   }, [filteredMembers, getMemberTotal]);
 
-  // Debug logging
-  console.log('WeekResourceView render:', {
-    allMembers: allMembers?.length || 0,
-    filteredMembers: filteredMembers?.length || 0,
-    projects: projects?.length || 0,
-    allocationMapSize: allocationMap?.size || 0,
-    isLoading,
-    selectedWeek: format(selectedWeek, 'yyyy-MM-dd')
-  });
+  // Debug logging - but only when not loading to reduce noise
+  if (!isLoading) {
+    console.log('WeekResourceView stable render:', {
+      allMembers: allMembers?.length || 0,
+      filteredMembers: filteredMembers?.length || 0,
+      projects: projects?.length || 0,
+      allocationMapSize: allocationMap?.size || 0,
+      selectedWeek: format(selectedWeek, 'yyyy-MM-dd'),
+      hasGetMemberTotal: !!getMemberTotal,
+      hasGetProjectCount: !!getProjectCount
+    });
+  }
 
   if (error) {
     return (
@@ -284,20 +289,22 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <NewResourceTable 
-            members={filteredMembers || []}
-            projects={projects || []}
-            allocationMap={allocationMap || new Map()}
-            annualLeaveData={annualLeaveData || {}}
-            holidaysData={holidaysData || {}}
-            otherLeaveData={otherLeaveData || {}}
-            getMemberTotal={getMemberTotal}
-            getProjectCount={getProjectCount}
-            getWeeklyLeave={getWeeklyLeave}
-            updateOtherLeave={updateOtherLeave}
-            viewMode="compact"
-            selectedWeek={selectedWeek}
-          />
+          {filteredMembers.length > 0 && projects.length > 0 && allocationMap && (
+            <NewResourceTable 
+              members={filteredMembers}
+              projects={projects}
+              allocationMap={allocationMap}
+              annualLeaveData={annualLeaveData || {}}
+              holidaysData={holidaysData || {}}
+              otherLeaveData={otherLeaveData || {}}
+              getMemberTotal={getMemberTotal}
+              getProjectCount={getProjectCount}
+              getWeeklyLeave={getWeeklyLeave}
+              updateOtherLeave={updateOtherLeave}
+              viewMode="compact"
+              selectedWeek={selectedWeek}
+            />
+          )}
         </CardContent>
       </Card>
     </div>
