@@ -47,29 +47,37 @@ export const useTeamData = (companyId?: string) => {
 
       console.log('Pre-registered members fetched:', invitesData?.length || 0);
       
-      // Detailed logging for all pre-registered members
-      console.log('📋 All pre-registered members data:');
+      // SUPER DETAILED logging for ALL pre-registered members
+      console.log('🔍 DETAILED pre-registered members analysis:');
       invitesData?.forEach((member, index) => {
-        console.log(`${index + 1}. ${member.first_name} ${member.last_name}`);
-        console.log('   - avatar_url:', member.avatar_url);
-        console.log('   - email:', member.email);
-        console.log('   - id:', member.id);
+        console.log(`--- Member ${index + 1} ---`);
+        console.log('ID:', member.id);
+        console.log('Name:', member.first_name, member.last_name);
+        console.log('Email:', member.email);
+        console.log('Avatar URL:', member.avatar_url);
+        console.log('Avatar URL type:', typeof member.avatar_url);
+        console.log('Avatar URL length:', member.avatar_url?.length);
+        console.log('All keys:', Object.keys(member));
+        console.log('Full object:', JSON.stringify(member, null, 2));
       });
       
-      // Specific check for Jingjing Kim in the raw data
+      // Specific check for Jingjing Kim
       const jingjingInvite = invitesData?.find(m => 
-        m.first_name?.toLowerCase() === 'jingjing' && m.last_name?.toLowerCase() === 'kim'
+        m.first_name?.toLowerCase().includes('jingjing') || 
+        m.first_name?.toLowerCase().includes('jing')
       );
       
       if (jingjingInvite) {
-        console.log('🎯 Found Jingjing Kim in invite data:');
-        console.log('- ID:', jingjingInvite.id);
-        console.log('- Avatar URL:', jingjingInvite.avatar_url);
-        console.log('- Email:', jingjingInvite.email);
-        console.log('- Full object:', jingjingInvite);
+        console.log('🎯 FOUND Jingjing in data - DETAILED ANALYSIS:');
+        console.log('- Exact first_name:', `"${jingjingInvite.first_name}"`);
+        console.log('- Exact last_name:', `"${jingjingInvite.last_name}"`);
+        console.log('- Exact avatar_url:', `"${jingjingInvite.avatar_url}"`);
+        console.log('- Avatar URL exists:', !!jingjingInvite.avatar_url);
+        console.log('- Avatar URL is string:', typeof jingjingInvite.avatar_url === 'string');
+        console.log('- Raw JSON:', JSON.stringify(jingjingInvite));
       } else {
-        console.log('❌ Jingjing Kim NOT found in invite data');
-        console.log('Available members:', invitesData?.map(m => `${m.first_name} ${m.last_name}`));
+        console.log('❌ Jingjing NOT found in pre-registered data');
+        console.log('Available first names:', invitesData?.map(m => `"${m.first_name}"`));
       }
 
       setTeamMembers(membersData || []);

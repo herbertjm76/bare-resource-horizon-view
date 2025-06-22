@@ -15,78 +15,63 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
   };
 
   const getAvatarUrl = (member: TeamMember): string | undefined => {
-    // Debug logging for specific members
-    if (member.first_name?.toLowerCase() === 'jingjing' && member.last_name?.toLowerCase() === 'kim') {
-      console.log('🔍 Jingjing Kim Avatar Debug:');
-      console.log('- avatar_url from member:', member.avatar_url);
-      console.log('- member keys:', Object.keys(member));
-    }
+    const memberName = `${member.first_name} ${member.last_name}`;
     
-    if (member.first_name?.toLowerCase() === 'rob' && member.last_name?.toLowerCase() === 'night') {
-      console.log('🔍 Rob Night Avatar Debug:');
-      console.log('- avatar_url from member:', member.avatar_url);
-      console.log('- member keys:', Object.keys(member));
-    }
+    console.log(`🔍 Processing avatar for ${memberName}:`);
+    console.log('- Raw avatar_url:', member.avatar_url);
+    console.log('- Member object keys:', Object.keys(member));
+    console.log('- Full member object:', member);
     
-    // Get the avatar URL from the member object
     const avatarUrl = member.avatar_url;
     
     if (!avatarUrl) {
+      console.log(`❌ No avatar URL found for ${memberName}`);
       return undefined;
     }
     
-    // If it's already a full URL (starts with http/https), return as is
-    if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
-      return avatarUrl;
-    }
-    
-    // If it starts with /lovable-uploads/, return it as is (this should work)
-    if (avatarUrl.startsWith('/lovable-uploads/')) {
-      return avatarUrl;
-    }
-    
-    // For any other relative paths, return as is
+    // Return the URL as-is - let's not modify it
+    console.log(`✅ Final avatar URL for ${memberName}:`, avatarUrl);
     return avatarUrl;
   };
 
   const avatarUrl = getAvatarUrl(member);
   const initials = getUserInitials(member);
+  const memberName = `${member.first_name} ${member.last_name}`;
 
-  // Debug logging for specific members - now with more detail
-  if (member.first_name?.toLowerCase() === 'jingjing' && member.last_name?.toLowerCase() === 'kim') {
-    console.log('🖼️ Final avatar rendering for Jingjing Kim:');
-    console.log('- Final avatarUrl:', avatarUrl);
-    console.log('- Initials fallback:', initials);
-  }
-  
-  if (member.first_name?.toLowerCase() === 'rob' && member.last_name?.toLowerCase() === 'night') {
-    console.log('🖼️ Final avatar rendering for Rob Night:');
-    console.log('- Final avatarUrl:', avatarUrl);
-    console.log('- Initials fallback:', initials);
-  }
+  console.log(`🖼️ Rendering avatar for ${memberName}:`);
+  console.log('- Avatar URL to render:', avatarUrl);
+  console.log('- Initials fallback:', initials);
 
   return (
     <Avatar className="h-10 w-10">
-      <AvatarImage 
-        src={avatarUrl} 
-        alt={`${member.first_name} ${member.last_name}`}
-        onLoad={(e) => {
-          const memberName = `${member.first_name} ${member.last_name}`;
-          console.log(`✅ AvatarImage onLoad triggered for ${memberName}`);
-          console.log('- Image element:', e.target);
-          console.log('- naturalWidth:', (e.target as HTMLImageElement).naturalWidth);
-          console.log('- naturalHeight:', (e.target as HTMLImageElement).naturalHeight);
-          console.log('- Final src:', (e.target as HTMLImageElement).src);
-        }}
-        onError={(e) => {
-          const memberName = `${member.first_name} ${member.last_name}`;
-          console.log(`❌ AvatarImage onError triggered for ${memberName}`);
-          console.log('- Error target:', e.target);
-          console.log('- Attempted URL:', avatarUrl);
-          console.log('- Error type:', e.type);
-          console.log('- Image src:', (e.target as HTMLImageElement).src);
-        }}
-      />
+      {avatarUrl && (
+        <AvatarImage 
+          src={avatarUrl} 
+          alt={`${member.first_name} ${member.last_name}`}
+          onLoad={(e) => {
+            console.log(`✅ Image SUCCESSFULLY loaded for ${memberName}`);
+            console.log('- Image element:', e.target);
+            console.log('- Natural dimensions:', (e.target as HTMLImageElement).naturalWidth, 'x', (e.target as HTMLImageElement).naturalHeight);
+            console.log('- Final src used:', (e.target as HTMLImageElement).src);
+            console.log('- Current src attribute:', (e.target as HTMLImageElement).getAttribute('src'));
+          }}
+          onError={(e) => {
+            console.log(`❌ Image FAILED to load for ${memberName}`);
+            console.log('- Error target:', e.target);
+            console.log('- Attempted URL:', avatarUrl);
+            console.log('- Error event:', e);
+            console.log('- Image src:', (e.target as HTMLImageElement).src);
+            console.log('- Current src attribute:', (e.target as HTMLImageElement).getAttribute('src'));
+            
+            // Test if we can fetch the URL directly
+            fetch(avatarUrl).then(response => {
+              console.log(`🔍 Direct fetch test for ${memberName}:`, response.status, response.statusText);
+            }).catch(fetchError => {
+              console.log(`❌ Direct fetch failed for ${memberName}:`, fetchError);
+            });
+          }}
+        />
+      )}
       <AvatarFallback className="bg-brand-violet text-white">
         {initials}
       </AvatarFallback>
