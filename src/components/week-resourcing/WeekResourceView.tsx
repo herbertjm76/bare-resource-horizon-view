@@ -53,6 +53,26 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     error
   } = useWeekResourceData(selectedWeek, stableFilters);
 
+  // Filter members based on search term
+  const filteredMembers = useMemo(() => {
+    if (!allMembers) return [];
+    
+    let filtered = allMembers;
+    
+    // Apply search filter
+    if (stableFilters.searchTerm) {
+      const searchLower = stableFilters.searchTerm.toLowerCase();
+      filtered = filtered.filter(member => {
+        const fullName = `${member.first_name || ''} ${member.last_name || ''}`.toLowerCase();
+        const email = (member.email || '').toLowerCase();
+        return fullName.includes(searchLower) || email.includes(searchLower);
+      });
+    }
+    
+    console.log('Filtered members:', filtered.length, 'from', allMembers.length);
+    return filtered;
+  }, [allMembers, stableFilters.searchTerm]);
+
   const handleWeekChange = useMemo(() => (date: Date) => {
     setSelectedWeek(date);
     if (onWeekChange) {
@@ -72,7 +92,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
 
   // Calculate weekly metrics with memoization
   const metrics = useMemo(() => {
-    if (!allMembers || allMembers.length === 0) {
+    if (!filteredMembers || filteredMembers.length === 0) {
       return {
         totalCapacity: 0,
         totalAllocated: 0,
@@ -88,7 +108,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     let overloadedMembers = 0;
     let underUtilizedMembers = 0;
 
-    allMembers.forEach(member => {
+    filteredMembers.forEach(member => {
       const weeklyCapacity = member.weekly_capacity || 40;
       totalCapacity += weeklyCapacity;
 
@@ -115,7 +135,17 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       underUtilizedMembers,
       availableHours
     };
-  }, [allMembers, getMemberTotal]);
+  }, [filteredMembers, getMemberTotal]);
+
+  // Debug logging
+  console.log('WeekResourceView render:', {
+    allMembers: allMembers?.length || 0,
+    filteredMembers: filteredMembers?.length || 0,
+    projects: projects?.length || 0,
+    allocationMapSize: allocationMap?.size || 0,
+    isLoading,
+    selectedWeek: format(selectedWeek, 'yyyy-MM-dd')
+  });
 
   if (error) {
     return (
@@ -255,12 +285,12 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         </CardHeader>
         <CardContent className="p-0">
           <NewResourceTable 
-            members={allMembers || []}
+            members={filteredMembers || []}
             projects={projects || []}
-            allocationMap={allocationMap}
-            annualLeaveData={annualLeaveData}
-            holidaysData={holidaysData}
-            otherLeaveData={otherLeaveData}
+            allocationMap={allocationMap || new Map()}
+            annualLeaveData={annualLeaveData || {}}
+            holidaysData={holidaysData || {}}
+            otherLeaveData={otherLeaveData || {}}
             getMemberTotal={getMemberTotal}
             getProjectCount={getProjectCount}
             getWeeklyLeave={getWeeklyLeave}

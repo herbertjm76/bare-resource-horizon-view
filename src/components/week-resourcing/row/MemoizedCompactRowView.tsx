@@ -71,6 +71,15 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     </div>
   ), [memberData.displayName, member]);
 
+  // Debug logging for this member
+  console.log(`CompactRowView for ${memberData.displayName}:`, {
+    memberId: member.id,
+    projectsCount: projects.length,
+    allocationMapSize: allocationMap.size,
+    totalUsedHours,
+    projectCount
+  });
+
   return (
     <TableRow
       className={
@@ -281,15 +290,12 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   );
 };
 
-// Memoize with strict comparison to prevent unnecessary re-renders
+// Simplified memo comparison to be less strict
 export const CompactRowView = memo(CompactRowViewComponent, (prevProps, nextProps) => {
-  return (
-    prevProps.member.id === nextProps.member.id &&
-    prevProps.memberIndex === nextProps.memberIndex &&
-    prevProps.projects.length === nextProps.projects.length &&
-    prevProps.allocationMap === nextProps.allocationMap &&
-    prevProps.annualLeaveData === nextProps.annualLeaveData &&
-    prevProps.holidaysData === nextProps.holidaysData &&
-    prevProps.otherLeaveData === nextProps.otherLeaveData
-  );
+  // Only compare the most essential props that actually change
+  const membersEqual = prevProps.member.id === nextProps.member.id;
+  const indexEqual = prevProps.memberIndex === nextProps.memberIndex;
+  const projectsEqual = prevProps.projects.length === nextProps.projects.length;
+  
+  return membersEqual && indexEqual && projectsEqual;
 });
