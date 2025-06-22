@@ -14,6 +14,8 @@ import { format, addDays, startOfWeek } from 'date-fns';
 interface CompactRowViewProps extends RowData {
   viewMode: 'compact';
   selectedWeek?: Date;
+  otherLeaveData?: Record<string, number>;
+  updateOtherLeave?: (memberId: string, hours: number, notes?: string) => Promise<boolean>;
 }
 
 // Enhanced Utilization Popover Component
@@ -192,6 +194,8 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
   projects,
   allocationMap,
   selectedWeek = new Date(),
+  otherLeaveData = {},
+  updateOtherLeave,
   ...props
 }) => {
   const [utilizationPopoverOpen, setUtilizationPopoverOpen] = useState(false);
@@ -207,7 +211,16 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
     displayedOtherLeave,
     remarks,
     handleOtherLeaveChange
-  } = useRowData(member, { projects, allocationMap, ...props });
+  } = useRowData(member, { 
+    projects, 
+    allocationMap, 
+    otherLeaveData,
+    updateOtherLeave,
+    ...props 
+  });
+
+  // Get other leave from the new data source
+  const otherLeave = otherLeaveData[member.id] || 0;
 
   // Fetch detailed allocations for enhanced tooltips
   const { data: detailedAllocations } = useDetailedWeeklyAllocations(selectedWeek, [member.id]);
@@ -353,7 +366,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
               utilizationPercentage={utilizationPercentage}
               annualLeave={annualLeave}
               holidayHours={holidayHours}
-              otherLeave={displayedOtherLeave}
+              otherLeave={otherLeave}
               projects={memberDetailedData?.projects || []}
             />
           </PopoverContent>
@@ -372,12 +385,16 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
                 <MultiLeaveBadgeCell
                   annualLeave={annualLeave}
                   holidayHours={holidayHours}
-                  otherLeave={displayedOtherLeave}
+                  otherLeave={otherLeave}
                   remarks={remarks}
                   leaveDays={leaveDays}
                   className="px-0.5 py-0.5"
-                  editableOther={editableOtherLeave}
-                  onOtherLeaveChange={handleOtherLeaveChange}
+                  editableOther={true}
+                  onOtherLeaveChange={async (value: number) => {
+                    if (updateOtherLeave) {
+                      await updateOtherLeave(member.id, value);
+                    }
+                  }}
                   compact
                 />
               </div>
@@ -385,7 +402,30 @@ export const CompactRowView: React.FC<CompactRowViewProps> = ({
             <TooltipContent 
               className="z-[250] max-w-xs px-3 py-2 bg-white border border-gray-200 shadow-xl"
             >
-              {annualLeaveTooltip}
+              <div className="space-y-2 text-xs">
+                <p className="font-semibold mb-2">Leave Breakdown</p>
+                {annualLeave > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-green-600">Annual Leave:</span>
+                    <span className="font-medium">{annualLeave}h</span>
+                  </div>
+                )}
+                {holidayHours > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-purple-600">Holiday Hours:</span>
+                    <span className="font-medium">{holidayHours}h</span>
+                  </div>
+                )}
+                {otherLeave > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-orange-600">Other Leave:</span>
+                    <span className="font-medium">{otherLeave}h</span>
+                  </div>
+                )}
+                {annualLeave === 0 && holidayHours === 0 && otherLeave === 0 && (
+                  <p className="text-gray-500">No leave this week</p>
+                )}
+              </div>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

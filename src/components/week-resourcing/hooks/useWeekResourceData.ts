@@ -5,6 +5,7 @@ import { useWeekResourceProjects } from './useWeekResourceProjects';
 import { useComprehensiveAllocations } from './useComprehensiveAllocations';
 import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
 import { useWeeklyLeaveDetails } from './useWeeklyLeaveDetails';
+import { useWeeklyOtherLeaveData } from './useWeeklyOtherLeaveData';
 import { format } from 'date-fns';
 
 export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
@@ -41,6 +42,13 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     weekStartDate, 
     memberIds 
   });
+
+  // Fetch other leave data with update functionality
+  const { 
+    otherLeaveData = {}, 
+    isLoading: isLoadingOtherLeave,
+    updateOtherLeave 
+  } = useWeeklyOtherLeaveData(weekStartDate, memberIds);
 
   // Create allocation map
   const allocationMap = useMemo(() => {
@@ -85,7 +93,7 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     };
   }, [weeklyLeaveDetails]);
 
-  const isLoading = isLoadingMembers || isLoadingProjects || isLoadingLeave;
+  const isLoading = isLoadingMembers || isLoadingProjects || isLoadingLeave || isLoadingOtherLeave;
   const error = membersError || null;
 
   return {
@@ -99,6 +107,8 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     getProjectCount,
     getWeeklyLeave,
     annualLeaveData,
-    holidaysData
+    holidaysData,
+    otherLeaveData,
+    updateOtherLeave
   };
 };

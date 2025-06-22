@@ -40,6 +40,10 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     getProjectCount,
     getWeeklyLeave,
     allocationMap,
+    annualLeaveData,
+    holidaysData,
+    otherLeaveData,
+    updateOtherLeave,
     error
   } = useWeekResourceData(selectedWeek, filters);
 
@@ -250,11 +254,13 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             members={allMembers || []}
             projects={projects || []}
             allocationMap={allocationMap}
-            annualLeaveData={{}}
-            holidaysData={{}}
+            annualLeaveData={annualLeaveData}
+            holidaysData={holidaysData}
+            otherLeaveData={otherLeaveData}
             getMemberTotal={getMemberTotal}
             getProjectCount={getProjectCount}
             getWeeklyLeave={getWeeklyLeave}
+            updateOtherLeave={updateOtherLeave}
             viewMode="compact"
             selectedWeek={selectedWeek}
           />

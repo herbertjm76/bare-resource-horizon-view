@@ -10,9 +10,11 @@ interface NewResourceTableRowProps {
   allocationMap: Map<string, number>;
   annualLeaveData: Record<string, number>;
   holidaysData: Record<string, number>;
+  otherLeaveData?: Record<string, number>;
   getMemberTotal: (memberId: string) => number;
   getProjectCount: (memberId: string) => number;
   getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
+  updateOtherLeave?: (memberId: string, hours: number, notes?: string) => Promise<boolean>;
   viewMode?: 'compact' | 'expanded';
   onOtherLeaveEdit?: (memberId: string, value: number) => void;
   selectedWeek?: Date;
@@ -25,9 +27,11 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   allocationMap,
   annualLeaveData,
   holidaysData,
+  otherLeaveData = {},
   getMemberTotal,
   getProjectCount,
   getWeeklyLeave,
+  updateOtherLeave,
   viewMode = 'compact',
   onOtherLeaveEdit,
   selectedWeek = new Date(),
@@ -39,9 +43,11 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
     allocationMap,
     annualLeaveData,
     holidaysData,
+    otherLeaveData,
     getMemberTotal,
     getProjectCount,
     getWeeklyLeave,
+    updateOtherLeave,
     onOtherLeaveEdit,
     selectedWeek,
   };
