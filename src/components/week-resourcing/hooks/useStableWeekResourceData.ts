@@ -1,5 +1,5 @@
 
-import { useMemo, useCallback, useRef } from 'react';
+import { useMemo, useCallback, useRef, useState, useEffect } from 'react';
 import { useWeekResourceTeamMembers } from './useWeekResourceTeamMembers';
 import { useWeekResourceProjects } from './useWeekResourceProjects';
 import { useComprehensiveAllocations } from './useComprehensiveAllocations';
@@ -50,90 +50,110 @@ export const useStableWeekResourceData = (selectedWeek: Date, filters: any) => {
     updateOtherLeave 
   } = useWeeklyOtherLeaveData(weekStartDate, memberIds);
 
-  // Create stable references using useRef to prevent recreation
-  const stableAllocationsRef = useRef(comprehensiveWeeklyAllocations);
-  const stableWeeklyLeaveDetailsRef = useRef(weeklyLeaveDetails);
+  // Use simple state for stable data instead of refs with JSON comparison
+  const [stableAllocations, setStableAllocations] = useState(comprehensiveWeeklyAllocations);
+  const [stableLeaveDetails, setStableLeaveDetails] = useState(weeklyLeaveDetails);
   
-  // Only update refs when data actually changes
-  useMemo(() => {
-    if (JSON.stringify(stableAllocationsRef.current) !== JSON.stringify(comprehensiveWeeklyAllocations)) {
-      stableAllocationsRef.current = comprehensiveWeeklyAllocations;
+  // Update stable data only when the length or first/last items change (simpler comparison)
+  useEffect(() => {
+    if (comprehensiveWeeklyAllocations.length !== stableAllocations.length ||
+        (comprehensiveWeeklyAllocations.length > 0 && stableAllocations.length > 0 &&
+         comprehensiveWeeklyAllocations[0]?.id !== stableAllocations[0]?.id)) {
+      setStableAllocations(comprehensiveWeeklyAllocations);
     }
-  }, [comprehensiveWeeklyAllocations]);
+  }, [comprehensiveWeeklyAllocations, stableAllocations]);
 
-  useMemo(() => {
-    if (JSON.stringify(stableWeeklyLeaveDetailsRef.current) !== JSON.stringify(weeklyLeaveDetails)) {
-      stableWeeklyLeaveDetailsRef.current = weeklyLeaveDetails;
+  useEffect(() => {
+    const newKeys = Object.keys(weeklyLeaveDetails);
+    const oldKeys = Object.keys(stableLeaveDetails);
+    if (newKeys.length !== oldKeys.length || newKeys.some(key => !oldKeys.includes(key))) {
+      setStableLeaveDetails(weeklyLeaveDetails);
     }
-  }, [weeklyLeaveDetails]);
+  }, [weeklyLeaveDetails, stableLeaveDetails]);
 
   // Create allocation map - memoize to prevent unnecessary recalculations
   const allocationMap = useMemo(() => {
     const map = new Map<string, number>();
-    stableAllocationsRef.current.forEach(allocation => {
+    stableAllocations.forEach(allocation => {
       const key = `${allocation.resource_id}:${allocation.project_id}`;
       map.set(key, allocation.hours || 0);
     });
     return map;
-  }, [stableAllocationsRef.current]);
+  }, [stableAllocations]);
 
-  // Create stable callback functions with useCallback and dependency on refs
+  // Create stable callback functions with useCallback
   const getMemberTotal = useCallback((memberId: string) => {
     let total = 0;
-    stableAllocationsRef.current.forEach(allocation => {
+    stableAllocations.forEach(allocation => {
       if (allocation.resource_id === memberId) {
         total += allocation.hours || 0;
       }
     });
     return total;
-  }, []);
+  }, [stableAllocations]);
 
   const getProjectCount = useCallback((memberId: string) => {
     const uniqueProjects = new Set<string>();
-    stableAllocationsRef.current.forEach(allocation => {
+    stableAllocations.forEach(allocation => {
       if (allocation.resource_id === memberId && (allocation.hours || 0) > 0) {
         uniqueProjects.add(allocation.project_id);
       }
     });
     return uniqueProjects.size;
-  }, []);
+  }, [stableAllocations]);
 
   const getWeeklyLeave = useCallback((memberId: string): Array<{ date: string; hours: number }> => {
-    return stableWeeklyLeaveDetailsRef.current[memberId] || [];
-  }, []);
+    return stableLeaveDetails[memberId] || [];
+  }, [stableLeaveDetails]);
 
   const isLoading = isLoadingMembers || isLoadingProjects || isLoadingLeave || isLoadingOtherLeave;
   const error = membersError || null;
 
-  // Create a completely stable return object
-  const stableReturnValue = useMemo(() => ({
-    allMembers: members || [],
-    projects: projects || [],
-    allocations: stableAllocationsRef.current,
-    isLoading,
-    error,
-    allocationMap,
-    getMemberTotal,
-    getProjectCount,
-    getWeeklyLeave,
-    annualLeaveData,
-    holidaysData,
-    otherLeaveData,
-    updateOtherLeave
-  }), [
-    members,
-    projects,
-    isLoading,
-    error,
-    allocationMap,
-    getMemberTotal,
-    getProjectCount,
-    getWeeklyLeave,
-    annualLeaveData,
-    holidaysData,
-    otherLeaveData,
-    updateOtherLeave
-  ]);
+  // Return stable object - use refs to prevent recreation
+  const returnValueRef = useRef({
+    allMembers: [],
+    projects: [],
+    allocations: [],
+    isLoading: true,
+    error: null,
+    allocationMap: new Map(),
+    getMemberTotal: () => 0,
+    getProjectCount: () => 0,
+    getWeeklyLeave: () => [],
+    annualLeaveData: {},
+    holidaysData: {},
+    otherLeaveData: {},
+    updateOtherLeave: undefined
+  });
 
-  return stableReturnValue;
+  // Only update the return value when essential data changes
+  const shouldUpdate = 
+    returnValueRef.current.allMembers !== members ||
+    returnValueRef.current.projects !== projects ||
+    returnValueRef.current.isLoading !== isLoading ||
+    returnValueRef.current.error !== error ||
+    returnValueRef.current.annualLeaveData !== annualLeaveData ||
+    returnValueRef.current.holidaysData !== holidaysData ||
+    returnValueRef.current.otherLeaveData !== otherLeaveData ||
+    returnValueRef.current.updateOtherLeave !== updateOtherLeave;
+
+  if (shouldUpdate) {
+    returnValueRef.current = {
+      allMembers: members || [],
+      projects: projects || [],
+      allocations: stableAllocations,
+      isLoading,
+      error,
+      allocationMap,
+      getMemberTotal,
+      getProjectCount,
+      getWeeklyLeave,
+      annualLeaveData,
+      holidaysData,
+      otherLeaveData,
+      updateOtherLeave
+    };
+  }
+
+  return returnValueRef.current;
 };
