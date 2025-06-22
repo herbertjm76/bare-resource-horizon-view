@@ -44,9 +44,25 @@
 }
 
 .workload-grid-header.week-column {
-  min-width: 80px;
-  max-width: 80px;
-  width: 80px;
+  min-width: 50px;
+  max-width: 50px;
+  width: 50px;
+  height: 80px;
+  padding: 4px 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Rotated week header text */
+.workload-grid-header.week-column > div {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-90deg);
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .workload-grid-header.total-column {
@@ -70,11 +86,11 @@
 
 /* Cell styles */
 .workload-grid-cell {
-  padding: 8px;
+  padding: 4px;
   border-right: 1px solid #e5e7eb;
   text-align: center;
   vertical-align: middle;
-  height: 60px;
+  height: 50px;
 }
 
 .workload-grid-cell.member-cell {
@@ -89,10 +105,10 @@
 }
 
 .workload-grid-cell.week-cell {
-  min-width: 80px;
-  max-width: 80px;
-  width: 80px;
-  padding: 4px;
+  min-width: 50px;
+  max-width: 50px;
+  width: 50px;
+  padding: 2px;
 }
 
 .workload-grid-cell.total-cell {
@@ -101,26 +117,26 @@
   border-right: none;
 }
 
-/* Square workload pills */
+/* Compact square workload pills */
 .workload-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
+  width: 44px;
   height: 40px;
-  border-radius: 6px;
-  font-size: 12px;
+  border-radius: 4px;
+  font-size: 10px;
   font-weight: 600;
   color: white;
   cursor: help;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .workload-pill:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
 .workload-pill.empty {
@@ -194,10 +210,23 @@
     padding: 8px 12px;
   }
   
+  .workload-grid-header.week-column {
+    min-width: 45px;
+    max-width: 45px;
+    width: 45px;
+    height: 75px;
+  }
+  
+  .workload-grid-cell.week-cell {
+    min-width: 45px;
+    max-width: 45px;
+    width: 45px;
+  }
+  
   .workload-pill {
-    width: 48px;
+    width: 40px;
     height: 36px;
-    font-size: 11px;
+    font-size: 9px;
   }
   
   .member-avatar {

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -67,13 +66,8 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
                   key={week.key} 
                   className="workload-grid-header week-column"
                 >
-                  <div className="flex flex-col items-center">
-                    <span className="text-xs font-medium">
-                      Week of
-                    </span>
-                    <span className="text-xs">
-                      {format(week.date, 'MMM d')}
-                    </span>
+                  <div>
+                    {format(week.date, 'MMM d')}
                   </div>
                 </th>
               ))}
