@@ -20,7 +20,6 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
       console.log('🔍 Jingjing Kim Avatar Debug:');
       console.log('- avatar_url from member:', member.avatar_url);
       console.log('- member keys:', Object.keys(member));
-      console.log('- full member object:', member);
     }
     
     // Always try to access avatar_url directly from the member object
@@ -33,11 +32,25 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
   const avatarUrl = getAvatarUrl(member);
   const initials = getUserInitials(member);
 
-  // Debug logging for Jingjing Kim specifically
+  // Debug logging for Jingjing Kim specifically - now with more detail
   if (member.first_name?.toLowerCase() === 'jingjing' && member.last_name?.toLowerCase() === 'kim') {
     console.log('🖼️ Final avatar rendering for Jingjing Kim:');
     console.log('- Final avatarUrl:', avatarUrl);
     console.log('- Initials fallback:', initials);
+    console.log('- Testing image accessibility...');
+    
+    // Test if the image is accessible
+    if (avatarUrl) {
+      const img = new Image();
+      img.onload = () => {
+        console.log('✅ Image loaded successfully from:', avatarUrl);
+      };
+      img.onerror = (error) => {
+        console.log('❌ Image failed to load from:', avatarUrl);
+        console.log('Error details:', error);
+      };
+      img.src = avatarUrl;
+    }
   }
 
   return (
@@ -45,15 +58,20 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
       <AvatarImage 
         src={avatarUrl} 
         alt={`${member.first_name} ${member.last_name}`}
-        onLoad={() => {
+        onLoad={(e) => {
           if (member.first_name?.toLowerCase() === 'jingjing' && member.last_name?.toLowerCase() === 'kim') {
-            console.log('✅ Jingjing Kim avatar loaded successfully!');
+            console.log('✅ AvatarImage onLoad triggered for Jingjing Kim');
+            console.log('- Image element:', e.target);
+            console.log('- naturalWidth:', (e.target as HTMLImageElement).naturalWidth);
+            console.log('- naturalHeight:', (e.target as HTMLImageElement).naturalHeight);
           }
         }}
         onError={(e) => {
           if (member.first_name?.toLowerCase() === 'jingjing' && member.last_name?.toLowerCase() === 'kim') {
-            console.log('❌ Jingjing Kim avatar failed to load:', e);
+            console.log('❌ AvatarImage onError triggered for Jingjing Kim');
+            console.log('- Error target:', e.target);
             console.log('- Attempted URL:', avatarUrl);
+            console.log('- Error type:', e.type);
           }
         }}
       />
