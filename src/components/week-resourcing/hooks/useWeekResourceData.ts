@@ -4,6 +4,7 @@ import { useWeekResourceTeamMembers } from './useWeekResourceTeamMembers';
 import { useWeekResourceProjects } from './useWeekResourceProjects';
 import { useComprehensiveAllocations } from './useComprehensiveAllocations';
 import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
+import { useWeeklyLeaveDetails } from './useWeeklyLeaveDetails';
 import { format } from 'date-fns';
 
 export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
@@ -31,6 +32,12 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     holidaysData = {}, 
     isLoading: isLoadingLeave 
   } = useWeekResourceLeaveData({ 
+    weekStartDate, 
+    memberIds 
+  });
+
+  // Fetch detailed leave data for proper formatting
+  const { weeklyLeaveDetails = {} } = useWeeklyLeaveDetails({ 
     weekStartDate, 
     memberIds 
   });
@@ -71,12 +78,12 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     };
   }, [comprehensiveWeeklyAllocations]);
 
-  // Create a simple getWeeklyLeave function
+  // Create a proper getWeeklyLeave function that returns the expected array format
   const getWeeklyLeave = useMemo(() => {
-    return (memberId: string) => {
-      return annualLeaveData[memberId] || 0;
+    return (memberId: string): Array<{ date: string; hours: number }> => {
+      return weeklyLeaveDetails[memberId] || [];
     };
-  }, [annualLeaveData]);
+  }, [weeklyLeaveDetails]);
 
   const isLoading = isLoadingMembers || isLoadingProjects || isLoadingLeave;
   const error = membersError || null;
