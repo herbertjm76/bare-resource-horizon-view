@@ -54,11 +54,11 @@ export const useStableWeekResourceData = (selectedWeek: Date, filters: any) => {
   const [stableAllocations, setStableAllocations] = useState(comprehensiveWeeklyAllocations);
   const [stableLeaveDetails, setStableLeaveDetails] = useState(weeklyLeaveDetails);
   
-  // Update stable data only when the length or first/last items change (simpler comparison)
+  // Update stable data only when the length or key allocations change
   useEffect(() => {
     if (comprehensiveWeeklyAllocations.length !== stableAllocations.length ||
         (comprehensiveWeeklyAllocations.length > 0 && stableAllocations.length > 0 &&
-         comprehensiveWeeklyAllocations[0]?.id !== stableAllocations[0]?.id)) {
+         comprehensiveWeeklyAllocations[0]?.resource_id !== stableAllocations[0]?.resource_id)) {
       setStableAllocations(comprehensiveWeeklyAllocations);
     }
   }, [comprehensiveWeeklyAllocations, stableAllocations]);
@@ -117,13 +117,13 @@ export const useStableWeekResourceData = (selectedWeek: Date, filters: any) => {
     isLoading: true,
     error: null,
     allocationMap: new Map(),
-    getMemberTotal: () => 0,
-    getProjectCount: () => 0,
-    getWeeklyLeave: () => [],
+    getMemberTotal: (memberId: string) => 0,
+    getProjectCount: (memberId: string) => 0,
+    getWeeklyLeave: (memberId: string) => [] as Array<{ date: string; hours: number }>,
     annualLeaveData: {},
     holidaysData: {},
     otherLeaveData: {},
-    updateOtherLeave: undefined
+    updateOtherLeave: undefined as typeof updateOtherLeave
   });
 
   // Only update the return value when essential data changes
