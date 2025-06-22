@@ -108,7 +108,6 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   };
 
   const metrics = calculateWeeklyMetrics();
-  const isCurrentWeek = isThisWeek(selectedWeek);
 
   if (error) {
     return (
@@ -142,8 +141,13 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       <Card className="border-none shadow-sm bg-white">
         <CardContent className="p-4">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-            {/* Search and Filters */}
-            <div className="flex items-center gap-2">
+            {/* Week Selector and Search - reordered */}
+            <div className="flex items-center gap-4">
+              <WeekStartSelector
+                selectedWeek={selectedWeek}
+                onWeekChange={handleWeekChange}
+              />
+
               <div className="relative">
                 <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <Input
@@ -173,19 +177,6 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                   <X className="h-4 w-4" />
                   Clear ({activeFiltersCount})
                 </Button>
-              )}
-            </div>
-
-            {/* Week Selector with Current Week Badge */}
-            <div className="flex items-center gap-2">
-              <WeekStartSelector
-                selectedWeek={selectedWeek}
-                onWeekChange={handleWeekChange}
-              />
-              {isCurrentWeek && (
-                <Badge variant="default" className="ml-2">
-                  Current Week
-                </Badge>
               )}
             </div>
           </div>

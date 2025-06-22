@@ -78,10 +78,6 @@ export const WeekStartSelector: React.FC<WeekStartSelectorProps> = ({
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
-      
-      <div className="text-xs text-muted-foreground">
-        Starting week for 36-week analysis
-      </div>
     </div>
   );
 };
