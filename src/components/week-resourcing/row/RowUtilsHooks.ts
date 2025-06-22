@@ -54,6 +54,9 @@ export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberI
   // Use the actual other leave data as the displayed value
   const displayedOtherLeave = otherLeave;
   
+  // Check if other leave editing is available
+  const editableOtherLeave = typeof props.updateOtherLeave === "function";
+  
   const remarks = useMemo(() => '', []);
 
   const handleOtherLeaveChange = useCallback(async (value: number) => {
@@ -87,6 +90,7 @@ export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberI
     otherLeave,
     leaveDays,
     displayedOtherLeave,
+    editableOtherLeave,
     remarks,
     handleOtherLeaveChange,
     getProjectBreakdown
@@ -99,6 +103,7 @@ export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberI
     otherLeave,
     leaveDays,
     displayedOtherLeave,
+    editableOtherLeave,
     remarks,
     handleOtherLeaveChange,
     getProjectBreakdown
