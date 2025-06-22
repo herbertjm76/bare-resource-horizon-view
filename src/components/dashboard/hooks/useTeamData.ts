@@ -35,7 +35,7 @@ export const useTeamData = (companyId?: string) => {
       // Fetch pre-registered members from invites table with avatar_url
       const { data: invitesData, error: invitesError } = await supabase
         .from('invites')
-        .select('*, avatar_url')
+        .select('*')
         .eq('company_id', companyId)
         .eq('status', 'pending')
         .eq('invitation_type', 'pre_registered');
@@ -46,7 +46,14 @@ export const useTeamData = (companyId?: string) => {
       }
 
       console.log('Pre-registered members fetched:', invitesData?.length || 0);
-      console.log('Pre-registered members with avatars:', invitesData?.map(m => ({ name: `${m.first_name} ${m.last_name}`, avatar_url: m.avatar_url })));
+      
+      // Log specific info for Jingjing Kim to verify avatar URL
+      const jingjingMember = invitesData?.find(m => 
+        m.first_name?.toLowerCase() === 'jingjing' && m.last_name?.toLowerCase() === 'kim'
+      );
+      if (jingjingMember) {
+        console.log('Jingjing Kim avatar URL:', jingjingMember.avatar_url);
+      }
 
       setTeamMembers(membersData || []);
       setPreRegisteredMembers(invitesData || []);

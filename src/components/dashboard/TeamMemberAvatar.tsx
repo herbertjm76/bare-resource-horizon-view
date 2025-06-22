@@ -15,19 +15,10 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
   };
 
   const getAvatarUrl = (member: TeamMember): string | undefined => {
-    console.log('=== Avatar Debug Info ===');
-    console.log('Member:', member.first_name, member.last_name);
-    console.log('Member object keys:', Object.keys(member));
-    console.log('Has isPending property:', 'isPending' in member);
-    console.log('isPending value:', (member as any).isPending);
-    console.log('Direct avatar_url access:', member.avatar_url);
-    console.log('Member type check - has avatar_url in member:', 'avatar_url' in member);
-    
     // Always try to access avatar_url directly from the member object
     const avatarUrl = member.avatar_url;
-    console.log('Final avatar URL:', avatarUrl);
-    console.log('========================');
     
+    // Return the avatar URL if it exists, undefined otherwise
     return avatarUrl || undefined;
   };
 
