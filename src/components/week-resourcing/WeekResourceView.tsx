@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,12 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   filters,
   onFilterChange
 }) => {
+  // Stabilize filters to prevent unnecessary re-renders
+  const stableFilters = useMemo(() => ({
+    office: filters.office,
+    searchTerm: filters.searchTerm
+  }), [filters.office, filters.searchTerm]);
+
   const { 
     allMembers, 
     projects, 
@@ -45,27 +51,27 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     otherLeaveData,
     updateOtherLeave,
     error
-  } = useWeekResourceData(selectedWeek, filters);
+  } = useWeekResourceData(selectedWeek, stableFilters);
 
-  const handleWeekChange = (date: Date) => {
+  const handleWeekChange = useMemo(() => (date: Date) => {
     setSelectedWeek(date);
     if (onWeekChange) {
       onWeekChange(date);
     }
-  };
+  }, [setSelectedWeek, onWeekChange]);
 
-  const clearFilters = () => {
+  const clearFilters = useMemo(() => () => {
     onFilterChange('office', 'all');
     onFilterChange('searchTerm', '');
-  };
+  }, [onFilterChange]);
 
-  const activeFiltersCount = [
+  const activeFiltersCount = useMemo(() => [
     filters.office !== 'all' ? 'office' : '',
     filters.searchTerm ? 'search' : ''
-  ].filter(Boolean).length;
+  ].filter(Boolean).length, [filters.office, filters.searchTerm]);
 
-  // Calculate weekly metrics
-  const calculateWeeklyMetrics = () => {
+  // Calculate weekly metrics with memoization
+  const metrics = useMemo(() => {
     if (!allMembers || allMembers.length === 0) {
       return {
         totalCapacity: 0,
@@ -109,9 +115,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       underUtilizedMembers,
       availableHours
     };
-  };
-
-  const metrics = calculateWeeklyMetrics();
+  }, [allMembers, getMemberTotal]);
 
   if (error) {
     return (
