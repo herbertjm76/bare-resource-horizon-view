@@ -52,8 +52,6 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
           <tr className="border-b border-gray-200">
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Member</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Role</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Department</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Location</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Status</th>
             {editMode && <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Actions</th>}
           </tr>
@@ -73,13 +71,7 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
                       <Mail className="h-5 w-5" />
                     </div>
                     <div>
-                      <div className="font-medium text-gray-900">
-                        {invite.first_name && invite.last_name 
-                          ? `${invite.first_name} ${invite.last_name}` 
-                          : 'Pending Member'}
-                      </div>
-                      <div className="text-sm text-gray-500 flex items-center gap-1">
-                        <Mail className="h-3 w-3" />
+                      <div className="text-sm text-gray-900">
                         {invite.email}
                       </div>
                     </div>
@@ -89,16 +81,6 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
                   <Badge className={`${getRoleBadgeColor(invite.role)} border`}>
                     {invite.role?.charAt(0).toUpperCase() + invite.role?.slice(1) || 'Member'}
                   </Badge>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="text-sm text-gray-900">
-                    {invite.department || '-'}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <span className="text-sm text-gray-900">
-                    {invite.location || '-'}
-                  </span>
                 </td>
                 <td className="px-4 py-3">
                   <Badge 
