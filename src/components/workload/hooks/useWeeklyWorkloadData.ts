@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { TeamMember } from '@/components/dashboard/types';
@@ -6,7 +5,7 @@ import { useComprehensiveAllocations } from '@/components/week-resourcing/hooks/
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useOfficeHolidays } from './useOfficeHolidays';
-import { format, startOfWeek, addWeeks, endOfWeek } from 'date-fns';
+import { format, startOfWeek, addWeeks, endOfWeek, subWeeks } from 'date-fns';
 
 export interface WeeklyWorkloadBreakdown {
   projectHours: number;
@@ -16,15 +15,16 @@ export interface WeeklyWorkloadBreakdown {
   total: number;
 }
 
-export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], periodWeeks: number = 4) => {
+export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMember[], periodWeeks: number = 36) => {
   const [weeklyWorkloadData, setWeeklyWorkloadData] = useState<Record<string, Record<string, WeeklyWorkloadBreakdown>>>({});
   const [isLoadingWorkload, setIsLoadingWorkload] = useState<boolean>(true);
   const { company } = useCompany();
 
-  // Generate week start dates for the period
+  // Generate week start dates for the period, starting from current week minus 1
   const weekStartDates = useMemo(() => {
     const weeks = [];
-    const startWeek = startOfWeek(selectedDate, { weekStartsOn: 1 });
+    const currentWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const startWeek = subWeeks(currentWeek, 1); // Start from current week minus 1
     
     for (let i = 0; i < periodWeeks; i++) {
       const weekStart = addWeeks(startWeek, i);
@@ -35,7 +35,7 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
     }
     
     return weeks;
-  }, [selectedDate, periodWeeks]);
+  }, [periodWeeks]); // Remove selectedDate dependency since we're using current week
 
   // Get member IDs
   const memberIds = useMemo(() => teamMembers.map(member => member.id), [teamMembers]);
@@ -61,8 +61,7 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
             projects (
               id,
               name,
-              current_stage,
-              end_date
+              current_stage
             )
           `)
           .eq('company_id', company.id)
@@ -131,7 +130,7 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
 
   // Fetch holiday data for the entire period
   const { data: holidaysData, isLoading: isLoadingHolidays } = useOfficeHolidays(
-    selectedDate, 
+    weekStartDates[0]?.date || new Date(), 
     teamMembers, 
     company?.id, 
     periodWeeks

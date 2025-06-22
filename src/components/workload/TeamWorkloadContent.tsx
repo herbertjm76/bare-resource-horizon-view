@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,7 +48,8 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   onPreviousWeek,
   onNextWeek
 }) => {
-  const [periodWeeks, setPeriodWeeks] = useState<number>(4);
+  // Fixed to 36 weeks as requested
+  const periodWeeks = 36;
   
   // Use the new weekly workload data hook
   const { 
@@ -74,48 +75,6 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
       <Card className="border-none shadow-sm bg-white">
         <CardContent className="p-4">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-            {/* Week Navigation */}
-            <div className="flex items-center gap-3">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={onPreviousWeek}
-                className="h-8"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              
-              <div className="flex items-center gap-2 min-w-[200px]">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="font-medium text-sm">{weekLabel}</span>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={onNextWeek}
-                className="h-8"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Period Selection */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Show weeks:</span>
-              <Select value={periodWeeks.toString()} onValueChange={(value) => setPeriodWeeks(parseInt(value))}>
-                <SelectTrigger className="w-20 h-8">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2">2</SelectItem>
-                  <SelectItem value="4">4</SelectItem>
-                  <SelectItem value="6">6</SelectItem>
-                  <SelectItem value="8">8</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
             {/* Search and Filters */}
             <div className="flex items-center gap-2">
               <div className="relative">

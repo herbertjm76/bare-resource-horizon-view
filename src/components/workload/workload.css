@@ -1,11 +1,14 @@
 
+/* Import the new grid styles */
+@import './workload-grid.css';
+
 /* Additional workload specific styles */
 .workload-header {
   background-color: #D2C6FB;
   border-bottom: 2px solid #e5e7eb;
 }
 
-/* Intensity colors for workload cells - standardized to #6F4BF6 */
+/* Legacy styles for backwards compatibility */
 .workload-high {
   background-color: rgba(111, 75, 246, 0.9) !important;
   color: white;
@@ -19,111 +22,13 @@
   background-color: rgba(111, 75, 246, 0.3) !important;
 }
 
-/* Enhanced workload pill styling */
-.workload-pill {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  min-width: 24px;
-  transition: all 0.15s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.workload-pill:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.25);
-}
-
-/* Cell hover effect for workload */
-.workload-cell:hover {
-  outline: 2px solid rgba(111, 75, 246, 0.5);
-  outline-offset: -2px;
-  z-index: 5;
-  position: relative;
-}
-
-/* Total column styling */
-.total-column {
-  background-color: #D2C6FB;
-  font-weight: 500;
-}
-
-/* Special styling for overallocated members */
-.overallocated {
-  color: #e11d48;
-}
-
 /* Sunday border class for the calendar grid */
 .sunday-border {
   border-left-width: 2px !important;
   border-left-color: rgba(111, 75, 246, 0.3) !important;
 }
 
-/* Workload grid container with responsive width and horizontal scrollbar */
-.workload-grid-container {
-  width: calc(100vw - 22rem);
-  max-width: calc(100vw - 22rem);
-  overflow-x: auto;
-  overflow-y: visible;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: 1px;
-  border-radius: 0.5rem;
-}
-
-.workload-grid-container::-webkit-scrollbar {
-  height: 12px;
-}
-
-.workload-grid-container::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 6px;
-}
-
-.workload-grid-container::-webkit-scrollbar-thumb {
-  background: #94a3b8;
-  border-radius: 6px;
-  border: 2px solid #f1f5f9;
-}
-
-.workload-grid-container::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-/* Firefox scrollbar styling */
-.workload-grid-container {
-  scrollbar-width: thin;
-  scrollbar-color: #94a3b8 #f1f5f9;
-}
-
-/* Workload calendar table styling */
-.workload-calendar {
-  min-width: max-content;
-  width: 100%;
-}
-
-/* Mobile-specific scrollbar improvements for workload */
-@media (max-width: 640px) {
-  .workload-grid-container {
-    width: 100vw;
-    max-width: 100vw;
-    margin-left: calc(-1rem);
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-  
-  .workload-grid-container::-webkit-scrollbar {
-    height: 8px;
-  }
-  
-  .workload-grid-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-    border: 1px solid #f1f5f9;
-  }
-  
-  .workload-grid-container::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
-  
-  .workload-calendar {
-    min-width: 800px;
-  }
+/* Special styling for overallocated members */
+.overallocated {
+  color: #e11d48;
 }
