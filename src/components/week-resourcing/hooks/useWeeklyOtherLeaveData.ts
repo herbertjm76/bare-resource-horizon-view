@@ -46,7 +46,7 @@ export const useWeeklyOtherLeaveData = (
     },
     enabled: !!company?.id && memberIds.length > 0 && enabled,
     staleTime: 2 * 60 * 1000, // 2 minutes
-    cacheTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const updateOtherLeaveMutation = useMutation({

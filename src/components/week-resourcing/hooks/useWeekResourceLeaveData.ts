@@ -86,7 +86,7 @@ export const useWeekResourceLeaveData = ({
     },
     enabled: !!company?.id && memberIds.length > 0 && enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   return {
