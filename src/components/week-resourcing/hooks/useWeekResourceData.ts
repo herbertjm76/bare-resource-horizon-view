@@ -70,22 +70,24 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     return totalsMap;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Create stable project count map to avoid recalculation
+  // Create stable project count map to avoid recalculation - FIXED
   const projectCountMap = useMemo(() => {
-    const countMap = new Map<string, number>();
+    const projectSetsMap = new Map<string, Set<string>>();
+    
     comprehensiveWeeklyAllocations.forEach(allocation => {
       if ((allocation.hours || 0) > 0) {
-        const current = countMap.get(allocation.resource_id) || new Set<string>();
+        const current = projectSetsMap.get(allocation.resource_id) || new Set<string>();
         current.add(allocation.project_id);
-        countMap.set(allocation.resource_id, current);
+        projectSetsMap.set(allocation.resource_id, current);
       }
     });
     
     // Convert sets to counts
     const finalCountMap = new Map<string, number>();
-    countMap.forEach((projectSet, memberId) => {
+    projectSetsMap.forEach((projectSet, memberId) => {
       finalCountMap.set(memberId, projectSet.size);
     });
+    
     return finalCountMap;
   }, [comprehensiveWeeklyAllocations]);
 
