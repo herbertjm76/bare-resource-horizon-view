@@ -1,66 +1,78 @@
 
-import React from 'react';
-import { TableRow, TableCell } from '@/components/ui/table';
-import { CapacityBar } from '../CapacityBar'; 
-import { ProjectAllocationCells } from './ProjectAllocationCells';
-import { format } from 'date-fns';
+import React, { memo, useMemo } from 'react';
+import { TableRow, TableCell } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { MultiLeaveBadgeCell } from './MultiLeaveBadgeCell';
+import { LongCapacityBar } from '../LongCapacityBar';
+import { RowData, useRowData } from './RowUtilsHooks';
+import { EnhancedUtilizationPopover } from './components/EnhancedUtilizationPopover';
+import { ProjectCellTooltip } from '../tooltips/ProjectCellTooltip';
+import { useDetailedWeeklyAllocations } from '../hooks/useDetailedWeeklyAllocations';
 
-interface MemoizedCompactRowViewProps {
-  member: any;
-  memberIndex: number;
-  projects: any[];
-  allocationMap: Map<string, number>;
-  annualLeaveData: Record<string, number>;
-  holidaysData: Record<string, number>;
-  otherLeaveData?: Record<string, number>;
-  getMemberTotal: (memberId: string) => number;
-  getProjectCount: (memberId: string) => number;
-  getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
-  updateOtherLeave?: (memberId: string, hours: number, notes?: string) => Promise<boolean>;
-  onOtherLeaveEdit?: (memberId: string, value: number) => void;
-  selectedWeek: Date;
-  viewMode: 'compact' | 'expanded';
+interface CompactRowViewProps extends RowData {
+  viewMode: 'compact';
+  selectedWeek?: Date;
 }
 
-export const CompactRowView: React.FC<MemoizedCompactRowViewProps> = React.memo(({
+const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   member,
   memberIndex,
   projects,
   allocationMap,
-  annualLeaveData,
-  holidaysData,
+  selectedWeek = new Date(),
   otherLeaveData = {},
-  getMemberTotal,
-  getProjectCount,
-  getWeeklyLeave,
   updateOtherLeave,
-  onOtherLeaveEdit,
-  selectedWeek,
-  viewMode
+  ...props
 }) => {
-  const isEvenRow = memberIndex % 2 === 0;
-  const rowBgClass = isEvenRow ? 'bg-white' : 'bg-gray-50/50';
-  
-  // Calculate totals using the provided functions
-  const totalProjectHours = getMemberTotal(member.id);
-  const projectCount = getProjectCount(member.id);
-  
-  // Get leave data
-  const annualLeave = annualLeaveData[member.id] || 0;
-  const holidayHours = holidaysData[member.id] || 0;
-  const otherLeave = otherLeaveData[member.id] || 0;
-  
-  // Calculate total used hours
-  const totalUsedHours = totalProjectHours + annualLeave + holidayHours + otherLeave;
-  const weeklyCapacity = member.weekly_capacity || 40;
-  
-  // Calculate utilization percentage
-  const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0;
-  
-  // Format week start date for allocations
-  const weekStartDate = format(selectedWeek, 'yyyy-MM-dd');
+  const {
+    weeklyCapacity,
+    totalUsedHours,
+    projectCount,
+    annualLeave,
+    holidayHours,
+    leaveDays,
+    editableOtherLeave,
+    displayedOtherLeave,
+    remarks,
+    handleOtherLeaveChange
+  } = useRowData(member, { 
+    projects, 
+    allocationMap, 
+    otherLeaveData,
+    updateOtherLeave,
+    ...props 
+  });
 
-  console.log(`CompactRowView for ${member.first_name} ${member.last_name}:`, {
+  // Get other leave from the new data source
+  const otherLeave = otherLeaveData[member.id] || 0;
+
+  // Fetch detailed allocations for enhanced tooltips
+  const { data: detailedAllocations } = useDetailedWeeklyAllocations(selectedWeek, [member.id]);
+  const memberDetailedData = detailedAllocations?.[member.id];
+
+  // Memoize member data to prevent recalculations
+  const memberData = useMemo(() => ({
+    initials: member ? `${(member.first_name || '').charAt(0)}${(member.last_name || '').charAt(0)}`.toUpperCase() : '??',
+    displayName: member ? `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed' : 'Unknown',
+    avatarUrl: member?.avatar_url,
+    utilizationPercentage: weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0
+  }), [member, weeklyCapacity, totalUsedHours]);
+
+  const memberTooltip = useMemo(() => (
+    <div className="space-y-1 text-xs">
+      <p className="font-semibold">{memberData.displayName}</p>
+      {member.role && <p>Role: {member.role}</p>}
+      {member.department && <p>Department: {member.department}</p>}
+      {member.location && <p>Location: {member.location}</p>}
+      {member.weekly_capacity && <p>Weekly Capacity: {member.weekly_capacity}h</p>}
+      {member.email && <p>Email: {member.email}</p>}
+    </div>
+  ), [memberData.displayName, member]);
+
+  // Debug logging for this member
+  console.log(`CompactRowView for ${memberData.displayName}:`, {
     memberId: member.id,
     projectsCount: projects.length,
     allocationMapSize: allocationMap.size,
@@ -69,93 +81,221 @@ export const CompactRowView: React.FC<MemoizedCompactRowViewProps> = React.memo(
   });
 
   return (
-    <TableRow className={`h-12 ${rowBgClass} hover:bg-gray-100/50 border-b`}>
-      {/* Team Member Name - Sticky */}
-      <TableCell className="font-medium sticky left-0 bg-inherit z-10 border-r" style={{ width: 180, minWidth: 180 }}>
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold">
-            {member.first_name} {member.last_name}
-          </span>
-          <span className="text-xs text-gray-500">{member.location || 'Unknown'}</span>
-        </div>
+    <TableRow
+      className={
+        `resource-table-row-compact ${memberIndex % 2 === 0 ? 'bg-white' : 'bg-slate-50/70'}
+        hover:bg-blue-50/80 transition-all duration-150 h-8 min-h-0`
+      }
+      style={{ fontSize: 12, minHeight: 28, height: 28, lineHeight: 1 }}
+    >
+      {/* Team Member consolidated cell - 180px fixed */}
+      <TableCell
+        className="border-r border-gray-200 px-2 py-0.5 name-column bg-gradient-to-r from-blue-50 to-indigo-50"
+        style={{ width: 180, minWidth: 180, maxWidth: 180, zIndex: 5 }}
+      >
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                className="flex items-center w-full gap-2 cursor-pointer"
+                style={{ width: '100%', minWidth: 0, height: '26px' }}
+                title={memberData.displayName}
+              >
+                <Avatar className="h-6 w-6 min-w-[24px] min-h-[24px]" >
+                  <AvatarImage 
+                    src={memberData.avatarUrl} 
+                    alt={memberData.displayName}
+                  />
+                  <AvatarFallback className="bg-[#6465F0] text-white text-[11px]">
+                    {memberData.initials}
+                  </AvatarFallback>
+                </Avatar>
+                <span
+                  className="font-semibold leading-tight"
+                  style={{
+                    fontSize: '15px',
+                    lineHeight: '1.2',
+                    maxWidth: 'calc(100% - 32px)',
+                    display: 'block',
+                    wordWrap: 'break-word',
+                    whiteSpace: 'normal',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxHeight: '2.4em',
+                  }}
+                  data-testid="compact-full-name"
+                >
+                  {memberData.displayName}
+                </span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent 
+              side="right" 
+              align="start" 
+              sideOffset={8}
+              className="z-[200] max-w-xs"
+              avoidCollisions={true}
+            >
+              {memberTooltip}
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </TableCell>
       
-      {/* Weekly Utilization */}
-      <TableCell className="text-center border-r" style={{ width: 200, minWidth: 200 }}>
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold">{totalUsedHours}h / {weeklyCapacity}h</span>
-            <span className={`font-bold ${utilizationPercentage > 100 ? 'text-red-600' : utilizationPercentage < 60 ? 'text-orange-500' : 'text-green-600'}`}>
-              {utilizationPercentage}%
-            </span>
-          </div>
-          <CapacityBar 
-            totalUsedHours={totalUsedHours} 
-            totalCapacity={weeklyCapacity}
-            className="h-2"
-          />
-        </div>
-      </TableCell>
-      
-      {/* Leave Summary */}
-      <TableCell className="text-center border-r" style={{ width: 150, minWidth: 150 }}>
-        <div className="flex flex-col gap-1 text-xs">
-          {annualLeave > 0 && (
-            <div className="flex justify-between">
-              <span>Annual:</span>
-              <span className="font-medium">{annualLeave}h</span>
+      {/* Utilization: 200px fixed Progress Bar with click-activated enhanced popover */}
+      <TableCell 
+        className="text-center border-r border-gray-200 px-1 py-0.5 utilization-column bg-gradient-to-r from-emerald-50 to-green-50"
+        style={{ width: 200, minWidth: 200, maxWidth: 200 }}
+      >
+        <Popover>
+          <PopoverTrigger asChild>
+            <div className="cursor-pointer">
+              <LongCapacityBar
+                totalUsedHours={totalUsedHours}
+                totalCapacity={weeklyCapacity}
+                compact
+              />
             </div>
-          )}
-          {holidayHours > 0 && (
-            <div className="flex justify-between">
-              <span>Holiday:</span>
-              <span className="font-medium">{holidayHours}h</span>
-            </div>
-          )}
-          {otherLeave > 0 && (
-            <div className="flex justify-between">
-              <span>Other:</span>
-              <span className="font-medium">{otherLeave}h</span>
-            </div>
-          )}
-          {(annualLeave + holidayHours + otherLeave) === 0 && (
-            <span className="text-gray-400">No leave</span>
-          )}
-        </div>
+          </PopoverTrigger>
+          <PopoverContent 
+            className="z-[250] max-w-lg px-4 py-3 bg-white border border-gray-200 shadow-xl"
+            side="top"
+            align="center"
+            sideOffset={5}
+          >
+            <EnhancedUtilizationPopover
+              memberName={memberData.displayName}
+              selectedWeek={selectedWeek}
+              totalUsedHours={totalUsedHours}
+              weeklyCapacity={weeklyCapacity}
+              utilizationPercentage={memberData.utilizationPercentage}
+              annualLeave={annualLeave}
+              holidayHours={holidayHours}
+              otherLeave={otherLeave}
+              projects={memberDetailedData?.projects || []}
+            />
+          </PopoverContent>
+        </Popover>
       </TableCell>
       
-      {/* Project Count */}
-      <TableCell className="text-center border-r" style={{ width: 35, minWidth: 35 }}>
-        <div className="flex items-center justify-center">
-          <span className={`inline-flex items-center justify-center w-6 h-6 text-xs font-bold rounded-full ${
-            projectCount > 0 
-              ? 'bg-purple-100 text-purple-800 border border-purple-300' 
-              : 'bg-gray-100 text-gray-500 border border-gray-300'
-          }`}>
-            {projectCount}
-          </span>
-        </div>
+      {/* Leave Badge Cells + editable Other - 150px fixed */}
+      <TableCell 
+        className="text-center border-r border-gray-200 px-0.5 py-0.5 bg-gradient-to-r from-yellow-50 to-orange-50 leave-column" 
+        style={{ width: 150, minWidth: 150, maxWidth: 150 }}
+      >
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="cursor-pointer">
+                <MultiLeaveBadgeCell
+                  annualLeave={annualLeave}
+                  holidayHours={holidayHours}
+                  otherLeave={otherLeave}
+                  remarks={remarks}
+                  leaveDays={leaveDays}
+                  className="px-0.5 py-0.5"
+                  editableOther={true}
+                  onOtherLeaveChange={async (value: number) => {
+                    if (updateOtherLeave) {
+                      await updateOtherLeave(member.id, value);
+                    }
+                  }}
+                  compact
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent 
+              className="z-[250] max-w-xs px-3 py-2 bg-white border border-gray-200 shadow-xl"
+            >
+              <div className="space-y-2 text-xs">
+                <p className="font-semibold mb-2">Leave Breakdown</p>
+                {annualLeave > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-green-600">Annual Leave:</span>
+                    <span className="font-medium">{annualLeave}h</span>
+                  </div>
+                )}
+                {holidayHours > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-purple-600">Holiday Hours:</span>
+                    <span className="font-medium">{holidayHours}h</span>
+                  </div>
+                )}
+                {otherLeave > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-orange-600">Other Leave:</span>
+                    <span className="font-medium">{otherLeave}h</span>
+                  </div>
+                )}
+                {annualLeave === 0 && holidayHours === 0 && otherLeave === 0 && (
+                  <p className="text-gray-500">No leave this week</p>
+                )}
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </TableCell>
+
+      {/* Project Count - 35px fixed */}
+      <TableCell 
+        className="text-center border-r border-gray-200 px-1 py-0.5 count-column bg-gradient-to-r from-gray-50 to-slate-50"
+        style={{ width: 35, minWidth: 35, maxWidth: 35 }}
+      >
+        <span className="inline-flex items-center justify-center w-7 h-6 bg-slate-500 text-white rounded-sm font-semibold text-[11px] shadow-sm">
+          {projectCount}
+        </span>
       </TableCell>
       
-      {/* Project Allocation Cells */}
-      <ProjectAllocationCells 
-        projects={projects}
-        member={member}
-        allocationMap={allocationMap}
-        weekStartDate={weekStartDate}
-      />
+      {/* Project Cells - all 35px fixed with enhanced tooltips */}
+      {projects.map((project) => {
+        const allocationKey = `${member.id}:${project.id}`;
+        const hours = allocationMap.get(allocationKey) || 0;
+        const projectDetailedData = memberDetailedData?.projects.find(p => p.project_id === project.id);
+        
+        return (
+          <TableCell
+            key={project.id}
+            className="text-center border-r border-gray-200 px-0.5 py-0.5 project-column bg-gradient-to-r from-purple-50 to-violet-50"
+            style={{ width: 35, minWidth: 35, maxWidth: 35 }}
+          >
+            {hours > 0 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex items-center justify-center w-6 h-6 bg-emerald-500 text-white rounded-sm font-semibold text-[11px] hover:bg-emerald-600 transition-colors duration-100 cursor-pointer">
+                      {hours}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent 
+                    className="z-[250] max-w-xs px-3 py-2 bg-white border border-gray-200 shadow-xl"
+                    side="top"
+                    align="center"
+                  >
+                    <ProjectCellTooltip
+                      projectName={project.name}
+                      projectCode={project.code}
+                      memberName={memberData.displayName}
+                      selectedWeek={selectedWeek}
+                      totalHours={hours}
+                      dailyBreakdown={projectDetailedData?.daily_breakdown}
+                    />
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </TableCell>
+        );
+      })}
     </TableRow>
   );
-}, (prevProps, nextProps) => {
-  // Optimized comparison for better performance
-  const memberChanged = prevProps.member.id !== nextProps.member.id;
-  const indexChanged = prevProps.memberIndex !== nextProps.memberIndex;
-  const allocationMapChanged = prevProps.allocationMap.size !== nextProps.allocationMap.size;
-  const projectsChanged = prevProps.projects.length !== nextProps.projects.length;
+};
+
+// Simplified memo comparison to be less strict
+export const CompactRowView = memo(CompactRowViewComponent, (prevProps, nextProps) => {
+  // Only compare the most essential props that actually change
+  const membersEqual = prevProps.member.id === nextProps.member.id;
+  const indexEqual = prevProps.memberIndex === nextProps.memberIndex;
+  const projectsEqual = prevProps.projects.length === nextProps.projects.length;
   
-  return !memberChanged && !indexChanged && !allocationMapChanged && !projectsChanged;
+  return membersEqual && indexEqual && projectsEqual;
 });
-
-CompactRowView.displayName = 'CompactRowView';
-
-export { CompactRowView as MemoizedCompactRowView };

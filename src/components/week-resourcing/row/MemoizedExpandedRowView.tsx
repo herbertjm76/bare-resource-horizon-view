@@ -1,161 +1,137 @@
 
-import React from 'react';
-import { TableRow, TableCell } from '@/components/ui/table';
-import { CapacityBar } from '../CapacityBar';
-import { ProjectAllocationCells } from './ProjectAllocationCells';
-import { format } from 'date-fns';
+import React, { memo } from 'react';
+import { TableRow, TableCell } from "@/components/ui/table";
+import { Badge } from '@/components/ui/badge';
+import { NameCell } from '../cells/NameCell';
+import { EnhancedTooltip } from '../EnhancedTooltip';
+import { MultiLeaveBadgeCell } from './MultiLeaveBadgeCell';
+import { LongCapacityBar } from '../LongCapacityBar';
+import { RowData, useRowData } from './RowUtilsHooks';
 
-interface MemoizedExpandedRowViewProps {
-  member: any;
-  memberIndex: number;
-  projects: any[];
-  allocationMap: Map<string, number>;
-  annualLeaveData: Record<string, number>;
-  holidaysData: Record<string, number>;
-  otherLeaveData?: Record<string, number>;
-  getMemberTotal: (memberId: string) => number;
-  getProjectCount: (memberId: string) => number;
-  getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
-  updateOtherLeave?: (memberId: string, hours: number, notes?: string) => Promise<boolean>;
-  onOtherLeaveEdit?: (memberId: string, value: number) => void;
-  selectedWeek: Date;
-  viewMode: 'compact' | 'expanded';
+interface ExpandedRowViewProps extends RowData {
+  viewMode: 'expanded';
 }
 
-export const ExpandedRowView: React.FC<MemoizedExpandedRowViewProps> = React.memo(({
+const ExpandedRowViewComponent: React.FC<ExpandedRowViewProps> = ({
   member,
   memberIndex,
   projects,
   allocationMap,
   annualLeaveData,
   holidaysData,
-  otherLeaveData = {},
+  otherLeaveData,
   getMemberTotal,
   getProjectCount,
   getWeeklyLeave,
   updateOtherLeave,
   onOtherLeaveEdit,
-  selectedWeek,
-  viewMode
 }) => {
-  const isEvenRow = memberIndex % 2 === 0;
-  const rowBgClass = isEvenRow ? 'bg-white' : 'bg-gray-50/50';
-  
-  // Calculate totals using the provided functions
-  const totalProjectHours = getMemberTotal(member.id);
-  const projectCount = getProjectCount(member.id);
-  
-  // Get leave data
-  const annualLeave = annualLeaveData[member.id] || 0;
-  const holidayHours = holidaysData[member.id] || 0;
-  const otherLeave = otherLeaveData[member.id] || 0;
-  const weeklyLeaveDetails = getWeeklyLeave(member.id);
-  
-  // Calculate total used hours
-  const totalUsedHours = totalProjectHours + annualLeave + holidayHours + otherLeave;
-  const weeklyCapacity = member.weekly_capacity || 40;
-  
-  // Calculate utilization percentage
-  const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0;
-  
-  // Format week start date for allocations
-  const weekStartDate = format(selectedWeek, 'yyyy-MM-dd');
+  const {
+    weeklyCapacity,
+    totalUsedHours,
+    projectCount,
+    annualLeave,
+    holidayHours,
+    leaveDays,
+    editableOtherLeave,
+    displayedOtherLeave,
+    remarks,
+    handleOtherLeaveChange,
+    getProjectBreakdown
+  } = useRowData(member, {
+    projects,
+    allocationMap,
+    annualLeaveData,
+    holidaysData,
+    otherLeaveData,
+    getMemberTotal,
+    getProjectCount,
+    getWeeklyLeave,
+    updateOtherLeave,
+    onOtherLeaveEdit,
+  });
 
   return (
-    <TableRow className={`h-16 ${rowBgClass} hover:bg-gray-100/50 border-b`}>
-      {/* Team Member Name - Sticky */}
-      <TableCell className="font-medium sticky left-0 bg-inherit z-10 border-r" style={{ width: 180, minWidth: 180 }}>
-        <div className="flex flex-col">
-          <span className="text-sm font-semibold">
-            {member.first_name} {member.last_name}
-          </span>
-          <span className="text-xs text-gray-500">{member.job_title || 'Unknown Role'}</span>
-          <span className="text-xs text-gray-400">{member.location || 'Unknown Location'}</span>
-        </div>
-      </TableCell>
-      
-      {/* Weekly Utilization - Expanded */}
-      <TableCell className="border-r" style={{ width: 200, minWidth: 200 }}>
+    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors duration-200 h-20 border-b`}>
+      {/* Name Cell */}
+      <TableCell className="border-r border-gray-200 px-4 py-3 min-w-[180px]">
         <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold">Total: {totalUsedHours}h / {weeklyCapacity}h</span>
-            <span className={`font-bold ${utilizationPercentage > 100 ? 'text-red-600' : utilizationPercentage < 60 ? 'text-orange-500' : 'text-green-600'}`}>
-              {utilizationPercentage}%
-            </span>
+          <div className="flex items-center gap-3">
+            <NameCell member={member} />
           </div>
-          <CapacityBar 
-            totalUsedHours={totalUsedHours} 
-            totalCapacity={weeklyCapacity}
-            className="h-3"
-          />
-          <div className="text-xs text-gray-600">
-            <div>Projects: {totalProjectHours}h ({projectCount} projects)</div>
-            <div>Leave: {annualLeave + holidayHours + otherLeave}h</div>
+          <div className="flex flex-wrap gap-1">
+            {member.office_location && (
+              <Badge variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
+                {member.office_location}
+              </Badge>
+            )}
+            <Badge variant="outline" className="text-xs px-2 py-0.5 bg-gray-50 text-gray-700 border-gray-200">
+              {weeklyCapacity}h capacity
+            </Badge>
+            {member.department && (
+              <Badge variant="outline" className="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 border-purple-200">
+                {member.department}
+              </Badge>
+            )}
           </div>
-        </div>
-      </TableCell>
-      
-      {/* Leave Details - Expanded */}
-      <TableCell className="border-r" style={{ width: 150, minWidth: 150 }}>
-        <div className="flex flex-col gap-1 text-xs">
-          <div className="flex justify-between">
-            <span>Annual:</span>
-            <span className="font-medium">{annualLeave}h</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Holiday:</span>
-            <span className="font-medium">{holidayHours}h</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Other:</span>
-            <span className="font-medium">{otherLeave}h</span>
-          </div>
-          {weeklyLeaveDetails.length > 0 && (
-            <div className="mt-1 pt-1 border-t">
-              <div className="text-xs text-gray-500 mb-1">Daily breakdown:</div>
-              {weeklyLeaveDetails.map((leave, idx) => (
-                <div key={idx} className="flex justify-between text-xs">
-                  <span>{format(new Date(leave.date), 'EEE')}</span>
-                  <span>{leave.hours}h</span>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </TableCell>
       
       {/* Project Count */}
-      <TableCell className="text-center border-r" style={{ width: 35, minWidth: 35 }}>
-        <div className="flex items-center justify-center">
-          <span className={`inline-flex items-center justify-center w-8 h-8 text-sm font-bold rounded-full ${
-            projectCount > 0 
-              ? 'bg-purple-100 text-purple-800 border border-purple-300' 
-              : 'bg-gray-100 text-gray-500 border border-gray-300'
-          }`}>
-            {projectCount}
-          </span>
-        </div>
+      <TableCell className="text-center border-r border-gray-200 px-3 py-3">
+        {projectCount}
       </TableCell>
       
-      {/* Project Allocation Cells */}
-      <ProjectAllocationCells 
-        projects={projects}
-        member={member}
-        allocationMap={allocationMap}
-        weekStartDate={weekStartDate}
+      {/* Utilization: Larger Progress Bar */}
+      <TableCell className="text-center border-r border-gray-200 px-3 py-3">
+        <LongCapacityBar
+          totalUsedHours={totalUsedHours}
+          totalCapacity={weeklyCapacity}
+        />
+      </TableCell>
+      
+      {/* Multiple badge pills per leave type, edit Other */}
+      <MultiLeaveBadgeCell
+        annualLeave={annualLeave}
+        holidayHours={holidayHours}
+        otherLeave={displayedOtherLeave}
+        remarks={remarks}
+        leaveDays={leaveDays}
+        className="px-3 py-3"
+        editableOther={editableOtherLeave}
+        onOtherLeaveChange={handleOtherLeaveChange}
       />
+      
+      {/* Project allocation cells */}
+      {projects.map((project) => {
+        const allocationKey = `${member.id}:${project.id}`;
+        const hours = allocationMap.get(allocationKey) || 0;
+        return (
+          <TableCell key={project.id} className="text-center border-r border-gray-200 px-2 py-3">
+            <EnhancedTooltip
+              type="project"
+              projectBreakdown={getProjectBreakdown(project, hours)}
+            >
+              {hours > 0 && (
+                <span className="inline-flex items-center justify-center w-10 h-8 bg-green-500 text-white rounded-lg font-semibold text-sm shadow-sm">
+                  {hours}
+                </span>
+              )}
+            </EnhancedTooltip>
+          </TableCell>
+        );
+      })}
     </TableRow>
   );
-}, (prevProps, nextProps) => {
-  // Optimized comparison for better performance
-  const memberChanged = prevProps.member.id !== nextProps.member.id;
-  const indexChanged = prevProps.memberIndex !== nextProps.memberIndex;
-  const allocationMapChanged = prevProps.allocationMap.size !== nextProps.allocationMap.size;
-  const projectsChanged = prevProps.projects.length !== nextProps.projects.length;
-  
-  return !memberChanged && !indexChanged && !allocationMapChanged && !projectsChanged;
+};
+
+// Memoize with simplified comparison
+export const ExpandedRowView = memo(ExpandedRowViewComponent, (prevProps, nextProps) => {
+  // Only compare essential props that actually indicate a real change
+  return (
+    prevProps.member.id === nextProps.member.id &&
+    prevProps.memberIndex === nextProps.memberIndex &&
+    prevProps.projects.length === nextProps.projects.length &&
+    prevProps.allocationMap.size === nextProps.allocationMap.size
+  );
 });
-
-ExpandedRowView.displayName = 'ExpandedRowView';
-
-export { ExpandedRowView as MemoizedExpandedRowView };
