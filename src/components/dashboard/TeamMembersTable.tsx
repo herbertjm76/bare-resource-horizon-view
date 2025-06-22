@@ -69,7 +69,12 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   };
 
   const getAvatarUrl = (member: TeamMember): string | undefined => {
-    // Only access avatar_url if the member has this property (i.e., is a Profile, not PendingMember)
+    // For pending members (pre-registered), check if they have avatar_url property
+    if ('isPending' in member && member.isPending) {
+      // Cast to any to access avatar_url property which exists on invites
+      return (member as any).avatar_url || undefined;
+    }
+    // For active members (Profile type), access avatar_url directly
     return 'avatar_url' in member ? member.avatar_url : undefined;
   };
 

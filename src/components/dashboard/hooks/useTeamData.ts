@@ -32,10 +32,10 @@ export const useTeamData = (companyId?: string) => {
 
       console.log('Team members fetched:', membersData?.length || 0);
 
-      // Fetch pre-registered members from invites table
+      // Fetch pre-registered members from invites table with avatar_url
       const { data: invitesData, error: invitesError } = await supabase
         .from('invites')
-        .select('*')
+        .select('*, avatar_url')
         .eq('company_id', companyId)
         .eq('status', 'pending')
         .eq('invitation_type', 'pre_registered');
@@ -46,6 +46,7 @@ export const useTeamData = (companyId?: string) => {
       }
 
       console.log('Pre-registered members fetched:', invitesData?.length || 0);
+      console.log('Pre-registered members with avatars:', invitesData?.map(m => ({ name: `${m.first_name} ${m.last_name}`, avatar_url: m.avatar_url })));
 
       setTeamMembers(membersData || []);
       setPreRegisteredMembers(invitesData || []);
