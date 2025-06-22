@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { ExpandedRowView } from './row/ExpandedRowView';
 import { CompactRowView } from './row/CompactRowView';
 
@@ -20,7 +20,7 @@ interface NewResourceTableRowProps {
   selectedWeek?: Date;
 }
 
-export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
+export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = memo(({
   member,
   memberIndex,
   projects,
@@ -57,4 +57,6 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   }
 
   return <CompactRowView {...sharedProps} viewMode="compact" />;
-};
+});
+
+NewResourceTableRow.displayName = 'NewResourceTableRow';

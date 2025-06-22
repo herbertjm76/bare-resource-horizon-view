@@ -18,59 +18,66 @@ export interface RowData {
 }
 
 export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberIndex'>) => {
+  // Create stable references for member data to prevent re-renders
+  const memberId = useMemo(() => member?.id || '', [member?.id]);
+  const memberCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
+  
   // Memoize calculated values to prevent unnecessary re-renders
-  const weeklyCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
+  const weeklyCapacity = memberCapacity;
   
   const totalUsedHours = useMemo(() => 
-    props.getMemberTotal(member?.id || ''), 
-    [props.getMemberTotal, member?.id]
+    props.getMemberTotal(memberId), 
+    [props.getMemberTotal, memberId]
   );
   
   const projectCount = useMemo(() => 
-    props.getProjectCount(member?.id || ''), 
-    [props.getProjectCount, member?.id]
+    props.getProjectCount(memberId), 
+    [props.getProjectCount, memberId]
   );
   
   const annualLeave = useMemo(() => 
-    props.annualLeaveData[member?.id || ''] || 0, 
-    [props.annualLeaveData, member?.id]
+    props.annualLeaveData[memberId] || 0, 
+    [props.annualLeaveData, memberId]
   );
   
   const holidayHours = useMemo(() => 
-    props.holidaysData[member?.id || ''] || 0, 
-    [props.holidaysData, member?.id]
+    props.holidaysData[memberId] || 0, 
+    [props.holidaysData, memberId]
   );
   
   const otherLeave = useMemo(() => 
-    props.otherLeaveData?.[member?.id || ''] || 0, 
-    [props.otherLeaveData, member?.id]
+    props.otherLeaveData?.[memberId] || 0, 
+    [props.otherLeaveData, memberId]
   );
   
   const leaveDays = useMemo(() => 
-    props.getWeeklyLeave(member?.id || ''), 
-    [props.getWeeklyLeave, member?.id]
+    props.getWeeklyLeave(memberId), 
+    [props.getWeeklyLeave, memberId]
   );
   
   // Use the actual other leave data as the displayed value
   const displayedOtherLeave = otherLeave;
   
   // Check if other leave editing is available
-  const editableOtherLeave = typeof props.updateOtherLeave === "function";
+  const editableOtherLeave = useMemo(() => 
+    typeof props.updateOtherLeave === "function", 
+    [props.updateOtherLeave]
+  );
   
   const remarks = useMemo(() => '', []);
 
   const handleOtherLeaveChange = useCallback(async (value: number) => {
-    if (props.updateOtherLeave && member?.id) {
-      const success = await props.updateOtherLeave(member.id, value);
+    if (props.updateOtherLeave && memberId) {
+      const success = await props.updateOtherLeave(memberId, value);
       if (!success) {
         console.error('Failed to update other leave');
       }
     }
     
-    if (props.onOtherLeaveEdit && member?.id) {
-      props.onOtherLeaveEdit(member.id, value);
+    if (props.onOtherLeaveEdit && memberId) {
+      props.onOtherLeaveEdit(memberId, value);
     }
-  }, [props.updateOtherLeave, props.onOtherLeaveEdit, member?.id]);
+  }, [props.updateOtherLeave, props.onOtherLeaveEdit, memberId]);
 
   const getProjectBreakdown = useCallback((project: any, hours: number) => ({
     projectName: project.name,
@@ -81,6 +88,7 @@ export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberI
     isActive: !!(hours > 0)
   }), []);
 
+  // Return a completely stable object to prevent re-renders
   return useMemo(() => ({
     weeklyCapacity,
     totalUsedHours,

@@ -60,36 +60,41 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     return map;
   }, [comprehensiveWeeklyAllocations]);
 
+  // Create stable references for callback functions to prevent re-renders
+  const stableAllocations = useMemo(() => comprehensiveWeeklyAllocations, [comprehensiveWeeklyAllocations]);
+  const stableWeeklyLeaveDetails = useMemo(() => weeklyLeaveDetails, [weeklyLeaveDetails]);
+
   // Calculate member totals - memoize the function to prevent unnecessary re-renders
   const getMemberTotal = useCallback((memberId: string) => {
     let total = 0;
-    comprehensiveWeeklyAllocations.forEach(allocation => {
+    stableAllocations.forEach(allocation => {
       if (allocation.resource_id === memberId) {
         total += allocation.hours || 0;
       }
     });
     return total;
-  }, [comprehensiveWeeklyAllocations]);
+  }, [stableAllocations]);
 
   // Calculate project count per member - memoize the function
   const getProjectCount = useCallback((memberId: string) => {
     const uniqueProjects = new Set<string>();
-    comprehensiveWeeklyAllocations.forEach(allocation => {
+    stableAllocations.forEach(allocation => {
       if (allocation.resource_id === memberId && (allocation.hours || 0) > 0) {
         uniqueProjects.add(allocation.project_id);
       }
     });
     return uniqueProjects.size;
-  }, [comprehensiveWeeklyAllocations]);
+  }, [stableAllocations]);
 
   // Create a proper getWeeklyLeave function - memoize to prevent unnecessary re-renders
   const getWeeklyLeave = useCallback((memberId: string): Array<{ date: string; hours: number }> => {
-    return weeklyLeaveDetails[memberId] || [];
-  }, [weeklyLeaveDetails]);
+    return stableWeeklyLeaveDetails[memberId] || [];
+  }, [stableWeeklyLeaveDetails]);
 
   const isLoading = isLoadingMembers || isLoadingProjects || isLoadingLeave || isLoadingOtherLeave;
   const error = membersError || null;
 
+  // Return a stable object to prevent unnecessary re-renders
   return useMemo(() => ({
     allMembers: members || [],
     projects,

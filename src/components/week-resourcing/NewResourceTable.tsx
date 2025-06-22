@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { NewResourceTableRow } from './NewResourceTableRow';
 import { NewResourceSummaryRow } from './NewResourceSummaryRow';
@@ -19,7 +19,7 @@ interface NewResourceTableProps {
   selectedWeek?: Date;
 }
 
-export const NewResourceTable: React.FC<NewResourceTableProps> = ({
+export const NewResourceTable: React.FC<NewResourceTableProps> = memo(({
   members,
   projects,
   allocationMap,
@@ -95,7 +95,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           <TableBody>
             {members.map((member, index) => (
               <NewResourceTableRow
-                key={member.id}
+                key={`${member.id}-${index}`}
                 member={member}
                 memberIndex={index}
                 projects={projects}
@@ -121,4 +121,6 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
       </div>
     </div>
   );
-};
+});
+
+NewResourceTable.displayName = 'NewResourceTable';
