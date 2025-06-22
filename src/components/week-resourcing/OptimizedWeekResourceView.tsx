@@ -1,0 +1,288 @@
+
+import React, { memo, useMemo, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search, X, Calendar, Users, Clock, TrendingUp } from 'lucide-react';
+import { WeekStartSelector } from '@/components/workload/WeekStartSelector';
+import { StableNewResourceTable } from './StableNewResourceTable';
+import { useStableWeekResourceData } from './hooks/useStableWeekResourceData';
+import { Skeleton } from '@/components/ui/skeleton';
+import { format } from 'date-fns';
+
+interface OptimizedWeekResourceViewProps {
+  selectedWeek: Date;
+  setSelectedWeek: (date: Date) => void;
+  onWeekChange?: (date: Date) => void;
+  weekLabel: string;
+  filters: {
+    office: string;
+    searchTerm: string;
+  };
+  onFilterChange: (key: string, value: string) => void;
+}
+
+// Memoized metrics calculation
+const useWeeklyMetrics = (allMembers: any[], getMemberTotal: (id: string) => number) => {
+  return useMemo(() => {
+    if (!allMembers || allMembers.length === 0) {
+      return {
+        totalCapacity: 0,
+        totalAllocated: 0,
+        utilizationRate: 0,
+        overloadedMembers: 0,
+        underUtilizedMembers: 0,
+        availableHours: 0
+      };
+    }
+
+    let totalCapacity = 0;
+    let totalAllocated = 0;
+    let overloadedMembers = 0;
+    let underUtilizedMembers = 0;
+
+    allMembers.forEach(member => {
+      const weeklyCapacity = member.weekly_capacity || 40;
+      totalCapacity += weeklyCapacity;
+
+      const memberTotal = getMemberTotal(member.id);
+      totalAllocated += memberTotal;
+
+      const memberUtilization = weeklyCapacity > 0 ? (memberTotal / weeklyCapacity) * 100 : 0;
+      
+      if (memberUtilization > 100) {
+        overloadedMembers++;
+      } else if (memberUtilization < 60) {
+        underUtilizedMembers++;
+      }
+    });
+
+    const utilizationRate = totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
+    const availableHours = Math.max(0, totalCapacity - totalAllocated);
+
+    return {
+      totalCapacity,
+      totalAllocated,
+      utilizationRate,
+      overloadedMembers,
+      underUtilizedMembers,
+      availableHours
+    };
+  }, [allMembers, getMemberTotal]);
+};
+
+// Memoized metrics cards component
+const MetricsCards = memo(({ metrics }: { metrics: any }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-blue-500" />
+          <div>
+            <p className="text-sm font-medium">Week Utilization</p>
+            <p className="text-2xl font-bold">{metrics.utilizationRate}%</p>
+            <p className="text-xs text-gray-500">{metrics.totalAllocated}h / {metrics.totalCapacity}h</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+    
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2">
+          <Clock className="h-5 w-5 text-green-500" />
+          <div>
+            <p className="text-sm font-medium">Available Hours</p>
+            <p className="text-2xl font-bold">{Math.round(metrics.availableHours)}h</p>
+            <p className="text-xs text-gray-500">This week</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+    
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2">
+          <Users className="h-5 w-5 text-orange-500" />
+          <div>
+            <p className="text-sm font-medium">Overloaded</p>
+            <p className="text-2xl font-bold">{metrics.overloadedMembers}</p>
+            <p className="text-xs text-gray-500">Over 100% capacity</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+    
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-purple-500" />
+          <div>
+            <p className="text-sm font-medium">Under-utilized</p>
+            <p className="text-2xl font-bold">{metrics.underUtilizedMembers}</p>
+            <p className="text-xs text-gray-500">Under 60% capacity</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+));
+
+MetricsCards.displayName = 'MetricsCards';
+
+export const OptimizedWeekResourceView: React.FC<OptimizedWeekResourceViewProps> = memo(({
+  selectedWeek,
+  setSelectedWeek,
+  onWeekChange,
+  weekLabel,
+  filters,
+  onFilterChange
+}) => {
+  const { 
+    allMembers, 
+    projects, 
+    isLoading, 
+    getMemberTotal,
+    getProjectCount,
+    getWeeklyLeave,
+    allocationMap,
+    annualLeaveData,
+    holidaysData,
+    otherLeaveData,
+    updateOtherLeave,
+    error
+  } = useStableWeekResourceData(selectedWeek, filters);
+
+  const handleWeekChange = useCallback((date: Date) => {
+    setSelectedWeek(date);
+    if (onWeekChange) {
+      onWeekChange(date);
+    }
+  }, [setSelectedWeek, onWeekChange]);
+
+  const clearFilters = useCallback(() => {
+    onFilterChange('office', 'all');
+    onFilterChange('searchTerm', '');
+  }, [onFilterChange]);
+
+  const activeFiltersCount = useMemo(() => [
+    filters.office !== 'all' ? 'office' : '',
+    filters.searchTerm ? 'search' : ''
+  ].filter(Boolean).length, [filters.office, filters.searchTerm]);
+
+  const metrics = useWeeklyMetrics(allMembers, getMemberTotal);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    onFilterChange('searchTerm', e.target.value);
+  }, [onFilterChange]);
+
+  const handleOfficeChange = useCallback((value: string) => {
+    onFilterChange('office', value);
+  }, [onFilterChange]);
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <p className="text-red-600">Error loading data: {error.message}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="mt-4"
+          >
+            Reload Page
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header Controls */}
+      <Card className="border-none shadow-sm bg-white">
+        <CardContent className="p-4">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div className="flex items-center gap-4">
+              <WeekStartSelector
+                selectedWeek={selectedWeek}
+                onWeekChange={handleWeekChange}
+              />
+
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search members..."
+                  value={filters.searchTerm}
+                  onChange={handleSearchChange}
+                  className="pl-8 h-8 w-48"
+                />
+              </div>
+
+              <Select value={filters.office} onValueChange={handleOfficeChange}>
+                <SelectTrigger className="w-36 h-8">
+                  <SelectValue placeholder="Filter by office..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Offices</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {activeFiltersCount > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="h-8 px-2"
+                >
+                  <X className="h-4 w-4" />
+                  Clear ({activeFiltersCount})
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Weekly Summary Stats */}
+      <MetricsCards metrics={metrics} />
+
+      {/* Weekly Resource Table */}
+      <Card className="border-none shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg font-semibold">
+            Weekly Resource Allocation - {format(selectedWeek, 'MMM d, yyyy')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <StableNewResourceTable 
+            members={allMembers}
+            projects={projects}
+            allocationMap={allocationMap}
+            annualLeaveData={annualLeaveData}
+            holidaysData={holidaysData}
+            otherLeaveData={otherLeaveData}
+            getMemberTotal={getMemberTotal}
+            getProjectCount={getProjectCount}
+            getWeeklyLeave={getWeeklyLeave}
+            updateOtherLeave={updateOtherLeave}
+            viewMode="compact"
+            selectedWeek={selectedWeek}
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
+});
+
+OptimizedWeekResourceView.displayName = 'OptimizedWeekResourceView';
