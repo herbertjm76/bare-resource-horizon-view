@@ -1,3 +1,4 @@
+
 import React, { useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -283,22 +284,20 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       {/* Weekly Resource Table */}
       <Card className="border-none shadow-sm">
         <CardContent className="p-0">
-          {filteredMembers.length > 0 && projects.length > 0 && allocationMap && (
-            <NewResourceTable 
-              members={filteredMembers}
-              projects={projects}
-              allocationMap={allocationMap}
-              annualLeaveData={annualLeaveData || {}}
-              holidaysData={holidaysData || {}}
-              otherLeaveData={otherLeaveData || {}}
-              getMemberTotal={getMemberTotal}
-              getProjectCount={getProjectCount}
-              getWeeklyLeave={getWeeklyLeave}
-              updateOtherLeave={updateOtherLeave}
-              viewMode="compact"
-              selectedWeek={selectedWeek}
-            />
-          )}
+          <NewResourceTable 
+            members={filteredMembers || []}
+            projects={projects || []}
+            allocationMap={allocationMap || new Map()}
+            annualLeaveData={annualLeaveData || {}}
+            holidaysData={holidaysData || {}}
+            otherLeaveData={otherLeaveData || {}}
+            getMemberTotal={getMemberTotal}
+            getProjectCount={getProjectCount}
+            getWeeklyLeave={getWeeklyLeave}
+            updateOtherLeave={updateOtherLeave}
+            viewMode="compact"
+            selectedWeek={selectedWeek}
+          />
         </CardContent>
       </Card>
     </div>
