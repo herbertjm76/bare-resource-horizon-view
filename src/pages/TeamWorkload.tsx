@@ -12,7 +12,7 @@ import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
 const TeamWorkload = () => {
-  // State for selected week (starting Monday) - still used for calculations
+  // State for selected week (starting Monday) - this is the starting week for the 36-week analysis
   const [selectedWeek, setSelectedWeek] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
@@ -43,7 +43,7 @@ const TeamWorkload = () => {
     clearFilters
   } = useTeamFilters(allMembers);
   
-  // Handle week navigation (still used for period calculations)
+  // Handle week navigation
   const handleWeekChange = (newWeek: Date) => {
     setSelectedWeek(startOfWeek(newWeek, { weekStartsOn: 1 }));
   };
@@ -56,8 +56,8 @@ const TeamWorkload = () => {
     setSelectedWeek(prev => addWeeks(prev, 1));
   };
 
-  // Format week label (still used for internal calculations)
-  const weekLabel = `Week of ${format(selectedWeek, 'MMMM d, yyyy')}`;
+  // Format week label for the starting week
+  const weekLabel = `Starting Week: ${format(selectedWeek, 'MMM d, yyyy')}`;
 
   const isLoading = isLoadingTeamMembers;
 
@@ -70,6 +70,9 @@ const TeamWorkload = () => {
               <Briefcase className="h-8 w-8 text-brand-violet" />
               Team Workload
             </h1>
+            <p className="text-muted-foreground">
+              Analyze team workload over a 36-week period starting from your selected week
+            </p>
           </div>
         </div>
       </div>

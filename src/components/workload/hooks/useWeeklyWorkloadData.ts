@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { TeamMember } from '@/components/dashboard/types';
@@ -5,7 +6,7 @@ import { useComprehensiveAllocations } from '@/components/week-resourcing/hooks/
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useOfficeHolidays } from './useOfficeHolidays';
-import { format, startOfWeek, addWeeks, endOfWeek, subWeeks } from 'date-fns';
+import { format, startOfWeek, addWeeks, endOfWeek } from 'date-fns';
 
 export interface WeeklyWorkloadBreakdown {
   projectHours: number;
@@ -20,11 +21,10 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
   const [isLoadingWorkload, setIsLoadingWorkload] = useState<boolean>(true);
   const { company } = useCompany();
 
-  // Generate week start dates for the period, starting from current week minus 1
+  // Generate week start dates for the period, starting from the selected week
   const weekStartDates = useMemo(() => {
     const weeks = [];
-    const currentWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
-    const startWeek = subWeeks(currentWeek, 1); // Start from current week minus 1
+    const startWeek = startOfWeek(selectedDate, { weekStartsOn: 1 });
     
     for (let i = 0; i < periodWeeks; i++) {
       const weekStart = addWeeks(startWeek, i);
@@ -35,7 +35,7 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
     }
     
     return weeks;
-  }, [periodWeeks]); // Remove selectedDate dependency since we're using current week
+  }, [selectedDate, periodWeeks]);
 
   // Get member IDs
   const memberIds = useMemo(() => teamMembers.map(member => member.id), [teamMembers]);
@@ -130,7 +130,7 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
 
   // Fetch holiday data for the entire period
   const { data: holidaysData, isLoading: isLoadingHolidays } = useOfficeHolidays(
-    weekStartDates[0]?.date || new Date(), 
+    weekStartDates[0]?.date || selectedDate, 
     teamMembers, 
     company?.id, 
     periodWeeks
@@ -147,6 +147,7 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
     console.log('🔍 WEEKLY WORKLOAD: Processing weekly workload data for', teamMembers.length, 'members');
     console.log('🔍 WEEKLY WORKLOAD: Period weeks:', periodWeeks);
     console.log('🔍 WEEKLY WORKLOAD: Week start dates:', weekStartDates.map(w => w.key));
+    console.log('🔍 WEEKLY WORKLOAD: Starting from week:', format(selectedDate, 'MMM d, yyyy'));
 
     const processedData: Record<string, Record<string, WeeklyWorkloadBreakdown>> = {};
 
@@ -220,7 +221,7 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
     console.log('🔍 WEEKLY WORKLOAD: Final processed data:', processedData);
     setWeeklyWorkloadData(processedData);
     setIsLoadingWorkload(false);
-  }, [company?.id, teamMembers, weekStartDates, allAllocationsData, allLeaveData, holidaysData]);
+  }, [company?.id, teamMembers, weekStartDates, allAllocationsData, allLeaveData, holidaysData, selectedDate]);
 
   return { 
     weeklyWorkloadData, 

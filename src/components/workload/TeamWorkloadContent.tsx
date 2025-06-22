@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { ChevronLeft, ChevronRight, Search, Filter, X, Calendar, Users, Clock, TrendingUp } from 'lucide-react';
 import { TeamMember } from '@/components/dashboard/types';
 import { WeeklyWorkloadCalendar } from './WeeklyWorkloadCalendar';
+import { WeekStartSelector } from './WeekStartSelector';
 import { useWeeklyWorkloadData } from './hooks/useWeeklyWorkloadData';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -51,7 +52,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   // Fixed to 36 weeks as requested
   const periodWeeks = 36;
   
-  // Use the new weekly workload data hook
+  // Use the new weekly workload data hook with the selected week as starting point
   const { 
     weeklyWorkloadData, 
     isLoadingWorkload, 
@@ -179,10 +180,11 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
               )}
             </div>
 
-            {/* Period Info */}
-            <div className="text-sm text-gray-600">
-              Showing {periodWeeks} weeks of workload data
-            </div>
+            {/* Week Selector */}
+            <WeekStartSelector
+              selectedWeek={selectedWeek}
+              onWeekChange={onWeekChange}
+            />
           </div>
         </CardContent>
       </Card>
