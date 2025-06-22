@@ -17,17 +17,22 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
     let total = 0;
     members.forEach(member => {
       const key = `${member.id}:${projectId}`;
-      total += allocationMap.get(key) || 0;
+      const hours = allocationMap.get(key) || 0;
+      total += hours;
+      console.log(`Project ${projectId} - Member ${member.id}: ${hours}h (running total: ${total}h)`);
     });
+    console.log(`Final project total for ${projectId}:`, total);
     return total;
   };
 
   const getTotalHours = () => {
     let total = 0;
     // Sum all hours from the allocation map
-    allocationMap.forEach(hours => {
+    allocationMap.forEach((hours, key) => {
       total += hours;
+      console.log(`Adding ${hours}h from key ${key}, running total: ${total}h`);
     });
+    console.log('Final total hours across all allocations:', total);
     return total;
   };
 
@@ -43,6 +48,17 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
     return membersWithAllocations.size;
   };
 
+  // Debug logging for the summary row
+  console.log('NewResourceSummaryRow - Allocation Map:', {
+    mapSize: allocationMap.size,
+    allEntries: Array.from(allocationMap.entries()),
+    projectsCount: projects.length,
+    membersCount: members.length
+  });
+
+  const totalHours = getTotalHours();
+  const totalMembers = getGrandTotalMembers();
+
   return (
     <TableRow className="bg-slate-100 font-semibold border-t-2 border-slate-300">
       <TableCell className="text-center sticky left-0 bg-slate-100 z-10">
@@ -55,10 +71,10 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         —
       </TableCell>
       <TableCell className="text-center">
-        {getGrandTotalMembers()} / {members.length}
+        {totalMembers} / {members.length}
       </TableCell>
       <TableCell className="text-center font-bold text-lg">
-        {getTotalHours()}h
+        {totalHours}h
       </TableCell>
       {projects.map((project) => {
         const projectTotal = getProjectTotal(project.id);

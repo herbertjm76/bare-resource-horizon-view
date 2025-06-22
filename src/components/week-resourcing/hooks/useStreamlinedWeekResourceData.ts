@@ -64,16 +64,24 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     shouldFetchData
   );
 
-  // Create stable allocation map - this is the key fix for proper hour summation
+  // Create stable allocation map - FIXED: properly sum hours for same member-project combinations
   const allocationMap = useMemo(() => {
     const map = new Map<string, number>();
     if (comprehensiveWeeklyAllocations.length > 0) {
+      console.log('Processing allocations for map creation:', comprehensiveWeeklyAllocations.length);
+      
       comprehensiveWeeklyAllocations.forEach(allocation => {
         const key = `${allocation.resource_id}:${allocation.project_id}`;
         const currentHours = map.get(key) || 0;
-        // Sum up hours for the same resource-project combination in the same week
-        map.set(key, currentHours + (allocation.hours || 0));
+        const newHours = allocation.hours || 0;
+        const totalHours = currentHours + newHours;
+        
+        map.set(key, totalHours);
+        
+        console.log(`Allocation map update - Key: ${key}, Current: ${currentHours}h, Adding: ${newHours}h, New Total: ${totalHours}h`);
       });
+      
+      console.log('Final allocation map:', Array.from(map.entries()));
     }
     return map;
   }, [comprehensiveWeeklyAllocations]);
@@ -85,9 +93,11 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
       comprehensiveWeeklyAllocations.forEach(allocation => {
         const memberId = allocation.resource_id;
         const current = totalsMap.get(memberId) || 0;
-        // Sum all hours for this member across all projects for this week
-        totalsMap.set(memberId, current + (allocation.hours || 0));
+        const hours = allocation.hours || 0;
+        totalsMap.set(memberId, current + hours);
       });
+      
+      console.log('Member totals map:', Array.from(totalsMap.entries()));
     }
     return totalsMap;
   }, [comprehensiveWeeklyAllocations]);
@@ -189,10 +199,10 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     memberTotalsMapSize: memberTotalsMap.size,
     isLoading,
     shouldFetchData,
-    // Log all member totals for debugging
-    allMemberTotals: Array.from(memberTotalsMap.entries()),
-    // Log allocation map entries
-    allAllocationEntries: Array.from(allocationMap.entries()).slice(0, 5)
+    // Log sample allocation map entries for debugging
+    sampleAllocationEntries: Array.from(allocationMap.entries()).slice(0, 5),
+    // Log member totals for debugging
+    sampleMemberTotals: Array.from(memberTotalsMap.entries()).slice(0, 3)
   });
 
   return result;
