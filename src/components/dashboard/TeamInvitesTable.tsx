@@ -41,10 +41,10 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[30%]">Email</TableHead>
-            <TableHead className="w-[20%]">Status</TableHead>
-            <TableHead className="w-[20%]">Sent</TableHead>
-            <TableHead className="w-[30%]"></TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Sent</TableHead>
+            {editMode && <TableHead>Actions</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -56,8 +56,8 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
               
             return (
               <TableRow key={invite.id}>
-                <TableCell className="w-[30%]">{invite.email}</TableCell>
-                <TableCell className="w-[20%]">
+                <TableCell>{invite.email}</TableCell>
+                <TableCell>
                   <Badge 
                     variant={statusStyle.variant}
                     className={statusStyle.className}
@@ -65,9 +65,9 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
                     {invite.status || 'Invited'}
                   </Badge>
                 </TableCell>
-                <TableCell className="w-[20%]">{new Date(invite.created_at).toLocaleDateString()}</TableCell>
-                <TableCell className="w-[30%]">
-                  {editMode ? (
+                <TableCell>{new Date(invite.created_at).toLocaleDateString()}</TableCell>
+                {editMode && (
+                  <TableCell>
                     <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
@@ -87,10 +87,8 @@ const TeamInvitesTable: React.FC<TeamInvitesTableProps> = ({
                         Delete
                       </Button>
                     </div>
-                  ) : (
-                    <div className="h-9"></div> // Empty space holder to maintain layout
-                  )}
-                </TableCell>
+                  </TableCell>
+                )}
               </TableRow>
             );
           })}
