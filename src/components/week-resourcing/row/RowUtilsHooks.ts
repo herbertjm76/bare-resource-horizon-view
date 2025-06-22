@@ -49,6 +49,15 @@ export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberI
     }
   };
 
+  const getProjectBreakdown = (project: any, hours: number) => ({
+    projectName: project.name,
+    projectCode: project.code,
+    projectStage: project.current_stage || project.stage,
+    projectFee: project.fee,
+    hours: hours,
+    isActive: !!(hours > 0)
+  });
+
   return {
     weeklyCapacity,
     totalUsedHours,
@@ -60,6 +69,7 @@ export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberI
     editableOtherLeave,
     displayedOtherLeave,
     remarks,
-    handleOtherLeaveChange
+    handleOtherLeaveChange,
+    getProjectBreakdown
   };
 };
