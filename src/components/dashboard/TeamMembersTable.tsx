@@ -69,13 +69,20 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
   };
 
   const getAvatarUrl = (member: TeamMember): string | undefined => {
-    // For pending members (pre-registered), access avatar_url from the member object directly
-    if ('isPending' in member && member.isPending) {
-      console.log('Getting avatar for pending member:', member.first_name, member.last_name, 'Avatar URL:', member.avatar_url);
-      return member.avatar_url || undefined;
-    }
-    // For active members (Profile type), access avatar_url directly
-    return 'avatar_url' in member ? member.avatar_url : undefined;
+    console.log('=== Avatar Debug Info ===');
+    console.log('Member:', member.first_name, member.last_name);
+    console.log('Member object keys:', Object.keys(member));
+    console.log('Has isPending property:', 'isPending' in member);
+    console.log('isPending value:', (member as any).isPending);
+    console.log('Direct avatar_url access:', member.avatar_url);
+    console.log('Member type check - has avatar_url in member:', 'avatar_url' in member);
+    
+    // Always try to access avatar_url directly from the member object
+    const avatarUrl = member.avatar_url;
+    console.log('Final avatar URL:', avatarUrl);
+    console.log('========================');
+    
+    return avatarUrl || undefined;
   };
 
   if (teamMembers.length === 0) {
@@ -109,7 +116,6 @@ const TeamMembersTable: React.FC<TeamMembersTableProps> = ({
         <tbody className="divide-y divide-gray-200">
           {teamMembers.map((member) => {
             const avatarUrl = getAvatarUrl(member);
-            console.log('Rendering member:', member.first_name, member.last_name, 'Avatar URL:', avatarUrl);
             
             return (
               <tr key={member.id} className="hover:bg-gray-50">
