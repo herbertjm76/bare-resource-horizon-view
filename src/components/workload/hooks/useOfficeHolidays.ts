@@ -1,83 +1,81 @@
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { format, eachDayOfInterval } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
+import { format, startOfWeek, addWeeks, addDays } from 'date-fns';
 
 export const useOfficeHolidays = (
-  selectedMonth: Date, 
+  selectedDate: Date, 
   teamMembers: TeamMember[], 
-  companyId: string | undefined
+  companyId?: string,
+  periodWeeks: number = 1
 ) => {
-  const [data, setData] = useState<Record<string, Record<string, number>>>({});
-  const [isLoading, setIsLoading] = useState(false);
+  return useQuery({
+    queryKey: ['office-holidays', selectedDate, companyId, periodWeeks],
+    queryFn: async () => {
+      if (!companyId || teamMembers.length === 0) return {};
 
-  useEffect(() => {
-    if (!companyId || teamMembers.length === 0) {
-      setData({});
-      setIsLoading(false);
-      return;
-    }
+      console.log('🔍 OFFICE HOLIDAYS: Fetching for', periodWeeks, 'weeks starting', format(selectedDate, 'yyyy-MM-dd'));
 
-    const fetchOfficeHolidays = async () => {
-      setIsLoading(true);
+      // Generate date range for all weeks
+      const startWeek = startOfWeek(selectedDate, { weekStartsOn: 1 });
+      const endWeek = addWeeks(startWeek, periodWeeks);
+      const startDateString = format(startWeek, 'yyyy-MM-dd');
+      const endDateString = format(endWeek, 'yyyy-MM-dd');
+
+      console.log('🔍 OFFICE HOLIDAYS: Date range:', startDateString, 'to', endDateString);
+
+      // Get all unique locations from team members
+      const locations = [...new Set(teamMembers.map(member => member.location).filter(Boolean))];
       
-      try {
-        const monthStart = format(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1), 'yyyy-MM-dd');
-        const monthEnd = format(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0), 'yyyy-MM-dd');
-        const memberIds = teamMembers.map(member => member.id);
-
-        console.log('Fetching office holidays for company:', companyId);
-
-        const { data: holidaysData, error } = await supabase
-          .from('office_holidays')
-          .select('date, end_date, name')
-          .eq('company_id', companyId)
-          .or(`date.lte.${monthEnd},end_date.gte.${monthStart}`);
-        
-        if (error) {
-          console.error('Error fetching office holidays:', error);
-          setData({});
-        } else if (holidaysData) {
-          const holidayHours: Record<string, Record<string, number>> = {};
-          
-          // Initialize structure
-          memberIds.forEach(memberId => {
-            holidayHours[memberId] = {};
-          });
-          
-          holidaysData.forEach(holiday => {
-            const startDate = new Date(holiday.date);
-            const endDate = holiday.end_date ? new Date(holiday.end_date) : startDate;
-            
-            const holidayDays = eachDayOfInterval({ start: startDate, end: endDate });
-            
-            holidayDays.forEach(day => {
-              const dateKey = format(day, 'yyyy-MM-dd');
-              
-              if (day.getMonth() === selectedMonth.getMonth() && 
-                  day.getFullYear() === selectedMonth.getFullYear()) {
-                
-                memberIds.forEach(memberId => {
-                  holidayHours[memberId][dateKey] = 8; // Standard 8-hour holiday
-                });
-              }
-            });
-          });
-          
-          console.log('Processed office holidays data:', holidayHours);
-          setData(holidayHours);
-        }
-      } catch (error) {
-        console.error('Error in fetchOfficeHolidays:', error);
-        setData({});
-      } finally {
-        setIsLoading(false);
+      if (locations.length === 0) {
+        console.log('🔍 OFFICE HOLIDAYS: No locations found for team members');
+        return {};
       }
-    };
 
-    fetchOfficeHolidays();
-  }, [companyId, selectedMonth, teamMembers]);
+      // Fetch office holidays for the date range and locations
+      const { data: holidays, error } = await supabase
+        .from('office_holidays')
+        .select('*')
+        .eq('company_id', companyId)
+        .gte('date', startDateString)
+        .lt('date', endDateString)
+        .in('location_id', locations);
 
-  return { data, isLoading };
+      if (error) {
+        console.error('Error fetching office holidays:', error);
+        return {};
+      }
+
+      console.log('🔍 OFFICE HOLIDAYS: Found', holidays?.length || 0, 'holidays');
+
+      // Create holiday data structure
+      const holidayData: Record<string, Record<string, number>> = {};
+
+      // Initialize structure for all team members
+      teamMembers.forEach(member => {
+        holidayData[member.id] = {};
+      });
+
+      // Process holidays and distribute to team members
+      holidays?.forEach(holiday => {
+        const holidayDate = format(new Date(holiday.date), 'yyyy-MM-dd');
+        
+        // Find team members in this location
+        const membersInLocation = teamMembers.filter(member => member.location === holiday.location_id);
+        
+        membersInLocation.forEach(member => {
+          if (!holidayData[member.id][holidayDate]) {
+            holidayData[member.id][holidayDate] = 0;
+          }
+          // Assume 8 hours per holiday day
+          holidayData[member.id][holidayDate] += 8;
+        });
+      });
+
+      console.log('🔍 OFFICE HOLIDAYS: Final holiday data structure:', holidayData);
+      return holidayData;
+    },
+    enabled: !!companyId && teamMembers.length > 0
+  });
 };
