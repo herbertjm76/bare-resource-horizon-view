@@ -115,13 +115,17 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     return finalCountMap;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Stable callback functions
+  // Fixed callback functions - directly use the maps instead of depending on changing references
   const getMemberTotal = useCallback((memberId: string) => {
-    return memberTotalsMap.get(memberId) || 0;
+    const total = memberTotalsMap.get(memberId) || 0;
+    console.log(`getMemberTotal for ${memberId}:`, total);
+    return total;
   }, [memberTotalsMap]);
 
   const getProjectCount = useCallback((memberId: string) => {
-    return projectCountMap.get(memberId) || 0;
+    const count = projectCountMap.get(memberId) || 0;
+    console.log(`getProjectCount for ${memberId}:`, count);
+    return count;
   }, [projectCountMap]);
 
   const getWeeklyLeave = useCallback((memberId: string): Array<{ date: string; hours: number }> => {
@@ -175,7 +179,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     updateOtherLeave
   ]);
 
-  // Only log when data state changes meaningfully
+  // Enhanced logging for debugging
   console.log('Streamlined WeekResourceData:', {
     weekStartDate,
     membersCount: members?.length || 0,
@@ -185,8 +189,10 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     memberTotalsMapSize: memberTotalsMap.size,
     isLoading,
     shouldFetchData,
-    // Log sample member totals for debugging
-    sampleMemberTotals: Array.from(memberTotalsMap.entries()).slice(0, 3)
+    // Log all member totals for debugging
+    allMemberTotals: Array.from(memberTotalsMap.entries()),
+    // Log allocation map entries
+    allAllocationEntries: Array.from(allocationMap.entries()).slice(0, 5)
   });
 
   return result;
