@@ -3,9 +3,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { TeamMember } from '@/components/dashboard/types';
 import { useComprehensiveAllocations } from '@/components/week-resourcing/hooks/useComprehensiveAllocations';
-import { useWeeklyLeaveDetails } from '@/components/week-resourcing/hooks/useWeeklyLeaveDetails';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useOfficeHolidays } from './useOfficeHolidays';
-import { format, startOfWeek, addWeeks } from 'date-fns';
+import { format, startOfWeek, addWeeks, endOfWeek } from 'date-fns';
 
 export interface WeeklyWorkloadBreakdown {
   projectHours: number;
@@ -39,22 +40,93 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
   // Get member IDs
   const memberIds = useMemo(() => teamMembers.map(member => member.id), [teamMembers]);
 
-  // Fetch comprehensive allocations for all weeks
-  const weeklyAllocationsData = weekStartDates.map(week => {
-    const { comprehensiveWeeklyAllocations } = useComprehensiveAllocations({
-      weekStartDate: week.key,
-      memberIds
-    });
-    return { weekKey: week.key, allocations: comprehensiveWeeklyAllocations || [] };
+  // Fetch comprehensive allocations for all weeks in a single query
+  const weekKeys = weekStartDates.map(w => w.key);
+  const { data: allAllocationsData } = useQuery({
+    queryKey: ['comprehensive-allocations-multiple', weekKeys, memberIds],
+    queryFn: async () => {
+      if (!company?.id || memberIds.length === 0) return {};
+
+      const allocationsMap: Record<string, any[]> = {};
+      
+      // Fetch allocations for each week
+      for (const weekKey of weekKeys) {
+        const weekStart = new Date(weekKey);
+        const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
+
+        const { data, error } = await supabase
+          .from('project_resource_allocations')
+          .select(`
+            *,
+            projects (
+              id,
+              name,
+              current_stage,
+              end_date
+            )
+          `)
+          .eq('company_id', company.id)
+          .in('resource_id', memberIds)
+          .eq('week_start_date', weekKey);
+
+        if (error) {
+          console.error('Error fetching allocations for week', weekKey, error);
+          continue;
+        }
+
+        allocationsMap[weekKey] = data || [];
+      }
+
+      return allocationsMap;
+    },
+    enabled: !!company?.id && memberIds.length > 0
   });
 
-  // Fetch leave data for all weeks
-  const weeklyLeaveData = weekStartDates.map(week => {
-    const { weeklyLeaveDetails } = useWeeklyLeaveDetails({
-      weekStartDate: week.key,
-      memberIds
-    });
-    return { weekKey: week.key, leaveDetails: weeklyLeaveDetails || [] };
+  // Fetch leave data for all weeks in a single query
+  const { data: allLeaveData } = useQuery({
+    queryKey: ['annual-leave-multiple', weekKeys, memberIds, company?.id],
+    queryFn: async () => {
+      if (!company?.id || memberIds.length === 0) return {};
+
+      const startDate = weekStartDates[0]?.key;
+      const endWeek = weekStartDates[weekStartDates.length - 1];
+      const endDate = endWeek ? format(endOfWeek(endWeek.date, { weekStartsOn: 1 }), 'yyyy-MM-dd') : startDate;
+
+      const { data, error } = await supabase
+        .from('annual_leaves')
+        .select('member_id, date, hours')
+        .eq('company_id', company.id)
+        .in('member_id', memberIds)
+        .gte('date', startDate)
+        .lte('date', endDate);
+
+      if (error) {
+        console.error('Error fetching annual leave:', error);
+        return {};
+      }
+
+      // Group by week and member
+      const leaveByWeek: Record<string, Array<{ member_id: string; hours: number; date: string }>> = {};
+      
+      data?.forEach(leave => {
+        const leaveDate = new Date(leave.date);
+        const weekStart = startOfWeek(leaveDate, { weekStartsOn: 1 });
+        const weekKey = format(weekStart, 'yyyy-MM-dd');
+        
+        if (!leaveByWeek[weekKey]) {
+          leaveByWeek[weekKey] = [];
+        }
+        
+        leaveByWeek[weekKey].push({
+          member_id: leave.member_id,
+          hours: Number(leave.hours) || 0,
+          date: leave.date
+        });
+      });
+
+      return leaveByWeek;
+    },
+    enabled: !!company?.id && memberIds.length > 0
   });
 
   // Fetch holiday data for the entire period
@@ -94,26 +166,30 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
     });
 
     // Process project allocations
-    weeklyAllocationsData.forEach(({ weekKey, allocations }) => {
-      allocations.forEach(allocation => {
-        const memberId = allocation.resource_id;
-        if (processedData[memberId] && processedData[memberId][weekKey]) {
-          processedData[memberId][weekKey].projectHours += allocation.hours || 0;
-        }
+    if (allAllocationsData) {
+      Object.keys(allAllocationsData).forEach(weekKey => {
+        const allocations = allAllocationsData[weekKey] || [];
+        allocations.forEach(allocation => {
+          const memberId = allocation.resource_id;
+          if (processedData[memberId] && processedData[memberId][weekKey]) {
+            processedData[memberId][weekKey].projectHours += allocation.hours || 0;
+          }
+        });
       });
-    });
+    }
 
     // Process annual leave
-    weeklyLeaveData.forEach(({ weekKey, leaveDetails }) => {
-      if (Array.isArray(leaveDetails)) {
+    if (allLeaveData) {
+      Object.keys(allLeaveData).forEach(weekKey => {
+        const leaveDetails = allLeaveData[weekKey] || [];
         leaveDetails.forEach(leave => {
           const memberId = leave.member_id;
           if (processedData[memberId] && processedData[memberId][weekKey]) {
             processedData[memberId][weekKey].annualLeave += leave.hours || 0;
           }
         });
-      }
-    });
+      });
+    }
 
     // Process office holidays
     if (holidaysData) {
@@ -145,7 +221,7 @@ export const useWeeklyWorkloadData = (selectedDate: Date, teamMembers: TeamMembe
     console.log('🔍 WEEKLY WORKLOAD: Final processed data:', processedData);
     setWeeklyWorkloadData(processedData);
     setIsLoadingWorkload(false);
-  }, [company?.id, teamMembers, weekStartDates, weeklyAllocationsData, weeklyLeaveData, holidaysData]);
+  }, [company?.id, teamMembers, weekStartDates, allAllocationsData, allLeaveData, holidaysData]);
 
   return { 
     weeklyWorkloadData, 
