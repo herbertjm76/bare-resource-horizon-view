@@ -5,11 +5,13 @@ import { cn } from '@/lib/utils';
 interface CapacityBarProps {
   totalUsedHours: number;
   totalCapacity: number;
+  className?: string;
 }
 
 export const CapacityBar: React.FC<CapacityBarProps> = ({
   totalUsedHours,
-  totalCapacity
+  totalCapacity,
+  className
 }) => {
   // Calculate utilization percentage based on actual used hours vs total capacity
   const utilizationPercentage = totalCapacity > 0 ? (totalUsedHours / totalCapacity) * 100 : 0;
@@ -49,7 +51,7 @@ export const CapacityBar: React.FC<CapacityBarProps> = ({
   });
 
   return (
-    <div className="flex items-center justify-center w-full">
+    <div className={cn("flex items-center justify-center w-full", className)}>
       <div className="flex-1 flex justify-center items-center gap-1">
         {/* Horizontal progress bar */}
         <div className="relative">
