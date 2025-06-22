@@ -22,11 +22,28 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
       console.log('- member keys:', Object.keys(member));
     }
     
-    // Always try to access avatar_url directly from the member object
+    // Get the avatar URL from the member object
     const avatarUrl = member.avatar_url;
     
-    // Return the avatar URL if it exists, undefined otherwise
-    return avatarUrl || undefined;
+    if (!avatarUrl) {
+      return undefined;
+    }
+    
+    // If it's already a full URL (starts with http/https), return as is
+    if (avatarUrl.startsWith('http://') || avatarUrl.startsWith('https://')) {
+      return avatarUrl;
+    }
+    
+    // If it starts with /lovable-uploads/, convert to full path
+    if (avatarUrl.startsWith('/lovable-uploads/')) {
+      // Extract just the filename
+      const filename = avatarUrl.replace('/lovable-uploads/', '');
+      // Return the full public path
+      return `/lovable-uploads/${filename}`;
+    }
+    
+    // For any other relative paths, return as is
+    return avatarUrl;
   };
 
   const avatarUrl = getAvatarUrl(member);
@@ -39,17 +56,17 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
     console.log('- Initials fallback:', initials);
     console.log('- Testing image accessibility...');
     
-    // Test if the image is accessible
+    // Test if the image is accessible by trying to fetch it
     if (avatarUrl) {
-      const img = new Image();
-      img.onload = () => {
-        console.log('✅ Image loaded successfully from:', avatarUrl);
-      };
-      img.onerror = (error) => {
-        console.log('❌ Image failed to load from:', avatarUrl);
-        console.log('Error details:', error);
-      };
-      img.src = avatarUrl;
+      fetch(avatarUrl, { method: 'HEAD' })
+        .then(response => {
+          console.log('✅ Image fetch successful:', response.status, response.statusText);
+          console.log('- Response headers:', Object.fromEntries(response.headers.entries()));
+        })
+        .catch(error => {
+          console.log('❌ Image fetch failed:', error);
+          console.log('- Trying alternative: Check if file exists in public directory');
+        });
     }
   }
 
@@ -64,6 +81,7 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
             console.log('- Image element:', e.target);
             console.log('- naturalWidth:', (e.target as HTMLImageElement).naturalWidth);
             console.log('- naturalHeight:', (e.target as HTMLImageElement).naturalHeight);
+            console.log('- Final src:', (e.target as HTMLImageElement).src);
           }
         }}
         onError={(e) => {
@@ -72,6 +90,7 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
             console.log('- Error target:', e.target);
             console.log('- Attempted URL:', avatarUrl);
             console.log('- Error type:', e.type);
+            console.log('- Image src:', (e.target as HTMLImageElement).src);
           }
         }}
       />
