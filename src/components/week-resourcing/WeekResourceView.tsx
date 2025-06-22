@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -249,8 +250,8 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             members={allMembers || []}
             projects={projects || []}
             allocationMap={allocationMap}
-            annualLeaveData={[]}
-            holidaysData={[]}
+            annualLeaveData={{}}
+            holidaysData={{}}
             getMemberTotal={getMemberTotal}
             getProjectCount={getProjectCount}
             getWeeklyLeave={getWeeklyLeave}

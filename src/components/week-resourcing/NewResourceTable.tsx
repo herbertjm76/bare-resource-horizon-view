@@ -8,12 +8,13 @@ interface NewResourceTableProps {
   members: any[];
   projects: any[];
   allocationMap: Map<string, number>;
-  annualLeaveData: any[];
-  holidaysData: any[];
+  annualLeaveData: Record<string, number>;
+  holidaysData: Record<string, number>;
   getMemberTotal: (memberId: string) => number;
   getProjectCount: (memberId: string) => number;
-  getWeeklyLeave: (memberId: string) => number;
+  getWeeklyLeave: (memberId: string) => Array<{ date: string; hours: number }>;
   viewMode: 'compact' | 'expanded';
+  selectedWeek?: Date;
 }
 
 export const NewResourceTable: React.FC<NewResourceTableProps> = ({
@@ -25,7 +26,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   getMemberTotal,
   getProjectCount,
   getWeeklyLeave,
-  viewMode
+  viewMode,
+  selectedWeek = new Date()
 }) => {
   const tableClassName = viewMode === 'compact' 
     ? 'resource-table-compact weekly-table' 
@@ -100,6 +102,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                 getProjectCount={getProjectCount}
                 getWeeklyLeave={getWeeklyLeave}
                 viewMode={viewMode}
+                selectedWeek={selectedWeek}
               />
             ))}
             <NewResourceSummaryRow
