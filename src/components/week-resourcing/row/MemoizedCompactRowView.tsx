@@ -18,9 +18,11 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   allocationMap,
   annualLeaveData,
   holidaysData,
+  otherLeaveData,
   getMemberTotal,
   getProjectCount,
   getWeeklyLeave,
+  updateOtherLeave,
   onOtherLeaveEdit,
 }) => {
   const {
@@ -40,9 +42,11 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     allocationMap,
     annualLeaveData,
     holidaysData,
+    otherLeaveData,
     getMemberTotal,
     getProjectCount,
     getWeeklyLeave,
+    updateOtherLeave,
     onOtherLeaveEdit,
   });
 
@@ -103,19 +107,13 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   );
 };
 
-// Memoize the component to prevent unnecessary rerenders
+// Memoize with simplified comparison
 export const CompactRowView = memo(CompactRowViewComponent, (prevProps, nextProps) => {
-  // Custom comparison function to prevent unnecessary rerenders
+  // Only compare essential props that actually indicate a real change
   return (
     prevProps.member.id === nextProps.member.id &&
     prevProps.memberIndex === nextProps.memberIndex &&
     prevProps.projects.length === nextProps.projects.length &&
-    prevProps.allocationMap === nextProps.allocationMap &&
-    prevProps.annualLeaveData === nextProps.annualLeaveData &&
-    prevProps.holidaysData === nextProps.holidaysData &&
-    prevProps.getMemberTotal === nextProps.getMemberTotal &&
-    prevProps.getProjectCount === nextProps.getProjectCount &&
-    prevProps.getWeeklyLeave === nextProps.getWeeklyLeave &&
-    prevProps.onOtherLeaveEdit === nextProps.onOtherLeaveEdit
+    prevProps.allocationMap.size === nextProps.allocationMap.size
   );
 });

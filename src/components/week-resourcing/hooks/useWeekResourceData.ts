@@ -60,27 +60,44 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     return map;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Calculate member totals with stable callback
-  const getMemberTotal = useCallback((memberId: string) => {
-    let total = 0;
+  // Create stable member totals map to avoid recalculation
+  const memberTotalsMap = useMemo(() => {
+    const totalsMap = new Map<string, number>();
     comprehensiveWeeklyAllocations.forEach(allocation => {
-      if (allocation.resource_id === memberId) {
-        total += allocation.hours || 0;
-      }
+      const current = totalsMap.get(allocation.resource_id) || 0;
+      totalsMap.set(allocation.resource_id, current + (allocation.hours || 0));
     });
-    return total;
+    return totalsMap;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Calculate project count per member with stable callback
-  const getProjectCount = useCallback((memberId: string) => {
-    const uniqueProjects = new Set<string>();
+  // Create stable project count map to avoid recalculation
+  const projectCountMap = useMemo(() => {
+    const countMap = new Map<string, number>();
     comprehensiveWeeklyAllocations.forEach(allocation => {
-      if (allocation.resource_id === memberId && (allocation.hours || 0) > 0) {
-        uniqueProjects.add(allocation.project_id);
+      if ((allocation.hours || 0) > 0) {
+        const current = countMap.get(allocation.resource_id) || new Set<string>();
+        current.add(allocation.project_id);
+        countMap.set(allocation.resource_id, current);
       }
     });
-    return uniqueProjects.size;
+    
+    // Convert sets to counts
+    const finalCountMap = new Map<string, number>();
+    countMap.forEach((projectSet, memberId) => {
+      finalCountMap.set(memberId, projectSet.size);
+    });
+    return finalCountMap;
   }, [comprehensiveWeeklyAllocations]);
+
+  // Calculate member totals with stable callback using the pre-calculated map
+  const getMemberTotal = useCallback((memberId: string) => {
+    return memberTotalsMap.get(memberId) || 0;
+  }, [memberTotalsMap]);
+
+  // Calculate project count per member with stable callback using the pre-calculated map
+  const getProjectCount = useCallback((memberId: string) => {
+    return projectCountMap.get(memberId) || 0;
+  }, [projectCountMap]);
 
   // Create a proper getWeeklyLeave function with stable callback
   const getWeeklyLeave = useCallback((memberId: string): Array<{ date: string; hours: number }> => {

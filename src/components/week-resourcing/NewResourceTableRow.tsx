@@ -58,20 +58,16 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = React.mem
 
   return <CompactRowView {...sharedProps} viewMode="compact" />;
 }, (prevProps, nextProps) => {
-  // Custom comparison to prevent unnecessary rerenders
+  // Simplified comparison - only check essential props that actually change
   return (
     prevProps.member.id === nextProps.member.id &&
     prevProps.memberIndex === nextProps.memberIndex &&
+    prevProps.viewMode === nextProps.viewMode &&
     prevProps.projects.length === nextProps.projects.length &&
-    prevProps.allocationMap === nextProps.allocationMap &&
+    prevProps.allocationMap.size === nextProps.allocationMap.size &&
+    // Compare critical data objects by reference (they should be stable from the hook)
     prevProps.annualLeaveData === nextProps.annualLeaveData &&
     prevProps.holidaysData === nextProps.holidaysData &&
-    prevProps.otherLeaveData === nextProps.otherLeaveData &&
-    prevProps.getMemberTotal === nextProps.getMemberTotal &&
-    prevProps.getProjectCount === nextProps.getProjectCount &&
-    prevProps.getWeeklyLeave === nextProps.getWeeklyLeave &&
-    prevProps.updateOtherLeave === nextProps.updateOtherLeave &&
-    prevProps.viewMode === nextProps.viewMode &&
-    prevProps.onOtherLeaveEdit === nextProps.onOtherLeaveEdit
+    prevProps.otherLeaveData === nextProps.otherLeaveData
   );
 });

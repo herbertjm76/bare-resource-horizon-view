@@ -20,12 +20,15 @@ export interface RowData {
 export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberIndex'>) => {
   const [editableOtherLeave, setEditableOtherLeave] = useState(0);
   
-  // Memoize basic values to prevent recalculation
+  // Memoize basic values to prevent recalculation - make these more stable
+  const memberId = useMemo(() => member?.id || '', [member?.id]);
   const weeklyCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
-  const memberId = member?.id || '';
   
+  // Use the callback functions directly from props instead of recalculating
   const totalUsedHours = useMemo(() => props.getMemberTotal(memberId), [props.getMemberTotal, memberId]);
   const projectCount = useMemo(() => props.getProjectCount(memberId), [props.getProjectCount, memberId]);
+  
+  // Memoize data lookups with stable references
   const annualLeave = useMemo(() => props.annualLeaveData[memberId] || 0, [props.annualLeaveData, memberId]);
   const holidayHours = useMemo(() => props.holidaysData[memberId] || 0, [props.holidaysData, memberId]);
   const otherLeave = useMemo(() => props.otherLeaveData?.[memberId] || 0, [props.otherLeaveData, memberId]);
@@ -44,6 +47,7 @@ export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberI
     return typeof props.updateOtherLeave === "function";
   }, [props.updateOtherLeave]);
 
+  // Stable callback for other leave changes
   const handleOtherLeaveChange = useCallback(async (value: number) => {
     if (props.updateOtherLeave && memberId) {
       const success = await props.updateOtherLeave(memberId, value);
@@ -57,6 +61,7 @@ export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberI
     }
   }, [props.updateOtherLeave, props.onOtherLeaveEdit, memberId]);
 
+  // Stable callback for project breakdown
   const getProjectBreakdown = useCallback((project: any, hours: number) => ({
     projectName: project.name,
     projectCode: project.code,
@@ -66,6 +71,7 @@ export const useRowData = (member: any, props: Omit<RowData, 'member' | 'memberI
     isActive: !!(hours > 0)
   }), []);
 
+  // Return stable object with all computed values
   return useMemo(() => ({
     weeklyCapacity,
     totalUsedHours,
