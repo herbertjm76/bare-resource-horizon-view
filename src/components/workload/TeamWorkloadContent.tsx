@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Search, Filter, X, Calendar, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Filter, X, Calendar, Users, Clock, TrendingUp } from 'lucide-react';
 import { TeamMember } from '@/components/dashboard/types';
 import { WeeklyWorkloadCalendar } from './WeeklyWorkloadCalendar';
 import { useWeeklyWorkloadData } from './hooks/useWeeklyWorkloadData';
@@ -58,12 +58,64 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
     weekStartDates 
   } = useWeeklyWorkloadData(selectedWeek, filteredMembers, periodWeeks);
 
-  const activeFiltersCount = [activeFilter, searchQuery].filter(Boolean).length;
+  const activeFiltersCount = [activeFilter !== 'all' ? activeFilter : '', searchQuery].filter(Boolean).length;
+
+  // Calculate workload metrics
+  const calculateWorkloadMetrics = () => {
+    if (!weeklyWorkloadData || Object.keys(weeklyWorkloadData).length === 0) {
+      return {
+        totalCapacity: 0,
+        totalAllocated: 0,
+        utilizationRate: 0,
+        overloadedMembers: 0,
+        underUtilizedMembers: 0,
+        availableHours: 0
+      };
+    }
+
+    let totalCapacity = 0;
+    let totalAllocated = 0;
+    let overloadedMembers = 0;
+    let underUtilizedMembers = 0;
+
+    filteredMembers.forEach(member => {
+      const weeklyCapacity = member.weekly_capacity || 40;
+      const memberTotalCapacity = weeklyCapacity * periodWeeks;
+      totalCapacity += memberTotalCapacity;
+
+      const memberData = weeklyWorkloadData[member.id] || {};
+      const memberTotalAllocated = Object.values(memberData).reduce((sum, week) => sum + (week?.total || 0), 0);
+      totalAllocated += memberTotalAllocated;
+
+      const memberUtilization = memberTotalCapacity > 0 ? (memberTotalAllocated / memberTotalCapacity) * 100 : 0;
+      
+      if (memberUtilization > 100) {
+        overloadedMembers++;
+      } else if (memberUtilization < 60) {
+        underUtilizedMembers++;
+      }
+    });
+
+    const utilizationRate = totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
+    const availableHours = Math.max(0, totalCapacity - totalAllocated);
+
+    return {
+      totalCapacity,
+      totalAllocated,
+      utilizationRate,
+      overloadedMembers,
+      underUtilizedMembers,
+      availableHours
+    };
+  };
+
+  const metrics = calculateWorkloadMetrics();
 
   if (isLoading || isLoadingWorkload) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-32 w-full" />
         <Skeleton className="h-96 w-full" />
       </div>
     );
@@ -126,19 +178,25 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
                 </Button>
               )}
             </div>
+
+            {/* Period Info */}
+            <div className="text-sm text-gray-600">
+              Showing {periodWeeks} weeks of workload data
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Workload Summary Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-500" />
+              <TrendingUp className="h-5 w-5 text-blue-500" />
               <div>
-                <p className="text-sm font-medium">Total Members</p>
-                <p className="text-2xl font-bold">{filteredMembers.length}</p>
+                <p className="text-sm font-medium">Team Utilization</p>
+                <p className="text-2xl font-bold">{metrics.utilizationRate}%</p>
+                <p className="text-xs text-gray-500">{metrics.totalAllocated}h / {metrics.totalCapacity}h</p>
               </div>
             </div>
           </CardContent>
@@ -147,10 +205,11 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-green-500" />
+              <Clock className="h-5 w-5 text-green-500" />
               <div>
-                <p className="text-sm font-medium">Weeks Shown</p>
-                <p className="text-2xl font-bold">{periodWeeks}</p>
+                <p className="text-sm font-medium">Available Hours</p>
+                <p className="text-2xl font-bold">{Math.round(metrics.availableHours)}h</p>
+                <p className="text-xs text-gray-500">Next {periodWeeks} weeks</p>
               </div>
             </div>
           </CardContent>
@@ -159,10 +218,24 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Filter className="h-5 w-5 text-purple-500" />
+              <Users className="h-5 w-5 text-orange-500" />
               <div>
-                <p className="text-sm font-medium">Active Filters</p>
-                <p className="text-2xl font-bold">{activeFiltersCount}</p>
+                <p className="text-sm font-medium">Overloaded</p>
+                <p className="text-2xl font-bold">{metrics.overloadedMembers}</p>
+                <p className="text-xs text-gray-500">Over 100% capacity</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5 text-purple-500" />
+              <div>
+                <p className="text-sm font-medium">Under-utilized</p>
+                <p className="text-2xl font-bold">{metrics.underUtilizedMembers}</p>
+                <p className="text-xs text-gray-500">Under 60% capacity</p>
               </div>
             </div>
           </CardContent>
