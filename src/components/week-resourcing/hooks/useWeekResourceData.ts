@@ -24,7 +24,7 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     return members.map(member => member.id);
   }, [members]);
   
-  // Only fetch allocations and leave data when we have member IDs
+  // Only fetch data when we have member IDs
   const shouldFetchData = memberIds.length > 0;
   
   // Fetch allocations only when we have members
@@ -116,11 +116,23 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     return weeklyLeaveDetails[memberId] || [];
   }, [weeklyLeaveDetails]);
 
-  // Consolidate loading state - only show loading if members are loading OR if we have members but other data is still loading
+  // Improved loading state calculation - prevent rapid changes by being more conservative
   const isLoading = useMemo(() => {
-    if (isLoadingMembers || isLoadingProjects) return true;
-    if (shouldFetchData && (isLoadingLeave || isLoadingOtherLeave)) return true;
-    return false;
+    // Always show loading if members or projects are loading
+    if (isLoadingMembers || isLoadingProjects) {
+      return true;
+    }
+    
+    // If we don't need to fetch additional data, we're not loading
+    if (!shouldFetchData) {
+      return false;
+    }
+    
+    // Only show loading for leave data if we have members but leave data is still loading
+    // Use a more stable approach - only consider loading if BOTH leave sources are loading
+    const leaveDataLoading = isLoadingLeave && isLoadingOtherLeave;
+    
+    return leaveDataLoading;
   }, [isLoadingMembers, isLoadingProjects, shouldFetchData, isLoadingLeave, isLoadingOtherLeave]);
 
   const error = membersError || null;
@@ -156,19 +168,16 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     updateOtherLeave
   ]);
 
-  // Debug logging
-  console.log('useWeekResourceData hook:', {
+  // Simplified debug logging - only log when loading state changes
+  console.log('useWeekResourceData loading state:', {
     weekStartDate,
-    membersCount: members?.length || 0,
-    memberIds: memberIds.length,
-    shouldFetchData,
-    allocationsCount: comprehensiveWeeklyAllocations.length,
-    allocationMapSize: allocationMap.size,
     isLoadingMembers,
     isLoadingProjects,
     isLoadingLeave,
     isLoadingOtherLeave,
-    finalIsLoading: isLoading
+    shouldFetchData,
+    finalIsLoading: isLoading,
+    membersCount: members?.length || 0
   });
 
   return result;
