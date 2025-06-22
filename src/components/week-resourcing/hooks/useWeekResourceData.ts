@@ -1,5 +1,5 @@
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useWeekResourceTeamMembers } from './useWeekResourceTeamMembers';
 import { useWeekResourceProjects } from './useWeekResourceProjects';
 import { useComprehensiveAllocations } from './useComprehensiveAllocations';
@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 
 export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
   // Convert Date to string format for API calls
-  const weekStartDate = format(selectedWeek, 'yyyy-MM-dd');
+  const weekStartDate = useMemo(() => format(selectedWeek, 'yyyy-MM-dd'), [selectedWeek]);
   
   // Fetch team members
   const { members, loadingMembers: isLoadingMembers, membersError } = useWeekResourceTeamMembers();
@@ -50,7 +50,7 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     updateOtherLeave 
   } = useWeeklyOtherLeaveData(weekStartDate, memberIds);
 
-  // Create allocation map
+  // Create allocation map with stable reference
   const allocationMap = useMemo(() => {
     const map = new Map<string, number>();
     comprehensiveWeeklyAllocations.forEach(allocation => {
@@ -60,43 +60,38 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     return map;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Calculate member totals
-  const getMemberTotal = useMemo(() => {
-    return (memberId: string) => {
-      let total = 0;
-      comprehensiveWeeklyAllocations.forEach(allocation => {
-        if (allocation.resource_id === memberId) {
-          total += allocation.hours || 0;
-        }
-      });
-      return total;
-    };
+  // Calculate member totals with stable callback
+  const getMemberTotal = useCallback((memberId: string) => {
+    let total = 0;
+    comprehensiveWeeklyAllocations.forEach(allocation => {
+      if (allocation.resource_id === memberId) {
+        total += allocation.hours || 0;
+      }
+    });
+    return total;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Calculate project count per member
-  const getProjectCount = useMemo(() => {
-    return (memberId: string) => {
-      const uniqueProjects = new Set<string>();
-      comprehensiveWeeklyAllocations.forEach(allocation => {
-        if (allocation.resource_id === memberId && (allocation.hours || 0) > 0) {
-          uniqueProjects.add(allocation.project_id);
-        }
-      });
-      return uniqueProjects.size;
-    };
+  // Calculate project count per member with stable callback
+  const getProjectCount = useCallback((memberId: string) => {
+    const uniqueProjects = new Set<string>();
+    comprehensiveWeeklyAllocations.forEach(allocation => {
+      if (allocation.resource_id === memberId && (allocation.hours || 0) > 0) {
+        uniqueProjects.add(allocation.project_id);
+      }
+    });
+    return uniqueProjects.size;
   }, [comprehensiveWeeklyAllocations]);
 
-  // Create a proper getWeeklyLeave function that returns the expected array format
-  const getWeeklyLeave = useMemo(() => {
-    return (memberId: string): Array<{ date: string; hours: number }> => {
-      return weeklyLeaveDetails[memberId] || [];
-    };
+  // Create a proper getWeeklyLeave function with stable callback
+  const getWeeklyLeave = useCallback((memberId: string): Array<{ date: string; hours: number }> => {
+    return weeklyLeaveDetails[memberId] || [];
   }, [weeklyLeaveDetails]);
 
   const isLoading = isLoadingMembers || isLoadingProjects || isLoadingLeave || isLoadingOtherLeave;
   const error = membersError || null;
 
-  return {
+  // Return memoized object to prevent unnecessary rerenders
+  return useMemo(() => ({
     allMembers: members || [],
     projects,
     allocations: comprehensiveWeeklyAllocations,
@@ -110,5 +105,19 @@ export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
     holidaysData,
     otherLeaveData,
     updateOtherLeave
-  };
+  }), [
+    members,
+    projects,
+    comprehensiveWeeklyAllocations,
+    isLoading,
+    error,
+    allocationMap,
+    getMemberTotal,
+    getProjectCount,
+    getWeeklyLeave,
+    annualLeaveData,
+    holidaysData,
+    otherLeaveData,
+    updateOtherLeave
+  ]);
 };

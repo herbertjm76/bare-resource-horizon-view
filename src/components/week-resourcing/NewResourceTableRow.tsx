@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { ExpandedRowView } from './row/ExpandedRowView';
-import { CompactRowView } from './row/CompactRowView';
+import { ExpandedRowView } from './row/MemoizedExpandedRowView';
+import { CompactRowView } from './row/MemoizedCompactRowView';
 
 interface NewResourceTableRowProps {
   member: any;
@@ -20,7 +20,7 @@ interface NewResourceTableRowProps {
   selectedWeek?: Date;
 }
 
-export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
+export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = React.memo(({
   member,
   memberIndex,
   projects,
@@ -57,4 +57,21 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = ({
   }
 
   return <CompactRowView {...sharedProps} viewMode="compact" />;
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison to prevent unnecessary rerenders
+  return (
+    prevProps.member.id === nextProps.member.id &&
+    prevProps.memberIndex === nextProps.memberIndex &&
+    prevProps.projects.length === nextProps.projects.length &&
+    prevProps.allocationMap === nextProps.allocationMap &&
+    prevProps.annualLeaveData === nextProps.annualLeaveData &&
+    prevProps.holidaysData === nextProps.holidaysData &&
+    prevProps.otherLeaveData === nextProps.otherLeaveData &&
+    prevProps.getMemberTotal === nextProps.getMemberTotal &&
+    prevProps.getProjectCount === nextProps.getProjectCount &&
+    prevProps.getWeeklyLeave === nextProps.getWeeklyLeave &&
+    prevProps.updateOtherLeave === nextProps.updateOtherLeave &&
+    prevProps.viewMode === nextProps.viewMode &&
+    prevProps.onOtherLeaveEdit === nextProps.onOtherLeaveEdit
+  );
+});
