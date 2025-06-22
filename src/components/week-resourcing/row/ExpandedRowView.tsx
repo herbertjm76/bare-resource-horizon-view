@@ -35,6 +35,7 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
     holidayHours,
     leaveDays,
     displayedOtherLeave,
+    editableOtherLeave,
     remarks,
     handleOtherLeaveChange,
     getProjectBreakdown
