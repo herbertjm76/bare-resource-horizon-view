@@ -15,9 +15,15 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
   };
 
   const getAvatarUrl = (member: TeamMember): string | undefined => {
-    // Debug logging for Jingjing Kim specifically
+    // Debug logging for specific members
     if (member.first_name?.toLowerCase() === 'jingjing' && member.last_name?.toLowerCase() === 'kim') {
       console.log('🔍 Jingjing Kim Avatar Debug:');
+      console.log('- avatar_url from member:', member.avatar_url);
+      console.log('- member keys:', Object.keys(member));
+    }
+    
+    if (member.first_name?.toLowerCase() === 'rob' && member.last_name?.toLowerCase() === 'night') {
+      console.log('🔍 Rob Night Avatar Debug:');
       console.log('- avatar_url from member:', member.avatar_url);
       console.log('- member keys:', Object.keys(member));
     }
@@ -34,12 +40,9 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
       return avatarUrl;
     }
     
-    // If it starts with /lovable-uploads/, convert to full path
+    // If it starts with /lovable-uploads/, return it as is (this should work)
     if (avatarUrl.startsWith('/lovable-uploads/')) {
-      // Extract just the filename
-      const filename = avatarUrl.replace('/lovable-uploads/', '');
-      // Return the full public path
-      return `/lovable-uploads/${filename}`;
+      return avatarUrl;
     }
     
     // For any other relative paths, return as is
@@ -49,25 +52,17 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
   const avatarUrl = getAvatarUrl(member);
   const initials = getUserInitials(member);
 
-  // Debug logging for Jingjing Kim specifically - now with more detail
+  // Debug logging for specific members - now with more detail
   if (member.first_name?.toLowerCase() === 'jingjing' && member.last_name?.toLowerCase() === 'kim') {
     console.log('🖼️ Final avatar rendering for Jingjing Kim:');
     console.log('- Final avatarUrl:', avatarUrl);
     console.log('- Initials fallback:', initials);
-    console.log('- Testing image accessibility...');
-    
-    // Test if the image is accessible by trying to fetch it
-    if (avatarUrl) {
-      fetch(avatarUrl, { method: 'HEAD' })
-        .then(response => {
-          console.log('✅ Image fetch successful:', response.status, response.statusText);
-          console.log('- Response headers:', Object.fromEntries(response.headers.entries()));
-        })
-        .catch(error => {
-          console.log('❌ Image fetch failed:', error);
-          console.log('- Trying alternative: Check if file exists in public directory');
-        });
-    }
+  }
+  
+  if (member.first_name?.toLowerCase() === 'rob' && member.last_name?.toLowerCase() === 'night') {
+    console.log('🖼️ Final avatar rendering for Rob Night:');
+    console.log('- Final avatarUrl:', avatarUrl);
+    console.log('- Initials fallback:', initials);
   }
 
   return (
@@ -76,22 +71,20 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
         src={avatarUrl} 
         alt={`${member.first_name} ${member.last_name}`}
         onLoad={(e) => {
-          if (member.first_name?.toLowerCase() === 'jingjing' && member.last_name?.toLowerCase() === 'kim') {
-            console.log('✅ AvatarImage onLoad triggered for Jingjing Kim');
-            console.log('- Image element:', e.target);
-            console.log('- naturalWidth:', (e.target as HTMLImageElement).naturalWidth);
-            console.log('- naturalHeight:', (e.target as HTMLImageElement).naturalHeight);
-            console.log('- Final src:', (e.target as HTMLImageElement).src);
-          }
+          const memberName = `${member.first_name} ${member.last_name}`;
+          console.log(`✅ AvatarImage onLoad triggered for ${memberName}`);
+          console.log('- Image element:', e.target);
+          console.log('- naturalWidth:', (e.target as HTMLImageElement).naturalWidth);
+          console.log('- naturalHeight:', (e.target as HTMLImageElement).naturalHeight);
+          console.log('- Final src:', (e.target as HTMLImageElement).src);
         }}
         onError={(e) => {
-          if (member.first_name?.toLowerCase() === 'jingjing' && member.last_name?.toLowerCase() === 'kim') {
-            console.log('❌ AvatarImage onError triggered for Jingjing Kim');
-            console.log('- Error target:', e.target);
-            console.log('- Attempted URL:', avatarUrl);
-            console.log('- Error type:', e.type);
-            console.log('- Image src:', (e.target as HTMLImageElement).src);
-          }
+          const memberName = `${member.first_name} ${member.last_name}`;
+          console.log(`❌ AvatarImage onError triggered for ${memberName}`);
+          console.log('- Error target:', e.target);
+          console.log('- Attempted URL:', avatarUrl);
+          console.log('- Error type:', e.type);
+          console.log('- Image src:', (e.target as HTMLImageElement).src);
         }}
       />
       <AvatarFallback className="bg-brand-violet text-white">
