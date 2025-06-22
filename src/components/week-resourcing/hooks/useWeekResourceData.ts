@@ -4,8 +4,12 @@ import { useWeekResourceTeamMembers } from './useWeekResourceTeamMembers';
 import { useWeekResourceProjects } from './useWeekResourceProjects';
 import { useComprehensiveAllocations } from './useComprehensiveAllocations';
 import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
+import { format } from 'date-fns';
 
-export const useWeekResourceData = (weekStartDate: string, filters: any) => {
+export const useWeekResourceData = (selectedWeek: Date, filters: any) => {
+  // Convert Date to string format for API calls
+  const weekStartDate = format(selectedWeek, 'yyyy-MM-dd');
+  
   // Fetch team members
   const { members, loadingMembers: isLoadingMembers, membersError } = useWeekResourceTeamMembers();
   
@@ -13,7 +17,7 @@ export const useWeekResourceData = (weekStartDate: string, filters: any) => {
   const { data: projects = [], isLoading: isLoadingProjects } = useWeekResourceProjects({ filters });
   
   // Extract member IDs for allocations and leave data
-  const memberIds = useMemo(() => members.map(member => member.id), [members]);
+  const memberIds = useMemo(() => members?.map(member => member.id) || [], [members]);
   
   // Fetch allocations
   const { comprehensiveWeeklyAllocations = [] } = useComprehensiveAllocations({ 
@@ -23,8 +27,8 @@ export const useWeekResourceData = (weekStartDate: string, filters: any) => {
   
   // Fetch leave data
   const { 
-    annualLeaveData, 
-    holidaysData, 
+    annualLeaveData = {}, 
+    holidaysData = {}, 
     isLoading: isLoadingLeave 
   } = useWeekResourceLeaveData({ 
     weekStartDate, 
@@ -54,7 +58,7 @@ export const useWeekResourceData = (weekStartDate: string, filters: any) => {
     };
   }, [comprehensiveWeeklyAllocations]);
 
-  // Calculate project count per member - fixed logic
+  // Calculate project count per member
   const getProjectCount = useMemo(() => {
     return (memberId: string) => {
       const uniqueProjects = new Set<string>();
@@ -63,24 +67,22 @@ export const useWeekResourceData = (weekStartDate: string, filters: any) => {
           uniqueProjects.add(allocation.project_id);
         }
       });
-      console.log(`Project count for member ${memberId}:`, uniqueProjects.size, 'projects:', Array.from(uniqueProjects));
       return uniqueProjects.size;
     };
   }, [comprehensiveWeeklyAllocations]);
 
-  // Create a simple getWeeklyLeave function that returns empty array for now
+  // Create a simple getWeeklyLeave function
   const getWeeklyLeave = useMemo(() => {
     return (memberId: string) => {
-      // This could be enhanced to return actual weekly leave breakdown
-      return [];
+      return annualLeaveData[memberId] || 0;
     };
-  }, []);
+  }, [annualLeaveData]);
 
   const isLoading = isLoadingMembers || isLoadingProjects || isLoadingLeave;
   const error = membersError || null;
 
   return {
-    members,
+    allMembers: members || [],
     projects,
     allocations: comprehensiveWeeklyAllocations,
     isLoading,
@@ -89,7 +91,7 @@ export const useWeekResourceData = (weekStartDate: string, filters: any) => {
     getMemberTotal,
     getProjectCount,
     getWeeklyLeave,
-    annualLeaveData: annualLeaveData || {},
-    holidaysData: holidaysData || {}
+    annualLeaveData,
+    holidaysData
   };
 };

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Filter, X, Calendar, Users, Clock, TrendingUp } from 'lucide-react';
 import { WeekStartSelector } from '@/components/workload/WeekStartSelector';
 import { NewResourceTable } from './NewResourceTable';
-import { useWeeklyResourceData } from '@/components/weekly-overview/hooks/useWeeklyResourceData';
+import { useWeekResourceData } from './hooks/useWeekResourceData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, isThisWeek } from 'date-fns';
 
@@ -35,12 +36,12 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     allMembers, 
     projects, 
     isLoading, 
-    getMemberAllocation,
     getMemberTotal,
     getProjectCount,
     getWeeklyLeave,
-    allocationMap
-  } = useWeeklyResourceData(selectedWeek, filters);
+    allocationMap,
+    error
+  } = useWeekResourceData(selectedWeek, filters);
 
   const handleWeekChange = (date: Date) => {
     setSelectedWeek(date);
@@ -109,6 +110,22 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   const metrics = calculateWeeklyMetrics();
   const isCurrentWeek = isThisWeek(selectedWeek);
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <p className="text-red-600">Error loading data: {error.message}</p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            className="mt-4"
+          >
+            Reload Page
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -166,7 +183,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                 onWeekChange={handleWeekChange}
               />
               {isCurrentWeek && (
-                <Badge variant="brand" className="ml-2">
+                <Badge variant="default" className="ml-2">
                   Current Week
                 </Badge>
               )}
@@ -246,7 +263,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             holidaysData={[]}
             getMemberTotal={getMemberTotal}
             getProjectCount={getProjectCount}
-            getWeeklyLeave={(memberId: string) => 0}
+            getWeeklyLeave={getWeeklyLeave}
             viewMode="compact"
           />
         </CardContent>

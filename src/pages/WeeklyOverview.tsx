@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
 import { WeekResourceView } from '@/components/week-resourcing/WeekResourceView';
-import { OfficeSettingsProvider } from '@/context/officeSettings';
 import { startOfWeek, format } from 'date-fns';
 import { Toaster } from 'sonner';
 import { Calendar } from 'lucide-react';
@@ -37,31 +36,29 @@ const WeeklyOverview = () => {
   
   return (
     <StandardLayout>
-      <OfficeSettingsProvider>
-        <div className="space-y-6 mb-6">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                <Calendar className="h-8 w-8 text-brand-violet" />
-                Weekly Overview
-              </h1>
-              <p className="text-muted-foreground">
-                View and manage weekly resource allocations for your team
-              </p>
-            </div>
+      <div className="space-y-6 mb-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+          <div className="space-y-2">
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+              <Calendar className="h-8 w-8 text-brand-violet" />
+              Weekly Overview
+            </h1>
+            <p className="text-muted-foreground">
+              View and manage weekly resource allocations for your team
+            </p>
           </div>
         </div>
+      </div>
 
-        <WeekResourceView
-          selectedWeek={selectedWeek}
-          setSelectedWeek={setSelectedWeek}
-          onWeekChange={handleWeekChange}
-          weekLabel={weekLabel}
-          filters={filters}
-          onFilterChange={handleFilterChange}
-        />
-        <Toaster position="top-right" />
-      </OfficeSettingsProvider>
+      <WeekResourceView
+        selectedWeek={selectedWeek}
+        setSelectedWeek={setSelectedWeek}
+        onWeekChange={handleWeekChange}
+        weekLabel={weekLabel}
+        filters={filters}
+        onFilterChange={handleFilterChange}
+      />
+      <Toaster position="top-right" />
     </StandardLayout>
   );
 };
