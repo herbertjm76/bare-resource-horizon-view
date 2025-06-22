@@ -1,4 +1,3 @@
-
 import React, { useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -283,11 +282,6 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
 
       {/* Weekly Resource Table */}
       <Card className="border-none shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-semibold">
-            Weekly Resource Allocation - {format(selectedWeek, 'MMM d, yyyy')}
-          </CardTitle>
-        </CardHeader>
         <CardContent className="p-0">
           {filteredMembers.length > 0 && projects.length > 0 && allocationMap && (
             <NewResourceTable 
