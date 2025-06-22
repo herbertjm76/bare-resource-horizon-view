@@ -43,6 +43,17 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
     return membersWithAllocations.size;
   };
 
+  const totalHours = getTotalHours();
+  const membersWithWork = getGrandTotalMembers();
+
+  console.log('NewResourceSummaryRow calculations:', {
+    totalHours,
+    membersWithWork,
+    totalMembers: members.length,
+    allocationMapSize: allocationMap.size,
+    sampleAllocations: Array.from(allocationMap.entries()).slice(0, 3)
+  });
+
   return (
     <TableRow className="bg-slate-100 font-semibold border-t-2 border-slate-300">
       <TableCell className="text-center sticky left-0 bg-slate-100 z-10">
@@ -55,10 +66,10 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         —
       </TableCell>
       <TableCell className="text-center">
-        {getGrandTotalMembers()} / {members.length}
+        {membersWithWork} / {members.length}
       </TableCell>
       <TableCell className="text-center font-bold text-lg">
-        {getTotalHours()}h
+        {totalHours}h
       </TableCell>
       {projects.map((project) => {
         const projectTotal = getProjectTotal(project.id);
