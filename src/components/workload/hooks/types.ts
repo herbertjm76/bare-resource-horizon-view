@@ -28,3 +28,20 @@ export interface DailyWorkloadBreakdown extends WorkloadBreakdown {
 export interface MemberWorkloadData {
   daily: Record<string, DailyWorkloadBreakdown>;
 }
+
+// Add interfaces for the refactored services
+export interface WeekStartDate {
+  date: Date;
+  key: string;
+}
+
+export interface WorkloadDataParams {
+  companyId: string;
+  memberIds: string[];
+  startDate: Date;
+  numberOfWeeks: number;
+}
+
+export interface ProcessedWorkloadResult {
+  [memberId: string]: Record<string, WeeklyWorkloadBreakdown>;
+}
