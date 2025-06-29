@@ -18,3 +18,13 @@ export interface ProjectAllocation {
 export interface WeeklyWorkloadBreakdown extends WorkloadBreakdown {
   projects: ProjectAllocation[];
 }
+
+// Add the missing DailyWorkloadBreakdown type
+export interface DailyWorkloadBreakdown extends WorkloadBreakdown {
+  totalHours: number; // Alias for compatibility
+}
+
+// Add the missing MemberWorkloadData type
+export interface MemberWorkloadData {
+  daily: Record<string, DailyWorkloadBreakdown>;
+}

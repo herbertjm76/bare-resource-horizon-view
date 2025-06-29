@@ -6,9 +6,12 @@ import { TeamMember } from '@/components/dashboard/types';
 import { startOfWeek, format, addWeeks } from 'date-fns';
 import { WeeklyWorkloadBreakdown, ProjectAllocation } from './types';
 
+// Export the type for use in other components
+export { WeeklyWorkloadBreakdown } from './types';
+
 export const useWeeklyWorkloadData = (
-  members: TeamMember[],
   startDate: Date,
+  members: TeamMember[],
   numberOfWeeks: number = 12
 ) => {
   const { company } = useCompany();
@@ -190,9 +193,21 @@ export const useWeeklyWorkloadData = (
     gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  // Generate week start dates for the calendar
+  const weekStartDates = [];
+  for (let i = 0; i < numberOfWeeks; i++) {
+    const weekStart = startOfWeek(addWeeks(startDate, i), { weekStartsOn: 1 });
+    weekStartDates.push({
+      date: weekStart,
+      key: format(weekStart, 'yyyy-MM-dd')
+    });
+  }
+
   return {
     weeklyWorkloadData,
     isLoading,
-    error
+    isLoadingWorkload: isLoading, // Add alias for compatibility
+    error,
+    weekStartDates
   };
 };

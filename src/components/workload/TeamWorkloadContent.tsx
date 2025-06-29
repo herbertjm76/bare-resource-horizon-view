@@ -52,7 +52,7 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   // Fixed to 36 weeks as requested
   const periodWeeks = 36;
   
-  // Use the new weekly workload data hook with the selected week as starting point
+  // Use the new weekly workload data hook with corrected parameter order
   const { 
     weeklyWorkloadData, 
     isLoadingWorkload, 
