@@ -1,84 +1,128 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { format, startOfWeek, addWeeks } from 'date-fns';
-import { ProjectAllocation, WorkloadDataParams } from '../types';
+import { WorkloadDataParams, ProcessedWorkloadResult, WeeklyWorkloadBreakdown } from '../types';
+import { format, startOfWeek, endOfWeek } from 'date-fns';
 
 export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
   const { companyId, memberIds, startDate, numberOfWeeks } = params;
-
-  // Generate week start dates
-  const weekStartDates = [];
-  for (let i = 0; i < numberOfWeeks; i++) {
-    const weekStart = startOfWeek(addWeeks(startDate, i), { weekStartsOn: 1 });
-    weekStartDates.push(format(weekStart, 'yyyy-MM-dd'));
-  }
-
-  console.log('Fetching project allocations for:', {
+  
+  // Calculate the end date for the period
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + (numberOfWeeks * 7));
+  
+  console.log('Fetching project allocations:', {
     companyId,
     memberIds: memberIds.length,
-    weekStartDates: weekStartDates.length
+    startDate: format(startDate, 'yyyy-MM-dd'),
+    endDate: format(endDate, 'yyyy-MM-dd'),
+    numberOfWeeks
   });
 
-  // Get project allocations with project details
-  const { data: allocations, error } = await supabase
+  const { data, error } = await supabase
     .from('project_resource_allocations')
     .select(`
-      resource_id,
-      project_id,
-      hours,
-      week_start_date,
-      projects:project_id (
-        id,
-        name,
-        code
-      )
+      *,
+      projects!inner(id, name, code)
     `)
     .eq('company_id', companyId)
     .in('resource_id', memberIds)
-    .in('week_start_date', weekStartDates);
+    .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
+    .lt('week_start_date', format(endDate, 'yyyy-MM-dd'))
+    .eq('resource_type', 'team_member');
 
   if (error) {
     console.error('Error fetching project allocations:', error);
     throw error;
   }
 
-  console.log('Fetched project allocations:', allocations?.length || 0);
-  return allocations || [];
+  console.log('Fetched project allocations:', data?.length || 0);
+  return data || [];
 };
 
 export const processProjectAllocations = (
   allocations: any[],
-  result: Record<string, Record<string, any>>
+  result: ProcessedWorkloadResult
 ) => {
+  console.log('Processing project allocations:', allocations.length);
+  
+  // Group allocations by member and week
+  const allocationsByMemberWeek = new Map<string, Map<string, number>>();
+  const projectsByMemberWeek = new Map<string, Map<string, any[]>>();
+
   allocations.forEach(allocation => {
     const memberId = allocation.resource_id;
-    const weekKey = allocation.week_start_date;
-    const hours = allocation.hours || 0;
-    
-    if (result[memberId] && result[memberId][weekKey]) {
-      result[memberId][weekKey].projectHours += hours;
-      result[memberId][weekKey].total += hours;
-      
-      // Add project details
-      if (allocation.projects && hours > 0) {
-        const project: ProjectAllocation = {
-          project_id: allocation.project_id,
-          project_name: allocation.projects.name || 'Unknown Project',
-          project_code: allocation.projects.code || 'Unknown Code',
-          hours: hours
-        };
-        
-        // Check if project already exists and sum hours
-        const existingProjectIndex = result[memberId][weekKey].projects.findIndex(
-          (p: ProjectAllocation) => p.project_id === project.project_id
-        );
-        
-        if (existingProjectIndex >= 0) {
-          result[memberId][weekKey].projects[existingProjectIndex].hours += hours;
-        } else {
-          result[memberId][weekKey].projects.push(project);
-        }
-      }
+    const weekStartDate = new Date(allocation.week_start_date);
+    const weekKey = format(weekStartDate, 'yyyy-MM-dd');
+    const hours = parseFloat(allocation.hours) || 0;
+
+    // Initialize member maps if they don't exist
+    if (!allocationsByMemberWeek.has(memberId)) {
+      allocationsByMemberWeek.set(memberId, new Map());
+      projectsByMemberWeek.set(memberId, new Map());
     }
+
+    const memberWeekMap = allocationsByMemberWeek.get(memberId)!;
+    const memberProjectMap = projectsByMemberWeek.get(memberId)!;
+
+    // Sum hours for this member-week combination
+    const currentHours = memberWeekMap.get(weekKey) || 0;
+    memberWeekMap.set(weekKey, currentHours + hours);
+
+    // Track projects for this member-week
+    if (!memberProjectMap.has(weekKey)) {
+      memberProjectMap.set(weekKey, []);
+    }
+    
+    const projects = memberProjectMap.get(weekKey)!;
+    const existingProject = projects.find(p => p.project_id === allocation.project_id);
+    
+    if (existingProject) {
+      existingProject.hours += hours;
+    } else {
+      projects.push({
+        project_id: allocation.project_id,
+        project_name: allocation.projects?.name || 'Unknown Project',
+        project_code: allocation.projects?.code || 'N/A',
+        hours: hours
+      });
+    }
+
+    console.log(`Processing allocation - Member: ${memberId}, Week: ${weekKey}, Hours: ${hours}, Total for week: ${memberWeekMap.get(weekKey)}`);
   });
+
+  // Update the result with processed data
+  allocationsByMemberWeek.forEach((weekMap, memberId) => {
+    if (!result[memberId]) {
+      result[memberId] = {};
+    }
+
+    weekMap.forEach((totalHours, weekKey) => {
+      if (!result[memberId][weekKey]) {
+        result[memberId][weekKey] = {
+          projectHours: 0,
+          annualLeave: 0,
+          officeHolidays: 0,
+          otherLeave: 0,
+          total: 0,
+          projects: []
+        };
+      }
+
+      // Update project hours and projects
+      result[memberId][weekKey].projectHours = totalHours;
+      result[memberId][weekKey].projects = projectsByMemberWeek.get(memberId)?.get(weekKey) || [];
+      
+      // Recalculate total
+      const breakdown = result[memberId][weekKey];
+      breakdown.total = breakdown.projectHours + breakdown.annualLeave + breakdown.officeHolidays + breakdown.otherLeave;
+
+      console.log(`Updated result for ${memberId}, week ${weekKey}:`, {
+        projectHours: breakdown.projectHours,
+        total: breakdown.total,
+        projectCount: breakdown.projects.length
+      });
+    });
+  });
+
+  console.log('Finished processing project allocations. Updated members:', Object.keys(result).length);
 };

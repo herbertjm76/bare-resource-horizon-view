@@ -1,21 +1,24 @@
 
 import { format, startOfWeek, addWeeks } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
-import { WeeklyWorkloadBreakdown, WeekStartDate } from '../types';
+import { ProcessedWorkloadResult, WeekStartDate } from '../types';
 
 export const initializeWorkloadData = (
   members: TeamMember[],
   startDate: Date,
   numberOfWeeks: number
-): Record<string, Record<string, WeeklyWorkloadBreakdown>> => {
-  const result: Record<string, Record<string, WeeklyWorkloadBreakdown>> = {};
-
-  // Initialize all members and weeks with empty data
-  for (const member of members) {
+): ProcessedWorkloadResult => {
+  const result: ProcessedWorkloadResult = {};
+  
+  // Initialize all members with empty weekly data
+  members.forEach(member => {
     result[member.id] = {};
-    for (let i = 0; i < numberOfWeeks; i++) {
-      const weekStart = startOfWeek(addWeeks(startDate, i), { weekStartsOn: 1 });
+    
+    // Initialize each week for this member
+    for (let weekIndex = 0; weekIndex < numberOfWeeks; weekIndex++) {
+      const weekStart = addWeeks(startDate, weekIndex);
       const weekKey = format(weekStart, 'yyyy-MM-dd');
+      
       result[member.id][weekKey] = {
         projectHours: 0,
         annualLeave: 0,
@@ -25,7 +28,13 @@ export const initializeWorkloadData = (
         projects: []
       };
     }
-  }
+  });
+
+  console.log('Initialized workload data for:', {
+    members: members.length,
+    weeks: numberOfWeeks,
+    totalEntries: Object.keys(result).length * numberOfWeeks
+  });
 
   return result;
 };
@@ -34,41 +43,77 @@ export const generateWeekStartDates = (
   startDate: Date,
   numberOfWeeks: number
 ): WeekStartDate[] => {
-  const weekStartDates = [];
+  const weekStartDates: WeekStartDate[] = [];
+  
   for (let i = 0; i < numberOfWeeks; i++) {
-    const weekStart = startOfWeek(addWeeks(startDate, i), { weekStartsOn: 1 });
+    const weekStart = addWeeks(startDate, i);
+    const weekKey = format(weekStart, 'yyyy-MM-dd');
+    
     weekStartDates.push({
       date: weekStart,
-      key: format(weekStart, 'yyyy-MM-dd')
+      key: weekKey
     });
   }
+
+  console.log('Generated week start dates:', {
+    count: weekStartDates.length,
+    firstWeek: weekStartDates[0]?.key,
+    lastWeek: weekStartDates[weekStartDates.length - 1]?.key
+  });
+
   return weekStartDates;
 };
 
 export const debugWorkloadData = (
   members: TeamMember[],
-  result: Record<string, Record<string, WeeklyWorkloadBreakdown>>,
+  result: ProcessedWorkloadResult,
   allocations: any[]
 ) => {
-  // Debug logging for specific member (Paul Julius)
-  const paulMember = members.find(m => 
-    m.first_name?.toLowerCase().includes('paul') || 
-    m.last_name?.toLowerCase().includes('julius')
-  );
+  console.log('=== WORKLOAD DATA DEBUG ===');
   
-  if (paulMember && result[paulMember.id]) {
-    console.log(`Workload calculation for ${paulMember.first_name} ${paulMember.last_name}:`, {
-      memberId: paulMember.id,
-      weeklyData: Object.entries(result[paulMember.id]).slice(0, 5),
-      june9Week: result[paulMember.id]['2024-06-03'] || result[paulMember.id]['2024-06-10'],
-      allocationsSample: allocations?.filter(a => a.resource_id === paulMember.id).slice(0, 5)
-    });
-  }
-
-  console.log('Completed workload data processing. Sample result:', {
-    totalMembers: Object.keys(result).length,
-    totalWeeks: Object.keys(result[Object.keys(result)[0]] || {}).length,
-    sampleMemberWeeks: Object.entries(result)[0]?.[1] ? Object.keys(Object.entries(result)[0][1]).length : 0,
-    allocationsProcessed: allocations?.length || 0
+  // Log overall statistics
+  const totalMembers = Object.keys(result).length;
+  const totalWeeks = totalMembers > 0 ? Object.keys(result[Object.keys(result)[0]]).length : 0;
+  const totalAllocations = allocations.length;
+  
+  console.log('Overall Stats:', {
+    totalMembers,
+    totalWeeks,
+    totalAllocations,
+    expectedEntries: totalMembers * totalWeeks
   });
+  
+  // Log sample data for first few members
+  const sampleMembers = Object.keys(result).slice(0, 3);
+  sampleMembers.forEach(memberId => {
+    const member = members.find(m => m.id === memberId);
+    const memberName = member ? `${member.first_name} ${member.last_name}` : memberId;
+    
+    console.log(`Member: ${memberName} (${memberId})`);
+    
+    const weekKeys = Object.keys(result[memberId]).sort();
+    const sampleWeeks = weekKeys.slice(0, 5);
+    
+    sampleWeeks.forEach(weekKey => {
+      const weekData = result[memberId][weekKey];
+      console.log(`  Week ${weekKey}:`, {
+        projectHours: weekData.projectHours,
+        annualLeave: weekData.annualLeave,
+        otherLeave: weekData.otherLeave,
+        total: weekData.total,
+        projectCount: weekData.projects.length
+      });
+    });
+  });
+
+  // Log allocation distribution
+  const allocationsByMember = new Map<string, number>();
+  allocations.forEach(allocation => {
+    const current = allocationsByMember.get(allocation.resource_id) || 0;
+    allocationsByMember.set(allocation.resource_id, current + (parseFloat(allocation.hours) || 0));
+  });
+
+  console.log('Allocation Totals by Member:', Array.from(allocationsByMember.entries()).slice(0, 5));
+  
+  console.log('=== END WORKLOAD DATA DEBUG ===');
 };
