@@ -5,12 +5,16 @@ export interface WorkloadBreakdown {
   officeHolidays: number;
   otherLeave: number;
   total: number;
+  projects?: ProjectAllocation[];
 }
 
-export interface DailyWorkloadBreakdown extends WorkloadBreakdown {
-  totalHours: number; // Alias for total for compatibility
+export interface ProjectAllocation {
+  project_id: string;
+  project_name: string;
+  project_code: string;
+  hours: number;
 }
 
-export interface MemberWorkloadData {
-  daily: Record<string, DailyWorkloadBreakdown>;
+export interface WeeklyWorkloadBreakdown extends WorkloadBreakdown {
+  projects: ProjectAllocation[];
 }

@@ -36,21 +36,19 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
     return `${member.first_name || ''} ${member.last_name || ''}`.trim();
   };
 
-  // Get workload intensity class for pill styling
-  const getWorkloadPillClass = (hours: number, capacity: number) => {
-    if (!hours) return 'workload-pill empty';
-    const percentage = (hours / capacity) * 100;
-    if (percentage >= 100) return 'workload-pill bg-red-500';
-    if (percentage >= 80) return 'workload-pill bg-orange-500';
-    return 'workload-pill bg-blue-500';
-  };
-
-  // Get utilization badge class
-  const getUtilizationBadgeClass = (percent: number) => {
-    if (percent > 100) return 'utilization-badge high';
-    if (percent >= 80) return 'utilization-badge medium';
-    return 'utilization-badge low';
-  };
+  // Debug logging for workload calculation
+  console.log('WeeklyWorkloadCalendar - Data Summary:', {
+    membersCount: members.length,
+    weeksCount: weekStartDates.length,
+    sampleMemberData: Object.keys(weeklyWorkloadData).slice(0, 3),
+    sampleWeekData: weekStartDates.slice(0, 2).map(week => ({
+      week: week.key,
+      date: format(week.date, 'yyyy-MM-dd'),
+      membersWithData: Object.keys(weeklyWorkloadData).filter(memberId => 
+        weeklyWorkloadData[memberId]?.[week.key]?.total > 0
+      ).length
+    }))
+  });
 
   return (
     <TooltipProvider>
@@ -132,6 +130,7 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
             {members.map((member, memberIndex) => {
               const memberWeeklyData = weeklyWorkloadData[member.id] || {};
               const weeklyCapacity = member.weekly_capacity || 40;
+              const memberDisplayName = getMemberDisplayName(member);
               
               // Calculate total hours across all weeks
               const totalHours = weekStartDates.reduce((sum, week) => {
@@ -141,6 +140,20 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
               
               const totalCapacity = weeklyCapacity * weekStartDates.length;
               const utilizationPercent = totalCapacity > 0 ? Math.round((totalHours / totalCapacity) * 100) : 0;
+
+              // Debug logging for specific member
+              if (memberDisplayName.toLowerCase().includes('paul')) {
+                console.log(`Workload data for ${memberDisplayName}:`, {
+                  memberWeeklyData,
+                  totalHours,
+                  weeklyCapacity,
+                  sampleWeekData: weekStartDates.slice(0, 3).map(week => ({
+                    week: week.key,
+                    date: format(week.date, 'MMM d'),
+                    data: memberWeeklyData[week.key]
+                  }))
+                });
+              }
               
               return (
                 <tr 
@@ -150,7 +163,7 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
                   <td className="workload-grid-cell member-cell sticky-left-0 bg-inherit z-5 border-r-2 border-gray-300">
                     <div className="member-info">
                       <Avatar className="member-avatar">
-                        <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
+                        <AvatarImage src={getAvatarUrl(member)} alt={memberDisplayName} />
                         <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white' }}>
                           {getUserInitials(member)}
                         </AvatarFallback>
@@ -164,6 +177,7 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
                   {weekStartDates.map((week) => {
                     const weekData = memberWeeklyData[week.key];
                     const weekHours = weekData?.total || 0;
+                    const weekDateString = format(week.date, 'MMM d, yyyy');
                     
                     return (
                       <td 
@@ -182,10 +196,11 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
                               annualLeave: weekData.annualLeave,
                               officeHolidays: weekData.officeHolidays,
                               otherLeave: weekData.otherLeave,
-                              total: weekData.total
+                              total: weekData.total,
+                              projects: weekData.projects || []
                             }}
-                            memberName={`${member.first_name} ${member.last_name}`}
-                            date={format(week.date, 'MMM d, yyyy')}
+                            memberName={memberDisplayName}
+                            date={weekDateString}
                           >
                             <div 
                               className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-semibold text-white cursor-help transition-all duration-200 hover:scale-110"
@@ -206,7 +221,7 @@ export const WeeklyWorkloadCalendar: React.FC<WeeklyWorkloadCalendarProps> = ({
                   })}
                   
                   <td className="workload-grid-cell total-cell bg-gray-50 font-semibold">
-                    <div className={getUtilizationBadgeClass(utilizationPercent)}>
+                    <div className={`utilization-badge ${utilizationPercent > 100 ? 'high' : utilizationPercent >= 80 ? 'medium' : 'low'}`}>
                       {utilizationPercent}%
                     </div>
                   </td>
