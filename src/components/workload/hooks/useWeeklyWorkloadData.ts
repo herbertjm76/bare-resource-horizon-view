@@ -6,8 +6,8 @@ import { TeamMember } from '@/components/dashboard/types';
 import { startOfWeek, format, addWeeks } from 'date-fns';
 import { WeeklyWorkloadBreakdown, ProjectAllocation } from './types';
 
-// Export the type for use in other components
-export { WeeklyWorkloadBreakdown } from './types';
+// Export the type for use in other components - using export type for isolatedModules compatibility
+export type { WeeklyWorkloadBreakdown } from './types';
 
 export const useWeeklyWorkloadData = (
   startDate: Date,
