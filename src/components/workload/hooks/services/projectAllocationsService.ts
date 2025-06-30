@@ -1,16 +1,16 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { WorkloadDataParams, ProcessedWorkloadResult, WeeklyWorkloadBreakdown } from '../types';
-import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addDays, isWithinInterval } from 'date-fns';
 
 export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
   const { companyId, memberIds, startDate, numberOfWeeks } = params;
   
   // Calculate the end date for the period
   const endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + (numberOfWeeks * 7));
+  endDate.setDate(endDate.getDate() + (numberOfWeeks * 7) - 1);
   
-  console.log('Fetching project allocations:', {
+  console.log('Fetching daily project allocations for weekly aggregation:', {
     companyId,
     memberIds: memberIds.length,
     startDate: format(startDate, 'yyyy-MM-dd'),
@@ -18,6 +18,7 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     numberOfWeeks
   });
 
+  // Fetch daily project resource allocations and aggregate to weekly
   const { data, error } = await supabase
     .from('project_resource_allocations')
     .select(`
@@ -43,7 +44,7 @@ export const processProjectAllocations = (
   allocations: any[],
   result: ProcessedWorkloadResult
 ) => {
-  console.log('Processing project allocations:', allocations.length);
+  console.log('Processing project allocations for weekly aggregation:', allocations.length);
   
   // Group allocations by member and week
   const allocationsByMemberWeek = new Map<string, Map<string, number>>();
@@ -54,6 +55,8 @@ export const processProjectAllocations = (
     const weekStartDate = new Date(allocation.week_start_date);
     const weekKey = format(weekStartDate, 'yyyy-MM-dd');
     const hours = parseFloat(allocation.hours) || 0;
+
+    console.log(`Processing allocation - Member: ${memberId}, Week: ${weekKey}, Hours: ${hours}, Project: ${allocation.projects?.name}`);
 
     // Initialize member maps if they don't exist
     if (!allocationsByMemberWeek.has(memberId)) {
@@ -87,7 +90,7 @@ export const processProjectAllocations = (
       });
     }
 
-    console.log(`Processing allocation - Member: ${memberId}, Week: ${weekKey}, Hours: ${hours}, Total for week: ${memberWeekMap.get(weekKey)}`);
+    console.log(`Updated totals - Member: ${memberId}, Week: ${weekKey}, Total Hours: ${memberWeekMap.get(weekKey)}, Project Count: ${projects.length}`);
   });
 
   // Update the result with processed data
@@ -116,13 +119,27 @@ export const processProjectAllocations = (
       const breakdown = result[memberId][weekKey];
       breakdown.total = breakdown.projectHours + breakdown.annualLeave + breakdown.officeHolidays + breakdown.otherLeave;
 
-      console.log(`Updated result for ${memberId}, week ${weekKey}:`, {
+      console.log(`Final result for ${memberId}, week ${weekKey}:`, {
         projectHours: breakdown.projectHours,
         total: breakdown.total,
-        projectCount: breakdown.projects.length
+        projectCount: breakdown.projects.length,
+        projects: breakdown.projects.map(p => `${p.project_name}: ${p.hours}h`)
       });
     });
   });
 
-  console.log('Finished processing project allocations. Updated members:', Object.keys(result).length);
+  console.log('Finished processing project allocations. Members with data:', Object.keys(result).length);
+  
+  // Debug: Log sample results
+  const sampleMemberId = Object.keys(result)[0];
+  if (sampleMemberId) {
+    const sampleWeeks = Object.keys(result[sampleMemberId]).slice(0, 3);
+    console.log(`Sample data for member ${sampleMemberId}:`, 
+      sampleWeeks.map(week => ({
+        week,
+        projectHours: result[sampleMemberId][week].projectHours,
+        projects: result[sampleMemberId][week].projects.length
+      }))
+    );
+  }
 };
