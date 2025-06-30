@@ -1,24 +1,48 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { WorkloadDataParams, ProcessedWorkloadResult, WeeklyWorkloadBreakdown } from '../types';
-import { format, startOfWeek, endOfWeek, addDays, isWithinInterval } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addDays, addWeeks } from 'date-fns';
 
 export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
   const { companyId, memberIds, startDate, numberOfWeeks } = params;
   
-  // Calculate the end date for the period
-  const endDate = new Date(startDate);
-  endDate.setDate(endDate.getDate() + (numberOfWeeks * 7) - 1);
+  // Calculate the end date for the period - include the full last week
+  const endDate = addWeeks(startDate, numberOfWeeks);
   
-  console.log('Fetching daily project allocations for weekly aggregation:', {
+  console.log('🔍 PROJECT ALLOCATIONS: Fetching with parameters:', {
     companyId,
     memberIds: memberIds.length,
+    memberSample: memberIds.slice(0, 3),
     startDate: format(startDate, 'yyyy-MM-dd'),
     endDate: format(endDate, 'yyyy-MM-dd'),
     numberOfWeeks
   });
 
-  // Fetch daily project resource allocations and aggregate to weekly
+  // First, let's see what's actually in the project_resource_allocations table
+  const { data: debugData, error: debugError } = await supabase
+    .from('project_resource_allocations')
+    .select('*')
+    .eq('company_id', companyId)
+    .limit(5);
+
+  console.log('🔍 PROJECT ALLOCATIONS DEBUG: Sample data in table:', debugData);
+  if (debugError) {
+    console.error('🔍 PROJECT ALLOCATIONS DEBUG: Error fetching sample data:', debugError);
+  }
+
+  // Also check if there are any allocations for our specific members
+  const { data: memberDebugData, error: memberDebugError } = await supabase
+    .from('project_resource_allocations')
+    .select('*')
+    .eq('company_id', companyId)
+    .in('resource_id', memberIds)
+    .limit(10);
+
+  console.log('🔍 PROJECT ALLOCATIONS DEBUG: Allocations for our members:', memberDebugData);
+  if (memberDebugError) {
+    console.error('🔍 PROJECT ALLOCATIONS DEBUG: Error fetching member data:', memberDebugError);
+  }
+
+  // Now fetch the actual data with a broader date range to see if we have any data
   const { data, error } = await supabase
     .from('project_resource_allocations')
     .select(`
@@ -32,11 +56,50 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     .eq('resource_type', 'team_member');
 
   if (error) {
-    console.error('Error fetching project allocations:', error);
+    console.error('🔍 PROJECT ALLOCATIONS: Error fetching project allocations:', error);
     throw error;
   }
 
-  console.log('Fetched project allocations:', data?.length || 0);
+  console.log('🔍 PROJECT ALLOCATIONS: Final query result:', {
+    count: data?.length || 0,
+    sampleData: data?.slice(0, 3).map(item => ({
+      resource_id: item.resource_id,
+      week_start_date: item.week_start_date,
+      hours: item.hours,
+      project_name: item.projects?.name
+    }))
+  });
+
+  // If we still have no data, let's try a much broader query to see if there's any data at all
+  if (!data || data.length === 0) {
+    console.log('🔍 PROJECT ALLOCATIONS: No data found, trying broader query...');
+    
+    const { data: broadData, error: broadError } = await supabase
+      .from('project_resource_allocations')
+      .select(`
+        *,
+        projects!inner(id, name, code)
+      `)
+      .eq('company_id', companyId)
+      .in('resource_id', memberIds)
+      .eq('resource_type', 'team_member')
+      .limit(10);
+
+    console.log('🔍 PROJECT ALLOCATIONS: Broader query result:', {
+      count: broadData?.length || 0,
+      sampleData: broadData?.slice(0, 3).map(item => ({
+        resource_id: item.resource_id,
+        week_start_date: item.week_start_date,
+        hours: item.hours,
+        project_name: item.projects?.name
+      }))
+    });
+
+    if (broadError) {
+      console.error('🔍 PROJECT ALLOCATIONS: Error in broader query:', broadError);
+    }
+  }
+
   return data || [];
 };
 
