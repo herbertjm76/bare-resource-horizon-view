@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { WorkloadDataParams, ProcessedWorkloadResult, WeeklyWorkloadBreakdown } from '../types';
 import { format, startOfWeek, endOfWeek, addDays, addWeeks } from 'date-fns';
@@ -29,6 +30,23 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     console.error('🔍 PROJECT ALLOCATIONS DEBUG: Error fetching sample data:', debugError);
   }
 
+  // Check what companies exist in the table
+  const { data: companyData, error: companyError } = await supabase
+    .from('project_resource_allocations')
+    .select('company_id, resource_id, hours, week_start_date')
+    .limit(10);
+
+  console.log('🔍 PROJECT ALLOCATIONS DEBUG: All companies in table:', companyData);
+
+  // Check if there's data for any team member resources
+  const { data: teamMemberData, error: teamMemberError } = await supabase
+    .from('project_resource_allocations')
+    .select('*')
+    .eq('resource_type', 'team_member')
+    .limit(10);
+
+  console.log('🔍 PROJECT ALLOCATIONS DEBUG: Team member allocations in table:', teamMemberData);
+
   // Also check if there are any allocations for our specific members
   const { data: memberDebugData, error: memberDebugError } = await supabase
     .from('project_resource_allocations')
@@ -42,7 +60,30 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     console.error('🔍 PROJECT ALLOCATIONS DEBUG: Error fetching member data:', memberDebugError);
   }
 
-  // Now fetch the actual data with a broader date range to see if we have any data
+  // Check what resource_types exist in the table
+  const { data: resourceTypeData, error: resourceTypeError } = await supabase
+    .from('project_resource_allocations')
+    .select('resource_type, count(*)')
+    .eq('company_id', companyId);
+
+  console.log('🔍 PROJECT ALLOCATIONS DEBUG: Resource types for company:', resourceTypeData);
+
+  // Try without the inner join first to see if that's the issue
+  const { data: dataWithoutJoin, error: errorWithoutJoin } = await supabase
+    .from('project_resource_allocations')
+    .select('*')
+    .eq('company_id', companyId)
+    .in('resource_id', memberIds)
+    .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
+    .lt('week_start_date', format(endDate, 'yyyy-MM-dd'))
+    .eq('resource_type', 'team_member');
+
+  console.log('🔍 PROJECT ALLOCATIONS DEBUG: Query without join:', {
+    count: dataWithoutJoin?.length || 0,
+    sample: dataWithoutJoin?.slice(0, 3)
+  });
+
+  // Now fetch the actual data with the join
   const { data, error } = await supabase
     .from('project_resource_allocations')
     .select(`
