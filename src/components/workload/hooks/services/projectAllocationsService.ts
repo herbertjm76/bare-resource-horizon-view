@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { WorkloadDataParams, ProcessedWorkloadResult, WeeklyWorkloadBreakdown } from '../types';
-import { format, startOfWeek, endOfWeek, addDays, addWeeks } from 'date-fns';
+import { format, startOfWeek, endOfWeek, addDays, addWeeks, parseISO } from 'date-fns';
 import { investigateDataConsistency } from './dataInvestigationService';
 
 export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
@@ -109,17 +109,20 @@ export const processProjectAllocations = (
 ) => {
   console.log('🔍 PROCESSING: Starting project allocations processing:', allocations.length);
   
-  // Group allocations by member and week
+  // Group allocations by member and week - aggregate multiple days within the same week
   const allocationsByMemberWeek = new Map<string, Map<string, number>>();
   const projectsByMemberWeek = new Map<string, Map<string, any[]>>();
 
   allocations.forEach((allocation, index) => {
     const memberId = allocation.resource_id;
-    const weekStartDate = new Date(allocation.week_start_date);
+    const allocationDate = parseISO(allocation.week_start_date);
+    
+    // Find the Monday of the week this allocation belongs to
+    const weekStartDate = startOfWeek(allocationDate, { weekStartsOn: 1 });
     const weekKey = format(weekStartDate, 'yyyy-MM-dd');
     const hours = parseFloat(allocation.hours) || 0;
 
-    console.log(`🔍 PROCESSING: Allocation ${index + 1} - Member: ${memberId}, Week: ${weekKey}, Hours: ${hours}, Project: ${allocation.projects?.name}`);
+    console.log(`🔍 PROCESSING: Allocation ${index + 1} - Member: ${memberId}, Original Date: ${format(allocationDate, 'yyyy-MM-dd')}, Week Start: ${weekKey}, Hours: ${hours}, Project: ${allocation.projects?.name}`);
 
     // Initialize member maps if they don't exist
     if (!allocationsByMemberWeek.has(memberId)) {
@@ -130,7 +133,7 @@ export const processProjectAllocations = (
     const memberWeekMap = allocationsByMemberWeek.get(memberId)!;
     const memberProjectMap = projectsByMemberWeek.get(memberId)!;
 
-    // Sum hours for this member-week combination
+    // Sum hours for this member-week combination (aggregating multiple days in the same week)
     const currentHours = memberWeekMap.get(weekKey) || 0;
     memberWeekMap.set(weekKey, currentHours + hours);
 
