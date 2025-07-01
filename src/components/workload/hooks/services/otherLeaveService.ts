@@ -10,16 +10,9 @@ export const fetchOtherLeave = async (params: WorkloadDataParams) => {
   const endDate = new Date(startDate);
   endDate.setDate(endDate.getDate() + (numberOfWeeks * 7));
   
-  console.log('Fetching other leave:', {
-    companyId,
-    memberIds: memberIds.length,
-    startDate: format(startDate, 'yyyy-MM-dd'),
-    endDate: format(endDate, 'yyyy-MM-dd')
-  });
-
   const { data, error } = await supabase
     .from('weekly_other_leave')
-    .select('*')
+    .select('member_id, week_start_date, hours')
     .eq('company_id', companyId)
     .in('member_id', memberIds)
     .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
@@ -30,7 +23,6 @@ export const fetchOtherLeave = async (params: WorkloadDataParams) => {
     throw error;
   }
 
-  console.log('Fetched other leave entries:', data?.length || 0);
   return data || [];
 };
 
@@ -38,31 +30,28 @@ export const processOtherLeave = (
   otherLeaves: any[],
   result: ProcessedWorkloadResult
 ) => {
-  console.log('Processing other leave entries:', otherLeaves.length);
-  
-  // Group other leave by member and week
-  const leaveByMemberWeek = new Map<string, Map<string, number>>();
+  if (otherLeaves.length === 0) return;
 
-  otherLeaves.forEach(leave => {
+  // Use Map for faster aggregation
+  const memberWeekHours = new Map<string, Map<string, number>>();
+
+  // Single pass aggregation
+  for (const leave of otherLeaves) {
     const memberId = leave.member_id;
     const weekStartDate = new Date(leave.week_start_date);
     const weekKey = format(weekStartDate, 'yyyy-MM-dd');
     const hours = parseFloat(leave.hours) || 0;
 
-    // Initialize member map if it doesn't exist
-    if (!leaveByMemberWeek.has(memberId)) {
-      leaveByMemberWeek.set(memberId, new Map());
+    if (!memberWeekHours.has(memberId)) {
+      memberWeekHours.set(memberId, new Map());
     }
 
-    const memberWeekMap = leaveByMemberWeek.get(memberId)!;
-    const currentHours = memberWeekMap.get(weekKey) || 0;
-    memberWeekMap.set(weekKey, currentHours + hours);
+    const currentHours = memberWeekHours.get(memberId)!.get(weekKey) || 0;
+    memberWeekHours.get(memberId)!.set(weekKey, currentHours + hours);
+  }
 
-    console.log(`Processing other leave - Member: ${memberId}, Week: ${weekKey}, Hours: ${hours}, Total for week: ${memberWeekMap.get(weekKey)}`);
-  });
-
-  // Update the result with processed other leave data
-  leaveByMemberWeek.forEach((weekMap, memberId) => {
+  // Update result
+  memberWeekHours.forEach((weekMap, memberId) => {
     if (!result[memberId]) {
       result[memberId] = {};
     }
@@ -79,19 +68,11 @@ export const processOtherLeave = (
         };
       }
 
-      // Update other leave hours
       result[memberId][weekKey].otherLeave = totalHours;
       
       // Recalculate total
       const breakdown = result[memberId][weekKey];
       breakdown.total = breakdown.projectHours + breakdown.annualLeave + breakdown.officeHolidays + breakdown.otherLeave;
-
-      console.log(`Updated other leave for ${memberId}, week ${weekKey}:`, {
-        otherLeave: breakdown.otherLeave,
-        total: breakdown.total
-      });
     });
   });
-
-  console.log('Finished processing other leave. Updated members:', Object.keys(result).length);
 };

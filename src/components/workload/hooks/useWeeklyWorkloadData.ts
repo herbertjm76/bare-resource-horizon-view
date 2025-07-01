@@ -34,82 +34,39 @@ export const useWeeklyWorkloadData = (
         numberOfWeeks
       };
 
-      console.log('🔍 WORKLOAD DATA: Starting comprehensive workload data fetch:', {
-        companyId: company.id,
-        memberCount: memberIds.length,
-        memberIds: memberIds,
-        memberNames: members.map(m => `${m.first_name} ${m.last_name}`),
-        startDate: format(startDate, 'yyyy-MM-dd'),
-        numberOfWeeks
-      });
+      console.log('🔍 WORKLOAD DATA: Starting workload data fetch for', memberIds.length, 'members over', numberOfWeeks, 'weeks');
 
       // Initialize the result structure
       const result = initializeWorkloadData(members, startDate, numberOfWeeks);
-      console.log('🔍 WORKLOAD DATA: Initialized result structure for members:', Object.keys(result));
 
       try {
-        // Fetch all data in parallel
-        console.log('🔍 WORKLOAD DATA: Fetching all data sources...');
+        // Fetch all data in parallel for faster loading
         const [allocations, annualLeaves, otherLeaves] = await Promise.all([
           fetchProjectAllocations(params),
           fetchAnnualLeave(params),
           fetchOtherLeave(params)
         ]);
 
-        console.log('🔍 WORKLOAD DATA: Raw data received:', {
-          allocations: allocations.length,
-          annualLeaves: annualLeaves.length,
-          otherLeaves: otherLeaves.length
-        });
+        console.log('🔍 WORKLOAD DATA: Fetched data -', 
+          'allocations:', allocations.length,
+          'annual leaves:', annualLeaves.length,
+          'other leaves:', otherLeaves.length
+        );
 
-        // Log detailed allocation data if available
-        if (allocations.length > 0) {
-          console.log('🔍 WORKLOAD DATA: Sample allocations:', allocations.slice(0, 3).map(a => ({
-            resource_id: a.resource_id,
-            hours: a.hours,
-            week_start_date: a.week_start_date,
-            project_name: a.projects?.name,
-            resource_type: a.resource_type
-          })));
-        } else {
-          console.log('🔍 WORKLOAD DATA: NO PROJECT ALLOCATIONS FOUND!');
-          
-          // Additional debugging for allocation issues
-          console.log('🔍 WORKLOAD DATA: Query parameters used:', {
-            companyId: company.id,
-            memberIds,
-            memberCount: memberIds.length,
-            startDate: format(startDate, 'yyyy-MM-dd'),
-            endDate: format(new Date(startDate.getTime() + (numberOfWeeks * 7 * 24 * 60 * 60 * 1000)), 'yyyy-MM-dd')
-          });
-        }
-
-        // Process all data
-        console.log('🔍 WORKLOAD DATA: Processing data...');
+        // Process all data efficiently
         processProjectAllocations(allocations, result);
         processAnnualLeave(annualLeaves, result);
         processOtherLeave(otherLeaves, result);
 
-        // Debug logging
-        debugWorkloadData(members, result, allocations);
-
-        // Final verification
-        const membersWithProjectHours = Object.keys(result).filter(memberId => {
-          return Object.values(result[memberId]).some(week => week.projectHours > 0);
+        // Final verification - count members with data
+        const membersWithData = Object.keys(result).filter(memberId => {
+          return Object.values(result[memberId]).some(week => week.total > 0);
         });
         
-        console.log('🔍 WORKLOAD DATA: Final summary:', {
-          totalMembers: Object.keys(result).length,
-          membersWithProjectHours: membersWithProjectHours.length,
-          membersWithProjectHoursList: membersWithProjectHours,
-          sampleProjectHours: membersWithProjectHours.slice(0, 3).map(memberId => ({
-            memberId,
-            memberName: members.find(m => m.id === memberId) ? 
-              `${members.find(m => m.id === memberId)?.first_name} ${members.find(m => m.id === memberId)?.last_name}` : 
-              'Unknown',
-            totalProjectHours: Object.values(result[memberId]).reduce((sum, week) => sum + week.projectHours, 0)
-          }))
-        });
+        console.log('🔍 WORKLOAD DATA: Processing complete -', 
+          'members with data:', membersWithData.length, 
+          'total members:', Object.keys(result).length
+        );
 
         return result;
       } catch (error) {
@@ -118,8 +75,8 @@ export const useWeeklyWorkloadData = (
       }
     },
     enabled: !!company?.id && members.length > 0,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 30 * 1000, // 30 seconds - reduce from 2 minutes for faster updates
+    gcTime: 2 * 60 * 1000, // 2 minutes - reduce from 5 minutes
   });
 
   // Generate week start dates for the calendar
