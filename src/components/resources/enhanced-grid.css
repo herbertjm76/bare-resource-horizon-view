@@ -14,8 +14,17 @@
   width: auto;
 }
 
-/* Remove the problematic last column hiding rule */
-.enhanced-resource-table td:last-child,
-.enhanced-resource-table th:last-child {
-  display: table-cell;
+/* Ensure all columns are visible - override any hiding rules */
+.enhanced-resource-table td,
+.enhanced-resource-table th {
+  display: table-cell !important;
+}
+
+/* Specific override for project name column visibility */
+.enhanced-resource-table .project-name-column,
+.enhanced-resource-table th.project-name-column,
+.enhanced-resource-table td.project-name-column {
+  display: table-cell !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
