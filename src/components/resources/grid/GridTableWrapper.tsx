@@ -10,7 +10,7 @@ export const GridTableWrapper: React.FC<GridTableWrapperProps> = ({ children }) 
   return (
     <Card className="w-full overflow-hidden">
       <div className="overflow-x-auto">
-        <div className="flex justify-center min-w-full">
+        <div className="inline-block min-w-full">
           {children}
         </div>
       </div>

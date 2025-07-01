@@ -24,7 +24,9 @@
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed !important;
-  width: fit-content !important; /* Let the table size to fit its content */
+  width: auto !important; /* Let the table size to its calculated width */
+  min-width: fit-content !important;
+  max-width: none !important;
   margin: 0;
 }
 

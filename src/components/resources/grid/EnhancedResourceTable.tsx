@@ -20,7 +20,10 @@ export const EnhancedResourceTable: React.FC<EnhancedResourceTableProps> = ({
   onToggleProjectExpand
 }) => {
   return (
-    <table className="enhanced-resource-table">
+    <table 
+      className="enhanced-resource-table"
+      style={{ width: `${tableWidth}px` }}
+    >
       <colgroup>
         <col style={{ width: '48px' }} />
         <col style={{ width: '200px' }} />
