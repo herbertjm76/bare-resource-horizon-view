@@ -10,9 +10,15 @@ interface GridDaysHeaderProps {
 export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
   return (
     <tr style={{ backgroundColor: '#6465F0' }}>
-      {/* Fixed columns */}
-      <th className="sticky-left-0 min-w-12 z-20 text-center text-white font-semibold py-3 px-3" style={{ backgroundColor: '#6465F0' }}>#</th>
-      <th className="sticky-left-12 min-w-48 z-20 text-white font-semibold py-3 px-6" style={{ backgroundColor: '#6465F0' }}>Project / Resource</th>
+      {/* Fixed counter column */}
+      <th className="counter-column text-center text-white font-semibold py-3 px-1" style={{ backgroundColor: '#6465F0' }}>
+        #
+      </th>
+      
+      {/* Fixed project name column */}
+      <th className="project-name-column text-white font-semibold py-3 px-3" style={{ backgroundColor: '#6465F0' }}>
+        Project / Resource
+      </th>
       
       {/* Day columns */}
       {days.map((day, index) => {
@@ -37,16 +43,12 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
           <th 
             key={uniqueKey}
             className={`
-              min-w-8 text-center text-xs font-semibold text-white py-2 px-1 relative
+              day-column text-center text-xs font-semibold text-white py-2 px-1 relative
               ${isSundayDay ? 'border-l-2 border-yellow-300' : ''}
               ${isFirstOfMonthDay ? 'border-l-4 border-orange-400' : ''}
               ${isTodayDay ? 'ring-2 ring-purple-300 ring-inset' : ''}
             `}
-            style={{ 
-              width: '30px', 
-              minWidth: '30px',
-              backgroundColor: backgroundColor
-            }}
+            style={{ backgroundColor: backgroundColor }}
           >
             <div className="flex flex-col items-center h-full">
               {isNewMonth ? (

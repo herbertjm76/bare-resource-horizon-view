@@ -1,0 +1,117 @@
+
+/* Project Resourcing Grid - Fixed Width Columns & Center Alignment */
+
+/* Container for center alignment */
+.project-resourcing-grid-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Table wrapper with fixed positioning */
+.project-resourcing-table-wrapper {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: visible;
+  min-width: fit-content;
+  max-width: 100%;
+}
+
+/* Enhanced resource table with fixed column widths */
+.enhanced-resource-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  width: 100%;
+  min-width: max-content;
+  margin: 0 auto;
+}
+
+/* Fixed width for counter column */
+.enhanced-resource-table .counter-column {
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: inherit;
+  border-right: 2px solid #e5e7eb;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Fixed width for project/resource name column */
+.enhanced-resource-table .project-name-column {
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  position: sticky;
+  left: 48px;
+  z-index: 10;
+  background: inherit;
+  border-right: 2px solid #e5e7eb;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Day columns with consistent width */
+.enhanced-resource-table .day-column {
+  width: 32px;
+  min-width: 32px;
+  max-width: 32px;
+  text-align: center;
+  padding: 0 2px;
+}
+
+/* Header styling for fixed columns */
+.enhanced-resource-table thead th.counter-column,
+.enhanced-resource-table thead th.project-name-column {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #6465F0;
+  color: white;
+}
+
+/* Ensure proper text truncation in fixed width columns */
+.project-name-column .truncate-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .project-name-column {
+    width: 180px;
+    min-width: 180px;
+    max-width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .project-name-column {
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+  }
+  
+  .counter-column {
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+  }
+  
+  .enhanced-resource-table .project-name-column {
+    left: 40px;
+  }
+  
+  .day-column {
+    width: 28px;
+    min-width: 28px;
+    max-width: 28px;
+  }
+}

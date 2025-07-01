@@ -2,7 +2,6 @@
 import React from 'react';
 import { ChevronDown, ChevronRight, Users, Clock, DollarSign } from 'lucide-react';
 import { ResourceUtilizationBadge } from './ResourceUtilizationBadge';
-import { NoFeeBadge } from './NoFeeBadge';
 
 interface ProjectHeaderProps {
   project: any;
@@ -10,7 +9,7 @@ interface ProjectHeaderProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   headerBgClass: string;
-  totalHours?: number; // Optional total hours
+  totalHours?: number;
 }
 
 export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
@@ -27,7 +26,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   return (
     <>
       {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${headerBgClass} z-10 p-1 w-12 text-center`}>
+      <td className={`counter-column ${headerBgClass} text-center p-1`}>
         <button 
           onClick={onToggleExpand} 
           className="rounded-full p-1 hover:bg-white/30 transition-colors"
@@ -41,12 +40,11 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
       </td>
       
       {/* Fixed project name column */}
-      <td 
-        className={`sticky-left-12 ${headerBgClass} z-10 p-1 font-medium`}
-        style={{ width: '200px', minWidth: '200px' }}
-      >
+      <td className={`project-name-column ${headerBgClass} p-1 font-medium`}>
         <div className="flex flex-col">
-          <div className="text-sm font-medium line-clamp-1 mb-0.5">{project.name || 'Untitled Project'}</div>
+          <div className="text-sm font-medium truncate-text mb-0.5">
+            {project.name || 'Untitled Project'}
+          </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-0.5">
               <Users className="h-3 w-3" />

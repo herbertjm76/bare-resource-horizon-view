@@ -82,7 +82,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
   return (
     <tr className={`border-b ${rowBgClass} group hover:bg-gray-50 h-7`}>
       {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${rowBgClass} z-10 p-0.5 w-12 group-hover:bg-gray-50`}></td>
+      <td className={`counter-column ${rowBgClass} p-0.5 group-hover:bg-gray-50`}></td>
       
       {/* Resource info column */}
       <ResourceInfo

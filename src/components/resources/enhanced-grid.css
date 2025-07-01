@@ -6,6 +6,7 @@
 @import './css/interactive-elements.css';
 @import './css/utility-classes.css';
 @import './css/responsive-design.css';
+@import './css/project-resourcing-grid.css';
 
 /* Enhanced table specific styles */
 .enhanced-resource-table {

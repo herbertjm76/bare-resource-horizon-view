@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 interface AddResourceRowProps {
   isExpanded: boolean;
   rowBgClass: string;
-  daysCount: number; // Changed from weeksCount to daysCount
+  daysCount: number;
   onAddResource: () => void;
 }
 
@@ -21,10 +21,10 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
   return (
     <tr className={`border-b ${rowBgClass} hover:bg-gray-50 h-10`}>
       {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${rowBgClass} z-10 p-0.5 w-12 hover:bg-gray-50`}></td>
+      <td className={`counter-column ${rowBgClass} p-0.5 hover:bg-gray-50`}></td>
       
-      {/* Add Resource column */}
-      <td className={`sticky-left-12 ${rowBgClass} z-10 p-2 hover:bg-gray-50`} colSpan={daysCount + 1}>
+      {/* Add Resource button in project name column */}
+      <td className={`project-name-column ${rowBgClass} p-2 hover:bg-gray-50`}>
         <Button 
           variant="default"
           size="sm" 
@@ -35,6 +35,14 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
           Add Resource
         </Button>
       </td>
+      
+      {/* Empty day columns */}
+      {Array.from({ length: daysCount }, (_, index) => (
+        <td key={index} className="day-column p-0"></td>
+      ))}
+      
+      {/* Flexible end column */}
+      <td className="p-0"></td>
     </tr>
   );
 };
