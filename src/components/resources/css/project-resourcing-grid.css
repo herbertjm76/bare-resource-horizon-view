@@ -24,7 +24,8 @@
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed !important;
-  margin: 0 auto; /* Center the table */
+  width: fit-content !important;
+  margin: 0; /* Remove auto margin since we're using flexbox centering */
 }
 
 /* Fixed width for counter column - STRICTLY ENFORCED */

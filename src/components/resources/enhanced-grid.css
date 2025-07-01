@@ -14,9 +14,6 @@
   border-spacing: 0;
   table-layout: fixed !important; /* Force fixed layout */
   width: fit-content !important; /* Let width be determined by content */
-  min-width: auto !important;
-  max-width: none !important;
-  margin: 0; /* Remove auto margin since we're using flexbox centering */
 }
 
 /* Remove any container width constraints */
