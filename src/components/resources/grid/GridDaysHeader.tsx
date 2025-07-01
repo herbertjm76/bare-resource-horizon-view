@@ -1,7 +1,17 @@
 
 import React from 'react';
-import { DayInfo } from './types';
-import { isToday } from 'date-fns';
+import { format } from 'date-fns';
+
+interface DayInfo {
+  date: Date;
+  label: string;
+  dayName: string;
+  monthLabel: string;
+  isWeekend: boolean;
+  isSunday: boolean;
+  isFirstOfMonth: boolean;
+  isEndOfWeek?: boolean;
+}
 
 interface GridDaysHeaderProps {
   days: DayInfo[];
@@ -10,56 +20,48 @@ interface GridDaysHeaderProps {
 export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
   return (
     <tr style={{ backgroundColor: '#6465F0' }}>
-      {/* Fixed columns */}
-      <th className="sticky-left-0 min-w-12 z-20 text-center text-white font-semibold py-3 px-3" style={{ backgroundColor: '#6465F0' }}>#</th>
-      <th className="sticky-left-12 min-w-48 z-20 text-white font-semibold py-3 px-6" style={{ backgroundColor: '#6465F0' }}>Project / Resource</th>
+      {/* Project/Resource column - Fixed width */}
+      <th 
+        className="sticky-left-0 z-20 text-left font-semibold text-white py-3 px-4 border-r-2 border-gray-300"
+        style={{ 
+          backgroundColor: '#6465F0',
+          width: '250px',
+          minWidth: '250px',
+          maxWidth: '250px'
+        }}
+      >
+        Project / Resource
+      </th>
       
-      {/* Day columns */}
+      {/* Day columns - Fixed width */}
       {days.map((day, index) => {
-        const isWeekendDay = day.isWeekend;
-        const isSundayDay = day.isSunday;
-        const isFirstOfMonthDay = day.isFirstOfMonth;
-        const isNewMonth = index === 0 || days[index - 1].monthLabel !== day.monthLabel;
-        const isTodayDay = isToday(day.date);
-        
-        // Create a unique key using date and index to avoid duplicates
-        const uniqueKey = `${day.date.toISOString().split('T')[0]}-${index}`;
-        
-        // Determine background color based on day type
-        let backgroundColor = '#6465F0'; // Default
-        if (isTodayDay) {
-          backgroundColor = '#a855f7'; // Light purple for current day
-        } else if (isWeekendDay) {
-          backgroundColor = '#5a5b8a'; // Weekend color
-        }
+        const isFirstOfMonth = day.isFirstOfMonth;
+        const isNewMonth = index === 0 || days[index - 1]?.date.getMonth() !== day.date.getMonth();
         
         return (
           <th 
-            key={uniqueKey}
-            className={`
-              min-w-8 text-center text-xs font-semibold text-white py-2 px-1 relative
-              ${isSundayDay ? 'border-l-2 border-yellow-300' : ''}
-              ${isFirstOfMonthDay ? 'border-l-4 border-orange-400' : ''}
-              ${isTodayDay ? 'ring-2 ring-purple-300 ring-inset' : ''}
-            `}
+            key={day.label}
+            className="text-center text-xs font-semibold text-white py-2 px-1 relative"
             style={{ 
               width: '30px', 
               minWidth: '30px',
-              backgroundColor: backgroundColor
+              maxWidth: '30px',
+              backgroundColor: '#6465F0',
+              borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined
             }}
           >
             <div className="flex flex-col items-center h-full">
               {isNewMonth ? (
                 <>
                   <span className="text-[10px] font-bold uppercase leading-none text-yellow-200 mb-1">
-                    {day.monthLabel}
+                    {format(day.date, 'MMM')}
                   </span>
                   <div className="flex flex-col items-center justify-end gap-0.5 flex-1">
                     <span className="text-[10px] opacity-90 uppercase leading-none font-medium">
                       {day.dayName}
                     </span>
                     <span className="text-sm font-bold leading-none">
-                      {day.label}
+                      {format(day.date, 'd')}
                     </span>
                   </div>
                 </>
@@ -69,7 +71,7 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
                     {day.dayName}
                   </span>
                   <span className="text-sm font-bold leading-none">
-                    {day.label}
+                    {format(day.date, 'd')}
                   </span>
                 </div>
               )}
@@ -77,9 +79,6 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
           </th>
         );
       })}
-      
-      {/* Flexible end column */}
-      <th className="min-w-4" style={{ backgroundColor: '#6465F0' }}></th>
     </tr>
   );
 };

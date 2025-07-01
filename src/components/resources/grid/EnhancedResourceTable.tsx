@@ -23,7 +23,7 @@ export const EnhancedResourceTable: React.FC<EnhancedResourceTableProps> = ({
     <table 
       className="enhanced-resource-table w-full" 
       style={{
-        minWidth: `${tableWidth}px`,
+        minWidth: `${250 + (days.length * 30)}px`,
         width: '100%'
       }}
     >

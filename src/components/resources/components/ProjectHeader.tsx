@@ -25,12 +25,18 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   const hasFeesSet = project.fee > 0 || (project.stage_fees && project.stage_fees.length > 0);
 
   return (
-    <>
-      {/* Fixed counter column */}
-      <td className={`sticky-left-0 ${headerBgClass} z-10 p-1 w-12 text-center`}>
+    <td 
+      className={`sticky-left-0 ${headerBgClass} z-10 p-3 font-medium`}
+      style={{
+        width: '250px',
+        minWidth: '250px',
+        maxWidth: '250px'
+      }}
+    >
+      <div className="flex items-center gap-2">
         <button 
           onClick={onToggleExpand} 
-          className="rounded-full p-1 hover:bg-white/30 transition-colors"
+          className="rounded-full p-1 hover:bg-white/30 transition-colors flex-shrink-0"
         >
           {isExpanded ? (
             <ChevronDown className="h-4 w-4 text-foreground/80" />
@@ -38,14 +44,8 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             <ChevronRight className="h-4 w-4 text-foreground/80" />
           )}
         </button>
-      </td>
-      
-      {/* Fixed project name column */}
-      <td 
-        className={`sticky-left-12 ${headerBgClass} z-10 p-1 font-medium`}
-        style={{ width: '200px', minWidth: '200px' }}
-      >
-        <div className="flex flex-col">
+        
+        <div className="flex flex-col min-w-0 flex-1">
           <div className="text-sm font-medium line-clamp-1 mb-0.5">{project.name || 'Untitled Project'}</div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-0.5">
@@ -70,7 +70,7 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
             )}
           </div>
         </div>
-      </td>
-    </>
+      </div>
+    </td>
   );
 };
