@@ -8,12 +8,12 @@
 @import './css/responsive-design.css';
 @import './css/project-resourcing-grid.css';
 
-/* Enhanced table specific styles - OVERRIDE CONFLICTS */
+/* Enhanced table specific styles - Natural layout */
 .enhanced-resource-table {
   border-collapse: separate;
   border-spacing: 0;
-  table-layout: fixed !important; /* Force fixed layout */
-  width: fit-content !important; /* Let width be determined by content */
+  table-layout: fixed !important;
+  width: fit-content !important;
 }
 
 /* Remove any container width constraints */
@@ -25,5 +25,5 @@
 /* Remove the problematic last column hiding rule */
 .enhanced-resource-table td:last-child,
 .enhanced-resource-table th:last-child {
-  display: table-cell; /* Keep all columns visible */
+  display: table-cell;
 }

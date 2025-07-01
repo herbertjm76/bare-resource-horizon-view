@@ -1,7 +1,7 @@
 
-/* Project Resourcing Grid - Fixed Width Columns & Center Alignment */
+/* Project Resourcing Grid - Flexible Width Columns & Natural Alignment */
 
-/* Container for center alignment */
+/* Container for natural flow */
 .project-resourcing-grid-container {
   display: block;
   width: auto;
@@ -10,7 +10,7 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* Table wrapper with fixed positioning */
+/* Table wrapper with natural positioning */
 .project-resourcing-table-wrapper {
   position: relative;
   overflow-x: auto;
@@ -19,13 +19,13 @@
   max-width: 100%;
 }
 
-/* Enhanced resource table with fixed column widths */
+/* Enhanced resource table with natural width */
 .enhanced-resource-table {
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed !important;
   width: fit-content !important;
-  margin: 0; /* Remove auto margin since we're using flexbox centering */
+  margin: 0;
 }
 
 /* Fixed width for counter column - STRICTLY ENFORCED */
