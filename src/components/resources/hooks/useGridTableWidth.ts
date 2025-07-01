@@ -5,14 +5,14 @@ export const useGridTableWidth = (daysCount: number): number => {
   return useMemo(() => {
     // Fixed columns: counter (48px) + project name (200px)
     const fixedColumnsWidth = 48 + 200;
-    // Day columns: 30px per day (fixed width)
-    const daysColumnsWidth = daysCount * 30;
-    // Add padding for better spacing
-    const totalWidth = fixedColumnsWidth + daysColumnsWidth + 40;
+    // Day columns: 32px per day (matching the CSS day-column width)
+    const daysColumnsWidth = daysCount * 32;
+    // Small buffer for borders and spacing
+    const buffer = 20;
     
-    // Ensure minimum width but allow expansion
-    const minWidth = 1200;
+    // Calculate exact width needed
+    const totalWidth = fixedColumnsWidth + daysColumnsWidth + buffer;
     
-    return Math.max(totalWidth, minWidth);
+    return totalWidth;
   }, [daysCount]);
 };

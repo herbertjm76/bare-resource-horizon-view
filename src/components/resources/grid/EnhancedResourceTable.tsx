@@ -19,16 +19,13 @@ export const EnhancedResourceTable: React.FC<EnhancedResourceTableProps> = ({
   tableWidth,
   onToggleProjectExpand
 }) => {
-  // Calculate minimum table width based on fixed columns and day columns
-  const minTableWidth = 48 + 200 + (days.length * 32) + 20; // counter + project name + days + buffer
-  const actualTableWidth = Math.max(minTableWidth, tableWidth);
-
   return (
     <table 
       className="enhanced-resource-table" 
       style={{
-        minWidth: `${actualTableWidth}px`,
-        width: `${actualTableWidth}px`
+        width: `${tableWidth}px`,
+        maxWidth: `${tableWidth}px`,
+        minWidth: `${tableWidth}px`
       }}
     >
       <thead>

@@ -79,9 +79,6 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
           </th>
         );
       })}
-      
-      {/* Flexible end column */}
-      <th className="min-w-4" style={{ backgroundColor: '#6465F0' }}></th>
     </tr>
   );
 };

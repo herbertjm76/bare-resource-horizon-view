@@ -111,9 +111,6 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({
           />
         );
       })}
-      
-      {/* Add blank flexible cell */}
-      <td className="p-0"></td>
     </tr>
   );
 };

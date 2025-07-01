@@ -40,9 +40,6 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
       {Array.from({ length: daysCount }, (_, index) => (
         <td key={index} className="day-column p-0"></td>
       ))}
-      
-      {/* Flexible end column */}
-      <td className="p-0"></td>
     </tr>
   );
 };
