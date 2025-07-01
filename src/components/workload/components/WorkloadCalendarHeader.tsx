@@ -12,15 +12,20 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
   return (
     <thead>
       <tr style={{ backgroundColor: '#6465F0' }}>
-        {/* Team Member column */}
+        {/* Team Member column - Fixed width */}
         <th 
           className="workload-grid-header member-column sticky-left-0 z-20"
-          style={{ backgroundColor: '#6465F0' }}
+          style={{ 
+            backgroundColor: '#6465F0',
+            width: '250px',
+            minWidth: '250px',
+            maxWidth: '250px'
+          }}
         >
           Team Member
         </th>
         
-        {/* Week columns - matching Project Resourcing format */}
+        {/* Week columns - Fixed width matching Project Resourcing format */}
         {weekStartDates.map((week, index) => {
           const isFirstOfMonth = week.date.getDate() <= 7;
           const isNewMonth = index === 0 || weekStartDates[index - 1].date.getMonth() !== week.date.getMonth();
@@ -32,6 +37,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
               style={{ 
                 width: '30px', 
                 minWidth: '30px',
+                maxWidth: '30px',
                 backgroundColor: '#6465F0',
                 borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined
               }}
@@ -66,10 +72,15 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
           );
         })}
         
-        {/* Total Utilization column */}
+        {/* Total Utilization column - Fixed width */}
         <th 
           className="workload-grid-header total-column"
-          style={{ backgroundColor: '#7c3aed' }}
+          style={{ 
+            backgroundColor: '#7c3aed',
+            width: '120px',
+            minWidth: '120px',
+            maxWidth: '120px'
+          }}
         >
           Total Utilization
         </th>

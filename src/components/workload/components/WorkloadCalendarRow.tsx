@@ -66,7 +66,14 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
       key={member.id} 
       className={`workload-grid-row ${memberIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} border-b border-gray-200`}
     >
-      <td className="workload-grid-cell member-cell sticky-left-0 bg-inherit z-5 border-r-2 border-gray-300">
+      <td 
+        className="workload-grid-cell member-cell sticky-left-0 bg-inherit z-5 border-r-2 border-gray-300"
+        style={{
+          width: '250px',
+          minWidth: '250px',
+          maxWidth: '250px'
+        }}
+      >
         <div className="member-info">
           <Avatar className="member-avatar">
             <AvatarImage src={getAvatarUrl(member)} alt={memberDisplayName} />
@@ -90,7 +97,14 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
         />
       ))}
       
-      <td className="workload-grid-cell total-cell bg-gray-50 font-semibold">
+      <td 
+        className="workload-grid-cell total-cell bg-gray-50 font-semibold"
+        style={{
+          width: '120px',
+          minWidth: '120px',
+          maxWidth: '120px'
+        }}
+      >
         <div className={`utilization-badge ${utilizationPercent > 100 ? 'high' : utilizationPercent >= 80 ? 'medium' : 'low'}`}>
           {utilizationPercent}%
         </div>

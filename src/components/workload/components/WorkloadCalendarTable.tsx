@@ -18,31 +18,32 @@ export const WorkloadCalendarTable: React.FC<WorkloadCalendarTableProps> = ({
 }) => {
   return (
     <div className="workload-grid-container">
-      <table 
-        className="workload-grid-table enhanced-resource-table" 
-        style={{
-          minWidth: `${200 + (weekStartDates.length * 30) + 100}px`,
-          width: '100%'
-        }}
-      >
-        <WorkloadCalendarHeader weekStartDates={weekStartDates} />
-        
-        <tbody>
-          {members.map((member, memberIndex) => {
-            const memberWeeklyData = weeklyWorkloadData[member.id] || {};
-            
-            return (
-              <WorkloadCalendarRow
-                key={member.id}
-                member={member}
-                memberIndex={memberIndex}
-                weekStartDates={weekStartDates}
-                memberWeeklyData={memberWeeklyData}
-              />
-            );
-          })}
-        </tbody>
-      </table>
+      <div className="workload-table-wrapper">
+        <table 
+          className="workload-grid-table enhanced-resource-table" 
+          style={{
+            minWidth: `${250 + (weekStartDates.length * 30) + 120}px`
+          }}
+        >
+          <WorkloadCalendarHeader weekStartDates={weekStartDates} />
+          
+          <tbody>
+            {members.map((member, memberIndex) => {
+              const memberWeeklyData = weeklyWorkloadData[member.id] || {};
+              
+              return (
+                <WorkloadCalendarRow
+                  key={member.id}
+                  member={member}
+                  memberIndex={memberIndex}
+                  weekStartDates={weekStartDates}
+                  memberWeeklyData={memberWeeklyData}
+                />
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
