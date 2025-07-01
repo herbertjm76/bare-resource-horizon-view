@@ -1,0 +1,39 @@
+
+/* Workload Grid - Base Table Styles */
+
+.workload-grid-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: max-content;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  margin: 0 auto; /* Center the table */
+}
+
+.workload-grid-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  background: white;
+  display: flex;
+  justify-content: center; /* Center the table wrapper */
+}
+
+.workload-table-wrapper {
+  display: inline-block; /* Allow the wrapper to shrink to content size */
+  min-width: min-content;
+}
+
+/* Row styles */
+.workload-grid-row {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.15s ease;
+}
+
+.workload-grid-row:hover {
+  background-color: #f3f4f6 !important;
+}
