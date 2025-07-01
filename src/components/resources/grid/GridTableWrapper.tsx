@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface GridTableWrapperProps {
   children: React.ReactNode;
@@ -9,12 +9,14 @@ interface GridTableWrapperProps {
 
 export const GridTableWrapper: React.FC<GridTableWrapperProps> = ({ children, tableWidth }) => {
   return (
-    <Card className="w-full overflow-hidden">
-      <div className="project-resourcing-grid-container">
-        <div className="project-resourcing-table-wrapper">
-          {children}
+    <Card className="border-none shadow-sm">
+      <CardContent className="p-0">
+        <div className="workload-grid-container">
+          <div className="workload-table-wrapper">
+            {children}
+          </div>
         </div>
-      </div>
+      </CardContent>
     </Card>
   );
 };
