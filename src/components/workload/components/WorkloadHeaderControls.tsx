@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, X } from 'lucide-react';
 import { WeekStartSelector } from '../WeekStartSelector';
+import { WeekViewSelector } from './WeekViewSelector';
 
 interface WorkloadHeaderControlsProps {
   searchQuery: string;
@@ -20,6 +21,8 @@ interface WorkloadHeaderControlsProps {
   clearFilters: () => void;
   selectedWeek: Date;
   onWeekChange: (date: Date) => void;
+  selectedWeeks: number;
+  onWeeksChange: (weeks: number) => void;
 }
 
 export const WorkloadHeaderControls: React.FC<WorkloadHeaderControlsProps> = ({
@@ -34,18 +37,27 @@ export const WorkloadHeaderControls: React.FC<WorkloadHeaderControlsProps> = ({
   activeFiltersCount,
   clearFilters,
   selectedWeek,
-  onWeekChange
+  onWeekChange,
+  selectedWeeks,
+  onWeeksChange
 }) => {
   return (
     <Card className="border-none shadow-sm bg-white">
       <CardContent className="p-4">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           
-          {/* Week Selector - moved to the left */}
-          <WeekStartSelector
-            selectedWeek={selectedWeek}
-            onWeekChange={onWeekChange}
-          />
+          {/* Week Selector and Period Selector - moved to the left */}
+          <div className="flex items-center gap-4">
+            <WeekStartSelector
+              selectedWeek={selectedWeek}
+              onWeekChange={onWeekChange}
+            />
+            
+            <WeekViewSelector
+              selectedWeeks={selectedWeeks}
+              onWeeksChange={onWeeksChange}
+            />
+          </div>
 
           {/* Search and Filters - moved to the right */}
           <div className="flex items-center gap-2">

@@ -15,7 +15,7 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
   filteredMembers,
   periodWeeks
 }) => {
-  // Calculate workload metrics
+  // Calculate workload metrics based on the selected period
   const calculateWorkloadMetrics = () => {
     if (!weeklyWorkloadData || Object.keys(weeklyWorkloadData).length === 0) {
       return {
@@ -75,7 +75,7 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
             <div>
               <p className="text-sm font-medium">Team Utilization</p>
               <p className="text-2xl font-bold">{metrics.utilizationRate}%</p>
-              <p className="text-xs text-gray-500">{metrics.totalAllocated}h / {metrics.totalCapacity}h</p>
+              <p className="text-xs text-gray-500">{Math.round(metrics.totalAllocated)}h / {metrics.totalCapacity}h</p>
             </div>
           </div>
         </CardContent>

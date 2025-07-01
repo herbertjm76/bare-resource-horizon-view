@@ -11,6 +11,8 @@ import { WorkloadMetricsCards } from './components/WorkloadMetricsCards';
 interface TeamWorkloadContentProps {
   selectedWeek: Date;
   onWeekChange: (date: Date) => void;
+  selectedWeeks: number;
+  onWeeksChange: (weeks: number) => void;
   isLoading: boolean;
   filteredMembers: TeamMember[];
   departments: string[];
@@ -30,6 +32,8 @@ interface TeamWorkloadContentProps {
 export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   selectedWeek,
   onWeekChange,
+  selectedWeeks,
+  onWeeksChange,
   isLoading,
   filteredMembers,
   departments,
@@ -45,15 +49,12 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   onPreviousWeek,
   onNextWeek
 }) => {
-  // Fixed to 36 weeks as requested
-  const periodWeeks = 36;
-  
-  // Use the new weekly workload data hook with corrected parameter order
+  // Use the selected week period instead of fixed 36 weeks
   const { 
     weeklyWorkloadData, 
     isLoadingWorkload, 
     weekStartDates 
-  } = useWeeklyWorkloadData(selectedWeek, filteredMembers, periodWeeks);
+  } = useWeeklyWorkloadData(selectedWeek, filteredMembers, selectedWeeks);
 
   const activeFiltersCount = [activeFilter !== 'all' ? activeFilter : '', searchQuery].filter(Boolean).length;
 
@@ -83,19 +84,23 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
         clearFilters={clearFilters}
         selectedWeek={selectedWeek}
         onWeekChange={onWeekChange}
+        selectedWeeks={selectedWeeks}
+        onWeeksChange={onWeeksChange}
       />
 
       {/* Workload Summary Stats */}
       <WorkloadMetricsCards
         weeklyWorkloadData={weeklyWorkloadData}
         filteredMembers={filteredMembers}
-        periodWeeks={periodWeeks}
+        periodWeeks={selectedWeeks}
       />
 
       {/* Weekly Workload Calendar */}
       <Card className="border-none shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-semibold">Weekly Team Workload</CardTitle>
+          <CardTitle className="text-lg font-semibold">
+            Weekly Team Workload ({selectedWeeks} weeks)
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <WeeklyWorkloadCalendar

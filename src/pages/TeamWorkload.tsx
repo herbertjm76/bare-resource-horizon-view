@@ -13,10 +13,13 @@ import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
 const TeamWorkload = () => {
-  // State for selected week (starting Monday) - this is the starting week for the 36-week analysis
+  // State for selected week (starting Monday) - this is the starting week for the analysis
   const [selectedWeek, setSelectedWeek] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
+  
+  // State for selected weeks period - default to 24 weeks
+  const [selectedWeeks, setSelectedWeeks] = useState<number>(24);
   
   // Fetch team members data
   const { teamMembers, isLoading: isLoadingTeamMembers } = useTeamMembersData(true);
@@ -42,6 +45,7 @@ const TeamWorkload = () => {
     preRegisteredMembers: preRegisteredMembers.length,
     transformedPreRegistered: transformedPreRegisteredMembers.length,
     totalMembers: allMembers.length,
+    selectedWeeks,
     sampleActiveMembers: teamMembers.slice(0, 3).map(m => ({
       id: m.id,
       name: `${m.first_name} ${m.last_name}`,
@@ -85,6 +89,10 @@ const TeamWorkload = () => {
     setSelectedWeek(startOfWeek(newWeek, { weekStartsOn: 1 }));
   };
 
+  const handleWeeksChange = (weeks: number) => {
+    setSelectedWeeks(weeks);
+  };
+
   const handlePreviousWeek = () => {
     setSelectedWeek(prev => subWeeks(prev, 1));
   };
@@ -108,7 +116,7 @@ const TeamWorkload = () => {
               Team Workload
             </h1>
             <p className="text-muted-foreground">
-              Analyze team workload over a 36-week period starting from your selected week
+              Analyze team workload over a {selectedWeeks}-week period starting from your selected week
             </p>
           </div>
         </div>
@@ -117,6 +125,8 @@ const TeamWorkload = () => {
       <TeamWorkloadContent
         selectedWeek={selectedWeek}
         onWeekChange={handleWeekChange}
+        selectedWeeks={selectedWeeks}
+        onWeeksChange={handleWeeksChange}
         isLoading={isLoading}
         filteredMembers={filteredMembers}
         departments={departments}
