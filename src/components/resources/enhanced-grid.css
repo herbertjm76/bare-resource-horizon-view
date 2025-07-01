@@ -16,13 +16,13 @@
   width: auto !important; /* Let width be determined by column widths */
   min-width: auto !important;
   max-width: none !important;
+  margin: 0; /* Remove auto margin since we're using flexbox centering */
 }
 
+/* Remove any container width constraints */
 .enhanced-grid-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  overflow-x: auto;
+  display: block;
+  width: auto;
 }
 
 /* Remove the problematic last column hiding rule */

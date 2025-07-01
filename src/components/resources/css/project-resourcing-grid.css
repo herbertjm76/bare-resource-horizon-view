@@ -3,9 +3,8 @@
 
 /* Container for center alignment */
 .project-resourcing-grid-container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
+  display: block;
+  width: auto;
   max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -16,7 +15,7 @@
   position: relative;
   overflow-x: auto;
   overflow-y: visible;
-  min-width: fit-content;
+  width: auto;
   max-width: 100%;
 }
 
@@ -25,7 +24,8 @@
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed !important;
-  margin: 0 auto;
+  width: auto !important; /* Let the table size itself based on columns */
+  margin: 0;
 }
 
 /* Fixed width for counter column - STRICTLY ENFORCED */
