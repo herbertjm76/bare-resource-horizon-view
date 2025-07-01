@@ -40,7 +40,14 @@ export const WorkloadHeaderControls: React.FC<WorkloadHeaderControlsProps> = ({
     <Card className="border-none shadow-sm bg-white">
       <CardContent className="p-4">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-          {/* Search and Filters */}
+          
+          {/* Week Selector - moved to the left */}
+          <WeekStartSelector
+            selectedWeek={selectedWeek}
+            onWeekChange={onWeekChange}
+          />
+
+          {/* Search and Filters - moved to the right */}
           <div className="flex items-center gap-2">
             <div className="relative">
               <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -91,12 +98,6 @@ export const WorkloadHeaderControls: React.FC<WorkloadHeaderControlsProps> = ({
               </Button>
             )}
           </div>
-
-          {/* Week Selector */}
-          <WeekStartSelector
-            selectedWeek={selectedWeek}
-            onWeekChange={onWeekChange}
-          />
         </div>
       </CardContent>
     </Card>
