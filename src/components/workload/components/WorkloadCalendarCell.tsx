@@ -20,6 +20,29 @@ export const WorkloadCalendarCell: React.FC<WorkloadCalendarCellProps> = ({
   const weekHours = weekData?.total || 0;
   const weekDateString = format(week.date, 'MMM d, yyyy');
   
+  // Color-coding based on utilization levels
+  const getUtilizationColor = (hours: number) => {
+    if (hours === 0) {
+      return '#f3f4f6'; // Gray for 0 hours
+    } else if (hours < 10) {
+      return '#a5b4fc'; // Light purple-gray for single digit hours (underutilized)
+    } else if (hours === 40) {
+      return '#22c55e'; // Green for exactly 40 hours (fully utilized)
+    } else if (hours > 40) {
+      return '#ef4444'; // Red for over 40 hours (over capacity)
+    } else {
+      return '#3b82f6'; // Blue for 10-39 hours (moderate utilization)
+    }
+  };
+
+  // Text color based on background for better contrast
+  const getTextColor = (hours: number) => {
+    if (hours === 0) {
+      return '#9ca3af'; // Gray text for 0 hours
+    }
+    return '#ffffff'; // White text for all other cases
+  };
+  
   return (
     <td 
       key={week.key}
@@ -44,16 +67,23 @@ export const WorkloadCalendarCell: React.FC<WorkloadCalendarCellProps> = ({
           date={weekDateString}
         >
           <div 
-            className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-semibold text-white cursor-help transition-all duration-200 hover:scale-110"
+            className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-semibold cursor-help transition-all duration-200 hover:scale-110"
             style={{
-              backgroundColor: weekHours >= weeklyCapacity ? '#ef4444' : weekHours >= weeklyCapacity * 0.8 ? '#f97316' : '#3b82f6'
+              backgroundColor: getUtilizationColor(weekHours),
+              color: getTextColor(weekHours)
             }}
           >
             {weekHours}
           </div>
         </WorkloadTooltip>
       ) : (
-        <div className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium text-gray-400 bg-gray-100">
+        <div 
+          className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium"
+          style={{
+            backgroundColor: getUtilizationColor(0),
+            color: getTextColor(0)
+          }}
+        >
           0
         </div>
       )}
