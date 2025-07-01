@@ -25,7 +25,7 @@ export const WorkloadCalendarCell: React.FC<WorkloadCalendarCellProps> = ({
     if (hours === 0) {
       return '#f3f4f6'; // Gray for 0 hours
     } else if (hours < 10) {
-      return '#a5b4fc'; // Light purple-gray for single digit hours (underutilized)
+      return '#3b82f6'; // Blue for single digit hours (underutilized)
     } else if (hours === 40) {
       return '#22c55e'; // Green for exactly 40 hours (fully utilized)
     } else if (hours > 40) {
