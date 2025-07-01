@@ -6,7 +6,7 @@
 @import './css/interactive-elements.css';
 @import './css/utility-classes.css';
 @import './css/responsive-design.css';
-@import './css/project-resourcing-grid.css';
+@import '../workload/workload-grid.css';
 
 /* Remove any container width constraints */
 .enhanced-grid-container {
