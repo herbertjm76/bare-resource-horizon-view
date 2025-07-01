@@ -58,9 +58,11 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
         </div>
         
         <div className="flex items-center space-x-2 flex-shrink-0">
-          <ResourceUtilizationBadge utilizationPercentage={utilizationPercentage} />
+          <ResourceUtilizationBadge utilization={utilizationPercentage} />
           <ResourceActions 
-            resource={resource}
+            resourceId={resource.id}
+            resourceName={displayName}
+            resourceType={resource.isPending ? 'pre_registered' : 'active'}
             onDeleteResource={onDeleteResource}
             onCheckOtherProjects={onCheckOtherProjects}
           />
