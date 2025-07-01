@@ -24,10 +24,7 @@
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed !important;
-  width: auto !important; /* Let the table size to its calculated width */
-  min-width: fit-content !important;
-  max-width: none !important;
-  margin: 0;
+  margin: 0 auto; /* Center the table */
 }
 
 /* Fixed width for counter column - STRICTLY ENFORCED */
