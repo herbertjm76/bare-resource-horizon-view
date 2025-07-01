@@ -8,6 +8,7 @@ import { useTeamFilters } from '@/hooks/useTeamFilters';
 import { TeamWorkloadContent } from '@/components/workload/TeamWorkloadContent';
 import { startOfWeek, format, addWeeks, subWeeks } from 'date-fns';
 import { Briefcase } from 'lucide-react';
+import { TeamMember, PendingMember } from '@/components/dashboard/types';
 import '@/components/resources/resources-grid.css';
 import '@/components/workload/workload.css';
 
@@ -26,26 +27,14 @@ const TeamWorkload = () => {
   // Fetch pre-registered members
   const { preRegisteredMembers } = useTeamMembersState(company?.id, 'owner');
   
-  // Transform pre-registered members to match TeamMember structure
-  const transformedPreRegisteredMembers = preRegisteredMembers.map(member => ({
-    id: member.id,
-    first_name: member.first_name || '',
-    last_name: member.last_name || '',
-    email: member.email || '',
-    company_id: company?.id || '',
-    role: member.role || 'member',
-    department: member.department,
-    location: member.location,
-    job_title: member.job_title,
-    weekly_capacity: member.weekly_capacity || 40,
-    avatar_url: member.avatar_url || null,
-    created_at: member.created_at || new Date().toISOString(),
-    updated_at: member.updated_at || new Date().toISOString(),
-    isPending: true
+  // Transform pre-registered members to match PendingMember structure
+  const transformedPreRegisteredMembers: PendingMember[] = preRegisteredMembers.map(member => ({
+    ...member, // Spread all original properties from the invite
+    isPending: true as const
   }));
   
   // Combine active and pre-registered members
-  const allMembers = [...teamMembers, ...transformedPreRegisteredMembers];
+  const allMembers: TeamMember[] = [...teamMembers, ...transformedPreRegisteredMembers];
   
   // Debug logging for team members
   console.log('🔍 TEAM WORKLOAD PAGE: Team members data:', {
@@ -87,7 +76,7 @@ const TeamWorkload = () => {
       id: m.id,
       name: `${m.first_name} ${m.last_name}`,
       company_id: m.company_id,
-      isPending: m.isPending || false
+      isPending: 'isPending' in m ? m.isPending : false
     }))
   });
   
