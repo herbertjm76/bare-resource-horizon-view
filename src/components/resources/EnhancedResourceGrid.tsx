@@ -85,7 +85,7 @@ export const EnhancedResourceGrid: React.FC<EnhancedResourceGridProps> = ({
       />
 
       {/* Resource Grid Table */}
-      <GridTableWrapper tableWidth={tableWidth}>
+      <GridTableWrapper>
         <EnhancedResourceTable
           projects={filteredProjects}
           days={days}

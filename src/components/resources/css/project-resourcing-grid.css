@@ -1,22 +1,22 @@
 
-/* Project Resourcing Grid - Fixed Width Columns & Center Alignment */
+/* Project Resourcing Grid - Matching Team Workload Pattern */
 
-/* Container for center alignment */
+/* Container for center alignment - matching workload-grid-container */
 .project-resourcing-grid-container {
-  display: block;
-  width: auto;
-  max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* Table wrapper with center alignment */
-.project-resourcing-table-wrapper {
-  position: relative;
+  width: 100%;
   overflow-x: auto;
   overflow-y: visible;
-  width: fit-content;
-  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
+  background: white;
+  display: flex;
+  justify-content: center; /* Center the table wrapper */
+}
+
+/* Table wrapper - matching workload-table-wrapper */
+.project-resourcing-table-wrapper {
+  display: inline-block; /* Allow the wrapper to shrink to content size */
+  min-width: min-content;
 }
 
 /* Enhanced resource table with exact width */

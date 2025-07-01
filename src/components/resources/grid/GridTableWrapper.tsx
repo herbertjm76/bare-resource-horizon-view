@@ -10,14 +10,8 @@ interface GridTableWrapperProps {
 export const GridTableWrapper: React.FC<GridTableWrapperProps> = ({ children, tableWidth }) => {
   return (
     <Card className="w-full overflow-hidden">
-      <div className="w-full flex justify-center">
-        <div 
-          className="overflow-x-auto"
-          style={{ 
-            width: tableWidth ? `${tableWidth}px` : 'fit-content',
-            maxWidth: '100%'
-          }}
-        >
+      <div className="project-resourcing-grid-container">
+        <div className="project-resourcing-table-wrapper">
           {children}
         </div>
       </div>
