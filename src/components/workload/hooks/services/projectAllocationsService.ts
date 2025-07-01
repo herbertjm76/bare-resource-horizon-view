@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { WorkloadDataParams, ProcessedWorkloadResult, WeeklyWorkloadBreakdown } from '../types';
 import { format, startOfWeek, endOfWeek, addDays, addWeeks, parseISO } from 'date-fns';
@@ -22,18 +21,8 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
   // First, investigate the data structure
   const investigation = await investigateDataConsistency(companyId, memberIds);
   
-  // Determine the correct resource type to use
-  let resourceTypeFilter = 'team_member'; // default
-  if (investigation.uniqueResourceTypes.length > 0) {
-    // Use the first available resource type if 'team_member' doesn't exist
-    if (!investigation.uniqueResourceTypes.includes('team_member')) {
-      resourceTypeFilter = investigation.uniqueResourceTypes[0];
-      console.log('🔍 PROJECT ALLOCATIONS: Using resource type:', resourceTypeFilter);
-    }
-  }
-
-  // Try the query with the determined resource type
-  let query = supabase
+  // Query for allocations with both 'active' and 'pre_registered' resource types
+  const { data, error } = await supabase
     .from('project_resource_allocations')
     .select(`
       *,
@@ -42,21 +31,15 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     .eq('company_id', companyId)
     .in('resource_id', memberIds)
     .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
-    .lt('week_start_date', format(endDate, 'yyyy-MM-dd'));
-
-  // Only add resource_type filter if we have resource types in the data
-  if (investigation.uniqueResourceTypes.length > 0) {
-    query = query.eq('resource_type', resourceTypeFilter);
-  }
-
-  const { data, error } = await query;
+    .lt('week_start_date', format(endDate, 'yyyy-MM-dd'))
+    .in('resource_type', ['active', 'pre_registered']);
 
   if (error) {
     console.error('🔍 PROJECT ALLOCATIONS: Error fetching project allocations:', error);
     throw error;
   }
 
-  console.log('🔍 PROJECT ALLOCATIONS: Final query result:', {
+  console.log('🔍 PROJECT ALLOCATIONS: Query result with both resource types:', {
     count: data?.length || 0,
     sampleData: data?.slice(0, 3).map(item => ({
       resource_id: item.resource_id,
@@ -67,9 +50,9 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     }))
   });
 
-  // If we still have no data, try without any resource_type filter
+  // If we still have no data, try a fallback query without resource_type filter
   if (!data || data.length === 0) {
-    console.log('🔍 PROJECT ALLOCATIONS: No data found, trying without resource_type filter...');
+    console.log('🔍 PROJECT ALLOCATIONS: No data found, trying fallback query...');
     
     const { data: fallbackData, error: fallbackError } = await supabase
       .from('project_resource_allocations')
@@ -84,6 +67,7 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
 
     console.log('🔍 PROJECT ALLOCATIONS: Fallback query result:', {
       count: fallbackData?.length || 0,
+      resourceTypes: [...new Set(fallbackData?.map(item => item.resource_type) || [])],
       sampleData: fallbackData?.slice(0, 3).map(item => ({
         resource_id: item.resource_id,
         week_start_date: item.week_start_date,
