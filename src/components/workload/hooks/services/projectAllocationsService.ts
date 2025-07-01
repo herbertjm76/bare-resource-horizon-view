@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { WorkloadDataParams, ProcessedWorkloadResult, WeeklyWorkloadBreakdown } from '../types';
 import { format, startOfWeek, endOfWeek, addDays, addWeeks } from 'date-fns';
+import { investigateDataConsistency } from './dataInvestigationService';
 
 export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
   const { companyId, memberIds, startDate, numberOfWeeks } = params;
@@ -18,73 +19,21 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     numberOfWeeks
   });
 
-  // First, let's see what's actually in the project_resource_allocations table
-  const { data: debugData, error: debugError } = await supabase
-    .from('project_resource_allocations')
-    .select('*')
-    .eq('company_id', companyId)
-    .limit(5);
-
-  console.log('🔍 PROJECT ALLOCATIONS DEBUG: Sample data in table:', debugData);
-  if (debugError) {
-    console.error('🔍 PROJECT ALLOCATIONS DEBUG: Error fetching sample data:', debugError);
+  // First, investigate the data structure
+  const investigation = await investigateDataConsistency(companyId, memberIds);
+  
+  // Determine the correct resource type to use
+  let resourceTypeFilter = 'team_member'; // default
+  if (investigation.uniqueResourceTypes.length > 0) {
+    // Use the first available resource type if 'team_member' doesn't exist
+    if (!investigation.uniqueResourceTypes.includes('team_member')) {
+      resourceTypeFilter = investigation.uniqueResourceTypes[0];
+      console.log('🔍 PROJECT ALLOCATIONS: Using resource type:', resourceTypeFilter);
+    }
   }
 
-  // Check what companies exist in the table
-  const { data: companyData, error: companyError } = await supabase
-    .from('project_resource_allocations')
-    .select('company_id, resource_id, hours, week_start_date')
-    .limit(10);
-
-  console.log('🔍 PROJECT ALLOCATIONS DEBUG: All companies in table:', companyData);
-
-  // Check if there's data for any team member resources
-  const { data: teamMemberData, error: teamMemberError } = await supabase
-    .from('project_resource_allocations')
-    .select('*')
-    .eq('resource_type', 'team_member')
-    .limit(10);
-
-  console.log('🔍 PROJECT ALLOCATIONS DEBUG: Team member allocations in table:', teamMemberData);
-
-  // Also check if there are any allocations for our specific members
-  const { data: memberDebugData, error: memberDebugError } = await supabase
-    .from('project_resource_allocations')
-    .select('*')
-    .eq('company_id', companyId)
-    .in('resource_id', memberIds)
-    .limit(10);
-
-  console.log('🔍 PROJECT ALLOCATIONS DEBUG: Allocations for our members:', memberDebugData);
-  if (memberDebugError) {
-    console.error('🔍 PROJECT ALLOCATIONS DEBUG: Error fetching member data:', memberDebugError);
-  }
-
-  // Check what resource_types exist in the table
-  const { data: resourceTypeData, error: resourceTypeError } = await supabase
-    .from('project_resource_allocations')
-    .select('resource_type, count(*)')
-    .eq('company_id', companyId);
-
-  console.log('🔍 PROJECT ALLOCATIONS DEBUG: Resource types for company:', resourceTypeData);
-
-  // Try without the inner join first to see if that's the issue
-  const { data: dataWithoutJoin, error: errorWithoutJoin } = await supabase
-    .from('project_resource_allocations')
-    .select('*')
-    .eq('company_id', companyId)
-    .in('resource_id', memberIds)
-    .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
-    .lt('week_start_date', format(endDate, 'yyyy-MM-dd'))
-    .eq('resource_type', 'team_member');
-
-  console.log('🔍 PROJECT ALLOCATIONS DEBUG: Query without join:', {
-    count: dataWithoutJoin?.length || 0,
-    sample: dataWithoutJoin?.slice(0, 3)
-  });
-
-  // Now fetch the actual data with the join
-  const { data, error } = await supabase
+  // Try the query with the determined resource type
+  let query = supabase
     .from('project_resource_allocations')
     .select(`
       *,
@@ -93,8 +42,14 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     .eq('company_id', companyId)
     .in('resource_id', memberIds)
     .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
-    .lt('week_start_date', format(endDate, 'yyyy-MM-dd'))
-    .eq('resource_type', 'team_member');
+    .lt('week_start_date', format(endDate, 'yyyy-MM-dd'));
+
+  // Only add resource_type filter if we have resource types in the data
+  if (investigation.uniqueResourceTypes.length > 0) {
+    query = query.eq('resource_type', resourceTypeFilter);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('🔍 PROJECT ALLOCATIONS: Error fetching project allocations:', error);
@@ -107,15 +62,16 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
       resource_id: item.resource_id,
       week_start_date: item.week_start_date,
       hours: item.hours,
-      project_name: item.projects?.name
+      project_name: item.projects?.name,
+      resource_type: item.resource_type
     }))
   });
 
-  // If we still have no data, let's try a much broader query to see if there's any data at all
+  // If we still have no data, try without any resource_type filter
   if (!data || data.length === 0) {
-    console.log('🔍 PROJECT ALLOCATIONS: No data found, trying broader query...');
+    console.log('🔍 PROJECT ALLOCATIONS: No data found, trying without resource_type filter...');
     
-    const { data: broadData, error: broadError } = await supabase
+    const { data: fallbackData, error: fallbackError } = await supabase
       .from('project_resource_allocations')
       .select(`
         *,
@@ -123,22 +79,25 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
       `)
       .eq('company_id', companyId)
       .in('resource_id', memberIds)
-      .eq('resource_type', 'team_member')
-      .limit(10);
+      .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
+      .lt('week_start_date', format(endDate, 'yyyy-MM-dd'));
 
-    console.log('🔍 PROJECT ALLOCATIONS: Broader query result:', {
-      count: broadData?.length || 0,
-      sampleData: broadData?.slice(0, 3).map(item => ({
+    console.log('🔍 PROJECT ALLOCATIONS: Fallback query result:', {
+      count: fallbackData?.length || 0,
+      sampleData: fallbackData?.slice(0, 3).map(item => ({
         resource_id: item.resource_id,
         week_start_date: item.week_start_date,
         hours: item.hours,
-        project_name: item.projects?.name
+        project_name: item.projects?.name,
+        resource_type: item.resource_type
       }))
     });
 
-    if (broadError) {
-      console.error('🔍 PROJECT ALLOCATIONS: Error in broader query:', broadError);
+    if (fallbackError) {
+      console.error('🔍 PROJECT ALLOCATIONS: Error in fallback query:', fallbackError);
     }
+
+    return fallbackData || [];
   }
 
   return data || [];
@@ -148,19 +107,19 @@ export const processProjectAllocations = (
   allocations: any[],
   result: ProcessedWorkloadResult
 ) => {
-  console.log('Processing project allocations for weekly aggregation:', allocations.length);
+  console.log('🔍 PROCESSING: Starting project allocations processing:', allocations.length);
   
   // Group allocations by member and week
   const allocationsByMemberWeek = new Map<string, Map<string, number>>();
   const projectsByMemberWeek = new Map<string, Map<string, any[]>>();
 
-  allocations.forEach(allocation => {
+  allocations.forEach((allocation, index) => {
     const memberId = allocation.resource_id;
     const weekStartDate = new Date(allocation.week_start_date);
     const weekKey = format(weekStartDate, 'yyyy-MM-dd');
     const hours = parseFloat(allocation.hours) || 0;
 
-    console.log(`Processing allocation - Member: ${memberId}, Week: ${weekKey}, Hours: ${hours}, Project: ${allocation.projects?.name}`);
+    console.log(`🔍 PROCESSING: Allocation ${index + 1} - Member: ${memberId}, Week: ${weekKey}, Hours: ${hours}, Project: ${allocation.projects?.name}`);
 
     // Initialize member maps if they don't exist
     if (!allocationsByMemberWeek.has(memberId)) {
@@ -194,10 +153,11 @@ export const processProjectAllocations = (
       });
     }
 
-    console.log(`Updated totals - Member: ${memberId}, Week: ${weekKey}, Total Hours: ${memberWeekMap.get(weekKey)}, Project Count: ${projects.length}`);
+    console.log(`🔍 PROCESSING: Updated totals - Member: ${memberId}, Week: ${weekKey}, Total Hours: ${memberWeekMap.get(weekKey)}, Project Count: ${projects.length}`);
   });
 
   // Update the result with processed data
+  console.log('🔍 PROCESSING: Updating result object...');
   allocationsByMemberWeek.forEach((weekMap, memberId) => {
     if (!result[memberId]) {
       result[memberId] = {};
@@ -223,7 +183,7 @@ export const processProjectAllocations = (
       const breakdown = result[memberId][weekKey];
       breakdown.total = breakdown.projectHours + breakdown.annualLeave + breakdown.officeHolidays + breakdown.otherLeave;
 
-      console.log(`Final result for ${memberId}, week ${weekKey}:`, {
+      console.log(`🔍 PROCESSING: Final result for ${memberId}, week ${weekKey}:`, {
         projectHours: breakdown.projectHours,
         total: breakdown.total,
         projectCount: breakdown.projects.length,
@@ -232,18 +192,14 @@ export const processProjectAllocations = (
     });
   });
 
-  console.log('Finished processing project allocations. Members with data:', Object.keys(result).length);
+  console.log('🔍 PROCESSING: Finished processing project allocations. Members with data:', Object.keys(result).length);
   
-  // Debug: Log sample results
-  const sampleMemberId = Object.keys(result)[0];
-  if (sampleMemberId) {
-    const sampleWeeks = Object.keys(result[sampleMemberId]).slice(0, 3);
-    console.log(`Sample data for member ${sampleMemberId}:`, 
-      sampleWeeks.map(week => ({
-        week,
-        projectHours: result[sampleMemberId][week].projectHours,
-        projects: result[sampleMemberId][week].projects.length
-      }))
-    );
-  }
+  // Debug: Log final results summary
+  Object.keys(result).forEach(memberId => {
+    const memberData = result[memberId];
+    const totalProjectHours = Object.values(memberData).reduce((sum, week) => sum + week.projectHours, 0);
+    if (totalProjectHours > 0) {
+      console.log(`🔍 PROCESSING: Member ${memberId} total project hours: ${totalProjectHours}`);
+    }
+  });
 };

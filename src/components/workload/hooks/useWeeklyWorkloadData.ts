@@ -22,7 +22,7 @@ export const useWeeklyWorkloadData = (
     queryKey: ['weekly-workload-data', company?.id, members.map(m => m.id), format(startDate, 'yyyy-MM-dd'), numberOfWeeks],
     queryFn: async () => {
       if (!company?.id || members.length === 0) {
-        console.log('Skipping workload data fetch - no company or members');
+        console.log('🔍 WORKLOAD DATA: Skipping fetch - no company or members');
         return {};
       }
 
@@ -34,54 +34,58 @@ export const useWeeklyWorkloadData = (
         numberOfWeeks
       };
 
-      console.log('🔍 WORKLOAD DATA FETCH: Starting comprehensive workload data fetch:', {
+      console.log('🔍 WORKLOAD DATA: Starting comprehensive workload data fetch:', {
         companyId: company.id,
-        memberIds: memberIds.length,
-        memberSample: memberIds.slice(0, 3),
+        memberCount: memberIds.length,
+        memberIds: memberIds,
+        memberNames: members.map(m => `${m.first_name} ${m.last_name}`),
         startDate: format(startDate, 'yyyy-MM-dd'),
         numberOfWeeks
       });
 
       // Initialize the result structure
       const result = initializeWorkloadData(members, startDate, numberOfWeeks);
+      console.log('🔍 WORKLOAD DATA: Initialized result structure for members:', Object.keys(result));
 
       try {
         // Fetch all data in parallel
-        console.log('🔍 WORKLOAD DATA FETCH: Fetching all data sources...');
+        console.log('🔍 WORKLOAD DATA: Fetching all data sources...');
         const [allocations, annualLeaves, otherLeaves] = await Promise.all([
           fetchProjectAllocations(params),
           fetchAnnualLeave(params),
           fetchOtherLeave(params)
         ]);
 
-        console.log('🔍 WORKLOAD DATA FETCH: Raw data received:', {
+        console.log('🔍 WORKLOAD DATA: Raw data received:', {
           allocations: allocations.length,
           annualLeaves: annualLeaves.length,
           otherLeaves: otherLeaves.length
         });
 
-        // Log sample allocation data if available
+        // Log detailed allocation data if available
         if (allocations.length > 0) {
-          console.log('🔍 WORKLOAD DATA FETCH: Sample allocation:', {
-            resource_id: allocations[0].resource_id,
-            hours: allocations[0].hours,
-            week_start_date: allocations[0].week_start_date,
-            project_name: allocations[0].projects?.name
-          });
+          console.log('🔍 WORKLOAD DATA: Sample allocations:', allocations.slice(0, 3).map(a => ({
+            resource_id: a.resource_id,
+            hours: a.hours,
+            week_start_date: a.week_start_date,
+            project_name: a.projects?.name,
+            resource_type: a.resource_type
+          })));
         } else {
-          console.log('🔍 WORKLOAD DATA FETCH: No project allocations found!');
+          console.log('🔍 WORKLOAD DATA: NO PROJECT ALLOCATIONS FOUND!');
           
-          // Debug: Check what's in the database
-          console.log('🔍 WORKLOAD DATA DEBUG: Query parameters used:', {
+          // Additional debugging for allocation issues
+          console.log('🔍 WORKLOAD DATA: Query parameters used:', {
             companyId: company.id,
             memberIds,
+            memberCount: memberIds.length,
             startDate: format(startDate, 'yyyy-MM-dd'),
-            endDateCalculated: format(new Date(startDate.getTime() + (numberOfWeeks * 7 * 24 * 60 * 60 * 1000)), 'yyyy-MM-dd')
+            endDate: format(new Date(startDate.getTime() + (numberOfWeeks * 7 * 24 * 60 * 60 * 1000)), 'yyyy-MM-dd')
           });
         }
 
         // Process all data
-        console.log('🔍 WORKLOAD DATA FETCH: Processing data...');
+        console.log('🔍 WORKLOAD DATA: Processing data...');
         processProjectAllocations(allocations, result);
         processAnnualLeave(annualLeaves, result);
         processOtherLeave(otherLeaves, result);
@@ -94,18 +98,22 @@ export const useWeeklyWorkloadData = (
           return Object.values(result[memberId]).some(week => week.projectHours > 0);
         });
         
-        console.log('🔍 WORKLOAD DATA FETCH: Final summary:', {
+        console.log('🔍 WORKLOAD DATA: Final summary:', {
           totalMembers: Object.keys(result).length,
           membersWithProjectHours: membersWithProjectHours.length,
+          membersWithProjectHoursList: membersWithProjectHours,
           sampleProjectHours: membersWithProjectHours.slice(0, 3).map(memberId => ({
             memberId,
+            memberName: members.find(m => m.id === memberId) ? 
+              `${members.find(m => m.id === memberId)?.first_name} ${members.find(m => m.id === memberId)?.last_name}` : 
+              'Unknown',
             totalProjectHours: Object.values(result[memberId]).reduce((sum, week) => sum + week.projectHours, 0)
           }))
         });
 
         return result;
       } catch (error) {
-        console.error('🔍 WORKLOAD DATA FETCH: Error processing workload data:', error);
+        console.error('🔍 WORKLOAD DATA: Error processing workload data:', error);
         throw error;
       }
     },

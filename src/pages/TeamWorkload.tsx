@@ -29,6 +29,19 @@ const TeamWorkload = () => {
   // Combine active and pre-registered members
   const allMembers = [...teamMembers, ...preRegisteredMembers];
   
+  // Debug logging for team members
+  console.log('🔍 TEAM WORKLOAD PAGE: Team members data:', {
+    activeMembers: teamMembers.length,
+    preRegisteredMembers: preRegisteredMembers.length,
+    totalMembers: allMembers.length,
+    sampleActiveMembers: teamMembers.slice(0, 3).map(m => ({
+      id: m.id,
+      name: `${m.first_name} ${m.last_name}`,
+      company_id: m.company_id
+    })),
+    companyId: company?.id
+  });
+  
   // Use filtering hook
   const {
     activeFilter,
@@ -42,6 +55,16 @@ const TeamWorkload = () => {
     filteredMembers,
     clearFilters
   } = useTeamFilters(allMembers);
+  
+  // Debug logging for filtered members
+  console.log('🔍 TEAM WORKLOAD PAGE: Filtered members:', {
+    filteredCount: filteredMembers.length,
+    filteredMembers: filteredMembers.map(m => ({
+      id: m.id,
+      name: `${m.first_name} ${m.last_name}`,
+      company_id: m.company_id
+    }))
+  });
   
   // Handle week navigation
   const handleWeekChange = (newWeek: Date) => {
@@ -100,3 +123,4 @@ const TeamWorkload = () => {
 };
 
 export default TeamWorkload;
+</lov-code>
