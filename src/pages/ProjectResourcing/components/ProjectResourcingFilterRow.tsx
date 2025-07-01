@@ -74,11 +74,11 @@ export const ProjectResourcingFilterRow: React.FC<ProjectResourcingFilterRowProp
 
   const monthLabel = format(selectedDate, 'MMMM yyyy');
 
-  // Updated period options with monthly labels
+  // Updated period options to 1, 2, and 3 months
   const periodOptions = [
     { value: '4', label: '1 Month' },
-    { value: '12', label: '3 Months' },
-    { value: '52', label: '12 Months' }
+    { value: '8', label: '2 Months' },
+    { value: '12', label: '3 Months' }
   ];
 
   // Determine if all projects are expanded
