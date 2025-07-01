@@ -20,12 +20,12 @@ export const EnhancedResourceTable: React.FC<EnhancedResourceTableProps> = ({
   onToggleProjectExpand
 }) => {
   return (
-    <table className="workload-grid-table">
+    <table className="workload-grid-table enhanced-resource-table">
       <colgroup>
-        <col style={{ width: '48px' }} />
-        <col style={{ width: '200px' }} />
+        <col className="counter-column" style={{ width: '48px', minWidth: '48px' }} />
+        <col className="project-name-column" style={{ width: '200px', minWidth: '200px' }} />
         {days.map((_, index) => (
-          <col key={index} style={{ width: '32px' }} />
+          <col key={index} className="day-column" style={{ width: '32px', minWidth: '32px' }} />
         ))}
       </colgroup>
       <thead>

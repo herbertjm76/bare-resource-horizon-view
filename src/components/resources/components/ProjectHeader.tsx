@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { ChevronDown, ChevronRight, Users, Clock, DollarSign } from 'lucide-react';
-import { ResourceUtilizationBadge } from './ResourceUtilizationBadge';
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ProjectHeaderProps {
   project: any;
@@ -20,52 +20,39 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   headerBgClass,
   totalHours = 0
 }) => {
-  // Check if the project has fees set
-  const hasFeesSet = project.fee > 0 || (project.stage_fees && project.stage_fees.length > 0);
-
   return (
     <>
-      {/* Fixed counter column */}
-      <td className={`counter-column ${headerBgClass} text-center p-1`}>
-        <button 
-          onClick={onToggleExpand} 
-          className="rounded-full p-1 hover:bg-white/30 transition-colors"
+      {/* Counter column */}
+      <td className={`counter-column ${headerBgClass} p-1 text-center`}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 w-6 p-0 text-white hover:bg-white/20"
+          onClick={onToggleExpand}
         >
           {isExpanded ? (
-            <ChevronDown className="h-4 w-4 text-foreground/80" />
+            <ChevronDown className="h-3 w-3" />
           ) : (
-            <ChevronRight className="h-4 w-4 text-foreground/80" />
+            <ChevronRight className="h-3 w-3" />
           )}
-        </button>
+        </Button>
       </td>
       
-      {/* Fixed project name column */}
-      <td className={`project-name-column ${headerBgClass} p-1 font-medium`}>
-        <div className="flex flex-col">
-          <div className="text-sm font-medium truncate-text mb-0.5">
-            {project.name || 'Untitled Project'}
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-0.5">
-              <Users className="h-3 w-3" />
-              <span>{resourceCount}</span>
+      {/* Project name column */}
+      <td className={`project-name-column ${headerBgClass} p-2`}>
+        <div className="flex items-center justify-between">
+          <div className="truncate-text">
+            <div className="font-medium text-white text-sm">
+              {project.name}
             </div>
-            
-            {totalHours > 0 && (
-              <div className="flex items-center gap-0.5 bg-white/80 rounded-full px-2.5 py-0.5">
-                <Clock className="h-3 w-3" />
-                <span className="font-medium text-sm">{totalHours}h</span>
-              </div>
-            )}
-            
-            {hasFeesSet ? (
-              <ResourceUtilizationBadge utilization={75} size="xs" />
-            ) : (
-              <div className="flex items-center gap-0.5">
-                <DollarSign className="h-3 w-3" />
-                <span className="text-[10px]">Not set</span>
-              </div>
-            )}
+            <div className="text-xs text-white/80">
+              {resourceCount} resource{resourceCount !== 1 ? 's' : ''}
+              {totalHours > 0 && (
+                <span className="ml-2">
+                  • {totalHours}h total
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </td>

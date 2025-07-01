@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { ResourceUtilizationBadge } from './ResourceUtilizationBadge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ResourceActions } from './ResourceActions';
+import { ResourceUtilizationBadge } from './ResourceUtilizationBadge';
 
 interface ResourceInfoProps {
   resource: {
@@ -27,50 +27,44 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
   onDeleteResource,
   onCheckOtherProjects
 }) => {
-  const resourceType = resource.isPending ? 'pre_registered' : 'active';
+  const displayName = resource.first_name && resource.last_name 
+    ? `${resource.first_name} ${resource.last_name}`
+    : resource.name;
 
-  // Helper to get user initials from name or first_name/last_name
-  const getUserInitials = (): string => {
-    if (resource.first_name && resource.last_name) {
-      return `${resource.first_name.charAt(0)}${resource.last_name.charAt(0)}`.toUpperCase();
-    }
-    // Fallback to splitting the name field
-    const nameParts = resource.name.split(' ');
-    if (nameParts.length >= 2) {
-      return `${nameParts[0].charAt(0)}${nameParts[nameParts.length - 1].charAt(0)}`.toUpperCase();
-    }
-    return resource.name.substring(0, 2).toUpperCase();
-  };
-
-  // Helper to get avatar URL safely
-  const getAvatarUrl = (): string | undefined => {
-    return resource.avatar_url || undefined;
-  };
+  const initials = resource.first_name && resource.last_name
+    ? `${resource.first_name.charAt(0)}${resource.last_name.charAt(0)}`
+    : resource.name.split(' ').map(n => n.charAt(0)).join('').slice(0, 2);
 
   return (
-    <td className={`project-name-column ${rowBgClass} p-0.5 group-hover:bg-gray-50`}>
+    <td className={`project-name-column ${rowBgClass} p-2 group-hover:bg-gray-50`}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Avatar className="h-6 w-6">
-            <AvatarImage src={getAvatarUrl()} alt={resource.name} />
-            <AvatarFallback className="bg-[#6F4BF6] text-white text-xs">
-              {getUserInitials()}
+        <div className="flex items-center space-x-2 min-w-0 flex-grow">
+          <Avatar className="h-6 w-6 border border-gray-200 flex-shrink-0">
+            <AvatarImage src={resource.avatar_url} alt={displayName} />
+            <AvatarFallback className="text-xs bg-gray-100 text-gray-600">
+              {initials}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1 min-w-0">
-            <div className="font-medium text-xs truncate-text flex items-center gap-1">
-              <span className="truncate-text">{resource.name}</span>
-              <ResourceUtilizationBadge utilization={utilizationPercentage} size="xs" />
+          
+          <div className="min-w-0 flex-grow">
+            <div className="text-sm font-medium text-gray-900 truncate">
+              {displayName}
+            </div>
+            <div className="text-xs text-gray-500 truncate">
+              {resource.role}
+              {resource.isPending && <span className="text-amber-600 ml-1">(Pending)</span>}
             </div>
           </div>
         </div>
-        <ResourceActions
-          resourceId={resource.id}
-          resourceName={resource.name}
-          resourceType={resourceType}
-          onDeleteResource={onDeleteResource}
-          onCheckOtherProjects={onCheckOtherProjects}
-        />
+        
+        <div className="flex items-center space-x-2 flex-shrink-0">
+          <ResourceUtilizationBadge utilizationPercentage={utilizationPercentage} />
+          <ResourceActions 
+            resource={resource}
+            onDeleteResource={onDeleteResource}
+            onCheckOtherProjects={onCheckOtherProjects}
+          />
+        </div>
       </div>
     </td>
   );
