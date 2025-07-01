@@ -24,7 +24,7 @@
 .enhanced-resource-table {
   border-collapse: separate;
   border-spacing: 0;
-  table-layout: fixed;
+  table-layout: fixed !important;
   margin: 0 auto;
 }
 
@@ -79,12 +79,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
-}
-
-/* Remove any flexible end columns that might cause extra space */
-.enhanced-resource-table td:last-child,
-.enhanced-resource-table th:last-child {
-  display: none;
 }
 
 /* Responsive adjustments while maintaining fixed widths */

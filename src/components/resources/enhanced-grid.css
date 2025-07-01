@@ -8,15 +8,25 @@
 @import './css/responsive-design.css';
 @import './css/project-resourcing-grid.css';
 
-/* Enhanced table specific styles */
+/* Enhanced table specific styles - OVERRIDE CONFLICTS */
 .enhanced-resource-table {
   border-collapse: separate;
   border-spacing: 0;
-  table-layout: auto;
-  width: 100% !important;
+  table-layout: fixed !important; /* Force fixed layout */
+  width: auto !important; /* Let width be determined by column widths */
+  min-width: auto !important;
+  max-width: none !important;
 }
 
 .enhanced-grid-container {
-  min-width: 100%;
+  display: flex;
+  justify-content: center;
   width: 100%;
+  overflow-x: auto;
+}
+
+/* Remove the problematic last column hiding rule */
+.enhanced-resource-table td:last-child,
+.enhanced-resource-table th:last-child {
+  display: table-cell; /* Keep all columns visible */
 }

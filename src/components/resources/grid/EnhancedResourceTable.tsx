@@ -24,10 +24,16 @@ export const EnhancedResourceTable: React.FC<EnhancedResourceTableProps> = ({
       className="enhanced-resource-table" 
       style={{
         width: `${tableWidth}px`,
-        maxWidth: `${tableWidth}px`,
-        minWidth: `${tableWidth}px`
+        tableLayout: 'fixed'
       }}
     >
+      <colgroup>
+        <col style={{ width: '48px' }} />
+        <col style={{ width: '200px' }} />
+        {days.map((_, index) => (
+          <col key={index} style={{ width: '32px' }} />
+        ))}
+      </colgroup>
       <thead>
         <GridDaysHeader days={days} />
       </thead>

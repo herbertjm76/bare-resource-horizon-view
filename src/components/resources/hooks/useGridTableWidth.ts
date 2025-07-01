@@ -7,11 +7,10 @@ export const useGridTableWidth = (daysCount: number): number => {
     const fixedColumnsWidth = 48 + 200;
     // Day columns: 32px per day (matching the CSS day-column width)
     const daysColumnsWidth = daysCount * 32;
-    // Small buffer for borders and spacing
-    const buffer = 20;
+    // No buffer needed for exact width calculation
     
-    // Calculate exact width needed
-    const totalWidth = fixedColumnsWidth + daysColumnsWidth + buffer;
+    // Calculate exact width needed without extra space
+    const totalWidth = fixedColumnsWidth + daysColumnsWidth;
     
     return totalWidth;
   }, [daysCount]);
