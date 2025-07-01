@@ -8,16 +8,18 @@ interface GridTableWrapperProps {
 
 export const GridTableWrapper: React.FC<GridTableWrapperProps> = ({ children }) => {
   return (
-    <div className="project-resourcing-grid-container">
-      <div className="project-resourcing-table-wrapper">
-        <Card className="w-full overflow-hidden border">
-          <div className="project-resourcing-table-scroll">
-            <div className="project-resourcing-table-inner">
-              {children}
-            </div>
-          </div>
-        </Card>
+    <Card className="w-full overflow-hidden">
+      <div 
+        className="overflow-x-auto overflow-y-visible"
+        style={{
+          width: '100%',
+          maxWidth: '100%'
+        }}
+      >
+        <div className="enhanced-grid-container w-full">
+          {children}
+        </div>
       </div>
-    </div>
+    </Card>
   );
 };

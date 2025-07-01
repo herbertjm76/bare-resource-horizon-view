@@ -49,24 +49,20 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
 
   return (
     <td 
-      className={`sticky-left-0 ${rowBgClass} z-10 p-2 group-hover:bg-gray-50`} 
-      style={{ 
-        width: '250px', 
-        minWidth: '250px',
-        maxWidth: '250px'
-      }}
+      className={`sticky-left-12 ${rowBgClass} z-10 p-0.5 group-hover:bg-gray-50`} 
+      style={{ width: '200px', minWidth: '200px' }}
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <Avatar className="h-6 w-6 flex-shrink-0">
+        <div className="flex items-center gap-2">
+          <Avatar className="h-6 w-6">
             <AvatarImage src={getAvatarUrl()} alt={resource.name} />
             <AvatarFallback className="bg-[#6F4BF6] text-white text-xs">
               {getUserInitials()}
             </AvatarFallback>
           </Avatar>
-          <div className="min-w-0 flex-1">
+          <div>
             <div className="font-medium text-xs truncate flex items-center gap-1">
-              <span className="truncate">{resource.name}</span>
+              {resource.name}
               <ResourceUtilizationBadge utilization={utilizationPercentage} size="xs" />
             </div>
           </div>
