@@ -69,10 +69,10 @@ export const WeekCalendarSelector: React.FC<WeekCalendarSelectorProps> = ({
     });
 
     return (
-      <div key={weekStart.toISOString()} className="flex items-center">
+      <div key={weekStart.toISOString()} className="flex items-center mb-1">
         {/* Week number */}
         <div className={cn(
-          "w-12 h-9 flex items-center justify-center text-sm font-medium rounded-l-md",
+          "w-12 h-10 flex items-center justify-center text-sm font-semibold rounded-l-md border-r",
           isSelected ? "bg-black text-white" : "bg-gray-100 text-gray-600"
         )}>
           {weekNumber}
@@ -82,7 +82,7 @@ export const WeekCalendarSelector: React.FC<WeekCalendarSelectorProps> = ({
         <button
           onClick={() => handleWeekSelect(weekStart)}
           className={cn(
-            "flex-1 flex items-center h-9 rounded-r-md border transition-colors",
+            "flex-1 flex items-center h-10 rounded-r-md border transition-colors min-w-0",
             isSelected 
               ? "bg-blue-500 text-white border-blue-500" 
               : "bg-white hover:bg-blue-50 border-gray-200 hover:border-blue-300"
@@ -92,9 +92,8 @@ export const WeekCalendarSelector: React.FC<WeekCalendarSelectorProps> = ({
             <div
               key={dayIndex}
               className={cn(
-                "flex-1 text-center text-sm py-1",
-                dayIndex === 0 && "pl-2",
-                dayIndex === 6 && "pr-2"
+                "flex-1 text-center text-sm py-2 px-1 min-w-0",
+                "font-medium"
               )}
             >
               {format(day, 'd')}
@@ -128,7 +127,7 @@ export const WeekCalendarSelector: React.FC<WeekCalendarSelectorProps> = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <div className="p-4">
+            <div className="p-4 min-w-[420px]">
               {/* Month navigation */}
               <div className="flex items-center justify-between mb-4">
                 <Button
@@ -155,11 +154,11 @@ export const WeekCalendarSelector: React.FC<WeekCalendarSelectorProps> = ({
               </div>
 
               {/* Days of week header */}
-              <div className="flex items-center mb-2">
-                <div className="w-12 text-xs text-gray-500 text-center">Wk</div>
+              <div className="flex items-center mb-3">
+                <div className="w-12 text-xs text-gray-500 text-center font-semibold">Wk</div>
                 <div className="flex-1 flex">
                   {['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].map(day => (
-                    <div key={day} className="flex-1 text-xs text-gray-500 text-center py-1">
+                    <div key={day} className="flex-1 text-xs text-gray-500 text-center py-2 font-semibold">
                       {day}
                     </div>
                   ))}
@@ -167,7 +166,7 @@ export const WeekCalendarSelector: React.FC<WeekCalendarSelectorProps> = ({
               </div>
 
               {/* Week rows */}
-              <div className="space-y-1">
+              <div className="space-y-0">
                 {weeks.map(renderWeekRow)}
               </div>
             </div>
