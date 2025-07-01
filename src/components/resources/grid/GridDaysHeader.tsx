@@ -9,14 +9,14 @@ interface GridDaysHeaderProps {
 
 export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
   return (
-    <tr style={{ backgroundColor: '#6465F0' }}>
+    <tr>
       {/* Fixed counter column */}
-      <th className="counter-column text-center text-white font-semibold py-3 px-1" style={{ backgroundColor: '#6465F0' }}>
+      <th className="counter-column text-center text-white font-semibold py-3 px-1">
         #
       </th>
       
       {/* Fixed project name column */}
-      <th className="project-name-column text-white font-semibold py-3 px-3" style={{ backgroundColor: '#6465F0' }}>
+      <th className="project-name-column text-white font-semibold py-3 px-3">
         Project / Resource
       </th>
       
