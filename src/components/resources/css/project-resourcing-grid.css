@@ -1,7 +1,7 @@
 
-/* Project Resourcing Grid - Flexible Width Columns & Natural Alignment */
+/* Project Resourcing Grid - Fixed Width Columns & Center Alignment */
 
-/* Container for natural flow */
+/* Container for center alignment */
 .project-resourcing-grid-container {
   display: block;
   width: auto;
@@ -10,16 +10,16 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* Table wrapper with natural positioning */
+/* Table wrapper with center alignment */
 .project-resourcing-table-wrapper {
   position: relative;
   overflow-x: auto;
   overflow-y: visible;
-  width: auto;
+  width: fit-content;
   max-width: 100%;
 }
 
-/* Enhanced resource table with natural width */
+/* Enhanced resource table with exact width */
 .enhanced-resource-table {
   border-collapse: separate;
   border-spacing: 0;
