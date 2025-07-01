@@ -11,8 +11,8 @@ export const GridTableWrapper: React.FC<GridTableWrapperProps> = ({ children, ta
   return (
     <Card className="border-none shadow-sm">
       <CardContent className="p-0">
-        <div className="project-resourcing-grid-container">
-          <div className="project-resourcing-table-wrapper">
+        <div className="workload-grid-container">
+          <div className="workload-table-wrapper">
             {children}
           </div>
         </div>
