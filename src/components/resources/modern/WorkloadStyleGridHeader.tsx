@@ -1,37 +1,45 @@
 
 import React from 'react';
 import { DayInfo } from '../grid/types';
-import { isToday } from 'date-fns';
+import { format, isToday } from 'date-fns';
 
-interface ModernTableHeaderProps {
+interface WorkloadStyleGridHeaderProps {
   days: DayInfo[];
 }
 
-export const ModernTableHeader: React.FC<ModernTableHeaderProps> = ({ days }) => {
+export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = ({ days }) => {
   return (
     <thead className="modern-table-header">
       <tr>
-        {/* Control column - matching workload style exactly */}
+        {/* Control column - Fixed width, sticky */}
         <th 
           className="modern-header-cell control-column"
           style={{ 
             width: '60px',
             minWidth: '60px',
-            maxWidth: '60px'
+            maxWidth: '60px',
+            position: 'sticky',
+            left: '0px',
+            zIndex: 30,
+            backgroundColor: '#6465F0'
           }}
         >
           <div className="header-content">
-            <span className="header-label">View</span>
+            <span className="header-label">#</span>
           </div>
         </th>
         
-        {/* Project column - matching workload style exactly */}
+        {/* Project/Resource column - Fixed width, sticky */}
         <th 
           className="modern-header-cell project-column"
           style={{ 
             width: '250px',
             minWidth: '250px',
-            maxWidth: '250px'
+            maxWidth: '250px',
+            position: 'sticky',
+            left: '60px',
+            zIndex: 30,
+            backgroundColor: '#6465F0'
           }}
         >
           <div className="header-content">
@@ -39,45 +47,39 @@ export const ModernTableHeader: React.FC<ModernTableHeaderProps> = ({ days }) =>
           </div>
         </th>
         
-        {/* Day columns - matching workload header style exactly */}
+        {/* Day columns */}
         {days.map((day, index) => {
           const isTodayDay = isToday(day.date);
-          const isNewMonth = index === 0 || days[index - 1].monthLabel !== day.monthLabel;
+          const isFirstOfMonth = day.date.getDate() <= 7;
+          const isNewMonth = index === 0 || days[index - 1].date.getMonth() !== day.date.getMonth();
           
-          let headerClasses = 'modern-header-cell day-column';
           let backgroundColor = '#6465F0';
-          
           if (isTodayDay) {
-            headerClasses += ' today';
             backgroundColor = '#f6ad55';
           } else if (day.isWeekend) {
-            headerClasses += ' weekend';
             backgroundColor = '#4a5568';
           }
           
-          if (day.isSunday) headerClasses += ' sunday';
-          if (day.isFirstOfMonth) headerClasses += ' month-start';
-          
           return (
             <th 
-              key={`${day.date.toISOString()}-${index}`} 
-              className={headerClasses}
+              key={`${day.date.toISOString()}-${index}`}
+              className="modern-header-cell day-column"
               style={{ 
                 width: '30px', 
                 minWidth: '30px',
                 maxWidth: '30px',
                 height: '80px',
                 backgroundColor,
-                borderLeft: day.isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined
+                borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined
               }}
             >
               <div className="header-content day-header">
                 {isNewMonth && (
-                  <div className="month-label">{day.monthLabel}</div>
+                  <div className="month-label">{format(day.date, 'MMM').toUpperCase()}</div>
                 )}
                 <div className="day-info">
-                  <div className="day-name">{day.dayName}</div>
-                  <div className="day-number">{day.label}</div>
+                  <div className="day-name">{format(day.date, 'EEE').charAt(0)}</div>
+                  <div className="day-number">{format(day.date, 'd')}</div>
                 </div>
               </div>
             </th>

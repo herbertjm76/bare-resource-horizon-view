@@ -3,7 +3,7 @@ import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { DayInfo } from '../grid/types';
 
-interface ModernWorkloadStyleResourceRowProps {
+interface WorkloadStyleResourceRowProps {
   resource: any;
   project: any;
   days: DayInfo[];
@@ -11,7 +11,7 @@ interface ModernWorkloadStyleResourceRowProps {
   resourceIndex: number;
 }
 
-export const ModernWorkloadStyleResourceRow: React.FC<ModernWorkloadStyleResourceRowProps> = ({
+export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> = ({
   resource,
   project,
   days,
@@ -26,25 +26,47 @@ export const ModernWorkloadStyleResourceRow: React.FC<ModernWorkloadStyleResourc
     ? `${resource.first_name.charAt(0)}${resource.last_name.charAt(0)}`
     : resource.name.split(' ').map((n: string) => n.charAt(0)).join('').slice(0, 2);
 
-  const rowClass = `workload-grid-row bg-gray-50 border-b border-gray-200`;
+  const rowBgColor = '#fcfcfc'; // Slightly different shade for resource rows
 
   return (
-    <tr className={rowClass}>
+    <tr className="workload-grid-row" style={{ backgroundColor: rowBgColor }}>
+      {/* Empty control column - Fixed width, sticky */}
+      <td 
+        className="workload-grid-cell"
+        style={{
+          width: '60px',
+          minWidth: '60px',
+          maxWidth: '60px',
+          position: 'sticky',
+          left: '0px',
+          zIndex: 20,
+          backgroundColor: rowBgColor,
+          boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)',
+          borderRight: '2px solid rgba(156, 163, 175, 0.8)'
+        }}
+      >
+        {/* Empty control cell for resources */}
+      </td>
+      
       {/* Resource info column - Fixed width, sticky */}
       <td 
-        className="workload-grid-cell member-cell sticky-left-0 bg-inherit z-5 border-r-2 border-gray-300"
+        className="workload-grid-cell"
         style={{
           width: '250px',
           minWidth: '250px',
           maxWidth: '250px',
           position: 'sticky',
-          left: '0px',
+          left: '60px',
           zIndex: 20,
-          backgroundColor: '#fcfcfc'
+          backgroundColor: rowBgColor,
+          textAlign: 'left',
+          padding: '12px 16px',
+          boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)',
+          borderRight: '2px solid rgba(156, 163, 175, 0.8)'
         }}
       >
-        <div className="member-info flex items-center gap-3 p-3 pl-12">
-          <Avatar className="member-avatar w-8 h-8">
+        <div className="member-info flex items-center gap-3 pl-8">
+          <Avatar className="w-8 h-8">
             <AvatarImage src={resource.avatar_url} alt={displayName} />
             <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white', fontSize: '12px' }}>
               {initials}
@@ -72,27 +94,28 @@ export const ModernWorkloadStyleResourceRow: React.FC<ModernWorkloadStyleResourc
         const dayKey = day.date.toISOString().split('T')[0];
         const allocation = resource.allocations?.[dayKey] || 0;
         
-        let cellClass = 'workload-grid-cell week-cell text-center';
-        if (day.isWeekend) cellClass += ' bg-gray-100';
-        if (allocation > 0) cellClass += ' has-allocation';
+        let cellBgColor = rowBgColor;
+        if (day.isWeekend) cellBgColor = '#f3f4f6';
         
         return (
           <td 
             key={dayKey} 
-            className={cellClass}
+            className="workload-grid-cell"
             style={{ 
               width: '30px', 
               minWidth: '30px',
-              maxWidth: '30px'
+              maxWidth: '30px',
+              backgroundColor: cellBgColor,
+              textAlign: 'center',
+              padding: '2px'
             }}
           >
-            <div className="allocation-input p-1">
+            <div className="allocation-input">
               <input
                 type="number"
-                className="allocation-field w-6 h-6 text-center text-xs border-0 bg-transparent focus:bg-white focus:border focus:border-blue-500 focus:rounded"
+                className="w-6 h-6 text-center text-xs border-0 bg-transparent focus:bg-white focus:border focus:border-blue-500 focus:rounded"
                 value={allocation || ''}
                 onChange={(e) => {
-                  // Handle allocation change
                   console.log('Allocation change:', {
                     resource: resource.id,
                     day: dayKey,

@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { ModernWorkloadStyleGrid } from './ModernWorkloadStyleGrid';
-import { ModernGridTable } from './ModernGridTable';
+import { WorkloadStyleResourceGrid } from './WorkloadStyleResourceGrid';
 import { useProjects } from '@/hooks/useProjects';
 import { useFilteredProjects } from '../hooks/useFilteredProjects';
 import { useGridDays } from '../hooks/useGridDays';
@@ -53,39 +52,19 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* New Workload-Style Grid */}
       <div className="bg-white rounded-lg shadow-sm border">
         <div className="p-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">Project Resources (Workload Style)</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Project Resources</h3>
           <p className="text-sm text-gray-600 mt-1">
-            Team workload styled grid with sticky columns and matching UI/UX
+            Team workload styled grid with sticky # and Project/Resource columns
           </p>
         </div>
         
         <div className="p-4">
-          <ModernWorkloadStyleGrid
+          <WorkloadStyleResourceGrid
             projects={filteredProjects}
             days={days}
             expandedProjects={localExpandedProjects}
-            onToggleProjectExpand={handleToggleProjectExpand}
-          />
-        </div>
-      </div>
-
-      {/* Original Grid */}
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="p-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">Project Resources (Original Style)</h3>
-          <p className="text-sm text-gray-600 mt-1">
-            Original project resources grid
-          </p>
-        </div>
-        
-        <div className="p-4">
-          <ModernGridTable
-            projects={filteredProjects}
-            days={days}
-            expandedProjects={expandedProjects}
             onToggleProjectExpand={handleToggleProjectExpand}
           />
         </div>
