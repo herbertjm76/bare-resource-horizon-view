@@ -5,9 +5,7 @@ import { ProjectResourcingHeader } from './ProjectResourcingHeader';
 import { ProjectResourcingFilterRow } from './ProjectResourcingFilterRow';
 import { ModernResourceGrid } from '@/components/resources/modern/ModernResourceGrid';
 import { useProjects } from '@/hooks/useProjects';
-import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { GridLoadingState } from '@/components/resources/grid/GridLoadingState';
-import { GridEmptyState } from '@/components/resources/grid/GridEmptyState';
 
 interface ProjectResourcingContentProps {
   selectedMonth: Date;
@@ -113,7 +111,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         />
       </div>
       
-      {/* Modern Resource Grid */}
+      {/* Modern Resource Grid with original styling */}
       <div className="w-full max-w-full overflow-hidden">
         <ModernResourceGrid
           startDate={selectedMonth}

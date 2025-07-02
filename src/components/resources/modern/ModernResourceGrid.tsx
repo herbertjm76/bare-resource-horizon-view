@@ -8,7 +8,6 @@ import { useProjects } from '@/hooks/useProjects';
 import { useOfficeSettings } from '@/context/OfficeSettingsContext';
 import { useGridDays } from '../hooks/useGridDays';
 import { useFilteredProjects } from '../hooks/useFilteredProjects';
-import './modern-grid.css';
 
 interface ModernResourceGridProps {
   startDate: Date;
@@ -49,22 +48,27 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   // Filter projects
   const filteredProjects = useFilteredProjects(projects, filters, office_stages);
   
-  // Toggle project expansion
+  // Toggle individual project expansion
+  const [localExpanded, setLocalExpanded] = useState<string[]>(expandedProjects);
+  
   const toggleProjectExpanded = (projectId: string) => {
-    const currentExpanded = expandedProjects.includes(projectId);
-    if (currentExpanded) {
-      // Collapse
-      const newExpanded = expandedProjects.filter(id => id !== projectId);
-      onCollapseAll(); // This will be updated to handle individual toggles
-    } else {
-      // Expand  
-      onExpandAll(); // This will be updated to handle individual toggles
-    }
+    setLocalExpanded(prev => {
+      if (prev.includes(projectId)) {
+        return prev.filter(id => id !== projectId);
+      } else {
+        return [...prev, projectId];
+      }
+    });
   };
+  
+  // Sync with parent component
+  React.useEffect(() => {
+    setLocalExpanded(expandedProjects);
+  }, [expandedProjects]);
 
   if (isLoading) {
     return (
-      <div className="modern-grid-loading">
+      <div className="grid-loading">
         <div className="space-y-4">
           <div className="h-16 bg-gray-100 rounded-lg animate-pulse" />
           <div className="h-64 bg-gray-100 rounded-lg animate-pulse" />
@@ -75,7 +79,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
 
   if (filteredProjects.length === 0) {
     return (
-      <Card className="modern-grid-empty">
+      <Card className="grid-empty">
         <div className="p-12 text-center">
           <div className="text-gray-400 text-lg mb-2">No projects found</div>
           <div className="text-gray-500 text-sm">
@@ -87,31 +91,40 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   }
 
   return (
-    <div className="modern-resource-grid">
+    <div className="resource-grid-container">
       {/* Grid Header with Metrics */}
       <ModernGridHeader 
         projectCount={filteredProjects.length}
         totalProjects={totalProjects}
         periodToShow={periodToShow}
-        expandedCount={expandedProjects.length}
+        expandedCount={localExpanded.length}
       />
 
       {/* Grid Controls */}
       <ModernGridControls
         projectCount={filteredProjects.length}
-        expandedCount={expandedProjects.length}
-        onExpandAll={onExpandAll}
-        onCollapseAll={onCollapseAll}
+        expandedCount={localExpanded.length}
+        onExpandAll={() => {
+          const allIds = filteredProjects.map(p => p.id);
+          setLocalExpanded(allIds);
+          onExpandAll();
+        }}
+        onCollapseAll={() => {
+          setLocalExpanded([]);
+          onCollapseAll();
+        }}
       />
 
       {/* Main Grid Table */}
-      <Card className="modern-grid-card">
-        <ModernGridTable
-          projects={filteredProjects}
-          days={days}
-          expandedProjects={expandedProjects}
-          onToggleProjectExpand={toggleProjectExpanded}
-        />
+      <Card className="grid-table-card">
+        <div className="grid-table-card-scroll">
+          <ModernGridTable
+            projects={filteredProjects}
+            days={days}
+            expandedProjects={localExpanded}
+            onToggleProjectExpand={toggleProjectExpanded}
+          />
+        </div>
       </Card>
     </div>
   );
