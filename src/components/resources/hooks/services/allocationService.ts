@@ -9,7 +9,8 @@ export const initializeAllocations = async (
   companyId: string
 ): Promise<ProjectAllocations> => {
   try {
-    console.log('Initializing allocations for project:', projectId);
+    console.log('DEBUG initializeAllocations - Starting for project:', projectId, 'company:', companyId);
+    console.log('DEBUG initializeAllocations - About to query project_resource_allocations table');
     
     // Fetch all resource allocations for this project from database
     const { data, error } = await supabase
@@ -19,12 +20,13 @@ export const initializeAllocations = async (
       .eq('company_id', companyId);
       
     if (error) {
-      console.error('Error fetching resource allocations:', error);
+      console.error('DEBUG initializeAllocations - Database error:', error);
       toast.error('Failed to load resource allocations');
       return {};
     }
     
-    console.log('Fetched allocations:', data?.length || 0);
+    console.log('DEBUG initializeAllocations - Raw data from database:', data);
+    console.log('DEBUG initializeAllocations - Fetched allocations count:', data?.length || 0);
     
     // Transform the data into our allocation structure
     const initialAllocations: ProjectAllocations = {};
@@ -33,10 +35,14 @@ export const initializeAllocations = async (
       const weekKey = allocation.week_start_date;
       const resourceId = allocation.resource_id;
       const allocationKey = getAllocationKey(resourceId, weekKey);
-      initialAllocations[allocationKey] = allocation.hours;
+      const hours = allocation.hours;
+      initialAllocations[allocationKey] = hours;
+      
+      console.log(`DEBUG initializeAllocations - Processing allocation: ${allocationKey} = ${hours}h`);
     });
     
-    console.log('Initialized allocations:', initialAllocations);
+    console.log('DEBUG initializeAllocations - Final initialized allocations:', initialAllocations);
+    console.log('DEBUG initializeAllocations - Total allocation keys created:', Object.keys(initialAllocations).length);
     return initialAllocations;
     
   } catch (err) {
