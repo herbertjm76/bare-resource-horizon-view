@@ -1,9 +1,13 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { VisualCard } from '@/components/common/VisualElements';
 import { LayoutDashboard, Calendar, GanttChartSquare, UserSquare2, Flag } from 'lucide-react';
 
 const AppTour = () => {
+  const location = useLocation();
+  const isMainPage = location.pathname === '/';
+  
   const appFeatures = [
     {
       icon: <LayoutDashboard className="w-16 h-16" />,
@@ -43,6 +47,9 @@ const AppTour = () => {
     }
   ];
 
+  // Show only first 3 features on main page
+  const displayFeatures = isMainPage ? appFeatures.slice(0, 3) : appFeatures;
+
   return (
     <div id="app-tour" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,8 +65,8 @@ const AppTour = () => {
           </div>
         </AnimatedSection>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-          {appFeatures.map((feature, index) => (
+        <div className={`grid gap-8 ${isMainPage ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-6'}`}>
+          {displayFeatures.map((feature, index) => (
             <AnimatedSection key={index} animation="fadeInUp" delay={index * 100}>
               <div className="group text-center">
                 <div className={`relative mb-4 mx-auto w-24 h-24 rounded-2xl bg-gradient-to-br ${feature.bgColor} flex items-center justify-center shadow-lg backdrop-blur-sm group-hover:scale-110 transition-all duration-300 group-hover:shadow-xl`}>
@@ -81,12 +88,23 @@ const AppTour = () => {
 
         <AnimatedSection animation="fadeInUp" delay={600}>
           <div className="text-center mt-16">
-            <button className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg mr-4">
-              Try Demo
-            </button>
-            <button className="border border-purple-600 text-purple-600 px-8 py-3 rounded-lg font-medium hover:bg-purple-50 transition-colors">
-              View Screenshots
-            </button>
+            {isMainPage ? (
+              <Link 
+                to="/app-tour"
+                className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg inline-block"
+              >
+                Explore More Features →
+              </Link>
+            ) : (
+              <>
+                <button className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg mr-4">
+                  Try Demo
+                </button>
+                <button className="border border-purple-600 text-purple-600 px-8 py-3 rounded-lg font-medium hover:bg-purple-50 transition-colors">
+                  View Screenshots
+                </button>
+              </>
+            )}
           </div>
         </AnimatedSection>
       </div>

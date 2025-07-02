@@ -3,6 +3,7 @@ import Navbar from '../components/landing/Navbar';
 import Hero from '../components/landing/Hero';
 import ProblemOutcome from '../components/landing/ProblemOutcome';
 import FeatureTrio from '../components/landing/FeatureTrio';
+import AppTour from '../components/landing/AppTour';
 
 import Pricing from '../components/landing/Pricing';
 import LeadMagnet from '../components/landing/LeadMagnet';
@@ -21,6 +22,8 @@ const Index = () => {
       <div id="features">
         <FeatureTrio />
       </div>
+      
+      <AppTour />
       <div id="pricing">
         <Pricing />
       </div>
