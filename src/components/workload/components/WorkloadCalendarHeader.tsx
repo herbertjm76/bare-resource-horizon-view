@@ -24,8 +24,8 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({ 
             zIndex: 30,
             textAlign: 'left',
             padding: '12px 16px',
-            borderRight: '2px solid rgba(156, 163, 175, 0.8)',
-            borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+            borderRight: '2px solid rgba(255, 255, 255, 0.2)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
             fontWeight: '600'
           }}
         >
@@ -55,8 +55,8 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({ 
                 color: 'white',
                 textAlign: 'center',
                 padding: '4px 2px',
-                borderRight: '1px solid rgba(156, 163, 175, 0.6)',
-                borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+                borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
                 borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined,
                 fontSize: '12px',
                 fontWeight: '600',
@@ -155,7 +155,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({ 
             textAlign: 'center',
             padding: '12px 8px',
             borderRight: 'none',
-            borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
             fontWeight: '600'
           }}
         >

@@ -52,8 +52,8 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
           zIndex: 20,
           textAlign: 'left',
           padding: '12px 16px',
-          borderRight: '2px solid rgba(156, 163, 175, 0.8)',
-          borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
+          borderRight: '2px solid rgba(156, 163, 175, 0.3)',
+          borderBottom: '1px solid rgba(156, 163, 175, 0.2)',
           verticalAlign: 'middle'
         }}
       >
@@ -109,8 +109,8 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
               backgroundColor: rowBgColor,
               textAlign: 'center',
               padding: '2px',
-              borderRight: '1px solid rgba(156, 163, 175, 0.6)',
-              borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
+              borderRight: '1px solid rgba(156, 163, 175, 0.2)',
+              borderBottom: '1px solid rgba(156, 163, 175, 0.2)',
               verticalAlign: 'middle'
             }}
           >
@@ -167,7 +167,7 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
           textAlign: 'center',
           padding: '12px 8px',
           borderRight: 'none',
-          borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
+          borderBottom: '1px solid rgba(156, 163, 175, 0.2)',
           verticalAlign: 'middle',
           fontWeight: '600'
         }}

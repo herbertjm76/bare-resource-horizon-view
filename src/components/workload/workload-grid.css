@@ -1,8 +1,8 @@
 
-/* Workload Grid Styles - Matching Project Resourcing Format */
+/* Workload Grid Styles - Using Project Resourcing Format */
 
 /* Main Container */
-.workload-grid-container {
+.workload-resource-grid-container {
   width: 100%;
   position: relative;
   background: white;
@@ -12,13 +12,13 @@
 }
 
 /* Center alignment for short periods */
-.workload-grid-container.center-aligned {
+.workload-resource-grid-container.center-aligned {
   display: flex;
   justify-content: center;
 }
 
 /* Table Wrapper with Horizontal Scrolling */
-.workload-table-wrapper {
+.workload-resource-table-wrapper {
   width: 100%;
   overflow-x: auto;
   overflow-y: visible;
@@ -28,13 +28,13 @@
 }
 
 /* Center alignment for table wrapper */
-.center-aligned .workload-table-wrapper {
+.center-aligned .workload-resource-table-wrapper {
   display: inline-block;
   min-width: min-content;
 }
 
 /* Main Table */
-.workload-grid-table {
+.workload-resource-table {
   border-collapse: separate;
   border-spacing: 0;
   background: white;
@@ -45,7 +45,7 @@
 }
 
 /* Center alignment for table */
-.center-aligned .workload-grid-table {
+.center-aligned .workload-resource-table {
   margin: 0 auto;
 }
 
@@ -143,22 +143,22 @@
 }
 
 /* Scrollbar styling */
-.workload-table-wrapper::-webkit-scrollbar {
+.workload-resource-table-wrapper::-webkit-scrollbar {
   height: 12px;
 }
 
-.workload-table-wrapper::-webkit-scrollbar-track {
+.workload-resource-table-wrapper::-webkit-scrollbar-track {
   background: #f1f5f9;
   border-radius: 6px;
 }
 
-.workload-table-wrapper::-webkit-scrollbar-thumb {
+.workload-resource-table-wrapper::-webkit-scrollbar-thumb {
   background: #94a3b8;
   border-radius: 6px;
   border: 2px solid #f1f5f9;
 }
 
-.workload-table-wrapper::-webkit-scrollbar-thumb:hover {
+.workload-resource-table-wrapper::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
 
@@ -201,7 +201,7 @@
 }
 
 /* Ensure proper z-index stacking */
-.workload-grid-container * {
+.workload-resource-grid-container * {
   position: relative;
 }
 

@@ -23,10 +23,10 @@ export const WorkloadCalendarTable: React.FC<WorkloadCalendarTableProps> = ({
   const tableWidth = 250 + (weekStartDates.length * 30) + 120;
 
   return (
-    <div className={`workload-grid-container ${shouldCenterAlign ? 'center-aligned' : ''}`}>
-      <div className="workload-table-wrapper">
+    <div className={`workload-resource-grid-container ${shouldCenterAlign ? 'center-aligned' : ''}`}>
+      <div className="workload-resource-table-wrapper">
         <table 
-          className="workload-grid-table"
+          className="workload-resource-table"
           style={{ 
             width: `${tableWidth}px`,
             minWidth: `${tableWidth}px`,
