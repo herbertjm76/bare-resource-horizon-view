@@ -21,19 +21,19 @@ export const ModernGridTable: React.FC<ModernGridTableProps> = ({
   const totalWidth = 310 + (days.length * 30); // 60px control + 250px project + day columns
 
   return (
-    <div className="modern-table-container">
-      <div className="modern-table-scroll">
+    <div className="workload-grid-container">
+      <div className="workload-table-wrapper">
         <table 
-          className="modern-resource-table"
+          className="workload-grid-table enhanced-resource-table"
           style={{ 
             minWidth: `${totalWidth}px`
           }}
         >
           <colgroup>
-            <col style={{ width: '60px' }} /> {/* Control column - matching workload */}
-            <col style={{ width: '250px' }} /> {/* Project name column - matching workload */}
+            <col style={{ width: '60px' }} />
+            <col style={{ width: '250px' }} />
             {days.map((_, index) => (
-              <col key={index} style={{ width: '30px' }} /> /* Day columns - matching workload */
+              <col key={index} style={{ width: '30px' }} />
             ))}
           </colgroup>
           

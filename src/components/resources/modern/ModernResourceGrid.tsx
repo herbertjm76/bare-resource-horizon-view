@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { ModernGridHeader } from './ModernGridHeader';
 import { ModernGridTable } from './ModernGridTable';
 import { ModernGridControls } from './ModernGridControls';
@@ -115,16 +115,16 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
         }}
       />
 
-      {/* Main Grid Table */}
-      <Card className="grid-table-card">
-        <div className="grid-table-card-scroll">
+      {/* Main Grid Table - Using same structure as team workload */}
+      <Card className="border-none shadow-sm">
+        <CardContent className="p-0">
           <ModernGridTable
             projects={filteredProjects}
             days={days}
             expandedProjects={localExpanded}
             onToggleProjectExpand={toggleProjectExpanded}
           />
-        </div>
+        </CardContent>
       </Card>
     </div>
   );
