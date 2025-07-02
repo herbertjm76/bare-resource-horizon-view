@@ -28,7 +28,7 @@ export const WorkloadCalendarTable: React.FC<WorkloadCalendarTableProps> = ({
         <table 
           className="workload-resource-table"
           style={{ 
-            width: `${tableWidth}px`,
+            width: shouldCenterAlign ? `${tableWidth}px` : '100%',
             minWidth: `${tableWidth}px`,
             borderCollapse: 'separate',
             borderSpacing: '0',
@@ -39,7 +39,10 @@ export const WorkloadCalendarTable: React.FC<WorkloadCalendarTableProps> = ({
             tableLayout: 'fixed'
           }}
         >
-          <WorkloadCalendarHeader weekStartDates={weekStartDates} />
+          <WorkloadCalendarHeader 
+            weekStartDates={weekStartDates} 
+            shouldCenterAlign={shouldCenterAlign}
+          />
           
           <tbody>
             {members.map((member, memberIndex) => {
@@ -52,6 +55,7 @@ export const WorkloadCalendarTable: React.FC<WorkloadCalendarTableProps> = ({
                   memberIndex={memberIndex}
                   weekStartDates={weekStartDates}
                   memberWeeklyData={memberWeeklyData}
+                  shouldCenterAlign={shouldCenterAlign}
                 />
               );
             })}

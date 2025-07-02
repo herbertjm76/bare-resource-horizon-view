@@ -1,16 +1,19 @@
-
 import React from 'react';
 import { format, isToday } from 'date-fns';
 
 interface WorkloadCalendarHeaderProps {
   weekStartDates: Array<{ date: Date; key: string }>;
+  shouldCenterAlign?: boolean;
 }
 
-export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({ weekStartDates }) => {
+export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({ 
+  weekStartDates, 
+  shouldCenterAlign = false 
+}) => {
   return (
     <thead>
       <tr>
-        {/* Team Member column - Fixed width, sticky */}
+        {/* Team Member column - Fixed width, conditionally sticky */}
         <th 
           className="workload-grid-header member-column"
           style={{ 
@@ -19,9 +22,9 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({ 
             width: '250px',
             minWidth: '250px',
             maxWidth: '250px',
-            position: 'sticky',
-            left: '0',
-            zIndex: 30,
+            position: shouldCenterAlign ? 'static' : 'sticky',
+            left: shouldCenterAlign ? 'auto' : '0',
+            zIndex: shouldCenterAlign ? 25 : 30,
             textAlign: 'left',
             padding: '12px 16px',
             borderRight: '2px solid rgba(255, 255, 255, 0.2)',

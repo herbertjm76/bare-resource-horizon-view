@@ -15,6 +15,7 @@
 .workload-resource-grid-container.center-aligned {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
 }
 
 /* Table Wrapper with Horizontal Scrolling */
@@ -29,8 +30,9 @@
 
 /* Center alignment for table wrapper */
 .center-aligned .workload-resource-table-wrapper {
-  display: inline-block;
-  min-width: min-content;
+  width: auto;
+  max-width: 100%;
+  overflow-x: visible;
 }
 
 /* Main Table */
@@ -46,7 +48,7 @@
 
 /* Center alignment for table */
 .center-aligned .workload-resource-table {
-  margin: 0 auto;
+  margin: 0;
 }
 
 /* Header styles - matching Project Resourcing with fixed widths */
@@ -68,6 +70,12 @@
   z-index: 30;
   background: #6465F0 !important;
   color: white !important;
+}
+
+/* Disable sticky positioning for center-aligned tables */
+.center-aligned .workload-grid-header.member-column {
+  position: static;
+  z-index: 25;
 }
 
 /* Week Column Headers */
@@ -101,6 +109,12 @@
   left: 0;
   z-index: 20;
   background: inherit;
+}
+
+/* Disable sticky positioning for center-aligned tables */
+.center-aligned .workload-grid-cell.member-cell {
+  position: static;
+  z-index: auto;
 }
 
 /* Week Column Cells */
@@ -142,23 +156,23 @@
   transform: scale(1.1);
 }
 
-/* Scrollbar styling */
-.workload-resource-table-wrapper::-webkit-scrollbar {
+/* Scrollbar styling - only for non-centered tables */
+.workload-resource-table-wrapper:not(.center-aligned .workload-resource-table-wrapper)::-webkit-scrollbar {
   height: 12px;
 }
 
-.workload-resource-table-wrapper::-webkit-scrollbar-track {
+.workload-resource-table-wrapper:not(.center-aligned .workload-resource-table-wrapper)::-webkit-scrollbar-track {
   background: #f1f5f9;
   border-radius: 6px;
 }
 
-.workload-resource-table-wrapper::-webkit-scrollbar-thumb {
+.workload-resource-table-wrapper:not(.center-aligned .workload-resource-table-wrapper)::-webkit-scrollbar-thumb {
   background: #94a3b8;
   border-radius: 6px;
   border: 2px solid #f1f5f9;
 }
 
-.workload-resource-table-wrapper::-webkit-scrollbar-thumb:hover {
+.workload-resource-table-wrapper:not(.center-aligned .workload-resource-table-wrapper)::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
 
@@ -208,4 +222,10 @@
 .workload-grid-header.member-column,
 .workload-grid-cell.member-cell {
   position: sticky !important;
+}
+
+/* Override sticky positioning for center-aligned tables */
+.center-aligned .workload-grid-header.member-column,
+.center-aligned .workload-grid-cell.member-cell {
+  position: static !important;
 }

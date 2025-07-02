@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { TeamMember } from '@/components/dashboard/types';
@@ -9,13 +8,15 @@ interface WorkloadCalendarRowProps {
   memberIndex: number;
   weekStartDates: Array<{ date: Date; key: string }>;
   memberWeeklyData: Record<string, WeeklyWorkloadBreakdown>;
+  shouldCenterAlign?: boolean;
 }
 
 export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
   member,
   memberIndex,
   weekStartDates,
-  memberWeeklyData
+  memberWeeklyData,
+  shouldCenterAlign = false
 }) => {
   const displayName = member.first_name && member.last_name 
     ? `${member.first_name} ${member.last_name}`
@@ -39,7 +40,7 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
 
   return (
     <tr className="workload-grid-row">
-      {/* Member info column - Fixed width, sticky */}
+      {/* Member info column - Fixed width, conditionally sticky */}
       <td 
         className="workload-grid-cell member-cell"
         style={{
@@ -47,9 +48,9 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
           width: '250px',
           minWidth: '250px',
           maxWidth: '250px',
-          position: 'sticky',
-          left: '0',
-          zIndex: 20,
+          position: shouldCenterAlign ? 'static' : 'sticky',
+          left: shouldCenterAlign ? 'auto' : '0',
+          zIndex: shouldCenterAlign ? 'auto' : 20,
           textAlign: 'left',
           padding: '12px 16px',
           borderRight: '2px solid rgba(156, 163, 175, 0.3)',
