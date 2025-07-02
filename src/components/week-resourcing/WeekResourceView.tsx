@@ -1,4 +1,3 @@
-
 import React, { useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -100,7 +99,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     filters.searchTerm ? 'search' : ''
   ].filter(Boolean).length, [filters.office, filters.searchTerm]);
 
-  // Calculate weekly metrics with proper hour summation
+  // Calculate weekly metrics with proper hour summation - focus on PROJECT hours only for utilization
   const metrics = useMemo(() => {
     if (!filteredMembers || filteredMembers.length === 0 || !getMemberTotal) {
       return {
@@ -114,7 +113,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     }
 
     let totalCapacity = 0;
-    let totalAllocated = 0;
+    let totalProjectHours = 0;
     let overloadedMembers = 0;
     let underUtilizedMembers = 0;
 
@@ -122,11 +121,12 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       const weeklyCapacity = member.weekly_capacity || 40;
       totalCapacity += weeklyCapacity;
 
-      // Get the total hours for this member for the selected week
-      const memberTotal = getMemberTotal(member.id);
-      totalAllocated += memberTotal;
+      // Get the total PROJECT hours for this member for the selected week
+      const memberProjectHours = getMemberTotal(member.id);
+      totalProjectHours += memberProjectHours;
 
-      const memberUtilization = weeklyCapacity > 0 ? (memberTotal / weeklyCapacity) * 100 : 0;
+      // Calculate utilization based on PROJECT hours only
+      const memberUtilization = weeklyCapacity > 0 ? (memberProjectHours / weeklyCapacity) * 100 : 0;
       
       if (memberUtilization > 100) {
         overloadedMembers++;
@@ -135,12 +135,12 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       }
     });
 
-    const utilizationRate = totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
-    const availableHours = Math.max(0, totalCapacity - totalAllocated);
+    const utilizationRate = totalCapacity > 0 ? Math.round((totalProjectHours / totalCapacity) * 100) : 0;
+    const availableHours = Math.max(0, totalCapacity - totalProjectHours);
 
     return {
       totalCapacity,
-      totalAllocated,
+      totalAllocated: totalProjectHours,
       utilizationRate,
       overloadedMembers,
       underUtilizedMembers,

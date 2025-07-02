@@ -46,27 +46,21 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
-  // Get total hours for this member
-  const totalHours = getMemberTotal(member.id);
+  // Get total PROJECT hours for this member (excluding leave)
+  const totalProjectHours = getMemberTotal(member.id);
   const projectCount = getProjectCount(member.id);
   
-  // Calculate all leave hours
-  const annualLeave = annualLeaveData[member.id] || 0;
-  const holidayHours = holidaysData[member.id] || 0;
-  const otherLeave = otherLeaveData[member.id] || 0;
-  
-  // Total used hours (project + leave)
-  const totalUsedHours = totalHours + annualLeave + holidayHours + otherLeave;
+  // Get weekly capacity
   const weeklyCapacity = member.weekly_capacity || 40;
   
-  // Calculate utilization percentage
-  const utilizationPercentage = weeklyCapacity > 0 ? (totalUsedHours / weeklyCapacity) * 100 : 0;
+  // Calculate utilization percentage based on PROJECT hours only
+  const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalProjectHours / weeklyCapacity) * 100) : 0;
 
   console.log(`CompactRowView for ${displayName}:`, {
     memberId: member.id,
-    projectsCount: projects.length,
-    allocationMapSize: allocationMap?.size || 0,
-    totalUsedHours,
+    totalProjectHours,
+    weeklyCapacity,
+    utilizationPercentage,
     projectCount
   });
 
@@ -116,9 +110,18 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
           padding: '8px'
         }}
       >
-        <span className="font-semibold text-sm">
-          {totalHours}h
-        </span>
+        <div className="flex flex-col items-center">
+          <span className="font-semibold text-sm">
+            {totalProjectHours}h
+          </span>
+          <span className={`text-xs font-medium ${
+            utilizationPercentage > 100 ? 'text-red-600' : 
+            utilizationPercentage > 80 ? 'text-orange-600' : 
+            'text-green-600'
+          }`}>
+            {utilizationPercentage}%
+          </span>
+        </div>
       </TableCell>
       
       {/* Project allocation cells */}
