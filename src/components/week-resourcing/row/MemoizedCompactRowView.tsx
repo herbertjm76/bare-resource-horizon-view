@@ -26,9 +26,20 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   updateOtherLeave,
   ...props
 }) => {
+  // Calculate total PROJECT hours directly from allocation map to ensure accuracy
+  const calculateDirectProjectHours = useMemo(() => {
+    let totalHours = 0;
+    allocationMap.forEach((hours, key) => {
+      const [resourceId] = key.split(':');
+      if (resourceId === member.id) {
+        totalHours += hours;
+      }
+    });
+    return totalHours;
+  }, [allocationMap, member.id]);
+
   const {
     weeklyCapacity,
-    totalUsedHours,
     projectCount,
     annualLeave,
     holidayHours,
@@ -44,6 +55,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     updateOtherLeave,
     ...props 
   });
+
+  // Use direct calculation instead of getMemberTotal to ensure accuracy
+  const totalUsedHours = calculateDirectProjectHours;
 
   // Get other leave from the new data source
   const otherLeave = otherLeaveData[member.id] || 0;
@@ -72,12 +86,16 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   ), [memberData.displayName, member]);
 
   // Debug logging for this member
-  console.log(`CompactRowView for ${memberData.displayName}:`, {
+  console.log(`MemoizedCompactRowView for ${memberData.displayName}:`, {
     memberId: member.id,
     projectsCount: projects.length,
     allocationMapSize: allocationMap.size,
-    totalUsedHours,
-    projectCount
+    totalUsedHours: totalUsedHours,
+    directCalculation: calculateDirectProjectHours,
+    projectCount,
+    weeklyCapacity,
+    utilizationPercentage: memberData.utilizationPercentage,
+    allocationMapEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
   });
 
   return (

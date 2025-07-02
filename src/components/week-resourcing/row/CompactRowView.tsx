@@ -46,8 +46,20 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
-  // Get total PROJECT hours for this member (excluding leave)
-  const totalProjectHours = getMemberTotal(member.id);
+  // Calculate total PROJECT hours directly from allocation map to ensure accuracy
+  const calculateDirectProjectHours = (memberId: string) => {
+    let totalHours = 0;
+    allocationMap.forEach((hours, key) => {
+      const [resourceId] = key.split(':');
+      if (resourceId === memberId) {
+        totalHours += hours;
+      }
+    });
+    return totalHours;
+  };
+
+  // Use direct calculation to ensure we have the correct project hours
+  const totalProjectHours = calculateDirectProjectHours(member.id);
   const projectCount = getProjectCount(member.id);
   
   // Get weekly capacity
@@ -58,10 +70,12 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
 
   console.log(`CompactRowView for ${displayName}:`, {
     memberId: member.id,
-    totalProjectHours,
+    totalProjectHours: totalProjectHours,
+    getMemberTotalResult: getMemberTotal(member.id),
     weeklyCapacity,
     utilizationPercentage,
-    projectCount
+    projectCount,
+    allocationMapEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
   });
 
   const rowBgColor = memberIndex % 2 === 0 ? '#ffffff' : '#f9fafb';
@@ -99,7 +113,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
         </div>
       </TableCell>
       
-      {/* Total Hours column */}
+      {/* Total Hours column with utilization percentage */}
       <TableCell 
         className="text-center border-r border-gray-200 text-sm font-medium"
         style={{ 
