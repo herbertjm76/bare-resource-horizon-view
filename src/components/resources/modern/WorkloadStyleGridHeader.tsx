@@ -15,8 +15,8 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
         <th 
           className="workload-resource-header project-resource-column"
           style={{ 
-            backgroundColor: 'hsl(var(--primary))',
-            color: 'hsl(var(--primary-foreground))',
+            backgroundColor: '#6465F0',
+            color: 'white',
             width: '250px',
             minWidth: '250px',
             maxWidth: '250px',
@@ -25,10 +25,9 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
             zIndex: 30,
             textAlign: 'left',
             padding: '12px 16px',
-            borderRight: '2px solid hsl(var(--border))',
-            borderBottom: '1px solid hsl(var(--border))',
-            fontWeight: '600',
-            fontSize: '14px'
+            borderRight: '2px solid rgba(156, 163, 175, 0.8)',
+            borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+            fontWeight: '600'
           }}
         >
           Project / Resource
@@ -40,11 +39,11 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
           const isFirstOfMonth = day.date.getDate() === 1;
           const isNewMonth = index === 0 || days[index - 1].date.getMonth() !== day.date.getMonth();
           
-          let backgroundColor = 'hsl(var(--primary))';
+          let backgroundColor = '#6465F0';
           if (isTodayDay) {
-            backgroundColor = 'hsl(var(--warning))';
+            backgroundColor = '#f6ad55';
           } else if (day.isWeekend) {
-            backgroundColor = 'hsl(var(--muted))';
+            backgroundColor = '#4a5568';
           }
           
           return (
@@ -56,15 +55,15 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                 minWidth: '30px',
                 maxWidth: '30px',
                 backgroundColor,
-                color: isTodayDay || day.isWeekend ? 'hsl(var(--foreground))' : 'hsl(var(--primary-foreground))',
+                color: 'white',
                 textAlign: 'center',
                 padding: '4px 2px',
-                borderRight: '1px solid hsl(var(--border))',
-                borderBottom: '1px solid hsl(var(--border))',
-                borderLeft: isFirstOfMonth ? '4px solid hsl(var(--warning))' : isNewMonth ? '2px solid hsl(var(--warning))' : undefined,
-                fontSize: '11px',
+                borderRight: '1px solid rgba(156, 163, 175, 0.6)',
+                borderBottom: '1px solid rgba(156, 163, 175, 0.8)',
+                borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined,
+                fontSize: '12px',
                 fontWeight: '600',
-                height: '70px',
+                height: '80px',
                 position: 'relative',
                 overflow: 'visible'
               }}
@@ -79,11 +78,11 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                 {isNewMonth ? (
                   <>
                     <span style={{ 
-                      fontSize: '9px', 
+                      fontSize: '10px', 
                       fontWeight: '700', 
                       textTransform: 'uppercase', 
                       lineHeight: '1',
-                      color: 'hsl(var(--warning-foreground))',
+                      color: '#fbbf24',
                       marginBottom: '4px'
                     }}>
                       {format(day.date, 'MMM')}
@@ -97,8 +96,8 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                       flex: '1'
                     }}>
                       <span style={{ 
-                        fontSize: '9px', 
-                        opacity: '0.8', 
+                        fontSize: '10px', 
+                        opacity: '0.9', 
                         textTransform: 'uppercase', 
                         lineHeight: '1',
                         fontWeight: '500'
@@ -106,7 +105,7 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                         {format(day.date, 'EEE').charAt(0)}
                       </span>
                       <span style={{ 
-                        fontSize: '13px', 
+                        fontSize: '14px', 
                         fontWeight: '700', 
                         lineHeight: '1'
                       }}>
@@ -125,8 +124,8 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                     paddingTop: '16px'
                   }}>
                     <span style={{ 
-                      fontSize: '9px', 
-                      opacity: '0.8', 
+                      fontSize: '10px', 
+                      opacity: '0.9', 
                       textTransform: 'uppercase', 
                       lineHeight: '1',
                       fontWeight: '500'
@@ -134,7 +133,7 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
                       {format(day.date, 'EEE').charAt(0)}
                     </span>
                     <span style={{ 
-                      fontSize: '13px', 
+                      fontSize: '14px', 
                       fontWeight: '700', 
                       lineHeight: '1'
                     }}>

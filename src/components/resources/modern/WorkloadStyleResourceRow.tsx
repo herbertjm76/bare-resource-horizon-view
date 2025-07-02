@@ -73,9 +73,9 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%' }}>
+          <Avatar style={{ width: '24px', height: '24px', borderRadius: '4px' }}>
             <AvatarImage src={resource.avatar_url} alt={displayName} />
-            <AvatarFallback style={{ backgroundColor: 'hsl(var(--primary))', color: 'white', borderRadius: '50%' }}>
+            <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white' }}>
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -83,7 +83,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
             <span style={{ 
               fontSize: '13px',
               fontWeight: '500',
-              color: 'hsl(var(--foreground))',
+              color: '#111827',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -95,7 +95,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
             {resource.role && (
               <span style={{ 
                 fontSize: '11px',
-                color: 'hsl(var(--muted-foreground))',
+                color: '#6b7280',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
@@ -106,12 +106,12 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
             )}
             {resource.isPending && (
               <span style={{ 
-                backgroundColor: 'hsl(var(--warning))',
-                color: 'hsl(var(--warning-foreground))',
+                backgroundColor: '#fef3c7',
+                color: '#d97706',
                 fontSize: '9px',
                 fontWeight: '600',
-                padding: '2px 6px',
-                borderRadius: '12px',
+                padding: '1px 4px',
+                borderRadius: '3px',
                 flexShrink: 0
               }}>
                 Pending

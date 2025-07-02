@@ -24,20 +24,20 @@ export const ProjectResourcingHeader: React.FC<ProjectResourcingHeaderProps> = (
     <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-6">
       {/* Left side - Title with icon */}
       <div className="space-y-2">
-        <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-          <Calendar className="h-7 w-7 text-primary" />
+        <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
+          <Calendar className="h-8 w-8 text-brand-violet" />
           Project Resourcing
         </h1>
       </div>
 
       {/* Right side - Metrics as rounded badges */}
       <div className="flex flex-wrap items-center gap-3">
-        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20 rounded-full px-3 py-1.5 text-xs font-medium">
-          <BarChart3 className="h-3 w-3 mr-1.5" />
+        <Badge variant="secondary" className="bg-blue-50 text-blue-600 border-blue-200 rounded-full px-4 py-2 text-sm font-medium">
+          <BarChart3 className="h-4 w-4 mr-2" />
           {projectCount} Projects
         </Badge>
-        <Badge variant="secondary" className="bg-secondary/50 text-secondary-foreground border-secondary/20 rounded-full px-3 py-1.5 text-xs font-medium">
-          <Clock className="h-3 w-3 mr-1.5" />
+        <Badge variant="secondary" className="bg-green-50 text-green-600 border-green-200 rounded-full px-4 py-2 text-sm font-medium">
+          <Clock className="h-4 w-4 mr-2" />
           {getPeriodLabel(periodToShow)} View
         </Badge>
       </div>
