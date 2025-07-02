@@ -2,6 +2,7 @@
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { DayInfo } from '../grid/types';
+import { useAllocationInput } from '../hooks/useAllocationInput';
 
 interface WorkloadStyleResourceRowProps {
   resource: any;
@@ -27,6 +28,21 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     : resource.name.split(' ').map((n: string) => n.charAt(0)).join('').slice(0, 2);
 
   const rowBgColor = '#fcfcfc';
+  
+  // Use the allocation input system for this resource
+  const {
+    allocations,
+    inputValues,
+    isLoading,
+    isSaving,
+    handleInputChange,
+    handleInputBlur
+  } = useAllocationInput({
+    projectId: project.id,
+    resourceId: resource.id,
+    resourceType: resource.isPending ? 'pre_registered' : 'active',
+    onAllocationChange: () => {} // Empty callback since we're just displaying
+  });
 
   return (
     <tr className="workload-resource-row resource-row">
@@ -100,7 +116,8 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
       {/* Day allocation cells */}
       {days.map((day) => {
         const dayKey = day.date.toISOString().split('T')[0];
-        const allocation = resource.allocations?.[dayKey] || 0;
+        // Get allocation from the proper allocation system
+        const allocation = allocations[dayKey] || 0;
         
         let cellBgColor = rowBgColor;
         if (day.isWeekend) cellBgColor = '#f3f4f6';

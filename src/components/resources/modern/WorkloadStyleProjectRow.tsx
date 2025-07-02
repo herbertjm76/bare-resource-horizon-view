@@ -21,7 +21,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
   onToggleExpand,
   isEven
 }) => {
-  const { resources, isLoading } = useProjectResources(project.id);
+  const { resources, isLoading, projectAllocations, getAllocationKey } = useProjectResources(project.id);
   
   const rowBgColor = isEven ? '#ffffff' : '#f9fafb';
   
@@ -117,7 +117,13 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
         {/* Day allocation cells */}
         {days.map((day) => {
           const dayKey = day.date.toISOString().split('T')[0];
-          const dayTotal = 0; // Calculate from actual data
+          
+          // Calculate day total from all resources for this project
+          const dayTotal = resources.reduce((total, resource) => {
+            const allocationKey = getAllocationKey(resource.id, dayKey);
+            const hours = projectAllocations[allocationKey] || 0;
+            return total + hours;
+          }, 0);
           
           let cellBgColor = rowBgColor;
           if (day.isWeekend) cellBgColor = '#f3f4f6';
