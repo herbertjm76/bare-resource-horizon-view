@@ -159,6 +159,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
                 ${allocation > 0 ? 'bg-primary/10 text-primary font-medium' : 'bg-muted/50 text-muted-foreground'}
                 ${isSaving ? 'opacity-50' : ''}
                 ${day.isWeekend ? 'bg-muted/30' : ''}
+                flex items-center justify-center
               `}
               placeholder=""
               disabled={isLoading || isSaving}
@@ -166,7 +167,10 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
                 fontSize: '10px',
                 lineHeight: '1',
                 minHeight: '20px',
-                borderRadius: '2px'
+                borderRadius: '2px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}
             />
           </td>
