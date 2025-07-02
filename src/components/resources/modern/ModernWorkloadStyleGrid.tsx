@@ -19,9 +19,12 @@ export const ModernWorkloadStyleGrid: React.FC<ModernWorkloadStyleGridProps> = (
 }) => {
   // Calculate total width: fixed columns + day columns (matching workload exactly)
   const totalWidth = 250 + (days.length * 30); // 250px project column + day columns
+  
+  // Determine if this is approximately a 1-month view (28-31 days)
+  const isOneMonthView = days.length >= 28 && days.length <= 31;
 
   return (
-    <div className="workload-grid-container">
+    <div className={`workload-grid-container ${isOneMonthView ? 'center-aligned' : ''}`}>
       <div className="workload-table-wrapper">
         <table 
           className="workload-grid-table enhanced-resource-table"
