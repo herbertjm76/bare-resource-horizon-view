@@ -4,7 +4,7 @@ import { Calendar, TrendingUp, BarChart3 } from 'lucide-react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { VisualCard } from '@/components/common/VisualElements';
 import weeklySnapshotImage from '/lovable-uploads/97ce6f0c-da23-42f7-91b7-5d483efca9cc.png';
-import teamWorkloadImage from '@/assets/team-workload-illustration.png';
+import teamWorkloadImage from '/lovable-uploads/5b342562-6df9-4a91-bdbb-f199ea3273bd.png';
 import dashboardInsightsImage from '@/assets/dashboard-insights-illustration.png';
 
 const FeatureTrio = () => {
