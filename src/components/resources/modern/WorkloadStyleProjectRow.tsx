@@ -154,12 +154,15 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                   <span style={{ 
                     fontSize: '14px',
                     fontWeight: '700',
-                    backgroundColor: 'hsl(var(--primary))',
+                    backgroundColor: '#6465F0',
                     color: 'white',
-                    padding: '4px 8px',
+                    padding: '0',
                     borderRadius: '3px',
                     minWidth: '24px',
-                    display: 'inline-block'
+                    minHeight: '24px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
                   }}>
                     {dayTotal}
                   </span>
