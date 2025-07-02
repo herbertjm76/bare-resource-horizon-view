@@ -31,7 +31,8 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
           className="workload-resource-grid-table"
           style={{ 
             minWidth: `${totalWidth}px`,
-            width: `${totalWidth}px`
+            width: isOneMonthView ? `${totalWidth}px` : '100%',
+            margin: isOneMonthView ? '0 auto' : '0'
           }}
         >
           <WorkloadStyleGridHeader days={days} />
