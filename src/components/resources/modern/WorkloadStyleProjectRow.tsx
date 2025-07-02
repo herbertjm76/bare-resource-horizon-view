@@ -23,52 +23,92 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
 }) => {
   const { resources, isLoading } = useProjectResources(project.id);
   
-  const rowBgColor = isEven ? 'white' : '#f9fafb';
+  const rowBgColor = isEven ? '#ffffff' : '#f9fafb';
   
   return (
     <>
       {/* Project Header Row */}
-      <tr className={`workload-grid-row ${isEven ? 'bg-white' : 'bg-gray-50'} border-b border-gray-200`}>
+      <tr className="workload-resource-row project-header-row">
         {/* Project info column - Fixed width, sticky */}
         <td 
-          className="workload-grid-cell member-cell sticky-left-0 bg-inherit z-5 border-r-2 border-gray-300"
+          className="workload-resource-cell project-resource-column"
           style={{
+            backgroundColor: rowBgColor,
             width: '250px',
             minWidth: '250px',
-            maxWidth: '250px'
+            maxWidth: '250px',
+            position: 'sticky',
+            left: '0',
+            zIndex: 20,
+            textAlign: 'left',
+            padding: '12px 16px',
+            borderRight: '2px solid rgba(156, 163, 175, 0.8)',
+            borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
+            verticalAlign: 'middle'
           }}
         >
-          <div className="project-info">
-            <div className="project-header flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-6 h-6 p-0 border border-gray-300 hover:bg-gray-100"
-                onClick={onToggleExpand}
-                disabled={isLoading}
-              >
-                {isExpanded ? (
-                  <ChevronDown className="h-3 w-3" />
-                ) : (
-                  <ChevronRight className="h-3 w-3" />
-                )}
-              </Button>
-              
-              <div className="project-details flex-1">
-                <h3 className="project-title text-sm font-medium text-gray-900 truncate">
-                  {project.name}
-                </h3>
-                <div className="project-meta flex items-center gap-2 mt-1">
-                  <span className="resource-count flex items-center gap-1 text-xs text-gray-600">
-                    <Users className="h-3 w-3" />
-                    {resources.length} resources
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Button
+              variant="ghost"
+              size="sm"
+              style={{ 
+                width: '24px', 
+                height: '24px', 
+                padding: '0',
+                border: '1px solid #d1d5db',
+                backgroundColor: 'white'
+              }}
+              onClick={onToggleExpand}
+              disabled={isLoading}
+            >
+              {isExpanded ? (
+                <ChevronDown style={{ width: '12px', height: '12px' }} />
+              ) : (
+                <ChevronRight style={{ width: '12px', height: '12px' }} />
+              )}
+            </Button>
+            
+            <div style={{ flex: '1', minWidth: '0' }}>
+              <h3 style={{ 
+                fontSize: '14px', 
+                fontWeight: '500', 
+                color: '#111827',
+                margin: '0',
+                lineHeight: '1.2',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                {project.name}
+              </h3>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '8px', 
+                marginTop: '4px'
+              }}>
+                <span style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '4px',
+                  fontSize: '12px',
+                  color: '#6b7280'
+                }}>
+                  <Users style={{ width: '12px', height: '12px' }} />
+                  {resources.length} resources
+                </span>
+                {project.code && (
+                  <span style={{ 
+                    backgroundColor: '#e5e7eb',
+                    color: '#374151',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    fontSize: '11px',
+                    fontWeight: '500'
+                  }}>
+                    {project.code}
                   </span>
-                  {project.code && (
-                    <span className="project-code bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-medium">
-                      {project.code}
-                    </span>
-                  )}
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -85,22 +125,43 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
           return (
             <td 
               key={dayKey} 
-              className="workload-grid-cell week-cell text-center border-r border-gray-200"
+              className="workload-resource-cell day-column"
               style={{ 
                 width: '30px', 
                 minWidth: '30px',
                 maxWidth: '30px',
                 backgroundColor: cellBgColor,
-                padding: '2px'
+                textAlign: 'center',
+                padding: '2px',
+                borderRight: '1px solid rgba(156, 163, 175, 0.6)',
+                borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
+                verticalAlign: 'middle'
               }}
             >
-              <div className="allocation-summary">
+              <div style={{ 
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '24px'
+              }}>
                 {dayTotal > 0 ? (
-                  <span className="total-hours text-xs font-semibold bg-gray-800 text-white px-2 py-1 rounded">
+                  <span style={{ 
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    backgroundColor: '#1f2937',
+                    color: '#ffffff',
+                    padding: '4px 8px',
+                    borderRadius: '4px'
+                  }}>
                     {dayTotal}h
                   </span>
                 ) : (
-                  <span className="no-allocation text-gray-400 text-xs">—</span>
+                  <span style={{ 
+                    color: '#9ca3af',
+                    fontSize: '12px'
+                  }}>
+                    —
+                  </span>
                 )}
               </div>
             </td>

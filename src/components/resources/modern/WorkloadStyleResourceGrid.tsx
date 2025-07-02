@@ -18,16 +18,20 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
   expandedProjects,
   onToggleProjectExpand
 }) => {
-  // Calculate table width: project column (250px) + day columns (30px each)
-  const totalWidth = 250 + (days.length * 30);
+  // Calculate if we should center align (for 1-month views)
+  const shouldCenterAlign = days.length <= 31;
+  
+  // Calculate total table width: project column (250px) + day columns (30px each)
+  const tableWidth = 250 + (days.length * 30);
 
   return (
-    <div className="workload-grid-container">
-      <div className="workload-table-wrapper">
+    <div className={`workload-resource-grid-container ${shouldCenterAlign ? 'center-aligned' : ''}`}>
+      <div className="workload-resource-table-wrapper">
         <table 
-          className="workload-grid-table"
+          className="workload-resource-table"
           style={{ 
-            minWidth: `${totalWidth}px`
+            width: `${tableWidth}px`,
+            minWidth: `${tableWidth}px`
           }}
         >
           <WorkloadStyleGridHeader days={days} />
