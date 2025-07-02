@@ -52,11 +52,11 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="p-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">Project Resources</h3>
-          <p className="text-sm text-gray-600 mt-1">
-            Team workload styled grid with sticky # and Project/Resource columns
+      <div className="bg-card rounded-lg shadow-sm border border-border">
+        <div className="p-4 border-b border-border">
+          <h3 className="text-lg font-semibold text-foreground">Project Resources</h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage team allocations across projects with real-time editing
           </p>
         </div>
         
