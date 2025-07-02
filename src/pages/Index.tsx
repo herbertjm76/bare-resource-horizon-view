@@ -3,6 +3,8 @@ import Navbar from '../components/landing/Navbar';
 import Hero from '../components/landing/Hero';
 import ProblemOutcome from '../components/landing/ProblemOutcome';
 import FeatureTrio from '../components/landing/FeatureTrio';
+import Solutions from '../components/landing/Solutions';
+import AppTour from '../components/landing/AppTour';
 import ExcelComparison from '../components/landing/ExcelComparison';
 import Pricing from '../components/landing/Pricing';
 import LeadMagnet from '../components/landing/LeadMagnet';
@@ -17,9 +19,19 @@ const Index = () => {
       <Navbar />
       <Hero />
       <ProblemOutcome />
-      <FeatureTrio />
+      
+      <div id="features">
+        <FeatureTrio />
+      </div>
+      
+      <Solutions />
+      <AppTour />
       <ExcelComparison />
-      <Pricing />
+      
+      <div id="pricing">
+        <Pricing />
+      </div>
+      
       <LeadMagnet />
       <FAQ />
       
