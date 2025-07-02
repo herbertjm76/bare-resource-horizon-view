@@ -10,6 +10,7 @@ import { NewResourceTable } from './NewResourceTable';
 import { useStreamlinedWeekResourceData } from './hooks/useStreamlinedWeekResourceData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, isThisWeek } from 'date-fns';
+import { calculateMemberProjectHours, calculateUtilizationPercentage } from './utils/utilizationCalculations';
 
 interface WeekResourceViewProps {
   selectedWeek: Date;
@@ -99,9 +100,9 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     filters.searchTerm ? 'search' : ''
   ].filter(Boolean).length, [filters.office, filters.searchTerm]);
 
-  // Calculate weekly metrics with proper hour summation - focus on PROJECT hours only for utilization
+  // STANDARDIZED weekly metrics calculation using the utility functions
   const metrics = useMemo(() => {
-    if (!filteredMembers || filteredMembers.length === 0 || !getMemberTotal) {
+    if (!filteredMembers || filteredMembers.length === 0 || !allocationMap) {
       return {
         totalCapacity: 0,
         totalAllocated: 0,
@@ -121,12 +122,12 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       const weeklyCapacity = member.weekly_capacity || 40;
       totalCapacity += weeklyCapacity;
 
-      // Get the total PROJECT hours for this member for the selected week
-      const memberProjectHours = getMemberTotal(member.id);
+      // Use STANDARDIZED calculation for project hours
+      const memberProjectHours = calculateMemberProjectHours(member.id, allocationMap);
       totalProjectHours += memberProjectHours;
 
-      // Calculate utilization based on PROJECT hours only
-      const memberUtilization = weeklyCapacity > 0 ? (memberProjectHours / weeklyCapacity) * 100 : 0;
+      // Use STANDARDIZED utilization calculation
+      const memberUtilization = calculateUtilizationPercentage(memberProjectHours, weeklyCapacity);
       
       if (memberUtilization > 100) {
         overloadedMembers++;
@@ -138,6 +139,15 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     const utilizationRate = totalCapacity > 0 ? Math.round((totalProjectHours / totalCapacity) * 100) : 0;
     const availableHours = Math.max(0, totalCapacity - totalProjectHours);
 
+    console.log('STANDARDIZED Weekly Metrics:', {
+      totalCapacity,
+      totalProjectHours,
+      utilizationRate,
+      overloadedMembers,
+      underUtilizedMembers,
+      availableHours
+    });
+
     return {
       totalCapacity,
       totalAllocated: totalProjectHours,
@@ -146,7 +156,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       underUtilizedMembers,
       availableHours
     };
-  }, [filteredMembers, getMemberTotal]);
+  }, [filteredMembers, allocationMap]);
 
   if (error) {
     return (
@@ -223,7 +233,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         </CardContent>
       </Card>
 
-      {/* Weekly Summary Stats */}
+      {/* Weekly Summary Stats with STANDARDIZED calculations */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">

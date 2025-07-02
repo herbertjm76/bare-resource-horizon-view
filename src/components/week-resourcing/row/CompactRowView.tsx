@@ -2,6 +2,11 @@
 import React from 'react';
 import { TableRow, TableCell } from '@/components/ui/table';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { 
+  calculateMemberProjectHours, 
+  calculateUtilizationPercentage, 
+  getUtilizationColor 
+} from '../utils/utilizationCalculations';
 
 interface CompactRowViewProps {
   member: any;
@@ -46,34 +51,18 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
-  // Calculate total PROJECT hours directly from allocation map to ensure accuracy
-  const calculateDirectProjectHours = (memberId: string) => {
-    let totalHours = 0;
-    allocationMap.forEach((hours, key) => {
-      const [resourceId] = key.split(':');
-      if (resourceId === memberId) {
-        totalHours += hours;
-      }
-    });
-    return totalHours;
-  };
-
-  // Use direct calculation to ensure we have the correct project hours
-  const totalProjectHours = calculateDirectProjectHours(member.id);
-  const projectCount = getProjectCount(member.id);
-  
-  // Get weekly capacity
+  // STANDARDIZED CALCULATIONS - Use the utility functions
+  const totalProjectHours = calculateMemberProjectHours(member.id, allocationMap);
   const weeklyCapacity = member.weekly_capacity || 40;
-  
-  // Calculate utilization percentage based on PROJECT hours only
-  const utilizationPercentage = weeklyCapacity > 0 ? Math.round((totalProjectHours / weeklyCapacity) * 100) : 0;
+  const utilizationPercentage = calculateUtilizationPercentage(totalProjectHours, weeklyCapacity);
+  const projectCount = getProjectCount(member.id);
 
-  console.log(`CompactRowView for ${displayName}:`, {
+  // Debug logging with standardized values
+  console.log(`CompactRowView STANDARDIZED for ${displayName}:`, {
     memberId: member.id,
-    totalProjectHours: totalProjectHours,
-    getMemberTotalResult: getMemberTotal(member.id),
-    weeklyCapacity,
-    utilizationPercentage,
+    totalProjectHours_STANDARDIZED: totalProjectHours,
+    weeklyCapacity_WEEKLY: weeklyCapacity,
+    utilizationPercentage_FINAL: utilizationPercentage,
     projectCount,
     allocationMapEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
   });
@@ -113,7 +102,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
         </div>
       </TableCell>
       
-      {/* Total Hours column with utilization percentage */}
+      {/* Total Hours column with STANDARDIZED utilization percentage */}
       <TableCell 
         className="text-center border-r border-gray-200 text-sm font-medium"
         style={{ 
@@ -128,11 +117,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
           <span className="font-semibold text-sm">
             {totalProjectHours}h
           </span>
-          <span className={`text-xs font-medium ${
-            utilizationPercentage > 100 ? 'text-red-600' : 
-            utilizationPercentage > 80 ? 'text-orange-600' : 
-            'text-green-600'
-          }`}>
+          <span className={`text-xs font-medium ${getUtilizationColor(utilizationPercentage)}`}>
             {utilizationPercentage}%
           </span>
         </div>

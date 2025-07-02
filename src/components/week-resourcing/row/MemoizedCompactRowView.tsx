@@ -10,6 +10,11 @@ import { RowData, useRowData } from './RowUtilsHooks';
 import { EnhancedUtilizationPopover } from './components/EnhancedUtilizationPopover';
 import { ProjectCellTooltip } from '../tooltips/ProjectCellTooltip';
 import { useDetailedWeeklyAllocations } from '../hooks/useDetailedWeeklyAllocations';
+import { 
+  calculateMemberProjectHours, 
+  calculateUtilizationPercentage, 
+  calculateMemberProjectCount 
+} from '../utils/utilizationCalculations';
 
 interface CompactRowViewProps extends RowData {
   viewMode: 'compact';
@@ -26,21 +31,25 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   updateOtherLeave,
   ...props
 }) => {
-  // Calculate total PROJECT hours directly from allocation map to ensure accuracy
-  const calculateDirectProjectHours = useMemo(() => {
-    let totalHours = 0;
-    allocationMap.forEach((hours, key) => {
-      const [resourceId] = key.split(':');
-      if (resourceId === member.id) {
-        totalHours += hours;
-      }
-    });
-    return totalHours;
-  }, [allocationMap, member.id]);
+  // STANDARDIZED CALCULATIONS - Use the utility functions consistently
+  const totalProjectHours = useMemo(() => 
+    calculateMemberProjectHours(member.id, allocationMap), 
+    [member.id, allocationMap]
+  );
+  
+  const weeklyCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
+  
+  const utilizationPercentage = useMemo(() => 
+    calculateUtilizationPercentage(totalProjectHours, weeklyCapacity), 
+    [totalProjectHours, weeklyCapacity]
+  );
+  
+  const projectCount = useMemo(() => 
+    calculateMemberProjectCount(member.id, allocationMap), 
+    [member.id, allocationMap]
+  );
 
   const {
-    weeklyCapacity,
-    projectCount,
     annualLeave,
     holidayHours,
     leaveDays,
@@ -56,9 +65,6 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     ...props 
   });
 
-  // Use direct calculation instead of getMemberTotal to ensure accuracy
-  const totalUsedHours = calculateDirectProjectHours;
-
   // Get other leave from the new data source
   const otherLeave = otherLeaveData[member.id] || 0;
 
@@ -70,9 +76,8 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   const memberData = useMemo(() => ({
     initials: member ? `${(member.first_name || '').charAt(0)}${(member.last_name || '').charAt(0)}`.toUpperCase() : '??',
     displayName: member ? `${member.first_name || ''} ${member.last_name || ''}`.trim() || 'Unnamed' : 'Unknown',
-    avatarUrl: member?.avatar_url,
-    utilizationPercentage: weeklyCapacity > 0 ? Math.round((totalUsedHours / weeklyCapacity) * 100) : 0
-  }), [member, weeklyCapacity, totalUsedHours]);
+    avatarUrl: member?.avatar_url
+  }), [member]);
 
   const memberTooltip = useMemo(() => (
     <div className="space-y-1 text-xs">
@@ -85,16 +90,14 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     </div>
   ), [memberData.displayName, member]);
 
-  // Debug logging for this member
-  console.log(`MemoizedCompactRowView for ${memberData.displayName}:`, {
+  // Debug logging with STANDARDIZED calculations
+  console.log(`MemoizedCompactRowView STANDARDIZED for ${memberData.displayName}:`, {
     memberId: member.id,
-    projectsCount: projects.length,
+    totalProjectHours_STANDARDIZED: totalProjectHours,
+    weeklyCapacity_WEEKLY: weeklyCapacity,
+    utilizationPercentage_FINAL: utilizationPercentage,
+    projectCount_STANDARDIZED: projectCount,
     allocationMapSize: allocationMap.size,
-    totalUsedHours: totalUsedHours,
-    directCalculation: calculateDirectProjectHours,
-    projectCount,
-    weeklyCapacity,
-    utilizationPercentage: memberData.utilizationPercentage,
     allocationMapEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
   });
 
@@ -160,7 +163,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
         </TooltipProvider>
       </TableCell>
       
-      {/* Utilization: 200px fixed Progress Bar with click-activated enhanced popover */}
+      {/* Utilization: 200px fixed Progress Bar with STANDARDIZED calculation */}
       <TableCell 
         className="text-center border-r border-gray-200 px-1 py-0.5 utilization-column bg-gradient-to-r from-emerald-50 to-green-50"
         style={{ width: 200, minWidth: 200, maxWidth: 200 }}
@@ -169,7 +172,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           <PopoverTrigger asChild>
             <div className="cursor-pointer">
               <LongCapacityBar
-                totalUsedHours={totalUsedHours}
+                totalUsedHours={totalProjectHours}
                 totalCapacity={weeklyCapacity}
                 compact
               />
@@ -184,9 +187,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
             <EnhancedUtilizationPopover
               memberName={memberData.displayName}
               selectedWeek={selectedWeek}
-              totalUsedHours={totalUsedHours}
+              totalUsedHours={totalProjectHours}
               weeklyCapacity={weeklyCapacity}
-              utilizationPercentage={memberData.utilizationPercentage}
+              utilizationPercentage={utilizationPercentage}
               annualLeave={annualLeave}
               holidayHours={holidayHours}
               otherLeave={otherLeave}
