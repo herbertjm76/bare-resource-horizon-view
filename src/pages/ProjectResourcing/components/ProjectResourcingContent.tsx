@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 import { ProjectResourcingHeader } from './ProjectResourcingHeader';
 import { ProjectResourcingFilterRow } from './ProjectResourcingFilterRow';
 import { ModernResourceGrid } from '@/components/resources/modern/ModernResourceGrid';
+import { WorkloadResourceGrid } from '@/components/resources/workload/WorkloadResourceGrid';
 import { useProjects } from '@/hooks/useProjects';
 import { GridLoadingState } from '@/components/resources/grid/GridLoadingState';
 
@@ -111,8 +111,26 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         />
       </div>
       
-      {/* Modern Resource Grid with original styling */}
+      {/* NEW: Workload-Style Resource Grid */}
       <div className="w-full max-w-full overflow-hidden">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Team Workload Style View</h2>
+          <p className="text-sm text-gray-600">Resource allocation grid matching team workload design</p>
+        </div>
+        <WorkloadResourceGrid
+          startDate={selectedMonth}
+          periodToShow={filters.periodToShow}
+          filters={combinedFilters}
+          displayOptions={displayOptions}
+        />
+      </div>
+      
+      {/* EXISTING: Modern Resource Grid */}
+      <div className="w-full max-w-full overflow-hidden">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">Modern Grid View</h2>
+          <p className="text-sm text-gray-600">Enhanced modern resource grid with controls</p>
+        </div>
         <ModernResourceGrid
           startDate={selectedMonth}
           periodToShow={filters.periodToShow}
