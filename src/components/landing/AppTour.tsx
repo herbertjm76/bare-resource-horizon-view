@@ -1,39 +1,45 @@
 import React from 'react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { VisualCard } from '@/components/common/VisualElements';
-import { BarChart3, Calendar, Users, Settings, FileText, Target } from 'lucide-react';
+import { LayoutDashboard, Calendar, GanttChartSquare, UserSquare2, Flag } from 'lucide-react';
 
 const AppTour = () => {
   const appFeatures = [
     {
-      icon: <BarChart3 className="w-16 h-16" />,
+      icon: <LayoutDashboard className="w-16 h-16" />,
       title: "Dashboard",
-      description: "Comprehensive analytics and insights"
+      description: "Comprehensive analytics and insights",
+      bgColor: "from-purple-600 to-purple-700"
     },
     {
       icon: <Calendar className="w-16 h-16" />,
       title: "Weekly Overview", 
-      description: "Visual capacity planning"
+      description: "Visual capacity planning",
+      bgColor: "from-blue-600 to-blue-700"
     },
     {
-      icon: <Users className="w-16 h-16" />,
+      icon: <UserSquare2 className="w-16 h-16" />,
       title: "Team Management",
-      description: "Complete team coordination"
+      description: "Complete team coordination",
+      bgColor: "from-purple-500 to-purple-600"
     },
     {
-      icon: <Target className="w-16 h-16" />,
+      icon: <GanttChartSquare className="w-16 h-16" />,
       title: "Project Resourcing",
-      description: "Strategic resource allocation"
+      description: "Strategic resource allocation",
+      bgColor: "from-violet-600 to-violet-700"
     },
     {
-      icon: <FileText className="w-16 h-16" />,
+      icon: <Calendar className="w-16 h-16" />,
       title: "Annual Leave",
-      description: "Smart vacation planning"
+      description: "Smart vacation planning",
+      bgColor: "from-blue-500 to-blue-600"
     },
     {
-      icon: <Settings className="w-16 h-16" />,
+      icon: <Flag className="w-16 h-16" />,
       title: "Office Settings",
-      description: "Complete workspace control"
+      description: "Complete workspace control",
+      bgColor: "from-purple-700 to-purple-800"
     }
   ];
 
@@ -56,9 +62,9 @@ const AppTour = () => {
           {appFeatures.map((feature, index) => (
             <AnimatedSection key={index} animation="fadeInUp" delay={index * 100}>
               <div className="group text-center">
-                <div className="relative mb-4 mx-auto w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-100 via-blue-50 to-pink-50 flex items-center justify-center border border-purple-200/30 shadow-lg backdrop-blur-sm group-hover:scale-110 transition-all duration-300 group-hover:shadow-xl">
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-2xl"></div>
-                  <div className="relative text-purple-600 group-hover:text-purple-700 transition-colors">
+                <div className={`relative mb-4 mx-auto w-24 h-24 rounded-2xl bg-gradient-to-br ${feature.bgColor} flex items-center justify-center shadow-lg backdrop-blur-sm group-hover:scale-110 transition-all duration-300 group-hover:shadow-xl`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-2xl"></div>
+                  <div className="relative text-white transition-colors">
                     {feature.icon}
                   </div>
                 </div>
