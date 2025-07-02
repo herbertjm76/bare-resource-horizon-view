@@ -5,7 +5,7 @@ import ProblemOutcome from '../components/landing/ProblemOutcome';
 import FeatureTrio from '../components/landing/FeatureTrio';
 import Solutions from '../components/landing/Solutions';
 import AppTour from '../components/landing/AppTour';
-import ExcelComparison from '../components/landing/ExcelComparison';
+
 import Pricing from '../components/landing/Pricing';
 import LeadMagnet from '../components/landing/LeadMagnet';
 import FAQ from '../components/landing/FAQ';
@@ -26,7 +26,6 @@ const Index = () => {
       
       <Solutions />
       <AppTour />
-      <ExcelComparison />
       
       <div id="pricing">
         <Pricing />
