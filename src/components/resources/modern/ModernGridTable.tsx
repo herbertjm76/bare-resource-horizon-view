@@ -17,8 +17,8 @@ export const ModernGridTable: React.FC<ModernGridTableProps> = ({
   expandedProjects,
   onToggleProjectExpand
 }) => {
-  // Calculate total width: fixed columns + day columns
-  const totalWidth = 300 + (days.length * 40); // Increased day column width for better readability
+  // Calculate total width: fixed columns + day columns (matching workload style)
+  const totalWidth = 310 + (days.length * 30); // 60px control + 250px project + day columns
 
   return (
     <div className="modern-table-container">
@@ -26,15 +26,14 @@ export const ModernGridTable: React.FC<ModernGridTableProps> = ({
         <table 
           className="modern-resource-table"
           style={{ 
-            width: `${totalWidth}px`,
-            minWidth: '100%'
+            minWidth: `${totalWidth}px`
           }}
         >
           <colgroup>
-            <col style={{ width: '60px' }} /> {/* Expand/collapse column */}
-            <col style={{ width: '240px' }} /> {/* Project name column */}
+            <col style={{ width: '60px' }} /> {/* Control column - matching workload */}
+            <col style={{ width: '250px' }} /> {/* Project name column - matching workload */}
             {days.map((_, index) => (
-              <col key={index} style={{ width: '40px' }} />
+              <col key={index} style={{ width: '30px' }} /> {/* Day columns - matching workload */}
             ))}
           </colgroup>
           
