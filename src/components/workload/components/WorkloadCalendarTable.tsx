@@ -16,8 +16,8 @@ export const WorkloadCalendarTable: React.FC<WorkloadCalendarTableProps> = ({
   weeklyWorkloadData,
   weekStartDates
 }) => {
-  // Calculate if we should center align (for short periods)
-  const shouldCenterAlign = weekStartDates.length <= 12; // 12 weeks or less
+  // Calculate if we should center align (only for 12 weeks or less)
+  const shouldCenterAlign = weekStartDates.length <= 12;
   
   // Calculate total table width: member column (250px) + week columns (30px each) + total column (120px)
   const tableWidth = 250 + (weekStartDates.length * 30) + 120;
