@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, TrendingUp, Mail } from 'lucide-react';
+import { Calendar, TrendingUp, BarChart3 } from 'lucide-react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { VisualCard } from '@/components/common/VisualElements';
 
@@ -8,20 +8,20 @@ const FeatureTrio = () => {
   const features = [
     {
       icon: <Calendar className="w-8 h-8 text-purple-600" />,
-      title: "Rolling Availability Calendar",
-      description: "Drag people, capacity colours update.",
+      title: "Weekly Snapshot",
+      description: "Get a comprehensive view of your team's weekly allocations and capacity at a glance.",
       gif: "/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
     },
     {
       icon: <TrendingUp className="w-8 h-8 text-orange-600" />,
-      title: "Live Burn Meter",
-      description: "Fee vs. hours bar turns amber/red.",
+      title: "Team Workload",
+      description: "Monitor team workload distribution and identify capacity bottlenecks before they impact projects.",
       gif: "/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
     },
     {
-      icon: <Mail className="w-8 h-8 text-blue-600" />,
-      title: "Morning Heads-Up",
-      description: "Slack/email digest: clashes, gaps, leave.",
+      icon: <BarChart3 className="w-8 h-8 text-blue-600" />,
+      title: "Dashboard Insights",
+      description: "Access intelligent analytics and actionable insights to optimize resource planning decisions.",
       gif: "/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
     }
   ];
