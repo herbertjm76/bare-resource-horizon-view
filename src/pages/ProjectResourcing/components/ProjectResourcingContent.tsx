@@ -3,11 +3,7 @@ import React from 'react';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 import { ProjectResourcingHeader } from './ProjectResourcingHeader';
 import { ProjectResourcingFilterRow } from './ProjectResourcingFilterRow';
-import { GridTableWrapper } from '@/components/resources/grid/GridTableWrapper';
-import { EnhancedResourceTable } from '@/components/resources/grid/EnhancedResourceTable';
-import { useGridDays } from '@/components/resources/hooks/useGridDays';
-import { useFilteredProjects } from '@/components/resources/hooks/useFilteredProjects';
-import { useGridTableWidth } from '@/components/resources/hooks/useGridTableWidth';
+import { ModernResourceGrid } from '@/components/resources/modern/ModernResourceGrid';
 import { useProjects } from '@/hooks/useProjects';
 import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { GridLoadingState } from '@/components/resources/grid/GridLoadingState';
@@ -57,28 +53,13 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   onClearFilters
 }) => {
   const { projects, isLoading } = useProjects();
-  const { office_stages } = useOfficeSettings();
   const [expandedProjects, setExpandedProjects] = React.useState<string[]>([]);
   
-  // Generate array of days for the selected period
-  const days = useGridDays(selectedMonth, filters.periodToShow, displayOptions);
-
-  // Filter and enhance projects
-  const filteredProjects = useFilteredProjects(projects, { ...filters, searchTerm }, office_stages);
-
-  // Calculate the table width
-  const tableWidth = useGridTableWidth(days.length);
-  
-  // Toggle project expansion
-  const toggleProjectExpanded = (projectId: string) => {
-    setExpandedProjects(prev => 
-      prev.includes(projectId) ? prev.filter(id => id !== projectId) : [...prev, projectId]
-    );
-  };
-
   // Expand all projects
   const expandAll = () => {
-    setExpandedProjects(filteredProjects.map(p => p.id));
+    if (projects) {
+      setExpandedProjects(projects.map(p => p.id));
+    }
   };
 
   // Collapse all projects
@@ -86,20 +67,24 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
     setExpandedProjects([]);
   };
 
+  const totalProjects = projects?.length || 0;
+
+  // Combine filters with search term for filtering
+  const combinedFilters = {
+    ...filters,
+    searchTerm
+  };
+
   if (isLoading) {
     return <GridLoadingState />;
   }
-  
-  if (filteredProjects.length === 0) {
-    return <GridEmptyState />;
-  }
 
   return (
-    <div className="w-full max-w-full overflow-hidden space-y-6">
+    <div className="w-full max-w-full overflow-hidden space-y-6 bg-gray-50">
       
       {/* Header with metrics */}
       <ProjectResourcingHeader 
-        projectCount={filteredProjects.length}
+        projectCount={totalProjects}
         periodToShow={filters.periodToShow}
       />
 
@@ -124,21 +109,22 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
           onExpandAll={expandAll}
           onCollapseAll={collapseAll}
           expandedProjects={expandedProjects}
-          totalProjects={filteredProjects.length}
+          totalProjects={totalProjects}
         />
       </div>
       
-      {/* Resource Grid Table */}
+      {/* Modern Resource Grid */}
       <div className="w-full max-w-full overflow-hidden">
-        <GridTableWrapper>
-          <EnhancedResourceTable
-            projects={filteredProjects}
-            days={days}
-            expandedProjects={expandedProjects}
-            tableWidth={tableWidth}
-            onToggleProjectExpand={toggleProjectExpanded}
-          />
-        </GridTableWrapper>
+        <ModernResourceGrid
+          startDate={selectedMonth}
+          periodToShow={filters.periodToShow}
+          filters={combinedFilters}
+          displayOptions={displayOptions}
+          onExpandAll={expandAll}
+          onCollapseAll={collapseAll}
+          expandedProjects={expandedProjects}
+          totalProjects={totalProjects}
+        />
       </div>
     </div>
   );
