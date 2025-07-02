@@ -36,7 +36,7 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
         {/* Day columns - Fixed width */}
         {days.map((day, index) => {
           const isTodayDay = isToday(day.date);
-          const isFirstOfMonth = day.date.getDate() <= 7;
+          const isFirstOfMonth = day.date.getDate() === 1;
           const isNewMonth = index === 0 || days[index - 1].date.getMonth() !== day.date.getMonth();
           
           let backgroundColor = '#6465F0';
