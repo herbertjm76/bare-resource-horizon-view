@@ -35,9 +35,6 @@ export const ModernResourceRow: React.FC<ModernResourceRowProps> = ({
           width: '60px',
           minWidth: '60px',
           maxWidth: '60px',
-          position: 'sticky',
-          left: '0px',
-          zIndex: 10,
           backgroundColor: isEven ? '#f9fafb' : '#fcfcfc'
         }}
       ></td>
@@ -49,9 +46,6 @@ export const ModernResourceRow: React.FC<ModernResourceRowProps> = ({
           width: '250px',
           minWidth: '250px',
           maxWidth: '250px',
-          position: 'sticky',
-          left: '60px',
-          zIndex: 10,
           backgroundColor: isEven ? '#f9fafb' : '#fcfcfc'
         }}
       >

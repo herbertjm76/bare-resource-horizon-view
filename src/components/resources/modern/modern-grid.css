@@ -91,12 +91,20 @@
 .modern-header-cell.control-column {
   text-align: center;
   border-right: 2px solid rgba(156, 163, 175, 0.8);
+  /* Fixed sticky positioning */
+  position: sticky !important;
+  left: 0px !important;
+  z-index: 30 !important;
 }
 
 .modern-header-cell.project-column {
   text-align: left;
   padding-left: 16px;
   border-right: 2px solid rgba(156, 163, 175, 0.8);
+  /* Fixed sticky positioning */
+  position: sticky !important;
+  left: 60px !important;
+  z-index: 30 !important;
 }
 
 .modern-header-cell.day-column {
@@ -219,6 +227,10 @@
   text-align: center;
   border-right: 2px solid rgba(156, 163, 175, 0.8);
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  /* Fixed sticky positioning */
+  position: sticky !important;
+  left: 0px !important;
+  z-index: 20 !important;
 }
 
 .modern-cell.project-cell,
@@ -227,6 +239,10 @@
   padding: 12px 16px;
   border-right: 2px solid rgba(156, 163, 175, 0.8);
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  /* Fixed sticky positioning */
+  position: sticky !important;
+  left: 60px !important;
+  z-index: 20 !important;
 }
 
 .modern-cell.day-cell {
@@ -439,7 +455,7 @@
     width: 200px;
     min-width: 200px;
     max-width: 200px;
-    left: 50px;
+    left: 50px !important;
     padding-left: 12px;
   }
   

@@ -17,11 +17,7 @@ export const ModernTableHeader: React.FC<ModernTableHeaderProps> = ({ days }) =>
           style={{ 
             width: '60px',
             minWidth: '60px',
-            maxWidth: '60px',
-            position: 'sticky',
-            left: '0px',
-            zIndex: 25,
-            backgroundColor: '#6465F0'
+            maxWidth: '60px'
           }}
         >
           <div className="header-content">
@@ -35,11 +31,7 @@ export const ModernTableHeader: React.FC<ModernTableHeaderProps> = ({ days }) =>
           style={{ 
             width: '250px',
             minWidth: '250px',
-            maxWidth: '250px',
-            position: 'sticky',
-            left: '60px',
-            zIndex: 25,
-            backgroundColor: '#6465F0'
+            maxWidth: '250px'
           }}
         >
           <div className="header-content">
