@@ -5,7 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   calculateMemberProjectHours, 
   calculateUtilizationPercentage, 
-  getUtilizationColor 
+  getUtilizationColor,
+  calculateCapacityDisplay
 } from '../utils/utilizationCalculations';
 
 interface CompactRowViewProps {
@@ -51,20 +52,18 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
     return 'avatar_url' in member ? member.avatar_url || undefined : undefined;
   };
 
-  // STANDARDIZED CALCULATIONS - Use the utility functions
-  const totalProjectHours = calculateMemberProjectHours(member.id, allocationMap);
+  // STANDARDIZED CALCULATIONS - Use the utility functions ONLY
   const weeklyCapacity = member.weekly_capacity || 40;
-  const utilizationPercentage = calculateUtilizationPercentage(totalProjectHours, weeklyCapacity);
+  const capacityDisplay = calculateCapacityDisplay(member.id, allocationMap, weeklyCapacity);
   const projectCount = getProjectCount(member.id);
 
-  // Debug logging with standardized values
-  console.log(`CompactRowView STANDARDIZED for ${displayName}:`, {
+  // Debug logging with STANDARDIZED values
+  console.log(`CompactRowView FINAL STANDARDIZED for ${displayName}:`, {
     memberId: member.id,
-    totalProjectHours_STANDARDIZED: totalProjectHours,
-    weeklyCapacity_WEEKLY: weeklyCapacity,
-    utilizationPercentage_FINAL: utilizationPercentage,
+    ...capacityDisplay,
     projectCount,
-    allocationMapEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
+    allocationMapSize: allocationMap.size,
+    allocationEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
   });
 
   const rowBgColor = memberIndex % 2 === 0 ? '#ffffff' : '#f9fafb';
@@ -115,10 +114,10 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
       >
         <div className="flex flex-col items-center">
           <span className="font-semibold text-sm">
-            {totalProjectHours}h
+            {capacityDisplay.projectHours}h
           </span>
-          <span className={`text-xs font-medium ${getUtilizationColor(utilizationPercentage)}`}>
-            {utilizationPercentage}%
+          <span className={`text-xs font-medium ${getUtilizationColor(capacityDisplay.utilizationPercentage)}`}>
+            {capacityDisplay.utilizationPercentage}%
           </span>
         </div>
       </TableCell>

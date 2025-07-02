@@ -13,7 +13,8 @@ import { useDetailedWeeklyAllocations } from '../hooks/useDetailedWeeklyAllocati
 import { 
   calculateMemberProjectHours, 
   calculateUtilizationPercentage, 
-  calculateMemberProjectCount 
+  calculateMemberProjectCount,
+  calculateCapacityDisplay
 } from '../utils/utilizationCalculations';
 
 interface CompactRowViewProps extends RowData {
@@ -32,16 +33,12 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
   ...props
 }) => {
   // STANDARDIZED CALCULATIONS - Use the utility functions consistently
-  const totalProjectHours = useMemo(() => 
-    calculateMemberProjectHours(member.id, allocationMap), 
-    [member.id, allocationMap]
-  );
-  
   const weeklyCapacity = useMemo(() => member?.weekly_capacity || 40, [member?.weekly_capacity]);
   
-  const utilizationPercentage = useMemo(() => 
-    calculateUtilizationPercentage(totalProjectHours, weeklyCapacity), 
-    [totalProjectHours, weeklyCapacity]
+  // Use the standardized capacity display calculation
+  const capacityDisplay = useMemo(() => 
+    calculateCapacityDisplay(member.id, allocationMap, weeklyCapacity), 
+    [member.id, allocationMap, weeklyCapacity]
   );
   
   const projectCount = useMemo(() => 
@@ -90,12 +87,10 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
     </div>
   ), [memberData.displayName, member]);
 
-  // Debug logging with STANDARDIZED calculations
-  console.log(`MemoizedCompactRowView STANDARDIZED for ${memberData.displayName}:`, {
+  // Debug logging with FINAL STANDARDIZED calculations
+  console.log(`MemoizedCompactRowView FINAL STANDARDIZED for ${memberData.displayName}:`, {
     memberId: member.id,
-    totalProjectHours_STANDARDIZED: totalProjectHours,
-    weeklyCapacity_WEEKLY: weeklyCapacity,
-    utilizationPercentage_FINAL: utilizationPercentage,
+    ...capacityDisplay,
     projectCount_STANDARDIZED: projectCount,
     allocationMapSize: allocationMap.size,
     allocationMapEntries: Array.from(allocationMap.entries()).filter(([key]) => key.startsWith(member.id))
@@ -172,8 +167,8 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
           <PopoverTrigger asChild>
             <div className="cursor-pointer">
               <LongCapacityBar
-                totalUsedHours={totalProjectHours}
-                totalCapacity={weeklyCapacity}
+                totalUsedHours={capacityDisplay.projectHours}
+                totalCapacity={capacityDisplay.capacity}
                 compact
               />
             </div>
@@ -187,9 +182,9 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
             <EnhancedUtilizationPopover
               memberName={memberData.displayName}
               selectedWeek={selectedWeek}
-              totalUsedHours={totalProjectHours}
-              weeklyCapacity={weeklyCapacity}
-              utilizationPercentage={utilizationPercentage}
+              totalUsedHours={capacityDisplay.projectHours}
+              weeklyCapacity={capacityDisplay.capacity}
+              utilizationPercentage={capacityDisplay.utilizationPercentage}
               annualLeave={annualLeave}
               holidayHours={holidayHours}
               otherLeave={otherLeave}

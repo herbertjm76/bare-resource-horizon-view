@@ -100,7 +100,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     filters.searchTerm ? 'search' : ''
   ].filter(Boolean).length, [filters.office, filters.searchTerm]);
 
-  // STANDARDIZED weekly metrics calculation using the utility functions
+  // FINAL STANDARDIZED weekly metrics calculation using the utility functions
   const metrics = useMemo(() => {
     if (!filteredMembers || filteredMembers.length === 0 || !allocationMap) {
       return {
@@ -122,11 +122,11 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       const weeklyCapacity = member.weekly_capacity || 40;
       totalCapacity += weeklyCapacity;
 
-      // Use STANDARDIZED calculation for project hours
+      // Use FINAL STANDARDIZED calculation for project hours
       const memberProjectHours = calculateMemberProjectHours(member.id, allocationMap);
       totalProjectHours += memberProjectHours;
 
-      // Use STANDARDIZED utilization calculation
+      // Use FINAL STANDARDIZED utilization calculation
       const memberUtilization = calculateUtilizationPercentage(memberProjectHours, weeklyCapacity);
       
       if (memberUtilization > 100) {
@@ -139,13 +139,14 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     const utilizationRate = totalCapacity > 0 ? Math.round((totalProjectHours / totalCapacity) * 100) : 0;
     const availableHours = Math.max(0, totalCapacity - totalProjectHours);
 
-    console.log('STANDARDIZED Weekly Metrics:', {
+    console.log('FINAL STANDARDIZED Weekly Metrics:', {
       totalCapacity,
       totalProjectHours,
       utilizationRate,
       overloadedMembers,
       underUtilizedMembers,
-      availableHours
+      availableHours,
+      calculation: `${totalProjectHours} / ${totalCapacity} * 100 = ${utilizationRate}%`
     });
 
     return {
@@ -233,7 +234,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
         </CardContent>
       </Card>
 
-      {/* Weekly Summary Stats with STANDARDIZED calculations */}
+      {/* Weekly Summary Stats with FINAL STANDARDIZED calculations */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
