@@ -3,6 +3,9 @@ import React from 'react';
 import { Calendar, TrendingUp, BarChart3 } from 'lucide-react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { VisualCard } from '@/components/common/VisualElements';
+import weeklySnapshotImage from '@/assets/weekly-snapshot-illustration.png';
+import teamWorkloadImage from '@/assets/team-workload-illustration.png';
+import dashboardInsightsImage from '@/assets/dashboard-insights-illustration.png';
 
 const FeatureTrio = () => {
   const features = [
@@ -10,19 +13,19 @@ const FeatureTrio = () => {
       icon: <Calendar className="w-8 h-8 text-purple-600" />,
       title: "Weekly Snapshot",
       description: "Get a comprehensive view of your team's weekly allocations and capacity at a glance.",
-      gif: "/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
+      gif: weeklySnapshotImage
     },
     {
       icon: <TrendingUp className="w-8 h-8 text-orange-600" />,
       title: "Team Workload",
       description: "Monitor team workload distribution and identify capacity bottlenecks before they impact projects.",
-      gif: "/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
+      gif: teamWorkloadImage
     },
     {
       icon: <BarChart3 className="w-8 h-8 text-blue-600" />,
       title: "Dashboard Insights",
       description: "Access intelligent analytics and actionable insights to optimize resource planning decisions.",
-      gif: "/lovable-uploads/2e5c6c87-dc1b-4eff-8ab6-d373d5860128.png"
+      gif: dashboardInsightsImage
     }
   ];
 
