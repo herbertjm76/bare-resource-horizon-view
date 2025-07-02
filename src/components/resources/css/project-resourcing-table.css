@@ -1,0 +1,117 @@
+
+/* Project Resourcing Table - Clean Implementation */
+
+/* Container with proper scrolling */
+.project-resourcing-container {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Table with fixed layout */
+.project-resourcing-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  position: relative;
+}
+
+/* Sticky counter column */
+.project-resourcing-table .counter-column {
+  width: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 20 !important;
+  background: white !important;
+  border-right: 2px solid #e5e7eb !important;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Sticky project name column */
+.project-resourcing-table .project-name-column {
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+  position: sticky !important;
+  left: 48px !important;
+  z-index: 20 !important;
+  background: white !important;
+  border-right: 2px solid #e5e7eb !important;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Day columns */
+.project-resourcing-table .day-column {
+  width: 32px !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  text-align: center;
+  padding: 2px;
+}
+
+/* Header sticky positioning */
+.project-resourcing-table thead th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 25 !important;
+  background: #6465F0 !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 8px 4px;
+}
+
+/* Ensure header sticky columns have higher z-index */
+.project-resourcing-table thead th.counter-column,
+.project-resourcing-table thead th.project-name-column {
+  z-index: 30 !important;
+}
+
+/* Body cell styling */
+.project-resourcing-table tbody td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 4px;
+}
+
+/* Sticky body cells */
+.project-resourcing-table tbody td.counter-column,
+.project-resourcing-table tbody td.project-name-column {
+  background: white !important;
+}
+
+/* Text truncation for project names */
+.project-name-column .truncate-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .project-resourcing-table .counter-column {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+  }
+  
+  .project-resourcing-table .project-name-column {
+    width: 160px !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+    left: 40px !important;
+  }
+  
+  .project-resourcing-table .day-column {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+  }
+}

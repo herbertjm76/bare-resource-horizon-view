@@ -1,29 +1,30 @@
 
 /* Enhanced Resource Grid Styles - Main Import File */
+@import './css/project-resourcing-table.css';
 @import './css/base-layout.css';
 @import './css/header-styling.css';
 @import './css/row-cell-styling.css';
 @import './css/interactive-elements.css';
 @import './css/utility-classes.css';
 @import './css/responsive-design.css';
-@import '../workload/workload-grid.css';
 
-/* Remove any container width constraints */
+/* Container styling */
 .enhanced-grid-container {
   display: block;
-  width: auto;
+  width: 100%;
+  max-width: 100%;
 }
 
-/* Ensure all columns are visible - override any hiding rules */
+/* Ensure all table elements are visible */
+.enhanced-resource-table,
+.project-resourcing-table {
+  display: table !important;
+}
+
 .enhanced-resource-table td,
-.enhanced-resource-table th {
-  display: table-cell !important;
-}
-
-/* Specific override for project name column visibility */
-.enhanced-resource-table .project-name-column,
-.enhanced-resource-table th.project-name-column,
-.enhanced-resource-table td.project-name-column {
+.enhanced-resource-table th,
+.project-resourcing-table td,
+.project-resourcing-table th {
   display: table-cell !important;
   visibility: visible !important;
   opacity: 1 !important;
