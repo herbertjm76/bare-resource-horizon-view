@@ -39,6 +39,14 @@ export const EnhancedUtilizationPopover: React.FC<EnhancedUtilizationPopoverProp
   
   // Calculate total project hours
   const totalProjectHours = projects.reduce((sum, p) => sum + p.total_hours, 0);
+  
+  console.log(`DEBUG EnhancedUtilizationPopover for ${memberName}:`, {
+    receivedTotalUsedHours: totalUsedHours,
+    receivedUtilizationPercentage: utilizationPercentage,
+    receivedWeeklyCapacity: weeklyCapacity,
+    calculatedTotalFromProjects: totalProjectHours,
+    projectsData: projects
+  });
 
   // Create daily breakdown map for all projects combined
   const dailyBreakdown = new Map<string, number>();

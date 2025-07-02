@@ -16,10 +16,15 @@ export const calculateMemberProjectHours = (
 ): number => {
   let totalHours = 0;
   
+  console.log(`DEBUG calculateMemberProjectHours for ${memberId} - AllocationMap size:`, allocationMap.size);
+  console.log(`DEBUG calculateMemberProjectHours for ${memberId} - Full allocation map:`, Array.from(allocationMap.entries()));
+  
   allocationMap.forEach((hours, key) => {
     const [resourceId] = key.split(':');
+    console.log(`DEBUG checking allocation entry: ${key} -> ${hours}h, matches member: ${resourceId === memberId}`);
     if (resourceId === memberId) {
       totalHours += hours;
+      console.log(`DEBUG added ${hours}h to total for ${memberId}, new total: ${totalHours}h`);
     }
   });
   

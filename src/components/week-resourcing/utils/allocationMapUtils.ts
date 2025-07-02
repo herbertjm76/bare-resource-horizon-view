@@ -15,7 +15,8 @@ export const createAllocationMap = (comprehensiveWeeklyAllocations: any[]): Map<
     return allocationMap;
   }
 
-  console.log('Creating allocation map from comprehensive allocations:', comprehensiveWeeklyAllocations.length);
+  console.log('DEBUG createAllocationMap - Creating allocation map from comprehensive allocations:', comprehensiveWeeklyAllocations.length);
+  console.log('DEBUG createAllocationMap - Raw comprehensive allocations:', comprehensiveWeeklyAllocations);
 
   comprehensiveWeeklyAllocations.forEach(allocation => {
     const memberId = allocation.resource_id;
