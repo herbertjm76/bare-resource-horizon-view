@@ -65,53 +65,54 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
           left: '0',
           zIndex: 20,
           textAlign: 'left',
-          padding: '12px 16px',
+          padding: '8px 16px',
           borderRight: '2px solid rgba(156, 163, 175, 0.8)',
           borderBottom: '1px solid rgba(156, 163, 175, 0.6)',
-          verticalAlign: 'middle'
+          verticalAlign: 'middle',
+          height: '32px'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Avatar style={{ width: '32px', height: '32px', borderRadius: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Avatar style={{ width: '24px', height: '24px', borderRadius: '4px' }}>
             <AvatarImage src={resource.avatar_url} alt={displayName} />
             <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white' }}>
               {initials}
             </AvatarFallback>
           </Avatar>
-          <div style={{ flex: '1', minWidth: '0' }}>
+          <div style={{ flex: '1', minWidth: '0', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ 
-              fontSize: '14px',
+              fontSize: '13px',
               fontWeight: '500',
               color: '#111827',
-              display: 'block',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
+              whiteSpace: 'nowrap',
+              minWidth: '0',
+              flex: '1'
             }}>
               {displayName}
             </span>
             {resource.role && (
-              <div style={{ 
-                fontSize: '12px',
+              <span style={{ 
+                fontSize: '11px',
                 color: '#6b7280',
-                lineHeight: '1.2',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}>
                 {resource.role}
-              </div>
+              </span>
             )}
             {resource.isPending && (
               <span style={{ 
-                display: 'inline-block',
                 backgroundColor: '#fef3c7',
                 color: '#d97706',
-                fontSize: '10px',
+                fontSize: '9px',
                 fontWeight: '600',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                marginTop: '2px'
+                padding: '1px 4px',
+                borderRadius: '3px',
+                flexShrink: 0
               }}>
                 Pending
               </span>
@@ -153,7 +154,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               onChange={(e) => handleInputChange(dayKey, e.target.value)}
               onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
               className={`
-                w-6 h-6 px-1 py-0 text-center text-xs border-0 
+                w-5 h-5 px-0 py-0 text-center border-0 
                 focus:border focus:border-primary focus:ring-1 focus:ring-primary
                 ${allocation > 0 ? 'bg-primary/10 text-primary font-medium' : 'bg-muted/50 text-muted-foreground'}
                 ${isSaving ? 'opacity-50' : ''}
@@ -162,9 +163,9 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               placeholder=""
               disabled={isLoading || isSaving}
               style={{
-                fontSize: '11px',
+                fontSize: '10px',
                 lineHeight: '1',
-                minHeight: '24px',
+                minHeight: '20px',
                 borderRadius: '2px'
               }}
             />

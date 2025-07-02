@@ -152,13 +152,13 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
               }}>
                 {dayTotal > 0 ? (
                   <span style={{ 
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    backgroundColor: 'hsl(var(--muted))',
-                    color: 'hsl(var(--muted-foreground))',
-                    padding: '3px 6px',
-                    borderRadius: '2px',
-                    minWidth: '20px',
+                    fontSize: '14px',
+                    fontWeight: '700',
+                    backgroundColor: 'hsl(var(--primary))',
+                    color: 'white',
+                    padding: '4px 8px',
+                    borderRadius: '3px',
+                    minWidth: '24px',
                     display: 'inline-block'
                   }}>
                     {dayTotal}
@@ -166,7 +166,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                 ) : (
                   <span style={{ 
                     color: 'hsl(var(--muted-foreground))',
-                    fontSize: '11px'
+                    fontSize: '12px'
                   }}>
                     —
                   </span>
