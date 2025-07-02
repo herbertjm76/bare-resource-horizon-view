@@ -94,6 +94,23 @@
   font-size: 0.875rem;
 }
 
+/* Updated sticky positioning for workload style (only project column) */
+.workload-grid-header.member-column {
+  text-align: left;
+  padding-left: 16px;
+  border-right: 2px solid rgba(156, 163, 175, 0.8);
+  position: sticky !important;
+  left: 0px !important;
+  z-index: 30 !important;
+  background: #6465F0;
+}
+
+.workload-grid-header.week-column {
+  padding: 4px 2px;
+  position: relative;
+  overflow: visible;
+}
+
 .modern-header-cell.control-column {
   text-align: center;
   border-right: 2px solid rgba(156, 163, 175, 0.8);
@@ -219,6 +236,41 @@
   background: #f9fafb;
 }
 
+/* Updated workload grid row and cell styles */
+.workload-grid-row {
+  border-bottom: 1px solid rgba(156, 163, 175, 0.6);
+  background: white;
+  transition: background-color 0.15s ease;
+}
+
+.workload-grid-row:hover {
+  background-color: #f3f4f6 !important;
+}
+
+.workload-grid-cell {
+  padding: 4px;
+  border-right: 1px solid rgba(156, 163, 175, 0.6);
+  text-align: center;
+  vertical-align: middle;
+  height: 50px;
+  border-bottom: 1px solid rgba(156, 163, 175, 0.6);
+}
+
+/* Updated sticky positioning for workload style cells */
+.workload-grid-cell.member-cell {
+  text-align: left;
+  padding: 12px 16px;
+  border-right: 2px solid rgba(156, 163, 175, 0.8);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  position: sticky !important;
+  left: 0px !important;
+  z-index: 20 !important;
+}
+
+.workload-grid-cell.week-cell {
+  padding: 2px;
+}
+
 /* Cell Styles - EXACT COPY from Team Workload */
 .modern-cell {
   padding: 4px;
@@ -314,7 +366,14 @@
   gap: 12px;
 }
 
-.resource-avatar {
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.resource-avatar,
+.member-avatar {
   width: 32px;
   height: 32px;
   border-radius: 6px;
@@ -465,8 +524,18 @@
     padding-left: 12px;
   }
   
+  .workload-grid-header.member-column,
+  .workload-grid-cell.member-cell {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+    padding-left: 12px;
+  }
+  
   .modern-header-cell.day-column,
-  .modern-cell.day-cell {
+  .modern-cell.day-cell,
+  .workload-grid-header.week-column,
+  .workload-grid-cell.week-cell {
     width: 28px;
     min-width: 28px;
     max-width: 28px;
@@ -476,7 +545,8 @@
     height: 75px;
   }
   
-  .resource-avatar {
+  .resource-avatar,
+  .member-avatar {
     width: 28px;
     height: 28px;
   }
