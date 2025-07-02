@@ -53,6 +53,14 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     error
   } = useStreamlinedWeekResourceData(selectedWeek, stableFilters);
 
+  console.log('WeekResourceView - Data Summary:', {
+    membersCount: allMembers?.length || 0,
+    projectsCount: projects?.length || 0,
+    allocationMapSize: allocationMap?.size || 0,
+    isLoading,
+    hasError: !!error
+  });
+
   // Filter members based on search term - make this more stable
   const filteredMembers = useMemo(() => {
     if (!allMembers || allMembers.length === 0) {
@@ -144,10 +152,11 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     return (
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
-          <p className="text-red-600">Error loading data: {error.message}</p>
+          <p className="text-red-600 text-sm">Error loading data: {error.message}</p>
           <Button 
             onClick={() => window.location.reload()} 
             className="mt-4"
+            size="sm"
           >
             Reload Page
           </Button>
@@ -172,7 +181,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       <Card className="border-none shadow-sm bg-white">
         <CardContent className="p-4">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-            {/* Week Selector and Search - reordered */}
+            {/* Week Selector and Search */}
             <div className="flex items-center gap-4">
               <WeekStartSelector
                 selectedWeek={selectedWeek}
@@ -185,12 +194,12 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                   placeholder="Search members..."
                   value={filters.searchTerm}
                   onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-                  className="pl-8 h-8 w-48"
+                  className="pl-8 h-8 w-48 text-sm"
                 />
               </div>
 
               <Select value={filters.office} onValueChange={(value) => onFilterChange('office', value)}>
-                <SelectTrigger className="w-36 h-8">
+                <SelectTrigger className="w-36 h-8 text-sm">
                   <SelectValue placeholder="Filter by office..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -203,7 +212,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={clearFilters}
-                  className="h-8 px-2"
+                  className="h-8 px-2 text-sm"
                 >
                   <X className="h-4 w-4" />
                   Clear ({activeFiltersCount})

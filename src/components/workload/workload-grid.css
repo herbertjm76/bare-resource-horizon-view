@@ -56,6 +56,7 @@
   background: #6465F0;
   color: white;
   font-weight: 600;
+  font-size: 14px;
   text-align: center;
   border: none;
   position: sticky;
@@ -82,6 +83,7 @@
 .workload-grid-header.week-column {
   position: relative;
   overflow: visible;
+  font-size: 12px;
 }
 
 /* Row styles */
@@ -101,6 +103,7 @@
 /* Cell styles */
 .workload-grid-cell {
   vertical-align: middle;
+  font-size: 14px;
 }
 
 /* Sticky Member Column Cells */
@@ -120,6 +123,7 @@
 /* Week Column Cells */
 .workload-grid-cell.week-cell {
   position: relative;
+  font-size: 12px;
 }
 
 /* Member info styling */
@@ -150,10 +154,51 @@
 .utilization-badge {
   transition: all 0.2s;
   transform: scale(1);
+  font-size: 10px;
 }
 
 .utilization-badge:hover {
   transform: scale(1.1);
+}
+
+/* Weekly Resource Table Styles */
+.resource-table-compact-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.resource-table-compact th {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+.resource-table-compact td {
+  font-size: 14px !important;
+}
+
+.resource-table-compact .text-xs {
+  font-size: 12px !important;
+}
+
+.resource-table-compact .text-sm {
+  font-size: 14px !important;
+}
+
+/* Standardize all table text sizes */
+.weekly-table th {
+  font-size: 14px !important;
+}
+
+.weekly-table td {
+  font-size: 14px !important;
+}
+
+.weekly-table .text-xs {
+  font-size: 12px !important;
+}
+
+.weekly-table .text-sm {
+  font-size: 14px !important;
 }
 
 /* Scrollbar styling - only for non-centered tables */
@@ -211,6 +256,23 @@
   
   .member-name {
     font-size: 13px;
+  }
+  
+  /* Mobile font size adjustments */
+  .weekly-table th {
+    font-size: 12px !important;
+  }
+  
+  .weekly-table td {
+    font-size: 12px !important;
+  }
+  
+  .weekly-table .text-xs {
+    font-size: 10px !important;
+  }
+  
+  .weekly-table .text-sm {
+    font-size: 12px !important;
   }
 }
 

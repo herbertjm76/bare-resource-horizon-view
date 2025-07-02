@@ -48,30 +48,20 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
           <TableHeader>
             <TableRow className="bg-[#6465F0] hover:bg-[#6465F0] border-b-2 border-slate-200">
               {/* Team Member Column */}
-              <TableHead className="text-center font-semibold text-white sticky left-0 bg-[#6465F0] z-20 border-r border-white/20" style={{ width: 180, minWidth: 180 }}>
+              <TableHead className="text-center font-semibold text-white sticky left-0 bg-[#6465F0] z-20 border-r border-white/20 text-sm" style={{ width: 180, minWidth: 180 }}>
                 Team Member
               </TableHead>
               
-              {/* Utilization Column */}
-              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20" style={{ width: 200, minWidth: 200 }}>
-                Weekly Utilization
-              </TableHead>
-              
-              {/* Leave Column */}
-              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20" style={{ width: 150, minWidth: 150 }}>
-                Leave
-              </TableHead>
-              
-              {/* Project Count Column */}
-              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20" style={{ width: 35, minWidth: 35 }}>
-                #
+              {/* Project Count Column - simplified header */}
+              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20 text-sm" style={{ width: 80, minWidth: 80 }}>
+                Total Hours
               </TableHead>
               
               {/* Project Columns with Rotated Text */}
               {projects.map((project) => (
                 <TableHead 
                   key={project.id} 
-                  className="text-center font-semibold text-white border-r border-white/20 bg-[#6465F0] relative"
+                  className="text-center font-semibold text-white border-r border-white/20 bg-[#6465F0] relative text-sm"
                   style={{ width: 35, minWidth: 35, height: 120 }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">

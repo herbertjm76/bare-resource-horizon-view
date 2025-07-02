@@ -13,42 +13,6 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
   allocationMap,
   members
 }) => {
-  const getProjectTotal = (projectId: string) => {
-    let total = 0;
-    members.forEach(member => {
-      const key = `${member.id}:${projectId}`;
-      const hours = allocationMap.get(key) || 0;
-      total += hours;
-      console.log(`Project ${projectId} - Member ${member.id}: ${hours}h (running total: ${total}h)`);
-    });
-    console.log(`Final project total for ${projectId}:`, total);
-    return total;
-  };
-
-  const getTotalHours = () => {
-    let total = 0;
-    // Sum all hours from the allocation map
-    allocationMap.forEach((hours, key) => {
-      total += hours;
-      console.log(`Adding ${hours}h from key ${key}, running total: ${total}h`);
-    });
-    console.log('Final total hours across all allocations:', total);
-    return total;
-  };
-
-  const getGrandTotalMembers = () => {
-    // Count unique members who have any allocations
-    const membersWithAllocations = new Set<string>();
-    allocationMap.forEach((hours, key) => {
-      if (hours > 0) {
-        const [memberId] = key.split(':');
-        membersWithAllocations.add(memberId);
-      }
-    });
-    return membersWithAllocations.size;
-  };
-
-  // Debug logging for the summary row
   console.log('NewResourceSummaryRow - Allocation Map:', {
     mapSize: allocationMap.size,
     allEntries: Array.from(allocationMap.entries()),
@@ -56,34 +20,57 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
     membersCount: members.length
   });
 
-  const totalHours = getTotalHours();
-  const totalMembers = getGrandTotalMembers();
+  // Calculate total hours across all projects
+  let totalHours = 0;
+  allocationMap.forEach((hours) => {
+    console.log(`Adding ${hours}h from allocation, running total: ${totalHours + hours}h`);
+    totalHours += hours;
+  });
+
+  console.log('Final total hours across all allocations:', totalHours);
+
+  // Calculate project totals
+  const projectTotals = projects.map(project => {
+    let projectTotal = 0;
+    
+    members.forEach(member => {
+      const key = `${member.id}:${project.id}`;
+      const hours = allocationMap.get(key) || 0;
+      console.log(`Project ${project.id} - Member ${member.id}: ${hours}h (running total: ${projectTotal + hours}h)`);
+      projectTotal += hours;
+    });
+    
+    console.log(`Final project total for ${project.id}: ${projectTotal}`);
+    return {
+      projectId: project.id,
+      totalHours: projectTotal
+    };
+  });
 
   return (
-    <TableRow className="bg-slate-100 font-semibold border-t-2 border-slate-300">
-      <TableCell className="text-center sticky left-0 bg-slate-100 z-10">
-        T
-      </TableCell>
-      <TableCell className="sticky left-12 bg-slate-100 z-10">
+    <TableRow className="bg-gray-100 font-medium border-t-2 border-gray-300">
+      {/* Team Member Column */}
+      <TableCell className="sticky left-0 bg-gray-100 z-20 text-sm font-semibold">
         Weekly Total
       </TableCell>
-      <TableCell className="text-center">
-        —
-      </TableCell>
-      <TableCell className="text-center">
-        {totalMembers} / {members.length}
-      </TableCell>
-      <TableCell className="text-center font-bold text-lg">
+      
+      {/* Weekly Utilization Column - removed */}
+      
+      {/* Leave Column - removed */}
+      
+      {/* Project Count Column */}
+      <TableCell className="text-center text-sm font-semibold">
         {totalHours}h
       </TableCell>
+      
+      {/* Project Columns */}
       {projects.map((project) => {
-        const projectTotal = getProjectTotal(project.id);
+        const projectData = projectTotals.find(pt => pt.projectId === project.id);
+        const hours = projectData?.totalHours || 0;
+        
         return (
-          <TableCell 
-            key={project.id} 
-            className="text-center border-l border-slate-200 font-bold"
-          >
-            {projectTotal > 0 ? `${projectTotal}h` : '—'}
+          <TableCell key={project.id} className="text-center text-sm font-semibold">
+            {hours > 0 ? `${hours}h` : '—'}
           </TableCell>
         );
       })}
