@@ -27,6 +27,8 @@ import FinancialOverview from "./pages/FinancialOverview";
 import ProjectProfitDashboard from "./pages/ProjectProfitDashboard";
 import ProjectBilling from "./pages/ProjectBilling";
 import AgingInvoices from "./pages/AgingInvoices";
+import SolutionsPage from "./pages/Solutions";
+import AppTourPage from "./pages/AppTour";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +60,8 @@ function App() {
               <Route path="/help" element={<Help />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact-support" element={<ContactSupport />} />
+              <Route path="/solutions" element={<SolutionsPage />} />
+              <Route path="/app-tour" element={<AppTourPage />} />
               <Route path="/join" element={<Join />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />

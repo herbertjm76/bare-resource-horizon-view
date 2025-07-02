@@ -1,4 +1,6 @@
 
+import { Link } from 'react-router-dom';
+
 const Navbar = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -31,18 +33,18 @@ const Navbar = () => {
             >
               Features
             </button>
-            <button 
-              onClick={() => scrollToSection('solutions')} 
+            <Link 
+              to="/solutions"
               className="hover:text-purple-600 transition-colors cursor-pointer"
             >
               Solutions
-            </button>
-            <button 
-              onClick={() => scrollToSection('app-tour')} 
+            </Link>
+            <Link 
+              to="/app-tour"
               className="hover:text-purple-600 transition-colors cursor-pointer"
             >
               App Tour
-            </button>
+            </Link>
             <button 
               onClick={() => scrollToSection('pricing')} 
               className="hover:text-purple-600 transition-colors cursor-pointer"
