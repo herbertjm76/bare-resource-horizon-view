@@ -5,7 +5,7 @@ import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { VisualCard } from '@/components/common/VisualElements';
 import weeklySnapshotImage from '/lovable-uploads/5d7f036a-9d22-4daf-bae0-e9419c629c05.png';
 import teamWorkloadImage from '/lovable-uploads/5b342562-6df9-4a91-bdbb-f199ea3273bd.png';
-import dashboardInsightsImage from '@/assets/dashboard-insights-illustration.png';
+import dashboardInsightsImage from '/lovable-uploads/95bdf626-548e-4fa4-b1f7-dc9a505b14bc.png';
 
 const FeatureTrio = () => {
   const features = [
