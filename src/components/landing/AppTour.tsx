@@ -4,42 +4,36 @@ import { VisualCard } from '@/components/common/VisualElements';
 import { BarChart3, Calendar, Users, Settings, FileText, Target } from 'lucide-react';
 
 const AppTour = () => {
-  const appPages = [
+  const appFeatures = [
     {
-      icon: <BarChart3 className="w-6 h-6 text-purple-600" />,
+      icon: <BarChart3 className="w-16 h-16" />,
       title: "Dashboard",
-      description: "Get a comprehensive overview of your team's performance, project status, and resource utilization.",
-      features: ["Real-time metrics", "Smart insights", "Executive summaries"]
+      description: "Comprehensive analytics and insights"
     },
     {
-      icon: <Calendar className="w-6 h-6 text-blue-600" />,
-      title: "Weekly Overview",
-      description: "Plan and track weekly resource allocations with visual capacity management and project timelines.",
-      features: ["Capacity planning", "Resource allocation", "Timeline views"]
+      icon: <Calendar className="w-16 h-16" />,
+      title: "Weekly Overview", 
+      description: "Visual capacity planning"
     },
     {
-      icon: <Users className="w-6 h-6 text-green-600" />,
+      icon: <Users className="w-16 h-16" />,
       title: "Team Management",
-      description: "Manage your team members, track their skills, and optimize assignments based on availability.",
-      features: ["Team profiles", "Skill tracking", "Availability management"]
+      description: "Complete team coordination"
     },
     {
-      icon: <Target className="w-6 h-6 text-orange-600" />,
+      icon: <Target className="w-16 h-16" />,
       title: "Project Resourcing",
-      description: "Allocate resources efficiently across projects with advanced planning and forecasting tools.",
-      features: ["Resource planning", "Project allocation", "Milestone tracking"]
+      description: "Strategic resource allocation"
     },
     {
-      icon: <FileText className="w-6 h-6 text-red-600" />,
+      icon: <FileText className="w-16 h-16" />,
       title: "Annual Leave",
-      description: "Track and manage team vacation schedules with conflict detection and approval workflows.",
-      features: ["Leave calendars", "Conflict detection", "Approval workflows"]
+      description: "Smart vacation planning"
     },
     {
-      icon: <Settings className="w-6 h-6 text-gray-600" />,
+      icon: <Settings className="w-16 h-16" />,
       title: "Office Settings",
-      description: "Configure your workspace settings, departments, roles, and organizational structure.",
-      features: ["Organization setup", "Role management", "Custom configurations"]
+      description: "Complete workspace control"
     }
   ];
 
@@ -58,38 +52,29 @@ const AppTour = () => {
           </div>
         </AnimatedSection>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {appPages.map((page, index) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+          {appFeatures.map((feature, index) => (
             <AnimatedSection key={index} animation="fadeInUp" delay={index * 100}>
-              <VisualCard className="h-full p-6 hover:shadow-lg transition-all hover:scale-105">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="p-2 bg-gray-100 rounded-lg">
-                    {page.icon}
+              <div className="group text-center">
+                <div className="relative mb-4 mx-auto w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-100 via-blue-50 to-pink-50 flex items-center justify-center border border-purple-200/30 shadow-lg backdrop-blur-sm group-hover:scale-110 transition-all duration-300 group-hover:shadow-xl">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-2xl"></div>
+                  <div className="relative text-purple-600 group-hover:text-purple-700 transition-colors">
+                    {feature.icon}
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900">
-                    {page.title}
-                  </h3>
                 </div>
-                
-                <p className="text-gray-600 mb-4 text-sm">
-                  {page.description}
+                <h3 className="text-sm font-semibold text-gray-900 mb-1 group-hover:text-purple-600 transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-xs text-gray-600">
+                  {feature.description}
                 </p>
-                
-                <div className="space-y-2">
-                  {page.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-center text-xs text-gray-700">
-                      <div className="w-1 h-1 bg-purple-600 rounded-full mr-2"></div>
-                      {feature}
-                    </div>
-                  ))}
-                </div>
-              </VisualCard>
+              </div>
             </AnimatedSection>
           ))}
         </div>
 
         <AnimatedSection animation="fadeInUp" delay={600}>
-          <div className="text-center mt-12">
+          <div className="text-center mt-16">
             <button className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg mr-4">
               Try Demo
             </button>
