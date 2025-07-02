@@ -3,6 +3,7 @@ import React from 'react';
 import { WorkloadStyleGridHeader } from './WorkloadStyleGridHeader';
 import { WorkloadStyleProjectRow } from './WorkloadStyleProjectRow';
 import { DayInfo } from '../grid/types';
+import './workload-resource-grid.css';
 
 interface WorkloadStyleResourceGridProps {
   projects: any[];
@@ -17,17 +18,17 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
   expandedProjects,
   onToggleProjectExpand
 }) => {
-  // Calculate total width: control column (60px) + project column (250px) + day columns (30px each)
-  const totalWidth = 60 + 250 + (days.length * 30);
+  // Calculate table width: project column (250px) + day columns (30px each)
+  const totalWidth = 250 + (days.length * 30);
   
   // Determine if this is approximately a 1-month view (28-31 days)
   const isOneMonthView = days.length >= 28 && days.length <= 31;
 
   return (
-    <div className={`workload-grid-container ${isOneMonthView ? 'center-aligned' : ''}`}>
-      <div className="workload-table-wrapper">
+    <div className={`workload-resource-grid-container ${isOneMonthView ? 'center-aligned' : ''}`}>
+      <div className="workload-resource-table-wrapper">
         <table 
-          className="workload-grid-table"
+          className="workload-resource-grid-table"
           style={{ 
             minWidth: `${totalWidth}px`,
             width: `${totalWidth}px`

@@ -29,34 +29,16 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
   const rowBgColor = '#fcfcfc'; // Slightly different shade for resource rows
 
   return (
-    <tr className="workload-grid-row" style={{ backgroundColor: rowBgColor }}>
-      {/* Empty control column - Fixed width, sticky */}
-      <td 
-        className="workload-grid-cell"
-        style={{
-          width: '60px',
-          minWidth: '60px',
-          maxWidth: '60px',
-          position: 'sticky',
-          left: '0px',
-          zIndex: 20,
-          backgroundColor: rowBgColor,
-          boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)',
-          borderRight: '2px solid rgba(156, 163, 175, 0.8)'
-        }}
-      >
-        {/* Empty control cell for resources */}
-      </td>
-      
+    <tr className="workload-resource-grid-row" style={{ backgroundColor: rowBgColor }}>
       {/* Resource info column - Fixed width, sticky */}
       <td 
-        className="workload-grid-cell"
+        className="workload-resource-grid-cell resource-cell"
         style={{
           width: '250px',
           minWidth: '250px',
           maxWidth: '250px',
           position: 'sticky',
-          left: '60px',
+          left: '0px',
           zIndex: 20,
           backgroundColor: rowBgColor,
           textAlign: 'left',
@@ -100,7 +82,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
         return (
           <td 
             key={dayKey} 
-            className="workload-grid-cell"
+            className="workload-resource-grid-cell day-cell"
             style={{ 
               width: '30px', 
               minWidth: '30px',

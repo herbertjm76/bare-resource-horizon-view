@@ -9,35 +9,17 @@ interface WorkloadStyleGridHeaderProps {
 
 export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = ({ days }) => {
   return (
-    <thead className="modern-table-header">
+    <thead className="workload-resource-grid-header">
       <tr>
-        {/* Control column - Fixed width, sticky */}
-        <th 
-          className="modern-header-cell control-column"
-          style={{ 
-            width: '60px',
-            minWidth: '60px',
-            maxWidth: '60px',
-            position: 'sticky',
-            left: '0px',
-            zIndex: 30,
-            backgroundColor: '#6465F0'
-          }}
-        >
-          <div className="header-content">
-            <span className="header-label">#</span>
-          </div>
-        </th>
-        
         {/* Project/Resource column - Fixed width, sticky */}
         <th 
-          className="modern-header-cell project-column"
+          className="workload-resource-header-cell project-column"
           style={{ 
             width: '250px',
             minWidth: '250px',
             maxWidth: '250px',
             position: 'sticky',
-            left: '60px',
+            left: '0px',
             zIndex: 30,
             backgroundColor: '#6465F0'
           }}
@@ -63,7 +45,7 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
           return (
             <th 
               key={`${day.date.toISOString()}-${index}`}
-              className="modern-header-cell day-column"
+              className="workload-resource-header-cell day-column"
               style={{ 
                 width: '30px', 
                 minWidth: '30px',
