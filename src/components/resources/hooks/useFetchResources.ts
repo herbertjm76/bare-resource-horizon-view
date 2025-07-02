@@ -39,7 +39,8 @@ export const useFetchResources = (projectId: string) => {
         throw activeError;
       }
       
-      console.log('Active members:', activeMembers);
+      console.log('DEBUG useFetchResources - Active members from project_resources table:', activeMembers);
+      console.log('DEBUG useFetchResources - Active members count:', activeMembers?.length || 0);
       
       // Fetch pre-registered members assigned to this project
       const { data: preRegisteredMembers, error: pendingError } = await supabase
@@ -58,7 +59,8 @@ export const useFetchResources = (projectId: string) => {
         throw pendingError;
       }
       
-      console.log('Pre-registered members:', preRegisteredMembers);
+      console.log('DEBUG useFetchResources - Pre-registered members from pending_resources table:', preRegisteredMembers);
+      console.log('DEBUG useFetchResources - Pre-registered members count:', preRegisteredMembers?.length || 0);
       
       // Format the results to match our Resource interface
       const activeResources: Resource[] = (activeMembers || []).map(member => ({
@@ -82,6 +84,13 @@ export const useFetchResources = (projectId: string) => {
       
       // Combine resources
       const combinedResources = [...activeResources, ...pendingResources];
+      
+      console.log('DEBUG useFetchResources - Final combined resources for project:', combinedResources);
+      console.log('DEBUG useFetchResources - Total resources count:', combinedResources.length);
+      
+      if (combinedResources.length === 0) {
+        console.log('DEBUG useFetchResources - No resources found for this project. User needs to add resources first.');
+      }
       
       // Update state
       setResources(combinedResources);
