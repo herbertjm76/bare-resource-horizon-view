@@ -2,7 +2,7 @@
 import { useMemo, useCallback } from 'react';
 import { useWeekResourceTeamMembers } from './useWeekResourceTeamMembers';
 import { useWeekResourceProjects } from './useWeekResourceProjects';
-import { useComprehensiveAllocations } from './useComprehensiveAllocations';
+import { useDetailedWeeklyAllocations } from './useDetailedWeeklyAllocations';
 import { useWeekResourceLeaveData } from './useWeekResourceLeaveData';
 import { useWeeklyLeaveDetails } from './useWeeklyLeaveDetails';
 import { useWeeklyOtherLeaveData } from './useWeeklyOtherLeaveData';
@@ -28,12 +28,11 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     enabled: true // Always fetch projects
   });
   
-  // Fetch allocations - depends on members
-  const { comprehensiveWeeklyAllocations = [] } = useComprehensiveAllocations({ 
-    weekStartDate, 
-    memberIds: shouldFetchData ? memberIds : [],
-    enabled: shouldFetchData
-  });
+  // Fetch allocations - FIXED: Use detailed allocations that fetch all 7 days of the week
+  const { data: detailedAllocations } = useDetailedWeeklyAllocations(
+    selectedWeek, 
+    shouldFetchData ? memberIds : []
+  );
   
   // Fetch leave data - depends on members
   const { 
@@ -64,66 +63,60 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     shouldFetchData
   );
 
-  // Create stable allocation map - FIXED: properly sum hours for same member-project combinations
+  // Create stable allocation map - Use detailed allocations that have proper daily breakdowns
   const allocationMap = useMemo(() => {
     const map = new Map<string, number>();
-    if (comprehensiveWeeklyAllocations.length > 0) {
-      console.log('Processing allocations for map creation:', comprehensiveWeeklyAllocations.length);
+    
+    if (detailedAllocations) {
+      console.log('DEBUG useStreamlinedWeekResourceData - Building allocation map from detailed allocations');
+      console.log('DEBUG detailed allocations keys:', Object.keys(detailedAllocations));
       
-      comprehensiveWeeklyAllocations.forEach(allocation => {
-        const key = `${allocation.resource_id}:${allocation.project_id}`;
-        const currentHours = map.get(key) || 0;
-        const newHours = allocation.hours || 0;
-        const totalHours = currentHours + newHours;
-        
-        map.set(key, totalHours);
-        
-        console.log(`Allocation map update - Key: ${key}, Current: ${currentHours}h, Adding: ${newHours}h, New Total: ${totalHours}h`);
+      Object.values(detailedAllocations).forEach(memberData => {
+        memberData.projects.forEach(project => {
+          const key = `${memberData.member_id}:${project.project_id}`;
+          const totalHours = project.total_hours;
+          map.set(key, totalHours);
+          
+          console.log(`DEBUG Allocation map - Key: ${key}, Hours: ${totalHours}h`);
+        });
       });
       
-      console.log('Final allocation map:', Array.from(map.entries()));
+      console.log('DEBUG Final allocation map:', Array.from(map.entries()));
     }
+    
     return map;
-  }, [comprehensiveWeeklyAllocations]);
+  }, [detailedAllocations]);
 
-  // Create stable member totals map - sum all hours for each member across all projects
+  // Create stable member totals map - Use detailed allocations for accurate totals
   const memberTotalsMap = useMemo(() => {
     const totalsMap = new Map<string, number>();
-    if (comprehensiveWeeklyAllocations.length > 0) {
-      comprehensiveWeeklyAllocations.forEach(allocation => {
-        const memberId = allocation.resource_id;
-        const current = totalsMap.get(memberId) || 0;
-        const hours = allocation.hours || 0;
-        totalsMap.set(memberId, current + hours);
+    
+    if (detailedAllocations) {
+      Object.values(detailedAllocations).forEach(memberData => {
+        totalsMap.set(memberData.member_id, memberData.total_hours);
+        console.log(`DEBUG Member totals - ${memberData.member_id}: ${memberData.total_hours}h`);
       });
       
-      console.log('Member totals map:', Array.from(totalsMap.entries()));
+      console.log('Final member totals map:', Array.from(totalsMap.entries()));
     }
-    return totalsMap;
-  }, [comprehensiveWeeklyAllocations]);
-
-  // Create stable project count map - count unique projects per member
-  const projectCountMap = useMemo(() => {
-    const projectSetsMap = new Map<string, Set<string>>();
     
-    if (comprehensiveWeeklyAllocations.length > 0) {
-      comprehensiveWeeklyAllocations.forEach(allocation => {
-        if ((allocation.hours || 0) > 0) {
-          const current = projectSetsMap.get(allocation.resource_id) || new Set<string>();
-          current.add(allocation.project_id);
-          projectSetsMap.set(allocation.resource_id, current);
-        }
+    return totalsMap;
+  }, [detailedAllocations]);
+
+  // Create stable project count map - count unique projects per member from detailed allocations
+  const projectCountMap = useMemo(() => {
+    const finalCountMap = new Map<string, number>();
+    
+    if (detailedAllocations) {
+      Object.values(detailedAllocations).forEach(memberData => {
+        // Count projects with hours > 0
+        const projectCount = memberData.projects.filter(p => p.total_hours > 0).length;
+        finalCountMap.set(memberData.member_id, projectCount);
       });
     }
     
-    // Convert sets to counts
-    const finalCountMap = new Map<string, number>();
-    projectSetsMap.forEach((projectSet, memberId) => {
-      finalCountMap.set(memberId, projectSet.size);
-    });
-    
     return finalCountMap;
-  }, [comprehensiveWeeklyAllocations]);
+  }, [detailedAllocations]);
 
   // Fixed callback functions - directly use the maps instead of depending on changing references
   const getMemberTotal = useCallback((memberId: string) => {
@@ -162,7 +155,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
   const result = useMemo(() => ({
     allMembers: members || [],
     projects: projects || [],
-    allocations: comprehensiveWeeklyAllocations || [],
+    allocations: detailedAllocations ? Object.values(detailedAllocations).flatMap(m => m.daily_allocations) : [],
     isLoading,
     error,
     allocationMap,
@@ -176,7 +169,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
   }), [
     members,
     projects,
-    comprehensiveWeeklyAllocations,
+    detailedAllocations,
     isLoading,
     error,
     allocationMap,
@@ -194,7 +187,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     weekStartDate,
     membersCount: members?.length || 0,
     projectsCount: projects?.length || 0,
-    allocationsCount: comprehensiveWeeklyAllocations?.length || 0,
+    detailedAllocationsCount: detailedAllocations ? Object.keys(detailedAllocations).length : 0,
     allocationMapSize: allocationMap.size,
     memberTotalsMapSize: memberTotalsMap.size,
     isLoading,
