@@ -33,7 +33,7 @@ export const ModernGridTable: React.FC<ModernGridTableProps> = ({
             <col style={{ width: '60px' }} /> {/* Control column - matching workload */}
             <col style={{ width: '250px' }} /> {/* Project name column - matching workload */}
             {days.map((_, index) => (
-              <col key={index} style={{ width: '30px' }} /> {/* Day columns - matching workload */}
+              <col key={index} style={{ width: '30px' }} /> /* Day columns - matching workload */
             ))}
           </colgroup>
           
