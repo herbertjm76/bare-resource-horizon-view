@@ -21,7 +21,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
   onToggleExpand,
   isEven
 }) => {
-  const { resources, isLoading, projectAllocations, getAllocationKey } = useProjectResources(project.id);
+  const { resources, isLoading, projectAllocations, getAllocationKey, handleAllocationChange } = useProjectResources(project.id);
   
   const rowBgColor = isEven ? '#ffffff' : '#f9fafb';
   
@@ -186,6 +186,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
           days={days}
           isEven={isEven}
           resourceIndex={resourceIndex}
+          onAllocationChange={handleAllocationChange}
         />
       ))}
     </>

@@ -11,6 +11,7 @@ interface WorkloadStyleResourceRowProps {
   days: DayInfo[];
   isEven: boolean;
   resourceIndex: number;
+  onAllocationChange?: (resourceId: string, dayKey: string, hours: number) => void;
 }
 
 export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> = ({
@@ -18,7 +19,8 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
   project,
   days,
   isEven,
-  resourceIndex
+  resourceIndex,
+  onAllocationChange
 }) => {
   const displayName = resource.first_name && resource.last_name 
     ? `${resource.first_name} ${resource.last_name}`
@@ -43,7 +45,8 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     resourceId: resource.id,
     resourceType: resource.isPending ? 'pre_registered' : 'active',
     onAllocationChange: (resourceId, dayKey, hours) => {
-      // This will trigger re-calculation of project totals
+      // Update the parent project's allocation state immediately
+      onAllocationChange?.(resourceId, dayKey, hours);
       console.log(`Resource ${resourceId} allocation changed for ${dayKey}: ${hours}h`);
     }
   });
