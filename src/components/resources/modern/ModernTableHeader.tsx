@@ -11,14 +11,17 @@ export const ModernTableHeader: React.FC<ModernTableHeaderProps> = ({ days }) =>
   return (
     <thead className="modern-table-header">
       <tr>
-        {/* Control column - matching workload style */}
+        {/* Control column - matching workload style exactly */}
         <th 
           className="modern-header-cell control-column"
           style={{ 
-            backgroundColor: '#6465F0',
             width: '60px',
             minWidth: '60px',
-            maxWidth: '60px'
+            maxWidth: '60px',
+            position: 'sticky',
+            left: '0px',
+            zIndex: 25,
+            backgroundColor: '#6465F0'
           }}
         >
           <div className="header-content">
@@ -26,14 +29,17 @@ export const ModernTableHeader: React.FC<ModernTableHeaderProps> = ({ days }) =>
           </div>
         </th>
         
-        {/* Project column - matching workload style */}
+        {/* Project column - matching workload style exactly */}
         <th 
           className="modern-header-cell project-column"
           style={{ 
-            backgroundColor: '#6465F0',
             width: '250px',
             minWidth: '250px',
-            maxWidth: '250px'
+            maxWidth: '250px',
+            position: 'sticky',
+            left: '60px',
+            zIndex: 25,
+            backgroundColor: '#6465F0'
           }}
         >
           <div className="header-content">
@@ -41,15 +47,22 @@ export const ModernTableHeader: React.FC<ModernTableHeaderProps> = ({ days }) =>
           </div>
         </th>
         
-        {/* Day columns - matching workload header style */}
+        {/* Day columns - matching workload header style exactly */}
         {days.map((day, index) => {
           const isTodayDay = isToday(day.date);
           const isNewMonth = index === 0 || days[index - 1].monthLabel !== day.monthLabel;
-          const isFirstOfMonth = day.date.getDate() <= 7;
           
-          let headerClasses = 'modern-header-cell day-column text-center text-xs font-semibold text-white py-2 px-1 relative';
-          if (isTodayDay) headerClasses += ' today';
-          if (day.isWeekend) headerClasses += ' weekend';
+          let headerClasses = 'modern-header-cell day-column';
+          let backgroundColor = '#6465F0';
+          
+          if (isTodayDay) {
+            headerClasses += ' today';
+            backgroundColor = '#f6ad55';
+          } else if (day.isWeekend) {
+            headerClasses += ' weekend';
+            backgroundColor = '#4a5568';
+          }
+          
           if (day.isSunday) headerClasses += ' sunday';
           if (day.isFirstOfMonth) headerClasses += ' month-start';
           
@@ -61,8 +74,9 @@ export const ModernTableHeader: React.FC<ModernTableHeaderProps> = ({ days }) =>
                 width: '30px', 
                 minWidth: '30px',
                 maxWidth: '30px',
-                backgroundColor: day.isWeekend ? '#4a5568' : isTodayDay ? '#f6ad55' : '#6465F0',
-                borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined
+                height: '80px',
+                backgroundColor,
+                borderLeft: day.isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined
               }}
             >
               <div className="header-content day-header">

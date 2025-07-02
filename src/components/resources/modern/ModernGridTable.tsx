@@ -26,17 +26,10 @@ export const ModernGridTable: React.FC<ModernGridTableProps> = ({
         <table 
           className="workload-grid-table enhanced-resource-table"
           style={{ 
-            minWidth: `${totalWidth}px`
+            minWidth: `${totalWidth}px`,
+            width: `${totalWidth}px`
           }}
         >
-          <colgroup>
-            <col style={{ width: '60px' }} />
-            <col style={{ width: '250px' }} />
-            {days.map((_, index) => (
-              <col key={index} style={{ width: '30px' }} />
-            ))}
-          </colgroup>
-          
           <ModernTableHeader days={days} />
           
           <tbody>

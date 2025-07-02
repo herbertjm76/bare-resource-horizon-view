@@ -1,5 +1,5 @@
 
-/* Modern Resource Grid Styles - Updated to Match Team Workload Look */
+/* Modern Resource Grid Styles - Copied from Team Workload Implementation */
 
 .resource-grid-container {
   width: 100%;
@@ -35,10 +35,9 @@
   justify-content: center;
 }
 
-/* Workload Grid Container - Matching Team Workload */
+/* Workload Grid Container - EXACT COPY from Team Workload */
 .workload-grid-container {
   width: 100%;
-  max-width: 100%;
   position: relative;
   background: white;
   border-radius: 8px;
@@ -55,22 +54,20 @@
   background: white;
 }
 
-/* Main Table - Following Workload Style */
+/* Main Table - EXACT COPY from Team Workload */
 .workload-grid-table {
   border-collapse: separate;
   border-spacing: 0;
-  min-width: max-content;
   background: white;
   table-layout: fixed;
   position: relative;
-  width: 100%;
 }
 
 .enhanced-resource-table {
   /* Inherits from workload-grid-table */
 }
 
-/* Header Styles - Matching Workload Header */
+/* Header Styles - EXACT COPY from Team Workload */
 .modern-table-header {
   position: sticky;
   top: 0;
@@ -92,35 +89,17 @@
 }
 
 .modern-header-cell.control-column {
-  width: 60px;
-  min-width: 60px;
-  max-width: 60px;
-  position: sticky;
-  left: 0;
-  z-index: 25;
-  background: #6465F0;
   text-align: center;
   border-right: 2px solid rgba(156, 163, 175, 0.8);
 }
 
 .modern-header-cell.project-column {
-  width: 250px;
-  min-width: 250px;
-  max-width: 250px;
-  position: sticky;
-  left: 60px;
-  z-index: 25;
-  background: #6465F0;
   text-align: left;
   padding-left: 16px;
   border-right: 2px solid rgba(156, 163, 175, 0.8);
 }
 
 .modern-header-cell.day-column {
-  width: 30px;
-  min-width: 30px;
-  max-width: 30px;
-  height: 80px;
   padding: 4px 2px;
   position: relative;
   overflow: visible;
@@ -142,7 +121,7 @@
   border-left: 4px solid #fbbf24;
 }
 
-/* Header Content - Matching Workload Style */
+/* Header Content - EXACT COPY from Team Workload */
 .header-content {
   display: flex;
   flex-direction: column;
@@ -197,7 +176,7 @@
   line-height: 1;
 }
 
-/* Row Styles - Following Workload Pattern */
+/* Row Styles - EXACT COPY from Team Workload */
 .modern-project-row {
   border-bottom: 1px solid #e5e7eb;
   background: white;
@@ -226,7 +205,7 @@
   background: #f9fafb;
 }
 
-/* Cell Styles - Matching Workload Dimensions with FIXED STICKY POSITIONING */
+/* Cell Styles - EXACT COPY from Team Workload */
 .modern-cell {
   padding: 4px;
   border-right: 1px solid rgba(156, 163, 175, 0.6);
@@ -237,13 +216,6 @@
 }
 
 .modern-cell.control-cell {
-  width: 60px;
-  min-width: 60px;
-  max-width: 60px;
-  position: sticky;
-  left: 0;
-  background: inherit;
-  z-index: 10;
   text-align: center;
   border-right: 2px solid rgba(156, 163, 175, 0.8);
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
@@ -251,13 +223,6 @@
 
 .modern-cell.project-cell,
 .modern-cell.resource-info-cell {
-  width: 250px;
-  min-width: 250px;
-  max-width: 250px;
-  position: sticky;
-  left: 60px;
-  background: inherit;
-  z-index: 10;
   text-align: left;
   padding: 12px 16px;
   border-right: 2px solid rgba(156, 163, 175, 0.8);
@@ -265,9 +230,6 @@
 }
 
 .modern-cell.day-cell {
-  width: 30px;
-  min-width: 30px;
-  max-width: 30px;
   padding: 2px;
 }
 
@@ -279,28 +241,7 @@
   border-left: 1px solid #cbd5e0;
 }
 
-/* Ensure sticky cells maintain proper background colors */
-.modern-project-row .modern-cell.control-cell,
-.modern-project-row .modern-cell.project-cell {
-  background: inherit;
-}
-
-.modern-project-row.even .modern-cell.control-cell,
-.modern-project-row.even .modern-cell.project-cell {
-  background: #f9fafb;
-}
-
-.modern-resource-row .modern-cell.control-cell,
-.modern-resource-row .modern-cell.resource-info-cell {
-  background: inherit;
-}
-
-.modern-resource-row.even .modern-cell.control-cell,
-.modern-resource-row.even .modern-cell.resource-info-cell {
-  background: #f9fafb;
-}
-
-/* Project Info - Cleaner Layout */
+/* Project Info - EXACT COPY from Team Workload */
 .project-info {
   display: flex;
   align-items: center;
@@ -344,7 +285,7 @@
   font-size: 11px;
 }
 
-/* Resource Info - Matching Workload Style */
+/* Resource Info - EXACT COPY from Team Workload */
 .resource-info {
   display: flex;
   align-items: center;
@@ -402,7 +343,7 @@
   margin-top: 2px;
 }
 
-/* Expand Button - Simplified */
+/* Expand Button - EXACT COPY from Team Workload */
 .expand-button {
   width: 32px;
   height: 32px;
@@ -420,7 +361,7 @@
   color: #374151;
 }
 
-/* Allocation Cells - Matching Workload Style */
+/* Allocation Cells - EXACT COPY from Team Workload */
 .allocation-summary {
   display: flex;
   align-items: center;
@@ -483,7 +424,7 @@
   box-shadow: 0 1px 3px rgba(16,185,129,0.4);
 }
 
-/* Responsive Design - Matching Workload */
+/* Responsive Design - EXACT COPY from Team Workload */
 @media (max-width: 768px) {
   .modern-header-cell.control-column,
   .modern-cell.control-cell {
@@ -523,7 +464,7 @@
   }
 }
 
-/* Scrollbar styling - Matching Workload */
+/* Scrollbar styling - EXACT COPY from Team Workload */
 .workload-table-wrapper::-webkit-scrollbar {
   height: 12px;
 }

@@ -29,8 +29,19 @@ export const ModernProjectRow: React.FC<ModernProjectRowProps> = ({
     <>
       {/* Project Header Row */}
       <tr className={rowClass}>
-        {/* Control column */}
-        <td className="modern-cell control-cell">
+        {/* Control column - matching workload exactly */}
+        <td 
+          className="modern-cell control-cell"
+          style={{
+            width: '60px',
+            minWidth: '60px',
+            maxWidth: '60px',
+            position: 'sticky',
+            left: '0px',
+            zIndex: 10,
+            backgroundColor: isEven ? '#f9fafb' : 'white'
+          }}
+        >
           <Button
             variant="ghost"
             size="sm"
@@ -46,8 +57,19 @@ export const ModernProjectRow: React.FC<ModernProjectRowProps> = ({
           </Button>
         </td>
         
-        {/* Project info column */}
-        <td className="modern-cell project-cell">
+        {/* Project info column - matching workload exactly */}
+        <td 
+          className="modern-cell project-cell"
+          style={{
+            width: '250px',
+            minWidth: '250px',
+            maxWidth: '250px',
+            position: 'sticky',
+            left: '60px',
+            zIndex: 10,
+            backgroundColor: isEven ? '#f9fafb' : 'white'
+          }}
+        >
           <div className="project-info">
             <div className="project-header">
               <h3 className="project-title">{project.name}</h3>
@@ -75,7 +97,15 @@ export const ModernProjectRow: React.FC<ModernProjectRowProps> = ({
           if (day.isSunday) cellClass += ' sunday';
           
           return (
-            <td key={dayKey} className={cellClass}>
+            <td 
+              key={dayKey} 
+              className={cellClass}
+              style={{ 
+                width: '30px', 
+                minWidth: '30px',
+                maxWidth: '30px'
+              }}
+            >
               <div className="allocation-summary">
                 {dayTotal > 0 ? (
                   <span className="total-hours">{dayTotal}h</span>

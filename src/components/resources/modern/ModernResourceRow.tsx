@@ -28,11 +28,33 @@ export const ModernResourceRow: React.FC<ModernResourceRowProps> = ({
 
   return (
     <tr className={rowClass}>
-      {/* Empty control column */}
-      <td className="modern-cell control-cell"></td>
+      {/* Empty control column - matching workload exactly */}
+      <td 
+        className="modern-cell control-cell"
+        style={{
+          width: '60px',
+          minWidth: '60px',
+          maxWidth: '60px',
+          position: 'sticky',
+          left: '0px',
+          zIndex: 10,
+          backgroundColor: isEven ? '#f9fafb' : '#fcfcfc'
+        }}
+      ></td>
       
-      {/* Resource info column */}
-      <td className="modern-cell resource-info-cell">
+      {/* Resource info column - matching workload exactly */}
+      <td 
+        className="modern-cell resource-info-cell"
+        style={{
+          width: '250px',
+          minWidth: '250px',
+          maxWidth: '250px',
+          position: 'sticky',
+          left: '60px',
+          zIndex: 10,
+          backgroundColor: isEven ? '#f9fafb' : '#fcfcfc'
+        }}
+      >
         <div className="resource-info">
           <Avatar className="resource-avatar">
             <AvatarImage src={resource.avatar_url} alt={displayName} />
@@ -51,7 +73,7 @@ export const ModernResourceRow: React.FC<ModernResourceRowProps> = ({
         </div>
       </td>
       
-      {/* Day allocation cells */}
+      {/* Day allocation cells - matching workload exactly */}
       {days.map((day) => {
         const dayKey = day.date.toISOString().split('T')[0];
         const allocation = resource.allocations?.[dayKey] || 0;
@@ -62,7 +84,15 @@ export const ModernResourceRow: React.FC<ModernResourceRowProps> = ({
         if (allocation > 0) cellClass += ' has-allocation';
         
         return (
-          <td key={dayKey} className={cellClass}>
+          <td 
+            key={dayKey} 
+            className={cellClass}
+            style={{ 
+              width: '30px', 
+              minWidth: '30px',
+              maxWidth: '30px'
+            }}
+          >
             <div className="allocation-input">
               <input
                 type="number"
