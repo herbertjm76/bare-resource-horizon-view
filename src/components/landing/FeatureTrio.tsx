@@ -3,7 +3,7 @@ import React from 'react';
 import { Calendar, TrendingUp, BarChart3 } from 'lucide-react';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { VisualCard } from '@/components/common/VisualElements';
-import weeklySnapshotImage from '@/assets/weekly-snapshot-illustration.png';
+import weeklySnapshotImage from '/lovable-uploads/97ce6f0c-da23-42f7-91b7-5d483efca9cc.png';
 import teamWorkloadImage from '@/assets/team-workload-illustration.png';
 import dashboardInsightsImage from '@/assets/dashboard-insights-illustration.png';
 
