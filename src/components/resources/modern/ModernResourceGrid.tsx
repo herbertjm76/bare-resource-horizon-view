@@ -2,6 +2,7 @@
 import React from 'react';
 import { ModernWorkloadStyleGrid } from './ModernWorkloadStyleGrid';
 import { ModernGridTable } from './ModernGridTable';
+import { useProjects } from '@/hooks/useProjects';
 import { useFilteredProjects } from '../hooks/useFilteredProjects';
 import { useGridDays } from '../hooks/useGridDays';
 import { GridLoadingState } from '../grid/GridLoadingState';
@@ -28,8 +29,9 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   expandedProjects,
   totalProjects
 }) => {
-  const { filteredProjects, isLoading } = useFilteredProjects(filters);
-  const { days } = useGridDays(startDate, periodToShow, displayOptions);
+  const { projects, isLoading: isLoadingProjects } = useProjects();
+  const filteredProjects = useFilteredProjects(projects, filters);
+  const days = useGridDays(startDate, periodToShow, displayOptions);
 
   const [localExpandedProjects, setLocalExpandedProjects] = React.useState<string[]>(expandedProjects);
 
@@ -41,7 +43,7 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
     );
   };
 
-  if (isLoading) {
+  if (isLoadingProjects) {
     return <GridLoadingState />;
   }
 
