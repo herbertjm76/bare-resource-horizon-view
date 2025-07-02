@@ -79,44 +79,17 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               {initials}
             </AvatarFallback>
           </Avatar>
-          <div style={{ flex: '1', minWidth: '0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ flex: '1', minWidth: '0' }}>
             <span style={{ 
               fontSize: '13px',
               fontWeight: '500',
               color: '#111827',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              minWidth: '0',
-              flex: '1'
+              whiteSpace: 'nowrap'
             }}>
               {displayName}
             </span>
-            {resource.role && (
-              <span style={{ 
-                fontSize: '11px',
-                color: '#6b7280',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                flexShrink: 0
-              }}>
-                {resource.role}
-              </span>
-            )}
-            {resource.isPending && (
-              <span style={{ 
-                backgroundColor: '#fef3c7',
-                color: '#d97706',
-                fontSize: '9px',
-                fontWeight: '600',
-                padding: '1px 4px',
-                borderRadius: '3px',
-                flexShrink: 0
-              }}>
-                Pending
-              </span>
-            )}
           </div>
         </div>
       </td>
@@ -159,7 +132,6 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
                 ${allocation > 0 ? 'bg-primary/10 text-primary font-medium' : 'bg-muted/50 text-muted-foreground'}
                 ${isSaving ? 'opacity-50' : ''}
                 ${day.isWeekend ? 'bg-muted/30' : ''}
-                flex items-center justify-center
               `}
               placeholder=""
               disabled={isLoading || isSaving}
@@ -168,9 +140,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
                 lineHeight: '1',
                 minHeight: '20px',
                 borderRadius: '2px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                textAlign: 'center'
               }}
             />
           </td>
