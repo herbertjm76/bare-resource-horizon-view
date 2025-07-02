@@ -1,7 +1,7 @@
 
 /* Project Resourcing Table - Clean Implementation */
 
-/* Container with proper scrolling */
+/* Container with proper scrolling and centering */
 .project-resourcing-container {
   width: 100%;
   overflow-x: auto;
@@ -10,16 +10,19 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
 }
 
-/* Table with fixed layout */
+/* Table with fixed layout and proper centering */
 .project-resourcing-table {
   width: max-content;
-  min-width: 100%;
+  min-width: auto;
   border-collapse: separate;
   border-spacing: 0;
   table-layout: fixed;
   position: relative;
+  margin: 0 auto;
 }
 
 /* Sticky counter column */
@@ -72,6 +75,8 @@
 .project-resourcing-table thead th.counter-column,
 .project-resourcing-table thead th.project-name-column {
   z-index: 30 !important;
+  background: #6465F0 !important;
+  color: white !important;
 }
 
 /* Body cell styling */
@@ -80,10 +85,25 @@
   padding: 4px;
 }
 
-/* Sticky body cells */
+/* Sticky body cells - ensure proper background and text colors */
 .project-resourcing-table tbody td.counter-column,
 .project-resourcing-table tbody td.project-name-column {
   background: white !important;
+  color: #1f2937 !important;
+}
+
+/* Project header rows - special styling for sticky columns */
+.project-resourcing-table tbody tr.project-header-row td.counter-column,
+.project-resourcing-table tbody tr.project-header-row td.project-name-column {
+  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%) !important;
+  color: white !important;
+}
+
+/* Resource rows - ensure text is visible */
+.project-resourcing-table tbody tr.resource-row td.counter-column,
+.project-resourcing-table tbody tr.resource-row td.project-name-column {
+  background: white !important;
+  color: #374151 !important;
 }
 
 /* Text truncation for project names */

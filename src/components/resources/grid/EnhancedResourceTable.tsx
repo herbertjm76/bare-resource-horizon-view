@@ -25,7 +25,13 @@ export const EnhancedResourceTable: React.FC<EnhancedResourceTableProps> = ({
 
   return (
     <div className="project-resourcing-container">
-      <table className="project-resourcing-table" style={{ width: `${calculatedWidth}px` }}>
+      <table 
+        className="project-resourcing-table" 
+        style={{ 
+          width: `${calculatedWidth}px`,
+          maxWidth: '100%'
+        }}
+      >
         <colgroup>
           <col className="counter-column" style={{ width: '48px' }} />
           <col className="project-name-column" style={{ width: '200px' }} />
