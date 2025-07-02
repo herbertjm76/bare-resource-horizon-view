@@ -16,13 +16,27 @@ export const WorkloadCalendarTable: React.FC<WorkloadCalendarTableProps> = ({
   weeklyWorkloadData,
   weekStartDates
 }) => {
+  // Calculate if we should center align (for short periods)
+  const shouldCenterAlign = weekStartDates.length <= 12; // 12 weeks or less
+  
+  // Calculate total table width: member column (250px) + week columns (30px each) + total column (120px)
+  const tableWidth = 250 + (weekStartDates.length * 30) + 120;
+
   return (
-    <div className="workload-grid-container">
+    <div className={`workload-grid-container ${shouldCenterAlign ? 'center-aligned' : ''}`}>
       <div className="workload-table-wrapper">
         <table 
-          className="workload-grid-table enhanced-resource-table" 
-          style={{
-            minWidth: `${250 + (weekStartDates.length * 30) + 120}px`
+          className="workload-grid-table"
+          style={{ 
+            width: `${tableWidth}px`,
+            minWidth: `${tableWidth}px`,
+            borderCollapse: 'separate',
+            borderSpacing: '0',
+            background: 'white',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            margin: '0',
+            tableLayout: 'fixed'
           }}
         >
           <WorkloadCalendarHeader weekStartDates={weekStartDates} />
