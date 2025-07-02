@@ -154,17 +154,19 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                   <span style={{ 
                     fontSize: '11px',
                     fontWeight: '600',
-                    backgroundColor: '#1f2937',
-                    color: '#ffffff',
-                    padding: '4px 8px',
-                    borderRadius: '4px'
+                    backgroundColor: 'hsl(var(--primary))',
+                    color: 'white',
+                    padding: '3px 6px',
+                    borderRadius: '2px',
+                    minWidth: '20px',
+                    display: 'inline-block'
                   }}>
                     {dayTotal}h
                   </span>
                 ) : (
                   <span style={{ 
-                    color: '#9ca3af',
-                    fontSize: '12px'
+                    color: 'hsl(var(--muted-foreground))',
+                    fontSize: '11px'
                   }}>
                     —
                   </span>

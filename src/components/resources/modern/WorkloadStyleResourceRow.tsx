@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
 import { DayInfo } from '../grid/types';
 import { useAllocationInput } from '../hooks/useAllocationInput';
 
@@ -41,7 +42,10 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
     projectId: project.id,
     resourceId: resource.id,
     resourceType: resource.isPending ? 'pre_registered' : 'active',
-    onAllocationChange: () => {} // Empty callback since we're just displaying
+    onAllocationChange: (resourceId, dayKey, hours) => {
+      // This will trigger re-calculation of project totals
+      console.log(`Resource ${resourceId} allocation changed for ${dayKey}: ${hours}h`);
+    }
   });
 
   return (
@@ -138,50 +142,29 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               verticalAlign: 'middle'
             }}
           >
-            {allocation > 0 ? (
-              <div 
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  backgroundColor: '#10b981',
-                  color: 'white',
-                  cursor: 'help',
-                  transition: 'all 0.2s',
-                  transform: 'scale(1)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.1)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-              >
-                {allocation}
-              </div>
-            ) : (
-              <div 
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  backgroundColor: '#f3f4f6',
-                  color: '#9ca3af'
-                }}
-              >
-                0
-              </div>
-            )}
+            <Input
+              type="number"
+              min="0"
+              max="24"
+              value={inputValues[dayKey] || ''}
+              onChange={(e) => handleInputChange(dayKey, e.target.value)}
+              onBlur={(e) => handleInputBlur(dayKey, e.target.value)}
+              className={`
+                w-6 h-6 px-1 py-0 text-center text-xs border-0 
+                focus:border focus:border-primary focus:ring-1 focus:ring-primary
+                ${allocation > 0 ? 'bg-primary/10 text-primary font-medium' : 'bg-muted/50 text-muted-foreground'}
+                ${isSaving ? 'opacity-50' : ''}
+                ${day.isWeekend ? 'bg-muted/30' : ''}
+              `}
+              placeholder=""
+              disabled={isLoading || isSaving}
+              style={{
+                fontSize: '11px',
+                lineHeight: '1',
+                minHeight: '24px',
+                borderRadius: '2px'
+              }}
+            />
           </td>
         );
       })}
