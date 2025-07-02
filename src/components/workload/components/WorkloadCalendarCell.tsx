@@ -24,14 +24,12 @@ export const WorkloadCalendarCell: React.FC<WorkloadCalendarCellProps> = ({
   const getUtilizationColor = (hours: number) => {
     if (hours === 0) {
       return '#f3f4f6'; // Gray for 0 hours
-    } else if (hours < 10) {
-      return '#3b82f6'; // Blue for single digit hours (underutilized)
     } else if (hours === 40) {
       return '#22c55e'; // Green for exactly 40 hours (fully utilized)
     } else if (hours > 40) {
       return '#ef4444'; // Red for over 40 hours (over capacity)
     } else {
-      return '#3b82f6'; // Blue for 10-39 hours (moderate utilization)
+      return '#eab308'; // Yellow for less than 40 hours (underutilized)
     }
   };
 
