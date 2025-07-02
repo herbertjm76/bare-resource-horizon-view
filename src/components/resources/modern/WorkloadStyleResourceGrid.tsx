@@ -20,19 +20,14 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
 }) => {
   // Calculate table width: project column (250px) + day columns (30px each)
   const totalWidth = 250 + (days.length * 30);
-  
-  // Determine if this is approximately a 1-month view (28-31 days)
-  const isOneMonthView = days.length >= 28 && days.length <= 31;
 
   return (
-    <div className={`workload-resource-grid-container ${isOneMonthView ? 'center-aligned' : ''}`}>
-      <div className="workload-resource-table-wrapper">
+    <div className="workload-grid-container">
+      <div className="workload-table-wrapper">
         <table 
-          className="workload-resource-grid-table"
+          className="workload-grid-table"
           style={{ 
-            minWidth: `${totalWidth}px`,
-            width: isOneMonthView ? `${totalWidth}px` : '100%',
-            margin: isOneMonthView ? '0 auto' : '0'
+            minWidth: `${totalWidth}px`
           }}
         >
           <WorkloadStyleGridHeader days={days} />

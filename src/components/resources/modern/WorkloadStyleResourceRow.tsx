@@ -29,45 +29,36 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
   const rowBgColor = '#fcfcfc'; // Slightly different shade for resource rows
 
   return (
-    <tr className="workload-resource-grid-row" style={{ backgroundColor: rowBgColor }}>
+    <tr className={`workload-grid-row ${isEven ? 'bg-white' : 'bg-gray-50'} border-b border-gray-200`}>
       {/* Resource info column - Fixed width, sticky */}
       <td 
-        className="workload-resource-grid-cell resource-cell"
+        className="workload-grid-cell member-cell sticky-left-0 bg-inherit z-5 border-r-2 border-gray-300"
         style={{
           width: '250px',
           minWidth: '250px',
-          maxWidth: '250px',
-          position: 'sticky',
-          left: '0px',
-          zIndex: 20,
-          backgroundColor: rowBgColor,
-          textAlign: 'left',
-          padding: '12px 16px',
-          boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)',
-          borderRight: '2px solid rgba(156, 163, 175, 0.8)'
+          maxWidth: '250px'
         }}
       >
-        <div className="member-info flex items-center gap-3 pl-8">
-          <Avatar className="w-8 h-8">
+        <div className="member-info">
+          <Avatar className="member-avatar">
             <AvatarImage src={resource.avatar_url} alt={displayName} />
-            <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white', fontSize: '12px' }}>
+            <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white' }}>
               {initials}
             </AvatarFallback>
           </Avatar>
-          
-          <div className="resource-details flex-1 min-w-0">
-            <div className="resource-name text-sm font-medium text-gray-900 truncate">
-              {displayName}
-            </div>
+          <span className="member-name">
+            {displayName}
+          </span>
+          {resource.role && (
             <div className="resource-role text-xs text-gray-600 truncate">
               {resource.role}
             </div>
-            {resource.isPending && (
-              <span className="pending-badge bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded mt-1 inline-block">
-                Pending
-              </span>
-            )}
-          </div>
+          )}
+          {resource.isPending && (
+            <span className="pending-badge bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded mt-1 inline-block">
+              Pending
+            </span>
+          )}
         </div>
       </td>
       
@@ -82,39 +73,36 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
         return (
           <td 
             key={dayKey} 
-            className="workload-resource-grid-cell day-cell"
+            className="workload-grid-cell week-cell text-center border-r border-gray-200"
             style={{ 
               width: '30px', 
               minWidth: '30px',
               maxWidth: '30px',
               backgroundColor: cellBgColor,
-              textAlign: 'center',
               padding: '2px'
             }}
           >
-            <div className="allocation-input">
-              <input
-                type="number"
-                className="w-6 h-6 text-center text-xs border-0 bg-transparent focus:bg-white focus:border focus:border-blue-500 focus:rounded"
-                value={allocation || ''}
-                onChange={(e) => {
-                  console.log('Allocation change:', {
-                    resource: resource.id,
-                    day: dayKey,
-                    value: e.target.value
-                  });
-                }}
-                placeholder="0"
-                min="0"
-                max="24"
-                step="0.5"
+            {allocation > 0 ? (
+              <div 
+                className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-semibold cursor-help transition-all duration-200 hover:scale-110"
                 style={{
-                  backgroundColor: allocation > 0 ? '#10b981' : 'transparent',
-                  color: allocation > 0 ? 'white' : 'inherit',
-                  fontWeight: allocation > 0 ? '600' : 'normal'
+                  backgroundColor: '#10b981',
+                  color: 'white'
                 }}
-              />
-            </div>
+              >
+                {allocation}
+              </div>
+            ) : (
+              <div 
+                className="inline-flex items-center justify-center w-6 h-6 rounded text-xs font-medium"
+                style={{
+                  backgroundColor: '#f3f4f6',
+                  color: '#9ca3af'
+                }}
+              >
+                0
+              </div>
+            )}
           </td>
         );
       })}

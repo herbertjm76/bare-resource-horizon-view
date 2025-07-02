@@ -28,22 +28,14 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
   return (
     <>
       {/* Project Header Row */}
-      <tr className="workload-resource-grid-row" style={{ backgroundColor: rowBgColor }}>
+      <tr className={`workload-grid-row ${isEven ? 'bg-white' : 'bg-gray-50'} border-b border-gray-200`}>
         {/* Project info column - Fixed width, sticky */}
         <td 
-          className="workload-resource-grid-cell project-cell"
+          className="workload-grid-cell member-cell sticky-left-0 bg-inherit z-5 border-r-2 border-gray-300"
           style={{
             width: '250px',
             minWidth: '250px',
-            maxWidth: '250px',
-            position: 'sticky',
-            left: '0px',
-            zIndex: 20,
-            backgroundColor: rowBgColor,
-            textAlign: 'left',
-            padding: '12px 16px',
-            boxShadow: '2px 0 4px rgba(0, 0, 0, 0.1)',
-            borderRight: '2px solid rgba(156, 163, 175, 0.8)'
+            maxWidth: '250px'
           }}
         >
           <div className="project-info">
@@ -93,14 +85,13 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
           return (
             <td 
               key={dayKey} 
-              className="workload-resource-grid-cell day-cell"
+              className="workload-grid-cell week-cell text-center border-r border-gray-200"
               style={{ 
                 width: '30px', 
                 minWidth: '30px',
                 maxWidth: '30px',
                 backgroundColor: cellBgColor,
-                textAlign: 'center',
-                padding: '4px 2px'
+                padding: '2px'
               }}
             >
               <div className="allocation-summary">

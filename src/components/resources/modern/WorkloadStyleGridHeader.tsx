@@ -9,27 +9,22 @@ interface WorkloadStyleGridHeaderProps {
 
 export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = ({ days }) => {
   return (
-    <thead className="workload-resource-grid-header">
-      <tr>
+    <thead>
+      <tr style={{ backgroundColor: '#6465F0' }}>
         {/* Project/Resource column - Fixed width, sticky */}
         <th 
-          className="workload-resource-header-cell project-column"
+          className="workload-grid-header member-column sticky-left-0 z-20"
           style={{ 
+            backgroundColor: '#6465F0',
             width: '250px',
             minWidth: '250px',
-            maxWidth: '250px',
-            position: 'sticky',
-            left: '0px',
-            zIndex: 30,
-            backgroundColor: '#6465F0'
+            maxWidth: '250px'
           }}
         >
-          <div className="header-content">
-            <span className="header-label">Project / Resource</span>
-          </div>
+          Project / Resource
         </th>
         
-        {/* Day columns */}
+        {/* Day columns - Fixed width matching Team Workload format */}
         {days.map((day, index) => {
           const isTodayDay = isToday(day.date);
           const isFirstOfMonth = day.date.getDate() <= 7;
@@ -45,24 +40,40 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
           return (
             <th 
               key={`${day.date.toISOString()}-${index}`}
-              className="workload-resource-header-cell day-column"
+              className="workload-grid-header week-column text-center text-xs font-semibold text-white py-2 px-1 relative"
               style={{ 
                 width: '30px', 
                 minWidth: '30px',
                 maxWidth: '30px',
-                height: '80px',
                 backgroundColor,
                 borderLeft: isFirstOfMonth ? '4px solid #fbbf24' : isNewMonth ? '2px solid #fbbf24' : undefined
               }}
             >
-              <div className="header-content day-header">
-                {isNewMonth && (
-                  <div className="month-label">{format(day.date, 'MMM').toUpperCase()}</div>
+              <div className="flex flex-col items-center h-full">
+                {isNewMonth ? (
+                  <>
+                    <span className="text-[10px] font-bold uppercase leading-none text-yellow-200 mb-1">
+                      {format(day.date, 'MMM')}
+                    </span>
+                    <div className="flex flex-col items-center justify-end gap-0.5 flex-1">
+                      <span className="text-[10px] opacity-90 uppercase leading-none font-medium">
+                        {format(day.date, 'EEE').charAt(0)}
+                      </span>
+                      <span className="text-sm font-bold leading-none">
+                        {format(day.date, 'd')}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-end gap-0.5 h-full pt-4">
+                    <span className="text-[10px] opacity-90 uppercase leading-none font-medium">
+                      {format(day.date, 'EEE').charAt(0)}
+                    </span>
+                    <span className="text-sm font-bold leading-none">
+                      {format(day.date, 'd')}
+                    </span>
+                  </div>
                 )}
-                <div className="day-info">
-                  <div className="day-name">{format(day.date, 'EEE').charAt(0)}</div>
-                  <div className="day-number">{format(day.date, 'd')}</div>
-                </div>
               </div>
             </th>
           );
