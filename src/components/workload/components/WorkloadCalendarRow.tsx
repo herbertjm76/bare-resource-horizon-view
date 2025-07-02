@@ -94,9 +94,9 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
         
         const getUtilizationColor = (hours: number) => {
           if (hours === 0) return '#f3f4f6';
-          if (hours <= 20) return '#10b981';
-          if (hours <= 40) return '#f59e0b';
-          return '#ef4444';
+          if (hours === 40) return '#22c55e';
+          if (hours > 40) return '#ef4444';
+          return '#eab308';
         };
 
         return (
