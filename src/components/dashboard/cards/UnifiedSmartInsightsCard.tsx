@@ -1,13 +1,15 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Lightbulb, AlertTriangle, CheckCircle, TrendingUp, Calendar, Info, ChevronRight, Brain, DollarSign, Users, Target, RefreshCw, UserX } from 'lucide-react';
+import { Lightbulb, AlertTriangle, CheckCircle, TrendingUp, Calendar, Info, ChevronRight, Brain, DollarSign, Users, Target, RefreshCw, UserX, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
 import { UnifiedDashboardData } from '../hooks/useDashboardData';
 import { AdvancedInsightsService, AdvancedInsight } from '@/services/advancedInsightsService';
+import { AIInsightsService, AIInsight } from '@/services/aiInsightsService';
+import { useCompany } from '@/context/CompanyContext';
 
 interface UnifiedSmartInsightsCardProps {
   data: UnifiedDashboardData;
@@ -96,17 +98,70 @@ const getCategoryEmoji = (category: string) => {
 
 export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> = ({ data }) => {
   const [expandedInsight, setExpandedInsight] = useState<string | null>(null);
+  const [aiInsights, setAiInsights] = useState<AIInsight[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [useAI, setUseAI] = useState(true);
+  const { company } = useCompany();
   
-  // Generate advanced insights using the new service
-  const insights = AdvancedInsightsService.generateAdvancedInsights(data);
+  // Load AI insights
+  useEffect(() => {
+    const loadAIInsights = async () => {
+      if (!company?.id || !useAI) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const response = await AIInsightsService.generateInsights(company.id, '30d');
+        
+        if (response.success && response.insights.length > 0) {
+          setAiInsights(response.insights);
+        } else {
+          console.log('AI insights failed, falling back to local insights');
+          setUseAI(false);
+        }
+      } catch (error) {
+        console.error('Error loading AI insights:', error);
+        setUseAI(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAIInsights();
+  }, [company?.id, useAI]);
+
+  // Use AI insights if available, otherwise fall back to advanced insights
+  const insights = useAI && aiInsights.length > 0 ? aiInsights : AdvancedInsightsService.generateAdvancedInsights(data);
   
   // Count insights by priority for header badge
-  const highPriorityInsights = insights.filter(i => i.priority === 'high').length;
-  const criticalInsights = insights.filter(i => i.type === 'critical').length;
+  const highPriorityInsights = insights.filter(i => i.priority === 'critical' || i.priority === 'warning').length;
+  const criticalInsights = insights.filter(i => i.priority === 'critical').length;
 
   const toggleInsightExpansion = (insightId: string) => {
     setExpandedInsight(expandedInsight === insightId ? null : insightId);
   };
+
+  if (isLoading) {
+    return (
+      <Card className="rounded-2xl border-2 border-zinc-300 bg-white shadow-sm h-[500px]">
+        <CardContent className="p-3 sm:p-6 h-full flex flex-col items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="p-4 rounded-full bg-brand-violet/10 mx-auto w-16 h-16 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 text-brand-violet animate-spin" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-medium text-gray-900">Analyzing Team Performance</h3>
+              <p className="text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
+                Our AI is processing your team data to generate actionable insights and recommendations.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (insights.length === 0) {
     return (
@@ -117,9 +172,9 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
               <Brain className="h-8 w-8 text-brand-violet" />
             </div>
             <div className="space-y-2">
-              <h3 className="font-medium text-gray-900">Analyzing Team Performance</h3>
+              <h3 className="font-medium text-gray-900">No Insights Available</h3>
               <p className="text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
-                Our AI is processing your team data to generate actionable insights and recommendations.
+                Add team members and projects to generate insights about your team's performance.
               </p>
             </div>
           </div>
@@ -152,13 +207,13 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
             {insights.map((insight, index) => {
               const priorityConfig = getPriorityConfig(insight.type, insight.priority);
               const IconComponent = getInsightIcon(insight.icon);
-              const isExpanded = expandedInsight === insight.id;
+              const isExpanded = expandedInsight === (insight.id || `insight-${index}`);
               
               return (
                 <div 
-                  key={insight.id} 
+                  key={insight.id || `insight-${index}`} 
                   className={`group rounded-xl border-2 p-4 transition-all duration-300 hover:shadow-lg cursor-pointer ${priorityConfig.cardBg}`}
-                  onClick={() => toggleInsightExpansion(insight.id)}
+                  onClick={() => toggleInsightExpansion(insight.id || `insight-${index}`)}
                 >
                   <div className="flex items-start gap-4">
                     <div className={`p-2.5 rounded-xl flex-shrink-0 transition-transform group-hover:scale-110 ${priorityConfig.bgColor}`}>
@@ -185,12 +240,14 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
                             {insight.description}
                           </p>
                           
-                          {/* Metric Badge */}
-                          <div className="bg-white/60 rounded-lg px-3 py-2 border border-white/40 mb-2">
-                            <p className="text-xs font-medium text-gray-800">
-                              📊 {insight.metric}
-                            </p>
-                          </div>
+                           {/* Metric Badge - only show if metric exists */}
+                           {(insight as any).metric && (
+                             <div className="bg-white/60 rounded-lg px-3 py-2 border border-white/40 mb-2">
+                               <p className="text-xs font-medium text-gray-800">
+                                 📊 {(insight as any).metric}
+                               </p>
+                             </div>
+                           )}
                           
                           {/* Expandable content */}
                           {isExpanded && (
@@ -205,10 +262,10 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
                                 <p className="text-xs text-gray-700 leading-relaxed">{insight.recommendation}</p>
                               </div>
                               
-                              <div className="flex items-center justify-between text-xs text-gray-500">
-                                <span>Confidence: {insight.confidence}%</span>
-                                <span className="capitalize">{insight.timeframe} action needed</span>
-                              </div>
+                               <div className="flex items-center justify-between text-xs text-gray-500">
+                                 <span>Confidence: {typeof insight.confidence === 'number' && insight.confidence <= 1 ? Math.round(insight.confidence * 100) : insight.confidence}%</span>
+                                 <span className="capitalize">{insight.timeframe} action needed</span>
+                               </div>
                             </div>
                           )}
                         </div>
