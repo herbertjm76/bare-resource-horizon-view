@@ -1,11 +1,13 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Brain, TrendingUp, AlertTriangle, Users, Target, ChevronRight } from 'lucide-react';
+import { Brain, TrendingUp, AlertTriangle, Users, Target, ChevronRight, Loader2 } from 'lucide-react';
 import { useIntelligentInsights } from './intelligent-insights/hooks/useIntelligentInsights';
+import { AIInsightsService, AIInsight } from '@/services/aiInsightsService';
+import { useCompany } from '@/context/CompanyContext';
 
 interface TeamMember {
   id: string;
@@ -21,8 +23,8 @@ interface IntelligentInsightsProps {
   utilizationRate: number;
 }
 
-const getSeverityStyles = (severity: string) => {
-  switch (severity) {
+const getSeverityStyles = (priority: string) => {
+  switch (priority) {
     case 'critical': 
       return {
         card: 'bg-gradient-to-br from-red-50 via-red-50 to-red-100/80 border-red-200/60 hover:border-red-300/80',
@@ -41,6 +43,7 @@ const getSeverityStyles = (severity: string) => {
         icon: 'bg-green-100 text-green-600',
         badge: 'bg-green-500/10 text-green-700 border-green-200'
       };
+    case 'opportunity':
     case 'info': 
       return {
         card: 'bg-gradient-to-br from-blue-50 via-blue-50 to-blue-100/80 border-blue-200/60 hover:border-blue-300/80',
@@ -72,11 +75,82 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
   activeProjects,
   utilizationRate
 }) => {
-  const { insights } = useIntelligentInsights({
+  const [aiInsights, setAiInsights] = useState<AIInsight[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [useAI, setUseAI] = useState(true);
+  const { company } = useCompany();
+  
+  // Fallback insights using existing hook
+  const { insights: fallbackInsights } = useIntelligentInsights({
     teamMembers,
     activeProjects,
     utilizationRate
   });
+
+  // Load AI insights
+  useEffect(() => {
+    const loadAIInsights = async () => {
+      if (!company?.id || !useAI) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const response = await AIInsightsService.generateInsights(company.id, '30d');
+        
+        if (response.success && response.insights.length > 0) {
+          setAiInsights(response.insights);
+        } else {
+          console.log('AI insights failed, falling back to local insights');
+          setUseAI(false);
+        }
+      } catch (error) {
+        console.error('Error loading AI insights:', error);
+        setUseAI(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAIInsights();
+  }, [company?.id, useAI]);
+
+  // Use AI insights if available, otherwise fall back to local insights
+  const insights = useAI && aiInsights.length > 0 ? aiInsights : fallbackInsights;
+
+  if (isLoading) {
+    return (
+      <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
+        <CardHeader className="flex-shrink-0 pb-4">
+          <CardTitle className="text-lg flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
+              <Loader2 className="h-5 w-5 text-white animate-spin" />
+            </div>
+            <span className="text-brand-violet font-semibold">
+              Smart Insights
+            </span>
+            <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
+              AI-Powered
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex-1 flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="p-4 rounded-full bg-brand-violet/10 mx-auto w-16 h-16 flex items-center justify-center">
+              <Loader2 className="h-8 w-8 text-brand-violet animate-spin" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-medium text-gray-900">Analyzing Your Team</h3>
+              <p className="text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
+                Our AI is processing your team data to generate actionable insights.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (insights.length === 0) {
     return (
@@ -131,8 +205,11 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
         <ScrollArea className="h-full">
           <div className="space-y-3 px-6 pb-6">
             {insights.slice(0, 4).map((insight, index) => {
-              const styles = getSeverityStyles(insight.severity);
-              const IconComponent = getIconComponent(insight.icon?.name || 'brain');
+              // Handle both AI insights and fallback insights
+              const priority = (insight as any).priority || (insight as any).severity;
+              const iconName = typeof (insight as any).icon === 'string' ? (insight as any).icon : (insight as any).icon?.name || 'brain';
+              const styles = getSeverityStyles(priority);
+              const IconComponent = getIconComponent(iconName);
               
               return (
                 <div 

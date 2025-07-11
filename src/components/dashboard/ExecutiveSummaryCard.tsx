@@ -1,10 +1,13 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { StandardizedExecutiveSummary } from './StandardizedExecutiveSummary';
 import { getUtilizationStatus, getTimeRangeText } from './executiveSummary/utils/utilizationUtils';
 import { calculateCapacityHours } from './executiveSummary/utils/capacityUtils';
 import { ExecutiveSummaryProps } from './executiveSummary/types';
 import { TrendingUp, Clock, Briefcase, Users } from 'lucide-react';
+import { AIInsightsService, AIInsight } from '@/services/aiInsightsService';
+import { AISummaryService, AISummaryData } from '@/services/aiSummaryService';
+import { useCompany } from '@/context/CompanyContext';
 
 export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   activeProjects,
@@ -16,6 +19,35 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   staffData = [],
   standardizedUtilizationRate
 }) => {
+  const [aiSummary, setAiSummary] = useState<AISummaryData | null>(null);
+  const [isLoadingAI, setIsLoadingAI] = useState(true);
+  const { company } = useCompany();
+
+  // Load AI insights for summary enhancement
+  useEffect(() => {
+    const loadAISummary = async () => {
+      if (!company?.id) {
+        setIsLoadingAI(false);
+        return;
+      }
+
+      try {
+        setIsLoadingAI(true);
+        const response = await AIInsightsService.generateInsights(company.id, '30d');
+        
+        if (response.success && response.insights.length > 0) {
+          const summary = AISummaryService.generateSummaryFromInsights(response.insights);
+          setAiSummary(summary);
+        }
+      } catch (error) {
+        console.error('Error loading AI summary:', error);
+      } finally {
+        setIsLoadingAI(false);
+      }
+    };
+
+    loadAISummary();
+  }, [company?.id]);
   // Use standardized utilization rate if provided, otherwise fall back to legacy calculation
   const utilizationRate = standardizedUtilizationRate !== undefined 
     ? standardizedUtilizationRate 
@@ -38,35 +70,41 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   const capacityHours = calculateCapacityHours(selectedTimeRange, activeResources, utilizationRate, staffData);
   const isOverCapacity = capacityHours < 0;
 
+  // Enhanced metrics with AI insights
   const metrics = [
     {
       title: "Team Utilization",
       value: `${Math.round(utilizationRate)}%`,
-      subtitle: timeRangeText,
-      badgeText: utilizationStatus.label,
-      badgeColor: utilizationStatus.color === 'destructive' ? 'red' : 
-                 utilizationStatus.color === 'default' ? 'green' : 'blue'
+      subtitle: aiSummary ? `Trend: ${AISummaryService.getUtilizationTrendText(aiSummary.utilizationTrend)}` : timeRangeText,
+      badgeText: aiSummary ? AISummaryService.getUtilizationTrendText(aiSummary.utilizationTrend) : utilizationStatus.label,
+      badgeColor: aiSummary ? 
+        (aiSummary.utilizationTrend === 'improving' ? 'green' : 
+         aiSummary.utilizationTrend === 'declining' ? 'red' : 'blue') :
+        (utilizationStatus.color === 'destructive' ? 'red' : 
+         utilizationStatus.color === 'default' ? 'green' : 'blue')
     },
     {
       title: isOverCapacity ? "Over Capacity" : "Available Capacity",
       value: `${Math.abs(capacityHours).toLocaleString()}h`,
-      subtitle: timeRangeText,
-      badgeText: isOverCapacity ? "Over Capacity" : undefined,
-      badgeColor: isOverCapacity ? "red" : undefined
+      subtitle: aiSummary ? `Status: ${AISummaryService.getCapacityStatusText(aiSummary.capacityStatus)}` : timeRangeText,
+      badgeText: aiSummary ? AISummaryService.getCapacityStatusText(aiSummary.capacityStatus) : (isOverCapacity ? "Over Capacity" : undefined),
+      badgeColor: aiSummary ? AISummaryService.getCapacityStatusColor(aiSummary.capacityStatus) : (isOverCapacity ? "red" : undefined)
     },
     {
       title: "Active Projects",
       value: activeProjects,
       subtitle: activeResources > 0 
         ? `${(activeProjects / activeResources).toFixed(1)} per person` 
-        : 'No team members'
+        : 'No team members',
+      badgeText: aiSummary && aiSummary.criticalInsights > 0 ? `${aiSummary.criticalInsights} Critical Issues` : undefined,
+      badgeColor: aiSummary && aiSummary.criticalInsights > 0 ? 'red' : undefined
     },
     {
       title: "Team Size",
       value: activeResources,
-      subtitle: "Active resources",
-      badgeText: utilizationRate > 85 ? 'Consider Hiring' : 'Stable',
-      badgeColor: utilizationRate > 85 ? 'orange' : 'green'
+      subtitle: aiSummary ? `Risk Level: ${aiSummary.riskLevel.charAt(0).toUpperCase() + aiSummary.riskLevel.slice(1)}` : "Active resources",
+      badgeText: aiSummary ? `${aiSummary.riskLevel.charAt(0).toUpperCase() + aiSummary.riskLevel.slice(1)} Risk` : (utilizationRate > 85 ? 'Consider Hiring' : 'Stable'),
+      badgeColor: aiSummary ? AISummaryService.getRiskLevelColor(aiSummary.riskLevel) : (utilizationRate > 85 ? 'orange' : 'green')
     }
   ];
 
