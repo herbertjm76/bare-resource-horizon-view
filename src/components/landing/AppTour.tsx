@@ -1,11 +1,14 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { VisualCard } from '@/components/common/VisualElements';
-import { LayoutDashboard, Calendar, GanttChartSquare, UserSquare2, Flag } from 'lucide-react';
+import { LayoutDashboard, Calendar, GanttChartSquare, UserSquare2, Flag, Play } from 'lucide-react';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 const AppTour = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { startDemoMode } = useDemoAuth();
   const isMainPage = location.pathname === '/';
   
   const appFeatures = [
@@ -50,17 +53,24 @@ const AppTour = () => {
   // Show only first 3 features on main page
   const displayFeatures = isMainPage ? appFeatures.slice(0, 3) : appFeatures;
 
+  const handleLaunchDemo = () => {
+    startDemoMode();
+    navigate('/dashboard');
+  };
+
   return (
     <div id="app-tour" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <AnimatedSection animation="fadeInUp">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Explore the Platform
+              {isMainPage ? 'Explore the Platform' : 'Interactive Demo Available'}
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Discover all the powerful features and pages that make resource management 
-              effortless and efficient for your team.
+              {isMainPage 
+                ? 'Discover all the powerful features and pages that make resource management effortless and efficient for your team.'
+                : 'Experience the full platform with live demo data. Explore all features, navigate through pages, and see how it works for real teams.'
+              }
             </p>
           </div>
         </AnimatedSection>
@@ -97,8 +107,12 @@ const AppTour = () => {
               </Link>
             ) : (
               <>
-                <button className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg mr-4">
-                  Try Demo
+                <button 
+                  onClick={handleLaunchDemo}
+                  className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-8 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg mr-4 inline-flex items-center"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Launch Interactive Demo
                 </button>
                 <button className="border border-purple-600 text-purple-600 px-8 py-3 rounded-lg font-medium hover:bg-purple-50 transition-colors">
                   View Screenshots

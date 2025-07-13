@@ -1,9 +1,9 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { RefreshCw } from 'lucide-react';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -16,12 +16,40 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
   const [authError, setAuthError] = useState<string | null>(null);
   const navigate = useNavigate();
   const authChecked = useRef(false);
+  const { isDemoMode, user: demoUser, profile: demoProfile } = useDemoAuth();
   
   // Function to check authentication and authorization
   const checkAuth = async () => {
     if (!authChecked.current) {
       console.log("AuthGuard: Checking authorization...");
       
+      // Handle demo mode
+      if (isDemoMode && demoUser && demoProfile) {
+        console.log("AuthGuard: Demo mode active, checking demo authorization");
+        
+        if (requiredRole) {
+          const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
+          const hasRequiredRole = roles.includes(demoProfile.role);
+          
+          if (!hasRequiredRole) {
+            console.log("AuthGuard: Demo user doesn't have required role", demoProfile.role, "needs", requiredRole);
+            toast.error("You don't have permission to access this page");
+            setIsLoading(false);
+            setIsAuthorized(false);
+            navigate('/dashboard');
+            return;
+          }
+        }
+        
+        console.log("AuthGuard: Demo user is authorized");
+        setIsAuthorized(true);
+        setIsLoading(false);
+        setAuthError(null);
+        authChecked.current = true;
+        return;
+      }
+      
+      // Handle normal auth
       try {
         // First, check if we have an active session
         const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -133,29 +161,34 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
       }
     }, 5000);
     
-    // First set up auth state change listener
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("AuthGuard: Auth state changed:", event);
-      
-      if (!isMounted) return;
-      
-      // Directly handle sign out
-      if (event === 'SIGNED_OUT') {
-        setIsAuthorized(false);
-        setIsLoading(false);
-        navigate('/auth');
-        return;
-      }
-      
-      // For other events, just set auth checked to false to trigger a recheck
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        authChecked.current = false;
-        // Use setTimeout to avoid potential deadlocks with Supabase
-        setTimeout(() => {
-          if (isMounted) checkAuth();
-        }, 0);
-      }
-    });
+    // Only set up auth listener if not in demo mode
+    let authListener: any = null;
+    
+    if (!isDemoMode) {
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        console.log("AuthGuard: Auth state changed:", event);
+        
+        if (!isMounted) return;
+        
+        // Directly handle sign out
+        if (event === 'SIGNED_OUT') {
+          setIsAuthorized(false);
+          setIsLoading(false);
+          navigate('/auth');
+          return;
+        }
+        
+        // For other events, just set auth checked to false to trigger a recheck
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          authChecked.current = false;
+          // Use setTimeout to avoid potential deadlocks with Supabase
+          setTimeout(() => {
+            if (isMounted) checkAuth();
+          }, 0);
+        }
+      });
+      authListener = data;
+    }
     
     // Then check auth
     checkAuth();
@@ -169,9 +202,11 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         clearTimeout(authTimeout);
       }
       
-      authListener.subscription.unsubscribe();
+      if (authListener) {
+        authListener.subscription.unsubscribe();
+      }
     };
-  }, [navigate, requiredRole]);
+  }, [navigate, requiredRole, isDemoMode]);
 
   if (isLoading) {
     return (
