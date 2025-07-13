@@ -65,6 +65,15 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
     setExpandedProjects([]);
   };
 
+  // Toggle individual project
+  const handleToggleProjectExpand = (projectId: string) => {
+    setExpandedProjects(prev => 
+      prev.includes(projectId) 
+        ? prev.filter(id => id !== projectId)
+        : [...prev, projectId]
+    );
+  };
+
   const totalProjects = projects?.length || 0;
 
   // Combine filters with search term for filtering
@@ -122,6 +131,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
           onCollapseAll={collapseAll}
           expandedProjects={expandedProjects}
           totalProjects={totalProjects}
+          onToggleProjectExpand={handleToggleProjectExpand}
         />
       </div>
     </div>

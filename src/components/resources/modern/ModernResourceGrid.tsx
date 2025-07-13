@@ -16,6 +16,7 @@ interface ModernResourceGridProps {
   onCollapseAll?: () => void;
   expandedProjects: string[];
   totalProjects: number;
+  onToggleProjectExpand: (projectId: string) => void;
 }
 
 export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
@@ -26,21 +27,12 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
   onExpandAll,
   onCollapseAll,
   expandedProjects,
-  totalProjects
+  totalProjects,
+  onToggleProjectExpand
 }) => {
   const { projects, isLoading: isLoadingProjects } = useProjects();
   const filteredProjects = useFilteredProjects(projects, filters);
   const days = useGridDays(startDate, periodToShow, displayOptions);
-
-  const [localExpandedProjects, setLocalExpandedProjects] = React.useState<string[]>(expandedProjects);
-
-  const handleToggleProjectExpand = (projectId: string) => {
-    setLocalExpandedProjects(prev => 
-      prev.includes(projectId) 
-        ? prev.filter(id => id !== projectId)
-        : [...prev, projectId]
-    );
-  };
 
   if (isLoadingProjects) {
     return <GridLoadingState />;
@@ -64,8 +56,8 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
           <WorkloadStyleResourceGrid
             projects={filteredProjects}
             days={days}
-            expandedProjects={localExpandedProjects}
-            onToggleProjectExpand={handleToggleProjectExpand}
+            expandedProjects={expandedProjects}
+            onToggleProjectExpand={onToggleProjectExpand}
             selectedDate={startDate}
             periodToShow={periodToShow}
           />
