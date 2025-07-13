@@ -66,6 +66,8 @@ export const ModernResourceGrid: React.FC<ModernResourceGridProps> = ({
             days={days}
             expandedProjects={localExpandedProjects}
             onToggleProjectExpand={handleToggleProjectExpand}
+            selectedDate={startDate}
+            periodToShow={periodToShow}
           />
         </div>
       </div>

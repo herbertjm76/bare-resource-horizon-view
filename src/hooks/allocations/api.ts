@@ -10,10 +10,13 @@ export const fetchResourceAllocations = async (
   projectId: string,
   resourceId: string, 
   resourceType: 'active' | 'pre_registered',
-  companyId: string
+  companyId: string,
+  dateRange?: { startDate: string; endDate: string }
 ): Promise<Record<string, number>> => {
   try {
-    const { data, error } = await supabase
+    console.log(`🔍 ALLOCATION API: Fetching allocations for resource ${resourceId} in project ${projectId}`);
+    
+    let query = supabase
       .from('project_resource_allocations')
       .select('id, week_start_date, hours')
       .eq('project_id', projectId)
@@ -21,13 +24,26 @@ export const fetchResourceAllocations = async (
       .eq('resource_type', resourceType)
       .eq('company_id', companyId);
     
+    // Apply date range filter if provided
+    if (dateRange) {
+      console.log(`🔍 ALLOCATION API: Applying date range filter: ${dateRange.startDate} to ${dateRange.endDate}`);
+      query = query
+        .gte('week_start_date', dateRange.startDate)
+        .lte('week_start_date', dateRange.endDate);
+    }
+    
+    const { data, error } = await query;
+    
     if (error) throw error;
+    
+    console.log(`🔍 ALLOCATION API: Retrieved ${data?.length || 0} allocation records`);
     
     // Transform data into a week key -> hours mapping
     const allocationMap: Record<string, number> = {};
     data?.forEach(item => {
       const weekKey = formatDateKey(item.week_start_date);
       allocationMap[weekKey] = item.hours;
+      console.log(`🔍 ALLOCATION API: Mapped ${item.week_start_date} -> ${weekKey}: ${item.hours}h`);
     });
     
     return allocationMap;

@@ -24,7 +24,12 @@ export const useComprehensiveAllocations = ({
         return [];
       }
 
-      console.log('Fetching comprehensive allocations for week:', weekStartDate, 'members:', memberIds.length);
+      console.log('🔍 COMPREHENSIVE ALLOCATIONS: Fetching for week:', weekStartDate, 'members:', memberIds.length);
+      console.log('🔍 COMPREHENSIVE ALLOCATIONS: Query parameters:', { 
+        company_id: company.id, 
+        week_start_date: weekStartDate, 
+        resource_ids: memberIds 
+      });
       
       const { data, error } = await supabase
         .from('project_resource_allocations')
@@ -34,11 +39,12 @@ export const useComprehensiveAllocations = ({
         .in('resource_id', memberIds);
 
       if (error) {
-        console.error('Error fetching comprehensive allocations:', error);
+        console.error('🔍 COMPREHENSIVE ALLOCATIONS: Error fetching allocations:', error);
         throw error;
       }
 
-      console.log('Successfully fetched comprehensive allocations:', data?.length || 0);
+      console.log('🔍 COMPREHENSIVE ALLOCATIONS: Successfully fetched', data?.length || 0, 'allocation records');
+      console.log('🔍 COMPREHENSIVE ALLOCATIONS: Sample data:', data?.slice(0, 3));
       return data || [];
     },
     enabled: !!company?.id && memberIds.length > 0 && enabled,

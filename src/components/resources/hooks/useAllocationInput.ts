@@ -1,27 +1,45 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { useResourceAllocationsDB } from '@/hooks/allocations';
+import { useResourceAllocationsDB, useDateRangeAllocations } from '@/hooks/allocations';
 
 interface UseAllocationInputProps {
   projectId: string;
   resourceId: string;
   resourceType: 'active' | 'pre_registered';
   onAllocationChange: (resourceId: string, dayKey: string, hours: number) => void;
+  selectedDate?: Date;
+  periodToShow?: number;
 }
 
 export const useAllocationInput = ({
   projectId,
   resourceId,
   resourceType,
-  onAllocationChange
+  onAllocationChange,
+  selectedDate,
+  periodToShow
 }: UseAllocationInputProps) => {
+  // Use date range allocations if date parameters are provided, otherwise use the legacy hook
+  const legacyHook = useResourceAllocationsDB(projectId, resourceId, resourceType);
+  
+  const dateRangeHook = useDateRangeAllocations({
+    projectId,
+    resourceId,
+    resourceType,
+    selectedDate: selectedDate || new Date(),
+    periodToShow
+  });
+  
+  // Use the appropriate hook based on whether date range is specified
   const { 
     allocations, 
     isLoading, 
-    isSaving, 
-    saveAllocation 
-  } = useResourceAllocationsDB(projectId, resourceId, resourceType);
+    refreshAllocations
+  } = selectedDate ? dateRangeHook : legacyHook;
+  
+  // Use saving state from legacy hook (which has save functionality)
+  const { isSaving, saveAllocation } = legacyHook;
 
   const [inputValues, setInputValues] = useState<Record<string, string>>({});
 

@@ -31,6 +31,7 @@ export function useResourceAllocationsDB(
         resourceId,
         resourceType,
         company.id
+        // Note: No date range for backward compatibility - fetches all allocations
       );
       
       console.log('Fetched allocations:', allocationMap);

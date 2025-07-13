@@ -12,6 +12,8 @@ interface WorkloadStyleProjectRowProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   isEven: boolean;
+  selectedDate?: Date;
+  periodToShow?: number;
 }
 
 export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = ({
@@ -19,7 +21,9 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
   days,
   isExpanded,
   onToggleExpand,
-  isEven
+  isEven,
+  selectedDate,
+  periodToShow
 }) => {
   const { resources, isLoading, projectAllocations, getAllocationKey, handleAllocationChange } = useProjectResources(project.id);
   
@@ -189,6 +193,8 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
           days={days}
           isEven={isEven}
           resourceIndex={resourceIndex}
+          selectedDate={selectedDate}
+          periodToShow={periodToShow}
           onAllocationChange={handleAllocationChange}
         />
       ))}

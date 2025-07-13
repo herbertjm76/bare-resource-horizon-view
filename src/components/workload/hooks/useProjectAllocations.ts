@@ -29,6 +29,12 @@ export const useProjectAllocations = (
 
         console.log('🔍 PROJECT ALLOCATIONS: Fetching project allocations for member IDs:', memberIds);
         console.log('🔍 PROJECT ALLOCATIONS: Date range:', monthStart, 'to', monthEnd);
+        console.log('🔍 PROJECT ALLOCATIONS: Query parameters:', {
+          company_id: companyId,
+          resource_ids: memberIds,
+          week_start_date_gte: monthStart,
+          week_start_date_lte: monthEnd
+        });
 
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')

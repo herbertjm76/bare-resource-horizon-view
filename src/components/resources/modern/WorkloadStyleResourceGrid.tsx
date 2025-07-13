@@ -10,13 +10,17 @@ interface WorkloadStyleResourceGridProps {
   days: DayInfo[];
   expandedProjects: string[];
   onToggleProjectExpand: (projectId: string) => void;
+  selectedDate?: Date;
+  periodToShow?: number;
 }
 
 export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps> = ({
   projects,
   days,
   expandedProjects,
-  onToggleProjectExpand
+  onToggleProjectExpand,
+  selectedDate,
+  periodToShow
 }) => {
   // Calculate if we should center align (for 1-month views)
   const shouldCenterAlign = days.length <= 31;
@@ -45,6 +49,8 @@ export const WorkloadStyleResourceGrid: React.FC<WorkloadStyleResourceGridProps>
                 isExpanded={expandedProjects.includes(project.id)}
                 onToggleExpand={() => onToggleProjectExpand(project.id)}
                 isEven={index % 2 === 0}
+                selectedDate={selectedDate}
+                periodToShow={periodToShow}
               />
             ))}
           </tbody>
