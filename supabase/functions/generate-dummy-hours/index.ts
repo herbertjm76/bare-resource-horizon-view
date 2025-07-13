@@ -83,39 +83,69 @@ serve(async (req) => {
 
     const allocations = [];
 
-    // Generate realistic allocations
-    for (const project of projects) {
-      // Randomly assign 2-5 team members to each project
-      const shuffledMembers = [...members].sort(() => 0.5 - Math.random());
-      const projectMembers = shuffledMembers.slice(0, Math.floor(Math.random() * 4) + 2);
-
-      for (const member of projectMembers) {
-        for (const weekStart of julyWeeks) {
-          // Generate realistic hours (0-40, weighted towards common values)
-          const hoursOptions = [0, 8, 16, 20, 24, 32, 40];
-          const weights = [0.1, 0.15, 0.2, 0.25, 0.15, 0.1, 0.05]; // Favor 16-24 hours
-          
-          let random = Math.random();
-          let hours = 0;
-          for (let i = 0; i < hoursOptions.length; i++) {
-            random -= weights[i];
-            if (random <= 0) {
-              hours = hoursOptions[i];
-              break;
-            }
-          }
-
-          if (hours > 0) {
-            allocations.push({
-              project_id: project.id,
-              resource_id: member.id,
-              resource_type: 'active',
-              week_start_date: weekStart,
-              hours: hours,
-              company_id: profile.company_id
-            });
-          }
-        }
+    // Create allocation strategy for desired distribution:
+    // 80% of members at 40 hours (green)
+    // 10% of members under 40 hours (yellow) 
+    // 10% of members over 40 hours (red)
+    
+    const totalMembers = members.length;
+    const members40Hours = Math.ceil(totalMembers * 0.8); // 80%
+    const membersUnder40 = Math.ceil(totalMembers * 0.1); // 10%
+    const membersOver40 = totalMembers - members40Hours - membersUnder40; // remaining ~10%
+    
+    console.log(`Distribution: ${members40Hours} at 40h, ${membersUnder40} under 40h, ${membersOver40} over 40h`);
+    
+    // Shuffle members to randomize assignment
+    const shuffledMembers = [...members].sort(() => 0.5 - Math.random());
+    
+    // Assign members to different workload categories
+    const members40HoursList = shuffledMembers.slice(0, members40Hours);
+    const membersUnder40List = shuffledMembers.slice(members40Hours, members40Hours + membersUnder40);
+    const membersOver40List = shuffledMembers.slice(members40Hours + membersUnder40);
+    
+    // Ensure we have at least one project to allocate to
+    const primaryProject = projects[0];
+    
+    // Generate allocations for each category
+    for (const weekStart of julyWeeks) {
+      // 80% - Members with exactly 40 hours (green)
+      for (const member of members40HoursList) {
+        allocations.push({
+          project_id: primaryProject.id,
+          resource_id: member.id,
+          resource_type: 'active',
+          week_start_date: weekStart,
+          hours: 40,
+          company_id: profile.company_id
+        });
+      }
+      
+      // 10% - Members with under 40 hours (yellow)
+      for (const member of membersUnder40List) {
+        // Random hours between 20-35 for under-utilized
+        const hours = Math.floor(Math.random() * 16) + 20; // 20-35 hours
+        allocations.push({
+          project_id: primaryProject.id,
+          resource_id: member.id,
+          resource_type: 'active',
+          week_start_date: weekStart,
+          hours: hours,
+          company_id: profile.company_id
+        });
+      }
+      
+      // 10% - Members with over 40 hours (red)
+      for (const member of membersOver40List) {
+        // Random hours between 45-55 for over-allocated
+        const hours = Math.floor(Math.random() * 11) + 45; // 45-55 hours
+        allocations.push({
+          project_id: primaryProject.id,
+          resource_id: member.id,
+          resource_type: 'active',
+          week_start_date: weekStart,
+          hours: hours,
+          company_id: profile.company_id
+        });
       }
     }
 
