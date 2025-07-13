@@ -34,7 +34,12 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   selectedWeek = new Date()
 }) => {
   // Debug viewMode prop
-  console.log('NewResourceTable - Received viewMode:', viewMode);
+  console.log('NewResourceTable RENDER - Received viewMode:', viewMode);
+  
+  // Add useEffect to track viewMode changes  
+  React.useEffect(() => {
+    console.log('NewResourceTable useEffect - viewMode prop changed to:', viewMode);
+  }, [viewMode]);
   
   const tableClassName = viewMode === 'compact' 
     ? 'resource-table-compact weekly-table' 

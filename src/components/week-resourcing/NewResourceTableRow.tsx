@@ -36,6 +36,12 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = React.mem
   onOtherLeaveEdit,
   selectedWeek = new Date(),
 }) => {
+  // Debug viewMode changes
+  console.log(`NewResourceTableRow RENDER - Member ${member.id} received viewMode:`, viewMode);
+  
+  React.useEffect(() => {
+    console.log(`NewResourceTableRow useEffect - Member ${member.id} viewMode changed to:`, viewMode);
+  }, [viewMode, member.id]);
   const sharedProps = {
     member,
     memberIndex,

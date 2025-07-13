@@ -36,7 +36,12 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   const [viewMode, setViewMode] = useState<'compact' | 'expanded'>('compact');
   
   // Debug viewMode changes
-  console.log('WeekResourceView - Current viewMode:', viewMode);
+  console.log('WeekResourceView RENDER - Current viewMode:', viewMode);
+  
+  // Add useEffect to track viewMode changes
+  React.useEffect(() => {
+    console.log('WeekResourceView useEffect - viewMode changed to:', viewMode);
+  }, [viewMode]);
   
   // Stabilize filters to prevent unnecessary re-renders
   const stableFilters = useMemo(() => ({
@@ -245,8 +250,10 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                   variant={viewMode === 'compact' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => {
-                    console.log('Clicking Compact button, current viewMode:', viewMode);
+                    console.log('=== COMPACT BUTTON CLICKED ===');
+                    console.log('Current viewMode before change:', viewMode);
                     setViewMode('compact');
+                    console.log('setViewMode called with: compact');
                   }}
                   className="h-8 px-3 rounded-none"
                 >
@@ -257,8 +264,10 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                   variant={viewMode === 'expanded' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => {
-                    console.log('Clicking Expanded button, current viewMode:', viewMode);
+                    console.log('=== EXPANDED BUTTON CLICKED ===');
+                    console.log('Current viewMode before change:', viewMode);
                     setViewMode('expanded');
+                    console.log('setViewMode called with: expanded');
                   }}
                   className="h-8 px-3 rounded-none"
                 >

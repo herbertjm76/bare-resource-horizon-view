@@ -52,6 +52,7 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
       {/* Name Cell */}
       <TableCell className="border-r border-gray-200 px-4 py-3 min-w-[180px]">
         <div className="flex flex-col gap-2">
+          <div className="bg-green-100 text-green-600 text-xs px-1 py-0.5 rounded w-fit">EXPANDED</div>
           <div className="flex items-center gap-3">
             <NameCell member={member} />
           </div>
