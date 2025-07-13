@@ -97,35 +97,69 @@ serve(async (req) => {
 
     const allocations = [];
 
-    // Ensure we have at least one project to allocate to
-    const primaryProject = projects[0];
-    
-    // Generate allocations with random mix of red, green, yellow for each member/week
+    // Generate allocations with random distribution across projects
     for (const weekStart of weeks) {
       for (const member of allMembers) {
         // Randomly assign workload category for each member each week
         const random = Math.random();
-        let hours;
+        let totalHours;
         
         if (random < 0.7) {
           // 70% chance for green (exactly 40 hours)
-          hours = 40;
+          totalHours = 40;
         } else if (random < 0.85) {
           // 15% chance for yellow (under 40 hours)
-          hours = Math.floor(Math.random() * 16) + 20; // 20-35 hours
+          totalHours = Math.floor(Math.random() * 16) + 20; // 20-35 hours
         } else {
           // 15% chance for red (over 40 hours)
-          hours = Math.floor(Math.random() * 11) + 45; // 45-55 hours
+          totalHours = Math.floor(Math.random() * 11) + 45; // 45-55 hours
         }
         
-        allocations.push({
-          project_id: primaryProject.id,
-          resource_id: member.id,
-          resource_type: member.type,
-          week_start_date: weekStart,
-          hours: hours,
-          company_id: profile.company_id
-        });
+        // Randomly decide how many projects this member works on (1-3 projects)
+        const numProjects = Math.floor(Math.random() * 3) + 1;
+        const selectedProjects = projects.sort(() => 0.5 - Math.random()).slice(0, Math.min(numProjects, projects.length));
+        
+        if (selectedProjects.length === 1) {
+          // All hours go to one project
+          allocations.push({
+            project_id: selectedProjects[0].id,
+            resource_id: member.id,
+            resource_type: member.type,
+            week_start_date: weekStart,
+            hours: totalHours,
+            company_id: profile.company_id
+          });
+        } else {
+          // Split hours across multiple projects
+          let remainingHours = totalHours;
+          
+          for (let i = 0; i < selectedProjects.length; i++) {
+            let projectHours;
+            
+            if (i === selectedProjects.length - 1) {
+              // Last project gets remaining hours
+              projectHours = remainingHours;
+            } else {
+              // Randomly allocate 20-60% of remaining hours to this project
+              const percentage = Math.random() * 0.4 + 0.2; // 0.2 to 0.6
+              projectHours = Math.floor(remainingHours * percentage);
+              projectHours = Math.max(1, projectHours); // At least 1 hour
+            }
+            
+            if (projectHours > 0) {
+              allocations.push({
+                project_id: selectedProjects[i].id,
+                resource_id: member.id,
+                resource_type: member.type,
+                week_start_date: weekStart,
+                hours: projectHours,
+                company_id: profile.company_id
+              });
+              
+              remainingHours -= projectHours;
+            }
+          }
+        }
       }
     }
 
