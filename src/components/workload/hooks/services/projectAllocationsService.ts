@@ -6,18 +6,21 @@ import { format, startOfWeek, endOfWeek, addDays, addWeeks, parseISO } from 'dat
 export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
   const { companyId, memberIds, startDate, numberOfWeeks } = params;
   
-  // Calculate the end date for the period - include the full last week
-  const endDate = addWeeks(startDate, numberOfWeeks);
+  // Generate all week start dates for the period to match Project Resourcing logic
+  const weekStartDates = [];
+  for (let i = 0; i < numberOfWeeks; i++) {
+    const weekStart = addWeeks(startDate, i);
+    weekStartDates.push(format(weekStart, 'yyyy-MM-dd'));
+  }
   
   console.log('🔍 PROJECT ALLOCATIONS: Fetching with parameters:', {
     companyId,
     memberIds: memberIds.length,
-    startDate: format(startDate, 'yyyy-MM-dd'),
-    endDate: format(endDate, 'yyyy-MM-dd'),
+    weekStartDates: weekStartDates.slice(0, 3) + '...',
     numberOfWeeks
   });
 
-  // Query for allocations with only 'active' resource types (exclude pre_registered dummy data)
+  // Use the SAME query approach as Project Resourcing (useDetailedWeeklyAllocations)
   const { data, error } = await supabase
     .from('project_resource_allocations')
     .select(`
@@ -30,45 +33,16 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     `)
     .eq('company_id', companyId)
     .in('resource_id', memberIds)
-    .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
-    .lt('week_start_date', format(endDate, 'yyyy-MM-dd'))
-    .eq('resource_type', 'active');
+    .in('week_start_date', weekStartDates)
+    .gt('hours', 0);
 
   if (error) {
     console.error('🔍 PROJECT ALLOCATIONS: Error fetching project allocations:', error);
     throw error;
   }
 
-  console.log('🔍 PROJECT ALLOCATIONS: Fetched allocations:', data?.length || 0);
-
-  // If we still have no data, try a fallback query without resource_type filter
-  if (!data || data.length === 0) {
-    console.log('🔍 PROJECT ALLOCATIONS: No data found, trying fallback query...');
-    
-    const { data: fallbackData, error: fallbackError } = await supabase
-      .from('project_resource_allocations')
-      .select(`
-        resource_id,
-        project_id,
-        hours,
-        week_start_date,
-        resource_type,
-        projects!inner(id, name, code)
-      `)
-      .eq('company_id', companyId)
-      .in('resource_id', memberIds)
-      .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
-      .lt('week_start_date', format(endDate, 'yyyy-MM-dd'));
-
-    if (fallbackError) {
-      console.error('🔍 PROJECT ALLOCATIONS: Error in fallback query:', fallbackError);
-      throw fallbackError;
-    }
-
-    console.log('🔍 PROJECT ALLOCATIONS: Fallback query result:', fallbackData?.length || 0);
-    return fallbackData || [];
-  }
-
+  console.log('🔍 PROJECT ALLOCATIONS: Fetched allocations (using Project Resourcing logic):', data?.length || 0);
+  
   return data || [];
 };
 
