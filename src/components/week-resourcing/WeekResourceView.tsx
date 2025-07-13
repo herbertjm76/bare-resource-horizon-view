@@ -1,10 +1,10 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, X, Calendar, Users, Clock, TrendingUp } from 'lucide-react';
+import { Search, Filter, X, Calendar, Users, Clock, TrendingUp, Expand, Minimize2 } from 'lucide-react';
 import { WeekStartSelector } from '@/components/workload/WeekStartSelector';
 import { NewResourceTable } from './NewResourceTable';
 import { useStreamlinedWeekResourceData } from './hooks/useStreamlinedWeekResourceData';
@@ -32,6 +32,9 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   filters,
   onFilterChange
 }) => {
+  // View mode state for expand/collapse functionality
+  const [viewMode, setViewMode] = useState<'compact' | 'expanded'>('compact');
+  
   // Stabilize filters to prevent unnecessary re-renders
   const stableFilters = useMemo(() => ({
     office: filters.office,
@@ -230,6 +233,31 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                 </Button>
               )}
             </div>
+
+            {/* View Controls */}
+            <div className="flex items-center gap-2">
+              {/* View Mode Toggle */}
+              <div className="flex items-center border rounded-lg overflow-hidden bg-white">
+                <Button
+                  variant={viewMode === 'compact' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('compact')}
+                  className="h-8 px-3 rounded-none"
+                >
+                  <Minimize2 className="w-4 h-4 mr-1" />
+                  Compact
+                </Button>
+                <Button
+                  variant={viewMode === 'expanded' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setViewMode('expanded')}
+                  className="h-8 px-3 rounded-none"
+                >
+                  <Expand className="w-4 h-4 mr-1" />
+                  Expanded
+                </Button>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -303,7 +331,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             getProjectCount={getProjectCount}
             getWeeklyLeave={getWeeklyLeave}
             updateOtherLeave={updateOtherLeave}
-            viewMode="compact"
+            viewMode={viewMode}
             selectedWeek={selectedWeek}
           />
         </CardContent>
