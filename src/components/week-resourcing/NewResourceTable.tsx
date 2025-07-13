@@ -42,7 +42,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     : 'resource-table-expanded-container';
 
   return (
-    <div className={containerClassName} style={{ maxWidth: 'calc(100vw - 19rem)' }}>
+    <div className={containerClassName}>
       <div className="overflow-x-auto">
         <Table className={`${tableClassName} min-w-full`}>
           <TableHeader>
