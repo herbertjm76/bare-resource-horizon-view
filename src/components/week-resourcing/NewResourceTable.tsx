@@ -33,6 +33,9 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   viewMode,
   selectedWeek = new Date()
 }) => {
+  // Debug viewMode prop
+  console.log('NewResourceTable - Received viewMode:', viewMode);
+  
   const tableClassName = viewMode === 'compact' 
     ? 'resource-table-compact weekly-table' 
     : 'resource-table-expanded weekly-table';
@@ -40,6 +43,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
   const containerClassName = viewMode === 'compact'
     ? 'resource-table-compact-container'
     : 'resource-table-expanded-container';
+
+  console.log('NewResourceTable - Using classes:', { tableClassName, containerClassName });
 
   return (
     <div className={containerClassName}>

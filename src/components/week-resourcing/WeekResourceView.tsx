@@ -35,6 +35,9 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   // View mode state for expand/collapse functionality
   const [viewMode, setViewMode] = useState<'compact' | 'expanded'>('compact');
   
+  // Debug viewMode changes
+  console.log('WeekResourceView - Current viewMode:', viewMode);
+  
   // Stabilize filters to prevent unnecessary re-renders
   const stableFilters = useMemo(() => ({
     office: filters.office,
@@ -241,7 +244,10 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                 <Button
                   variant={viewMode === 'compact' ? 'default' : 'ghost'}
                   size="sm"
-                  onClick={() => setViewMode('compact')}
+                  onClick={() => {
+                    console.log('Clicking Compact button, current viewMode:', viewMode);
+                    setViewMode('compact');
+                  }}
                   className="h-8 px-3 rounded-none"
                 >
                   <Minimize2 className="w-4 h-4 mr-1" />
@@ -250,7 +256,10 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                 <Button
                   variant={viewMode === 'expanded' ? 'default' : 'ghost'}
                   size="sm"
-                  onClick={() => setViewMode('expanded')}
+                  onClick={() => {
+                    console.log('Clicking Expanded button, current viewMode:', viewMode);
+                    setViewMode('expanded');
+                  }}
                   className="h-8 px-3 rounded-none"
                 >
                   <Expand className="w-4 h-4 mr-1" />
@@ -331,7 +340,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             getProjectCount={getProjectCount}
             getWeeklyLeave={getWeeklyLeave}
             updateOtherLeave={updateOtherLeave}
-            viewMode={viewMode}
+            viewMode={viewMode} // Debug: {viewMode}
             selectedWeek={selectedWeek}
           />
         </CardContent>
