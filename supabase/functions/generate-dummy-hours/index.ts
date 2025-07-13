@@ -78,22 +78,22 @@ serve(async (req) => {
       });
     }
 
-    // Generate July 2025 week start dates (Mondays)
-    const julyWeeks = [
-      '2025-06-30', // Week containing July 1st
-      '2025-07-07',
-      '2025-07-14', 
-      '2025-07-21',
-      '2025-07-28'
-    ];
+    // Generate 16 weeks starting from July 7, 2025
+    const weeks = [];
+    const startDate = new Date('2025-07-07');
+    for (let i = 0; i < 16; i++) {
+      const weekDate = new Date(startDate);
+      weekDate.setDate(startDate.getDate() + (i * 7));
+      weeks.push(weekDate.toISOString().split('T')[0]);
+    }
 
-    // Clear existing July allocations first
+    // Clear existing allocations for the 16-week period first
     await supabaseClient
       .from('project_resource_allocations')
       .delete()
       .eq('company_id', profile.company_id)
-      .gte('week_start_date', '2025-06-30')
-      .lte('week_start_date', '2025-07-28');
+      .gte('week_start_date', weeks[0])
+      .lte('week_start_date', weeks[weeks.length - 1]);
 
     const allocations = [];
 
@@ -122,7 +122,7 @@ serve(async (req) => {
     const primaryProject = projects[0];
     
     // Generate allocations for each category
-    for (const weekStart of julyWeeks) {
+    for (const weekStart of weeks) {
       // 80% - Members with exactly 40 hours (green)
       for (const member of members40HoursList) {
         allocations.push({
@@ -177,11 +177,11 @@ serve(async (req) => {
       });
     }
 
-    console.log(`Generated ${allocations.length} dummy allocations for July 2025`);
+    console.log(`Generated ${allocations.length} dummy allocations for 16 weeks`);
 
     return new Response(JSON.stringify({ 
       success: true, 
-      message: `Generated ${allocations.length} dummy hour allocations for July 2025 (${activeMembers?.length || 0} active + ${pendingMembers?.length || 0} pending members)`,
+      message: `Generated ${allocations.length} dummy hour allocations for 16 weeks (${activeMembers?.length || 0} active + ${pendingMembers?.length || 0} pending members)`,
       projectsProcessed: projects.length,
       membersInvolved: allMembers.length,
       activeMembers: activeMembers?.length || 0,
