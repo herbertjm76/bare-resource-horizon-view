@@ -7,6 +7,7 @@ import { useWeeklyWorkloadData } from './hooks/useWeeklyWorkloadData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WorkloadHeaderControls } from './components/WorkloadHeaderControls';
 import { WorkloadMetricsCards } from './components/WorkloadMetricsCards';
+import { PopulateDummyDataButton } from './PopulateDummyDataButton';
 
 interface TeamWorkloadContentProps {
   selectedWeek: Date;
@@ -98,9 +99,12 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
       {/* Weekly Workload Calendar */}
       <Card className="border-none shadow-sm">
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-semibold">
-            Weekly Team Workload ({selectedWeeks} weeks)
-          </CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-lg font-semibold">
+              Weekly Team Workload ({selectedWeeks} weeks)
+            </CardTitle>
+            <PopulateDummyDataButton />
+          </div>
         </CardHeader>
         <CardContent className="p-0">
           <WeeklyWorkloadCalendar
