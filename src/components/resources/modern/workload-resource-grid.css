@@ -90,6 +90,60 @@
   background-color: #f3f4f6 !important;
 }
 
+/* Project Header Row - Distinctive Gradient Background */
+.workload-resource-row.project-header-row {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground)));
+  border-bottom: 2px solid rgba(156, 163, 175, 0.8);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.workload-resource-row.project-header-row .workload-resource-cell {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground))) !important;
+  color: white;
+}
+
+.workload-resource-row.project-header-row:hover .workload-resource-cell {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground))) !important;
+  opacity: 0.95;
+}
+
+/* Resource Row - Indented and Lighter */
+.workload-resource-row.resource-row {
+  background-color: #fcfcfc;
+}
+
+.workload-resource-row.resource-row .workload-resource-cell.project-resource-column {
+  padding-left: 32px !important; /* Indentation to show hierarchy */
+  border-left: 3px solid hsl(var(--primary)) !important; /* Subtle color indicator */
+  background-color: #fcfcfc !important;
+}
+
+.workload-resource-row.resource-row:hover {
+  background-color: #f8f9fa !important;
+}
+
+.workload-resource-row.resource-row:hover .workload-resource-cell {
+  background-color: #f8f9fa !important;
+}
+
+/* Add Resource Row - Special Styling */
+.workload-resource-row.add-resource-row {
+  background-color: #fafbfc;
+  border-top: 1px dashed rgba(156, 163, 175, 0.4);
+}
+
+.workload-resource-row.add-resource-row .workload-resource-cell.project-resource-column {
+  padding-left: 32px !important;
+}
+
+.workload-resource-row.add-resource-row:hover {
+  background-color: #f5f6f7 !important;
+}
+
+.workload-resource-row.add-resource-row:hover .workload-resource-cell {
+  background-color: #f5f6f7 !important;
+}
+
 /* Cell Styles */
 .workload-resource-cell {
   vertical-align: middle;

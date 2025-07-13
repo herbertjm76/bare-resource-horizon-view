@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronRight, Users } from 'lucide-react';
 import { WorkloadStyleResourceRow } from './WorkloadStyleResourceRow';
+import { AddResourceRow } from '../components/AddResourceRow';
+import { AddResourceDialog } from '../dialogs/AddResourceDialog';
 import { useProjectResources } from '../hooks/useProjectResources';
 import { DayInfo } from '../grid/types';
 
@@ -25,7 +27,17 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
   selectedDate,
   periodToShow
 }) => {
-  const { resources, isLoading, projectAllocations, getAllocationKey, handleAllocationChange } = useProjectResources(project.id);
+  const { 
+    resources, 
+    isLoading, 
+    projectAllocations, 
+    getAllocationKey, 
+    handleAllocationChange,
+    handleAddResource,
+    refreshResources 
+  } = useProjectResources(project.id);
+  
+  const [showAddResourceDialog, setShowAddResourceDialog] = useState(false);
   
   const rowBgColor = isEven ? '#ffffff' : '#f9fafb';
   
@@ -37,7 +49,6 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
         <td 
           className="workload-resource-cell project-resource-column"
           style={{
-            backgroundColor: rowBgColor,
             width: '250px',
             minWidth: '250px',
             maxWidth: '250px',
@@ -59,24 +70,25 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                 width: '24px', 
                 height: '24px', 
                 padding: '0',
-                border: '1px solid #d1d5db',
-                backgroundColor: 'white'
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                color: 'white'
               }}
               onClick={onToggleExpand}
               disabled={isLoading}
             >
               {isExpanded ? (
-                <ChevronDown style={{ width: '12px', height: '12px' }} />
+                <ChevronDown style={{ width: '12px', height: '12px', color: 'white' }} />
               ) : (
-                <ChevronRight style={{ width: '12px', height: '12px' }} />
+                <ChevronRight style={{ width: '12px', height: '12px', color: 'white' }} />
               )}
             </Button>
             
             <div style={{ flex: '1', minWidth: '0' }}>
               <h3 style={{ 
-                fontSize: '14px', 
-                fontWeight: '500', 
-                color: '#111827',
+                fontSize: '15px', 
+                fontWeight: '600', 
+                color: 'white',
                 margin: '0',
                 lineHeight: '1.2',
                 overflow: 'hidden',
@@ -96,15 +108,15 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                   alignItems: 'center', 
                   gap: '4px',
                   fontSize: '12px',
-                  color: '#6b7280'
+                  color: 'rgba(255, 255, 255, 0.8)'
                 }}>
                   <Users style={{ width: '12px', height: '12px' }} />
                   {resources.length} resources
                 </span>
                 {project.code && (
                   <span style={{ 
-                    backgroundColor: '#e5e7eb',
-                    color: '#374151',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                    color: 'white',
                     padding: '2px 6px',
                     borderRadius: '4px',
                     fontSize: '11px',
@@ -129,8 +141,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
             return total + hours;
           }, 0);
           
-          let cellBgColor = rowBgColor;
-          if (day.isWeekend) cellBgColor = '#f3f4f6';
+          let cellBgColor = 'transparent'; // Let CSS gradient show through
           
           return (
             <td 
@@ -140,7 +151,6 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                 width: '30px', 
                 minWidth: '30px',
                 maxWidth: '30px',
-                backgroundColor: cellBgColor,
                 textAlign: 'center',
                 padding: '2px',
                 borderRight: '1px solid rgba(156, 163, 175, 0.6)',
@@ -156,14 +166,14 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
               }}>
                 {dayTotal > 0 ? (
                   <span style={{ 
-                    fontSize: '14px',
+                    fontSize: '12px',
                     fontWeight: '700',
-                    backgroundColor: '#6465F0',
+                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
                     color: 'white',
-                    padding: '0',
+                    padding: '2px 6px',
                     borderRadius: '3px',
-                    minWidth: '24px',
-                    minHeight: '24px',
+                    minWidth: '20px',
+                    minHeight: '20px',
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -172,7 +182,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                   </span>
                 ) : (
                   <span style={{ 
-                    color: 'hsl(var(--muted-foreground))',
+                    color: 'rgba(255, 255, 255, 0.6)',
                     fontSize: '12px'
                   }}>
                     —
@@ -198,6 +208,29 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
           onAllocationChange={handleAllocationChange}
         />
       ))}
+
+      {/* Add Resource Row (when expanded) */}
+      {isExpanded && (
+        <AddResourceRow
+          isExpanded={true}
+          rowBgClass="add-resource-row"
+          daysCount={days.length}
+          onAddResource={() => setShowAddResourceDialog(true)}
+        />
+      )}
+
+      {/* Add Resource Dialog */}
+      {showAddResourceDialog && (
+        <AddResourceDialog
+          projectId={project.id}
+          onClose={() => setShowAddResourceDialog(false)}
+          onAdd={async (resource) => {
+            await handleAddResource(resource);
+            await refreshResources();
+            setShowAddResourceDialog(false);
+          }}
+        />
+      )}
     </>
   );
 };

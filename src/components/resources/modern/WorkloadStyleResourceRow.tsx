@@ -63,7 +63,6 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
       <td 
         className="workload-resource-cell project-resource-column"
         style={{
-          backgroundColor: rowBgColor,
           width: '250px',
           minWidth: '250px',
           maxWidth: '250px',
@@ -78,26 +77,26 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
           height: '32px'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%' }}>
-            <AvatarImage src={resource.avatar_url} alt={displayName} />
-            <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white' }}>
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div style={{ flex: '1', minWidth: '0' }}>
-            <span style={{ 
-              fontSize: '13px',
-              fontWeight: '500',
-              color: '#111827',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
-            }}>
-              {displayName}
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%' }}>
+              <AvatarImage src={resource.avatar_url} alt={displayName} />
+              <AvatarFallback style={{ backgroundColor: 'hsl(var(--primary))', color: 'white' }}>
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            <div style={{ flex: '1', minWidth: '0' }}>
+              <span style={{ 
+                fontSize: '13px',
+                fontWeight: '400',
+                color: 'hsl(var(--muted-foreground))',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                {displayName}
+              </span>
+            </div>
           </div>
-        </div>
       </td>
       
       {/* Day allocation cells */}
@@ -106,8 +105,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
         // Get allocation from the proper allocation system
         const allocation = allocations[dayKey] || 0;
         
-        let cellBgColor = rowBgColor;
-        if (day.isWeekend) cellBgColor = '#f3f4f6';
+        let cellBgColor = 'transparent'; // Let CSS handle the background
         
         return (
           <td 
@@ -117,7 +115,6 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
               width: '30px', 
               minWidth: '30px',
               maxWidth: '30px',
-              backgroundColor: cellBgColor,
               textAlign: 'center',
               padding: '2px',
               borderRight: '1px solid rgba(156, 163, 175, 0.6)',

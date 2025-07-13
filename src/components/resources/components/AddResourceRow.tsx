@@ -19,16 +19,23 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
   if (!isExpanded) return null;
   
   return (
-    <tr className={`border-b ${rowBgClass} hover:bg-gray-50 h-10`}>
-      {/* Fixed counter column */}
-      <td className={`counter-column ${rowBgClass} p-0.5 hover:bg-gray-50`}></td>
-      
-      {/* Add Resource button in project name column */}
-      <td className={`project-name-column ${rowBgClass} p-2 hover:bg-gray-50`}>
+    <tr className={`workload-resource-row add-resource-row border-b hover:bg-gray-50 h-10`}>
+      {/* Add Resource button spans the full project resource column */}
+      <td 
+        className={`workload-resource-cell project-resource-column p-2`}
+        style={{
+          width: '250px',
+          minWidth: '250px',
+          maxWidth: '250px',
+          position: 'sticky',
+          left: '0',
+          zIndex: 20
+        }}
+      >
         <Button 
           variant="default"
           size="sm" 
-          className="flex items-center text-xs ml-4"
+          className="flex items-center text-xs"
           onClick={onAddResource}
         >
           <UserPlus className="h-3.5 w-3.5 mr-1.5" />
@@ -38,7 +45,7 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
       
       {/* Empty day columns */}
       {Array.from({ length: daysCount }, (_, index) => (
-        <td key={index} className="day-column p-0"></td>
+        <td key={index} className="workload-resource-cell day-column p-0"></td>
       ))}
     </tr>
   );
