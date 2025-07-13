@@ -51,13 +51,27 @@ serve(async (req) => {
       .select('id, name')
       .eq('company_id', profile.company_id);
 
-    // Get all team members for the company
-    const { data: members } = await supabaseClient
+    // Get all active team members for the company
+    const { data: activeMembers } = await supabaseClient
       .from('profiles')
       .select('id, first_name, last_name')
       .eq('company_id', profile.company_id);
 
-    if (!projects || projects.length === 0 || !members || members.length === 0) {
+    // Get all pending users (pre-registered invites) for the company
+    const { data: pendingMembers } = await supabaseClient
+      .from('invites')
+      .select('id, first_name, last_name')
+      .eq('company_id', profile.company_id)
+      .eq('status', 'pending')
+      .eq('invitation_type', 'pre_registered');
+
+    // Combine active and pending members
+    const allMembers = [
+      ...(activeMembers || []).map(member => ({ ...member, type: 'active' })),
+      ...(pendingMembers || []).map(member => ({ ...member, type: 'pre_registered' }))
+    ];
+
+    if (!projects || projects.length === 0 || allMembers.length === 0) {
       return new Response(JSON.stringify({ error: 'No projects or team members found' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -88,15 +102,16 @@ serve(async (req) => {
     // 10% of members under 40 hours (yellow) 
     // 10% of members over 40 hours (red)
     
-    const totalMembers = members.length;
+    const totalMembers = allMembers.length;
     const members40Hours = Math.ceil(totalMembers * 0.8); // 80%
     const membersUnder40 = Math.ceil(totalMembers * 0.1); // 10%
     const membersOver40 = totalMembers - members40Hours - membersUnder40; // remaining ~10%
     
     console.log(`Distribution: ${members40Hours} at 40h, ${membersUnder40} under 40h, ${membersOver40} over 40h`);
+    console.log(`Total members: ${totalMembers} (${activeMembers?.length || 0} active + ${pendingMembers?.length || 0} pending)`);
     
     // Shuffle members to randomize assignment
-    const shuffledMembers = [...members].sort(() => 0.5 - Math.random());
+    const shuffledMembers = [...allMembers].sort(() => 0.5 - Math.random());
     
     // Assign members to different workload categories
     const members40HoursList = shuffledMembers.slice(0, members40Hours);
@@ -113,7 +128,7 @@ serve(async (req) => {
         allocations.push({
           project_id: primaryProject.id,
           resource_id: member.id,
-          resource_type: 'active',
+          resource_type: member.type,
           week_start_date: weekStart,
           hours: 40,
           company_id: profile.company_id
@@ -127,7 +142,7 @@ serve(async (req) => {
         allocations.push({
           project_id: primaryProject.id,
           resource_id: member.id,
-          resource_type: 'active',
+          resource_type: member.type,
           week_start_date: weekStart,
           hours: hours,
           company_id: profile.company_id
@@ -141,7 +156,7 @@ serve(async (req) => {
         allocations.push({
           project_id: primaryProject.id,
           resource_id: member.id,
-          resource_type: 'active',
+          resource_type: member.type,
           week_start_date: weekStart,
           hours: hours,
           company_id: profile.company_id
@@ -166,9 +181,11 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ 
       success: true, 
-      message: `Generated ${allocations.length} dummy hour allocations for July 2025`,
+      message: `Generated ${allocations.length} dummy hour allocations for July 2025 (${activeMembers?.length || 0} active + ${pendingMembers?.length || 0} pending members)`,
       projectsProcessed: projects.length,
-      membersInvolved: members.length
+      membersInvolved: allMembers.length,
+      activeMembers: activeMembers?.length || 0,
+      pendingMembers: pendingMembers?.length || 0
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
