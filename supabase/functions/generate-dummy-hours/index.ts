@@ -78,16 +78,16 @@ serve(async (req) => {
       });
     }
 
-    // Generate 16 weeks starting from July 7, 2025
+    // Generate 24 weeks starting from July 7, 2025
     const weeks = [];
     const startDate = new Date('2025-07-07');
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < 24; i++) {
       const weekDate = new Date(startDate);
       weekDate.setDate(startDate.getDate() + (i * 7));
       weeks.push(weekDate.toISOString().split('T')[0]);
     }
 
-    // Clear existing allocations for the 16-week period first
+    // Clear existing allocations for the 24-week period first
     await supabaseClient
       .from('project_resource_allocations')
       .delete()
@@ -176,11 +176,11 @@ serve(async (req) => {
       });
     }
 
-    console.log(`Generated ${allocations.length} dummy allocations for 16 weeks`);
+    console.log(`Generated ${allocations.length} dummy allocations for 24 weeks`);
 
     return new Response(JSON.stringify({ 
       success: true, 
-      message: `Generated ${allocations.length} dummy hour allocations for 16 weeks (${activeMembers?.length || 0} active + ${pendingMembers?.length || 0} pending members)`,
+      message: `Generated ${allocations.length} dummy hour allocations for 24 weeks (${activeMembers?.length || 0} active + ${pendingMembers?.length || 0} pending members)`,
       projectsProcessed: projects.length,
       membersInvolved: allMembers.length,
       activeMembers: activeMembers?.length || 0,
