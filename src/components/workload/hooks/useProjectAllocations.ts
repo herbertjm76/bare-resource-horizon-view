@@ -50,6 +50,14 @@ export const useProjectAllocations = (
         }
 
         console.log('🔍 PROJECT ALLOCATIONS: Fetched', allocations?.length || 0, 'allocation records');
+        console.log('🔍 PROJECT ALLOCATIONS: Raw data for debugging:', allocations);
+        
+        // Debug: Find Paul Julius specifically for July 7 week
+        const paulJuliusAllocations = allocations?.filter(a => 
+          a.resource_id === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' && // Paul's ID
+          a.week_start_date === '2025-07-07' // July 7 week
+        );
+        console.log('🔍 DEBUG: Paul Julius allocations for July 7 week:', paulJuliusAllocations);
         
         const projectHours: Record<string, Record<string, number>> = {};
         
@@ -63,6 +71,12 @@ export const useProjectAllocations = (
           
           const weekStartDate = new Date(allocation.week_start_date);
           const weeklyHours = Number(allocation.hours) || 0;
+          
+          // Extra debug for Paul Julius July 7 week
+          if (allocation.resource_id === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' && 
+              allocation.week_start_date === '2025-07-07') {
+            console.log(`🔍 DEBUG PAUL JULY 7: Processing ${weeklyHours}h from project ${allocation.project?.name}`);
+          }
           
           console.log(`🔍 PROJECT ALLOCATIONS: Processing - Resource: ${allocation.resource_id}, Week: ${allocation.week_start_date}, Hours: ${weeklyHours}`);
           
@@ -80,6 +94,13 @@ export const useProjectAllocations = (
           // Only distribute hours if there are working days
           if (workingDays.length > 0) {
             const dailyHours = weeklyHours / workingDays.length;
+            
+            // Extra debug for Paul Julius July 7
+            if (allocation.resource_id === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' && 
+                allocation.week_start_date === '2025-07-07') {
+              console.log(`🔍 DEBUG PAUL JULY 7: Distributing ${weeklyHours}h across ${workingDays.length} working days = ${dailyHours}h per day`);
+              console.log(`🔍 DEBUG PAUL JULY 7: Working days:`, workingDays.map(d => format(d, 'yyyy-MM-dd')));
+            }
             
             workingDays.forEach(workDay => {
               const dateKey = format(workDay, 'yyyy-MM-dd');
