@@ -312,6 +312,7 @@ export const CompactRowView = memo(CompactRowViewComponent, (prevProps, nextProp
   const membersEqual = prevProps.member.id === nextProps.member.id;
   const indexEqual = prevProps.memberIndex === nextProps.memberIndex;
   const projectsEqual = prevProps.projects.length === nextProps.projects.length;
+  const viewModeEqual = prevProps.viewMode === nextProps.viewMode;
   
-  return membersEqual && indexEqual && projectsEqual;
+  return membersEqual && indexEqual && projectsEqual && viewModeEqual;
 });

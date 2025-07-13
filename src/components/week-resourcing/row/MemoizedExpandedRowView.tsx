@@ -132,6 +132,7 @@ export const ExpandedRowView = memo(ExpandedRowViewComponent, (prevProps, nextPr
     prevProps.member.id === nextProps.member.id &&
     prevProps.memberIndex === nextProps.memberIndex &&
     prevProps.projects.length === nextProps.projects.length &&
-    prevProps.allocationMap.size === nextProps.allocationMap.size
+    prevProps.allocationMap.size === nextProps.allocationMap.size &&
+    prevProps.viewMode === nextProps.viewMode
   );
 });

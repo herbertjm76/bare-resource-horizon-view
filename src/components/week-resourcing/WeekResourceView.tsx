@@ -245,7 +245,6 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                   variant={viewMode === 'compact' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => {
-                    alert(`Clicking Compact! Current mode: ${viewMode}`);
                     console.log('Clicking Compact button, current viewMode:', viewMode);
                     setViewMode('compact');
                   }}
@@ -258,7 +257,6 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
                   variant={viewMode === 'expanded' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => {
-                    alert(`Clicking Expanded! Current mode: ${viewMode}`);
                     console.log('Clicking Expanded button, current viewMode:', viewMode);
                     setViewMode('expanded');
                   }}
