@@ -97,62 +97,27 @@ serve(async (req) => {
 
     const allocations = [];
 
-    // Create allocation strategy for desired distribution:
-    // 80% of members at 40 hours (green)
-    // 10% of members under 40 hours (yellow) 
-    // 10% of members over 40 hours (red)
-    
-    const totalMembers = allMembers.length;
-    const members40Hours = Math.ceil(totalMembers * 0.8); // 80%
-    const membersUnder40 = Math.ceil(totalMembers * 0.1); // 10%
-    const membersOver40 = totalMembers - members40Hours - membersUnder40; // remaining ~10%
-    
-    console.log(`Distribution: ${members40Hours} at 40h, ${membersUnder40} under 40h, ${membersOver40} over 40h`);
-    console.log(`Total members: ${totalMembers} (${activeMembers?.length || 0} active + ${pendingMembers?.length || 0} pending)`);
-    
-    // Shuffle members to randomize assignment
-    const shuffledMembers = [...allMembers].sort(() => 0.5 - Math.random());
-    
-    // Assign members to different workload categories
-    const members40HoursList = shuffledMembers.slice(0, members40Hours);
-    const membersUnder40List = shuffledMembers.slice(members40Hours, members40Hours + membersUnder40);
-    const membersOver40List = shuffledMembers.slice(members40Hours + membersUnder40);
-    
     // Ensure we have at least one project to allocate to
     const primaryProject = projects[0];
     
-    // Generate allocations for each category
+    // Generate allocations with random mix of red, green, yellow for each member/week
     for (const weekStart of weeks) {
-      // 80% - Members with exactly 40 hours (green)
-      for (const member of members40HoursList) {
-        allocations.push({
-          project_id: primaryProject.id,
-          resource_id: member.id,
-          resource_type: member.type,
-          week_start_date: weekStart,
-          hours: 40,
-          company_id: profile.company_id
-        });
-      }
-      
-      // 10% - Members with under 40 hours (yellow)
-      for (const member of membersUnder40List) {
-        // Random hours between 20-35 for under-utilized
-        const hours = Math.floor(Math.random() * 16) + 20; // 20-35 hours
-        allocations.push({
-          project_id: primaryProject.id,
-          resource_id: member.id,
-          resource_type: member.type,
-          week_start_date: weekStart,
-          hours: hours,
-          company_id: profile.company_id
-        });
-      }
-      
-      // 10% - Members with over 40 hours (red)
-      for (const member of membersOver40List) {
-        // Random hours between 45-55 for over-allocated
-        const hours = Math.floor(Math.random() * 11) + 45; // 45-55 hours
+      for (const member of allMembers) {
+        // Randomly assign workload category for each member each week
+        const random = Math.random();
+        let hours;
+        
+        if (random < 0.7) {
+          // 70% chance for green (exactly 40 hours)
+          hours = 40;
+        } else if (random < 0.85) {
+          // 15% chance for yellow (under 40 hours)
+          hours = Math.floor(Math.random() * 16) + 20; // 20-35 hours
+        } else {
+          // 15% chance for red (over 40 hours)
+          hours = Math.floor(Math.random() * 11) + 45; // 45-55 hours
+        }
+        
         allocations.push({
           project_id: primaryProject.id,
           resource_id: member.id,
