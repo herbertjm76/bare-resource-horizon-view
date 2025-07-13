@@ -58,16 +58,26 @@ export const NewResourceTableRow: React.FC<NewResourceTableRowProps> = React.mem
 
   return <CompactRowView {...sharedProps} viewMode="compact" />;
 }, (prevProps, nextProps) => {
-  // Simplified comparison - only check essential props that actually change
-  return (
+  // Include viewMode in the comparison to ensure re-render when view mode changes
+  const isEqual = (
     prevProps.member.id === nextProps.member.id &&
     prevProps.memberIndex === nextProps.memberIndex &&
     prevProps.viewMode === nextProps.viewMode &&
     prevProps.projects.length === nextProps.projects.length &&
     prevProps.allocationMap.size === nextProps.allocationMap.size &&
-    // Compare critical data objects by reference (they should be stable from the hook)
     prevProps.annualLeaveData === nextProps.annualLeaveData &&
     prevProps.holidaysData === nextProps.holidaysData &&
     prevProps.otherLeaveData === nextProps.otherLeaveData
   );
+  
+  // Debug log to see when component should re-render
+  if (!isEqual) {
+    console.log('NewResourceTableRow re-rendering due to prop changes:', {
+      memberId: nextProps.member.id,
+      viewMode: nextProps.viewMode,
+      previousViewMode: prevProps.viewMode
+    });
+  }
+  
+  return isEqual;
 });
