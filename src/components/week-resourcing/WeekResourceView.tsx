@@ -242,33 +242,24 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
               )}
             </div>
 
-            {/* View Controls - NEW IMPLEMENTATION */}
+            {/* View Controls - Single Toggle Button */}
             <div className="flex items-center gap-2">
-              <div className="bg-gray-100 p-1 rounded-lg flex">
-                <button
-                  onClick={() => setViewMode('compact')}
-                  className={`px-3 py-1 text-sm font-medium rounded transition-all ${
-                    viewMode === 'compact' 
-                      ? 'bg-white text-gray-900 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  📊 Compact
-                </button>
-                <button
-                  onClick={() => setViewMode('expanded')}
-                  className={`px-3 py-1 text-sm font-medium rounded transition-all ${
-                    viewMode === 'expanded' 
-                      ? 'bg-white text-gray-900 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  📋 Expanded
-                </button>
-              </div>
-              <div className="text-sm text-gray-500">
-                Current: <span className="font-medium">{viewMode}</span>
-              </div>
+              <button
+                onClick={() => setViewMode(viewMode === 'compact' ? 'expanded' : 'compact')}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                {viewMode === 'compact' ? (
+                  <>
+                    <Expand className="w-4 h-4" />
+                    Expand
+                  </>
+                ) : (
+                  <>
+                    <Minimize2 className="w-4 h-4" />
+                    Collapse
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </CardContent>
