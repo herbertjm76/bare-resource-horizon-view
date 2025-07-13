@@ -97,41 +97,56 @@ serve(async (req) => {
 
     const allocations = [];
 
-    // Generate allocations with random distribution across projects
+    // Generate realistic allocations with proper daily hour limits
     for (const weekStart of weeks) {
       for (const member of allMembers) {
-        // Randomly assign workload category for each member each week
-        const random = Math.random();
-        let totalHours;
+        // Randomly assign allocation scenario for each member each week
+        const scenario = Math.random();
+        let weeklyHours;
+        let maxProjectsForMember;
         
-        if (random < 0.7) {
-          // 70% chance for green (exactly 40 hours)
-          totalHours = 40;
-        } else if (random < 0.85) {
-          // 15% chance for yellow (under 40 hours)
-          totalHours = Math.floor(Math.random() * 16) + 20; // 20-35 hours
+        if (scenario < 0.6) {
+          // 60% - Well allocated (35-45 hours per week)
+          weeklyHours = Math.floor(Math.random() * 11) + 35; // 35-45 hours
+          maxProjectsForMember = Math.floor(Math.random() * 2) + 1; // 1-2 projects
+        } else if (scenario < 0.8) {
+          // 20% - Under-allocated (15-30 hours per week)
+          weeklyHours = Math.floor(Math.random() * 16) + 15; // 15-30 hours
+          maxProjectsForMember = Math.floor(Math.random() * 2) + 1; // 1-2 projects
+        } else if (scenario < 0.95) {
+          // 15% - Over-allocated but reasonable (45-55 hours per week)
+          weeklyHours = Math.floor(Math.random() * 11) + 45; // 45-55 hours
+          maxProjectsForMember = Math.floor(Math.random() * 3) + 2; // 2-4 projects
         } else {
-          // 15% chance for red (over 40 hours)
-          totalHours = Math.floor(Math.random() * 11) + 45; // 45-55 hours
+          // 5% - Heavily over-allocated (55-60 hours per week)
+          weeklyHours = Math.floor(Math.random() * 6) + 55; // 55-60 hours
+          maxProjectsForMember = Math.floor(Math.random() * 4) + 3; // 3-6 projects
         }
         
-        // Randomly decide how many projects this member works on (1-3 projects)
-        const numProjects = Math.floor(Math.random() * 3) + 1;
-        const selectedProjects = projects.sort(() => 0.5 - Math.random()).slice(0, Math.min(numProjects, projects.length));
+        // Select random projects for this member
+        const availableProjects = [...projects];
+        const numProjects = Math.min(maxProjectsForMember, availableProjects.length);
+        const selectedProjects = availableProjects
+          .sort(() => 0.5 - Math.random())
+          .slice(0, numProjects);
         
         if (selectedProjects.length === 1) {
-          // All hours go to one project
+          // Single project allocation
+          // Distribute hours across 5 work days (max 12 hours per day)
+          const dailyHours = Math.min(weeklyHours / 5, 12);
+          const actualWeeklyHours = Math.min(weeklyHours, dailyHours * 5);
+          
           allocations.push({
             project_id: selectedProjects[0].id,
             resource_id: member.id,
             resource_type: member.type,
             week_start_date: weekStart,
-            hours: totalHours,
+            hours: actualWeeklyHours,
             company_id: profile.company_id
           });
         } else {
-          // Split hours across multiple projects
-          let remainingHours = totalHours;
+          // Multiple project allocation
+          let remainingHours = weeklyHours;
           
           for (let i = 0; i < selectedProjects.length; i++) {
             let projectHours;
@@ -140,11 +155,18 @@ serve(async (req) => {
               // Last project gets remaining hours
               projectHours = remainingHours;
             } else {
-              // Randomly allocate 20-60% of remaining hours to this project
-              const percentage = Math.random() * 0.4 + 0.2; // 0.2 to 0.6
+              // Randomly allocate 15-50% of remaining hours to this project
+              const minPercentage = 0.15;
+              const maxPercentage = 0.5;
+              const percentage = Math.random() * (maxPercentage - minPercentage) + minPercentage;
               projectHours = Math.floor(remainingHours * percentage);
-              projectHours = Math.max(1, projectHours); // At least 1 hour
+              projectHours = Math.max(2, projectHours); // At least 2 hours per project
             }
+            
+            // Ensure we don't exceed realistic daily limits
+            // Assume max 12 hours per day across all projects
+            const maxWeeklyForProject = Math.min(projectHours, 60); // Max 60 hours per week total
+            projectHours = Math.min(projectHours, maxWeeklyForProject);
             
             if (projectHours > 0) {
               allocations.push({
