@@ -57,6 +57,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
     
     const hostParts = hostname.split('.');
+    
+    // Handle custom domain bareresource.com (no subdomain)
+    if (hostname === 'bareresource.com') {
+      console.log('Using custom domain bareresource.com - checking for user company');
+      return null; // Will fall back to user company lookup
+    }
+    
+    // Handle subdomain pattern like subdomain.bareresource.com
     if (hostParts.length === 3 && hostParts[1] === 'bareresource') {
       console.log('Found production subdomain:', hostParts[0]);
       return hostParts[0];
