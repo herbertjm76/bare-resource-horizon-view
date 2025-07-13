@@ -69,7 +69,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
   const rowBgColor = memberIndex % 2 === 0 ? '#ffffff' : '#f9fafb';
 
   return (
-    <TableRow className="hover:bg-gray-50">
+    <TableRow className="hover:bg-gray-50" style={{ height: '40px' }}>
       {/* Member info column */}
       <TableCell 
         className="sticky left-0 z-20 border-r border-gray-200 text-sm"
@@ -78,23 +78,22 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
           width: '180px',
           minWidth: '180px',
           maxWidth: '180px',
-          padding: '8px 12px'
+          padding: '4px 8px'
         }}
       >
-        <div className="flex items-center gap-2">
-          <div className="bg-red-100 text-red-600 text-xs px-1 py-0.5 rounded">COMPACT</div>
-          <Avatar className="w-8 h-8">
+        <div className="flex items-center gap-1">
+          <Avatar className="w-6 h-6">
             <AvatarImage src={getAvatarUrl(member)} alt={displayName} />
-            <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white', fontSize: '11px' }}>
+            <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white', fontSize: '10px' }}>
               {initials}
             </AvatarFallback>
           </Avatar>
           <div style={{ flex: '1', minWidth: '0' }}>
-            <span className="font-medium text-sm truncate block">
+            <span className="font-medium text-xs truncate block">
               {displayName}
             </span>
             {'isPending' in member && member.isPending && (
-              <span className="inline-block bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-1 rounded mt-1">
+              <span className="inline-block bg-yellow-100 text-yellow-700 text-xs font-medium px-1 py-0.5 rounded">
                 Pending
               </span>
             )}

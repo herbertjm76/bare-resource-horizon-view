@@ -48,26 +48,37 @@ export const ExpandedRowView: React.FC<ExpandedRowViewProps> = ({
   });
 
   return (
-    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors duration-200 h-20 border-b`}>
+    <TableRow className={`${memberIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'} hover:bg-blue-50 transition-colors duration-200 border-b`} style={{ height: '80px' }}>
       {/* Name Cell */}
-      <TableCell className="border-r border-gray-200 px-4 py-3 min-w-[180px]">
-        <div className="flex flex-col gap-2">
-          <div className="bg-green-100 text-green-600 text-xs px-1 py-0.5 rounded w-fit">EXPANDED</div>
+      <TableCell className="border-r border-gray-200 px-4 py-4 min-w-[180px]">
+        <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
             <NameCell member={member} />
+          </div>
+          <div className="text-sm text-gray-600 space-y-1">
+            <div className="flex items-center gap-2">
+              <span>📧</span>
+              <span className="text-xs">{member.email}</span>
+            </div>
+            {member.job_title && (
+              <div className="flex items-center gap-2">
+                <span>💼</span>
+                <span className="text-xs">{member.job_title}</span>
+              </div>
+            )}
           </div>
           <div className="flex flex-wrap gap-1">
             {member.office_location && (
               <Badge variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
-                {member.office_location}
+                📍 {member.office_location}
               </Badge>
             )}
             <Badge variant="outline" className="text-xs px-2 py-0.5 bg-gray-50 text-gray-700 border-gray-200">
-              {weeklyCapacity}h capacity
+              ⏰ {weeklyCapacity}h capacity
             </Badge>
             {member.department && (
               <Badge variant="outline" className="text-xs px-2 py-0.5 bg-purple-50 text-purple-700 border-purple-200">
-                {member.department}
+                🏢 {member.department}
               </Badge>
             )}
           </div>
