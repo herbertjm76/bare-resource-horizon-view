@@ -12,7 +12,7 @@ import { useDashboardData } from './hooks/useDashboardData';
 import { useStandardizedUtilization } from './hooks/useStandardizedUtilization';
 import { toast } from "sonner";
 import { TimeRange } from './TimeRangeSelector';
-import { DummyDataGenerator } from './DummyDataGenerator';
+
 
 export const DashboardMetrics = () => {
   const isMobile = useIsMobile();
@@ -107,10 +107,6 @@ const DashboardContent: React.FC<{
           standardizedUtilizationRate={utilizationRate}
         />
         
-        {/* Dummy Data Generator - positioned next to Executive Summary */}
-        <div className="mt-4">
-          <DummyDataGenerator />
-        </div>
       </div>
 
       {/* Filters Header - now positioned after Executive Summary */}
