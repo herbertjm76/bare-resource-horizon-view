@@ -22,23 +22,24 @@ export const AddResourceRow: React.FC<AddResourceRowProps> = ({
     <tr className={`workload-resource-row add-resource-row border-b hover:bg-gray-50 h-10`}>
       {/* Add Resource button spans the full project resource column */}
       <td 
-        className={`workload-resource-cell project-resource-column p-2`}
+        className={`workload-resource-cell project-resource-column`}
         style={{
           width: '250px',
           minWidth: '250px',
           maxWidth: '250px',
           position: 'sticky',
           left: '0',
-          zIndex: 20
+          zIndex: 20,
+          padding: '4px 32px' // More compact padding
         }}
       >
         <Button 
-          variant="default"
+          variant="outline"
           size="sm" 
-          className="flex items-center text-xs"
+          className="h-6 text-xs px-2 py-1 border-dashed border-gray-300 hover:border-primary hover:bg-primary/5"
           onClick={onAddResource}
         >
-          <UserPlus className="h-3.5 w-3.5 mr-1.5" />
+          <UserPlus className="h-3 w-3 mr-1" />
           Add Resource
         </Button>
       </td>
