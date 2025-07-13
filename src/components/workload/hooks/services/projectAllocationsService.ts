@@ -17,7 +17,7 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     numberOfWeeks
   });
 
-  // Query for allocations with both 'active' and 'pre_registered' resource types
+  // Query for allocations with only 'active' resource types (exclude pre_registered dummy data)
   const { data, error } = await supabase
     .from('project_resource_allocations')
     .select(`
@@ -32,7 +32,7 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     .in('resource_id', memberIds)
     .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
     .lt('week_start_date', format(endDate, 'yyyy-MM-dd'))
-    .in('resource_type', ['active', 'pre_registered']);
+    .eq('resource_type', 'active');
 
   if (error) {
     console.error('🔍 PROJECT ALLOCATIONS: Error fetching project allocations:', error);
