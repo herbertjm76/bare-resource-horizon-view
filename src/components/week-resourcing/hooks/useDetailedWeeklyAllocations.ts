@@ -37,15 +37,11 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
       if (!company?.id || memberIds.length === 0) return {};
 
       const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+      const weekStartDate = format(weekStart, 'yyyy-MM-dd');
       
-      // Generate all dates for the week (Monday through Sunday)
-      const weekDates = [];
-      for (let i = 0; i < 7; i++) {
-        const date = addDays(weekStart, i);
-        weekDates.push(format(date, 'yyyy-MM-dd'));
-      }
+      console.log('🔍 DETAILED ALLOCATIONS: Fetching for week starting:', weekStartDate);
 
-      // Fetch allocations with project details
+      // Fetch allocations with project details - only look for the Monday date since that's how we store week_start_date
       const { data: allocations, error } = await supabase
         .from('project_resource_allocations')
         .select(`
@@ -61,7 +57,7 @@ export const useDetailedWeeklyAllocations = (selectedWeek: Date, memberIds: stri
         `)
         .eq('company_id', company.id)
         .in('resource_id', memberIds)
-        .in('week_start_date', weekDates)
+        .eq('week_start_date', weekStartDate)  // Only look for Monday of the week
         .gt('hours', 0);
 
       if (error) {
