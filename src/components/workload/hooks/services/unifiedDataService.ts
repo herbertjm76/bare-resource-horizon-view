@@ -75,7 +75,7 @@ export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): P
         .eq('company_id', companyId)
         .in('member_id', memberIds)
         .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
-        .lt('week_start_date', format(endDate, 'yyyy-MM-dd'))
+        .lte('week_start_date', format(endDate, 'yyyy-MM-dd'))
     ]);
 
     console.log('🔄 UNIFIED DATA SERVICE: Raw data fetched:', {
