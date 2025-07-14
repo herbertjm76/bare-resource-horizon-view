@@ -116,7 +116,7 @@
 /* Project Total Hours Badge - Override project row color inheritance */
 .workload-resource-row.project-header-row .project-total-hours,
 .workload-resource-row.project-header-row .workload-resource-cell .project-total-hours {
-  background: hsl(var(--primary)) !important;
+  background: rgb(111, 75, 246) !important;
   color: white !important;
   border-radius: 6px !important;
   padding: 4px 8px !important;

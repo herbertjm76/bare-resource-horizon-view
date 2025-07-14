@@ -66,7 +66,7 @@ export const NameCell: React.FC<NameCellProps> = ({ member, compact = false }) =
                     console.log('NameCell - Avatar image loaded successfully:', avatarUrl);
                   }}
                 />
-                <AvatarFallback className="bg-primary text-white text-[10px]">
+                <AvatarFallback className="text-white text-[10px]" style={{ backgroundColor: 'rgb(111, 75, 246)' }}>
                   {getUserInitials()}
                 </AvatarFallback>
               </Avatar>
@@ -106,7 +106,7 @@ export const NameCell: React.FC<NameCellProps> = ({ member, compact = false }) =
                     console.log('NameCell - Avatar image loaded successfully:', avatarUrl);
                   }}
                 />
-                <AvatarFallback className="bg-primary text-white text-xs">
+                <AvatarFallback className="text-white text-xs" style={{ backgroundColor: 'rgb(111, 75, 246)' }}>
                   {getUserInitials()}
                 </AvatarFallback>
               </Avatar>

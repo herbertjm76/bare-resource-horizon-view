@@ -122,7 +122,7 @@ const CompactRowViewComponent: React.FC<CompactRowViewProps> = ({
                     src={memberData.avatarUrl} 
                     alt={memberData.displayName}
                   />
-                  <AvatarFallback className="bg-primary text-white text-[11px]">
+                  <AvatarFallback className="text-white text-[11px]" style={{ backgroundColor: 'rgb(111, 75, 246)' }}>
                     {memberData.initials}
                   </AvatarFallback>
                 </Avatar>
