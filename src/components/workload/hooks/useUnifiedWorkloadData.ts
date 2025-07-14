@@ -43,6 +43,14 @@ export const useUnifiedWorkloadData = (
         return {};
       }
 
+      console.log('🚨🚨🚨 CRITICAL - QUERY FUNCTION EXECUTING 🚨🚨🚨', {
+        companyId: company.id,
+        startDate: format(startDate, 'yyyy-MM-dd'),
+        numberOfWeeks,
+        memberCount: members.length,
+        viewType: `${numberOfWeeks}-week-unified`
+      });
+
       return fetchUnifiedWorkloadData({
         companyId: company.id,
         members,
@@ -51,8 +59,8 @@ export const useUnifiedWorkloadData = (
       });
     },
     enabled: !!company?.id && members.length > 0,
-    staleTime: 30 * 1000, // 30 seconds
-    gcTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 0, // DISABLE CACHING TO FORCE FRESH FETCH
+    gcTime: 0, // DISABLE CACHING TO FORCE FRESH FETCH
   });
 
   // Generate week start dates for the calendar
