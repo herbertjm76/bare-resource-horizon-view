@@ -90,21 +90,22 @@
   background-color: #f3f4f6 !important;
 }
 
-/* Project Header Row - Solid Brand Color Background */
+/* Project Header Row - Subtle Brand Color Accent */
 .workload-resource-row.project-header-row {
-  background: rgb(var(--brand-violet));
+  background: #f8f9ff;
   border-bottom: 2px solid rgba(156, 163, 175, 0.8);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid rgb(var(--brand-violet));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .workload-resource-row.project-header-row .workload-resource-cell {
-  background: rgb(var(--brand-violet)) !important;
-  color: white;
+  background: #f8f9ff !important;
+  color: #374151;
+  font-weight: 600;
 }
 
 .workload-resource-row.project-header-row:hover .workload-resource-cell {
-  background: rgb(var(--brand-violet)) !important;
-  opacity: 0.95;
+  background: #f1f3ff !important;
 }
 
 /* Resource Row - Indented and Lighter */
