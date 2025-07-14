@@ -34,25 +34,21 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
     let totalAllocated = 0;
     let overloadedMembers = 0;
     let underUtilizedMembers = 0;
-    let weeksWithData = 0;
 
-    // Calculate metrics for each member
+    // Calculate metrics for each member using CONSISTENT logic
     filteredMembers.forEach(member => {
       const weeklyCapacity = member.weekly_capacity || 40;
       const memberData = weeklyWorkloadData[member.id] || {};
       
-      // Count weeks that actually have data for capacity calculation
-      const memberWeeksWithData = Object.values(memberData).filter(week => week?.total > 0).length;
-      weeksWithData = Math.max(weeksWithData, memberWeeksWithData);
-      
+      // Calculate total allocated hours for this member across the period
       const memberTotalAllocated = Object.values(memberData).reduce((sum, week) => sum + (week?.total || 0), 0);
       totalAllocated += memberTotalAllocated;
 
-      // Use actual weeks with data for more accurate utilization, but cap at periodWeeks
-      const effectiveWeeks = Math.min(Math.max(memberWeeksWithData, 1), periodWeeks);
-      const memberTotalCapacity = weeklyCapacity * effectiveWeeks;
+      // Calculate capacity based on the REQUESTED period, not "weeks with data"
+      const memberTotalCapacity = weeklyCapacity * periodWeeks;
       totalCapacity += memberTotalCapacity;
 
+      // Calculate individual member utilization for overload/underutilized counts
       const memberUtilization = memberTotalCapacity > 0 ? (memberTotalAllocated / memberTotalCapacity) * 100 : 0;
       
       if (memberUtilization > 100) {
@@ -66,16 +62,28 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
     const availableHours = Math.max(0, totalCapacity - totalAllocated);
 
     // Debug logging to expose the calculation discrepancy
-    console.log('🔍 WORKLOAD METRICS DEBUG:', {
+    console.log('🔍 WORKLOAD METRICS COMPREHENSIVE DEBUG:', {
       periodWeeks,
-      weeksWithData,
       totalAllocated,
       totalCapacity,
       utilizationRate,
       calculation: `${totalAllocated} / ${totalCapacity} = ${utilizationRate}%`,
       membersCount: filteredMembers.length,
       overloadedMembers,
-      underUtilizedMembers
+      underUtilizedMembers,
+      rawWeeklyData: Object.keys(weeklyWorkloadData).reduce((acc, memberId) => {
+        const memberData = weeklyWorkloadData[memberId];
+        const weekCount = Object.keys(memberData).length;
+        const weeksWithDataCount = Object.values(memberData).filter(week => week?.total > 0).length;
+        const totalHours = Object.values(memberData).reduce((sum, week) => sum + (week?.total || 0), 0);
+        acc[memberId] = {
+          weekCount,
+          weeksWithDataCount, 
+          totalHours,
+          sampleWeeks: Object.keys(memberData).slice(0, 3)
+        };
+        return acc;
+      }, {} as any)
     });
 
     return {

@@ -64,7 +64,20 @@ export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): P
       ).length,
       totalMembers: Object.keys(result).length,
       numberOfWeeks,
-      viewType: `${numberOfWeeks}-week-unified`
+      viewType: `${numberOfWeeks}-week-unified`,
+      detailedMemberBreakdown: Object.keys(result).reduce((acc, memberId) => {
+        const memberWeeks = result[memberId];
+        const totalHours = Object.values(memberWeeks).reduce((sum, week) => sum + week.total, 0);
+        const weeksWithData = Object.values(memberWeeks).filter(week => week.total > 0).length;
+        acc[memberId] = {
+          totalHours,
+          weeksWithData,
+          weekCount: Object.keys(memberWeeks).length,
+          firstWeek: Object.keys(memberWeeks)[0],
+          lastWeek: Object.keys(memberWeeks)[Object.keys(memberWeeks).length - 1]
+        };
+        return acc;
+      }, {} as any)
     });
 
     return result;
