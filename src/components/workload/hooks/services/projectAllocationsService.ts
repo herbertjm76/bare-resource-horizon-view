@@ -16,7 +16,20 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     startDate: format(startDate, 'yyyy-MM-dd'),
     endDate: format(endDate, 'yyyy-MM-dd'),
     numberOfWeeks,
-    calculatedDayRange: Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    calculatedDayRange: Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1,
+    viewType: numberOfWeeks === 12 ? 'TWELVE_WEEK_VIEW' : numberOfWeeks === 24 ? 'TWENTY_FOUR_WEEK_VIEW' : `${numberOfWeeks}_WEEK_VIEW`
+  });
+  
+  console.log('🔍 PROJECT ALLOCATIONS: SQL Query will be:', {
+    table: 'project_resource_allocations',
+    filters: {
+      company_id: companyId,
+      resource_id_in: memberIds.slice(0, 3), // Show first 3 member IDs for brevity
+      week_start_date_gte: format(startDate, 'yyyy-MM-dd'),
+      week_start_date_lte: format(endDate, 'yyyy-MM-dd'),
+      hours_gt: 0
+    },
+    viewType: numberOfWeeks === 12 ? 'TWELVE_WEEK_VIEW' : numberOfWeeks === 24 ? 'TWENTY_FOUR_WEEK_VIEW' : `${numberOfWeeks}_WEEK_VIEW`
   });
 
   // DEBUG: Log specific date for troubleshooting (using correct 2025 date)
