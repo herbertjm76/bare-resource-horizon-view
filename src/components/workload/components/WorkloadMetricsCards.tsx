@@ -118,6 +118,5 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
-};
+    );
+  };
