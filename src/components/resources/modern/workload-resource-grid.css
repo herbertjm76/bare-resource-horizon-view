@@ -92,7 +92,7 @@
 
 /* Project Header Row - Gray Purple Background */
 .workload-resource-row.project-header-row {
-  background: #e5e7f0;
+  background: #e5e7f0 !important;
   border-bottom: 2px solid rgba(156, 163, 175, 0.8);
   border-left: 4px solid rgb(var(--brand-violet));
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -100,13 +100,13 @@
 
 .workload-resource-row.project-header-row .workload-resource-cell {
   background: #e5e7f0 !important;
-  color: #374151 !important;
-  font-weight: 600;
+  color: #1f2937 !important;
+  font-weight: 600 !important;
 }
 
 .workload-resource-row.project-header-row:hover .workload-resource-cell {
   background: #d1d5e0 !important;
-  color: #374151 !important;
+  color: #1f2937 !important;
 }
 
 /* Resource Row - Indented and Lighter */
