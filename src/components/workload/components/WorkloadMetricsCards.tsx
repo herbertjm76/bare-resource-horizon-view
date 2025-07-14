@@ -1,8 +1,12 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, Clock, Users, Calendar } from 'lucide-react';
+import { TrendingUp, Clock, Users, AlertTriangle } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
+import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
+import { ChatGPTInterpretationCard } from '@/components/dashboard/cards/ChatGPTInterpretationCard';
+import { SummaryDataPreparationService } from '@/services/summaryDataPreparationService';
 
 interface WorkloadMetricsCardsProps {
   weeklyWorkloadData: Record<string, Record<string, any>>;
@@ -66,59 +70,70 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
 
   const metrics = calculateWorkloadMetrics();
 
+  const summaryData = SummaryDataPreparationService.prepareWorkloadMetricsData(
+    weeklyWorkloadData,
+    filteredMembers
+  );
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-blue-500" />
-            <div>
-              <p className="text-sm font-medium">Team Utilization</p>
-              <p className="text-2xl font-bold">{metrics.utilizationRate}%</p>
-              <p className="text-xs text-gray-500">{Math.round(metrics.totalAllocated)}h / {metrics.totalCapacity}h</p>
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <div className="text-sm text-muted-foreground">Team Utilization</div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-green-500" />
-            <div>
-              <p className="text-sm font-medium">Available Hours</p>
-              <p className="text-2xl font-bold">{Math.round(metrics.availableHours)}h</p>
-              <p className="text-xs text-gray-500">Next {periodWeeks} weeks</p>
+            <div className="text-2xl font-bold mt-1">{metrics.utilizationRate.toFixed(1)}%</div>
+            <Badge variant={UtilizationCalculationService.getUtilizationColor(metrics.utilizationRate) as any}>
+              {UtilizationCalculationService.getUtilizationBadgeText(metrics.utilizationRate)}
+            </Badge>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <div className="text-sm text-muted-foreground">Available Hours</div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-orange-500" />
-            <div>
-              <p className="text-sm font-medium">Overloaded</p>
-              <p className="text-2xl font-bold">{metrics.overloadedMembers}</p>
-              <p className="text-xs text-gray-500">Over 100% capacity</p>
+            <div className="text-2xl font-bold mt-1">{Math.round(metrics.availableHours)}h</div>
+            <div className="text-sm text-muted-foreground">
+              {periodWeeks} week{periodWeeks > 1 ? 's' : ''}
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-purple-500" />
-            <div>
-              <p className="text-sm font-medium">Under-utilized</p>
-              <p className="text-2xl font-bold">{metrics.underUtilizedMembers}</p>
-              <p className="text-xs text-gray-500">Under 60% capacity</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-amber-500" />
+              <div className="text-sm text-muted-foreground">Overloaded</div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="text-2xl font-bold mt-1">{metrics.overloadedMembers}</div>
+            <div className="text-sm text-muted-foreground">team members</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-blue-500" />
+              <div className="text-sm text-muted-foreground">Under-utilized</div>
+            </div>
+            <div className="text-2xl font-bold mt-1">{metrics.underUtilizedMembers}</div>
+            <div className="text-sm text-muted-foreground">team members</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* ChatGPT Workload Analysis */}
+      <ChatGPTInterpretationCard
+        summaryData={summaryData}
+        title="Workload Analysis & Recommendations"
+        context={`Team workload analysis for ${filteredMembers.length} members across ${periodWeeks} weeks`}
+        autoGenerate={false}
+      />
     </div>
   );
 };

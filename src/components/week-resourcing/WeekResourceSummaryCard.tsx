@@ -4,6 +4,8 @@ import { Users, Calendar, Clock, TrendingUp } from 'lucide-react';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
+import { ChatGPTInterpretationCard } from '@/components/dashboard/cards/ChatGPTInterpretationCard';
+import { SummaryDataPreparationService } from '@/services/summaryDataPreparationService';
 
 interface WeekResourceSummaryCardProps {
   projects: any[];
