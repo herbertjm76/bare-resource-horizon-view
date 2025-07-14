@@ -1,4 +1,5 @@
 import { TeamMember } from '@/components/dashboard/types';
+import { WeeklyWorkloadBreakdown } from '../types';
 
 export interface UnifiedWorkloadParams {
   companyId: string;
@@ -20,19 +21,7 @@ export interface ProjectAllocation {
   };
 }
 
-export interface WeeklyBreakdown {
-  projectHours: number;
-  annualLeave: number;
-  officeHolidays: number;
-  otherLeave: number;
-  total: number;
-  projects: Array<{
-    project_id: string;
-    project_name: string;
-    project_code: string;
-    hours: number;
-  }>;
-}
+export interface WeeklyBreakdown extends WeeklyWorkloadBreakdown {}
 
 export interface UnifiedWorkloadResult {
   [memberId: string]: {

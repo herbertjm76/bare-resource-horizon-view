@@ -3,7 +3,7 @@ import React from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
-import { WeeklyBreakdown } from './hooks/services/unifiedDataService';
+import { WeeklyBreakdown } from './hooks/services/types';
 import { WorkloadCalendarTable } from './components/WorkloadCalendarTable';
 import './workload-grid.css';
 
