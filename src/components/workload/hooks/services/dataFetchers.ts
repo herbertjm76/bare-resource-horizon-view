@@ -10,6 +10,7 @@ export const fetchProjectAllocations = async (
   const startDateStr = format(startDate, 'yyyy-MM-dd');
   const endDateStr = format(endDate, 'yyyy-MM-dd');
   
+  console.log('🚨🚨🚨 CRITICAL DEBUG - FETCHING PROJECT ALLOCATIONS 🚨🚨🚨');
   console.log('🔍 FETCHING PROJECT ALLOCATIONS:', {
     companyId,
     memberIds: memberIds.slice(0, 3),
