@@ -4,6 +4,18 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { format, addWeeks, subWeeks, startOfWeek } from 'date-fns';
 
+const getShortWeekLabel = (selectedWeek: Date, fullLabel: string) => {
+  // On mobile, show shorter format like "Jun 9" instead of "Week of Jun 9, 2025"
+  const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
+  const isMobile = window.innerWidth < 768;
+  
+  if (isMobile) {
+    return format(weekStart, 'MMM d');
+  }
+  
+  return fullLabel;
+};
+
 interface WeekSelectorProps {
   selectedWeek: Date;
   onPreviousWeek: () => void;
@@ -30,7 +42,7 @@ export const WeekSelector: React.FC<WeekSelectorProps> = ({
       </Button>
       
       <span className="text-sm font-medium px-2">
-        {weekLabel}
+        {getShortWeekLabel(selectedWeek, weekLabel)}
       </span>
       
       <Button
