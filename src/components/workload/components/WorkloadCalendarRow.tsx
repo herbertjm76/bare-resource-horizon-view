@@ -41,12 +41,10 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
 
   // Helper function to render tooltip content for week data
   const renderWeekTooltip = (weekData: WeeklyWorkloadBreakdown | undefined) => {
+    console.log('Tooltip debug:', { weekData, weekTotal: weekData?.total });
+    
     if (!weekData || weekData.total === 0) {
-      return (
-        <div className="text-sm">
-          No allocation for this week
-        </div>
-      );
+      return "No allocation for this week";
     }
 
     return (
@@ -62,7 +60,7 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
             </div>
             
             {/* Show projects if available */}
-            {weekData.projects && weekData.projects.length > 0 && (
+            {'projects' in weekData && weekData.projects && weekData.projects.length > 0 && (
               <div className="ml-2 space-y-1">
                 {weekData.projects.map((project, index) => (
                   <div key={index} className="flex justify-between items-center text-xs">
