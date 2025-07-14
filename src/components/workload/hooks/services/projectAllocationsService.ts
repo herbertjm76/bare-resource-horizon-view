@@ -64,37 +64,32 @@ export const processProjectAllocations = (
   // Single pass through allocations for aggregation
   for (const allocation of allocations) {
     const memberId = allocation.resource_id;
-    // CRITICAL FIX: Use the exact week_start_date from database instead of recalculating
-    // This ensures consistency between Project Resourcing and Team Workload
-    const weekKey = allocation.week_start_date; // Use the database date directly
     const hours = parseFloat(allocation.hours) || 0;
     const projectId = allocation.project_id;
+    
+    // Use week_start_date directly from database since it's already normalized to Monday
+    const weekKey = allocation.week_start_date;
 
     console.log(`🔍 PROCESSING ALLOCATION: Member ${memberId}, Week ${weekKey}, Hours ${hours}, Project ${allocation.projects?.name || 'Unknown'}`);
-    
-    // Calculate the actual week boundary for this allocation to ensure consistent aggregation
-    const allocationDate = parseISO(allocation.week_start_date);
-    const normalizedWeekStart = startOfWeek(allocationDate, { weekStartsOn: 1 });
-    const normalizedWeekKey = format(normalizedWeekStart, 'yyyy-MM-dd');
 
-    // Initialize nested maps if needed - use normalized week key for consistent aggregation
+    // Initialize nested maps if needed
     if (!memberWeekHours.has(memberId)) {
       memberWeekHours.set(memberId, new Map());
       memberWeekProjects.set(memberId, new Map());
     }
-    if (!memberWeekProjects.get(memberId)!.has(normalizedWeekKey)) {
-      memberWeekProjects.get(memberId)!.set(normalizedWeekKey, new Map());
+    if (!memberWeekProjects.get(memberId)!.has(weekKey)) {
+      memberWeekProjects.get(memberId)!.set(weekKey, new Map());
     }
 
-    // Aggregate hours using normalized week key for consistent totals
-    const currentHours = memberWeekHours.get(memberId)!.get(normalizedWeekKey) || 0;
+    // Aggregate hours for this week
+    const currentHours = memberWeekHours.get(memberId)!.get(weekKey) || 0;
     const newTotal = currentHours + hours;
-    memberWeekHours.get(memberId)!.set(normalizedWeekKey, newTotal);
+    memberWeekHours.get(memberId)!.set(weekKey, newTotal);
     
-    console.log(`🔍 WEEK AGGREGATION: Member ${memberId}, Week ${normalizedWeekKey}, Current: ${currentHours}h, Adding: ${hours}h, New Total: ${newTotal}h`);
+    console.log(`🔍 WEEK AGGREGATION: Member ${memberId}, Week ${weekKey}, Current: ${currentHours}h, Adding: ${hours}h, New Total: ${newTotal}h`);
 
-    // Aggregate projects using normalized week key
-    const projectsMap = memberWeekProjects.get(memberId)!.get(normalizedWeekKey)!;
+    // Aggregate projects for this week
+    const projectsMap = memberWeekProjects.get(memberId)!.get(weekKey)!;
     const existingProject = projectsMap.get(projectId);
     
     if (existingProject) {
@@ -117,9 +112,9 @@ export const processProjectAllocations = (
       result[memberId] = {};
     }
 
-    weekMap.forEach((totalHours, normalizedWeekKey) => {
-      if (!result[memberId][normalizedWeekKey]) {
-        result[memberId][normalizedWeekKey] = {
+    weekMap.forEach((totalHours, weekKey) => {
+      if (!result[memberId][weekKey]) {
+        result[memberId][weekKey] = {
           projectHours: 0,
           annualLeave: 0,
           officeHolidays: 0,
@@ -130,17 +125,17 @@ export const processProjectAllocations = (
       }
 
       // Set project hours and projects
-      result[memberId][normalizedWeekKey].projectHours = totalHours;
+      result[memberId][weekKey].projectHours = totalHours;
       
       // Convert projects map to array
-      const projectsMap = memberWeekProjects.get(memberId)?.get(normalizedWeekKey);
-      result[memberId][normalizedWeekKey].projects = projectsMap ? Array.from(projectsMap.values()) : [];
+      const projectsMap = memberWeekProjects.get(memberId)?.get(weekKey);
+      result[memberId][weekKey].projects = projectsMap ? Array.from(projectsMap.values()) : [];
       
       // Recalculate total
-      const breakdown = result[memberId][normalizedWeekKey];
+      const breakdown = result[memberId][weekKey];
       breakdown.total = breakdown.projectHours + breakdown.annualLeave + breakdown.officeHolidays + breakdown.otherLeave;
       
-      console.log(`🔍 FINAL RESULT: Member ${memberId}, Week ${normalizedWeekKey}, Total Hours: ${breakdown.total} (Project: ${breakdown.projectHours}, Projects: ${breakdown.projects.length})`);
+      console.log(`🔍 FINAL RESULT: Member ${memberId}, Week ${weekKey}, Total Hours: ${breakdown.total} (Project: ${breakdown.projectHours}, Projects: ${breakdown.projects.length})`);
     });
   });
 
