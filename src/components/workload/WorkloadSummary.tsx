@@ -4,7 +4,7 @@ import { StandardizedExecutiveSummary } from '@/components/dashboard/Standardize
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
-import { WorkloadBreakdown } from './hooks/useWorkloadData';
+import { WorkloadBreakdown } from './hooks/types';
 
 interface WorkloadSummaryProps {
   members: TeamMember[];
