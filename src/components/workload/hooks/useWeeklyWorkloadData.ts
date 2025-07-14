@@ -19,7 +19,7 @@ export const useWeeklyWorkloadData = (
   const { company } = useCompany();
 
   const { data: weeklyWorkloadData = {}, isLoading, error } = useQuery({
-    queryKey: ['weekly-workload-data', company?.id, members.map(m => m.id), format(startDate, 'yyyy-MM-dd'), numberOfWeeks],
+    queryKey: ['weekly-workload-data-v2', company?.id, members.map(m => m.id), format(startDate, 'yyyy-MM-dd'), numberOfWeeks, `weeks-${numberOfWeeks}`],
     queryFn: async () => {
       if (!company?.id || members.length === 0) {
         console.log('🔍 WORKLOAD DATA: Skipping fetch - no company or members');

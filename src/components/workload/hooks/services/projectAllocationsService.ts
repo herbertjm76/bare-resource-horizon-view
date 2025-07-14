@@ -19,13 +19,14 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     calculatedDayRange: Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1
   });
 
-  // DEBUG: Log specific date for troubleshooting
-  const targetWeek = '2024-07-15'; // Week 29 start date (Monday)
+  // DEBUG: Log specific date for troubleshooting (using correct 2025 date)
+  const targetWeek = '2025-07-14'; // Week 29 start date (Monday) - 2025 data
   console.log('🔍 TARGET WEEK DEBUG:', {
     targetWeek,
     isInRange: targetWeek >= format(startDate, 'yyyy-MM-dd') && targetWeek <= format(endDate, 'yyyy-MM-dd'),
     numberOfWeeks,
-    viewType: numberOfWeeks === 12 ? '12-week' : numberOfWeeks === 24 ? '24-week' : `${numberOfWeeks}-week`
+    viewType: numberOfWeeks === 12 ? '12-week' : numberOfWeeks === 24 ? '24-week' : `${numberOfWeeks}-week`,
+    dateRange: `${format(startDate, 'yyyy-MM-dd')} to ${format(endDate, 'yyyy-MM-dd')}`
   });
 
   // Fetch ALL allocations within the date range (not just specific week_start_dates)
@@ -53,10 +54,14 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
 
   console.log('🔍 PROJECT ALLOCATIONS: Fetched allocations (using Project Resourcing logic):', data?.length || 0);
   
-  // DEBUG: Log Rob Night's data specifically
-  const robData = data?.filter(d => d.resource_id && d.resource_id.toString().includes('rob') || 
-    (d.week_start_date === '2024-07-15' && d.hours > 0)) || [];
-  console.log('🔍 ROB NIGHT DEBUG: Found allocations for week 2024-07-15:', robData);
+  // DEBUG: Log Rob Night's data specifically (updated for 2025)
+  const robNightId = 'fc351fa0-b6df-447a-bc27-b6675db2622e'; // Rob Night's ID from logs
+  const robData = data?.filter(d => 
+    d.resource_id === robNightId || 
+    (d.week_start_date === '2025-07-14' && d.hours > 0)
+  ) || [];
+  console.log('🔍 ROB NIGHT DEBUG: Found allocations for Rob Night in 2025-07-14:', robData);
+  console.log('🔍 ROB NIGHT DEBUG: All Rob Night allocations:', data?.filter(d => d.resource_id === robNightId));
   
   return data || [];
 };
@@ -83,10 +88,15 @@ export const processProjectAllocations = (
     const projectId = allocation.project_id;
     
     // Convert the allocation's week_start_date to the Monday of that week (in case data is inconsistent)
-    // Then map it to the correct display week based on our start date
+    // The allocation date might be any day in the week, so normalize to Monday
     const allocationDate = parseISO(allocation.week_start_date);
     const allocationWeekStart = startOfWeek(allocationDate, { weekStartsOn: 1 }); // Monday as week start
     const weekKey = format(allocationWeekStart, 'yyyy-MM-dd');
+    
+    // DEBUG: Log the week normalization
+    if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e') {
+      console.log(`🔍 ROB WEEK NORMALIZATION: Original: ${allocation.week_start_date} -> Normalized: ${weekKey}`);
+    }
 
     console.log(`🔍 PROCESSING ALLOCATION: Member ${memberId}, Original Date: ${allocation.week_start_date}, Normalized Week: ${weekKey}, Hours ${hours}, Project ${allocation.projects?.name || 'Unknown'}`);
 
