@@ -40,28 +40,43 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
   const rowBgColor = memberIndex % 2 === 0 ? '#ffffff' : '#f9fafb';
 
   // Helper function to render tooltip content for week data
-  const renderWeekTooltip = (weekData: WeeklyWorkloadBreakdown | undefined, weekTotal: number) => {
-    if (weekTotal === 0) return null;
+  const renderWeekTooltip = (weekData: WeeklyWorkloadBreakdown | undefined) => {
+    if (!weekData || weekData.total === 0) {
+      return (
+        <div className="text-sm">
+          No allocation for this week
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-2">
         <div className="font-semibold text-sm">Week Breakdown</div>
         
         {/* Project hours breakdown */}
-        {weekData?.projects && weekData.projects.length > 0 && (
+        {weekData.projectHours > 0 && (
           <div className="space-y-1">
-            <div className="text-xs font-medium text-muted-foreground">Projects:</div>
-            {weekData.projects.map((project, index) => (
-              <div key={index} className="flex justify-between items-center text-xs">
-                <span className="font-medium">{project.project_code || project.project_name}</span>
-                <span className="text-muted-foreground">{project.hours}h</span>
+            <div className="flex justify-between items-center text-xs">
+              <span className="font-medium">Project Hours:</span>
+              <span className="text-muted-foreground">{weekData.projectHours}h</span>
+            </div>
+            
+            {/* Show projects if available */}
+            {weekData.projects && weekData.projects.length > 0 && (
+              <div className="ml-2 space-y-1">
+                {weekData.projects.map((project, index) => (
+                  <div key={index} className="flex justify-between items-center text-xs">
+                    <span className="font-medium">{project.project_code || project.project_name}</span>
+                    <span className="text-muted-foreground">{project.hours}h</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         )}
 
         {/* Other time breakdown */}
-        {(weekData?.annualLeave || weekData?.otherLeave || weekData?.officeHolidays) && (
+        {(weekData.annualLeave > 0 || weekData.otherLeave > 0 || weekData.officeHolidays > 0) && (
           <div className="space-y-1">
             <div className="text-xs font-medium text-muted-foreground">Other Time:</div>
             {weekData.annualLeave > 0 && (
@@ -89,7 +104,7 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
         <div className="border-t pt-1">
           <div className="flex justify-between items-center text-sm font-semibold">
             <span>Total</span>
-            <span>{weekTotal}h</span>
+            <span>{weekData.total}h</span>
           </div>
         </div>
       </div>
@@ -196,7 +211,7 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
                   </div>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
-                  {renderWeekTooltip(weekData, weekTotal)}
+                  {renderWeekTooltip(weekData)}
                 </TooltipContent>
               </Tooltip>
             ) : (
