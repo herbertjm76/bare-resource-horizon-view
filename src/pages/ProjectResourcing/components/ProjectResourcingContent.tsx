@@ -3,6 +3,7 @@ import React from 'react';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
 import { ProjectResourcingHeader } from './ProjectResourcingHeader';
 import { ProjectResourcingFilterRow } from './ProjectResourcingFilterRow';
+import { ProjectResourcingSummaryCards } from './ProjectResourcingSummaryCards';
 import { ModernResourceGrid } from '@/components/resources/modern/ModernResourceGrid';
 import { useProjects } from '@/hooks/useProjects';
 import { GridLoadingState } from '@/components/resources/grid/GridLoadingState';
@@ -92,6 +93,12 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
       {/* Header with metrics */}
       <ProjectResourcingHeader 
         projectCount={totalProjects}
+        periodToShow={filters.periodToShow}
+      />
+
+      {/* Summary Cards */}
+      <ProjectResourcingSummaryCards 
+        selectedMonth={selectedMonth}
         periodToShow={filters.periodToShow}
       />
 
