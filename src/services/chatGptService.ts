@@ -39,7 +39,7 @@ export class ChatGPTService {
       const { data, error } = await supabase.functions.invoke('chatgpt-interpret', {
         body: {
           prompt,
-          maxTokens: 1000,
+          maxTokens: 1500,
           temperature: 0.3
         }
       });
@@ -67,7 +67,7 @@ export class ChatGPTService {
       const { data, error } = await supabase.functions.invoke('chatgpt-interpret', {
         body: {
           prompt,
-          maxTokens: 800,
+          maxTokens: 1200,
           temperature: 0.4
         }
       });
@@ -94,7 +94,7 @@ export class ChatGPTService {
       const { data, error } = await supabase.functions.invoke('chatgpt-interpret', {
         body: {
           prompt,
-          maxTokens: 600,
+          maxTokens: 1000,
           temperature: 0.5
         }
       });
@@ -116,53 +116,131 @@ export class ChatGPTService {
 
   private static buildSummaryInterpretationPrompt(summaryData: any, context?: string): string {
     return `
-As a resource management expert, analyze this team workload summary data and provide insights:
+You are a senior resource management consultant with 15+ years of experience optimizing team performance and project delivery. Analyze this team workload data and provide strategic insights.
 
-**Context:** ${context || 'Team workload analysis'}
+**Analysis Context:** ${context || 'Team workload analysis'}
 
-**Summary Data:**
+**Current Metrics:**
 ${JSON.stringify(summaryData, null, 2)}
 
-Please provide a structured analysis including:
-1. **Key Insights:** 3-4 main observations about the current state
-2. **Recommendations:** Specific actionable steps to improve utilization
-3. **Risks:** Potential issues to watch for
-4. **Opportunities:** Areas for optimization or growth
+**Your Task:** Provide a comprehensive analysis formatted as follows:
 
-Format your response as a clear, business-focused analysis that a project manager would find actionable.
+## KEY INSIGHTS
+Identify 3-4 critical observations about current resource utilization, focusing on:
+- Utilization rates vs. industry benchmarks (70-85% is optimal)
+- Resource distribution patterns and potential bottlenecks
+- Team capacity vs. project demands
+- Seasonal or cyclical trends
+
+## STRATEGIC RECOMMENDATIONS
+Provide 3-5 specific, actionable recommendations prioritized by impact:
+- Immediate actions (next 1-2 weeks)
+- Short-term optimizations (1-3 months)
+- Include expected outcomes and success metrics
+
+## RISK ASSESSMENT
+Identify potential risks with severity levels:
+- Resource burnout indicators
+- Project delivery risks
+- Client satisfaction threats
+- Team morale factors
+
+## GROWTH OPPORTUNITIES
+Highlight areas for optimization and expansion:
+- Underutilized capacity that could take on more work
+- Skill gaps that could be filled for higher-value projects
+- Process improvements for efficiency gains
+- Team development opportunities
+
+Focus on metrics-driven insights with specific percentages, time frames, and measurable outcomes. Consider industry best practices for professional services teams.
     `.trim();
   }
 
   private static buildWorkloadInsightsPrompt(workloadData: any): string {
     return `
-Analyze this workload metrics data for resource management insights:
+You are an expert workforce analytics consultant specializing in optimizing team performance and resource allocation. Analyze the following workload data to identify patterns, inefficiencies, and opportunities.
 
-**Workload Metrics:**
+**Workload Analytics Data:**
 ${JSON.stringify(workloadData, null, 2)}
 
-Focus on:
-- Team utilization patterns
-- Resource allocation efficiency
-- Capacity management
-- Workload distribution
+**Analysis Framework:**
 
-Provide 3-4 key insights and 2-3 specific recommendations for improvement.
+1. **UTILIZATION ANALYSIS**
+   - Calculate individual and team utilization rates
+   - Identify over-allocated (>90%) and under-utilized (<60%) team members
+   - Compare against optimal utilization benchmarks (70-85%)
+
+2. **WORKLOAD DISTRIBUTION**
+   - Assess workload balance across team members
+   - Identify workload concentration risks
+   - Evaluate skill-based allocation efficiency
+
+3. **CAPACITY PLANNING**
+   - Analyze current vs. available capacity
+   - Project future capacity needs based on trends
+   - Identify peak workload periods and resource gaps
+
+4. **PERFORMANCE INDICATORS**
+   - Resource allocation efficiency metrics
+   - Project delivery timeline adherence
+   - Quality impact of current workload levels
+
+**Deliverables:**
+- 4-5 data-driven insights with specific metrics
+- 3-4 prioritized recommendations with expected impact
+- Risk factors and mitigation strategies
+- Capacity optimization opportunities
+
+Include specific numbers, percentages, and timeframes. Reference industry standards for professional services utilization (typically 70-85% billable utilization).
     `.trim();
   }
 
   private static buildRecommendationsPrompt(metricsData: any): string {
     return `
-Based on these performance metrics, provide strategic recommendations:
+You are a strategic management consultant specializing in operational excellence and team optimization. Based on the performance metrics provided, create a comprehensive action plan that drives measurable improvements.
 
-**Metrics Data:**
+**Performance Metrics:**
 ${JSON.stringify(metricsData, null, 2)}
 
-Generate:
-1. **Immediate Actions:** What should be done in the next 1-2 weeks
-2. **Strategic Improvements:** Medium-term optimizations (1-3 months)
-3. **Risk Mitigation:** How to address potential issues
+**Strategic Recommendation Framework:**
 
-Keep recommendations specific and actionable.
+## IMMEDIATE PRIORITY ACTIONS (Next 1-2 weeks)
+- Critical issues requiring immediate attention
+- Resource reallocation opportunities
+- Process bottlenecks to address
+- Communication improvements needed
+- Expected impact: Quantify improvement potential
+
+## SHORT-TERM OPTIMIZATIONS (1-3 months)
+- Workflow process improvements
+- Technology or tool implementations
+- Team skill development initiatives
+- Client communication enhancements
+- Performance measurement system improvements
+
+## LONG-TERM STRATEGIC INITIATIVES (3-12 months)
+- Capacity planning and hiring decisions
+- Service offering optimization
+- Team structure reorganization
+- Technology infrastructure investments
+- Market expansion opportunities
+
+## RISK MITIGATION STRATEGIES
+- Client satisfaction protection measures
+- Employee retention strategies
+- Quality assurance improvements
+- Financial performance safeguards
+- Competitive positioning maintenance
+
+**For each recommendation, provide:**
+- Specific action steps
+- Success metrics and KPIs
+- Timeline for implementation
+- Resource requirements
+- Expected ROI or business impact
+- Risk level if not addressed
+
+Focus on actionable strategies that can be implemented by a project management team with measurable business outcomes.
     `.trim();
   }
 

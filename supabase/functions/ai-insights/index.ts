@@ -115,46 +115,78 @@ serve(async (req) => {
       allocationsCount: dataSummary.allocations.length
     });
 
+    // Calculate key metrics for enhanced analysis
+    const totalCapacity = dataSummary.teamMembers.reduce((sum, member) => sum + (member.weeklyCapacity || 40), 0);
+    const totalAllocatedHours = dataSummary.allocations.reduce((sum, alloc) => sum + alloc.hours, 0);
+    const utilizationRate = totalCapacity > 0 ? (totalAllocatedHours / totalCapacity) * 100 : 0;
+    const avgProjectsPerPerson = dataSummary.teamSize > 0 ? dataSummary.activeProjects / dataSummary.teamSize : 0;
+
     // Call OpenAI for analysis
     const aiPrompt = `
-You are an expert resource management analyst. Based on the following team and project data, provide actionable insights and recommendations.
+You are a senior management consultant specializing in professional services optimization, with expertise in resource allocation, team performance, and operational efficiency. Analyze the following comprehensive team and project data to provide strategic insights.
 
-Company Data:
-- Team Size: ${dataSummary.teamSize}
-- Active Projects: ${dataSummary.activeProjects}
-- Total Projects: ${dataSummary.totalProjects}
-- Time Period: ${dataSummary.timeRange}
+**COMPANY OVERVIEW:**
+- Team Size: ${dataSummary.teamSize} professionals
+- Active Projects: ${dataSummary.activeProjects} (${dataSummary.totalProjects} total)
+- Overall Utilization: ${utilizationRate.toFixed(1)}%
+- Projects per Person: ${avgProjectsPerPerson.toFixed(1)}
+- Analysis Period: ${dataSummary.timeRange}
 
-Team Members: ${JSON.stringify(dataSummary.teamMembers, null, 2)}
-Projects: ${JSON.stringify(dataSummary.projects, null, 2)}
+**DETAILED DATA:**
+Team Composition: ${JSON.stringify(dataSummary.teamMembers, null, 2)}
+Project Portfolio: ${JSON.stringify(dataSummary.projects, null, 2)}
 Resource Allocations: ${JSON.stringify(dataSummary.allocations, null, 2)}
 
-Please provide 3-5 specific, actionable insights in JSON format with this structure:
+**ANALYSIS REQUIREMENTS:**
+Generate 4-6 strategic insights using advanced resource management principles. Focus on identifying patterns, inefficiencies, risks, and opportunities that a senior executive would find valuable.
+
+**INDUSTRY BENCHMARKS:**
+- Optimal utilization: 70-85% for professional services
+- Maximum safe utilization: 90% (burnout risk above this)
+- Minimum viable utilization: 60% (profitability concern below this)
+- Ideal projects per senior consultant: 2-3 concurrent projects
+- Ideal projects per junior staff: 1-2 concurrent projects
+
+**RESPONSE FORMAT (JSON):**
 {
   "insights": [
     {
-      "type": "utilization" | "capacity" | "project_load" | "team_scaling" | "efficiency",
-      "category": "Resource Management" | "Team Performance" | "Project Planning" | "Risk Management",
+      "type": "utilization" | "capacity" | "project_load" | "team_scaling" | "efficiency" | "risk_management" | "growth_opportunity",
+      "category": "Resource Management" | "Team Performance" | "Project Planning" | "Risk Management" | "Strategic Planning" | "Financial Performance",
       "priority": "critical" | "warning" | "opportunity" | "success",
-      "title": "Brief title (max 50 chars)",
-      "description": "Detailed description (max 200 chars)",
-      "impact": "What impact this has (max 150 chars)",
-      "recommendation": "Specific action to take (max 200 chars)",
-      "confidence": 0.1-1.0,
+      "title": "Executive-level insight title (max 60 chars)",
+      "description": "Comprehensive description with specific metrics and context (max 250 chars)",
+      "impact": "Business impact with quantified potential (max 180 chars)",
+      "recommendation": "Specific, actionable strategy with timeline (max 250 chars)",
+      "confidence": 0.7-1.0,
       "timeframe": "immediate" | "short_term" | "long_term",
-      "icon": "users" | "trending-up" | "alert-triangle" | "target" | "clock" | "bar-chart"
+      "icon": "users" | "trending-up" | "alert-triangle" | "target" | "clock" | "bar-chart" | "dollar-sign" | "shield",
+      "metrics": {
+        "current_value": "Current metric value",
+        "target_value": "Recommended target",
+        "improvement_potential": "Quantified improvement opportunity"
+      }
     }
   ]
 }
 
-Focus on:
-1. Resource utilization patterns
-2. Project workload distribution
-3. Team capacity optimization
-4. Potential bottlenecks or risks
-5. Growth opportunities
+**FOCUS AREAS:**
+1. **Utilization Optimization:** Identify over/under-utilized resources with specific percentages
+2. **Capacity Planning:** Analyze current vs. optimal capacity allocation
+3. **Project Load Balancing:** Assess workload distribution and concentration risks
+4. **Revenue Optimization:** Identify opportunities to improve billable utilization
+5. **Risk Mitigation:** Spot burnout risks, skill gaps, and delivery threats
+6. **Growth Strategy:** Highlight expansion opportunities and efficiency gains
+7. **Financial Impact:** Quantify revenue and cost implications of current resource allocation
 
-Be specific and actionable. Use real data from the analysis.
+**DELIVERABLE STANDARDS:**
+- Include specific percentages, hours, and financial impacts where possible
+- Reference industry benchmarks in your analysis
+- Provide clear ROI projections for recommendations
+- Identify both immediate wins and strategic initiatives
+- Consider seasonal patterns and project lifecycle stages
+
+Ensure insights are executive-ready with concrete business impact and clear action steps.
     `;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -168,15 +200,15 @@ Be specific and actionable. Use real data from the analysis.
         messages: [
           {
             role: 'system',
-            content: 'You are an expert resource management analyst who provides actionable insights based on team and project data. Always respond with valid JSON.'
+            content: 'You are a senior management consultant and resource optimization expert with 15+ years of experience in professional services. You specialize in analyzing team performance data and providing strategic insights that drive measurable business outcomes. Always respond with valid, well-structured JSON that includes specific metrics and actionable recommendations.'
           },
           {
             role: 'user',
             content: aiPrompt
           }
         ],
-        temperature: 0.7,
-        max_tokens: 2000
+        temperature: 0.3,
+        max_tokens: 3000
       }),
     });
 
@@ -206,13 +238,18 @@ Be specific and actionable. Use real data from the analysis.
           type: "utilization",
           category: "Resource Management",
           priority: "warning",
-          title: "AI Analysis Unavailable",
-          description: "Unable to generate insights at this time. Please try again later.",
-          impact: "Limited visibility into resource optimization opportunities.",
-          recommendation: "Review team allocation manually and ensure data accuracy.",
-          confidence: 0.5,
+          title: "AI Analysis Temporarily Unavailable",
+          description: "Advanced insights generation is currently unavailable. Basic metrics are still accessible through the dashboard.",
+          impact: "Reduced visibility into optimization opportunities and strategic recommendations.",
+          recommendation: "Monitor utilization rates manually. Consider reviewing individual workloads and project allocations to identify immediate optimization opportunities.",
+          confidence: 0.8,
           timeframe: "immediate",
-          icon: "alert-triangle"
+          icon: "alert-triangle",
+          metrics: {
+            current_value: `${utilizationRate.toFixed(1)}% team utilization`,
+            target_value: "70-85% optimal range",
+            improvement_potential: "Enhanced insights available when service is restored"
+          }
         }
       ];
     }
