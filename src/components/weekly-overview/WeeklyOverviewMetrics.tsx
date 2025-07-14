@@ -80,8 +80,8 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
   const metrics = calculateWeeklyMetrics();
 
   return (
-    <div className="w-[90%] sm:w-full mx-auto bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-2 sm:p-3 border border-purple-100/50 shadow-sm">
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2">
+    <div className="w-full mx-auto bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-2 sm:p-3 border border-purple-100/50 shadow-sm">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 sm:gap-2">
         <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
           <CardContent className="p-1.5 sm:p-2">
             <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
