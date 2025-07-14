@@ -1,4 +1,4 @@
-import { format, startOfWeek } from 'date-fns';
+import { format, addWeeks } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { UnifiedWorkloadResult } from './types';
 
@@ -9,12 +9,24 @@ export const initializeWorkloadResult = (
 ): UnifiedWorkloadResult => {
   const result: UnifiedWorkloadResult = {};
   
+  console.log('🔄 WORKLOAD INITIALIZER: Creating week structure', {
+    startDate: format(startDate, 'yyyy-MM-dd'),
+    numberOfWeeks,
+    memberCount: members.length
+  });
+  
+  const weekKeys: string[] = [];
+  
   members.forEach(member => {
     result[member.id] = {};
     for (let week = 0; week < numberOfWeeks; week++) {
-      const weekStart = new Date(startDate);
-      weekStart.setDate(weekStart.getDate() + (week * 7));
-      const weekKey = format(startOfWeek(weekStart, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+      // Use addWeeks for proper date arithmetic - startDate is already normalized
+      const weekStart = addWeeks(startDate, week);
+      const weekKey = format(weekStart, 'yyyy-MM-dd');
+      
+      if (member === members[0]) { // Only log for first member to avoid spam
+        weekKeys.push(weekKey);
+      }
       
       result[member.id][weekKey] = {
         projectHours: 0,
@@ -25,6 +37,11 @@ export const initializeWorkloadResult = (
         projects: []
       };
     }
+  });
+
+  console.log('🔄 WORKLOAD INITIALIZER: Week keys created', {
+    weekKeys: weekKeys.slice(0, 5), // First 5 weeks
+    totalWeeks: weekKeys.length
   });
 
   return result;

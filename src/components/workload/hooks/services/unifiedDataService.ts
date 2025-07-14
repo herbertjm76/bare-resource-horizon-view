@@ -25,6 +25,14 @@ export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): P
     const normalizedStartDate = startOfWeek(startDate, { weekStartsOn: 1 });
     const endDate = new Date(normalizedStartDate);
     endDate.setDate(endDate.getDate() + (numberOfWeeks * 7) - 1);
+    
+    console.log('🔄 UNIFIED DATA SERVICE: Date range calculation', {
+      originalStartDate: format(startDate, 'yyyy-MM-dd'),
+      normalizedStartDate: format(normalizedStartDate, 'yyyy-MM-dd'),
+      endDate: format(endDate, 'yyyy-MM-dd'),
+      numberOfWeeks,
+      viewType: `${numberOfWeeks}-week-unified`
+    });
 
     // Initialize result structure with all weeks using normalized start date
     const result = initializeWorkloadResult(members, normalizedStartDate, numberOfWeeks);
