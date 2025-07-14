@@ -53,7 +53,7 @@ export const WeekAllocationCell: React.FC<WeekAllocationCellProps> = ({
         <div className="hours-display">
           {projectHours > 0 ? (
             <StandardizedBadge
-              variant="count"
+              variant="metric"
               className="text-lg font-bold mx-1"
             >
               {projectHours}h

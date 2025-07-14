@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Typography } from "@/components/ui/typography";
+import { StandardizedBadge } from "@/components/ui/standardized-badge";
 import { Users, Briefcase, TrendingUp, Clock, UserSquare2, FolderKanban, Calendar, GanttChartSquare } from 'lucide-react';
+import { typography } from '@/styles/typography';
+import { cn } from '@/lib/utils';
 
 interface SummaryMetric {
   title: string;
@@ -39,19 +40,19 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     return 'text-brand-violet bg-brand-violet/10';
   };
 
-  const getBadgeStyle = (badgeColor?: string, isGood?: boolean) => {
-    // Use indicator color for good/bad
-    if (isGood === true) return 'bg-green-500 text-white border-green-400';
-    if (isGood === false) return 'bg-red-500 text-white border-red-400';
+  const getBadgeVariant = (badgeColor?: string, isGood?: boolean) => {
+    // Use semantic variants for good/bad states
+    if (isGood === true) return 'success';
+    if (isGood === false) return 'error';
     
-    // Fallback to badge color
-    switch (badgeColor) {
-      case 'green': return 'bg-green-500 text-white border-green-400';
-      case 'red': return 'bg-red-500 text-white border-red-400';
-      case 'orange': return 'bg-orange-500 text-white border-orange-400';
-      case 'blue': return 'bg-blue-500 text-white border-blue-400';
-      case 'yellow': return 'bg-yellow-500 text-white border-yellow-400';
-      default: return 'bg-brand-violet text-white border-brand-violet';
+    // Map color strings to semantic variants
+    switch (badgeColor?.toLowerCase()) {
+      case 'green': return 'success';
+      case 'red': return 'error';
+      case 'orange': case 'yellow': return 'warning';
+      case 'blue': return 'info';
+      case 'violet': case 'purple': return 'primary';
+      default: return 'metric'; // Use the new metric variant for better visual hierarchy
     }
   };
 
@@ -172,50 +173,73 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   const getGradientClasses = () => {
     switch (gradientType) {
       case 'blue':
-        return 'bg-gradient-to-r from-blue-50 via-cyan-50 to-blue-50';
+        return 'bg-gradient-to-br from-blue-50/80 via-cyan-50/60 to-blue-50/80';
       case 'emerald':
-        return 'bg-gradient-to-r from-emerald-50 via-green-50 to-emerald-50';
+        return 'bg-gradient-to-br from-emerald-50/80 via-green-50/60 to-emerald-50/80';
       case 'violet':
-        return 'bg-gradient-to-r from-violet-50 via-purple-50 to-violet-50';
+        return 'bg-gradient-to-br from-violet-50/80 via-purple-50/60 to-violet-50/80';
       default:
-        return 'bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50';
+        return 'bg-gradient-to-br from-purple-50/80 via-blue-50/60 to-indigo-50/80 backdrop-blur-sm';
     }
   };
 
-  console.log('Rendering unified desktop/mobile format');
+  console.log('Rendering enhanced unified desktop/mobile format with improved visual hierarchy');
   return (
-    <div className={`w-[90%] sm:w-full mx-auto ${getGradientClasses()} rounded-xl p-2 sm:p-3 border border-purple-100/50 shadow-sm`}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2">
+    <div className={cn(
+      "w-[90%] sm:w-full mx-auto rounded-xl p-3 sm:p-4 border shadow-sm animate-in",
+      getGradientClasses(),
+      "border-semantic-border-primary/50"
+    )}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {metrics.map((metric, index) => {
           const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
           const IconComponent = getStandardIcon(metric, index);
           
           return (
             <div key={index} className="min-w-0">
-              <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
-                <CardContent className="p-1.5 sm:p-2">
-                  {/* Line 1: Icon + Title */}
-                  <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
-                    <div className={`p-0.5 sm:p-1 rounded-full ${getIconColor()} flex-shrink-0`}>
-                      <IconComponent className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              <Card className="bg-semantic-background-primary border border-semantic-border-primary/50 rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-brand-violet/30 h-full shadow-sm group">
+                <CardContent className="p-3 sm:p-4">
+                  {/* Header: Icon + Title with improved spacing */}
+                  <div className="flex items-start gap-2.5 mb-3">
+                    <div className={cn(
+                      "p-2 rounded-xl flex-shrink-0 transition-colors duration-200",
+                      "bg-brand-violet/10 text-brand-violet group-hover:bg-brand-violet/15"
+                    )}>
+                      <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
-                    <Typography variant="body-sm" className="font-medium text-gray-700 text-xs leading-tight truncate">
-                      {metric.title}
-                    </Typography>
+                    <div className="flex-1 min-w-0">
+                      <h4 className={cn(
+                        "font-medium text-semantic-text-primary leading-tight truncate",
+                        typography.ui.label.fontSize === '0.875rem' ? 'text-sm' : 'text-xs'
+                      )}>
+                        {metric.title}
+                      </h4>
+                    </div>
                   </div>
                   
-                  {/* Line 2: Value (left) and Badge (right) */}
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="text-base sm:text-lg font-bold text-gray-900 leading-none">
+                  {/* Main Value with enhanced typography hierarchy */}
+                  <div className="mb-3">
+                    <div className={cn(
+                      "font-bold text-semantic-text-primary leading-none mb-1",
+                      "text-2xl sm:text-3xl lg:text-2xl xl:text-3xl", // Responsive larger sizes
+                      "bg-gradient-to-br from-semantic-text-primary to-semantic-text-secondary bg-clip-text"
+                    )}>
                       {metric.value}
                     </div>
-                    <Badge className={`text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 ${getBadgeStyle(badge.color, metric.isGood)}`}>
+                    <StandardizedBadge 
+                      variant={getBadgeVariant(badge.color, metric.isGood)}
+                      size="metric"
+                      className="mt-2"
+                    >
                       {badge.text}
-                    </Badge>
+                    </StandardizedBadge>
                   </div>
                   
-                  {/* Line 3: Subtitle (left) */}
-                  <p className="text-xs text-gray-500 leading-tight">
+                  {/* Subtitle with improved typography */}
+                  <p className={cn(
+                    "text-semantic-text-secondary leading-relaxed",
+                    typography.body.small.fontSize === '0.875rem' ? 'text-sm' : 'text-xs'
+                  )}>
                     {subtitle}
                   </p>
                 </CardContent>

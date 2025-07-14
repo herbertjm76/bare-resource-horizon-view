@@ -146,7 +146,7 @@ export const HolidayCard: React.FC = () => {
                     {/* Countdown Badge using StandardizedBadge */}
                     {daysUntil >= 0 && (
                       <StandardizedBadge
-                        variant="countdown"
+                        variant="primary"
                         style={getCountdownBadgeStyle(daysUntil)}
                       >
                         {getCountdownText(daysUntil)}
