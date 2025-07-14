@@ -8,10 +8,12 @@ interface SummaryHeaderProps {
 
 export const SummaryHeader: React.FC<SummaryHeaderProps> = ({ timeRangeText }) => {
   return (
-    <h2 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-      <DollarSign className="h-5 w-5" />
+    <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+      <div className="p-2 rounded-xl glass-card">
+        <DollarSign className="h-6 w-6" />
+      </div>
       Executive Summary
-      <span className="text-sm font-normal ml-2 bg-white/20 px-2 py-0.5 rounded">
+      <span className="text-sm font-medium ml-3 glass-card px-3 py-1.5 rounded-full border border-white/20">
         {timeRangeText}
       </span>
     </h2>

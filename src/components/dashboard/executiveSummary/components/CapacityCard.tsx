@@ -15,22 +15,22 @@ export const CapacityCard: React.FC<CapacityCardProps> = ({
   timeRangeText
 }) => {
   return (
-    <Card className="rounded-2xl border-0 shadow-sm bg-white">
-      <CardContent className="p-2">
+    <Card className="rounded-2xl glass-card glass-hover border-white/20">
+      <CardContent className="p-4">
         <div className="flex items-center justify-between">
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-gray-600 mb-1">
+          <div className="flex-1 min-w-0 space-y-2">
+            <p className="text-xs font-semibold text-white/90 mb-2 tracking-wide">
               {isOverCapacity ? 'Over Capacity' : 'Available'}
             </p>
-            <p className={`text-2xl font-bold mb-0.5 ${isOverCapacity ? 'text-red-600' : 'text-gray-900'}`}>
+            <p className={`text-3xl font-bold mb-1 tracking-tight ${isOverCapacity ? 'text-red-300' : 'text-white'}`}>
               {Math.abs(capacityHours).toLocaleString()}h
             </p>
-            <p className="text-xs font-medium text-gray-500">{timeRangeText}</p>
+            <p className="text-sm font-medium text-white/80">{timeRangeText}</p>
           </div>
-          <div className={`h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ml-2 ${
-            isOverCapacity ? 'bg-red-100' : 'bg-blue-100'
+          <div className={`h-10 w-10 rounded-xl glass-card flex items-center justify-center flex-shrink-0 ml-3 ${
+            isOverCapacity ? 'border-red-300/20' : 'border-white/20'
           }`}>
-            <Clock className={`h-4 w-4 ${isOverCapacity ? 'text-red-600' : 'text-blue-600'}`} />
+            <Clock className={`h-5 w-5 ${isOverCapacity ? 'text-red-300' : 'text-white/90'}`} />
           </div>
         </div>
       </CardContent>

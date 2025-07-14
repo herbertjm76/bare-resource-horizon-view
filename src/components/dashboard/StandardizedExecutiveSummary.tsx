@@ -173,80 +173,63 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
   const getGradientClasses = () => {
     switch (gradientType) {
       case 'blue':
-        return 'bg-gradient-to-br from-blue-50/80 via-cyan-50/60 to-blue-50/80';
+        return 'bg-gradient-to-br from-blue-500 via-blue-600 to-cyan-600';
       case 'emerald':
-        return 'bg-gradient-to-br from-emerald-50/80 via-green-50/60 to-emerald-50/80';
+        return 'bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600';
       case 'violet':
-        return 'bg-gradient-to-br from-violet-50/80 via-purple-50/60 to-violet-50/80';
+        return 'bg-gradient-to-br from-violet-500 via-purple-500 to-indigo-600';
       default:
-        return 'bg-gradient-to-br from-purple-50/80 via-blue-50/60 to-indigo-50/80 backdrop-blur-sm';
+        return 'bg-gradient-to-br from-brand-violet via-purple-600 to-indigo-600';
     }
   };
 
   console.log('Rendering enhanced unified desktop/mobile format with improved visual hierarchy');
   return (
-    <div className={cn(
-      "w-[90%] sm:w-full mx-auto rounded-xl p-3 sm:p-4 border shadow-sm animate-in",
-      getGradientClasses(),
-      "border-semantic-border-primary/50"
-    )}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        {metrics.map((metric, index) => {
-          const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
-          const IconComponent = getStandardIcon(metric, index);
-          
-          return (
-            <div key={index} className="min-w-0">
-              <Card className="bg-semantic-background-primary border border-semantic-border-primary/50 rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:border-brand-violet/30 h-full shadow-sm group">
-                <CardContent className="p-3 sm:p-4">
-                  {/* Header: Icon + Title with improved spacing */}
-                  <div className="flex items-start gap-2.5 mb-3">
-                    <div className={cn(
-                      "p-2 rounded-xl flex-shrink-0 transition-colors duration-200",
-                      "bg-brand-violet/10 text-brand-violet group-hover:bg-brand-violet/15"
-                    )}>
-                      <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className={cn(
-                        "font-medium text-semantic-text-primary leading-tight truncate",
-                        typography.ui.label.fontSize === '0.875rem' ? 'text-sm' : 'text-xs'
-                      )}>
-                        {metric.title}
-                      </h4>
-                    </div>
+    <div className={`relative overflow-hidden rounded-3xl ${getGradientClasses()}`}>
+      {/* Glass overlay */}
+      <div className="absolute inset-0 glass-elevated"></div>
+      
+      {/* Content */}
+      <div className="relative z-10 p-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {metrics.map((metric, index) => {
+            const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
+            const IconComponent = getStandardIcon(metric, index);
+            
+            return (
+              <div key={index} className="glass-hover rounded-2xl p-5 space-y-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 rounded-xl glass-card">
+                    <IconComponent className="h-5 w-5 text-white/90" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-semibold text-white/95 truncate tracking-wide">
+                      {metric.title}
+                    </h3>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="text-3xl font-bold text-white tracking-tight">
+                    {metric.value}
                   </div>
                   
-                  {/* Main Value with enhanced typography hierarchy */}
-                  <div className="mb-3">
-                    <div className={cn(
-                      "font-bold text-semantic-text-primary leading-none mb-1",
-                      "text-2xl sm:text-3xl lg:text-2xl xl:text-3xl", // Responsive larger sizes
-                      "bg-gradient-to-br from-semantic-text-primary to-semantic-text-secondary bg-clip-text"
-                    )}>
-                      {metric.value}
-                    </div>
-                    <StandardizedBadge 
-                      variant={getBadgeVariant(badge.color, metric.isGood)}
-                      size="metric"
-                      className="mt-2"
-                    >
-                      {badge.text}
-                    </StandardizedBadge>
-                  </div>
+                  <StandardizedBadge 
+                    variant={getBadgeVariant(badge.color, metric.isGood)}
+                    size="metric"
+                    className="glass-card border-white/20 text-white/90"
+                  >
+                    {badge.text}
+                  </StandardizedBadge>
                   
-                  {/* Subtitle with improved typography */}
-                  <p className={cn(
-                    "text-semantic-text-secondary leading-relaxed",
-                    typography.body.small.fontSize === '0.875rem' ? 'text-sm' : 'text-xs'
-                  )}>
+                  <p className="text-sm text-white/80 leading-relaxed font-medium">
                     {subtitle}
                   </p>
-                </CardContent>
-              </Card>
-            </div>
-          );
-        })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
