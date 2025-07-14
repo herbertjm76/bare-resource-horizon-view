@@ -171,6 +171,13 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
         const weekData = memberWeeklyData[week.key];
         const weekTotal = weekData?.total || 0;
         
+        console.log('🔍 WEEK CELL DEBUG:', {
+          weekKey: week.key,
+          weekData,
+          weekTotal,
+          hasData: !!weekData
+        });
+        
         const getUtilizationColor = (hours: number) => {
           if (hours === 0) return '#f3f4f6';
           if (hours === 40) return '#22c55e';
