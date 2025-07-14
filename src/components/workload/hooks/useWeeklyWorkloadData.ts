@@ -18,9 +18,24 @@ export const useWeeklyWorkloadData = (
 ) => {
   const { company } = useCompany();
 
+  console.log('🚨 WORKLOAD HOOK CALLED:', {
+    startDate: format(startDate, 'yyyy-MM-dd'),
+    memberCount: members.length,
+    numberOfWeeks,
+    viewType: numberOfWeeks === 12 ? 'TWELVE_WEEK_VIEW' : numberOfWeeks === 24 ? 'TWENTY_FOUR_WEEK_VIEW' : `${numberOfWeeks}_WEEK_VIEW`,
+    companyId: company?.id
+  });
+
   const { data: weeklyWorkloadData = {}, isLoading, error } = useQuery({
     queryKey: ['weekly-workload-data-v2', company?.id, members.map(m => m.id), format(startDate, 'yyyy-MM-dd'), numberOfWeeks, `weeks-${numberOfWeeks}`],
     queryFn: async () => {
+      console.log('🚨 QUERY FUNCTION EXECUTING:', {
+        viewType: numberOfWeeks === 12 ? 'TWELVE_WEEK_VIEW' : numberOfWeeks === 24 ? 'TWENTY_FOUR_WEEK_VIEW' : `${numberOfWeeks}_WEEK_VIEW`,
+        companyId: company?.id,
+        memberCount: members.length,
+        startDate: format(startDate, 'yyyy-MM-dd')
+      });
+
       if (!company?.id || members.length === 0) {
         console.log('🔍 WORKLOAD DATA: Skipping fetch - no company or members');
         return {};
