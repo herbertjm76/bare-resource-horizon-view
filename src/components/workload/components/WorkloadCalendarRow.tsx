@@ -41,6 +41,14 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
 
   // Helper function to render tooltip content for week data
   const renderWeekTooltip = (weekData: WeeklyWorkloadBreakdown | undefined) => {
+    console.log('🔍 TOOLTIP DEBUG:', { 
+      weekData, 
+      hasWeekData: !!weekData,
+      weekTotal: weekData?.total,
+      projectHours: weekData?.projectHours,
+      projects: weekData?.projects
+    });
+    
     if (!weekData || weekData.total === 0) {
       return <div>No allocation for this week</div>;
     }
