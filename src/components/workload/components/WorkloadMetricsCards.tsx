@@ -87,11 +87,13 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-muted-foreground" />
-              <div className="text-sm text-muted-foreground">Available Hours</div>
+              <div className="text-sm text-muted-foreground">Utilization Summary</div>
             </div>
-            <div className="text-2xl font-bold mt-1">{Math.round(metrics.availableHours)}h</div>
+            <div className="text-2xl font-bold mt-1">{metrics.utilizationRate}%</div>
             <div className="text-sm text-muted-foreground">
-              {periodWeeks} week{periodWeeks > 1 ? 's' : ''}
+              {metrics.utilizationRate >= 85 ? 'High Utilization' : 
+               metrics.utilizationRate >= 70 ? 'Good Utilization' : 
+               'Low Utilization'}
             </div>
           </CardContent>
         </Card>
