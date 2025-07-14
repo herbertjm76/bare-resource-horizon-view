@@ -1,5 +1,6 @@
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { TeamMember } from '@/components/dashboard/types';
 import { WeeklyWorkloadBreakdown } from '../hooks/types';
 
@@ -37,6 +38,63 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
   }, 0);
 
   const rowBgColor = memberIndex % 2 === 0 ? '#ffffff' : '#f9fafb';
+
+  // Helper function to render tooltip content for week data
+  const renderWeekTooltip = (weekData: WeeklyWorkloadBreakdown | undefined, weekTotal: number) => {
+    if (weekTotal === 0) return null;
+
+    return (
+      <div className="space-y-2">
+        <div className="font-semibold text-sm">Week Breakdown</div>
+        
+        {/* Project hours breakdown */}
+        {weekData?.projects && weekData.projects.length > 0 && (
+          <div className="space-y-1">
+            <div className="text-xs font-medium text-muted-foreground">Projects:</div>
+            {weekData.projects.map((project, index) => (
+              <div key={index} className="flex justify-between items-center text-xs">
+                <span className="font-medium">{project.project_code || project.project_name}</span>
+                <span className="text-muted-foreground">{project.hours}h</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Other time breakdown */}
+        {(weekData?.annualLeave || weekData?.otherLeave || weekData?.officeHolidays) && (
+          <div className="space-y-1">
+            <div className="text-xs font-medium text-muted-foreground">Other Time:</div>
+            {weekData.annualLeave > 0 && (
+              <div className="flex justify-between items-center text-xs">
+                <span>Annual Leave</span>
+                <span className="text-muted-foreground">{weekData.annualLeave}h</span>
+              </div>
+            )}
+            {weekData.otherLeave > 0 && (
+              <div className="flex justify-between items-center text-xs">
+                <span>Other Leave</span>
+                <span className="text-muted-foreground">{weekData.otherLeave}h</span>
+              </div>
+            )}
+            {weekData.officeHolidays > 0 && (
+              <div className="flex justify-between items-center text-xs">
+                <span>Office Holidays</span>
+                <span className="text-muted-foreground">{weekData.officeHolidays}h</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Total */}
+        <div className="border-t pt-1">
+          <div className="flex justify-between items-center text-sm font-semibold">
+            <span>Total</span>
+            <span>{weekTotal}h</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <tr className="workload-grid-row">
@@ -116,25 +174,31 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
             }}
           >
             {weekTotal > 0 ? (
-              <div 
-                className="utilization-badge"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '4px',
-                  fontSize: '10px',
-                  fontWeight: '600',
-                  backgroundColor: getUtilizationColor(weekTotal),
-                  color: 'white',
-                  cursor: 'help'
-                }}
-                title={`${weekTotal}h allocated`}
-              >
-                {weekTotal}
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div 
+                    className="utilization-badge"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '4px',
+                      fontSize: '10px',
+                      fontWeight: '600',
+                      backgroundColor: getUtilizationColor(weekTotal),
+                      color: 'white',
+                      cursor: 'help'
+                    }}
+                  >
+                    {weekTotal}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  {renderWeekTooltip(weekData, weekTotal)}
+                </TooltipContent>
+              </Tooltip>
             ) : (
               <div 
                 style={{
