@@ -56,7 +56,7 @@ export const WeekUtilizationCell: React.FC<WeekUtilizationCellProps> = ({
                 fontWeight: '600',
                 backgroundColor: getUtilizationColor(weekTotal),
                 color: 'white',
-                cursor: 'help'
+                cursor: 'pointer'
               }}
             >
               {weekTotal}
