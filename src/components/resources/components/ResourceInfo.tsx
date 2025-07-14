@@ -39,9 +39,9 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
     <td className={`project-name-column ${rowBgClass} p-2 group-hover:bg-gray-50`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2 min-w-0 flex-grow">
-          <Avatar className="h-6 w-6 border-2 border-primary flex-shrink-0">
+          <Avatar className="h-6 w-6 flex-shrink-0" style={{ border: '2px solid rgb(111, 75, 246)' }}>
             <AvatarImage src={resource.avatar_url} alt={displayName} />
-            <AvatarFallback className="text-xs bg-primary text-white">
+            <AvatarFallback className="text-xs text-white" style={{ backgroundColor: 'rgb(111, 75, 246)' }}>
               {initials}
             </AvatarFallback>
           </Avatar>

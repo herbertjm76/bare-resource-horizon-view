@@ -136,7 +136,7 @@
 
 .workload-resource-row.resource-row .workload-resource-cell.project-resource-column {
   padding-left: 32px !important; /* Indentation to show hierarchy */
-  border-left: 3px solid hsl(var(--primary)) !important; /* Subtle color indicator */
+  border-left: 3px solid rgb(111, 75, 246) !important; /* Subtle color indicator */
   background-color: #fcfcfc !important;
 }
 
