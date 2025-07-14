@@ -183,54 +183,46 @@ export const StandardizedExecutiveSummary: React.FC<StandardizedExecutiveSummary
     }
   };
 
-  console.log('Rendering enhanced unified desktop/mobile format with improved visual hierarchy');
+  console.log('Rendering 4 separate executive summary cards');
   return (
-    <div className={`relative overflow-hidden rounded-3xl ${getGradientClasses()}`}>
-      {/* Glass overlay */}
-      <div className="absolute inset-0 glass-elevated"></div>
-      
-      {/* Content */}
-      <div className="relative z-10 p-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {metrics.map((metric, index) => {
-            const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
-            const IconComponent = getStandardIcon(metric, index);
-            
-            return (
-              <div key={index} className="glass-hover rounded-xl p-3 space-y-2">
-                <div className="flex items-center space-x-2">
-                  <div className="p-2 rounded-lg glass-card">
-                    <IconComponent className="h-4 w-4 text-white/90" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-xs font-semibold text-white/95 truncate tracking-wide uppercase">
-                      {metric.title}
-                    </h3>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="text-2xl font-bold text-white tracking-tight">
-                    {metric.value}
-                  </div>
-                  
-                  <StandardizedBadge 
-                    variant={getBadgeVariant(badge.color, metric.isGood)}
-                    size="metric"
-                    className="glass-card border-white/20 text-white/90 text-xs"
-                  >
-                    {badge.text}
-                  </StandardizedBadge>
-                  
-                  <p className="text-xs text-white/80 leading-relaxed font-medium">
-                    {subtitle}
-                  </p>
-                </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {metrics.map((metric, index) => {
+        const { badge, subtitle } = getDefaultBadgeAndSubtitle(metric, index);
+        const IconComponent = getStandardIcon(metric, index);
+        
+        return (
+          <div key={index} className="relative overflow-hidden rounded-xl bg-card border glass-card p-4 space-y-3 hover:shadow-lg transition-shadow">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <IconComponent className="h-4 w-4" />
               </div>
-            );
-          })}
-        </div>
-      </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-xs font-semibold text-muted-foreground truncate tracking-wide uppercase">
+                  {metric.title}
+                </h3>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="text-2xl font-bold text-foreground tracking-tight">
+                {metric.value}
+              </div>
+              
+              <StandardizedBadge 
+                variant={getBadgeVariant(badge.color, metric.isGood)}
+                size="metric"
+                className="text-xs"
+              >
+                {badge.text}
+              </StandardizedBadge>
+              
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {subtitle}
+              </p>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
