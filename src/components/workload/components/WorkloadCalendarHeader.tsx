@@ -10,6 +10,8 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
   weekStartDates, 
   shouldCenterAlign = false 
 }) => {
+  const weekCount = weekStartDates.length;
+  const weekText = weekCount === 1 ? 'week' : 'weeks';
   return (
     <thead>
       <tr>
@@ -162,7 +164,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
             fontWeight: '600'
           }}
         >
-          Total Utilization (12 weeks)
+          Total Utilization ({weekCount} {weekText})
         </th>
       </tr>
     </thead>

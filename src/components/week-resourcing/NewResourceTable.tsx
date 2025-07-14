@@ -87,7 +87,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
               
               {/* Utilization Column */}
               <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20 text-sm" style={{ width: 200, minWidth: 200 }}>
-                Utilization
+                Total Utilization (1 week)
               </TableHead>
               
               {/* Leave Column */}
