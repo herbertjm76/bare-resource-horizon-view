@@ -77,9 +77,10 @@ export const processProjectAllocations = (
     });
   }
 
-  // Update result with project data
+  // Update result with project data - with date range validation
   memberWeekHours.forEach((weekMap, memberId) => {
     weekMap.forEach((totalHours, weekKey) => {
+      // Only update weeks that exist in the result structure (within the requested date range)
       if (result[memberId] && result[memberId][weekKey]) {
         result[memberId][weekKey].projectHours = totalHours;
         const projectsMap = memberWeekProjects.get(memberId)?.get(weekKey);
@@ -95,13 +96,13 @@ export const processProjectAllocations = (
           });
         }
       } else {
-        // Debug missing weeks
+        // Debug weeks that fall outside the requested date range
         if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e') {
-          console.log('🔍 ROB NIGHT WEEK NOT FOUND IN RESULT:', {
+          console.log('🔍 ROB NIGHT WEEK OUTSIDE DATE RANGE (FILTERED OUT):', {
             weekKey,
             totalHours,
             memberExists: !!result[memberId],
-            availableWeeks: result[memberId] ? Object.keys(result[memberId]).slice(0, 5) : 'none'
+            reason: 'Week falls outside requested date range'
           });
         }
       }

@@ -19,6 +19,7 @@ export const fetchProjectAllocations = async (
     dateRange: `${startDateStr} to ${endDateStr}`
   });
 
+  // FIX: Remove restrictive date filtering - fetch ALL allocations and let frontend filter
   const result = await supabase
     .from('project_resource_allocations')
     .select(`
@@ -31,33 +32,27 @@ export const fetchProjectAllocations = async (
     `)
     .eq('company_id', companyId)
     .in('resource_id', memberIds)
-    .gte('week_start_date', startDateStr)
-    .lte('week_start_date', endDateStr)
-    .gt('hours', 0);
+    .gt('hours', 0)
+    .order('week_start_date', { ascending: true });
 
-  console.log('🔍 PROJECT ALLOCATIONS RESULT:', {
+  console.log('🔍 PROJECT ALLOCATIONS RESULT (ALL RECORDS):', {
     totalRecords: result.data?.length || 0,
     error: result.error,
     robNightRecords: result.data?.filter(r => r.resource_id === 'fc351fa0-b6df-447a-bc27-b6675db2622e').length || 0,
-    sampleRecords: result.data?.slice(0, 3).map(r => ({
-      resource_id: r.resource_id,
-      project_id: r.project_id,
-      hours: r.hours,
-      week_start_date: r.week_start_date
-    })) || []
+    dateRange: result.data ? `${result.data[0]?.week_start_date} to ${result.data[result.data.length - 1]?.week_start_date}` : 'none'
   });
 
   // Log Rob Night's specific records
   const robNightRecords = result.data?.filter(r => r.resource_id === 'fc351fa0-b6df-447a-bc27-b6675db2622e') || [];
   if (robNightRecords.length > 0) {
-    console.log('🔍 ROB NIGHT ALLOCATION RECORDS FETCHED:', {
+    console.log('🔍 ROB NIGHT ALLOCATION RECORDS FETCHED (ALL):', {
       totalRecords: robNightRecords.length,
       records: robNightRecords.map(r => ({
         project_id: r.project_id,
         project_name: r.projects?.name,
         hours: r.hours,
         week_start_date: r.week_start_date
-      }))
+      })).slice(0, 10) // Show first 10 records
     });
   }
 
