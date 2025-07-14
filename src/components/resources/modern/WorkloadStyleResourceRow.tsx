@@ -78,7 +78,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
         }}
       >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%' }}>
+            <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid hsl(var(--primary))' }}>
               <AvatarImage src={resource.avatar_url} alt={displayName} />
               <AvatarFallback style={{ backgroundColor: 'hsl(var(--primary))', color: 'white' }}>
                 {initials}
