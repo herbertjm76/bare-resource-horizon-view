@@ -70,17 +70,17 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                 width: '24px', 
                 height: '24px', 
                 padding: '0',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                color: 'white'
+                border: '1px solid rgba(0, 0, 0, 0.2)',
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                color: 'black'
               }}
               onClick={onToggleExpand}
               disabled={isLoading}
             >
               {isExpanded ? (
-                <ChevronDown style={{ width: '12px', height: '12px', color: 'white' }} />
+                <ChevronDown style={{ width: '12px', height: '12px', color: 'black' }} />
               ) : (
-                <ChevronRight style={{ width: '12px', height: '12px', color: 'white' }} />
+                <ChevronRight style={{ width: '12px', height: '12px', color: 'black' }} />
               )}
             </Button>
             
@@ -88,7 +88,7 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
               <h3 style={{ 
                 fontSize: '15px', 
                 fontWeight: '600', 
-                color: 'white',
+                color: 'black',
                 margin: '0',
                 lineHeight: '1.2',
                 overflow: 'hidden',
@@ -108,15 +108,15 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                   alignItems: 'center', 
                   gap: '4px',
                   fontSize: '12px',
-                  color: 'rgba(255, 255, 255, 0.8)'
+                  color: 'black'
                 }}>
-                  <Users style={{ width: '12px', height: '12px' }} />
+                  <Users style={{ width: '12px', height: '12px', color: 'black' }} />
                   {resources.length} resources
                 </span>
                 {project.code && (
                   <span style={{ 
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    color: 'white',
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+                    color: 'black',
                     padding: '2px 6px',
                     borderRadius: '4px',
                     fontSize: '11px',
@@ -165,24 +165,12 @@ export const WorkloadStyleProjectRow: React.FC<WorkloadStyleProjectRowProps> = (
                 minHeight: '24px'
               }}>
                 {dayTotal > 0 ? (
-                  <span style={{ 
-                    fontSize: '12px',
-                    fontWeight: '700',
-                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                    color: 'white',
-                    padding: '2px 6px',
-                    borderRadius: '3px',
-                    minWidth: '20px',
-                    minHeight: '20px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
+                  <span className="project-total-hours">
                     {dayTotal}
                   </span>
                 ) : (
                   <span style={{ 
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: 'rgba(0, 0, 0, 0.4)',
                     fontSize: '12px'
                   }}>
                     —
