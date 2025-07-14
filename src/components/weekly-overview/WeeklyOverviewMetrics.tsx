@@ -80,58 +80,97 @@ export const WeeklyOverviewMetrics: React.FC<WeeklyOverviewMetricsProps> = ({
   const metrics = calculateWeeklyMetrics();
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-blue-500" />
-            <div>
-              <p className="text-sm font-medium">Week Utilization</p>
-              <p className="text-2xl font-bold">{metrics.utilizationRate}%</p>
-              <p className="text-xs text-gray-500">{metrics.totalAllocated}h / {metrics.totalCapacity}h</p>
+    <div className="w-[90%] sm:w-full mx-auto bg-gradient-to-r from-purple-50 via-blue-50 to-indigo-50 rounded-xl p-2 sm:p-3 border border-purple-100/50 shadow-sm">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-1.5 sm:gap-2">
+        <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
+          <CardContent className="p-1.5 sm:p-2">
+            <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
+              <div className="p-0.5 sm:p-1 rounded-full text-brand-violet bg-brand-violet/10 flex-shrink-0">
+                <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              </div>
+              <p className="font-medium text-gray-700 text-xs leading-tight truncate">Week Utilization</p>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-green-500" />
-            <div>
-              <p className="text-sm font-medium">Available Hours</p>
-              <p className="text-2xl font-bold">{Math.round(metrics.availableHours)}h</p>
-              <p className="text-xs text-gray-500">This week</p>
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-base sm:text-lg font-bold text-gray-900 leading-none">
+                {metrics.utilizationRate}%
+              </div>
+              <div className={`text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 rounded ${
+                metrics.utilizationRate > 85 ? 'bg-orange-500 text-white' : 
+                metrics.utilizationRate > 70 ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'
+              }`}>
+                {metrics.utilizationRate > 85 ? 'High' : metrics.utilizationRate > 70 ? 'Optimal' : 'Low'}
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-orange-500" />
-            <div>
-              <p className="text-sm font-medium">Overloaded</p>
-              <p className="text-2xl font-bold">{metrics.overloadedMembers}</p>
-              <p className="text-xs text-gray-500">Over 100% capacity</p>
+            <p className="text-xs text-gray-500 leading-tight">
+              {metrics.totalAllocated}h / {metrics.totalCapacity}h
+            </p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
+          <CardContent className="p-1.5 sm:p-2">
+            <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
+              <div className="p-0.5 sm:p-1 rounded-full text-brand-violet bg-brand-violet/10 flex-shrink-0">
+                <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              </div>
+              <p className="font-medium text-gray-700 text-xs leading-tight truncate">Available Hours</p>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-purple-500" />
-            <div>
-              <p className="text-sm font-medium">Under-utilized</p>
-              <p className="text-2xl font-bold">{metrics.underUtilizedMembers}</p>
-              <p className="text-xs text-gray-500">Under 60% capacity</p>
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-base sm:text-lg font-bold text-gray-900 leading-none">
+                {Math.round(metrics.availableHours)}h
+              </div>
+              <div className="bg-blue-500 text-white text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 rounded">
+                Available
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+            <p className="text-xs text-gray-500 leading-tight">This week</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
+          <CardContent className="p-1.5 sm:p-2">
+            <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
+              <div className="p-0.5 sm:p-1 rounded-full text-brand-violet bg-brand-violet/10 flex-shrink-0">
+                <Users className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              </div>
+              <p className="font-medium text-gray-700 text-xs leading-tight truncate">Overloaded</p>
+            </div>
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-base sm:text-lg font-bold text-gray-900 leading-none">
+                {metrics.overloadedMembers}
+              </div>
+              <div className={`text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 rounded ${
+                metrics.overloadedMembers > 0 ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+              }`}>
+                {metrics.overloadedMembers > 0 ? 'Alert' : 'Good'}
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 leading-tight">Over 100% capacity</p>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-white border border-gray-100 rounded-md sm:rounded-lg transition-all duration-300 hover:shadow-md h-full shadow-sm">
+          <CardContent className="p-1.5 sm:p-2">
+            <div className="flex items-center gap-1.5 min-w-0 flex-1 mb-1">
+              <div className="p-0.5 sm:p-1 rounded-full text-brand-violet bg-brand-violet/10 flex-shrink-0">
+                <Calendar className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              </div>
+              <p className="font-medium text-gray-700 text-xs leading-tight truncate">Under-utilized</p>
+            </div>
+            <div className="flex items-center justify-between mb-1">
+              <div className="text-base sm:text-lg font-bold text-gray-900 leading-none">
+                {metrics.underUtilizedMembers}
+              </div>
+              <div className={`text-xs px-1 py-0.5 h-3.5 ml-1 flex-shrink-0 rounded ${
+                metrics.underUtilizedMembers > 0 ? 'bg-orange-500 text-white' : 'bg-green-500 text-white'
+              }`}>
+                {metrics.underUtilizedMembers > 0 ? 'Review' : 'Good'}
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 leading-tight">Under 60% capacity</p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

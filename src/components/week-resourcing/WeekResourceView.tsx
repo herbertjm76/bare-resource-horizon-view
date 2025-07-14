@@ -202,33 +202,39 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       {/* Header Controls */}
       <Card className="border-none shadow-sm bg-white">
         <CardContent className="p-4">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-            {/* Week Selector and Search */}
-            <div className="flex items-center gap-4">
-              <WeekStartSelector
-                selectedWeek={selectedWeek}
-                onWeekChange={handleWeekChange}
+          {/* Row 1: Week Selector */}
+          <div className="flex justify-center mb-4">
+            <WeekStartSelector
+              selectedWeek={selectedWeek}
+              onWeekChange={handleWeekChange}
+            />
+          </div>
+
+          {/* Row 2: Search and Office Filter */}
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-4">
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search members..."
+                value={filters.searchTerm}
+                onChange={(e) => onFilterChange('searchTerm', e.target.value)}
+                className="pl-8 h-8 w-48 text-sm"
               />
+            </div>
 
-              <div className="relative">
-                <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search members..."
-                  value={filters.searchTerm}
-                  onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-                  className="pl-8 h-8 w-48 text-sm"
-                />
-              </div>
+            <Select value={filters.office} onValueChange={(value) => onFilterChange('office', value)}>
+              <SelectTrigger className="w-36 h-8 text-sm">
+                <SelectValue placeholder="Filter by office..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Offices</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-              <Select value={filters.office} onValueChange={(value) => onFilterChange('office', value)}>
-                <SelectTrigger className="w-36 h-8 text-sm">
-                  <SelectValue placeholder="Filter by office..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Offices</SelectItem>
-                </SelectContent>
-              </Select>
-
+          {/* Row 3: Clear Filters and View Controls */}
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex items-center">
               {activeFiltersCount > 0 && (
                 <Button
                   variant="ghost"
