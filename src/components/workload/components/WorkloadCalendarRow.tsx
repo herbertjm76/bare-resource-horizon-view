@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { TeamMember } from '@/components/dashboard/types';
 import { WeeklyWorkloadBreakdown } from '../hooks/types';
 
@@ -118,8 +118,9 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
   };
 
   return (
-    <tr className="workload-grid-row">
-      {/* Member info column - Fixed width, conditionally sticky */}
+    <TooltipProvider>
+      <tr className="workload-grid-row">
+        {/* Member info column - Fixed width, conditionally sticky */}
       <td 
         className="workload-grid-cell member-cell"
         style={{
@@ -277,6 +278,7 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
           {totalHours}h
         </span>
       </td>
-    </tr>
+      </tr>
+    </TooltipProvider>
   );
 };
