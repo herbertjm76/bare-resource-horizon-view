@@ -35,6 +35,11 @@ export const useWeeklyWorkloadData = (
       };
 
       console.log('🔍 WORKLOAD DATA: Starting workload data fetch for', memberIds.length, 'members over', numberOfWeeks, 'weeks');
+      console.log('🔍 WORKLOAD DATA: Date range calculation:', {
+        startDate: format(startDate, 'yyyy-MM-dd'),
+        numberOfWeeks,
+        viewType: numberOfWeeks === 12 ? '12-week-view' : numberOfWeeks === 24 ? '24-week-view' : `${numberOfWeeks}-week-view`
+      });
 
       // Initialize the result structure
       const result = initializeWorkloadData(members, startDate, numberOfWeeks);
@@ -50,8 +55,14 @@ export const useWeeklyWorkloadData = (
         console.log('🔍 WORKLOAD DATA: Fetched data -', 
           'allocations:', allocations.length,
           'annual leaves:', annualLeaves.length,
-          'other leaves:', otherLeaves.length
+          'other leaves:', otherLeaves.length,
+          'viewType:', numberOfWeeks === 12 ? '12-week-view' : '24-week-view'
         );
+        
+        // Debug: Log unique projects found in allocations
+        const uniqueProjects = [...new Set(allocations.map(a => a.projects?.code || a.projects?.name || 'Unknown'))];
+        console.log('🔍 WORKLOAD DATA: Unique projects found:', uniqueProjects);
+        console.log('🔍 WORKLOAD DATA: Sample allocations for debugging:', allocations.slice(0, 5));
 
         // Process all data efficiently
         processProjectAllocations(allocations, result);
@@ -65,8 +76,24 @@ export const useWeeklyWorkloadData = (
         
         console.log('🔍 WORKLOAD DATA: Processing complete -', 
           'members with data:', membersWithData.length, 
-          'total members:', Object.keys(result).length
+          'total members:', Object.keys(result).length,
+          'viewType:', numberOfWeeks === 12 ? '12-week-view' : '24-week-view'
         );
+
+        // Debug: Log final result structure for first member
+        const firstMemberId = Object.keys(result)[0];
+        if (firstMemberId && result[firstMemberId]) {
+          const memberWeeks = Object.keys(result[firstMemberId]);
+          console.log('🔍 WORKLOAD DATA: Sample member data structure:', {
+            memberId: firstMemberId,
+            weekCount: memberWeeks.length,
+            sampleWeeks: memberWeeks.slice(0, 3),
+            sampleData: memberWeeks.slice(0, 3).map(week => ({
+              week,
+              data: result[firstMemberId][week]
+            }))
+          });
+        }
 
         return result;
       } catch (error) {
