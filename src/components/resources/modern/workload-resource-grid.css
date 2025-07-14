@@ -113,7 +113,8 @@
   color: #000000 !important;
 }
 
-/* Project Total Hours Badge */
+/* Project Total Hours Badge - Override project row color inheritance */
+.workload-resource-row.project-header-row .project-total-hours,
 .workload-resource-row.project-header-row .workload-resource-cell .project-total-hours {
   background: hsl(var(--primary)) !important;
   color: white !important;
