@@ -3,13 +3,13 @@ import React from 'react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
-import { WeeklyWorkloadBreakdown } from './hooks/useWeeklyWorkloadData';
+import { WeeklyBreakdown } from './hooks/services/unifiedDataService';
 import { WorkloadCalendarTable } from './components/WorkloadCalendarTable';
 import './workload-grid.css';
 
 interface WeeklyWorkloadCalendarProps {
   members: TeamMember[];
-  weeklyWorkloadData: Record<string, Record<string, WeeklyWorkloadBreakdown>>;
+  weeklyWorkloadData: Record<string, Record<string, WeeklyBreakdown>>;
   weekStartDates: Array<{ date: Date; key: string }>;
 }
 

@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TeamMember } from '@/components/dashboard/types';
 import { WeeklyWorkloadCalendar } from './WeeklyWorkloadCalendar';
-import { useWeeklyWorkloadData } from './hooks/useWeeklyWorkloadData';
+import { useUnifiedWorkloadData } from './hooks/useUnifiedWorkloadData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WorkloadHeaderControls } from './components/WorkloadHeaderControls';
 import { WorkloadMetricsCards } from './components/WorkloadMetricsCards';
@@ -51,11 +51,12 @@ export const TeamWorkloadContent: React.FC<TeamWorkloadContentProps> = ({
   onNextWeek
 }) => {
   // Use the selected week period instead of fixed 36 weeks
-  const { 
-    weeklyWorkloadData, 
-    isLoadingWorkload, 
-    weekStartDates 
-  } = useWeeklyWorkloadData(selectedWeek, filteredMembers, selectedWeeks);
+  // Use unified workload data hook - ensures consistency across all views
+  const { weeklyWorkloadData, isLoading: isLoadingWorkload, weekStartDates } = useUnifiedWorkloadData(
+    selectedWeek,
+    filteredMembers, 
+    selectedWeeks
+  );
 
   const activeFiltersCount = [activeFilter !== 'all' ? activeFilter : '', searchQuery].filter(Boolean).length;
 
