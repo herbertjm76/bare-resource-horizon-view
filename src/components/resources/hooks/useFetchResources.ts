@@ -82,8 +82,83 @@ export const useFetchResources = (projectId: string) => {
         last_name: member.invite?.last_name,
       }));
       
-      // Combine resources
-      const combinedResources = [...activeResources, ...pendingResources];
+      // Check for allocations that exist without corresponding resource entries
+      const { data: orphanedAllocations, error: allocError } = await supabase
+        .from('project_resource_allocations')
+        .select(`
+          resource_id,
+          resource_type,
+          hours
+        `)
+        .eq('project_id', projectId)
+        .eq('company_id', company.id);
+
+      console.log('DEBUG useFetchResources - Orphaned allocations:', orphanedAllocations);
+
+      // Get unique resource IDs from allocations that aren't in our resource lists
+      const existingResourceIds = new Set([
+        ...activeResources.map(r => r.id),
+        ...pendingResources.map(r => r.id)
+      ]);
+
+      const orphanedResourceIds = new Set();
+      orphanedAllocations?.forEach(allocation => {
+        if (!existingResourceIds.has(allocation.resource_id)) {
+          orphanedResourceIds.add(allocation.resource_id);
+        }
+      });
+
+      console.log('DEBUG useFetchResources - Orphaned resource IDs:', Array.from(orphanedResourceIds));
+
+      // Fetch profile information for orphaned resources
+      const orphanedResources: Resource[] = [];
+      if (orphanedResourceIds.size > 0) {
+        // Check if they are active users
+        const { data: orphanedProfiles } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, job_title, avatar_url')
+          .in('id', Array.from(orphanedResourceIds) as string[]);
+
+        orphanedProfiles?.forEach(profile => {
+          orphanedResources.push({
+            id: profile.id,
+            name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Unnamed',
+            role: profile.job_title || 'Team Member',
+            isPending: false,
+            avatar_url: profile.avatar_url,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+          });
+        });
+
+        // Check if they are pending invites
+        const remainingIds = Array.from(orphanedResourceIds).filter(id => 
+          !orphanedProfiles?.some(p => p.id === id)
+        );
+
+        if (remainingIds.length > 0) {
+          const { data: orphanedInvites } = await supabase
+            .from('invites')
+            .select('id, first_name, last_name, job_title')
+            .in('id', remainingIds as string[]);
+
+          orphanedInvites?.forEach(invite => {
+            orphanedResources.push({
+              id: invite.id,
+              name: `${invite.first_name || ''} ${invite.last_name || ''}`.trim() || 'Unnamed',
+              role: invite.job_title || 'Team Member',
+              isPending: true,
+              first_name: invite.first_name,
+              last_name: invite.last_name,
+            });
+          });
+        }
+      }
+
+      console.log('DEBUG useFetchResources - Orphaned resources found:', orphanedResources);
+
+      // Combine all resources
+      const combinedResources = [...activeResources, ...pendingResources, ...orphanedResources];
       
       console.log('DEBUG useFetchResources - Final combined resources for project:', combinedResources);
       console.log('DEBUG useFetchResources - Total resources count:', combinedResources.length);
