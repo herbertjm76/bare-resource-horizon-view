@@ -41,6 +41,29 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
     console.log('NewResourceTable useEffect - viewMode prop changed to:', viewMode);
   }, [viewMode]);
   
+  // Filter projects to only show those with allocated hours
+  const projectsWithHours = React.useMemo(() => {
+    return projects.filter(project => {
+      let projectTotal = 0;
+      
+      // Calculate total hours for this project across all members
+      members.forEach(member => {
+        const key = `${member.id}:${project.id}`;
+        const hours = allocationMap.get(key) || 0;
+        projectTotal += hours;
+      });
+      
+      console.log(`Project ${project.code || project.name}: ${projectTotal}h total - ${projectTotal > 0 ? 'SHOWING' : 'HIDING'}`);
+      return projectTotal > 0;
+    });
+  }, [projects, members, allocationMap]);
+  
+  console.log('NewResourceTable - Projects filtering:', {
+    originalCount: projects.length,
+    filteredCount: projectsWithHours.length,
+    hiddenCount: projects.length - projectsWithHours.length
+  });
+  
   const tableClassName = viewMode === 'compact' 
     ? 'resource-table-compact weekly-table' 
     : 'resource-table-expanded weekly-table';
@@ -67,8 +90,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                 Total Hours
               </TableHead>
               
-              {/* Project Columns with Rotated Text */}
-              {projects.map((project) => (
+              {/* Project Columns with Rotated Text - Only show projects with hours */}
+              {projectsWithHours.map((project) => (
                 <TableHead 
                   key={project.id} 
                   className="text-center font-semibold text-white border-r border-white/20 bg-[#6465F0] relative text-sm"
@@ -98,7 +121,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                 key={member.id}
                 member={member}
                 memberIndex={index}
-                projects={projects}
+                projects={projectsWithHours}
                 allocationMap={allocationMap}
                 annualLeaveData={annualLeaveData}
                 holidaysData={holidaysData}
@@ -112,7 +135,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
               />
             ))}
             <NewResourceSummaryRow
-              projects={projects}
+              projects={projectsWithHours}
               allocationMap={allocationMap}
               members={members}
             />
