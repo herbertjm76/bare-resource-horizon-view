@@ -85,9 +85,19 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                 Team Member
               </TableHead>
               
-              {/* Project Count Column - simplified header */}
-              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20 text-sm" style={{ width: 80, minWidth: 80 }}>
-                Total Hours
+              {/* Utilization Column */}
+              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20 text-sm" style={{ width: 200, minWidth: 200 }}>
+                Utilization
+              </TableHead>
+              
+              {/* Leave Column */}
+              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20 text-sm" style={{ width: 150, minWidth: 150 }}>
+                Leave
+              </TableHead>
+              
+              {/* Project Count Column */}
+              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20 text-sm" style={{ width: 35, minWidth: 35 }}>
+                Count
               </TableHead>
               
               {/* Project Columns with Rotated Text - Only show projects with hours */}

@@ -54,9 +54,15 @@ export const NewResourceSummaryRow: React.FC<NewResourceSummaryRowProps> = ({
         Weekly Total
       </TableCell>
       
-      {/* Weekly Utilization Column - removed */}
+      {/* Utilization Column */}
+      <TableCell className="text-center text-sm font-semibold">
+        —
+      </TableCell>
       
-      {/* Leave Column - removed */}
+      {/* Leave Column */}
+      <TableCell className="text-center text-sm font-semibold">
+        —
+      </TableCell>
       
       {/* Project Count Column */}
       <TableCell className="text-center text-sm font-semibold">
