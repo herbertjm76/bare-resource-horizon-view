@@ -5,8 +5,6 @@ import { TrendingUp, Clock, Users, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { TeamMember } from '@/components/dashboard/types';
 import { UtilizationCalculationService } from '@/services/utilizationCalculationService';
-import { ChatGPTInterpretationCard } from '@/components/dashboard/cards/ChatGPTInterpretationCard';
-import { SummaryDataPreparationService } from '@/services/summaryDataPreparationService';
 
 interface WorkloadMetricsCardsProps {
   weeklyWorkloadData: Record<string, Record<string, any>>;
@@ -70,14 +68,8 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
 
   const metrics = calculateWorkloadMetrics();
 
-  const summaryData = SummaryDataPreparationService.prepareWorkloadMetricsData(
-    weeklyWorkloadData,
-    filteredMembers
-  );
-
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">{/* Restored original layout */}
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -126,14 +118,6 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
           </CardContent>
         </Card>
       </div>
-
-      {/* ChatGPT Workload Analysis */}
-      <ChatGPTInterpretationCard
-        summaryData={summaryData}
-        title="Workload Analysis & Recommendations"
-        context={`Team workload analysis for ${filteredMembers.length} members across ${periodWeeks} weeks`}
-        autoGenerate={false}
-      />
     </div>
   );
 };
