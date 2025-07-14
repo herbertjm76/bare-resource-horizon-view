@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, startOfWeek } from 'date-fns';
 import { initializeWorkloadResult } from './workloadDataInitializer';
 import { fetchProjectAllocations, fetchAnnualLeaves, fetchOtherLeaves } from './dataFetchers';
 import { processProjectAllocations, processAnnualLeaves, processOtherLeaves, calculateTotals } from './dataProcessors';
@@ -21,18 +21,19 @@ export const fetchUnifiedWorkloadData = async (params: UnifiedWorkloadParams): P
   const memberIds = members.map(m => m.id);
 
   try {
-    // Initialize result structure with all weeks
-    const result = initializeWorkloadResult(members, startDate, numberOfWeeks);
-
-    // Calculate date range
-    const endDate = new Date(startDate);
+    // Calculate date range with proper week normalization
+    const normalizedStartDate = startOfWeek(startDate, { weekStartsOn: 1 });
+    const endDate = new Date(normalizedStartDate);
     endDate.setDate(endDate.getDate() + (numberOfWeeks * 7) - 1);
+
+    // Initialize result structure with all weeks using normalized start date
+    const result = initializeWorkloadResult(members, normalizedStartDate, numberOfWeeks);
 
     // Fetch ALL data in parallel - SINGLE DATA FETCH POINT
     const [projectAllocations, annualLeaves, otherLeaves] = await Promise.all([
-      fetchProjectAllocations(companyId, memberIds, startDate, endDate),
-      fetchAnnualLeaves(companyId, memberIds, startDate, endDate),
-      fetchOtherLeaves(companyId, memberIds, startDate, endDate)
+      fetchProjectAllocations(companyId, memberIds, normalizedStartDate, endDate),
+      fetchAnnualLeaves(companyId, memberIds, normalizedStartDate, endDate),
+      fetchOtherLeaves(companyId, memberIds, normalizedStartDate, endDate)
     ]);
 
     console.log('🔄 UNIFIED DATA SERVICE: Raw data fetched:', {
