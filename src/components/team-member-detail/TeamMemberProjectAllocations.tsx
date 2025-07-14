@@ -37,24 +37,37 @@ export const TeamMemberProjectAllocations: React.FC<TeamMemberProjectAllocations
         const currentWeek = startOfWeek(new Date(), { weekStartsOn: 1 });
         const endWeek = addWeeks(currentWeek, 8); // Next 8 weeks
 
+        // FIX: Fetch all allocations to prevent inconsistent data, then filter in frontend
         const { data: allocations, error } = await supabase
           .from('project_resource_allocations')
           .select(`
             hours,
+            week_start_date,
             project:projects(id, name, status)
           `)
           .eq('company_id', company.id)
           .eq('resource_id', memberId)
           .eq('resource_type', 'active')
-          .gte('week_start_date', format(currentWeek, 'yyyy-MM-dd'))
-          .lte('week_start_date', format(endWeek, 'yyyy-MM-dd'));
+          .order('week_start_date', { ascending: true });
 
         if (error) throw error;
 
-        // Group by project
+        // Filter to current + next 8 weeks in frontend for consistency
+        const filteredAllocations = allocations?.filter(allocation => {
+          const allocationDate = new Date(allocation.week_start_date);
+          return allocationDate >= currentWeek && allocationDate <= endWeek;
+        }) || [];
+
+        console.log('🔍 TEAM MEMBER ALLOCATIONS - FIXED:', {
+          totalRecords: allocations?.length || 0,
+          filteredRecords: filteredAllocations.length,
+          memberId
+        });
+
+        // Group by project using filtered allocations
         const projectMap = new Map<string, ProjectAllocation>();
         
-        allocations?.forEach(allocation => {
+        filteredAllocations?.forEach(allocation => {
           if (!allocation.project) return;
           
           const projectId = allocation.project.id;

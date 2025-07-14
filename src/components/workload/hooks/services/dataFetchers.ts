@@ -65,13 +65,23 @@ export const fetchAnnualLeaves = async (
   startDate: Date,
   endDate: Date
 ) => {
-  return supabase
+  console.log('🔍 FETCHING ANNUAL LEAVES - FIXED VERSION');
+  
+  // FIX: Remove restrictive date filtering - fetch ALL leaves and let frontend filter
+  const result = await supabase
     .from('annual_leaves')
     .select('member_id, date, hours')
     .eq('company_id', companyId)
     .in('member_id', memberIds)
-    .gte('date', format(startDate, 'yyyy-MM-dd'))
-    .lte('date', format(endDate, 'yyyy-MM-dd'));
+    .order('date', { ascending: true });
+
+  console.log('🔍 ANNUAL LEAVES RESULT (ALL RECORDS):', {
+    totalRecords: result.data?.length || 0,
+    error: result.error,
+    dateRange: result.data?.length ? `${result.data[0]?.date} to ${result.data[result.data.length - 1]?.date}` : 'none'
+  });
+
+  return result;
 };
 
 export const fetchOtherLeaves = async (
@@ -80,11 +90,21 @@ export const fetchOtherLeaves = async (
   startDate: Date,
   endDate: Date
 ) => {
-  return supabase
+  console.log('🔍 FETCHING OTHER LEAVES - FIXED VERSION');
+  
+  // FIX: Remove restrictive date filtering - fetch ALL other leaves and let frontend filter
+  const result = await supabase
     .from('weekly_other_leave')
     .select('member_id, week_start_date, hours')
     .eq('company_id', companyId)
     .in('member_id', memberIds)
-    .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
-    .lte('week_start_date', format(endDate, 'yyyy-MM-dd'));
+    .order('week_start_date', { ascending: true });
+
+  console.log('🔍 OTHER LEAVES RESULT (ALL RECORDS):', {
+    totalRecords: result.data?.length || 0,
+    error: result.error,
+    dateRange: result.data?.length ? `${result.data[0]?.week_start_date} to ${result.data[result.data.length - 1]?.week_start_date}` : 'none'
+  });
+
+  return result;
 };
