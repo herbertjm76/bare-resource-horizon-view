@@ -27,6 +27,10 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
     return total + (weekData?.total || 0);
   }, 0);
 
+  // Calculate total capacity for the period
+  const weeklyCapacity = member.weekly_capacity || 40;
+  const periodWeeks = weekStartDates.length;
+
   return (
     <TooltipProvider>
       <tr className="workload-grid-row">
@@ -48,7 +52,11 @@ export const WorkloadCalendarRow: React.FC<WorkloadCalendarRowProps> = ({
           );
         })}
 
-        <TotalHoursCell totalHours={totalHours} />
+        <TotalHoursCell 
+          totalHours={totalHours} 
+          weeklyCapacity={weeklyCapacity}
+          periodWeeks={periodWeeks}
+        />
       </tr>
     </TooltipProvider>
   );
