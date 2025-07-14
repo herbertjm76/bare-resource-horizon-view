@@ -1,0 +1,3 @@
+-- Enable the OpenAI API key secret for the Edge Function
+-- Note: The OPENAI_API_KEY secret needs to be configured in Supabase Edge Function Secrets
+-- This is just a comment to remind that the secret should be set up
