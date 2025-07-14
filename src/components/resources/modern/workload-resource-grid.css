@@ -115,8 +115,8 @@
 
 /* Project Total Hours Badge */
 .workload-resource-row.project-header-row .project-total-hours {
-  background: transparent !important;
-  color: hsl(var(--primary)) !important;
+  background: hsl(var(--primary)) !important;
+  color: white !important;
   border-radius: 6px !important;
   padding: 4px 8px !important;
   font-weight: 700 !important;
