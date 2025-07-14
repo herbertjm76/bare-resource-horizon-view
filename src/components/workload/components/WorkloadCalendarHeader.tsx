@@ -162,7 +162,7 @@ export const WorkloadCalendarHeader: React.FC<WorkloadCalendarHeaderProps> = ({
             fontWeight: '600'
           }}
         >
-          Total Hours
+          Total Utilization (12 weeks)
         </th>
       </tr>
     </thead>
