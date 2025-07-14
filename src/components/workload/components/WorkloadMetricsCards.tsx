@@ -34,15 +34,24 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
     let totalAllocated = 0;
     let overloadedMembers = 0;
     let underUtilizedMembers = 0;
+    let weeksWithData = 0;
 
+    // Calculate metrics for each member
     filteredMembers.forEach(member => {
       const weeklyCapacity = member.weekly_capacity || 40;
-      const memberTotalCapacity = weeklyCapacity * periodWeeks;
-      totalCapacity += memberTotalCapacity;
-
       const memberData = weeklyWorkloadData[member.id] || {};
+      
+      // Count weeks that actually have data for capacity calculation
+      const memberWeeksWithData = Object.values(memberData).filter(week => week?.total > 0).length;
+      weeksWithData = Math.max(weeksWithData, memberWeeksWithData);
+      
       const memberTotalAllocated = Object.values(memberData).reduce((sum, week) => sum + (week?.total || 0), 0);
       totalAllocated += memberTotalAllocated;
+
+      // Use actual weeks with data for more accurate utilization, but cap at periodWeeks
+      const effectiveWeeks = Math.min(Math.max(memberWeeksWithData, 1), periodWeeks);
+      const memberTotalCapacity = weeklyCapacity * effectiveWeeks;
+      totalCapacity += memberTotalCapacity;
 
       const memberUtilization = memberTotalCapacity > 0 ? (memberTotalAllocated / memberTotalCapacity) * 100 : 0;
       
@@ -55,6 +64,19 @@ export const WorkloadMetricsCards: React.FC<WorkloadMetricsCardsProps> = ({
 
     const utilizationRate = totalCapacity > 0 ? Math.round((totalAllocated / totalCapacity) * 100) : 0;
     const availableHours = Math.max(0, totalCapacity - totalAllocated);
+
+    // Debug logging to expose the calculation discrepancy
+    console.log('🔍 WORKLOAD METRICS DEBUG:', {
+      periodWeeks,
+      weeksWithData,
+      totalAllocated,
+      totalCapacity,
+      utilizationRate,
+      calculation: `${totalAllocated} / ${totalCapacity} = ${utilizationRate}%`,
+      membersCount: filteredMembers.length,
+      overloadedMembers,
+      underUtilizedMembers
+    });
 
     return {
       totalCapacity,
