@@ -53,6 +53,12 @@ export default {
         "border-accent": "#6465F0",
         "border-focus": "#6465F0",
         
+        // Purple shades for summary cards
+        "purple-1": "hsl(var(--purple-1))",
+        "purple-2": "hsl(var(--purple-2))",
+        "purple-3": "hsl(var(--purple-3))",
+        "purple-4": "hsl(var(--purple-4))",
+        
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
