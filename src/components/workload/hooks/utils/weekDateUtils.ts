@@ -1,11 +1,10 @@
 
 import { format, startOfWeek, addWeeks } from 'date-fns';
-import { WeekStartDate } from '../types/weeklyWorkloadTypes';
 
 export const generateWeekStartDates = (
   selectedDate: Date,
   periodWeeks: number = 36
-): WeekStartDate[] => {
+): Array<{ date: Date; key: string }> => {
   const weeks = [];
   const startWeek = startOfWeek(selectedDate, { weekStartsOn: 1 });
   

@@ -36,7 +36,7 @@ export const useUnifiedWorkloadData = (
   });
 
   const { data: workloadData = {}, isLoading, error } = useQuery<UnifiedWorkloadResult>({
-    queryKey: ['unified-workload-data', company?.id, members.map(m => m.id).sort(), format(startDate, 'yyyy-MM-dd'), numberOfWeeks],
+    queryKey: ['unified-workload-data-v2', company?.id, members.map(m => m.id).sort(), format(startDate, 'yyyy-MM-dd'), numberOfWeeks],
     queryFn: async () => {
       if (!company?.id || members.length === 0) {
         console.log('🔄 UNIFIED HOOK: Skipping fetch - no company or members');
