@@ -6,21 +6,20 @@ import { format, startOfWeek, endOfWeek, addDays, addWeeks, parseISO } from 'dat
 export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
   const { companyId, memberIds, startDate, numberOfWeeks } = params;
   
-  // Generate all week start dates for the period to match Project Resourcing logic
-  const weekStartDates = [];
-  for (let i = 0; i < numberOfWeeks; i++) {
-    const weekStart = addWeeks(startDate, i);
-    weekStartDates.push(format(weekStart, 'yyyy-MM-dd'));
-  }
+  // Calculate the full date range to capture all days in all weeks
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + (numberOfWeeks * 7) - 1);
   
   console.log('🔍 PROJECT ALLOCATIONS: Fetching with parameters:', {
     companyId,
     memberIds: memberIds.length,
-    weekStartDates: weekStartDates.slice(0, 3) + '...',
+    startDate: format(startDate, 'yyyy-MM-dd'),
+    endDate: format(endDate, 'yyyy-MM-dd'),
     numberOfWeeks
   });
 
-  // Use the SAME query approach as Project Resourcing (useDetailedWeeklyAllocations)
+  // Fetch ALL allocations within the date range (not just specific week_start_dates)
+  // This ensures we capture the full week data (Sunday to Saturday)
   const { data, error } = await supabase
     .from('project_resource_allocations')
     .select(`
@@ -33,7 +32,8 @@ export const fetchProjectAllocations = async (params: WorkloadDataParams) => {
     `)
     .eq('company_id', companyId)
     .in('resource_id', memberIds)
-    .in('week_start_date', weekStartDates)
+    .gte('week_start_date', format(startDate, 'yyyy-MM-dd'))
+    .lte('week_start_date', format(endDate, 'yyyy-MM-dd'))
     .gt('hours', 0);
 
   if (error) {
@@ -67,10 +67,13 @@ export const processProjectAllocations = (
     const hours = parseFloat(allocation.hours) || 0;
     const projectId = allocation.project_id;
     
-    // Use week_start_date directly from database since it's already normalized to Monday
-    const weekKey = allocation.week_start_date;
+    // Convert the allocation's week_start_date to the Monday of that week (in case data is inconsistent)
+    // Then map it to the correct display week based on our start date
+    const allocationDate = parseISO(allocation.week_start_date);
+    const allocationWeekStart = startOfWeek(allocationDate, { weekStartsOn: 1 }); // Monday as week start
+    const weekKey = format(allocationWeekStart, 'yyyy-MM-dd');
 
-    console.log(`🔍 PROCESSING ALLOCATION: Member ${memberId}, Week ${weekKey}, Hours ${hours}, Project ${allocation.projects?.name || 'Unknown'}`);
+    console.log(`🔍 PROCESSING ALLOCATION: Member ${memberId}, Original Date: ${allocation.week_start_date}, Normalized Week: ${weekKey}, Hours ${hours}, Project ${allocation.projects?.name || 'Unknown'}`);
 
     // Initialize nested maps if needed
     if (!memberWeekHours.has(memberId)) {

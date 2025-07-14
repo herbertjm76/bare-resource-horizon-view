@@ -35,20 +35,27 @@ export const processAnnualLeave = (
   // Use Map for faster aggregation
   const memberWeekHours = new Map<string, Map<string, number>>();
 
-  // Single pass aggregation
+  // Single pass aggregation - ensure all leave days are properly aggregated by week
   for (const leave of annualLeaves) {
     const memberId = leave.member_id;
     const leaveDate = new Date(leave.date);
     const hours = parseFloat(leave.hours) || 0;
-    const weekStart = startOfWeek(leaveDate, { weekStartsOn: 1 });
+    
+    // Normalize to Monday of the week to match our week aggregation logic
+    const weekStart = startOfWeek(leaveDate, { weekStartsOn: 1 }); // Monday as week start
     const weekKey = format(weekStart, 'yyyy-MM-dd');
+
+    console.log(`🔍 ANNUAL LEAVE: Member ${memberId}, Leave Date: ${leave.date}, Week: ${weekKey}, Hours: ${hours}`);
 
     if (!memberWeekHours.has(memberId)) {
       memberWeekHours.set(memberId, new Map());
     }
 
     const currentHours = memberWeekHours.get(memberId)!.get(weekKey) || 0;
-    memberWeekHours.get(memberId)!.set(weekKey, currentHours + hours);
+    const newTotal = currentHours + hours;
+    memberWeekHours.get(memberId)!.set(weekKey, newTotal);
+    
+    console.log(`🔍 ANNUAL LEAVE AGGREGATION: Member ${memberId}, Week ${weekKey}, Current: ${currentHours}h, Adding: ${hours}h, New Total: ${newTotal}h`);
   }
 
   // Update result

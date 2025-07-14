@@ -15,8 +15,9 @@ export const initializeWorkloadData = (
     result[member.id] = {};
     
     // Initialize each week for this member
+    // Ensure we're using Monday as the consistent week start for all calculations
     for (let weekIndex = 0; weekIndex < numberOfWeeks; weekIndex++) {
-      const weekStart = addWeeks(startDate, weekIndex);
+      const weekStart = addWeeks(startOfWeek(startDate, { weekStartsOn: 1 }), weekIndex);
       const weekKey = format(weekStart, 'yyyy-MM-dd');
       
       result[member.id][weekKey] = {
@@ -45,8 +46,11 @@ export const generateWeekStartDates = (
 ): WeekStartDate[] => {
   const weekStartDates: WeekStartDate[] = [];
   
+  // Ensure we start from Monday of the week containing startDate
+  const normalizedStartDate = startOfWeek(startDate, { weekStartsOn: 1 });
+  
   for (let i = 0; i < numberOfWeeks; i++) {
-    const weekStart = addWeeks(startDate, i);
+    const weekStart = addWeeks(normalizedStartDate, i);
     const weekKey = format(weekStart, 'yyyy-MM-dd');
     
     weekStartDates.push({
