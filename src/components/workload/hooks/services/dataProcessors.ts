@@ -7,8 +7,19 @@ export const processProjectAllocations = (
 ) => {
   if (!allocationsData || allocationsData.length === 0) return;
 
+  console.log('🔍 PROCESSING PROJECT ALLOCATIONS:', {
+    totalAllocations: allocationsData.length,
+    sampleAllocations: allocationsData.slice(0, 3).map(a => ({
+      resource_id: a.resource_id,
+      hours: a.hours,
+      week_start_date: a.week_start_date,
+      project_id: a.project_id
+    }))
+  });
+
   const memberWeekHours = new Map<string, Map<string, number>>();
   const memberWeekProjects = new Map<string, Map<string, Map<string, any>>>();
+  const debugProcessedRecords: any[] = [];
 
   for (const allocation of allocationsData) {
     const memberId = allocation.resource_id;
@@ -18,6 +29,18 @@ export const processProjectAllocations = (
     const allocationDate = parseISO(allocation.week_start_date);
     const allocationWeekStart = startOfWeek(allocationDate, { weekStartsOn: 1 });
     const weekKey = format(allocationWeekStart, 'yyyy-MM-dd');
+    
+    // Debug specific member (Rob Night's ID from logs)
+    if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e') {
+      debugProcessedRecords.push({
+        originalWeekStart: allocation.week_start_date,
+        parsedDate: allocationDate.toISOString(),
+        normalizedWeekStart: allocationWeekStart.toISOString(),
+        weekKey,
+        hours,
+        projectId
+      });
+    }
     
     if (!memberWeekHours.has(memberId)) {
       memberWeekHours.set(memberId, new Map());
@@ -45,6 +68,15 @@ export const processProjectAllocations = (
     }
   }
 
+  // Log debug info for Rob Night
+  if (debugProcessedRecords.length > 0) {
+    console.log('🔍 ROB NIGHT ALLOCATION PROCESSING:', {
+      totalRecords: debugProcessedRecords.length,
+      records: debugProcessedRecords,
+      weeklyTotals: Array.from(memberWeekHours.get('fc351fa0-b6df-447a-bc27-b6675db2622e')?.entries() || [])
+    });
+  }
+
   // Update result with project data
   memberWeekHours.forEach((weekMap, memberId) => {
     weekMap.forEach((totalHours, weekKey) => {
@@ -52,6 +84,26 @@ export const processProjectAllocations = (
         result[memberId][weekKey].projectHours = totalHours;
         const projectsMap = memberWeekProjects.get(memberId)?.get(weekKey);
         result[memberId][weekKey].projects = projectsMap ? Array.from(projectsMap.values()) : [];
+        
+        // Debug Rob Night's week updates  
+        if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e') {
+          console.log('🔍 UPDATING ROB NIGHT WEEK:', {
+            weekKey,
+            totalHours,
+            existsInResult: !!result[memberId][weekKey],
+            finalData: result[memberId][weekKey]
+          });
+        }
+      } else {
+        // Debug missing weeks
+        if (memberId === 'fc351fa0-b6df-447a-bc27-b6675db2622e') {
+          console.log('🔍 ROB NIGHT WEEK NOT FOUND IN RESULT:', {
+            weekKey,
+            totalHours,
+            memberExists: !!result[memberId],
+            availableWeeks: result[memberId] ? Object.keys(result[memberId]).slice(0, 5) : 'none'
+          });
+        }
       }
     });
   });
