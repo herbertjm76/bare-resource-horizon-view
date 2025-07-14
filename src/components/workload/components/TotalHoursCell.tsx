@@ -34,9 +34,7 @@ export const TotalHoursCell: React.FC<TotalHoursCellProps> = ({
       <span style={{ 
         fontSize: '14px',
         fontWeight: '700',
-        color: utilizationRate > 100 ? '#dc2626' : 
-               utilizationRate > 80 ? '#f59e0b' : 
-               utilizationRate > 0 ? '#1f2937' : '#9ca3af'
+        color: '#1f2937'
       }}>
         {utilizationRate}%
       </span>

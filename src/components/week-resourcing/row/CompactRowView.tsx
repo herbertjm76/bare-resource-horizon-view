@@ -113,14 +113,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
         }}
       >
         <div className="flex flex-col items-center">
-          <span 
-            className="text-sm font-bold px-2 py-1 rounded"
-            style={{
-              color: capacityDisplay.utilizationPercentage > 100 ? '#dc2626' : 
-                     capacityDisplay.utilizationPercentage > 80 ? '#f59e0b' : 
-                     capacityDisplay.utilizationPercentage > 0 ? '#1f2937' : '#9ca3af'
-            }}
-          >
+          <span className="text-sm font-bold px-2 py-1 rounded text-gray-800">
             {capacityDisplay.utilizationPercentage}%
           </span>
         </div>
