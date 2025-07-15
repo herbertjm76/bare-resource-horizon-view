@@ -68,18 +68,21 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         <div className="w-full">
           <WorkloadHeatMapCard 
             data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
           />
         </div>
         
         <div className="w-full">
           <TeamCapacityStatusCard 
             data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
           />
         </div>
         
         <div className="w-full">
           <LeavePlanningCard 
             data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
           />
         </div>
         

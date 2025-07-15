@@ -3,9 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Gauge, Users, Clock } from 'lucide-react';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
 import { UnifiedDashboardData } from '../hooks/useDashboardData';
+import { TimeRange } from '../TimeRangeSelector';
 
 interface TeamCapacityStatusCardProps {
   data: UnifiedDashboardData;
+  selectedTimeRange: TimeRange;
 }
 
 const CapacityGauge: React.FC<{ value: number; max: number; label: string; color: string }> = ({ 
@@ -37,8 +39,41 @@ const CapacityGauge: React.FC<{ value: number; max: number; label: string; color
   );
 };
 
-export const TeamCapacityStatusCard: React.FC<TeamCapacityStatusCardProps> = ({ data }) => {
-  const totalCapacity = data.teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0);
+export const TeamCapacityStatusCard: React.FC<TeamCapacityStatusCardProps> = ({ data, selectedTimeRange }) => {
+  // Calculate time period multiplier based on selected time range
+  const getTimePeriodMultiplier = () => {
+    switch (selectedTimeRange) {
+      case 'week':
+        return 1;
+      case 'month':
+        return 4; // ~4 weeks in a month
+      case '3months':
+        return 13; // ~13 weeks in 3 months
+      case '4months':
+        return 17; // ~17 weeks in 4 months
+      case '6months':
+        return 26; // ~26 weeks in 6 months
+      case 'year':
+        return 52; // 52 weeks in a year
+      default:
+        return 4;
+    }
+  };
+
+  const getTimeRangeLabel = () => {
+    switch (selectedTimeRange) {
+      case 'week': return 'This Week';
+      case 'month': return 'This Month';
+      case '3months': return '3 Months';
+      case '4months': return '4 Months';
+      case '6months': return '6 Months';
+      case 'year': return 'This Year';
+      default: return 'This Month';
+    }
+  };
+
+  const timePeriodMultiplier = getTimePeriodMultiplier();
+  const totalCapacity = data.teamMembers.reduce((sum, member) => sum + (member.weekly_capacity || 40), 0) * timePeriodMultiplier;
   const utilizationCapacity = (data.currentUtilizationRate / 100) * totalCapacity;
   const availableCapacity = totalCapacity - utilizationCapacity;
   

@@ -78,16 +78,19 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         <div>
           <WorkloadHeatMapCard 
             data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
           />
         </div>
         <div>
           <TeamCapacityStatusCard 
             data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
           />
         </div>
         <div>
           <LeavePlanningCard 
             data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
           />
         </div>
         <div>

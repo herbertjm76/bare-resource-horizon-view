@@ -3,10 +3,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, AlertTriangle, Users } from 'lucide-react';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
 import { UnifiedDashboardData } from '../hooks/useDashboardData';
-import { format, isWithinInterval, addDays, startOfMonth, endOfMonth } from 'date-fns';
+import { TimeRange } from '../TimeRangeSelector';
+import { format, isWithinInterval, addDays, startOfMonth, endOfMonth, addWeeks, addMonths } from 'date-fns';
 
 interface LeavePlanningCardProps {
   data: UnifiedDashboardData;
+  selectedTimeRange: TimeRange;
 }
 
 const getImpactColor = (impact: string) => {
@@ -18,16 +20,46 @@ const getImpactColor = (impact: string) => {
   }
 };
 
-export const LeavePlanningCard: React.FC<LeavePlanningCardProps> = ({ data }) => {
+export const LeavePlanningCard: React.FC<LeavePlanningCardProps> = ({ data, selectedTimeRange }) => {
+  const getTimeRangeLabel = () => {
+    switch (selectedTimeRange) {
+      case 'week': return 'This Week';
+      case 'month': return 'This Month';
+      case '3months': return 'Next 3 Months';
+      case '4months': return 'Next 4 Months';
+      case '6months': return 'Next 6 Months';
+      case 'year': return 'This Year';
+      default: return 'This Month';
+    }
+  };
   const currentDate = new Date();
-  const monthStart = startOfMonth(currentDate);
-  const monthEnd = endOfMonth(currentDate);
-  const next30Days = addDays(currentDate, 30);
+  
+  // Calculate time range end date based on selected time range
+  const getTimeRangeEnd = () => {
+    switch (selectedTimeRange) {
+      case 'week':
+        return addWeeks(currentDate, 1);
+      case 'month':
+        return addMonths(currentDate, 1);
+      case '3months':
+        return addMonths(currentDate, 3);
+      case '4months':
+        return addMonths(currentDate, 4);
+      case '6months':
+        return addMonths(currentDate, 6);
+      case 'year':
+        return addMonths(currentDate, 12);
+      default:
+        return addMonths(currentDate, 1);
+    }
+  };
 
-  // Filter holidays within the next 30 days
+  const timeRangeEnd = getTimeRangeEnd();
+
+  // Filter holidays within the selected time range
   const upcomingHolidays = data.holidays.filter(holiday => {
     const holidayDate = new Date(holiday.date);
-    return isWithinInterval(holidayDate, { start: currentDate, end: next30Days });
+    return isWithinInterval(holidayDate, { start: currentDate, end: timeRangeEnd });
   });
 
   // Calculate impact based on team size and holiday type
@@ -63,10 +95,13 @@ export const LeavePlanningCard: React.FC<LeavePlanningCardProps> = ({ data }) =>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
             <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
-            Leave Planning
+            <div>
+              <span>Leave Planning</span>
+              <div className="text-xs text-gray-500">{getTimeRangeLabel()}</div>
+            </div>
           </h2>
           <StandardizedHeaderBadge>
-            Next 30 Days
+            {upcomingHolidays.length} Events
           </StandardizedHeaderBadge>
         </div>
 

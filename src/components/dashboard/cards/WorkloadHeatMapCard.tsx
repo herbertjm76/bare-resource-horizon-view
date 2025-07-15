@@ -3,9 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
 import { UnifiedDashboardData } from '../hooks/useDashboardData';
+import { TimeRange } from '../TimeRangeSelector';
 
 interface WorkloadHeatMapCardProps {
   data: UnifiedDashboardData;
+  selectedTimeRange: TimeRange;
 }
 
 const getWorkloadColor = (utilization: number) => {
@@ -24,7 +26,20 @@ const getWorkloadLabel = (utilization: number) => {
   return 'Underutilized';
 };
 
-export const WorkloadHeatMapCard: React.FC<WorkloadHeatMapCardProps> = ({ data }) => {
+export const WorkloadHeatMapCard: React.FC<WorkloadHeatMapCardProps> = ({ data, selectedTimeRange }) => {
+  const getTimeRangeLabel = () => {
+    switch (selectedTimeRange) {
+      case 'week': return 'This Week';
+      case 'month': return 'This Month';
+      case '3months': return '3 Months';
+      case '4months': return '4 Months';
+      case '6months': return '6 Months';
+      case 'year': return 'This Year';
+      default: return 'This Month';
+    }
+  };
+
+  // Use the time-range aware utilization data that's already calculated in the dashboard
   const workloadData = data.transformedStaffData.map(member => ({
     name: member.fullName || 'Unknown',
     utilization: member.utilizationPercentage || 0,
