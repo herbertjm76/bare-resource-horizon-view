@@ -2,7 +2,7 @@ import { InsightStyles } from "./types";
 
 export const insightStyles: Record<string, InsightStyles> = {
   blue: {
-    bg: "bg-white/30",
+    bg: "bg-white/60",
     iconBg: "bg-blue-500/20",
     iconColor: "text-blue-500",
     textColor: "text-[#FDFDFD]",
@@ -10,7 +10,7 @@ export const insightStyles: Record<string, InsightStyles> = {
     shadow: "shadow-xl shadow-blue-500/20"
   },
   purple: {
-    bg: "bg-white/30",
+    bg: "bg-white/60",
     iconBg: "bg-purple-500/20",
     iconColor: "text-purple-500",
     textColor: "text-[#FDFDFD]",
@@ -18,7 +18,7 @@ export const insightStyles: Record<string, InsightStyles> = {
     shadow: "shadow-xl shadow-purple-500/20"
   },
   green: {
-    bg: "bg-white/30",
+    bg: "bg-white/60",
     iconBg: "bg-green-500/20",
     iconColor: "text-green-500",
     textColor: "text-[#FDFDFD]",
@@ -26,7 +26,7 @@ export const insightStyles: Record<string, InsightStyles> = {
     shadow: "shadow-xl shadow-green-500/20"
   },
   emerald: {
-    bg: "bg-white/30",
+    bg: "bg-white/60",
     iconBg: "bg-emerald-500/20",
     iconColor: "text-emerald-500",
     textColor: "text-[#FDFDFD]",
@@ -34,7 +34,7 @@ export const insightStyles: Record<string, InsightStyles> = {
     shadow: "shadow-xl shadow-emerald-500/20"
   },
   yellow: {
-    bg: "bg-white/30",
+    bg: "bg-white/60",
     iconBg: "bg-yellow-500/20",
     iconColor: "text-yellow-500",
     textColor: "text-[#FDFDFD]",
@@ -42,7 +42,7 @@ export const insightStyles: Record<string, InsightStyles> = {
     shadow: "shadow-xl shadow-yellow-500/20"
   },
   orange: {
-    bg: "bg-white/30",
+    bg: "bg-white/60",
     iconBg: "bg-orange-500/20",
     iconColor: "text-orange-500",
     textColor: "text-[#FDFDFD]",
@@ -50,7 +50,7 @@ export const insightStyles: Record<string, InsightStyles> = {
     shadow: "shadow-xl shadow-orange-500/20"
   },
   red: {
-    bg: "bg-white/30",
+    bg: "bg-white/60",
     iconBg: "bg-red-500/20",
     iconColor: "text-red-500",
     textColor: "text-[#FDFDFD]",
@@ -58,7 +58,7 @@ export const insightStyles: Record<string, InsightStyles> = {
     shadow: "shadow-xl shadow-red-500/20"
   },
   teal: {
-    bg: "bg-white/30",
+    bg: "bg-white/60",
     iconBg: "bg-teal-500/20",
     iconColor: "text-teal-500",
     textColor: "text-[#FDFDFD]",
