@@ -7,6 +7,7 @@ import { WorkloadHeatMapCard } from './cards/WorkloadHeatMapCard';
 import { TeamCapacityStatusCard } from './cards/TeamCapacityStatusCard';
 import { LeavePlanningCard } from './cards/LeavePlanningCard';
 import { ProjectPipelineHealthCard } from './cards/ProjectPipelineHealthCard';
+import { TeamCompositionCard } from './cards/TeamCompositionCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
@@ -69,6 +70,45 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         <div>
           <UnifiedHolidayCard 
             data={unifiedData}
+          />
+        </div>
+      </div>
+
+      {/* Second Row: 6-Card Dashboard Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-6">
+        <div>
+          <UnifiedStaffStatusCard 
+            data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
+          />
+        </div>
+        <div>
+          <TeamCapacityStatusCard 
+            data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
+          />
+        </div>
+        <div>
+          <WorkloadHeatMapCard 
+            data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
+          />
+        </div>
+        <div>
+          <LeavePlanningCard 
+            data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
+          />
+        </div>
+        <div>
+          <ProjectPipelineHealthCard 
+            data={unifiedData}
+          />
+        </div>
+        <div>
+          <TeamCompositionCard 
+            data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
           />
         </div>
       </div>

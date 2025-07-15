@@ -7,6 +7,7 @@ import { useHolidays } from './useHolidays';
 import { useTeamData } from './useTeamData';
 import { useProjectData } from './useProjectData';
 import { useUtilizationData } from './useUtilizationData';
+import { useTeamCompositionData } from './useTeamCompositionData';
 import { useAggregatedData } from './useAggregatedData';
 import { UnifiedDashboardData } from './types/dashboardTypes';
 
@@ -32,6 +33,12 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     isLoading: isProjectsLoading, 
     refetch: refetchProjects 
   } = useProjectData(company?.id);
+
+  // Use team composition hook
+  const { 
+    teamComposition, 
+    isLoading: isTeamCompositionLoading 
+  } = useTeamCompositionData(company?.id);
 
   // Use extracted utilization hook
   const { currentUtilizationRate, utilizationStatus, utilizationTrends } = useUtilizationData(
@@ -64,6 +71,10 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     // Project data
     projects,
     activeProjects: timeRangeMetrics.activeProjects,
+    
+    // Team composition data
+    teamComposition,
+    isTeamCompositionLoading,
     
     // Utilization data
     currentUtilizationRate,

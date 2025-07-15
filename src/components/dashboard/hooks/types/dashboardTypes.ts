@@ -10,6 +10,10 @@ export interface UnifiedDashboardData {
   projects: any[];
   activeProjects: number;
   
+  // Team composition data
+  teamComposition: any[];
+  isTeamCompositionLoading: boolean;
+  
   // Utilization data
   currentUtilizationRate: number;
   utilizationStatus: {
