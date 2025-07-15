@@ -73,32 +73,6 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         </div>
       </div>
 
-      {/* Second Row: New Dashboard Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-        <div>
-          <WorkloadHeatMapCard 
-            data={unifiedData}
-            selectedTimeRange={selectedTimeRange}
-          />
-        </div>
-        <div>
-          <TeamCapacityStatusCard 
-            data={unifiedData}
-            selectedTimeRange={selectedTimeRange}
-          />
-        </div>
-        <div>
-          <LeavePlanningCard 
-            data={unifiedData}
-            selectedTimeRange={selectedTimeRange}
-          />
-        </div>
-        <div>
-          <ProjectPipelineHealthCard 
-            data={unifiedData}
-          />
-        </div>
-      </div>
       
       {/* Analytics Charts - Project Status, Project Stages, Project Locations, Projects by PM */}
       <AnalyticsSection mockData={analyticsData} />
