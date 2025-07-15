@@ -50,21 +50,17 @@ const Hero = () => {
                 </h1>
               </AnimatedSection>
 
-              <AnimatedSection animation="fadeInUp" delay={500}>
-                <p className="text-base sm:text-lg text-white/90 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                  Balance capacity. <span className="text-pink-300">Spot bottlenecks.</span> <span className="text-blue-300">Deliver on time.</span>
-                  <br />
-                  Visualize people & projects in one space—clarity for your whole team.
-                </p>
-              </AnimatedSection>
+               <AnimatedSection animation="fadeInUp" delay={500}>
+                 <p className="text-base sm:text-lg font-bold uppercase tracking-wide leading-relaxed max-w-lg mx-auto lg:mx-0">
+                   <span className="text-green-300">BALANCE CAPACITY.</span> <span className="text-pink-300">SPOT BOTTLENECKS.</span> <span className="text-blue-300">DELIVER ON TIME.</span>
+                   <br />
+                   <span className="text-white/90 normal-case font-normal tracking-normal">Visualize people & projects in one space—clarity for your whole team.</span>
+                 </p>
+               </AnimatedSection>
               
               <AnimatedSection animation="fadeInUp" delay={600}>
                 <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-3 sm:p-4 border border-white/20 max-w-md mx-auto lg:mx-0">
                   <ul className="space-y-1 text-sm sm:text-base text-white/90">
-                    <li className="flex items-start">
-                      <span className="text-green-300 mr-3">•</span>
-                      Know who's free next month
-                    </li>
                     <li className="flex items-start">
                       <span className="text-green-300 mr-3">•</span>
                       See team capacity at a glance
@@ -79,15 +75,7 @@ const Hero = () => {
                     </li>
                     <li className="flex items-start">
                       <span className="text-green-300 mr-3">•</span>
-                      Visualize project timelines clearly
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-green-300 mr-3">•</span>
                       Avoid conflicts before they happen
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-green-300 mr-3">•</span>
-                      Stop overbooking before it hurts
                     </li>
                   </ul>
                 </div>
