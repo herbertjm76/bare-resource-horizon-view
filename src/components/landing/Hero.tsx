@@ -52,7 +52,7 @@ const Hero = () => {
 
                <AnimatedSection animation="fadeInUp" delay={500}>
                  <p className="text-base sm:text-lg font-bold uppercase tracking-wide leading-relaxed max-w-lg mx-auto lg:mx-0">
-                   <span style={{color: '#514FE1'}}>BALANCE CAPACITY.</span> <span style={{color: '#141947'}}>SPOT BOTTLENECKS.</span> <span style={{color: '#524FE5'}}>DELIVER ON TIME.</span>
+                   <span style={{color: '#141947'}}>BALANCE CAPACITY.</span> <span style={{color: '#141947'}}>SPOT BOTTLENECKS.</span> <span style={{color: '#141947'}}>DELIVER ON TIME.</span>
                    <br />
                    <span className="text-white/90 normal-case font-normal tracking-normal">Visualize people & projects in one space—clarity for your whole team.</span>
                  </p>
