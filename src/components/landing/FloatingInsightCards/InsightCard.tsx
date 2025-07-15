@@ -69,7 +69,8 @@ export const InsightCard: React.FC<InsightCardProps> = ({
           <Icon 
             className={`${styles.iconColor}`}
             size={Math.max(18, Math.round(20 * cardScale))}
-            strokeWidth={2.5}
+            strokeWidth={1}
+            fill="currentColor"
           />
         </div>
         <div className={`text-base font-bold ${styles.numberColor} leading-tight flex-1 drop-shadow-sm`}>

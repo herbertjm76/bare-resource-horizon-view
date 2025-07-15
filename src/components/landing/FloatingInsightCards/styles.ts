@@ -4,7 +4,7 @@ export const insightStyles: Record<string, InsightStyles> = {
   blue: {
     bg: "bg-white/10",
     iconBg: "bg-blue-500/20",
-    iconColor: "text-[#FDFDFD]",
+    iconColor: "text-blue-500",
     textColor: "text-[#FDFDFD]",
     numberColor: "text-[#151C51]",
     shadow: "shadow-xl shadow-blue-500/20"
@@ -12,7 +12,7 @@ export const insightStyles: Record<string, InsightStyles> = {
   purple: {
     bg: "bg-white/10",
     iconBg: "bg-purple-500/20",
-    iconColor: "text-[#FDFDFD]",
+    iconColor: "text-purple-500",
     textColor: "text-[#FDFDFD]",
     numberColor: "text-[#151C51]",
     shadow: "shadow-xl shadow-purple-500/20"
@@ -20,7 +20,7 @@ export const insightStyles: Record<string, InsightStyles> = {
   green: {
     bg: "bg-white/10",
     iconBg: "bg-green-500/20",
-    iconColor: "text-[#FDFDFD]",
+    iconColor: "text-green-500",
     textColor: "text-[#FDFDFD]",
     numberColor: "text-[#151C51]",
     shadow: "shadow-xl shadow-green-500/20"
@@ -28,7 +28,7 @@ export const insightStyles: Record<string, InsightStyles> = {
   emerald: {
     bg: "bg-white/10",
     iconBg: "bg-emerald-500/20",
-    iconColor: "text-[#FDFDFD]",
+    iconColor: "text-emerald-500",
     textColor: "text-[#FDFDFD]",
     numberColor: "text-[#151C51]",
     shadow: "shadow-xl shadow-emerald-500/20"
@@ -36,7 +36,7 @@ export const insightStyles: Record<string, InsightStyles> = {
   yellow: {
     bg: "bg-white/10",
     iconBg: "bg-yellow-500/20",
-    iconColor: "text-[#FDFDFD]",
+    iconColor: "text-yellow-500",
     textColor: "text-[#FDFDFD]",
     numberColor: "text-[#151C51]",
     shadow: "shadow-xl shadow-yellow-500/20"
@@ -44,7 +44,7 @@ export const insightStyles: Record<string, InsightStyles> = {
   orange: {
     bg: "bg-white/10",
     iconBg: "bg-orange-500/20",
-    iconColor: "text-[#FDFDFD]",
+    iconColor: "text-orange-500",
     textColor: "text-[#FDFDFD]",
     numberColor: "text-[#151C51]",
     shadow: "shadow-xl shadow-orange-500/20"
@@ -52,7 +52,7 @@ export const insightStyles: Record<string, InsightStyles> = {
   red: {
     bg: "bg-white/10",
     iconBg: "bg-red-500/20",
-    iconColor: "text-[#FDFDFD]",
+    iconColor: "text-red-500",
     textColor: "text-[#FDFDFD]",
     numberColor: "text-[#151C51]",
     shadow: "shadow-xl shadow-red-500/20"
@@ -60,7 +60,7 @@ export const insightStyles: Record<string, InsightStyles> = {
   teal: {
     bg: "bg-white/10",
     iconBg: "bg-teal-500/20",
-    iconColor: "text-[#FDFDFD]",
+    iconColor: "text-teal-500",
     textColor: "text-[#FDFDFD]",
     numberColor: "text-[#151C51]",
     shadow: "shadow-xl shadow-teal-500/20"
