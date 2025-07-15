@@ -46,7 +46,7 @@ const Hero = () => {
               
               <AnimatedSection animation="fadeInUp" delay={400}>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white leading-tight">
-                  Resource Planning Software for Design Studios
+                  Resource Planning for Design Studios
                 </h1>
               </AnimatedSection>
 

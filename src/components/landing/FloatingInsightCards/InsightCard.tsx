@@ -29,23 +29,30 @@ export const InsightCard: React.FC<InsightCardProps> = ({
 
   return (
     <div
-      className={`absolute z-30 insight-card ${styles.bg} backdrop-blur-md border border-white/40 rounded-2xl transition-all duration-300 hover:scale-110 hover:z-50 ${styles.shadow}`}
+      className={`absolute z-30 insight-card ${styles.bg} backdrop-blur-xl border border-white/20 rounded-3xl transition-all duration-500 hover:scale-110 hover:z-50 ${styles.shadow}`}
       style={{
         ...position,
         animationDelay,
         transform: `scale(${cardScale}) ${position.transform || ''}`,
-        width: `${14 * cardScale}rem`, // Increased width for better readability
-        height: `${6 * cardScale}rem`, // Increased height for proper text spacing
-        padding: '1.5rem', // Better padding for content
+        width: `${14 * cardScale}rem`,
+        height: `${6 * cardScale}rem`,
+        padding: '1.5rem',
         pointerEvents: 'auto',
-        // Enhanced visual depth
-        boxShadow: `0 12px 40px rgba(0,0,0,0.15), 0 6px 16px rgba(0,0,0,0.10)`,
-        backdropFilter: 'blur(20px)',
-        // Better aspect ratio for readability
+        // Liquid glass effect
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+        backdropFilter: 'blur(30px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(30px) saturate(180%)',
+        boxShadow: `
+          0 8px 32px rgba(0,0,0,0.12),
+          0 2px 8px rgba(0,0,0,0.08),
+          inset 0 1px 0 rgba(255,255,255,0.2),
+          inset 0 -1px 0 rgba(0,0,0,0.1)
+        `,
+        border: '1px solid rgba(255,255,255,0.18)',
         aspectRatio: '2.3/1',
-        maxWidth: '280px', // Increased for better text display
+        maxWidth: '280px',
         maxHeight: '120px',
-        minWidth: '220px', // Increased minimum size
+        minWidth: '220px',
         minHeight: '95px',
         display: 'flex',
         alignItems: 'center',
@@ -54,14 +61,18 @@ export const InsightCard: React.FC<InsightCardProps> = ({
     >
       {/* Improved layout with better spacing */}
       <div className="flex items-center gap-3.5 w-full">
-        <div className={`flex items-center justify-center rounded-xl ${styles.iconBg} p-2.5 shadow-lg flex-shrink-0`}>
+        <div className={`flex items-center justify-center rounded-2xl ${styles.iconBg} backdrop-blur-sm p-2.5 shadow-lg flex-shrink-0`}
+             style={{
+               background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
+               border: '1px solid rgba(255,255,255,0.1)'
+             }}>
           <Icon 
             className={`${styles.iconColor}`}
             size={Math.max(18, Math.round(20 * cardScale))}
             strokeWidth={2.5}
           />
         </div>
-        <div className={`text-sm font-bold ${styles.numberColor} leading-tight flex-1`}>
+        <div className={`text-sm font-bold ${styles.numberColor} leading-tight flex-1 drop-shadow-sm`}>
           {insight.title}
         </div>
       </div>
