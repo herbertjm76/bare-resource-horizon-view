@@ -67,7 +67,23 @@ const Hero = () => {
                     </li>
                     <li className="flex items-start">
                       <span className="text-green-300 mr-3">•</span>
-                      Track fee burn in real time
+                      See team capacity at a glance
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-300 mr-3">•</span>
+                      Plan resources weeks ahead
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-300 mr-3">•</span>
+                      Balance workloads across projects
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-300 mr-3">•</span>
+                      Visualize project timelines clearly
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-green-300 mr-3">•</span>
+                      Avoid conflicts before they happen
                     </li>
                     <li className="flex items-start">
                       <span className="text-green-300 mr-3">•</span>
