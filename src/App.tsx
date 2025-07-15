@@ -35,40 +35,98 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <CompanyProvider>
-        <TooltipProvider>
-          <Toaster />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/team-members" element={<TeamMembers />} />
-              <Route path="/team-members/:id" element={<TeamMemberDetail />} />
-              <Route path="/office-settings" element={<OfficeSettings />} />
-              <Route path="/weekly-overview" element={<WeeklyOverview />} />
-              <Route path="/team-workload" element={<TeamWorkload />} />
-              <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
-              <Route path="/project-resourcing" element={<ProjectResourcing />} />
-              <Route path="/financial-overview" element={<FinancialOverview />} />
-              <Route path="/project-profit-dashboard" element={<ProjectProfitDashboard />} />
-              <Route path="/project-billing" element={<ProjectBilling />} />
-              <Route path="/aging-invoices" element={<AgingInvoices />} />
-              <Route path="/documentation" element={<Documentation />} />
-              <Route path="/help" element={<Help />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/contact-support" element={<ContactSupport />} />
-              <Route path="/solutions" element={<SolutionsPage />} />
-              <Route path="/app-tour" element={<AppTourPage />} />
-              <Route path="/join" element={<Join />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </CompanyProvider>
+      <TooltipProvider>
+        <Toaster />
+        <BrowserRouter>
+          <Routes>
+            {/* Public routes without CompanyProvider */}
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/join" element={<Join />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/solutions" element={<SolutionsPage />} />
+            <Route path="/app-tour" element={<AppTourPage />} />
+            <Route path="/documentation" element={<Documentation />} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/contact-support" element={<ContactSupport />} />
+            
+            {/* Protected routes with CompanyProvider */}
+            <Route path="/dashboard" element={
+              <CompanyProvider>
+                <Dashboard />
+              </CompanyProvider>
+            } />
+            <Route path="/profile" element={
+              <CompanyProvider>
+                <Profile />
+              </CompanyProvider>
+            } />
+            <Route path="/projects" element={
+              <CompanyProvider>
+                <Projects />
+              </CompanyProvider>
+            } />
+            <Route path="/team-members" element={
+              <CompanyProvider>
+                <TeamMembers />
+              </CompanyProvider>
+            } />
+            <Route path="/team-members/:id" element={
+              <CompanyProvider>
+                <TeamMemberDetail />
+              </CompanyProvider>
+            } />
+            <Route path="/office-settings" element={
+              <CompanyProvider>
+                <OfficeSettings />
+              </CompanyProvider>
+            } />
+            <Route path="/weekly-overview" element={
+              <CompanyProvider>
+                <WeeklyOverview />
+              </CompanyProvider>
+            } />
+            <Route path="/team-workload" element={
+              <CompanyProvider>
+                <TeamWorkload />
+              </CompanyProvider>
+            } />
+            <Route path="/team-annual-leave" element={
+              <CompanyProvider>
+                <TeamAnnualLeave />
+              </CompanyProvider>
+            } />
+            <Route path="/project-resourcing" element={
+              <CompanyProvider>
+                <ProjectResourcing />
+              </CompanyProvider>
+            } />
+            <Route path="/financial-overview" element={
+              <CompanyProvider>
+                <FinancialOverview />
+              </CompanyProvider>
+            } />
+            <Route path="/project-profit-dashboard" element={
+              <CompanyProvider>
+                <ProjectProfitDashboard />
+              </CompanyProvider>
+            } />
+            <Route path="/project-billing" element={
+              <CompanyProvider>
+                <ProjectBilling />
+              </CompanyProvider>
+            } />
+            <Route path="/aging-invoices" element={
+              <CompanyProvider>
+                <AgingInvoices />
+              </CompanyProvider>
+            } />
+            
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }
