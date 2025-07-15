@@ -6,8 +6,6 @@ import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { WorkloadHeatMapCard } from './cards/WorkloadHeatMapCard';
 import { TeamCapacityStatusCard } from './cards/TeamCapacityStatusCard';
 import { LeavePlanningCard } from './cards/LeavePlanningCard';
-import { ProjectPipelineHealthCard } from './cards/ProjectPipelineHealthCard';
-import { AnalyticsSection } from './AnalyticsSection';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
 
@@ -43,40 +41,12 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   // Get unified data from context
   const unifiedData = useUnifiedDashboardData();
 
-  // Prepare analytics data for separate section - using the correct property names
-  const analyticsData = {
-    projectsByStatus: mockData.projectsByStatus || [],
-    projectsByStage: mockData.projectsByStage || [],
-    projectsByLocation: mockData.projectsByLocation || [],
-    projectsByPM: mockData.projectsByPM || []
-  };
-
   return (
     <div className="space-y-6">
-      {/* First Row: Staff Status, Smart Insights, Upcoming Holidays */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div>
-          <UnifiedStaffStatusCard 
-            data={unifiedData}
-            selectedTimeRange={selectedTimeRange}
-          />
-        </div>
-        <div>
-          <UnifiedSmartInsightsCard 
-            data={unifiedData}
-          />
-        </div>
-        <div>
-          <UnifiedHolidayCard 
-            data={unifiedData}
-          />
-        </div>
-      </div>
-
-      {/* Second Row: New Dashboard Cards */}
+      {/* Top Row: Team Performance Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
         <div>
-          <WorkloadHeatMapCard 
+          <UnifiedStaffStatusCard 
             data={unifiedData}
             selectedTimeRange={selectedTimeRange}
           />
@@ -88,20 +58,32 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           />
         </div>
         <div>
-          <LeavePlanningCard 
+          <WorkloadHeatMapCard 
             data={unifiedData}
             selectedTimeRange={selectedTimeRange}
           />
         </div>
         <div>
-          <ProjectPipelineHealthCard 
+          <LeavePlanningCard 
+            data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
+          />
+        </div>
+      </div>
+
+      {/* Second Row: Additional Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <UnifiedSmartInsightsCard 
+            data={unifiedData}
+          />
+        </div>
+        <div>
+          <UnifiedHolidayCard 
             data={unifiedData}
           />
         </div>
       </div>
-      
-      {/* Analytics Charts - Project Status, Project Stages, Project Locations, Projects by PM */}
-      <AnalyticsSection mockData={analyticsData} />
     </div>
   );
 };
