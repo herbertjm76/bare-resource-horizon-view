@@ -184,17 +184,11 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setLoading(true);
       setError(null);
       
-      // Set a timeout to prevent eternal loading state
+      // Clear any existing timeout
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
+        loadingTimeoutRef.current = null;
       }
-      
-      loadingTimeoutRef.current = setTimeout(() => {
-        console.log('Company data fetch timeout reached');
-        setLoading(false);
-        setError('Company data fetch timed out. Please try again.');
-        toast.error('Data fetch timed out, please refresh');
-      }, 10000); // 10 second timeout
       
       const currentSubdomain = extractSubdomain();
       console.log('Current subdomain check result:', currentSubdomain);
@@ -214,14 +208,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (error: any) {
       console.error('Error in refreshCompany:', error);
       setError(error.message || 'Error refreshing company data');
-      toast.error('Error refreshing company data');
-    } finally {
       setLoading(false);
-      // Always clear the timeout in finally block
-      if (loadingTimeoutRef.current) {
-        clearTimeout(loadingTimeoutRef.current);
-        loadingTimeoutRef.current = null;
-      }
     }
   };
 
