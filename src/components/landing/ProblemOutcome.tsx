@@ -20,8 +20,30 @@ const ProblemOutcome = () => {
   ];
 
   return (
-    <div className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="relative py-16 bg-gray-50 overflow-hidden">
+      {/* Left Banner Image - Hidden on mobile and tablet */}
+      <div className="hidden xl:block absolute left-0 top-1/2 transform -translate-y-1/2 z-5">
+        <AnimatedSection animation="fadeInLeft" delay={400}>
+          <img 
+            src="/lovable-uploads/61ffdb36-f460-42dd-9edf-1747848e3c39.png" 
+            alt="Project Management Table" 
+            className="w-80 h-auto rounded-2xl shadow-2xl opacity-80 hover:opacity-100 transition-opacity duration-500" 
+          />
+        </AnimatedSection>
+      </div>
+
+      {/* Right Banner Image - Hidden on mobile and tablet */}
+      <div className="hidden xl:block absolute right-0 top-1/2 transform -translate-y-1/2 z-5">
+        <AnimatedSection animation="fadeInRight" delay={400}>
+          <img 
+            src="/lovable-uploads/d95b62b0-8a60-406a-8ba4-4f207c8f8da2.png" 
+            alt="Team Workload Dashboard" 
+            className="w-80 h-auto rounded-2xl shadow-2xl opacity-80 hover:opacity-100 transition-opacity duration-500" 
+          />
+        </AnimatedSection>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <AnimatedSection animation="fadeInUp" className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Spreadsheets hide trouble. BareResource shows it.
