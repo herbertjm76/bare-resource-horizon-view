@@ -3,7 +3,6 @@ import React from 'react';
 import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
-import { TeamUtilizationGauge } from './TeamUtilizationGauge';
 import { HerbieFloatingButton } from './HerbieFloatingButton';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
@@ -39,14 +38,6 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   return (
     <div className="w-full min-h-screen bg-gray-50/30">
       <div className="max-w-sm mx-auto px-3 py-4 space-y-4">
-        {/* Team Utilization Gauge */}
-        <div className="w-full">
-          <TeamUtilizationGauge
-            utilizationRate={unifiedData.currentUtilizationRate}
-            size="lg"
-          />
-        </div>
-
         {/* Smart Insights */}
         <div className="w-full">
           <UnifiedSmartInsightsCard

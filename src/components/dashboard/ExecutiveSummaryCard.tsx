@@ -8,6 +8,7 @@ import { TrendingUp, Clock, Briefcase, Users } from 'lucide-react';
 import { AIInsightsService, AIInsight } from '@/services/aiInsightsService';
 import { AISummaryService, AISummaryData } from '@/services/aiSummaryService';
 import { useCompany } from '@/context/CompanyContext';
+import { Gauge } from './Gauge';
 
 export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   activeProjects,
@@ -74,7 +75,19 @@ export const ExecutiveSummaryCard: React.FC<ExecutiveSummaryProps> = ({
   const metrics = [
     {
       title: "Team Utilization",
-      value: `${Math.round(utilizationRate)}%`,
+      value: (
+        <div className="flex flex-col items-center space-y-1">
+          <Gauge
+            value={utilizationRate}
+            max={100}
+            title=""
+            size="sm"
+            showPercentage={false}
+            thresholds={{ good: 70, warning: 85, critical: 95 }}
+          />
+          <span className="text-lg font-bold">{Math.round(utilizationRate)}%</span>
+        </div>
+      ),
       subtitle: aiSummary ? `Trend: ${AISummaryService.getUtilizationTrendText(aiSummary.utilizationTrend)}` : timeRangeText,
       badgeText: aiSummary ? AISummaryService.getUtilizationTrendText(aiSummary.utilizationTrend) : utilizationStatus.label,
       badgeColor: aiSummary ? 
