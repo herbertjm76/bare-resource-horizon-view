@@ -72,7 +72,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
             strokeWidth={2.5}
           />
         </div>
-        <div className={`text-sm font-bold ${styles.numberColor} leading-tight flex-1 drop-shadow-sm`}>
+        <div className={`text-base font-bold ${styles.numberColor} leading-tight flex-1 drop-shadow-sm`}>
           {insight.title}
         </div>
       </div>
