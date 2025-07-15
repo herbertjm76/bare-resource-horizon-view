@@ -3,6 +3,7 @@ import React from 'react';
 import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
 import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
+import { TeamUtilizationGauge } from './TeamUtilizationGauge';
 import { AnalyticsSection } from './AnalyticsSection';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
@@ -49,8 +50,14 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Main Row: Staff Status, Smart Insights, Upcoming Holidays - Using unified cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main Row: Team Utilization, Staff Status, Smart Insights, Upcoming Holidays - Using unified cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div>
+          <TeamUtilizationGauge
+            utilizationRate={unifiedData.currentUtilizationRate}
+            size="lg"
+          />
+        </div>
         <div>
           <UnifiedStaffStatusCard 
             data={unifiedData}
