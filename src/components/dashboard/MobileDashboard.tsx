@@ -3,6 +3,10 @@ import React from 'react';
 import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
+import { WorkloadHeatMapCard } from './cards/WorkloadHeatMapCard';
+import { TeamCapacityStatusCard } from './cards/TeamCapacityStatusCard';
+import { LeavePlanningCard } from './cards/LeavePlanningCard';
+import { ProjectPipelineHealthCard } from './cards/ProjectPipelineHealthCard';
 import { HerbieFloatingButton } from './HerbieFloatingButton';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
@@ -56,6 +60,31 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         {/* Upcoming Events */}
         <div className="w-full">
           <UnifiedHolidayCard 
+            data={unifiedData}
+          />
+        </div>
+
+        {/* New Dashboard Cards */}
+        <div className="w-full">
+          <WorkloadHeatMapCard 
+            data={unifiedData}
+          />
+        </div>
+        
+        <div className="w-full">
+          <TeamCapacityStatusCard 
+            data={unifiedData}
+          />
+        </div>
+        
+        <div className="w-full">
+          <LeavePlanningCard 
+            data={unifiedData}
+          />
+        </div>
+        
+        <div className="w-full">
+          <ProjectPipelineHealthCard 
             data={unifiedData}
           />
         </div>
