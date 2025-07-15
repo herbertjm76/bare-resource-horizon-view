@@ -25,7 +25,7 @@ const ProblemOutcome = () => {
       <div className="hidden xl:block absolute left-0 top-1/2 transform -translate-y-1/2 z-5">
         <AnimatedSection animation="fadeInLeft" delay={400}>
           <img 
-            src="/lovable-uploads/61ffdb36-f460-42dd-9edf-1747848e3c39.png" 
+            src="/lovable-uploads/cdd81ca9-0aa0-4d74-9632-ab8c9dd67383.png" 
             alt="Project Management Table" 
             className="w-80 h-80 rounded-lg opacity-80 hover:opacity-100 transition-opacity duration-500 object-cover" 
           />
@@ -36,7 +36,7 @@ const ProblemOutcome = () => {
       <div className="hidden xl:block absolute right-0 top-1/2 transform -translate-y-1/2 z-5">
         <AnimatedSection animation="fadeInRight" delay={400}>
           <img 
-            src="/lovable-uploads/d95b62b0-8a60-406a-8ba4-4f207c8f8da2.png" 
+            src="/lovable-uploads/394a441f-b573-455c-b39d-0c8189483d1d.png" 
             alt="Team Workload Dashboard" 
             className="w-80 h-80 rounded-lg opacity-80 hover:opacity-100 transition-opacity duration-500 object-cover" 
           />
