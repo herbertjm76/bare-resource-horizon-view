@@ -122,9 +122,10 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         console.log("No active session, cannot fetch company data");
         setCompany(null);
         setError("No active session found. Please log in.");
-        setLoading(false);
         return;
       }
+      
+      console.log('Session found, fetching profile for user:', session.user.id);
       
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
@@ -136,17 +137,19 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         console.error("Error fetching user profile:", profileError);
         setError("Failed to fetch user profile");
         setCompany(null);
-        setLoading(false);
         return;
       }
+      
+      console.log('Profile fetched:', profile);
       
       if (!profile || !profile.company_id) {
         console.log("No company associated with user profile");
         setError("Your account is not associated with any company");
         setCompany(null);
-        setLoading(false);
         return;
       }
+      
+      console.log('Fetching company data for company_id:', profile.company_id);
       
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
@@ -168,6 +171,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setCompany(null);
       setError(error.message || 'Failed to fetch company data');
     } finally {
+      console.log('Setting loading to false');
       setLoading(false);
       // Clear any loading timeout
       if (loadingTimeoutRef.current) {
