@@ -1,7 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { DateRangeCalculationService } from '@/services/DateRangeCalculationService';
-import { format } from 'date-fns';
+import { getWeekStartOptions, getWeekDateRange } from './dateUtils';
 import { toast } from 'sonner';
 
 /**
@@ -15,7 +14,7 @@ export async function fetchPreciseDateAllocations(
   if (!companyId) return [];
   
   // Get both Monday and Sunday dates for the selected week
-  const { mondayKey, sundayKey } = DateRangeCalculationService.getWeekStartOptions(selectedWeek);
+  const { mondayKey, sundayKey } = getWeekStartOptions(selectedWeek);
   
   console.log('Looking for allocations with Monday date:', mondayKey);
   console.log('Or Sunday date:', sundayKey);
@@ -60,7 +59,7 @@ export async function fetchDateRangeAllocations(
   
   try {
     // Get the range for the entire week
-    const { startDateString, endDateString } = DateRangeCalculationService.getWeekDateRange(selectedWeek);
+    const { startDateString, endDateString } = getWeekDateRange(selectedWeek);
     
     console.log(`Trying date range query from ${startDateString} to ${endDateString}`);
     

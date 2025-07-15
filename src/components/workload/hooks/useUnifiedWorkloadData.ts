@@ -1,13 +1,23 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCompany } from '@/context/CompanyContext';
-import { format } from 'date-fns';
+import { format, startOfWeek, addWeeks } from 'date-fns';
 import { TeamMember } from '@/components/dashboard/types';
 import { fetchUnifiedWorkloadData, UnifiedWorkloadResult } from './services/unifiedDataService';
-import { DateRangeCalculationService } from '@/services/DateRangeCalculationService';
 
-// Generate week start dates for the calendar using centralized service
+// Generate week start dates for the calendar
 export const generateWeekStartDates = (startDate: Date, numberOfWeeks: number) => {
-  return DateRangeCalculationService.generateWeekStartDates(startDate, numberOfWeeks);
+  const weekStartDates = [];
+  const normalizedStartDate = startOfWeek(startDate, { weekStartsOn: 1 }); // Ensure Monday start
+  
+  for (let i = 0; i < numberOfWeeks; i++) {
+    const weekDate = addWeeks(normalizedStartDate, i);
+    weekStartDates.push({
+      date: weekDate,
+      key: format(weekDate, 'yyyy-MM-dd')
+    });
+  }
+  
+  return weekStartDates;
 };
 
 export const useUnifiedWorkloadData = (

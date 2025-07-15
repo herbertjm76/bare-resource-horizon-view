@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ResourceAllocation } from './types';
 import { formatDateKey } from './utils';
 import { toast } from 'sonner';
-import { DateRangeCalculationService } from '@/services/DateRangeCalculationService';
+import { getWeekStartDate } from './utils/dateUtils';
 import { format } from 'date-fns';
 
 export const fetchResourceAllocations = async (
@@ -70,7 +70,7 @@ export const saveResourceAllocation = async (
     // If it's not already a formatted date string, parse it
     if (weekKey.includes('T') || weekKey.includes(' ')) {
       const date = new Date(weekKey);
-      const mondayDate = DateRangeCalculationService.getWeekStartDate(date);
+      const mondayDate = getWeekStartDate(date);
       formattedWeekKey = format(mondayDate, 'yyyy-MM-dd');
     }
     
@@ -134,7 +134,7 @@ export const deleteResourceAllocation = async (
     // Double-check that the date is a Monday
     if (weekKey.includes('T') || weekKey.includes(' ')) {
       const date = new Date(weekKey);
-      const mondayDate = DateRangeCalculationService.getWeekStartDate(date);
+      const mondayDate = getWeekStartDate(date);
       formattedWeekKey = format(mondayDate, 'yyyy-MM-dd');
     }
     
