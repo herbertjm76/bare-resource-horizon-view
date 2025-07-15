@@ -226,72 +226,57 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   useEffect(() => {
-    console.log('Setting up auth state change listener');
-    
+    const initializeAuth = async () => {
+      console.log('CompanyContext: Initial loading started');
+      setAuthChecked(false);
+      
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Current auth session:', session ? 'Exists' : 'None');
+        
+        if (session) {
+          await refreshCompany();
+        } else {
+          setLoading(false);
+          setError('No active session found. Please log in.');
+        }
+      } catch (error: any) {
+        console.error('Error in initial auth check:', error);
+        setLoading(false);
+        setError(error.message || 'Failed to load initial data');
+      }
+      
+      setAuthChecked(true);
+    };
+
+    // Only run initial auth check once
+    if (!initialLoadAttempted.current) {
+      initialLoadAttempted.current = true;
+      initializeAuth();
+    }
+
+    // Set up auth listener for future changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event) => {
         console.log("Auth state changed:", event);
+        setAuthChecked(true);
+        
         if (event === 'SIGNED_IN') {
-          // Use setTimeout to avoid auth deadlocks
-          setTimeout(() => {
-            refreshCompany();
-          }, 0);
+          await refreshCompany();
         } else if (event === 'SIGNED_OUT') {
           setCompany(null);
           setError(null);
+          setLoading(false);
         }
-        setAuthChecked(true);
       }
     );
 
     return () => {
       subscription.unsubscribe();
-      // Clear any remaining timeout on unmount
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
     };
-  }, []);
-
-  useEffect(() => {
-    // Only load initial data if it hasn't been attempted yet
-    if (!initialLoadAttempted.current) {
-      const loadInitialData = async () => {
-        console.log('CompanyContext: Initial loading started');
-        initialLoadAttempted.current = true;
-        
-        try {
-          // Set a safety timeout for initial loading
-          loadingTimeoutRef.current = setTimeout(() => {
-            console.log('Initial company data fetch timeout');
-            setLoading(false);
-            setError('Initial data fetch timed out. Please refresh the page.');
-          }, 8000);
-          
-          const { data: { session } } = await supabase.auth.getSession();
-          console.log('Current auth session:', session ? 'Exists' : 'None');
-          
-          if (session) {
-            // Use setTimeout to avoid auth deadlocks
-            setTimeout(() => {
-              refreshCompany();
-            }, 0);
-          } else {
-            setLoading(false);
-            setError('No active session found. Please log in.');
-          }
-        } catch (error: any) {
-          console.error('Error in initial company data load:', error);
-          setLoading(false);
-          setError(error.message || 'Failed to load initial data');
-        }
-        
-        setAuthChecked(true);
-        console.log('CompanyContext: Initial loading completed');
-      };
-
-      loadInitialData();
-    }
   }, []);
 
   useEffect(() => {
