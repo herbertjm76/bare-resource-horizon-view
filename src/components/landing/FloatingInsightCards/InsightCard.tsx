@@ -39,7 +39,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
         padding: '1.5rem',
         pointerEvents: 'auto',
         // Liquid glass effect
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.2) 100%)',
         backdropFilter: 'blur(30px) saturate(180%)',
         WebkitBackdropFilter: 'blur(30px) saturate(180%)',
         boxShadow: `
