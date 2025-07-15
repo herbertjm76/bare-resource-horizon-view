@@ -32,28 +32,6 @@ const Hero = () => {
       ">
       <GradientOrbs />
 
-      {/* Left Banner Image - Hidden on mobile and tablet */}
-      <div className="hidden xl:block absolute left-0 top-1/2 transform -translate-y-1/2 z-5">
-        <AnimatedSection animation="fadeInLeft" delay={400}>
-          <img 
-            src="/lovable-uploads/61ffdb36-f460-42dd-9edf-1747848e3c39.png" 
-            alt="Project Management Table" 
-            className="w-80 h-auto rounded-2xl shadow-2xl opacity-90 hover:opacity-100 transition-opacity duration-500" 
-          />
-        </AnimatedSection>
-      </div>
-
-      {/* Right Banner Image - Hidden on mobile and tablet */}
-      <div className="hidden xl:block absolute right-0 top-1/2 transform -translate-y-1/2 z-5">
-        <AnimatedSection animation="fadeInRight" delay={400}>
-          <img 
-            src="/lovable-uploads/d95b62b0-8a60-406a-8ba4-4f207c8f8da2.png" 
-            alt="Team Workload Dashboard" 
-            className="w-80 h-auto rounded-2xl shadow-2xl opacity-90 hover:opacity-100 transition-opacity duration-500" 
-          />
-        </AnimatedSection>
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
           {/* Text Content - Full width on mobile, 4 cols on desktop */}
