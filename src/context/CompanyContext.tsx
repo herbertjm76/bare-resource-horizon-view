@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useEnhancedDashboardAuth } from '@/hooks/useEnhancedDashboardAuth';
+import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 type CompanyContextType = {
   company: any | null;
@@ -30,8 +30,9 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [subdomain, setSubdomain] = useState<string | null>(null);
   const [isSubdomainMode, setIsSubdomainMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any | null>(null);
   
-  const dashboardAuth = useEnhancedDashboardAuth();
+  const { isDemoMode, profile: demoProfile } = useDemoAuth();
 
   const extractSubdomain = () => {
     const hostname = window.location.hostname;
@@ -128,6 +129,30 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const fetchUserProfile = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) return null;
+      
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
+      }
+      
+      setUserProfile(profile);
+      return profile;
+    } catch (error) {
+      console.error('Error in fetchUserProfile:', error);
+      return null;
+    }
+  };
+
   const refreshCompany = async () => {
     const currentSubdomain = extractSubdomain();
     setSubdomain(currentSubdomain);
@@ -137,13 +162,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       await fetchCompanyBySubdomain(currentSubdomain);
     } else {
       setIsSubdomainMode(false);
-      if (dashboardAuth.profile) {
-        await fetchCompanyByProfile(dashboardAuth.profile);
+      const profile = userProfile || await fetchUserProfile();
+      if (profile) {
+        await fetchCompanyByProfile(profile);
       }
     }
   };
 
-  // Update company data when dashboard auth changes
+  // Update company data when auth changes
   useEffect(() => {
     const currentSubdomain = extractSubdomain();
     setSubdomain(currentSubdomain);
@@ -155,17 +181,28 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } else {
       // User profile mode
       setIsSubdomainMode(false);
-      if (!dashboardAuth.loading && dashboardAuth.profile) {
-        fetchCompanyByProfile(dashboardAuth.profile);
-      } else if (!dashboardAuth.loading && !dashboardAuth.profile) {
-        setError("No profile found");
-        setCompany(null);
-        setLoading(false);
-      } else {
-        setLoading(dashboardAuth.loading);
+      
+      // Handle demo mode
+      if (isDemoMode && demoProfile) {
+        fetchCompanyByProfile(demoProfile);
+        return;
       }
+      
+      // Handle normal auth
+      const initAuth = async () => {
+        const profile = await fetchUserProfile();
+        if (profile) {
+          await fetchCompanyByProfile(profile);
+        } else {
+          setError("No profile found");
+          setCompany(null);
+          setLoading(false);
+        }
+      };
+      
+      initAuth();
     }
-  }, [dashboardAuth.loading, dashboardAuth.profile]);
+  }, [isDemoMode, demoProfile]);
 
   return (
     <CompanyContext.Provider value={{ 
