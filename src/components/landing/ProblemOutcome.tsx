@@ -27,7 +27,7 @@ const ProblemOutcome = () => {
           <img 
             src="/lovable-uploads/cdd81ca9-0aa0-4d74-9632-ab8c9dd67383.png" 
             alt="Project Management Table" 
-            className="w-80 h-80 rounded-lg opacity-80 hover:opacity-100 transition-opacity duration-500 object-cover" 
+            className="w-80 h-80 rounded-lg opacity-95 hover:opacity-100 transition-opacity duration-500 object-cover" 
           />
         </AnimatedSection>
       </div>
@@ -38,7 +38,7 @@ const ProblemOutcome = () => {
           <img 
             src="/lovable-uploads/394a441f-b573-455c-b39d-0c8189483d1d.png" 
             alt="Team Workload Dashboard" 
-            className="w-80 h-80 rounded-lg opacity-80 hover:opacity-100 transition-opacity duration-500 object-cover" 
+            className="w-80 h-80 rounded-lg opacity-95 hover:opacity-100 transition-opacity duration-500 object-cover" 
           />
         </AnimatedSection>
       </div>
