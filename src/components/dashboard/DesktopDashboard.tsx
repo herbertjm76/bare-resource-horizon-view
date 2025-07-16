@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { TeamUtilizationCard } from './kpi/TeamUtilizationCard';
-import { OverCapacityCard } from './kpi/OverCapacityCard';
-import { ActiveProjectsCard } from './kpi/ActiveProjectsCard';
-import { TeamSizeCard } from './kpi/TeamSizeCard';
+import { TeamUtilizationCard } from './cards/TeamUtilizationCard';
+import { WorkloadCapacityCard } from './cards/WorkloadCapacityCard';
+import { TeamLeaveCard } from './cards/TeamLeaveCard';
+import { ProjectPipelineCard } from './cards/ProjectPipelineCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
@@ -48,27 +48,24 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
     projectsByPM: mockData.projectsByPM || []
   };
 
-  // Calculate over capacity hours (simplified calculation)
-  const overCapacityHours = Math.max(0, Math.round((unifiedData.currentUtilizationRate - 100) * unifiedData.totalTeamSize * 40 / 100));
-
   return (
     <div className="space-y-6">
-      {/* First Row: New KPI Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      {/* KPI Cards Row: Team Utilization, Workload Capacity, Team Leave, Project Pipeline */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
         <TeamUtilizationCard 
-          utilizationRate={unifiedData.currentUtilizationRate}
-          status={unifiedData.utilizationStatus}
+          data={unifiedData}
+          selectedTimeRange={selectedTimeRange}
         />
-        <OverCapacityCard 
-          overCapacityHours={overCapacityHours}
+        <WorkloadCapacityCard 
+          data={unifiedData}
+          selectedTimeRange={selectedTimeRange}
         />
-        <ActiveProjectsCard 
-          activeProjects={unifiedData.activeProjects}
-          totalTeamSize={unifiedData.totalTeamSize}
+        <TeamLeaveCard 
+          data={unifiedData}
+          selectedTimeRange={selectedTimeRange}
         />
-        <TeamSizeCard 
-          totalTeamSize={unifiedData.totalTeamSize}
-          activeResources={unifiedData.activeResources}
+        <ProjectPipelineCard 
+          data={unifiedData}
         />
       </div>
 
