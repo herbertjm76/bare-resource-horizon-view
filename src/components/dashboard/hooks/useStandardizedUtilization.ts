@@ -28,7 +28,7 @@ export const useStandardizedUtilization = (
 
     const averageUtilization = totalUtilization / teamMembers.length;
     
-    console.log('Standardized utilization calculation:', {
+    console.log('📊 LEGACY Standardized utilization calculation (WILL BE REPLACED BY CHATGPT):', {
       selectedTimeRange,
       totalMembers: teamMembers.length,
       totalUtilization,

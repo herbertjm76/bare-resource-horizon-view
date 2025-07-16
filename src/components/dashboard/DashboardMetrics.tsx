@@ -66,11 +66,9 @@ const DashboardContent: React.FC<{
     currentUtilizationRate
   } = dashboardData;
 
-  // Use standardized utilization calculation
-  const { utilizationRate, isLoading: isUtilizationLoading } = useStandardizedUtilization(
-    teamMembers || [],
-    selectedTimeRange
-  );
+  // Use ChatGPT-powered utilization data from unified dashboard
+  const utilizationRate = currentUtilizationRate;
+  const isUtilizationLoading = false; // Already handled in unified loading state
 
   // Show loading state with skeleton
   if (isLoading || isUtilizationLoading) {

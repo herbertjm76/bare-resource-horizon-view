@@ -26,6 +26,15 @@ verify_jwt = true
 [functions.create_annual_leave]
 verify_jwt = true
 
+[functions.dashboard-calculations]
+verify_jwt = true
+
+[functions.ai-insights]
+verify_jwt = true
+
+[functions.chatgpt-interpret]
+verify_jwt = true
+
 [db]
 port = 54322
 shadow_port = 54320
