@@ -7,11 +7,13 @@ import { ProjectPipelineBubbleGraph } from './ProjectPipelineBubbleGraph';
 interface ProjectPipelineCardProps {
   projects?: any[];
   maxScore?: number;
+  timeRange?: string;
 }
 
 export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
   projects = [],
-  maxScore = 100
+  maxScore = 100,
+  timeRange = 'This Month'
 }) => {
   // Calculate project statistics from real data
   const calculateProjectStats = () => {
@@ -71,27 +73,29 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
   ];
   
   return (
-    <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
+    <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
+      <CardContent className="p-4 h-full flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4 text-gray-600" />
             <span className="text-xs font-semibold text-gray-700 tracking-wide">PROJECT PIPELINE</span>
           </div>
         </div>
         
-        <div className="flex flex-col justify-between h-full">
-          {/* Bubble Graph and Legend side by side */}
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <div className="flex-1">
+        {/* Main content - flex-1 to fill remaining space */}
+        <div className="flex-1 flex flex-col">
+          {/* Bubble Graph and Legend - main content area */}
+          <div className="flex-1 flex items-center justify-between gap-3 mb-3">
+            <div className="flex-1 h-full flex items-center justify-center">
               <ProjectPipelineBubbleGraph 
                 bubbleData={bubbleData}
                 totalProjects={totalProjects}
               />
             </div>
             
-            {/* Legend - on the side */}
-            <div className="flex flex-col gap-2">
+            {/* Legend - compact side layout */}
+            <div className="flex flex-col gap-1.5">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#FDFDFD', border: '1px solid #E5E7EB' }}></div>
                 <span className="text-xs text-gray-600">Active</span>
@@ -107,8 +111,11 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
             </div>
           </div>
           
-          <div className="text-center">
-            <span className="text-xs text-gray-500">This Month</span>
+          {/* Time range badge at bottom */}
+          <div className="flex justify-center">
+            <Badge variant="outline" className="text-xs">
+              {timeRange}
+            </Badge>
           </div>
         </div>
       </CardContent>
