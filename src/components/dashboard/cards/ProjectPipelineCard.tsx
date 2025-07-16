@@ -81,40 +81,33 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
         </div>
         
         <div className="flex flex-col justify-between h-full">
-          {/* Bubble Graph showing project distribution */}
-          <div className="mb-4">
-            <ProjectPipelineBubbleGraph 
-              bubbleData={bubbleData}
-              totalProjects={totalProjects}
-            />
-          </div>
-          
-          {/* Legend - smaller */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5">
+          {/* Bubble Graph and Legend side by side */}
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex-1">
+              <ProjectPipelineBubbleGraph 
+                bubbleData={bubbleData}
+                totalProjects={totalProjects}
+              />
+            </div>
+            
+            {/* Legend - on the side */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#FDFDFD', border: '1px solid #E5E7EB' }}></div>
-                <span className="text-gray-600">Active</span>
+                <span className="text-xs text-gray-600">Active</span>
               </div>
-              <span className="font-semibold text-gray-900">{projectStats.inProgress.count}</span>
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
-                <span className="text-gray-600">Planning</span>
+                <span className="text-xs text-gray-600">Planning</span>
               </div>
-              <span className="font-semibold text-gray-900">{projectStats.planning.count}</span>
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
-                <span className="text-gray-600">Done</span>
+                <span className="text-xs text-gray-600">Done</span>
               </div>
-              <span className="font-semibold text-gray-900">{projectStats.complete.count}</span>
             </div>
           </div>
           
-          <div className="text-center mt-4">
+          <div className="text-center">
             <span className="text-xs text-gray-500">This Month</span>
           </div>
         </div>
