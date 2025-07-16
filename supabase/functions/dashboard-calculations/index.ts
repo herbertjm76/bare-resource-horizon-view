@@ -293,33 +293,64 @@ Return ONLY a valid JSON object with this enhanced structure:
 }
 `;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a precise data calculation assistant. Always return valid JSON with accurate calculations.'
+    // Call ChatGPT with retry logic for rate limiting
+    let response;
+    let retryCount = 0;
+    const maxRetries = 3;
+    
+    while (retryCount <= maxRetries) {
+      try {
+        response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openAIApiKey}`,
+            'Content-Type': 'application/json',
           },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.1,
-        max_tokens: 4000
-      }),
-    });
+          body: JSON.stringify({
+            model: 'gpt-4.1-2025-04-14',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are a precise data calculation assistant. Always return valid JSON with accurate calculations.'
+              },
+              {
+                role: 'user',
+                content: prompt
+              }
+            ],
+            temperature: 0.1,
+            max_tokens: 4000
+          }),
+        });
 
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('OpenAI API error:', errorData);
-      throw new Error(`OpenAI API error: ${response.status}`);
+        if (response.ok) {
+          console.log('OpenAI API call successful on attempt', retryCount + 1);
+          break;
+        } else if (response.status === 429) {
+          retryCount++;
+          if (retryCount <= maxRetries) {
+            const waitTime = Math.pow(2, retryCount) * 1000; // Exponential backoff
+            console.log(`Rate limited, waiting ${waitTime}ms before retry ${retryCount}/${maxRetries}`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+          } else {
+            const errorData = await response.text();
+            console.error('OpenAI API rate limit exceeded after all retries:', errorData);
+            throw new Error(`OpenAI API rate limit exceeded: ${response.status}`);
+          }
+        } else {
+          const errorData = await response.text();
+          console.error('OpenAI API error:', errorData);
+          throw new Error(`OpenAI API error: ${response.status}`);
+        }
+      } catch (fetchError) {
+        if (retryCount === maxRetries) {
+          throw fetchError;
+        }
+        retryCount++;
+        const waitTime = Math.pow(2, retryCount) * 1000;
+        console.log(`Network error, waiting ${waitTime}ms before retry ${retryCount}/${maxRetries}`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
     }
 
     const aiResponse = await response.json();
@@ -360,6 +391,27 @@ Return ONLY a valid JSON object with this enhanced structure:
 
   } catch (error) {
     console.error('Error in dashboard-calculations function:', error);
+    
+    // If OpenAI fails due to rate limiting, provide fallback calculations
+    if (error.message.includes('rate limit') || error.message.includes('429')) {
+      console.log('Falling back to direct calculation due to OpenAI rate limit');
+      
+      try {
+        const fallbackData = performFallbackCalculations(dataContext, startDate, endDate, weeksInPeriod);
+        
+        return new Response(JSON.stringify({
+          success: true,
+          data: fallbackData,
+          timestamp: new Date().toISOString(),
+          source: 'fallback_calculation'
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (fallbackError) {
+        console.error('Fallback calculation also failed:', fallbackError);
+      }
+    }
+    
     return new Response(JSON.stringify({ 
       success: false,
       error: error.message 
@@ -368,4 +420,106 @@ Return ONLY a valid JSON object with this enhanced structure:
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
+
+// Fallback calculation function
+function performFallbackCalculations(dataContext: any, startDate: Date, endDate: Date, weeksInPeriod: number) {
+  const { profiles, allocations, annualLeaves, otherLeaves, projects } = dataContext;
+  
+  console.log('Performing fallback calculations with comprehensive allocation logic');
+  
+  const teamMembers = profiles.map((profile: any) => {
+    const memberId = profile.id;
+    const weeklyCapacity = profile.weekly_capacity || 40;
+    const totalCapacity = weeklyCapacity * weeksInPeriod;
+    
+    // Calculate project hours
+    const projectHours = allocations
+      .filter((alloc: any) => {
+        if (alloc.resource_id !== memberId) return false;
+        const allocDate = new Date(alloc.week_start_date);
+        return allocDate >= startDate && allocDate <= endDate;
+      })
+      .reduce((sum: number, alloc: any) => sum + (alloc.hours || 0), 0);
+    
+    // Calculate annual leave hours
+    const annualLeaveHours = annualLeaves
+      .filter((leave: any) => {
+        if (leave.member_id !== memberId) return false;
+        const leaveDate = new Date(leave.date);
+        return leaveDate >= startDate && leaveDate <= endDate;
+      })
+      .reduce((sum: number, leave: any) => sum + (leave.hours || 0), 0);
+    
+    // Calculate other leave hours
+    const otherLeaveHours = otherLeaves
+      .filter((leave: any) => {
+        if (leave.member_id !== memberId) return false;
+        const leaveDate = new Date(leave.week_start_date);
+        return leaveDate >= startDate && leaveDate <= endDate;
+      })
+      .reduce((sum: number, leave: any) => sum + (leave.hours || 0), 0);
+    
+    const totalAllocatedHours = projectHours + annualLeaveHours + otherLeaveHours;
+    const utilization = totalCapacity > 0 ? Math.round((totalAllocatedHours / totalCapacity) * 100) : 0;
+    const availability = 100 - utilization;
+    
+    return {
+      id: memberId,
+      name: `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || profile.email,
+      utilization,
+      availability,
+      totalAllocatedHours,
+      projectHours,
+      annualLeaveHours,
+      otherLeaveHours,
+      weeklyCapacity,
+      totalCapacity
+    };
+  });
+  
+  // Calculate team metrics
+  const totalMembers = teamMembers.length;
+  const averageUtilization = totalMembers > 0 
+    ? Math.round(teamMembers.reduce((sum: number, member: any) => sum + member.utilization, 0) / totalMembers)
+    : 0;
+  const activeProjects = projects.filter((project: any) => 
+    project.status === 'In Progress' || project.status === 'Planning'
+  ).length;
+  const totalProjectHours = teamMembers.reduce((sum: number, member: any) => sum + member.projectHours, 0);
+  const totalLeaveHours = teamMembers.reduce((sum: number, member: any) => sum + member.annualLeaveHours + member.otherLeaveHours, 0);
+  
+  // Calculate project metrics
+  const projectsByStatus = {
+    'Planning': projects.filter((p: any) => p.status === 'Planning').length,
+    'In Progress': projects.filter((p: any) => p.status === 'In Progress').length,
+    'On Hold': projects.filter((p: any) => p.status === 'On Hold').length,
+    'Complete': projects.filter((p: any) => p.status === 'Complete').length
+  };
+  
+  return {
+    teamMembers,
+    teamMetrics: {
+      totalMembers,
+      averageUtilization,
+      totalActiveProjects: activeProjects,
+      totalProjectHours,
+      totalLeaveHours
+    },
+    projectMetrics: {
+      activeProjects,
+      totalAllocatedHours: totalProjectHours,
+      projectsByStatus
+    },
+    calculationMetadata: {
+      weeksInPeriod,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      dataQuality: {
+        profilesWithMissingCapacity: profiles.filter((p: any) => !p.weekly_capacity).length,
+        allocationsOutOfRange: 0,
+        calculationWarnings: ['Fallback calculation used due to OpenAI rate limit']
+      }
+    }
+  };
+}
 });
