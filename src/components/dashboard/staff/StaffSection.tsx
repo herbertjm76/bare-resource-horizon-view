@@ -79,7 +79,7 @@ export const StaffSection: React.FC<StaffSectionProps & { selectedTimeRange?: Ti
         allocations={allocations}
         isLoading={isLoading}
         weeklyCapacity={selectedMember?.weekly_capacity || 40}
-        utilizationRate={selectedMemberUtilization?.utilizationRate}
+        utilizationRate={selectedMember?.availability}
         selectedTimeRange={selectedTimeRange}
       />
     </div>
