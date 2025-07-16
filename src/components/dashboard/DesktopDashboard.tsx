@@ -1,13 +1,9 @@
 
 import React from 'react';
-import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
-import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
-import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
-import { WorkloadHeatMapCard } from './cards/WorkloadHeatMapCard';
-import { TeamCapacityStatusCard } from './cards/TeamCapacityStatusCard';
-import { LeavePlanningCard } from './cards/LeavePlanningCard';
-import { ProjectPipelineHealthCard } from './cards/ProjectPipelineHealthCard';
-import { TeamCompositionCard } from './cards/TeamCompositionCard';
+import { TeamUtilizationCard } from './kpi/TeamUtilizationCard';
+import { OverCapacityCard } from './kpi/OverCapacityCard';
+import { ActiveProjectsCard } from './kpi/ActiveProjectsCard';
+import { TeamSizeCard } from './kpi/TeamSizeCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
@@ -52,26 +48,28 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
     projectsByPM: mockData.projectsByPM || []
   };
 
+  // Calculate over capacity hours (simplified calculation)
+  const overCapacityHours = Math.max(0, Math.round((unifiedData.currentUtilizationRate - 100) * unifiedData.totalTeamSize * 40 / 100));
+
   return (
     <div className="space-y-6">
-      {/* First Row: Staff Status, Smart Insights, Upcoming Holidays */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div>
-          <UnifiedStaffStatusCard 
-            data={unifiedData}
-            selectedTimeRange={selectedTimeRange}
-          />
-        </div>
-        <div>
-          <UnifiedSmartInsightsCard 
-            data={unifiedData}
-          />
-        </div>
-        <div>
-          <UnifiedHolidayCard 
-            data={unifiedData}
-          />
-        </div>
+      {/* First Row: New KPI Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <TeamUtilizationCard 
+          utilizationRate={unifiedData.currentUtilizationRate}
+          status={unifiedData.utilizationStatus}
+        />
+        <OverCapacityCard 
+          overCapacityHours={overCapacityHours}
+        />
+        <ActiveProjectsCard 
+          activeProjects={unifiedData.activeProjects}
+          totalTeamSize={unifiedData.totalTeamSize}
+        />
+        <TeamSizeCard 
+          totalTeamSize={unifiedData.totalTeamSize}
+          activeResources={unifiedData.activeResources}
+        />
       </div>
 
 
