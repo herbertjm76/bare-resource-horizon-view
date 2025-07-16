@@ -69,8 +69,13 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     });
   }, [chatGPTData, originalTeamMembers]);
 
-  // Extract utilization data from ChatGPT
-  const currentUtilizationRate = chatGPTData?.teamMetrics.averageUtilization || 0;
+  // Extract utilization data from ChatGPT or calculate fallback
+  const { currentUtilizationRate: fallbackUtilizationRate, utilizationStatus: fallbackStatus, utilizationTrends: fallbackTrends } = useUtilizationData(
+    originalTeamMembers, 
+    preRegisteredMembers
+  );
+  
+  const currentUtilizationRate = chatGPTData?.teamMetrics.averageUtilization ?? fallbackUtilizationRate;
   
   // Create memberUtilizations array from ChatGPT data
   const memberUtilizations = useMemo(() => {
@@ -97,17 +102,17 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     };
   }, [chatGPTData]);
 
-  // Generate utilization status and trends from ChatGPT data
+  // Generate utilization status and trends from ChatGPT data or fallback
   const utilizationStatus = useMemo(() => {
-    if (!chatGPTData) return { status: 'optimal', color: 'green', textColor: 'text-green-600' };
+    if (!chatGPTData) return fallbackStatus;
     const avgUtil = chatGPTData.teamMetrics.averageUtilization;
     if (avgUtil > 120) return { status: 'overallocated', color: 'red', textColor: 'text-red-600' };
     if (avgUtil < 60) return { status: 'underutilized', color: 'yellow', textColor: 'text-yellow-600' };
     return { status: 'optimal', color: 'green', textColor: 'text-green-600' };
-  }, [chatGPTData]);
+  }, [chatGPTData, fallbackStatus]);
 
   const utilizationTrends = useMemo(() => {
-    if (!chatGPTData) return { days7: 0, days30: 0, days90: 0 };
+    if (!chatGPTData) return fallbackTrends;
     // Generate trend data based on current utilization
     const currentUtil = chatGPTData.teamMetrics.averageUtilization;
     return {
@@ -115,7 +120,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
       days30: Math.max(0, currentUtil + (Math.random() - 0.5) * 15),
       days90: Math.max(0, currentUtil + (Math.random() - 0.5) * 20)
     };
-  }, [chatGPTData]);
+  }, [chatGPTData, fallbackTrends]);
 
   // Use aggregated data hook for non-utilization data
   const { transformedStaffData, totalTeamSize, mockData, smartInsightsData } = useAggregatedData(
@@ -143,8 +148,16 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     chatGPTError,
     currentUtilizationRate,
     teamMembersCount: teamMembers.length,
-    memberUtilizations
+    memberUtilizations: memberUtilizations.length,
+    teamSummary: teamSummary ? 'available' : 'null',
+    fallbackUtilizationRate,
+    isLoading
   });
+
+  // Error handling for ChatGPT failure
+  if (chatGPTError) {
+    console.warn('⚠️ ChatGPT Dashboard Service failed, using fallback calculations:', chatGPTError);
+  }
 
   const unifiedData: UnifiedDashboardData = {
     // Team data
@@ -161,13 +174,13 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     teamComposition,
     isTeamCompositionLoading,
     
-    // Utilization data - PRIORITIZE standardized calculation over fallback
+    // Utilization data - Use ChatGPT data if available, otherwise fallback
     currentUtilizationRate: teamSummary?.teamUtilizationRate ?? currentUtilizationRate,
     utilizationStatus,
     utilizationTrends,
     
-    // Standardized utilization data
-    memberUtilizations: memberUtilizations || [],
+    // Standardized utilization data - Handle ChatGPT unavailability
+    memberUtilizations: memberUtilizations.length > 0 ? memberUtilizations : [],
     teamSummary: teamSummary || null,
     
     // Holiday data
