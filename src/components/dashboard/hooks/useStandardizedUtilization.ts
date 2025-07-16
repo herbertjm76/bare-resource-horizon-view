@@ -1,13 +1,18 @@
 
 import { useMemo } from 'react';
 import { useIndividualUtilization } from './useIndividualUtilization';
-import { TeamMember } from '../types';
+import { TeamMember, PendingMember } from '../types';
 import { TimeRange } from '../TimeRangeSelector';
 
 interface UtilizationResult {
   utilizationRate: number;
   isLoading: boolean;
 }
+
+// Type guard to check if a member is pending
+const isPendingMember = (member: TeamMember): member is PendingMember => {
+  return 'isPending' in member && member.isPending === true;
+};
 
 export const useStandardizedUtilization = (
   teamMembers: TeamMember[], 
@@ -21,19 +26,30 @@ export const useStandardizedUtilization = (
     }
 
     // Calculate team-wide utilization based on individual member utilizations
+    // Include ALL team members (active + pending) in the calculation
     const totalUtilization = teamMembers.reduce((sum, member) => {
       const memberUtilization = memberUtilizations[member.id] || 0;
-      return sum + memberUtilization;
+      // For pending members, utilization should be 0
+      const finalUtilization = isPendingMember(member) ? 0 : memberUtilization;
+      return sum + finalUtilization;
     }, 0);
 
     const averageUtilization = totalUtilization / teamMembers.length;
     
-    console.log('📊 LEGACY Standardized utilization calculation (WILL BE REPLACED BY CHATGPT):', {
+    console.log('📊 STANDARDIZED utilization calculation INCLUDING PENDING:', {
       selectedTimeRange,
       totalMembers: teamMembers.length,
+      activeMembers: teamMembers.filter(m => !isPendingMember(m)).length,
+      pendingMembers: teamMembers.filter(m => isPendingMember(m)).length,
       totalUtilization,
       averageUtilization: Math.round(averageUtilization),
-      memberUtilizations
+      memberBreakdown: teamMembers.map(m => ({
+        name: isPendingMember(m) ? 
+          `${m.first_name || ''} ${m.last_name || ''}`.trim() : 
+          `${m.first_name || ''} ${m.last_name || ''}`.trim(),
+        isPending: isPendingMember(m),
+        utilization: isPendingMember(m) ? 0 : (memberUtilizations[m.id] || 0)
+      }))
     });
 
     return Math.round(averageUtilization);

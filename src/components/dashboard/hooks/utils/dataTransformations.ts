@@ -46,5 +46,14 @@ export const transformActiveMembers = (teamMembers: any[], memberUtilizations?: 
 export const combineStaffData = (activeMembers: any[], preRegisteredMembers: any[], memberUtilizations?: any[]) => {
   const transformedActiveMembers = transformActiveMembers(activeMembers, memberUtilizations);
   const transformedPreRegistered = transformPreRegisteredMembers(preRegisteredMembers);
+  
+  console.log('🔄 COMBINE STAFF DATA:', {
+    activeMembers: transformedActiveMembers.length,
+    preRegisteredMembers: transformedPreRegistered.length,
+    totalCombined: transformedActiveMembers.length + transformedPreRegistered.length,
+    activeUtilizations: transformedActiveMembers.map(m => `${m.name}: ${m.utilization}%`),
+    pendingMembers: transformedPreRegistered.map(m => `${m.name}: ${m.availability}%`)
+  });
+  
   return [...transformedActiveMembers, ...transformedPreRegistered];
 };
