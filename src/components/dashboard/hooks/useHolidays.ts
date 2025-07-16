@@ -69,6 +69,7 @@ export const useHolidays = () => {
       } catch (err) {
         console.error('Error fetching holidays:', err);
         setError('Failed to load holidays');
+        // Provide fallback empty array instead of blocking
         setHolidays([]);
       } finally {
         setIsLoading(false);

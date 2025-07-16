@@ -29,13 +29,13 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers }: Us
 
         const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
         
-        // Fetch all required data in parallel
+        // Fetch all required data in parallel with error handling
         const [
           projectAllocationsData,
           annualLeaveData,
           holidaysData,
           otherLeaveData
-        ] = await Promise.all([
+        ] = await Promise.allSettled([
           // Project allocations
           supabase
             .from('project_resource_allocations')
@@ -70,27 +70,35 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers }: Us
             .in('member_id', teamMembers.map(m => m.id))
         ]);
 
-        // Process the data
+        // Process the data safely
         const memberUtilizationData: MemberUtilizationData[] = teamMembers.map(member => {
           // Calculate project hours
-          const projectHours = projectAllocationsData.data
-            ?.filter(allocation => allocation.resource_id === member.id)
-            .reduce((sum, allocation) => sum + (allocation.hours || 0), 0) || 0;
+          const projectHours = projectAllocationsData.status === 'fulfilled' && projectAllocationsData.value.data
+            ? projectAllocationsData.value.data
+                .filter(allocation => allocation.resource_id === member.id)
+                .reduce((sum, allocation) => sum + (allocation.hours || 0), 0)
+            : 0;
 
           // Calculate annual leave hours
-          const annualLeaveHours = annualLeaveData.data
-            ?.filter(leave => leave.member_id === member.id)
-            .reduce((sum, leave) => sum + (leave.hours || 0), 0) || 0;
+          const annualLeaveHours = annualLeaveData.status === 'fulfilled' && annualLeaveData.value.data
+            ? annualLeaveData.value.data
+                .filter(leave => leave.member_id === member.id)
+                .reduce((sum, leave) => sum + (leave.hours || 0), 0)
+            : 0;
 
           // Calculate office holiday hours (8 hours per day for holidays affecting member's location)
-          const officeHolidayHours = holidaysData.data
-            ?.filter(holiday => !holiday.location_id || holiday.location_id === member.location)
-            .length * 8 || 0;
+          const officeHolidayHours = holidaysData.status === 'fulfilled' && holidaysData.value.data
+            ? holidaysData.value.data
+                .filter(holiday => !holiday.location_id || holiday.location_id === member.location)
+                .length * 8
+            : 0;
 
           // Calculate other leave hours
-          const otherLeaveHours = otherLeaveData.data
-            ?.filter(leave => leave.member_id === member.id)
-            .reduce((sum, leave) => sum + (leave.hours || 0), 0) || 0;
+          const otherLeaveHours = otherLeaveData.status === 'fulfilled' && otherLeaveData.value.data
+            ? otherLeaveData.value.data
+                .filter(leave => leave.member_id === member.id)
+                .reduce((sum, leave) => sum + (leave.hours || 0), 0)
+            : 0;
 
           return UtilizationCalculationService.calculateMemberUtilization(
             member,
@@ -108,13 +116,18 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers }: Us
       } catch (err) {
         console.error('Error fetching utilization data:', err);
         setError(err instanceof Error ? err : new Error('Failed to fetch utilization data'));
+        // Don't show loading indefinitely on error
+        setIsLoading(false);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchUtilizationData();
-  }, [company?.id, selectedWeek, teamMembers]);
+    // Debounce the function call to prevent excessive API calls
+    const timeoutId = setTimeout(fetchUtilizationData, 300);
+    
+    return () => clearTimeout(timeoutId);
+  }, [company?.id, format(selectedWeek, 'yyyy-MM-dd'), teamMembers.length]);
 
   return {
     memberUtilizations,
