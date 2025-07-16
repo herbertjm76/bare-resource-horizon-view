@@ -96,12 +96,23 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
 
   const timeConfig = getTimeConfig();
 
-  // Generate workload data based on time range
+  // Generate workload data based on time range using SAME data as Team Utilization card
   const generateWorkload = () => {
     return teamResources.map((resource, index) => {
-      // Try to use real utilization data if available
-      const memberUtilization = memberUtilizations[index];
-      const baseUtilization = memberUtilization?.utilizationRate || Math.random() * 100;
+      // Get the actual team member from the combined resources
+      let actualMember;
+      if (index < teamMembers.length) {
+        actualMember = teamMembers[index];
+      } else {
+        actualMember = preRegisteredMembers[index - teamMembers.length];
+      }
+      
+      // Use the SAME memberUtilizations data that the Team Utilization card uses
+      let baseUtilization = 0;
+      if (actualMember && memberUtilizations) {
+        const memberData = memberUtilizations.find(m => m.memberId === actualMember.id);
+        baseUtilization = memberData?.utilizationRate || 0;
+      }
       
       return Array.from({ length: timeConfig.periods.length }, () => {
         // Use real utilization with some variation for different periods (can go over 100%)

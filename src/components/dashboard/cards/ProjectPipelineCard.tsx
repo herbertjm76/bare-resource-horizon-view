@@ -72,6 +72,8 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
     }
   };
 
+  const totalProjects = projects.length;
+  
   return (
     <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
       <CardContent className="p-6">
@@ -83,56 +85,73 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
         </div>
         
         <div className="flex flex-col justify-between h-full">
-          {/* Health Score Display with Visual */}
+          {/* Total Projects Count */}
           <div className="text-center mb-6">
-            <div className="relative w-24 h-24 mx-auto mb-3">
-              <svg className="w-24 h-24 transform -rotate-90">
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="40"
-                  stroke="rgb(229, 231, 235)"
-                  strokeWidth="6"
-                  fill="none"
-                />
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="40"
-                  stroke={score >= 70 ? "rgb(34, 197, 94)" : score >= 50 ? "rgb(234, 179, 8)" : "rgb(239, 68, 68)"}
-                  strokeWidth="6"
-                  fill="none"
-                  strokeDasharray={`${2 * Math.PI * 40}`}
-                  strokeDashoffset={`${2 * Math.PI * 40 * (1 - score / 100)}`}
-                  strokeLinecap="round"
-                  className="transition-all duration-500"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-2xl font-bold text-gray-900">{score}</span>
-              </div>
-            </div>
-            <Badge className={`text-xs ${getStatusColor(healthStatus)}`}>
-              {healthStatus}
-            </Badge>
+            <div className="text-3xl font-bold text-gray-900 mb-2">{totalProjects}</div>
+            <div className="text-xs text-gray-500 font-medium">Total Projects</div>
           </div>
           
-          {/* Simplified Project Distribution */}
-          <div className="grid grid-cols-3 gap-4 mb-4">
-            <div className="text-center">
-              <div className="w-3 h-3 rounded-full bg-blue-500 mx-auto mb-1"></div>
-              <div className="text-lg font-bold text-gray-900">{projectStats.inProgress.count}</div>
-              <div className="text-xs text-gray-500">Active</div>
+          {/* Bar Graph showing project distribution */}
+          <div className="mb-6">
+            <div className="relative h-8 bg-gray-100 rounded-full overflow-hidden">
+              {totalProjects > 0 ? (
+                <>
+                  {/* Done section */}
+                  <div 
+                    className="absolute left-0 top-0 h-full transition-all duration-500"
+                    style={{ 
+                      width: `${projectStats.complete.percentage}%`,
+                      backgroundColor: '#5A68F6'
+                    }}
+                  />
+                  {/* Planning section */}
+                  <div 
+                    className="absolute top-0 h-full transition-all duration-500"
+                    style={{ 
+                      left: `${projectStats.complete.percentage}%`,
+                      width: `${projectStats.planning.percentage}%`,
+                      backgroundColor: '#6B65F7'
+                    }}
+                  />
+                  {/* Active section */}
+                  <div 
+                    className="absolute top-0 h-full transition-all duration-500"
+                    style={{ 
+                      left: `${projectStats.complete.percentage + projectStats.planning.percentage}%`,
+                      width: `${projectStats.inProgress.percentage}%`,
+                      backgroundColor: '#FDFDFD',
+                      border: '1px solid #E5E7EB'
+                    }}
+                  />
+                </>
+              ) : (
+                <div className="w-full h-full bg-gray-200" />
+              )}
             </div>
-            <div className="text-center">
-              <div className="w-3 h-3 rounded-full bg-yellow-500 mx-auto mb-1"></div>
-              <div className="text-lg font-bold text-gray-900">{projectStats.planning.count}</div>
-              <div className="text-xs text-gray-500">Planning</div>
+          </div>
+          
+          {/* Legend */}
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#FDFDFD', border: '1px solid #E5E7EB' }}></div>
+                <span className="text-gray-600">Active</span>
+              </div>
+              <span className="font-semibold text-gray-900">{projectStats.inProgress.count}</span>
             </div>
-            <div className="text-center">
-              <div className="w-3 h-3 rounded-full bg-green-500 mx-auto mb-1"></div>
-              <div className="text-lg font-bold text-gray-900">{projectStats.complete.count}</div>
-              <div className="text-xs text-gray-500">Done</div>
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#6B65F7' }}></div>
+                <span className="text-gray-600">Planning</span>
+              </div>
+              <span className="font-semibold text-gray-900">{projectStats.planning.count}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#5A68F6' }}></div>
+                <span className="text-gray-600">Done</span>
+              </div>
+              <span className="font-semibold text-gray-900">{projectStats.complete.count}</span>
             </div>
           </div>
           
