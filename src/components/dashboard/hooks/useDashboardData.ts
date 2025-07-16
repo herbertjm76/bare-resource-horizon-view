@@ -69,38 +69,97 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     });
   }, [chatGPTData, originalTeamMembers]);
 
+  // Calculate date range for time-range-aware utilization
+  const timeRangeForUtilization = useMemo(() => {
+    const now = new Date();
+    let startDate: Date;
+    
+    switch (selectedTimeRange) {
+      case 'week':
+        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        break;
+      case 'month':
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        break;
+      case '3months':
+        startDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+        break;
+      case '4months':
+        startDate = new Date(now.getTime() - 120 * 24 * 60 * 60 * 1000);
+        break;
+      case '6months':
+        startDate = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
+        break;
+      case 'year':
+        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+        break;
+      default:
+        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    }
+    
+    return { startDate, endDate: now };
+  }, [selectedTimeRange]);
+
+  // Get time-range-aware standardized utilization data for fallback
+  const { 
+    memberUtilizations: standardizedMemberUtilizations,
+    teamSummary: standardizedTeamSummary,
+    isLoading: isStandardizedLoading 
+  } = useStandardizedUtilizationData({
+    selectedWeek: new Date(),
+    teamMembers: originalTeamMembers,
+    timeRange: timeRangeForUtilization
+  });
+  
   // Extract utilization data from ChatGPT or calculate fallback
   const { currentUtilizationRate: fallbackUtilizationRate, utilizationStatus: fallbackStatus, utilizationTrends: fallbackTrends } = useUtilizationData(
     originalTeamMembers, 
     preRegisteredMembers
   );
   
-  const currentUtilizationRate = chatGPTData?.teamMetrics.averageUtilization ?? fallbackUtilizationRate;
+  const currentUtilizationRate = chatGPTData?.teamMetrics.averageUtilization ?? 
+    standardizedTeamSummary?.teamUtilizationRate ?? 
+    fallbackUtilizationRate;
   
-  // Create memberUtilizations array from ChatGPT data
+  // Create memberUtilizations array from ChatGPT data or fallback to standardized
   const memberUtilizations = useMemo(() => {
-    if (!chatGPTData) return [];
+    if (chatGPTData) {
+      return chatGPTData.teamMembers.map(member => ({
+        memberId: member.id,
+        memberName: member.name,
+        utilization: member.utilization,
+        totalAllocatedHours: member.totalAllocatedHours,
+        weeklyCapacity: member.weeklyCapacity
+      }));
+    }
     
-    return chatGPTData.teamMembers.map(member => ({
-      memberId: member.id,
-      memberName: member.name,
-      utilization: member.utilization,
-      totalAllocatedHours: member.totalAllocatedHours,
-      weeklyCapacity: member.weeklyCapacity
-    }));
-  }, [chatGPTData]);
+    // Fallback to standardized utilization data with time range awareness
+    return standardizedMemberUtilizations.map(member => {
+      const teamMember = originalTeamMembers.find(tm => tm.id === member.id);
+      return {
+        memberId: member.id,
+        memberName: teamMember ? `${teamMember.first_name} ${teamMember.last_name}` : 'Unknown',
+        utilization: member.utilizationRate,
+        totalAllocatedHours: member.totalAllocatedHours,
+        weeklyCapacity: member.weeklyCapacity
+      };
+    });
+  }, [chatGPTData, standardizedMemberUtilizations, originalTeamMembers]);
 
-  // Create team summary from ChatGPT data
+  // Create team summary from ChatGPT data or fallback to standardized
   const teamSummary = useMemo(() => {
-    if (!chatGPTData) return null;
+    if (chatGPTData) {
+      return {
+        teamUtilizationRate: chatGPTData.teamMetrics.averageUtilization,
+        totalMembers: chatGPTData.teamMetrics.totalMembers,
+        totalAllocatedHours: chatGPTData.projectMetrics.totalAllocatedHours,
+        averageCapacity: chatGPTData.teamMembers.reduce((sum, m) => sum + m.weeklyCapacity, 0) / chatGPTData.teamMembers.length
+      };
+    }
     
-    return {
-      teamUtilizationRate: chatGPTData.teamMetrics.averageUtilization,
-      totalMembers: chatGPTData.teamMetrics.totalMembers,
-      totalAllocatedHours: chatGPTData.projectMetrics.totalAllocatedHours,
-      averageCapacity: chatGPTData.teamMembers.reduce((sum, m) => sum + m.weeklyCapacity, 0) / chatGPTData.teamMembers.length
-    };
-  }, [chatGPTData]);
+    // Fallback to standardized team summary with time range awareness
+    return standardizedTeamSummary;
+  }, [chatGPTData, standardizedTeamSummary]);
 
   // Generate utilization status and trends from ChatGPT data or fallback
   const utilizationStatus = useMemo(() => {
@@ -179,9 +238,9 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     utilizationStatus,
     utilizationTrends,
     
-    // Standardized utilization data - Handle ChatGPT unavailability
-    memberUtilizations: memberUtilizations.length > 0 ? memberUtilizations : [],
-    teamSummary: teamSummary || null,
+    // Standardized utilization data - Use either ChatGPT or time-range-aware fallback
+    memberUtilizations,
+    teamSummary,
     
     // Holiday data
     holidays: holidays || [],

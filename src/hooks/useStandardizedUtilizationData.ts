@@ -7,9 +7,10 @@ import { UtilizationCalculationService, MemberUtilizationData, TeamUtilizationSu
 interface UseStandardizedUtilizationDataProps {
   selectedWeek: Date;
   teamMembers: any[];
+  timeRange?: { startDate: Date; endDate: Date };
 }
 
-export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers }: UseStandardizedUtilizationDataProps) => {
+export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers, timeRange }: UseStandardizedUtilizationDataProps) => {
   const [memberUtilizations, setMemberUtilizations] = useState<MemberUtilizationData[]>([]);
   const [teamSummary, setTeamSummary] = useState<TeamUtilizationSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,6 +32,10 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers }: Us
 
         const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
         
+        // Use time range if provided, otherwise use selected week
+        const queryStartDate = timeRange ? format(timeRange.startDate, 'yyyy-MM-dd') : weekStartDate;
+        const queryEndDate = timeRange ? format(timeRange.endDate, 'yyyy-MM-dd') : format(new Date(selectedWeek.getTime() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd');
+        
         // Fetch all required data in parallel with error handling
         const [
           projectAllocationsData,
@@ -38,37 +43,39 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers }: Us
           holidaysData,
           otherLeaveData
         ] = await Promise.allSettled([
-          // Project allocations
+          // Project allocations - now respects time range
           supabase
             .from('project_resource_allocations')
-            .select('resource_id, hours')
+            .select('resource_id, hours, week_start_date')
             .eq('company_id', company.id)
-            .eq('week_start_date', weekStartDate)
+            .gte('week_start_date', queryStartDate)
+            .lt('week_start_date', queryEndDate)
             .in('resource_id', teamMembers.map(m => m.id)),
           
-          // Annual leave
+          // Annual leave - now respects time range
           supabase
             .from('annual_leaves')
             .select('member_id, hours')
             .eq('company_id', company.id)
-            .gte('date', weekStartDate)
-            .lt('date', format(new Date(selectedWeek.getTime() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'))
+            .gte('date', queryStartDate)
+            .lt('date', queryEndDate)
             .in('member_id', teamMembers.map(m => m.id)),
           
-          // Office holidays
+          // Office holidays - now respects time range
           supabase
             .from('office_holidays')
             .select('*')
             .eq('company_id', company.id)
-            .gte('date', weekStartDate)
-            .lt('end_date', format(new Date(selectedWeek.getTime() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd')),
+            .gte('date', queryStartDate)
+            .lt('end_date', queryEndDate),
           
-          // Other leave
+          // Other leave - now respects time range
           supabase
             .from('weekly_other_leave')
-            .select('member_id, hours, leave_type')
+            .select('member_id, hours, leave_type, week_start_date')
             .eq('company_id', company.id)
-            .eq('week_start_date', weekStartDate)
+            .gte('week_start_date', queryStartDate)
+            .lt('week_start_date', queryEndDate)
             .in('member_id', teamMembers.map(m => m.id))
         ]);
 
@@ -129,7 +136,7 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers }: Us
     const timeoutId = setTimeout(fetchUtilizationData, 300);
     
     return () => clearTimeout(timeoutId);
-  }, [company?.id, format(selectedWeek, 'yyyy-MM-dd'), teamMembers.length]);
+  }, [company?.id, format(selectedWeek, 'yyyy-MM-dd'), teamMembers.length, timeRange?.startDate, timeRange?.endDate]);
 
   return {
     memberUtilizations,
