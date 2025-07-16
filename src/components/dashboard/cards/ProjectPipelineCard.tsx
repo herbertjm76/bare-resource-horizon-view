@@ -83,50 +83,56 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
         </div>
         
         <div className="flex flex-col justify-between h-full">
-          {/* Score display */}
-          <div className="text-center space-y-2 mt-2">
-            <div className="text-3xl font-bold text-orange-600">
-              {score}<span className="text-lg text-gray-500">/{maxScore}</span>
+          {/* Health Score Display with Visual */}
+          <div className="text-center mb-6">
+            <div className="relative w-24 h-24 mx-auto mb-3">
+              <svg className="w-24 h-24 transform -rotate-90">
+                <circle
+                  cx="48"
+                  cy="48"
+                  r="40"
+                  stroke="rgb(229, 231, 235)"
+                  strokeWidth="6"
+                  fill="none"
+                />
+                <circle
+                  cx="48"
+                  cy="48"
+                  r="40"
+                  stroke={score >= 70 ? "rgb(34, 197, 94)" : score >= 50 ? "rgb(234, 179, 8)" : "rgb(239, 68, 68)"}
+                  strokeWidth="6"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 40}`}
+                  strokeDashoffset={`${2 * Math.PI * 40 * (1 - score / 100)}`}
+                  strokeLinecap="round"
+                  className="transition-all duration-500"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-2xl font-bold text-gray-900">{score}</span>
+              </div>
             </div>
-            <p className="text-sm text-gray-600">Pipeline Health Score</p>
             <Badge className={`text-xs ${getStatusColor(healthStatus)}`}>
               {healthStatus}
             </Badge>
           </div>
           
-          {/* Project breakdown */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-3 w-3 text-blue-500" />
-                <span className="text-sm text-gray-700">In Progress</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-900">{projectStats.inProgress.count}</span>
-                <span className="text-xs text-blue-500">{projectStats.inProgress.percentage}%</span>
-              </div>
+          {/* Simplified Project Distribution */}
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="text-center">
+              <div className="w-3 h-3 rounded-full bg-blue-500 mx-auto mb-1"></div>
+              <div className="text-lg font-bold text-gray-900">{projectStats.inProgress.count}</div>
+              <div className="text-xs text-gray-500">Active</div>
             </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                <span className="text-sm text-gray-700">Planning</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-900">{projectStats.planning.count}</span>
-                <span className="text-xs text-purple-500">{projectStats.planning.percentage}%</span>
-              </div>
+            <div className="text-center">
+              <div className="w-3 h-3 rounded-full bg-yellow-500 mx-auto mb-1"></div>
+              <div className="text-lg font-bold text-gray-900">{projectStats.planning.count}</div>
+              <div className="text-xs text-gray-500">Planning</div>
             </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                <span className="text-sm text-gray-700">Complete</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-900">{projectStats.complete.count}</span>
-                <span className="text-xs text-green-500">{projectStats.complete.percentage}%</span>
-              </div>
+            <div className="text-center">
+              <div className="w-3 h-3 rounded-full bg-green-500 mx-auto mb-1"></div>
+              <div className="text-lg font-bold text-gray-900">{projectStats.complete.count}</div>
+              <div className="text-xs text-gray-500">Done</div>
             </div>
           </div>
           

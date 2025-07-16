@@ -18,16 +18,17 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   status,
   utilizationStatus
 }) => {
-  // Calculate stroke dash array for circle progress
-  const radius = 45;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (utilizationRate / 100) * circumference;
-
   // Determine status and color based on utilization rate
   const finalStatus = status || utilizationStatus?.status || (utilizationRate > 100 ? "Over Capacity" : "Normal");
   const isOverCapacity = utilizationRate > 100;
-  const strokeColor = isOverCapacity ? "#ef4444" : "#22c55e";
+  
+  // Calculate semicircle progress (180 degrees max)
+  const normalizedRate = Math.min(utilizationRate, 200) / 200; // Cap at 200% for display
+  const angle = normalizedRate * 180; // 0 to 180 degrees
+  const radius = 60;
+  const strokeWidth = 8;
+  const circumference = Math.PI * radius; // Half circle circumference
+  const strokeDashoffset = circumference - (angle / 180) * circumference;
 
   return (
     <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
@@ -39,43 +40,48 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
           </div>
         </div>
         
-        <div className="flex flex-col items-center justify-between h-full">
-          {/* Circular Progress */}
-          <div className="relative w-28 h-28 mt-2">
-            <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
-              {/* Background circle */}
-              <circle
-                cx="50"
-                cy="50"
-                r={radius}
-                stroke="rgba(0,0,0,0.1)"
-                strokeWidth="8"
-                fill="transparent"
-              />
-              {/* Progress circle */}
-              <circle
-                cx="50"
-                cy="50"
-                r={radius}
-                stroke={strokeColor}
-                strokeWidth="8"
-                fill="transparent"
-                strokeDasharray={strokeDasharray}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                className="transition-all duration-300"
-              />
-            </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-3xl font-bold text-gray-900">{Math.round(utilizationRate)}%</span>
+        <div className="flex flex-col justify-between h-full">
+          {/* Semicircle Gauge */}
+          <div className="flex items-center justify-center mb-6">
+            <div className="relative">
+              <svg width="140" height="80" viewBox="0 0 140 80">
+                {/* Background semicircle */}
+                <path
+                  d={`M 20 70 A ${radius} ${radius} 0 0 1 120 70`}
+                  fill="none"
+                  stroke="rgb(229, 231, 235)"
+                  strokeWidth={strokeWidth}
+                  strokeLinecap="round"
+                />
+                {/* Progress semicircle */}
+                <path
+                  d={`M 20 70 A ${radius} ${radius} 0 0 1 120 70`}
+                  fill="none"
+                  stroke={isOverCapacity ? "rgb(239, 68, 68)" : "rgb(59, 130, 246)"}
+                  strokeWidth={strokeWidth}
+                  strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={strokeDashoffset}
+                  className="transition-all duration-700 ease-out"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-end justify-center pb-2">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-gray-900">{Math.round(utilizationRate)}%</div>
+                </div>
+              </div>
             </div>
           </div>
           
-          <div className="text-center space-y-2">
+          {/* Status Badge */}
+          <div className="flex justify-center mb-2">
             <Badge className={`text-xs ${isOverCapacity ? 'bg-red-100 text-red-700 border-red-200' : 'bg-green-100 text-green-700 border-green-200'}`}>
               {finalStatus}
             </Badge>
-            <div className="text-xs text-gray-500">This Month</div>
+          </div>
+          
+          <div className="text-center">
+            <span className="text-xs text-gray-500">This Month</span>
           </div>
         </div>
       </CardContent>

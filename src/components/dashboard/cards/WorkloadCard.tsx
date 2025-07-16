@@ -11,33 +11,37 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   workloadData,
   projects = []
 }) => {
-  // Generate workload data based on actual projects if available
-  const generateWorkloadFromProjects = () => {
-    const activeProjects = projects.filter(p => p.status === 'In Progress' || p.status === 'Planning');
-    const totalProjects = activeProjects.length;
-    const intensity = Math.min(totalProjects / 10, 1); // Scale to 0-1
+  // Mock team resources
+  const teamResources = [
+    'Sarah Chen',
+    'Michael Rodriguez', 
+    'Emma Thompson',
+    'David Park',
+    'Lisa Wang'
+  ];
+
+  // Generate 5 months of weekly data (current month + 4 months)
+  const generateWeeklyWorkload = () => {
+    const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+    const weeksPerMonth = 4;
     
-    // Generate 4 months of data
-    return Array.from({ length: 4 }, (_, monthIndex) => 
-      Array.from({ length: 7 }, (_, dayIndex) => {
-        // Vary intensity based on day and month
-        const dayVariation = (dayIndex + 1) / 7;
-        const monthVariation = (monthIndex + 1) / 4;
-        return Math.min(intensity * dayVariation * monthVariation * (Math.random() * 0.5 + 0.5), 1);
-      })
-    );
+    return teamResources.map(resource => {
+      return Array.from({ length: months.length * weeksPerMonth }, () => {
+        // Random workload between 0-100%
+        return Math.random() * 100;
+      });
+    });
   };
-  
-  const data = workloadData || generateWorkloadFromProjects();
-  const months = ['Apr', 'May', 'Jun', 'Jul'];
+
+  const workloadMatrix = generateWeeklyWorkload();
+  const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
   
   const getIntensityColor = (intensity: number) => {
-    if (intensity === 0) return 'bg-gray-100';
-    if (intensity <= 0.2) return 'bg-blue-200';
-    if (intensity <= 0.4) return 'bg-blue-400';
-    if (intensity <= 0.6) return 'bg-blue-500';
-    if (intensity <= 0.8) return 'bg-blue-600';
-    return 'bg-blue-700';
+    if (intensity <= 20) return 'bg-green-200';
+    if (intensity <= 40) return 'bg-yellow-200';
+    if (intensity <= 60) return 'bg-orange-300';
+    if (intensity <= 80) return 'bg-red-400';
+    return 'bg-red-600';
   };
 
   return (
@@ -51,36 +55,50 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
         </div>
         
         <div className="flex flex-col justify-between h-full">
-          {/* Legend */}
-          <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
-            <span>Less</span>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-blue-200"></div>
-              <div className="w-3 h-3 rounded-sm bg-blue-500"></div>
-              <div className="w-3 h-3 rounded-sm bg-blue-700"></div>
-            </div>
-            <span>More</span>
-          </div>
-          
-          {/* Month labels */}
-          <div className="grid grid-cols-4 gap-4 text-xs text-gray-600 text-center">
+          {/* Month headers */}
+          <div className="grid grid-cols-6 gap-1 mb-2">
+            <div className="text-xs text-gray-500"></div>
             {months.map(month => (
-              <span key={month}>{month}</span>
+              <div key={month} className="text-xs text-gray-600 text-center font-medium">
+                {month}
+              </div>
             ))}
           </div>
           
-          {/* Heat map grid */}
-          <div className="grid grid-cols-4 gap-4">
-            {data.map((monthData, monthIndex) => (
-              <div key={monthIndex} className="grid grid-cols-4 gap-1">
-                {monthData.map((intensity, dayIndex) => (
+          {/* Resource rows with weekly workload */}
+          <div className="flex-1 space-y-1">
+            {teamResources.map((resource, resourceIndex) => (
+              <div key={resource} className="grid grid-cols-6 gap-1 items-center">
+                <div className="text-xs text-gray-700 font-medium truncate pr-2">
+                  {resource.split(' ')[0]}
+                </div>
+                {workloadMatrix[resourceIndex].map((intensity, weekIndex) => (
                   <div
-                    key={dayIndex}
-                    className={`w-4 h-4 rounded-sm ${getIntensityColor(intensity)} transition-all duration-200 hover:scale-110`}
-                  />
+                    key={weekIndex}
+                    className={`h-6 rounded-sm ${getIntensityColor(intensity)} transition-all duration-200 hover:scale-105 relative group`}
+                    title={`${Math.round(intensity)}% utilization`}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-xs text-gray-700 font-medium opacity-0 group-hover:opacity-100">
+                        {Math.round(intensity)}%
+                      </span>
+                    </div>
+                  </div>
                 ))}
               </div>
             ))}
+          </div>
+          
+          {/* Legend */}
+          <div className="flex items-center justify-between text-xs text-gray-500 mt-4 mb-2">
+            <span>Low</span>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 rounded-sm bg-green-200"></div>
+              <div className="w-3 h-3 rounded-sm bg-yellow-200"></div>
+              <div className="w-3 h-3 rounded-sm bg-orange-300"></div>
+              <div className="w-3 h-3 rounded-sm bg-red-400"></div>
+            </div>
+            <span>High</span>
           </div>
           
           <div className="text-center">

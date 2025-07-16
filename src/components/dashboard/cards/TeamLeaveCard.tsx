@@ -57,10 +57,29 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                 />
               ))}
               
+              {/* Define gradient for area fill */}
+              <defs>
+                <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3"/>
+                  <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.05"/>
+                </linearGradient>
+              </defs>
+              
+              {/* Area fill */}
+              <path
+                d={`M 0 128 ${data.map((value, index) => {
+                  const x = (index * 280) / (data.length - 1);
+                  const y = 128 - ((value - minValue) / (maxValue - minValue)) * 108;
+                  return `L ${x} ${y}`;
+                }).join(' ')} L 280 128 Z`}
+                fill="url(#areaGradient)"
+                className="transition-all duration-300"
+              />
+              
               {/* Line chart */}
               <polyline
                 fill="none"
-                stroke="#8b5cf6"
+                stroke="#3b82f6"
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -81,7 +100,9 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                     cx={x}
                     cy={y}
                     r="4"
-                    fill="#8b5cf6"
+                    fill="#3b82f6"
+                    stroke="white"
+                    strokeWidth="2"
                     className="hover:r-5 transition-all duration-200"
                   />
                 );
