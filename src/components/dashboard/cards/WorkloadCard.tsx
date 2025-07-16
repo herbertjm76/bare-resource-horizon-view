@@ -2,15 +2,12 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock } from 'lucide-react';
 
-interface WorkloadCardProps {
-  workloadData?: number[][];
-  projects?: any[];
-}
 
 interface WorkloadCardProps {
   workloadData?: number[][];
   projects?: any[];
   teamMembers?: any[];
+  preRegisteredMembers?: any[];
   memberUtilizations?: any[];
 }
 
@@ -18,11 +15,26 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   workloadData,
   projects = [],
   teamMembers = [],
+  preRegisteredMembers = [],
   memberUtilizations = []
 }) => {
-  // Use real team members or fallback to mock data
-  const teamResources = teamMembers.length > 0 
-    ? teamMembers.map(member => member.first_name || member.name || 'Unknown')
+  // Combine all team members and pre-registered members to show ALL resources
+  const allResources = [
+    ...teamMembers.map(member => ({
+      name: member.first_name || member.name || 'Unknown',
+      type: 'active',
+      id: member.id
+    })),
+    ...preRegisteredMembers.map(member => ({
+      name: member.first_name || member.name || 'Unknown',
+      type: 'pending',
+      id: member.id
+    }))
+  ];
+
+  // If no real data, fallback to mock data
+  const teamResources = allResources.length > 0 
+    ? allResources.map(resource => resource.name)
     : [
         'Sarah Chen',
         'Michael Rodriguez', 

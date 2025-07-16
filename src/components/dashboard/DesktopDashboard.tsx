@@ -70,6 +70,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         <WorkloadCard 
           projects={unifiedData.projects}
           teamMembers={unifiedData.teamMembers}
+          preRegisteredMembers={unifiedData.preRegisteredMembers}
           memberUtilizations={unifiedData.memberUtilizations}
         />
         <TeamLeaveCard 
