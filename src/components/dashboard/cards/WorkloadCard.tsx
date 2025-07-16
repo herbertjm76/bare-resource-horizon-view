@@ -112,6 +112,17 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
       if (actualMember && memberUtilizations) {
         const memberData = memberUtilizations.find(m => m.memberId === actualMember.id);
         baseUtilization = memberData?.utilizationRate || 0;
+        
+        // Debug log for Paul Julius to track the data
+        if (memberData?.memberName?.includes('Paul') || actualMember.first_name?.includes('Paul')) {
+          console.log('🔍 WORKLOAD CARD - Paul Julius data:', {
+            memberName: memberData?.memberName || `${actualMember.first_name} ${actualMember.last_name}`,
+            utilizationRate: memberData?.utilizationRate,
+            baseUtilization,
+            memberData,
+            actualMember
+          });
+        }
       }
       
       return Array.from({ length: timeConfig.periods.length }, () => {

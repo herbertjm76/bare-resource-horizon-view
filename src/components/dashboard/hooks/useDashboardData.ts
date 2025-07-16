@@ -92,8 +92,8 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     teamComposition,
     isTeamCompositionLoading,
     
-    // Utilization data
-    currentUtilizationRate: teamSummary?.teamUtilizationRate || currentUtilizationRate,
+    // Utilization data - PRIORITIZE standardized calculation over fallback
+    currentUtilizationRate: teamSummary?.teamUtilizationRate ?? currentUtilizationRate,
     utilizationStatus,
     utilizationTrends,
     
