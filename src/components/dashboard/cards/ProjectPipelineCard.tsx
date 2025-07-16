@@ -73,7 +73,7 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
   ];
   
   return (
-    <Card className="rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 border border-purple-500/20 shadow-sm hover:shadow-md transition-shadow h-full">
+    <Card className="rounded-2xl border border-purple-500/20 shadow-lg hover:shadow-xl transition-shadow h-full" style={{ background: 'linear-gradient(135deg, #AD8DBE, #7060A5, #494D9C, #B18EC2)' }}>
       <CardContent className="p-4 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
