@@ -9,7 +9,7 @@ import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { LoadingDashboard } from './LoadingDashboard';
-import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
+import { useDashboardData } from './hooks/useDashboardData';
 import { TimeRange } from './TimeRangeSelector';
 
 interface DesktopDashboardProps {
@@ -20,7 +20,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   selectedTimeRange
 }) => {
   // Use unified dashboard data to ensure consistency
-  const data = useUnifiedDashboardData();
+  const data = useDashboardData(selectedTimeRange);
   
   // Debug logging for Paul Julius utilization data
   const paulData = data.memberUtilizations?.find(m => 
