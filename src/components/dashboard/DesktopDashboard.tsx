@@ -1,9 +1,13 @@
 
 import React from 'react';
-import { TeamUtilizationCard } from './cards/TeamUtilizationCard';
-import { WorkloadCapacityCard } from './cards/WorkloadCapacityCard';
-import { TeamLeaveCard } from './cards/TeamLeaveCard';
-import { ProjectPipelineCard } from './cards/ProjectPipelineCard';
+import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
+import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
+import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
+import { WorkloadHeatMapCard } from './cards/WorkloadHeatMapCard';
+import { TeamCapacityStatusCard } from './cards/TeamCapacityStatusCard';
+import { LeavePlanningCard } from './cards/LeavePlanningCard';
+import { ProjectPipelineHealthCard } from './cards/ProjectPipelineHealthCard';
+import { TeamCompositionCard } from './cards/TeamCompositionCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
@@ -50,23 +54,24 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* KPI Cards Row: Team Utilization, Workload Capacity, Team Leave, Project Pipeline */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-        <TeamUtilizationCard 
-          data={unifiedData}
-          selectedTimeRange={selectedTimeRange}
-        />
-        <WorkloadCapacityCard 
-          data={unifiedData}
-          selectedTimeRange={selectedTimeRange}
-        />
-        <TeamLeaveCard 
-          data={unifiedData}
-          selectedTimeRange={selectedTimeRange}
-        />
-        <ProjectPipelineCard 
-          data={unifiedData}
-        />
+      {/* First Row: Staff Status, Smart Insights, Upcoming Holidays */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div>
+          <UnifiedStaffStatusCard 
+            data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
+          />
+        </div>
+        <div>
+          <UnifiedSmartInsightsCard 
+            data={unifiedData}
+          />
+        </div>
+        <div>
+          <UnifiedHolidayCard 
+            data={unifiedData}
+          />
+        </div>
       </div>
 
 
