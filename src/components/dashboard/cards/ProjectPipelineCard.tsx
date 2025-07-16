@@ -73,13 +73,13 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
   ];
   
   return (
-    <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
+    <Card className="rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 border border-purple-500/20 shadow-sm hover:shadow-md transition-shadow h-full">
       <CardContent className="p-4 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-gray-600" />
-            <span className="text-xs font-semibold text-gray-700 tracking-wide">PROJECT PIPELINE</span>
+            <BarChart3 className="h-4 w-4 text-white/90" />
+            <span className="text-xs font-semibold text-white/90 tracking-wide">PROJECT PIPELINE</span>
           </div>
         </div>
         
@@ -98,22 +98,22 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#FDFDFD', border: '1px solid #E5E7EB' }}></div>
-                <span className="text-xs text-gray-600">Active</span>
+                <span className="text-xs text-white/80">Active</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
-                <span className="text-xs text-gray-600">Planning</span>
+                <span className="text-xs text-white/80">Planning</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
-                <span className="text-xs text-gray-600">Done</span>
+                <span className="text-xs text-white/80">Done</span>
               </div>
             </div>
           </div>
           
           {/* Time range badge at bottom */}
           <div className="flex justify-center">
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs border-white/20 text-white/90 bg-white/10">
               {timeRange}
             </Badge>
           </div>
