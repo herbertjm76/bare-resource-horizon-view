@@ -153,12 +153,12 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   };
 
   return (
-    <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+    <Card className="rounded-2xl border border-purple-500/20 shadow-lg hover:shadow-xl transition-shadow" style={{ background: '#7060A5' }}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-gray-600" />
-            <span className="text-xs font-semibold text-gray-700 tracking-wide">WORKLOAD</span>
+            <Clock className="h-4 w-4 text-white/90" />
+            <span className="text-xs font-semibold text-white/90 tracking-wide">WORKLOAD</span>
           </div>
         </div>
         
@@ -170,9 +170,9 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
             timeConfig.columnCount === 6 ? 'grid-cols-6' :
             timeConfig.columnCount === 7 ? 'grid-cols-7' : 'grid-cols-5'
           }`}>
-            <div className="text-xs text-gray-500"></div>
+            <div className="text-xs text-white/60"></div>
             {timeConfig.periods.map(period => (
-              <div key={period} className="text-xs text-gray-600 text-center font-medium">
+              <div key={period} className="text-xs text-white/80 text-center font-medium">
                 {period}
               </div>
             ))}
@@ -187,7 +187,7 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
                 timeConfig.columnCount === 6 ? 'grid-cols-6' :
                 timeConfig.columnCount === 7 ? 'grid-cols-7' : 'grid-cols-5'
               }`}>
-                <div className="text-xs text-gray-700 font-medium truncate pr-2">
+                <div className="text-xs text-white/90 font-medium truncate pr-2">
                   {resource.split(' ')[0]}
                 </div>
                 {workloadMatrix[resourceIndex].map((intensity, periodIndex) => (
@@ -208,7 +208,7 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           </div>
           
           {/* Legend */}
-          <div className="flex items-center justify-between text-xs text-gray-500 mt-4 mb-2">
+          <div className="flex items-center justify-between text-xs text-white/60 mt-4 mb-2">
             <span>Under-utilized</span>
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-sm bg-purple-600"></div>
@@ -221,7 +221,7 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           </div>
           
           <div className="text-center">
-            <span className="text-xs text-gray-500">{timeConfig.label}</span>
+            <span className="text-xs text-white/60">{timeConfig.label}</span>
           </div>
         </div>
       </CardContent>

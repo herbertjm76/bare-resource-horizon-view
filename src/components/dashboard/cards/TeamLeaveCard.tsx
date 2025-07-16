@@ -45,12 +45,12 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
   const minValue = Math.min(...data);
 
   return (
-    <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+    <Card className="rounded-2xl border border-purple-500/20 shadow-lg hover:shadow-xl transition-shadow" style={{ background: '#494D9C' }}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-gray-600" />
-            <span className="text-xs font-semibold text-gray-700 tracking-wide">TEAM LEAVE</span>
+            <Calendar className="h-4 w-4 text-white/90" />
+            <span className="text-xs font-semibold text-white/90 tracking-wide">TEAM LEAVE</span>
           </div>
         </div>
         
@@ -125,14 +125,14 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
           </div>
           
           {/* Day labels */}
-          <div className="grid grid-cols-7 gap-1 text-xs text-gray-500 text-center">
+          <div className="grid grid-cols-7 gap-1 text-xs text-white/60 text-center">
             {days.map(day => (
               <span key={day}>{day}</span>
             ))}
           </div>
           
           <div className="text-center">
-            <span className="text-xs text-gray-500">This Month</span>
+            <span className="text-xs text-white/60">This Month</span>
           </div>
         </div>
       </CardContent>

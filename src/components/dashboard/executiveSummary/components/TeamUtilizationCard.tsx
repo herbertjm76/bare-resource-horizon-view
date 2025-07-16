@@ -16,7 +16,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   utilizationStatus
 }) => {
   return (
-    <Card className="rounded-2xl border border-purple-500/20 shadow-lg hover:shadow-xl transition-shadow" style={{ background: 'linear-gradient(135deg, #AD8DBE, #7060A5, #494D9C, #B18EC2)' }}>
+    <Card className="rounded-2xl border border-purple-500/20 shadow-lg hover:shadow-xl transition-shadow" style={{ background: '#AD8DBE' }}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0 space-y-2">
