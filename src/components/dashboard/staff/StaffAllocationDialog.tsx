@@ -25,6 +25,7 @@ interface StaffAllocationDialogProps {
   }>;
   weeklyCapacity: number;
   isLoading?: boolean;
+  utilizationRate?: number; // Standardized utilization rate from dashboard data
 }
 
 export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
@@ -33,7 +34,8 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
   member,
   allocations,
   weeklyCapacity,
-  isLoading = false
+  isLoading = false,
+  utilizationRate
 }) => {
   if (!member) return null;
 
@@ -55,7 +57,23 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
 
   const consolidatedAllocationsList = Object.values(consolidatedAllocations);
   const totalAllocatedHours = consolidatedAllocationsList.reduce((sum, allocation) => sum + allocation.hours, 0);
-  const utilizationPercentage = weeklyCapacity > 0 ? (totalAllocatedHours / weeklyCapacity) * 100 : 0;
+  
+  // Use standardized utilization rate if provided, otherwise calculate from allocations
+  const utilizationPercentage = utilizationRate !== undefined ? 
+    utilizationRate : 
+    (weeklyCapacity > 0 ? (totalAllocatedHours / weeklyCapacity) * 100 : 0);
+  
+  // Debug log for utilization data consistency
+  if (member?.name?.includes('Paul')) {
+    console.log('🔍 DIALOG - Paul Julius utilization data:', {
+      memberName: member.name,
+      standardizedUtilization: utilizationRate,
+      calculatedUtilization: (totalAllocatedHours / weeklyCapacity) * 100,
+      finalUtilization: utilizationPercentage,
+      totalAllocatedHours,
+      weeklyCapacity
+    });
+  }
 
   // Get member details - handle both active members and pre-registered invites
   const memberDetails = {

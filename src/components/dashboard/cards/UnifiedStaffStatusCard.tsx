@@ -55,6 +55,7 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
               icon={<Users className="h-4 w-4 text-red-400" strokeWidth={1.5} />}
               members={atCapacityStaff}
               colorScheme="red"
+              memberUtilizations={data.memberUtilizations}
             />
 
             {/* Optimally Allocated Staff (66-90%) - Show all members */}
@@ -63,6 +64,7 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
               icon={<Users className="h-4 w-4 text-orange-400" strokeWidth={1.5} />}
               members={optimalStaff}
               colorScheme="orange"
+              memberUtilizations={data.memberUtilizations}
             />
 
             {/* Ready for Projects Staff (≤65%) - Show all members, no limit */}
@@ -72,6 +74,7 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
               members={readyStaff}
               colorScheme="green"
               subtitle="available for new work"
+              memberUtilizations={data.memberUtilizations}
             />
 
             {/* Show message if no staff data */}

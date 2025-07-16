@@ -11,7 +11,8 @@ export const StaffSection: React.FC<StaffSectionProps> = ({
   members,
   colorScheme,
   showLimit,
-  subtitle
+  subtitle,
+  memberUtilizations
 }) => {
   const [selectedMember, setSelectedMember] = useState<typeof members[0] | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -31,6 +32,10 @@ export const StaffSection: React.FC<StaffSectionProps> = ({
     setSelectedMember(member);
     setDialogOpen(true);
   };
+
+  // Find utilization data for the selected member
+  const selectedMemberUtilization = selectedMember && memberUtilizations ? 
+    memberUtilizations.find(u => u.memberId === selectedMember.id) : null;
 
   // Show all members unless showLimit is specifically set
   const membersToShow = showLimit ? members.slice(0, showLimit) : members;
@@ -72,6 +77,7 @@ export const StaffSection: React.FC<StaffSectionProps> = ({
         allocations={allocations}
         isLoading={isLoading}
         weeklyCapacity={selectedMember?.weekly_capacity || 40}
+        utilizationRate={selectedMemberUtilization?.utilizationRate}
       />
     </div>
   );

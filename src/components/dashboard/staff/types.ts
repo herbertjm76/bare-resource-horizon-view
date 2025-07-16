@@ -25,6 +25,11 @@ export interface StaffSectionProps {
   colorScheme: 'red' | 'orange' | 'blue' | 'green';
   showLimit?: number;
   subtitle?: string;
+  memberUtilizations?: Array<{
+    memberId: string;
+    memberName: string;
+    utilizationRate: number;
+  }>;
 }
 
 export interface StaffMemberCardProps {
