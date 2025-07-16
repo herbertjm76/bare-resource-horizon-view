@@ -69,6 +69,11 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     });
   }, [chatGPTData, originalTeamMembers]);
 
+  // Combine active and pending members for utilization calculations
+  const combinedTeamMembers = useMemo(() => {
+    return [...teamMembers, ...preRegisteredMembers];
+  }, [teamMembers, preRegisteredMembers]);
+
   // Calculate date range for time-range-aware utilization
   const timeRangeForUtilization = useMemo(() => {
     const now = new Date();
@@ -107,14 +112,14 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     isLoading: isStandardizedLoading 
   } = useStandardizedUtilizationData({
     selectedWeek: new Date(),
-    teamMembers: originalTeamMembers,
+    teamMembers: combinedTeamMembers, // Use combined team (active + pending)
     timeRange: timeRangeForUtilization
   });
   
   // Extract utilization data from ChatGPT or calculate fallback
   const { currentUtilizationRate: fallbackUtilizationRate, utilizationStatus: fallbackStatus, utilizationTrends: fallbackTrends } = useUtilizationData(
-    originalTeamMembers, 
-    preRegisteredMembers
+    combinedTeamMembers, // Use combined team (active + pending)
+    []  // Empty pre-registered since they're already in combinedTeamMembers
   );
   
   const currentUtilizationRate = chatGPTData?.teamMetrics.averageUtilization ?? 
@@ -135,7 +140,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     
     // Fallback to standardized utilization data with time range awareness
     return standardizedMemberUtilizations.map(member => {
-      const teamMember = originalTeamMembers.find(tm => tm.id === member.id);
+      const teamMember = combinedTeamMembers.find(tm => tm.id === member.id);
       return {
         memberId: member.id,
         memberName: teamMember ? `${teamMember.first_name} ${teamMember.last_name}` : 'Unknown',
@@ -189,6 +194,18 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     currentUtilizationRate,
     memberUtilizations // Pass real utilization data
   );
+
+  console.log('🔄 DASHBOARD DATA FLOW:', {
+    originalTeamMembers: originalTeamMembers.length,
+    preRegisteredMembers: preRegisteredMembers.length,
+    combinedTeamMembers: combinedTeamMembers.length,
+    transformedStaffData: transformedStaffData.length,
+    memberUtilizations: memberUtilizations.length,
+    currentUtilizationRate,
+    teamNames: combinedTeamMembers.map(m => 
+      'first_name' in m ? `${m.first_name} ${m.last_name}` : m.name || 'Unknown'
+    )
+  });
 
   const officeOptions = ['All Offices'];
   
