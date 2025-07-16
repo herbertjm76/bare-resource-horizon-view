@@ -38,7 +38,7 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
   weeklyCapacity,
   isLoading = false,
   utilizationRate,
-  selectedTimeRange = 'week'
+  selectedTimeRange
 }) => {
   if (!member) return null;
 
@@ -80,7 +80,7 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
 
   // Get time period display text
   const getTimePeriodText = () => {
-    switch (selectedTimeRange) {
+    switch (selectedTimeRange || 'week') {
       case 'week': return 'Current Week';
       case 'month': return 'Current Month';
       case '3months': return 'Last 3 Months';

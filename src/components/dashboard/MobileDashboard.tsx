@@ -12,11 +12,11 @@ import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
 
 interface MobileDashboardProps {
-  selectedTimeRange?: TimeRange;
+  selectedTimeRange: TimeRange;
 }
 
 export const MobileDashboard: React.FC<MobileDashboardProps> = ({
-  selectedTimeRange = 'week'
+  selectedTimeRange
 }) => {
   // Use unified dashboard data to ensure consistency
   const data = useUnifiedDashboardData();
