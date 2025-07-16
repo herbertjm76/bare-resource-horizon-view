@@ -7,24 +7,48 @@ export interface ChatGPTTeamMember {
   utilization: number;
   availability: number;
   totalAllocatedHours: number;
+  projectHours: number;
+  annualLeaveHours: number;
+  otherLeaveHours: number;
   weeklyCapacity: number;
+  totalCapacity: number;
 }
 
 export interface ChatGPTTeamMetrics {
   totalMembers: number;
   averageUtilization: number;
   totalActiveProjects: number;
+  totalProjectHours: number;
+  totalLeaveHours: number;
 }
 
 export interface ChatGPTProjectMetrics {
   activeProjects: number;
   totalAllocatedHours: number;
+  projectsByStatus: {
+    Planning: number;
+    'In Progress': number;
+    'On Hold': number;
+    Complete: number;
+  };
+}
+
+export interface ChatGPTCalculationMetadata {
+  weeksInPeriod: number;
+  startDate: string;
+  endDate: string;
+  dataQuality: {
+    profilesWithMissingCapacity: number;
+    allocationsOutOfRange: number;
+    calculationWarnings: string[];
+  };
 }
 
 export interface ChatGPTDashboardData {
   teamMembers: ChatGPTTeamMember[];
   teamMetrics: ChatGPTTeamMetrics;
   projectMetrics: ChatGPTProjectMetrics;
+  calculationMetadata: ChatGPTCalculationMetadata;
   timestamp: string;
 }
 
