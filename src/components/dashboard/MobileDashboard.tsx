@@ -12,32 +12,28 @@ import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
 
 interface MobileDashboardProps {
-  teamMembers: any[];
-  activeProjects: number;
-  activeResources: number;
-  utilizationTrends: {
-    days7: number;
-    days30: number;
-    days90: number;
-  };
-  staffData: any[];
-  mockData: any;
   selectedTimeRange?: TimeRange;
-  standardizedUtilizationRate?: number;
 }
 
 export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   selectedTimeRange = 'week'
 }) => {
-  // Get unified data from context
-  const unifiedData = useUnifiedDashboardData();
-
-  console.log('Mobile Dashboard - Using unified cards:', {
-    selectedTimeRange,
-    activeResources: unifiedData.activeResources,
-    currentUtilizationRate: unifiedData.currentUtilizationRate,
-    staffDataCount: unifiedData.transformedStaffData.length
-  });
+  // Use unified dashboard data to ensure consistency
+  const data = useUnifiedDashboardData();
+  
+  // Debug logging for Paul Julius utilization data
+  const paulData = data.memberUtilizations?.find(m => 
+    m.memberName?.includes('Paul') || m.memberName?.includes('Julius')
+  );
+  
+  if (paulData) {
+    console.log('🔍 MOBILE DASHBOARD - Paul Julius data:', {
+      memberName: paulData.memberName,
+      utilizationRate: paulData.utilizationRate,
+      memberId: paulData.memberId,
+      source: 'standardized memberUtilizations'
+    });
+  }
 
   return (
     <div className="w-full min-h-screen bg-gray-50/30">
@@ -45,14 +41,14 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         {/* Smart Insights */}
         <div className="w-full">
           <UnifiedSmartInsightsCard
-            data={unifiedData}
+            data={data}
           />
         </div>
         
         {/* Team Status */}
         <div className="w-full">
           <UnifiedStaffStatusCard
-            data={unifiedData}
+            data={data}
             selectedTimeRange={selectedTimeRange}
           />
         </div>
@@ -60,35 +56,35 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
         {/* Upcoming Events */}
         <div className="w-full">
           <UnifiedHolidayCard 
-            data={unifiedData}
+            data={data}
           />
         </div>
 
         {/* New Dashboard Cards */}
         <div className="w-full">
           <WorkloadHeatMapCard 
-            data={unifiedData}
+            data={data}
             selectedTimeRange={selectedTimeRange}
           />
         </div>
         
         <div className="w-full">
           <TeamCapacityStatusCard 
-            data={unifiedData}
+            data={data}
             selectedTimeRange={selectedTimeRange}
           />
         </div>
         
         <div className="w-full">
           <LeavePlanningCard 
-            data={unifiedData}
+            data={data}
             selectedTimeRange={selectedTimeRange}
           />
         </div>
         
         <div className="w-full">
           <ProjectPipelineHealthCard 
-            data={unifiedData}
+            data={data}
           />
         </div>
 

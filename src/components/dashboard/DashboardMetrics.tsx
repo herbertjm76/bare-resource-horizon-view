@@ -108,28 +108,12 @@ const DashboardContent: React.FC<{
       <div className="pb-4 lg:pb-6">
         {isMobile ? (
           <MobileDashboard
-            teamMembers={teamMembers}
-            activeProjects={activeProjects}
-            activeResources={metrics.activeResources}
-            utilizationTrends={utilizationTrends}
-            staffData={transformedStaffData}
-            mockData={mockData}
             selectedTimeRange={selectedTimeRange}
-            standardizedUtilizationRate={utilizationRate}
           />
         ) : (
           <div className="px-2 sm:px-3 lg:px-4">
             <DesktopDashboard
-              teamMembers={teamMembers}
-              activeProjects={activeProjects}
-              activeResources={metrics.activeResources}
-              utilizationTrends={utilizationTrends}
-              staffData={transformedStaffData}
-              mockData={mockData}
               selectedTimeRange={selectedTimeRange}
-              totalRevenue={metrics.totalRevenue}
-              avgProjectValue={metrics.avgProjectValue}
-              standardizedUtilizationRate={utilizationRate}
             />
           </div>
         )}

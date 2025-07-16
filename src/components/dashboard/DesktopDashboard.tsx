@@ -13,50 +13,40 @@ import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
 
 interface DesktopDashboardProps {
-  teamMembers: any[];
-  activeProjects: number;
-  activeResources: number;
-  utilizationTrends: {
-    days7: number;
-    days30: number;
-    days90: number;
-  };
-  staffData: Array<{
-    id: string;
-    name: string;
-    availability: number;
-    weekly_capacity?: number;
-    first_name?: string;
-    last_name?: string;
-    role?: string;
-  }>;
-  mockData: any;
   selectedTimeRange: TimeRange;
-  totalRevenue?: number;
-  avgProjectValue?: number;
-  standardizedUtilizationRate?: number;
 }
 
 export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
-  selectedTimeRange,
-  mockData,
-  activeProjects,
-  activeResources
+  selectedTimeRange
 }) => {
-  // Get unified data from context
-  const unifiedData = useUnifiedDashboardData();
+  // Use unified dashboard data to ensure consistency
+  const data = useUnifiedDashboardData();
+  
+  // Debug logging for Paul Julius utilization data
+  const paulData = data.memberUtilizations?.find(m => 
+    m.memberName?.includes('Paul') || m.memberName?.includes('Julius')
+  );
+  
+  if (paulData) {
+    console.log('🔍 DESKTOP DASHBOARD - Paul Julius data:', {
+      memberName: paulData.memberName,
+      utilizationRate: paulData.utilizationRate,
+      memberId: paulData.memberId,
+      source: 'standardized memberUtilizations'
+    });
+  }
 
   // Show loading state while core data is loading
-  if (unifiedData.isLoading) {
+  if (data.isLoading) {
     return <LoadingDashboard />;
   }
 
   // Prepare analytics data for separate section - using the correct property names
   const analyticsData = {
-    projectsByStatus: mockData.projectsByStatus || [],
-    projectsByStage: mockData.projectsByStage || [],
-    projectsByLocation: mockData.projectsByLocation || [],
-    projectsByPM: mockData.projectsByPM || []
+    projectsByStatus: data.mockData?.projectsByStatus || [],
+    projectsByStage: data.mockData?.projectsByStage || [],
+    projectsByLocation: data.mockData?.projectsByLocation || [],
+    projectsByPM: data.mockData?.projectsByPM || []
   };
 
   return (
@@ -64,36 +54,36 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
       {/* First Row: New Dashboard Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <TeamUtilizationCard 
-          utilizationRate={unifiedData.currentUtilizationRate} 
-          utilizationStatus={unifiedData.utilizationStatus}
+          utilizationRate={data.currentUtilizationRate} 
+          utilizationStatus={data.utilizationStatus}
         />
         <WorkloadCard 
-          projects={unifiedData.projects}
-          teamMembers={unifiedData.teamMembers}
-          preRegisteredMembers={unifiedData.preRegisteredMembers}
-          memberUtilizations={unifiedData.memberUtilizations}
+          projects={data.projects}
+          teamMembers={data.teamMembers}
+          preRegisteredMembers={data.preRegisteredMembers}
+          memberUtilizations={data.memberUtilizations}
           selectedTimeRange={selectedTimeRange}
         />
         <TeamLeaveCard 
-          teamMembers={unifiedData.teamMembers}
-          memberUtilizations={unifiedData.memberUtilizations}
+          teamMembers={data.teamMembers}
+          memberUtilizations={data.memberUtilizations}
         />
         <ProjectPipelineCard 
-          projects={unifiedData.projects}
+          projects={data.projects}
         />
       </div>
 
       {/* Second Row: The 3 Dashboard Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <UnifiedStaffStatusCard 
-          data={unifiedData}
+          data={data}
           selectedTimeRange={selectedTimeRange}
         />
         <UnifiedSmartInsightsCard 
-          data={unifiedData}
+          data={data}
         />
         <UnifiedHolidayCard 
-          data={unifiedData}
+          data={data}
         />
       </div>
 
