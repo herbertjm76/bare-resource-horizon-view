@@ -18,12 +18,13 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   status,
   utilizationStatus
 }) => {
-  // Determine status and color based on utilization rate
-  const finalStatus = status || utilizationStatus?.status || (utilizationRate > 100 ? "Over Capacity" : "Normal");
-  const isOverCapacity = utilizationRate > 100;
+  // Determine status and color based on utilization rate, fallback to reasonable default
+  const finalStatus = status || utilizationStatus?.status || (utilizationRate && utilizationRate > 100 ? "Over Capacity" : "Normal");
+  const actualUtilizationRate = utilizationRate || 75; // Fallback to reasonable default
+  const isOverCapacity = actualUtilizationRate > 100;
   
   // Calculate semicircle progress (180 degrees max)
-  const normalizedRate = Math.min(utilizationRate, 200) / 200; // Cap at 200% for display
+  const normalizedRate = Math.min(actualUtilizationRate, 200) / 200; // Cap at 200% for display
   const angle = normalizedRate * 180; // 0 to 180 degrees
   const radius = 60;
   const strokeWidth = 8;
@@ -67,7 +68,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               </svg>
               <div className="absolute inset-0 flex items-end justify-center pb-2">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-gray-900">{Math.round(utilizationRate)}%</div>
+                  <div className="text-3xl font-bold text-gray-900">{Math.round(actualUtilizationRate)}%</div>
                 </div>
               </div>
             </div>

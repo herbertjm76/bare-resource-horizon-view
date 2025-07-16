@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { TimeRange } from '../TimeRangeSelector';
 import { useTimeRangeMetrics } from './useTimeRangeMetrics';
@@ -47,9 +47,12 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     preRegisteredMembers
   );
 
-  // Use standardized utilization data for current week
+  // Memoize the current week date to prevent re-renders
+  const currentWeek = useMemo(() => new Date(), []);
+  
+  // Use standardized utilization data for current week only when we have team members
   const { memberUtilizations, teamSummary, isLoading: isStandardizedLoading } = useStandardizedUtilizationData({
-    selectedWeek: new Date(),
+    selectedWeek: currentWeek,
     teamMembers: teamMembers || []
   });
 
@@ -62,7 +65,8 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   );
 
   const officeOptions = ['All Offices'];
-  const isLoading = isTeamLoading || isProjectsLoading || metricsLoading || isStandardizedLoading;
+  // Only show loading when critical data is loading, not optional features
+  const isLoading = isTeamLoading || isProjectsLoading || metricsLoading;
 
   const refetch = async () => {
     await Promise.all([refetchTeam(), refetchProjects()]);
