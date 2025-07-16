@@ -94,20 +94,6 @@ const DashboardContent: React.FC<{
         />
       </div>
 
-      {/* Executive Summary - positioned directly after header with minimal padding */}
-      <div className="px-2 sm:px-3 lg:px-4">
-        <ExecutiveSummaryCard
-          activeProjects={activeProjects}
-          activeResources={metrics.activeResources}
-          utilizationTrends={utilizationTrends}
-          selectedTimeRange={selectedTimeRange}
-          totalRevenue={metrics.totalRevenue}
-          avgProjectValue={metrics.avgProjectValue}
-          staffData={transformedStaffData}
-          standardizedUtilizationRate={utilizationRate}
-        />
-        
-      </div>
 
       {/* Filters Header - now positioned after Executive Summary */}
       <DashboardHeader
