@@ -45,26 +45,8 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
 
   const projectStats = calculateProjectStats();
   
-  // Calculate health score based on project distribution
-  const calculateHealthScore = () => {
-    const total = projects.length;
-    if (total === 0) return 0;
-    
-    // Score based on project distribution and completion rate
-    const completionRate = projectStats.complete.percentage;
-    const activeRate = projectStats.inProgress.percentage;
-    const planningRate = projectStats.planning.percentage;
-    
-    // Ideal distribution: some planning, good active projects, steady completion
-    let score = 0;
-    if (planningRate > 0 && planningRate < 70) score += 30; // Good planning pipeline
-    if (activeRate > 20 && activeRate < 60) score += 40; // Good active work
-    if (completionRate > 10) score += 30; // Good completion rate
-    
-    return Math.min(score, 100);
-  };
-
-  const score = calculateHealthScore();
+  // Fixed health score as requested
+  const score = 62;
   
   const getHealthStatus = (score: number) => {
     if (score >= 80) return "Excellent";
@@ -100,9 +82,9 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
           </div>
         </div>
         
-        <div className="space-y-4">
+        <div className="flex flex-col justify-between h-full">
           {/* Score display */}
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-2 mt-2">
             <div className="text-3xl font-bold text-orange-600">
               {score}<span className="text-lg text-gray-500">/{maxScore}</span>
             </div>
@@ -113,7 +95,7 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
           </div>
           
           {/* Project breakdown */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-3 w-3 text-blue-500" />
@@ -148,7 +130,7 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
             </div>
           </div>
           
-          <div className="text-center pt-2">
+          <div className="text-center">
             <span className="text-xs text-gray-500">This Month</span>
           </div>
         </div>

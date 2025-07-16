@@ -14,7 +14,7 @@ interface TeamUtilizationCardProps {
 }
 
 export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
-  utilizationRate = 85,
+  utilizationRate = 165,
   status,
   utilizationStatus
 }) => {
@@ -39,10 +39,10 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
           </div>
         </div>
         
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center justify-between h-full">
           {/* Circular Progress */}
-          <div className="relative w-24 h-24">
-            <svg className="w-24 h-24 transform -rotate-90" viewBox="0 0 100 100">
+          <div className="relative w-28 h-28 mt-2">
+            <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
               {/* Background circle */}
               <circle
                 cx="50"
@@ -67,20 +67,15 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-2xl font-bold text-gray-900">{Math.round(utilizationRate)}</span>
+              <span className="text-3xl font-bold text-gray-900">{Math.round(utilizationRate)}%</span>
             </div>
           </div>
           
           <div className="text-center space-y-2">
-            <p className="text-sm text-gray-600">Here are some of the tricks to</p>
-            <p className="text-sm text-gray-600">improve your score</p>
-            
-            <div className="flex flex-col items-center gap-2 mt-4">
-              <Badge className={`text-xs ${isOverCapacity ? 'bg-red-100 text-red-700 border-red-200' : 'bg-green-100 text-green-700 border-green-200'}`}>
-                {finalStatus}
-              </Badge>
-              <span className="text-xs text-gray-500">This Month</span>
-            </div>
+            <Badge className={`text-xs ${isOverCapacity ? 'bg-red-100 text-red-700 border-red-200' : 'bg-green-100 text-green-700 border-green-200'}`}>
+              {finalStatus}
+            </Badge>
+            <div className="text-xs text-gray-500">This Month</div>
           </div>
         </div>
       </CardContent>

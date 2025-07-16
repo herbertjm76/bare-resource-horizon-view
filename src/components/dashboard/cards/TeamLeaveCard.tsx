@@ -11,15 +11,15 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
   leaveData,
   teamMembers = []
 }) => {
-  // Generate leave data based on team size and trends
+  // Generate leave data with exaggerated amplitude
   const generateLeaveData = () => {
     const teamSize = teamMembers.length || 1;
-    const baseLeave = teamSize * 2; // Base 2 hours per person per day
+    const baseLeave = teamSize * 3; // Increased base hours
     
     return Array.from({ length: 7 }, (_, index) => {
-      // Create realistic leave patterns (lower on weekends, higher mid-week)
-      const dayMultiplier = index === 0 || index === 6 ? 0.3 : 1; // Weekend reduction
-      const variation = Math.random() * 0.5 + 0.75; // 75-125% variation
+      // Create more dramatic patterns with higher variations
+      const dayMultiplier = index === 0 || index === 6 ? 0.2 : 1.5; // Bigger weekend reduction, higher mid-week
+      const variation = Math.random() * 1.2 + 0.4; // 40-160% variation (more exaggerated)
       return Math.round(baseLeave * dayMultiplier * variation);
     });
   };
@@ -40,18 +40,18 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
           </div>
         </div>
         
-        <div className="space-y-4">
+        <div className="flex flex-col justify-between h-full">
           {/* Chart area */}
-          <div className="relative h-24">
-            <svg className="w-full h-full" viewBox="0 0 280 96">
+          <div className="relative h-32 mt-2">
+            <svg className="w-full h-full" viewBox="0 0 280 128">
               {/* Grid lines */}
-              {[0, 25, 50, 75].map(y => (
+              {[0, 32, 64, 96].map(y => (
                 <line
                   key={y}
                   x1="0"
-                  y1={96 - y}
+                  y1={128 - y}
                   x2="280"
-                  y2={96 - y}
+                  y2={128 - y}
                   stroke="rgba(0,0,0,0.1)"
                   strokeWidth="1"
                 />
@@ -61,12 +61,12 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
               <polyline
                 fill="none"
                 stroke="#8b5cf6"
-                strokeWidth="2"
+                strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 points={data.map((value, index) => {
                   const x = (index * 280) / (data.length - 1);
-                  const y = 96 - ((value - minValue) / (maxValue - minValue)) * 76;
+                  const y = 128 - ((value - minValue) / (maxValue - minValue)) * 108;
                   return `${x},${y}`;
                 }).join(' ')}
               />
@@ -74,15 +74,15 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
               {/* Data points */}
               {data.map((value, index) => {
                 const x = (index * 280) / (data.length - 1);
-                const y = 96 - ((value - minValue) / (maxValue - minValue)) * 76;
+                const y = 128 - ((value - minValue) / (maxValue - minValue)) * 108;
                 return (
                   <circle
                     key={index}
                     cx={x}
                     cy={y}
-                    r="3"
+                    r="4"
                     fill="#8b5cf6"
-                    className="hover:r-4 transition-all duration-200"
+                    className="hover:r-5 transition-all duration-200"
                   />
                 );
               })}
@@ -96,7 +96,7 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
             ))}
           </div>
           
-          <div className="text-center pt-2">
+          <div className="text-center">
             <span className="text-xs text-gray-500">This Month</span>
           </div>
         </div>

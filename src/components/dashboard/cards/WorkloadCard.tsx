@@ -50,9 +50,9 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           </div>
         </div>
         
-        <div className="space-y-4">
+        <div className="flex flex-col justify-between h-full">
           {/* Legend */}
-          <div className="flex items-center justify-between text-xs text-gray-500">
+          <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
             <span>Less</span>
             <div className="flex items-center gap-1">
               <div className="w-3 h-3 rounded-sm bg-blue-200"></div>
@@ -76,14 +76,14 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
                 {monthData.map((intensity, dayIndex) => (
                   <div
                     key={dayIndex}
-                    className={`w-3 h-3 rounded-sm ${getIntensityColor(intensity)} transition-all duration-200 hover:scale-110`}
+                    className={`w-4 h-4 rounded-sm ${getIntensityColor(intensity)} transition-all duration-200 hover:scale-110`}
                   />
                 ))}
               </div>
             ))}
           </div>
           
-          <div className="text-center pt-2">
+          <div className="text-center">
             <span className="text-xs text-gray-500">This Month</span>
           </div>
         </div>
