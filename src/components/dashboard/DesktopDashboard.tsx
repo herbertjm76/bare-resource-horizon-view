@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { TeamUtilizationKPI } from './kpi/TeamUtilizationKPI';
-import { OverCapacityKPI } from './kpi/OverCapacityKPI';
-import { ActiveProjectsKPI } from './kpi/ActiveProjectsKPI';
-import { TeamSizeKPI } from './kpi/TeamSizeKPI';
+import { TeamUtilizationCard } from './cards/TeamUtilizationCard';
+import { WorkloadCard } from './cards/WorkloadCard';
+import { TeamLeaveCard } from './cards/TeamLeaveCard';
+import { ProjectPipelineCard } from './cards/ProjectPipelineCard';
 import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
 import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
@@ -55,12 +55,21 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* First Row: KPI Cards */}
+      {/* First Row: New Dashboard Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <TeamUtilizationKPI utilizationRate={165} />
-        <OverCapacityKPI overCapacityHours={624} />
-        <ActiveProjectsKPI activeProjects={activeProjects} activeResources={activeResources} />
-        <TeamSizeKPI teamSize={activeResources} recommendHiring={true} />
+        <TeamUtilizationCard score={42} status="Over Capacity" />
+        <WorkloadCard />
+        <TeamLeaveCard />
+        <ProjectPipelineCard 
+          score={62}
+          maxScore={100}
+          healthStatus="Moderate"
+          projectStats={{
+            inProgress: { count: 3, percentage: 6 },
+            planning: { count: 50, percentage: 93 },
+            complete: { count: 1, percentage: 2 }
+          }}
+        />
       </div>
 
       {/* Second Row: The 3 Dashboard Sections */}
