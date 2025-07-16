@@ -1,6 +1,13 @@
 
 import React from 'react';
-import { ExecutiveSummaryRow } from './executiveSummary/ExecutiveSummaryRow';
+import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
+import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
+import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
+import { WorkloadHeatMapCard } from './cards/WorkloadHeatMapCard';
+import { TeamCapacityStatusCard } from './cards/TeamCapacityStatusCard';
+import { LeavePlanningCard } from './cards/LeavePlanningCard';
+import { ProjectPipelineHealthCard } from './cards/ProjectPipelineHealthCard';
+import { TeamCompositionCard } from './cards/TeamCompositionCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
@@ -47,8 +54,27 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Executive Summary KPI Cards */}
-      <ExecutiveSummaryRow selectedTimeRange={selectedTimeRange} />
+      {/* First Row: Staff Status, Smart Insights, Upcoming Holidays */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div>
+          <UnifiedStaffStatusCard 
+            data={unifiedData}
+            selectedTimeRange={selectedTimeRange}
+          />
+        </div>
+        <div>
+          <UnifiedSmartInsightsCard 
+            data={unifiedData}
+          />
+        </div>
+        <div>
+          <UnifiedHolidayCard 
+            data={unifiedData}
+          />
+        </div>
+      </div>
+
+
       
       {/* Analytics Charts - Project Status, Project Stages, Project Locations, Projects by PM */}
       <AnalyticsSection mockData={analyticsData} />
