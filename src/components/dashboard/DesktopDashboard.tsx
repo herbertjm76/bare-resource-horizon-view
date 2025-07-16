@@ -72,6 +72,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
           teamMembers={unifiedData.teamMembers}
           preRegisteredMembers={unifiedData.preRegisteredMembers}
           memberUtilizations={unifiedData.memberUtilizations}
+          selectedTimeRange={selectedTimeRange}
         />
         <TeamLeaveCard 
           teamMembers={unifiedData.teamMembers}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock } from 'lucide-react';
+import { TimeRange } from '../TimeRangeSelector';
 
 
 interface WorkloadCardProps {
@@ -9,6 +10,7 @@ interface WorkloadCardProps {
   teamMembers?: any[];
   preRegisteredMembers?: any[];
   memberUtilizations?: any[];
+  selectedTimeRange?: TimeRange;
 }
 
 export const WorkloadCard: React.FC<WorkloadCardProps> = ({
@@ -16,7 +18,8 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   projects = [],
   teamMembers = [],
   preRegisteredMembers = [],
-  memberUtilizations = []
+  memberUtilizations = [],
+  selectedTimeRange = 'month'
 }) => {
   // Combine all team members and pre-registered members to show ALL resources
   const allResources = [
@@ -43,25 +46,71 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
         'Lisa Wang'
       ];
 
-  // Generate 5 months of weekly data (current month + 4 months)
-  const generateWeeklyWorkload = () => {
-    const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
-    const weeksPerMonth = 4;
-    
+  // Get time period configuration based on selected time range
+  const getTimeConfig = () => {
+    switch (selectedTimeRange) {
+      case 'week':
+        return {
+          periods: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+          columnCount: 6, // 1 for name + 5 for days
+          label: 'This Week'
+        };
+      case 'month':
+        return {
+          periods: ['W1', 'W2', 'W3', 'W4'],
+          columnCount: 5, // 1 for name + 4 for weeks
+          label: 'This Month'
+        };
+      case '3months':
+        return {
+          periods: ['Month 1', 'Month 2', 'Month 3'],
+          columnCount: 4, // 1 for name + 3 for months
+          label: '3 Months'
+        };
+      case '4months':
+        return {
+          periods: ['Month 1', 'Month 2', 'Month 3', 'Month 4'],
+          columnCount: 5, // 1 for name + 4 for months
+          label: '4 Months'
+        };
+      case '6months':
+        return {
+          periods: ['M1', 'M2', 'M3', 'M4', 'M5', 'M6'],
+          columnCount: 7, // 1 for name + 6 for months
+          label: '6 Months'
+        };
+      case 'year':
+        return {
+          periods: ['Q1', 'Q2', 'Q3', 'Q4'],
+          columnCount: 5, // 1 for name + 4 for quarters
+          label: 'This Year'
+        };
+      default:
+        return {
+          periods: ['W1', 'W2', 'W3', 'W4'],
+          columnCount: 5,
+          label: 'This Month'
+        };
+    }
+  };
+
+  const timeConfig = getTimeConfig();
+
+  // Generate workload data based on time range
+  const generateWorkload = () => {
     return teamResources.map((resource, index) => {
       // Try to use real utilization data if available
       const memberUtilization = memberUtilizations[index];
       const baseUtilization = memberUtilization?.utilizationRate || Math.random() * 100;
       
-      return Array.from({ length: months.length * weeksPerMonth }, () => {
-        // Use real utilization with some variation for different weeks
+      return Array.from({ length: timeConfig.periods.length }, () => {
+        // Use real utilization with some variation for different periods
         return Math.max(0, Math.min(100, baseUtilization + (Math.random() - 0.5) * 20));
       });
     });
   };
 
-  const workloadMatrix = generateWeeklyWorkload();
-  const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+  const workloadMatrix = generateWorkload();
   
   const getIntensityColor = (intensity: number) => {
     if (intensity <= 20) return 'bg-green-200';
@@ -82,26 +131,36 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
         </div>
         
         <div className="flex flex-col justify-between h-full">
-          {/* Month headers */}
-          <div className="grid grid-cols-6 gap-1 mb-2">
+          {/* Period headers */}
+          <div className={`grid gap-1 mb-2 ${
+            timeConfig.columnCount === 4 ? 'grid-cols-4' :
+            timeConfig.columnCount === 5 ? 'grid-cols-5' :
+            timeConfig.columnCount === 6 ? 'grid-cols-6' :
+            timeConfig.columnCount === 7 ? 'grid-cols-7' : 'grid-cols-5'
+          }`}>
             <div className="text-xs text-gray-500"></div>
-            {months.map(month => (
-              <div key={month} className="text-xs text-gray-600 text-center font-medium">
-                {month}
+            {timeConfig.periods.map(period => (
+              <div key={period} className="text-xs text-gray-600 text-center font-medium">
+                {period}
               </div>
             ))}
           </div>
           
-          {/* Resource rows with weekly workload */}
+          {/* Resource rows with workload */}
           <div className="flex-1 space-y-1">
             {teamResources.map((resource, resourceIndex) => (
-              <div key={resource} className="grid grid-cols-6 gap-1 items-center">
+              <div key={resource} className={`grid gap-1 items-center ${
+                timeConfig.columnCount === 4 ? 'grid-cols-4' :
+                timeConfig.columnCount === 5 ? 'grid-cols-5' :
+                timeConfig.columnCount === 6 ? 'grid-cols-6' :
+                timeConfig.columnCount === 7 ? 'grid-cols-7' : 'grid-cols-5'
+              }`}>
                 <div className="text-xs text-gray-700 font-medium truncate pr-2">
                   {resource.split(' ')[0]}
                 </div>
-                {workloadMatrix[resourceIndex].map((intensity, weekIndex) => (
+                {workloadMatrix[resourceIndex].map((intensity, periodIndex) => (
                   <div
-                    key={weekIndex}
+                    key={periodIndex}
                     className={`h-6 rounded-sm ${getIntensityColor(intensity)} transition-all duration-200 hover:scale-105 relative group`}
                     title={`${Math.round(intensity)}% utilization`}
                   >
@@ -129,7 +188,7 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           </div>
           
           <div className="text-center">
-            <span className="text-xs text-gray-500">This Month</span>
+            <span className="text-xs text-gray-500">{timeConfig.label}</span>
           </div>
         </div>
       </CardContent>
