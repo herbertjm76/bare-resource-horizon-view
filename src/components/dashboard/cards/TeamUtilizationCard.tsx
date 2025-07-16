@@ -66,8 +66,8 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                   className="transition-all duration-700 ease-out"
                 />
               </svg>
-              <div className="absolute inset-0 flex items-end justify-center pb-2">
-                <div className="text-center">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center mt-4">
                   <div className="text-3xl font-bold text-gray-900">{Math.round(actualUtilizationRate)}%</div>
                 </div>
               </div>
