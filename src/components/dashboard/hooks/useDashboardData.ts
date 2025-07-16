@@ -9,6 +9,7 @@ import { useProjectData } from './useProjectData';
 import { useUtilizationData } from './useUtilizationData';
 import { useTeamCompositionData } from './useTeamCompositionData';
 import { useAggregatedData } from './useAggregatedData';
+import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { UnifiedDashboardData } from './types/dashboardTypes';
 
 export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboardData & {
@@ -46,6 +47,12 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     preRegisteredMembers
   );
 
+  // Use standardized utilization data for current week
+  const { memberUtilizations, teamSummary, isLoading: isStandardizedLoading } = useStandardizedUtilizationData({
+    selectedWeek: new Date(),
+    teamMembers: teamMembers || []
+  });
+
   // Use extracted aggregated data hook
   const { transformedStaffData, totalTeamSize, mockData, smartInsightsData } = useAggregatedData(
     teamMembers,
@@ -55,7 +62,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   );
 
   const officeOptions = ['All Offices'];
-  const isLoading = isTeamLoading || isProjectsLoading || metricsLoading;
+  const isLoading = isTeamLoading || isProjectsLoading || metricsLoading || isStandardizedLoading;
 
   const refetch = async () => {
     await Promise.all([refetchTeam(), refetchProjects()]);
@@ -77,9 +84,13 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     isTeamCompositionLoading,
     
     // Utilization data
-    currentUtilizationRate,
+    currentUtilizationRate: teamSummary?.teamUtilizationRate || currentUtilizationRate,
     utilizationStatus,
     utilizationTrends,
+    
+    // Standardized utilization data
+    memberUtilizations: memberUtilizations || [],
+    teamSummary: teamSummary || null,
     
     // Holiday data
     holidays: holidays || [],

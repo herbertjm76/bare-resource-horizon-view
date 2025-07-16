@@ -14,7 +14,7 @@ interface TeamUtilizationCardProps {
 }
 
 export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
-  utilizationRate = 165,
+  utilizationRate,
   status,
   utilizationStatus
 }) => {

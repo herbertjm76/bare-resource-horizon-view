@@ -7,19 +7,33 @@ interface TeamLeaveCardProps {
   teamMembers?: any[];
 }
 
+interface TeamLeaveCardProps {
+  leaveData?: number[];
+  teamMembers?: any[];
+  memberUtilizations?: any[];
+}
+
 export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
   leaveData,
-  teamMembers = []
+  teamMembers = [],
+  memberUtilizations = []
 }) => {
-  // Generate leave data with exaggerated amplitude
+  // Generate leave data based on real data if available
   const generateLeaveData = () => {
-    const teamSize = teamMembers.length || 1;
-    const baseLeave = teamSize * 3; // Increased base hours
+    const teamSize = teamMembers.length || 5;
+    
+    // Calculate total leave from real data
+    const totalAnnualLeave = memberUtilizations.reduce((total, member) => total + (member.annualLeave || 0), 0);
+    const totalOtherLeave = memberUtilizations.reduce((total, member) => total + (member.otherLeave || 0), 0);
+    const totalLeave = totalAnnualLeave + totalOtherLeave;
+    
+    // Use real data if available, otherwise use mock data
+    const baseLeave = totalLeave > 0 ? totalLeave / 7 : teamSize * 3;
     
     return Array.from({ length: 7 }, (_, index) => {
-      // Create more dramatic patterns with higher variations
-      const dayMultiplier = index === 0 || index === 6 ? 0.2 : 1.5; // Bigger weekend reduction, higher mid-week
-      const variation = Math.random() * 1.2 + 0.4; // 40-160% variation (more exaggerated)
+      // Create more realistic patterns with higher variations
+      const dayMultiplier = index === 0 || index === 6 ? 0.2 : 1.5; // Lower weekend usage
+      const variation = Math.random() * 1.2 + 0.4; // 40-160% variation
       return Math.round(baseLeave * dayMultiplier * variation);
     });
   };

@@ -27,6 +27,10 @@ export interface UnifiedDashboardData {
     days90: number;
   };
   
+  // Standardized utilization data
+  memberUtilizations: any[];
+  teamSummary: any;
+  
   // Holiday data
   holidays: any[];
   isHolidaysLoading: boolean;

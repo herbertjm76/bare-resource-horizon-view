@@ -7,28 +7,43 @@ interface WorkloadCardProps {
   projects?: any[];
 }
 
+interface WorkloadCardProps {
+  workloadData?: number[][];
+  projects?: any[];
+  teamMembers?: any[];
+  memberUtilizations?: any[];
+}
+
 export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   workloadData,
-  projects = []
+  projects = [],
+  teamMembers = [],
+  memberUtilizations = []
 }) => {
-  // Mock team resources
-  const teamResources = [
-    'Sarah Chen',
-    'Michael Rodriguez', 
-    'Emma Thompson',
-    'David Park',
-    'Lisa Wang'
-  ];
+  // Use real team members or fallback to mock data
+  const teamResources = teamMembers.length > 0 
+    ? teamMembers.map(member => member.first_name || member.name || 'Unknown')
+    : [
+        'Sarah Chen',
+        'Michael Rodriguez', 
+        'Emma Thompson',
+        'David Park',
+        'Lisa Wang'
+      ];
 
   // Generate 5 months of weekly data (current month + 4 months)
   const generateWeeklyWorkload = () => {
     const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
     const weeksPerMonth = 4;
     
-    return teamResources.map(resource => {
+    return teamResources.map((resource, index) => {
+      // Try to use real utilization data if available
+      const memberUtilization = memberUtilizations[index];
+      const baseUtilization = memberUtilization?.utilizationRate || Math.random() * 100;
+      
       return Array.from({ length: months.length * weeksPerMonth }, () => {
-        // Random workload between 0-100%
-        return Math.random() * 100;
+        // Use real utilization with some variation for different weeks
+        return Math.max(0, Math.min(100, baseUtilization + (Math.random() - 0.5) * 20));
       });
     });
   };
