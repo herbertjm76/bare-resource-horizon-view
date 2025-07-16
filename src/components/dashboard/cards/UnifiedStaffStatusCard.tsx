@@ -7,10 +7,11 @@ import { StaffSection } from '../staff/StaffSection';
 import { categorizeStaff } from '../staff/utils';
 import { StandardizedHeaderBadge } from '../mobile/components/StandardizedHeaderBadge';
 import { UnifiedDashboardData } from '../hooks/useDashboardData';
+import { TimeRange } from '../TimeRangeSelector';
 
 interface UnifiedStaffStatusCardProps {
   data: UnifiedDashboardData;
-  selectedTimeRange?: string;
+  selectedTimeRange?: TimeRange;
 }
 
 export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
@@ -56,6 +57,7 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
               members={atCapacityStaff}
               colorScheme="red"
               memberUtilizations={data.memberUtilizations}
+              selectedTimeRange={selectedTimeRange}
             />
 
             {/* Optimally Allocated Staff (66-90%) - Show all members */}
@@ -65,6 +67,7 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
               members={optimalStaff}
               colorScheme="orange"
               memberUtilizations={data.memberUtilizations}
+              selectedTimeRange={selectedTimeRange}
             />
 
             {/* Ready for Projects Staff (≤65%) - Show all members, no limit */}
@@ -75,6 +78,7 @@ export const UnifiedStaffStatusCard: React.FC<UnifiedStaffStatusCardProps> = ({
               colorScheme="green"
               subtitle="available for new work"
               memberUtilizations={data.memberUtilizations}
+              selectedTimeRange={selectedTimeRange}
             />
 
             {/* Show message if no staff data */}

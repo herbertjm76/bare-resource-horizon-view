@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Clock, Briefcase, Calendar, User } from 'lucide-react';
 import { StaffMember } from './types';
+import { TimeRange } from '../TimeRangeSelector';
 
 interface StaffAllocationDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ interface StaffAllocationDialogProps {
   weeklyCapacity: number;
   isLoading?: boolean;
   utilizationRate?: number; // Standardized utilization rate from dashboard data
+  selectedTimeRange?: TimeRange;
 }
 
 export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
@@ -35,7 +37,8 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
   allocations,
   weeklyCapacity,
   isLoading = false,
-  utilizationRate
+  utilizationRate,
+  selectedTimeRange = 'week'
 }) => {
   if (!member) return null;
 
@@ -75,6 +78,19 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
     });
   }
 
+  // Get time period display text
+  const getTimePeriodText = () => {
+    switch (selectedTimeRange) {
+      case 'week': return 'Current Week';
+      case 'month': return 'Current Month';
+      case '3months': return 'Last 3 Months';
+      case '4months': return 'Last 4 Months';
+      case '6months': return 'Last 6 Months';
+      case 'year': return 'Current Year';
+      default: return 'Selected Period';
+    }
+  };
+
   // Get member details - handle both active members and pre-registered invites
   const memberDetails = {
     name: member.name,
@@ -109,12 +125,12 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
           {/* Summary Card */}
           <Card>
             <CardContent className="p-4">
-              <h3 className="font-semibold mb-3">Current Week Summary</h3>
+              <h3 className="font-semibold mb-3">{getTimePeriodText()} Summary</h3>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="flex flex-col items-center">
                   <Clock className="h-5 w-5 text-blue-500 mb-1" />
                   <div className="text-lg font-semibold">{totalAllocatedHours}h</div>
-                  <div className="text-xs text-gray-500">Allocated</div>
+                  <div className="text-xs text-gray-500">For {getTimePeriodText()}</div>
                 </div>
                 <div className="flex flex-col items-center">
                   <Calendar className="h-5 w-5 text-green-500 mb-1" />
@@ -157,7 +173,7 @@ export const StaffAllocationDialog: React.FC<StaffAllocationDialogProps> = ({
             ) : consolidatedAllocationsList.length === 0 ? (
               <Card>
                 <CardContent className="p-4 text-center text-gray-500">
-                  <div className="mb-2">No project allocations found for this week</div>
+                  <div className="mb-2">No project allocations found for {getTimePeriodText().toLowerCase()}</div>
                   <div className="text-xs">
                     {memberDetails.isPending ? 
                       'This member is pending registration and may have pre-allocated resources.' :

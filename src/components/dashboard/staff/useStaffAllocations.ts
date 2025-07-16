@@ -2,7 +2,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
-import { format, startOfWeek, endOfWeek } from 'date-fns';
+import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, addMonths } from 'date-fns';
+import { TimeRange } from '../TimeRangeSelector';
 
 interface StaffAllocation {
   projectId: string;
@@ -12,7 +13,7 @@ interface StaffAllocation {
   weekStartDate: string;
 }
 
-export const useStaffAllocations = (memberId: string | null) => {
+export const useStaffAllocations = (memberId: string | null, timeRange?: TimeRange) => {
   const [allocations, setAllocations] = useState<StaffAllocation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { company } = useCompany();
@@ -27,14 +28,43 @@ export const useStaffAllocations = (memberId: string | null) => {
       setIsLoading(true);
       
       try {
-        // Get current week range
+        // Get date range based on selected time range
         const now = new Date();
-        const weekStart = startOfWeek(now, { weekStartsOn: 1 });
-        const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
-        const weekStartStr = format(weekStart, 'yyyy-MM-dd');
-        const weekEndStr = format(weekEnd, 'yyyy-MM-dd');
+        let rangeStart: Date;
+        let rangeEnd: Date;
 
-        console.log(`Fetching allocations for member ${memberId} for week ${weekStartStr}`);
+        switch (timeRange) {
+          case 'month':
+            rangeStart = startOfMonth(now);
+            rangeEnd = endOfMonth(now);
+            break;
+          case '3months':
+            rangeStart = startOfMonth(addMonths(now, -2));
+            rangeEnd = endOfMonth(now);
+            break;
+          case '4months':
+            rangeStart = startOfMonth(addMonths(now, -3));
+            rangeEnd = endOfMonth(now);
+            break;
+          case '6months':
+            rangeStart = startOfMonth(addMonths(now, -5));
+            rangeEnd = endOfMonth(now);
+            break;
+          case 'year':
+            rangeStart = startOfYear(now);
+            rangeEnd = endOfYear(now);
+            break;
+          case 'week':
+          default:
+            rangeStart = startOfWeek(now, { weekStartsOn: 1 });
+            rangeEnd = endOfWeek(now, { weekStartsOn: 1 });
+            break;
+        }
+
+        const rangeStartStr = format(rangeStart, 'yyyy-MM-dd');
+        const rangeEndStr = format(rangeEnd, 'yyyy-MM-dd');
+
+        console.log(`Fetching allocations for member ${memberId} for ${timeRange || 'week'} ${rangeStartStr} to ${rangeEndStr}`);
 
         // Query project_resource_allocations with project details
         const { data: allocationData, error } = await supabase
@@ -52,8 +82,8 @@ export const useStaffAllocations = (memberId: string | null) => {
           `)
           .eq('resource_id', memberId)
           .eq('company_id', company.id)
-          .gte('week_start_date', weekStartStr)
-          .lte('week_start_date', weekEndStr)
+          .gte('week_start_date', rangeStartStr)
+          .lte('week_start_date', rangeEndStr)
           .gt('hours', 0);
 
         if (error) {
@@ -80,7 +110,7 @@ export const useStaffAllocations = (memberId: string | null) => {
     };
 
     fetchAllocations();
-  }, [memberId, company?.id]);
+  }, [memberId, company?.id, timeRange]);
 
   return { allocations, isLoading };
 };

@@ -4,15 +4,17 @@ import { StaffSectionProps } from './types';
 import { StaffMemberCard } from './StaffMemberCard';
 import { StaffAllocationDialog } from './StaffAllocationDialog';
 import { useStaffAllocations } from './useStaffAllocations';
+import { TimeRange } from '../TimeRangeSelector';
 
-export const StaffSection: React.FC<StaffSectionProps> = ({
+export const StaffSection: React.FC<StaffSectionProps & { selectedTimeRange?: TimeRange }> = ({
   title,
   icon,
   members,
   colorScheme,
   showLimit,
   subtitle,
-  memberUtilizations
+  memberUtilizations,
+  selectedTimeRange
 }) => {
   const [selectedMember, setSelectedMember] = useState<typeof members[0] | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -25,7 +27,7 @@ export const StaffSection: React.FC<StaffSectionProps> = ({
      selectedMember.first_name && selectedMember.last_name ? 
      `${selectedMember.first_name}_${selectedMember.last_name}` : null) : null;
 
-  const { allocations, isLoading } = useStaffAllocations(memberId);
+  const { allocations, isLoading } = useStaffAllocations(memberId, selectedTimeRange);
 
   const handleMemberClick = (member: typeof members[0]) => {
     console.log('Selected member:', member);
@@ -78,6 +80,7 @@ export const StaffSection: React.FC<StaffSectionProps> = ({
         isLoading={isLoading}
         weeklyCapacity={selectedMember?.weekly_capacity || 40}
         utilizationRate={selectedMemberUtilization?.utilizationRate}
+        selectedTimeRange={selectedTimeRange}
       />
     </div>
   );
