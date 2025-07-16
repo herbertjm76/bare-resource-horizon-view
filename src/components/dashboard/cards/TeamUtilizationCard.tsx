@@ -43,7 +43,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         
         <div className="flex flex-col justify-between h-full">
           {/* Semicircle Gauge */}
-          <div className="flex items-center justify-center mb-6">
+          <div className="flex flex-col items-center justify-center mb-6">
             <div className="relative">
               <svg width="140" height="80" viewBox="0 0 140 80">
                 {/* Background semicircle */}
@@ -66,11 +66,10 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                   className="transition-all duration-700 ease-out"
                 />
               </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center mt-4">
-                  <div className="text-3xl font-bold text-gray-900">{Math.round(actualUtilizationRate)}%</div>
-                </div>
-              </div>
+            </div>
+            {/* Percentage text below the gauge */}
+            <div className="text-center mt-2">
+              <div className="text-3xl font-bold text-gray-900">{Math.round(actualUtilizationRate)}%</div>
             </div>
           </div>
           
