@@ -4,6 +4,9 @@ import { TeamUtilizationKPI } from './kpi/TeamUtilizationKPI';
 import { OverCapacityKPI } from './kpi/OverCapacityKPI';
 import { ActiveProjectsKPI } from './kpi/ActiveProjectsKPI';
 import { TeamSizeKPI } from './kpi/TeamSizeKPI';
+import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
+import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
+import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
@@ -58,6 +61,20 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         <OverCapacityKPI overCapacityHours={624} />
         <ActiveProjectsKPI activeProjects={activeProjects} activeResources={activeResources} />
         <TeamSizeKPI teamSize={activeResources} recommendHiring={true} />
+      </div>
+
+      {/* Second Row: The 3 Dashboard Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <UnifiedStaffStatusCard 
+          data={unifiedData}
+          selectedTimeRange={selectedTimeRange}
+        />
+        <UnifiedSmartInsightsCard 
+          data={unifiedData}
+        />
+        <UnifiedHolidayCard 
+          data={unifiedData}
+        />
       </div>
 
       {/* Analytics Charts - Project Status, Project Stages, Project Locations, Projects by PM */}
