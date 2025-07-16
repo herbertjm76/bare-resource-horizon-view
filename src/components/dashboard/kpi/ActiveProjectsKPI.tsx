@@ -1,18 +1,19 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Briefcase } from 'lucide-react';
 
-interface ProjectsCardProps {
-  activeProjects: number;
-  activeResources: number;
+interface ActiveProjectsKPIProps {
+  activeProjects?: number;
+  activeResources?: number;
 }
 
-export const ProjectsCard: React.FC<ProjectsCardProps> = ({
-  activeProjects,
-  activeResources
+export const ActiveProjectsKPI: React.FC<ActiveProjectsKPIProps> = ({
+  activeProjects = 54,
+  activeResources = 1
 }) => {
+  const projectsPerPerson = activeResources > 0 ? (activeProjects / activeResources).toFixed(1) : '0';
+
   return (
     <Card className="rounded-2xl glass-card glass-hover border-white/20">
       <CardContent className="p-4">
@@ -23,11 +24,7 @@ export const ProjectsCard: React.FC<ProjectsCardProps> = ({
             <Badge className="text-xs glass-card border-white/20 text-green-400 bg-green-500/20">
               Active
             </Badge>
-            <p className="text-sm font-medium text-white/80">
-              {activeResources > 0 
-                ? `${(activeProjects / activeResources).toFixed(1)} per person` 
-                : 'No team'}
-            </p>
+            <p className="text-sm font-medium text-white/80">{projectsPerPerson} per person</p>
           </div>
           <div className="h-10 w-10 rounded-xl glass-card flex items-center justify-center flex-shrink-0 ml-3">
             <Briefcase className="h-5 w-5 text-white/90" />

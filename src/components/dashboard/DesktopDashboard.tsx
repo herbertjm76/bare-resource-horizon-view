@@ -1,13 +1,9 @@
 
 import React from 'react';
-import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
-import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
-import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
-import { WorkloadHeatMapCard } from './cards/WorkloadHeatMapCard';
-import { TeamCapacityStatusCard } from './cards/TeamCapacityStatusCard';
-import { LeavePlanningCard } from './cards/LeavePlanningCard';
-import { ProjectPipelineHealthCard } from './cards/ProjectPipelineHealthCard';
-import { TeamCompositionCard } from './cards/TeamCompositionCard';
+import { TeamUtilizationKPI } from './kpi/TeamUtilizationKPI';
+import { OverCapacityKPI } from './kpi/OverCapacityKPI';
+import { ActiveProjectsKPI } from './kpi/ActiveProjectsKPI';
+import { TeamSizeKPI } from './kpi/TeamSizeKPI';
 import { AnalyticsSection } from './AnalyticsSection';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
@@ -39,7 +35,9 @@ interface DesktopDashboardProps {
 
 export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   selectedTimeRange,
-  mockData
+  mockData,
+  activeProjects,
+  activeResources
 }) => {
   // Get unified data from context
   const unifiedData = useUnifiedDashboardData();
@@ -54,28 +52,14 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* First Row: Staff Status, Smart Insights, Upcoming Holidays */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div>
-          <UnifiedStaffStatusCard 
-            data={unifiedData}
-            selectedTimeRange={selectedTimeRange}
-          />
-        </div>
-        <div>
-          <UnifiedSmartInsightsCard 
-            data={unifiedData}
-          />
-        </div>
-        <div>
-          <UnifiedHolidayCard 
-            data={unifiedData}
-          />
-        </div>
+      {/* First Row: KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <TeamUtilizationKPI utilizationRate={165} />
+        <OverCapacityKPI overCapacityHours={624} />
+        <ActiveProjectsKPI activeProjects={activeProjects} activeResources={activeResources} />
+        <TeamSizeKPI teamSize={activeResources} recommendHiring={true} />
       </div>
 
-
-      
       {/* Analytics Charts - Project Status, Project Stages, Project Locations, Projects by PM */}
       <AnalyticsSection mockData={analyticsData} />
     </div>
