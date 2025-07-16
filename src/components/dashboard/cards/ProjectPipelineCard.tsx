@@ -53,7 +53,7 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
     {
       label: 'Active',
       count: projectStats.inProgress.count,
-      color: '#E5E7EB',
+      color: '#FDFDFD',
       textColor: 'text-gray-900'
     },
     {
@@ -93,7 +93,7 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#E5E7EB' }}></div>
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#FDFDFD', border: '1px solid #E5E7EB' }}></div>
                 <span className="text-gray-600">Active</span>
               </div>
               <span className="font-semibold text-gray-900">{projectStats.inProgress.count}</span>
