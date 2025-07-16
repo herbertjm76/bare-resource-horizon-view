@@ -57,18 +57,18 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
     <div className="space-y-6">
       {/* First Row: New Dashboard Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <TeamUtilizationCard score={42} status="Over Capacity" />
-        <WorkloadCard />
-        <TeamLeaveCard />
+        <TeamUtilizationCard 
+          utilizationRate={unifiedData.currentUtilizationRate} 
+          utilizationStatus={unifiedData.utilizationStatus}
+        />
+        <WorkloadCard 
+          projects={unifiedData.projects}
+        />
+        <TeamLeaveCard 
+          teamMembers={unifiedData.teamMembers}
+        />
         <ProjectPipelineCard 
-          score={62}
-          maxScore={100}
-          healthStatus="Moderate"
-          projectStats={{
-            inProgress: { count: 3, percentage: 6 },
-            planning: { count: 50, percentage: 93 },
-            complete: { count: 1, percentage: 2 }
-          }}
+          projects={unifiedData.projects}
         />
       </div>
 

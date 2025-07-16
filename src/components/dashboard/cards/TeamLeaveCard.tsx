@@ -4,26 +4,39 @@ import { Calendar } from 'lucide-react';
 
 interface TeamLeaveCardProps {
   leaveData?: number[];
+  teamMembers?: any[];
 }
 
 export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
-  leaveData
+  leaveData,
+  teamMembers = []
 }) => {
-  // Sample leave data for the week
-  const defaultData = [12, 8, 15, 22, 18, 25, 30];
-  const data = leaveData || defaultData;
+  // Generate leave data based on team size and trends
+  const generateLeaveData = () => {
+    const teamSize = teamMembers.length || 1;
+    const baseLeave = teamSize * 2; // Base 2 hours per person per day
+    
+    return Array.from({ length: 7 }, (_, index) => {
+      // Create realistic leave patterns (lower on weekends, higher mid-week)
+      const dayMultiplier = index === 0 || index === 6 ? 0.3 : 1; // Weekend reduction
+      const variation = Math.random() * 0.5 + 0.75; // 75-125% variation
+      return Math.round(baseLeave * dayMultiplier * variation);
+    });
+  };
+  
+  const data = leaveData || generateLeaveData();
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
-  const maxValue = Math.max(...data);
+  const maxValue = Math.max(...data, 10); // Ensure minimum scale
   const minValue = Math.min(...data);
 
   return (
-    <Card className="rounded-2xl glass-card glass-hover border-white/20">
+    <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-white/70" />
-            <span className="text-xs font-semibold text-white/90 tracking-wide">TEAM LEAVE</span>
+            <Calendar className="h-4 w-4 text-gray-600" />
+            <span className="text-xs font-semibold text-gray-700 tracking-wide">TEAM LEAVE</span>
           </div>
         </div>
         
@@ -39,7 +52,7 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                   y1={96 - y}
                   x2="280"
                   y2={96 - y}
-                  stroke="rgba(255,255,255,0.1)"
+                  stroke="rgba(0,0,0,0.1)"
                   strokeWidth="1"
                 />
               ))}
@@ -77,14 +90,14 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
           </div>
           
           {/* Day labels */}
-          <div className="grid grid-cols-7 gap-1 text-xs text-white/60 text-center">
+          <div className="grid grid-cols-7 gap-1 text-xs text-gray-500 text-center">
             {days.map(day => (
               <span key={day}>{day}</span>
             ))}
           </div>
           
           <div className="text-center pt-2">
-            <span className="text-xs text-white/60">This Month</span>
+            <span className="text-xs text-gray-500">This Month</span>
           </div>
         </div>
       </CardContent>
