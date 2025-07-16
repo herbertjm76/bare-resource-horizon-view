@@ -74,14 +74,8 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         </div>
       </div>
 
-      {/* Second Row: 6-Card Dashboard Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-6">
-        <div>
-          <UnifiedStaffStatusCard 
-            data={unifiedData}
-            selectedTimeRange={selectedTimeRange}
-          />
-        </div>
+      {/* Second Row: 5-Card Dashboard Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 gap-6">
         <div>
           <TeamCapacityStatusCard 
             data={unifiedData}
