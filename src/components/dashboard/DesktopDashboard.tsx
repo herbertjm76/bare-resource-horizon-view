@@ -8,6 +8,7 @@ import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
 import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { AnalyticsSection } from './AnalyticsSection';
+import { LoadingDashboard } from './LoadingDashboard';
 import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
 
@@ -44,6 +45,11 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 }) => {
   // Get unified data from context
   const unifiedData = useUnifiedDashboardData();
+
+  // Show loading state while core data is loading
+  if (unifiedData.isLoading) {
+    return <LoadingDashboard />;
+  }
 
   // Prepare analytics data for separate section - using the correct property names
   const analyticsData = {

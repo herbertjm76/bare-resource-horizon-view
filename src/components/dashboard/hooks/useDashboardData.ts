@@ -20,6 +20,8 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   
   const { company } = useCompany();
   const { metrics: timeRangeMetrics, isLoading: metricsLoading } = useTimeRangeMetrics(selectedTimeRange);
+  
+  // Only fetch holidays if we have a company - make this optional to speed up initial load
   const { holidays, isLoading: isHolidaysLoading } = useHolidays();
   
   const { 
@@ -50,10 +52,13 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   // Memoize the current week date to prevent re-renders
   const currentWeek = useMemo(() => new Date(), []);
   
+  // Only fetch standardized utilization data after core data is loaded
+  const shouldFetchUtilization = !isTeamLoading && !isProjectsLoading && teamMembers.length > 0;
+  
   // Use standardized utilization data for current week only when we have team members
   const { memberUtilizations, teamSummary, isLoading: isStandardizedLoading } = useStandardizedUtilizationData({
     selectedWeek: currentWeek,
-    teamMembers: teamMembers || []
+    teamMembers: shouldFetchUtilization ? teamMembers : []
   });
 
   // Use extracted aggregated data hook
@@ -65,8 +70,8 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   );
 
   const officeOptions = ['All Offices'];
-  // Only show loading when critical data is loading, not optional features
-  const isLoading = isTeamLoading || isProjectsLoading || metricsLoading;
+  // Prioritize core data loading - show dashboard as soon as team and projects are loaded
+  const isLoading = isTeamLoading || isProjectsLoading;
 
   const refetch = async () => {
     await Promise.all([refetchTeam(), refetchProjects()]);

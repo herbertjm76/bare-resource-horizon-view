@@ -19,6 +19,8 @@ export const useStandardizedUtilizationData = ({ selectedWeek, teamMembers }: Us
   useEffect(() => {
     const fetchUtilizationData = async () => {
       if (!company?.id || !teamMembers.length) {
+        setMemberUtilizations([]);
+        setTeamSummary(null);
         setIsLoading(false);
         return;
       }

@@ -19,8 +19,8 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   utilizationStatus
 }) => {
   // Determine status and color based on utilization rate, fallback to reasonable default
-  const finalStatus = status || utilizationStatus?.status || (utilizationRate && utilizationRate > 100 ? "Over Capacity" : "Normal");
-  const actualUtilizationRate = utilizationRate || 75; // Fallback to reasonable default
+  const finalStatus = status || utilizationStatus?.status || (utilizationRate && utilizationRate > 100 ? "Over Capacity" : "Optimal");
+  const actualUtilizationRate = utilizationRate || 75; // Show a reasonable default while loading
   const isOverCapacity = actualUtilizationRate > 100;
   
   // Calculate semicircle progress (180 degrees max)
