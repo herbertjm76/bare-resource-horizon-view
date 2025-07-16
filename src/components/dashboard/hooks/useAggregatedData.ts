@@ -7,10 +7,11 @@ export const useAggregatedData = (
   teamMembers: any[],
   preRegisteredMembers: any[],
   timeRangeMetrics: any,
-  currentUtilizationRate: number
+  currentUtilizationRate: number,
+  memberUtilizations?: any[]
 ) => {
   return useMemo(() => {
-    const transformedStaffData = combineStaffData(teamMembers, preRegisteredMembers);
+    const transformedStaffData = combineStaffData(teamMembers, preRegisteredMembers, memberUtilizations);
     const totalTeamSize = transformedStaffData.length;
     const mockData = createMockData(timeRangeMetrics);
     const smartInsightsData = createSmartInsightsData(
@@ -26,5 +27,5 @@ export const useAggregatedData = (
       mockData,
       smartInsightsData
     };
-  }, [teamMembers, preRegisteredMembers, timeRangeMetrics, currentUtilizationRate]);
+  }, [teamMembers, preRegisteredMembers, timeRangeMetrics, currentUtilizationRate, memberUtilizations]);
 };

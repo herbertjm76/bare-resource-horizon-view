@@ -181,12 +181,13 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     };
   }, [chatGPTData, fallbackTrends]);
 
-  // Use aggregated data hook for non-utilization data
+  // Use aggregated data hook for non-utilization data - now with real utilization data
   const { transformedStaffData, totalTeamSize, mockData, smartInsightsData } = useAggregatedData(
     teamMembers,
     preRegisteredMembers,
     timeRangeMetrics,
-    currentUtilizationRate
+    currentUtilizationRate,
+    memberUtilizations // Pass real utilization data
   );
 
   const officeOptions = ['All Offices'];
@@ -212,6 +213,23 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     fallbackUtilizationRate,
     isLoading
   });
+
+  // Debug Paul Julius data consistency across all sources
+  const paulMemberUtilization = memberUtilizations.find(m => 
+    m.memberName?.includes('Paul') || m.memberName?.includes('Julius')
+  );
+  const paulTransformedStaff = transformedStaffData.find(m => 
+    m.name?.includes('Paul') || m.first_name?.includes('Paul')
+  );
+  
+  if (paulMemberUtilization || paulTransformedStaff) {
+    console.log('🔍 PAUL JULIUS DATA CONSISTENCY CHECK:', {
+      timeRange: selectedTimeRange,
+      memberUtilizations_Paul: paulMemberUtilization,
+      transformedStaffData_Paul: paulTransformedStaff,
+      shouldMatch: 'Both should show same utilization/availability for Paul Julius'
+    });
+  }
 
   // Error handling for ChatGPT failure
   if (chatGPTError) {
