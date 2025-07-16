@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BarChart3, TrendingUp } from 'lucide-react';
+import { ProjectPipelineBubbleGraph } from './ProjectPipelineBubbleGraph';
 
 interface ProjectPipelineCardProps {
   projects?: any[];
@@ -45,34 +46,29 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
 
   const projectStats = calculateProjectStats();
   
-  // Fixed health score as requested
-  const score = 62;
-  
-  const getHealthStatus = (score: number) => {
-    if (score >= 80) return "Excellent";
-    if (score >= 60) return "Good";
-    if (score >= 40) return "Moderate";
-    return "Needs Attention";
-  };
-
-  const healthStatus = getHealthStatus(score);
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'excellent':
-        return 'bg-green-100 text-green-700 border-green-200';
-      case 'good':
-        return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'moderate':
-        return 'bg-orange-100 text-orange-700 border-orange-200';
-      case 'needs attention':
-        return 'bg-red-100 text-red-700 border-red-200';
-      default:
-        return 'bg-orange-100 text-orange-700 border-orange-200';
-    }
-  };
-
   const totalProjects = projects.length;
+  
+  // Prepare bubble data for the bubble graph
+  const bubbleData = [
+    {
+      label: 'Active',
+      count: projectStats.inProgress.count,
+      color: '#E5E7EB',
+      textColor: 'text-gray-900'
+    },
+    {
+      label: 'Planning',
+      count: projectStats.planning.count,
+      color: '#6B65F7',
+      textColor: 'text-white'
+    },
+    {
+      label: 'Complete',
+      count: projectStats.complete.count,
+      color: '#5A68F6',
+      textColor: 'text-white'
+    }
+  ];
   
   return (
     <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
@@ -91,64 +87,33 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
             <div className="text-xs text-gray-500 font-medium">Total Projects</div>
           </div>
           
-          {/* Bar Graph showing project distribution */}
+          {/* Bubble Graph showing project distribution */}
           <div className="mb-6">
-            <div className="relative h-8 bg-gray-100 rounded-full overflow-hidden">
-              {totalProjects > 0 ? (
-                <>
-                  {/* Done section */}
-                  <div 
-                    className="absolute left-0 top-0 h-full transition-all duration-500"
-                    style={{ 
-                      width: `${projectStats.complete.percentage}%`,
-                      backgroundColor: '#5A68F6'
-                    }}
-                  />
-                  {/* Planning section */}
-                  <div 
-                    className="absolute top-0 h-full transition-all duration-500"
-                    style={{ 
-                      left: `${projectStats.complete.percentage}%`,
-                      width: `${projectStats.planning.percentage}%`,
-                      backgroundColor: '#6B65F7'
-                    }}
-                  />
-                  {/* Active section */}
-                  <div 
-                    className="absolute top-0 h-full transition-all duration-500"
-                    style={{ 
-                      left: `${projectStats.complete.percentage + projectStats.planning.percentage}%`,
-                      width: `${projectStats.inProgress.percentage}%`,
-                      backgroundColor: '#FDFDFD',
-                      border: '1px solid #E5E7EB'
-                    }}
-                  />
-                </>
-              ) : (
-                <div className="w-full h-full bg-gray-200" />
-              )}
-            </div>
+            <ProjectPipelineBubbleGraph 
+              bubbleData={bubbleData}
+              totalProjects={totalProjects}
+            />
           </div>
           
           {/* Legend */}
           <div className="space-y-2 mb-4">
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#FDFDFD', border: '1px solid #E5E7EB' }}></div>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#E5E7EB' }}></div>
                 <span className="text-gray-600">Active</span>
               </div>
               <span className="font-semibold text-gray-900">{projectStats.inProgress.count}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#6B65F7' }}></div>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
                 <span className="text-gray-600">Planning</span>
               </div>
               <span className="font-semibold text-gray-900">{projectStats.planning.count}</span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: '#5A68F6' }}></div>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
                 <span className="text-gray-600">Done</span>
               </div>
               <span className="font-semibold text-gray-900">{projectStats.complete.count}</span>
