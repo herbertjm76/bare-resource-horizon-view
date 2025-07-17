@@ -83,51 +83,29 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
         
         {/* Main content - flex-1 to fill remaining space */}
         <div className="flex-1 flex flex-col">
-          {/* Bubble Graph and Legend - main content area */}
-          <div className="flex-1 flex items-center justify-between gap-2">
-            <div className="flex-1 h-full flex items-center justify-center">
-              <ProjectPipelineBubbleGraph 
-                bubbleData={bubbleData}
-                totalProjects={totalProjects}
-              />
-            </div>
-            
-            {/* Legend - compact vertical layout */}
-            <div className="flex flex-col gap-1">
+          {/* Bubble Graph - main content area without side legend */}
+          <div className="flex-1 flex items-center justify-center">
+            <ProjectPipelineBubbleGraph 
+              bubbleData={bubbleData}
+              totalProjects={totalProjects}
+            />
+          </div>
+          
+          {/* Bottom section with legend and time badge */}
+          <div className="space-y-2 mt-2">
+            {/* Legend - horizontal layout at bottom */}
+            <div className="flex justify-center gap-4">
               <div className="flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                <div className="w-2 h-2 rounded-full bg-white border border-gray-300"></div>
                 <span className="text-[9px] text-gray-600">Active</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
                 <span className="text-[9px] text-gray-600">Plan</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
                 <span className="text-[9px] text-gray-600">Done</span>
-              </div>
-            </div>
-          </div>
-          
-          {/* Enhanced bottom section with KPIs and time badge */}
-          <div className="space-y-2 mt-2">
-            {/* KPI metrics row */}
-            <div className="flex justify-between items-center px-1">
-              <div className="text-center">
-                <div className="text-xs font-semibold text-gray-700">{totalProjects}</div>
-                <div className="text-[8px] text-gray-500">Total</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xs font-semibold text-gray-700">{projectStats.inProgress.count}</div>
-                <div className="text-[8px] text-gray-500">Active</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xs font-semibold text-gray-700">{projectStats.planning.count}</div>
-                <div className="text-[8px] text-gray-500">Planning</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xs font-semibold text-gray-700">{projectStats.complete.count}</div>
-                <div className="text-[8px] text-gray-500">Complete</div>
               </div>
             </div>
             
