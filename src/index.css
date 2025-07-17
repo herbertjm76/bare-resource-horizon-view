@@ -45,11 +45,11 @@
     --brand-gray: 142 145 150;
     --brand-border: 240 240 244;
     
-    /* Purple shades for summary cards */
-    --purple-1: 263 45% 95%;     /* Light purple background */
-    --purple-2: 263 45% 85%;     /* Medium light purple */
-    --purple-3: 263 45% 75%;     /* Medium purple */
-    --purple-4: 263 45% 65%;     /* Darker purple */
+    /* Subtle purple gradient backgrounds for dashboard cards */
+    --card-gradient-1: 263 25% 97%;     /* Very light purple */
+    --card-gradient-2: 263 20% 95%;     /* Light purple */
+    --card-gradient-3: 263 15% 93%;     /* Medium light purple */
+    --card-gradient-4: 263 12% 91%;     /* Slightly darker purple */
     
     /* Semantic color tokens */
     --text-primary: 31 41 55;

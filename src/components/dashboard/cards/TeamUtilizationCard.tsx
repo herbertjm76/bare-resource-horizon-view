@@ -32,7 +32,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   const strokeDashoffset = circumference - (angle / 180) * circumference;
 
   return (
-    <Card className="rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+    <Card className="rounded-2xl bg-card-gradient-1 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">

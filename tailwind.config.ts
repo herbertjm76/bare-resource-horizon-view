@@ -54,10 +54,10 @@ export default {
         "border-focus": "#6465F0",
         
         // Purple shades for summary cards
-        "purple-1": "hsl(var(--purple-1))",
-        "purple-2": "hsl(var(--purple-2))",
-        "purple-3": "hsl(var(--purple-3))",
-        "purple-4": "hsl(var(--purple-4))",
+        "card-gradient-1": "hsl(var(--card-gradient-1))",
+        "card-gradient-2": "hsl(var(--card-gradient-2))",
+        "card-gradient-3": "hsl(var(--card-gradient-3))",
+        "card-gradient-4": "hsl(var(--card-gradient-4))",
         
         primary: {
           DEFAULT: "hsl(var(--primary))",

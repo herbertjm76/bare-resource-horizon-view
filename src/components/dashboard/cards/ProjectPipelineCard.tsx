@@ -73,12 +73,12 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
   ];
   
   return (
-    <Card className="rounded-xl border-0 shadow-sm h-full" style={{ background: 'linear-gradient(135deg, #EC4899, #BE185D)' }}>
+    <Card className="rounded-2xl bg-card-gradient-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
       <CardContent className="p-3 h-full flex flex-col">
         {/* Header */}
         <div className="flex items-center gap-1.5 mb-2">
-          <BarChart3 className="h-3.5 w-3.5 text-white/90" />
-          <span className="text-[10px] font-medium text-white/90 tracking-wider">PROJECT PIPELINE</span>
+          <BarChart3 className="h-3.5 w-3.5 text-gray-600" />
+          <span className="text-[10px] font-medium text-gray-700 tracking-wider">PROJECT PIPELINE</span>
         </div>
         
         {/* Main content - flex-1 to fill remaining space */}
@@ -96,22 +96,22 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-1">
                 <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
-                <span className="text-[9px] text-white/80">Active</span>
+                <span className="text-[9px] text-gray-600">Active</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
-                <span className="text-[9px] text-white/80">Plan</span>
+                <span className="text-[9px] text-gray-600">Plan</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
-                <span className="text-[9px] text-white/80">Done</span>
+                <span className="text-[9px] text-gray-600">Done</span>
               </div>
             </div>
           </div>
           
           {/* Time range badge at bottom */}
           <div className="flex justify-center mt-1">
-            <span className="text-[10px] text-white/70">{timeRange}</span>
+            <span className="text-[10px] text-gray-500">{timeRange}</span>
           </div>
         </div>
       </CardContent>

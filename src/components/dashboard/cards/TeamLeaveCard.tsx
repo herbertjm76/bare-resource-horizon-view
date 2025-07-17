@@ -45,11 +45,11 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
   const minValue = Math.min(...data);
 
   return (
-    <Card className="rounded-xl border-0 shadow-sm h-full" style={{ background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)' }}>
+    <Card className="rounded-2xl bg-card-gradient-3 border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
       <CardContent className="p-3 h-full flex flex-col">
         <div className="flex items-center gap-1.5 mb-2">
-          <Calendar className="h-3.5 w-3.5 text-white/90" />
-          <span className="text-[10px] font-medium text-white/90 tracking-wider">TEAM LEAVE</span>
+          <Calendar className="h-3.5 w-3.5 text-gray-600" />
+          <span className="text-[10px] font-medium text-gray-700 tracking-wider">TEAM LEAVE</span>
         </div>
         
         <div className="flex-1 flex flex-col">
@@ -59,8 +59,8 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
               {/* Define gradient for area fill */}
               <defs>
                 <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(255,255,255,0.4)" stopOpacity="1"/>
-                  <stop offset="100%" stopColor="rgba(255,255,255,0.1)" stopOpacity="0"/>
+                  <stop offset="0%" stopColor="rgba(107, 114, 128, 0.4)" stopOpacity="1"/>
+                  <stop offset="100%" stopColor="rgba(107, 114, 128, 0.1)" stopOpacity="0"/>
                 </linearGradient>
               </defs>
               
@@ -78,7 +78,7 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
               {/* Line chart */}
               <polyline
                 fill="none"
-                stroke="white"
+                stroke="rgb(107, 114, 128)"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -99,7 +99,7 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                     cx={x}
                     cy={y}
                     r="2"
-                    fill="white"
+                    fill="rgb(107, 114, 128)"
                     className="drop-shadow-sm"
                   />
                 );
@@ -108,14 +108,14 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
           </div>
           
           {/* Day labels */}
-          <div className="grid grid-cols-7 gap-0.5 text-[9px] text-white/70 text-center mt-1">
+          <div className="grid grid-cols-7 gap-0.5 text-[9px] text-gray-500 text-center mt-1">
             {days.map(day => (
               <span key={day}>{day}</span>
             ))}
           </div>
           
           <div className="text-center mt-1">
-            <span className="text-[10px] text-white/70">This Month</span>
+            <span className="text-[10px] text-gray-500">This Month</span>
           </div>
         </div>
       </CardContent>
