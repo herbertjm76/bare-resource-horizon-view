@@ -7,19 +7,17 @@ import { DashboardHeader } from './DashboardHeader';
 import { ModernDashboardHeader } from './ModernDashboardHeader';
 import { ExecutiveSummaryCard } from './ExecutiveSummaryCard';
 import { DashboardLoadingState } from './DashboardLoadingState';
-import { UnifiedDashboardProvider, useUnifiedDashboardData } from './UnifiedDashboardProvider';
-import { useDashboardCache } from './hooks/useDashboardCache';
+import { UnifiedDashboardProvider } from './UnifiedDashboardProvider';
+import { useDashboardData } from './hooks/useDashboardData';
 import { toast } from "sonner";
 import { TimeRange } from './TimeRangeSelector';
-
 
 export const DashboardMetrics = () => {
   const isMobile = useIsMobile();
   const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>('month');
-  const { preloadData } = useDashboardCache();
 
-  // Show toast when time range changes and preload next likely range
-  const handleTimeRangeChange = async (newRange: TimeRange) => {
+  // Show toast when time range changes
+  const handleTimeRangeChange = (newRange: TimeRange) => {
     setSelectedTimeRange(newRange);
     
     const rangeText = {
@@ -32,15 +30,6 @@ export const DashboardMetrics = () => {
     }[newRange];
     
     toast.success(`Dashboard updated to show data for ${rangeText}`);
-
-    // Preload commonly accessed ranges for better UX
-    setTimeout(async () => {
-      if (newRange === 'month') {
-        await preloadData('week');
-      } else if (newRange === 'week') {
-        await preloadData('month');
-      }
-    }, 1000);
   };
 
   return (
@@ -54,27 +43,33 @@ export const DashboardMetrics = () => {
   );
 };
 
-// Simplified dashboard content component that uses the optimized context
+// Separate component to access the unified data context
 const DashboardContent: React.FC<{
   isMobile: boolean;
   selectedTimeRange: TimeRange;
   handleTimeRangeChange: (newRange: TimeRange) => void;
 }> = ({ isMobile, selectedTimeRange, handleTimeRangeChange }) => {
-  // Use the optimized data from the provider
-  const dashboardData = useUnifiedDashboardData();
-
+  const dashboardData = useDashboardData(selectedTimeRange);
   const {
     selectedOffice,
     setSelectedOffice,
     teamMembers,
-    activeProjects,
-    currentUtilizationRate,
+    transformedStaffData,
+    utilizationTrends,
+    metrics,
     officeOptions,
-    isLoading
+    mockData,
+    isLoading,
+    activeProjects,
+    currentUtilizationRate
   } = dashboardData;
 
+  // Use ChatGPT-powered utilization data from unified dashboard
+  const utilizationRate = currentUtilizationRate;
+  const isUtilizationLoading = false; // Already handled in unified loading state
+
   // Show loading state with skeleton
-  if (isLoading) {
+  if (isLoading || isUtilizationLoading) {
     return <DashboardLoadingState />;
   }
 
@@ -91,7 +86,7 @@ const DashboardContent: React.FC<{
           totalTeamMembers={totalTeamMembers}
           totalActiveProjects={totalActiveProjects}
           totalOffices={totalOffices}
-          utilizationRate={currentUtilizationRate}
+          utilizationRate={utilizationRate}
         />
       </div>
 
