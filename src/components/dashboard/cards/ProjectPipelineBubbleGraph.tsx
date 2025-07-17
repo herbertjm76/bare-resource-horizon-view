@@ -26,23 +26,23 @@ export const ProjectPipelineBubbleGraph: React.FC<ProjectPipelineBubbleGraphProp
     return Math.max(minSize, Math.min(maxSize, minSize + (ratio * (maxSize - minSize))));
   };
 
-  // Position bubbles with less overlapping (spread out more)
+  // Position bubbles with maximum separation (no overlapping)
   const bubblePositions = [
-    { x: 35, y: 35 },  // Active - further left
-    { x: 85, y: 35 },  // Planning - further right  
-    { x: 60, y: 65 }   // Complete - lower position
+    { x: 25, y: 30 },  // Active - far left
+    { x: 95, y: 30 },  // Planning - far right  
+    { x: 60, y: 75 }   // Complete - bottom center with more separation
   ];
 
   // Position text to match bubble positions
   const textPositions = [
-    { x: 35, y: 35 },  // Active - centered on bubble
-    { x: 85, y: 35 },  // Planning - centered on bubble
-    { x: 60, y: 65 }   // Complete - centered on bubble
+    { x: 25, y: 30 },  // Active - centered on bubble
+    { x: 95, y: 30 },  // Planning - centered on bubble
+    { x: 60, y: 75 }   // Complete - centered on bubble
   ];
 
   return (
-    <div className="relative w-full h-24 flex items-center justify-center">
-      <svg width="160" height="80" viewBox="0 0 160 80" className="overflow-visible">
+    <div className="relative w-full h-28 flex items-center justify-center">
+      <svg width="160" height="90" viewBox="0 0 160 90" className="overflow-visible">
         {bubbleData.map((bubble, index) => {
           const size = getBubbleSize(bubble.count);
           const bubblePosition = bubblePositions[index];
