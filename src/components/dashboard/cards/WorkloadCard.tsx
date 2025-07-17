@@ -99,6 +99,18 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
 
   // Generate workload data based on time range using REAL data from database
   const generateWorkload = () => {
+    console.log('🔍 WORKLOAD CARD - Generating workload data:', {
+      teamResourcesCount: teamResources.length,
+      teamMembersCount: teamMembers.length,
+      preRegisteredCount: preRegisteredMembers.length,
+      memberUtilizationsCount: memberUtilizations?.length || 0,
+      memberUtilizationsData: memberUtilizations?.map(m => ({
+        id: m.id,
+        utilizationRate: m.utilizationRate,
+        projectHours: m.projectHours
+      })) || []
+    });
+
     return teamResources.map((resource, index) => {
       // Get the actual team member from the combined resources
       let actualMember;
@@ -110,31 +122,34 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
       
       // Use the REAL memberUtilizations data directly
       let utilizationRate = 0;
-      if (actualMember && memberUtilizations) {
+      if (actualMember && memberUtilizations && memberUtilizations.length > 0) {
         const memberData = memberUtilizations.find(m => m.id === actualMember.id);
         utilizationRate = memberData?.utilizationRate || 0;
         
-        // Debug log for tracking real data usage
-        if (memberData && (memberData.id === 'b06b0c9d-70c5-49cd-aae9-fcf9016ebe82' || actualMember.first_name?.includes('Paul'))) {
-          console.log('🔍 WORKLOAD CARD - Real database data for Paul Julius:', {
-            memberName: `${actualMember.first_name} ${actualMember.last_name}`,
-            memberId: memberData.id,
-            utilizationRate: memberData.utilizationRate,
-            projectHours: memberData.projectHours,
-            weeklyCapacity: memberData.weeklyCapacity,
-            totalAllocatedHours: memberData.totalAllocatedHours,
-            annualLeave: memberData.annualLeave,
-            source: 'REAL DATABASE DATA'
-          });
-        }
+        console.log('🔍 WORKLOAD CARD - Member data found:', {
+          memberName: `${actualMember.first_name} ${actualMember.last_name}`,
+          memberId: actualMember.id,
+          foundMemberData: !!memberData,
+          utilizationRate: memberData?.utilizationRate,
+          projectHours: memberData?.projectHours,
+          weeklyCapacity: memberData?.weeklyCapacity,
+          source: 'REAL DATABASE DATA'
+        });
+      } else {
+        console.log('🔍 WORKLOAD CARD - No member data available:', {
+          memberName: actualMember ? `${actualMember.first_name} ${actualMember.last_name}` : 'Unknown',
+          hasActualMember: !!actualMember,
+          hasMemberUtilizations: !!memberUtilizations,
+          memberUtilizationsLength: memberUtilizations?.length || 0
+        });
       }
       
-      // For different time periods, show consistent data based on real utilization
-      // with minimal realistic variation rather than random changes
+      // For different time periods, show the real utilization rate
+      // with MINIMAL variation to represent different weeks/months
       return Array.from({ length: timeConfig.periods.length }, (_, periodIndex) => {
-        // Use real utilization with very small variation (±5%) to show realistic data
-        const variation = (Math.random() - 0.5) * 10; // ±5% variation
-        return Math.max(0, utilizationRate + variation);
+        // Use real utilization with tiny variation (±2%) for different periods
+        const minimalVariation = (Math.random() - 0.5) * 4; // ±2% variation
+        return Math.max(0, utilizationRate + minimalVariation);
       });
     });
   };
@@ -142,21 +157,15 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   const workloadMatrix = generateWorkload();
   
   const getIntensityColor = (intensity: number) => {
-    // Green for good utilization (80-120%)
-    if (intensity >= 80 && intensity <= 120) return 'bg-green-500';
-    
-    // Purple shades for under-utilization
-    if (intensity < 80) {
-      if (intensity <= 20) return 'bg-purple-600';
-      if (intensity <= 40) return 'bg-purple-500';
-      if (intensity <= 60) return 'bg-purple-400';
-      return 'bg-purple-300';
-    }
-    
-    // Purple shades for over-utilization
-    if (intensity <= 140) return 'bg-purple-400';
-    if (intensity <= 160) return 'bg-purple-500';
-    return 'bg-purple-600';
+    // Color mapping for better visualization
+    if (intensity <= 0) return 'bg-gray-200'; // No work
+    if (intensity <= 30) return 'bg-blue-200'; // Very low utilization
+    if (intensity <= 60) return 'bg-blue-400'; // Low utilization  
+    if (intensity <= 80) return 'bg-yellow-400'; // Moderate utilization
+    if (intensity <= 100) return 'bg-green-500'; // Good utilization (80-100%)
+    if (intensity <= 120) return 'bg-orange-400'; // High but manageable
+    if (intensity <= 150) return 'bg-red-400'; // Over-utilized
+    return 'bg-red-600'; // Severely over-utilized
   };
 
   return (
@@ -218,11 +227,11 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           <div className="flex items-center justify-between text-xs text-gray-500 mt-4 mb-2">
             <span>Under-utilized</span>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-purple-600"></div>
-              <div className="w-3 h-3 rounded-sm bg-purple-400"></div>
+              <div className="w-3 h-3 rounded-sm bg-blue-200"></div>
+              <div className="w-3 h-3 rounded-sm bg-yellow-400"></div>
               <div className="w-3 h-3 rounded-sm bg-green-500"></div>
-              <div className="w-3 h-3 rounded-sm bg-purple-400"></div>
-              <div className="w-3 h-3 rounded-sm bg-purple-600"></div>
+              <div className="w-3 h-3 rounded-sm bg-orange-400"></div>
+              <div className="w-3 h-3 rounded-sm bg-red-600"></div>
             </div>
             <span>Over-utilized</span>
           </div>
