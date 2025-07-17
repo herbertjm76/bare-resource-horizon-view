@@ -6,7 +6,7 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
+    --card: 263 45% 95%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
@@ -46,10 +46,10 @@
     --brand-border: 240 240 244;
     
     /* Purple shades for summary cards */
-    --purple-1: 0 0% 99%;        /* #FDFDFD */
-    --purple-2: 244 89% 68%;     /* #6B65F7 */
-    --purple-3: 236 89% 67%;     /* #5A68F6 */
-    --purple-4: 311 69% 58%;     /* #D552CA */
+    --purple-1: 263 45% 95%;     /* Light purple background */
+    --purple-2: 263 45% 85%;     /* Medium light purple */
+    --purple-3: 263 45% 75%;     /* Medium purple */
+    --purple-4: 263 45% 65%;     /* Darker purple */
     
     /* Semantic color tokens */
     --text-primary: 31 41 55;
@@ -59,9 +59,9 @@
     --text-brand: 111 75 246;
     
     --bg-primary: 255 255 255;
-    --bg-secondary: 249 250 251;
-    --bg-tertiary: 243 244 246;
-    --bg-accent: 236 236 251;
+    --bg-secondary: 263 45% 98%;
+    --bg-tertiary: 263 45% 95%;
+    --bg-accent: 263 45% 92%;
     --bg-inverse: 31 41 55;
     
     --border-primary: 229 231 235;
