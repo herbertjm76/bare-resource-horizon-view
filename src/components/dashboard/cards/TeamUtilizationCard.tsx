@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -135,12 +134,9 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               ))}
             </svg>
             
-            {/* Center content */}
+            {/* Center content - only percentage */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="text-4xl font-bold text-foreground mb-2">{Math.round(actualUtilizationRate)}%</div>
-              <Badge className="text-xs bg-background/50 text-muted-foreground border-muted">
-                {finalStatus}
-              </Badge>
+              <div className="text-4xl font-bold text-foreground">{Math.round(actualUtilizationRate)}%</div>
             </div>
           </div>
 
