@@ -94,18 +94,18 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
           {/* Bottom section with legend and time badge */}
           <div className="space-y-2 mt-2">
             {/* Legend - horizontal layout at bottom */}
-            <div className="flex justify-center gap-4">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-white border border-gray-300"></div>
-                <span className="text-[9px] text-gray-600">Active</span>
+            <div className="flex justify-center gap-6">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full bg-white border border-gray-300"></div>
+                <span className="text-sm text-gray-600">Active</span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
-                <span className="text-[9px] text-gray-600">Plan</span>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
+                <span className="text-sm text-gray-600">Plan</span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
-                <span className="text-[9px] text-gray-600">Done</span>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
+                <span className="text-sm text-gray-600">Done</span>
               </div>
             </div>
             
