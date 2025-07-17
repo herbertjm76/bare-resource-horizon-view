@@ -6,21 +6,18 @@ import { Calendar } from 'lucide-react';
 interface TeamLeaveCardProps {
   leaveData?: number[];
   teamMembers?: any[];
-}
-
-interface TeamLeaveCardProps {
-  leaveData?: number[];
-  teamMembers?: any[];
   memberUtilizations?: any[];
+  viewType?: 'week' | 'month' | 'quarter';
 }
 
 export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
   leaveData,
   teamMembers = [],
-  memberUtilizations = []
+  memberUtilizations = [],
+  viewType = 'month'
 }) => {
-  // Generate leave data based on real data if available
-  const generateLeaveData = () => {
+  // Generate leave data based on view type
+  const generateLeaveData = (view: string) => {
     const teamSize = teamMembers.length || 5;
     
     // Calculate total leave from real data
@@ -28,19 +25,57 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
     const totalOtherLeave = memberUtilizations.reduce((total, member) => total + (member.otherLeave || 0), 0);
     const totalLeave = totalAnnualLeave + totalOtherLeave;
     
-    // Use real data if available, otherwise use mock data
-    const baseLeave = totalLeave > 0 ? totalLeave / 7 : teamSize * 3;
+    // Adjust data length based on view
+    const dataLength = view === 'week' ? 7 : view === 'month' ? 4 : 3; // week=7days, month=4weeks, quarter=3months
+    const baseLeave = totalLeave > 0 ? totalLeave / dataLength : teamSize * 3;
     
-    return Array.from({ length: 7 }, (_, index) => {
-      // Create more realistic patterns with higher variations
-      const dayMultiplier = index === 0 || index === 6 ? 0.2 : 1.5; // Lower weekend usage
+    return Array.from({ length: dataLength }, (_, index) => {
+      // Create different patterns based on view type
+      let multiplier = 1;
+      if (view === 'week') {
+        multiplier = index === 0 || index === 6 ? 0.2 : 1.5; // Lower weekend usage
+      } else if (view === 'month') {
+        multiplier = index === 1 || index === 2 ? 1.3 : 0.8; // Higher middle weeks
+      } else {
+        multiplier = index === 1 ? 1.4 : 0.9; // Higher middle month for quarter
+      }
+      
       const variation = Math.random() * 1.2 + 0.4; // 40-160% variation
-      return Math.round(baseLeave * dayMultiplier * variation);
+      return Math.round(baseLeave * multiplier * variation);
     });
   };
   
-  const data = leaveData || generateLeaveData();
-  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  // Get labels based on view type
+  const getLabels = (view: string) => {
+    switch (view) {
+      case 'week':
+        return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      case 'month':
+        return ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+      case 'quarter':
+        return ['Month 1', 'Month 2', 'Month 3'];
+      default:
+        return ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    }
+  };
+  
+  // Get badge text based on view type
+  const getBadgeText = (view: string) => {
+    switch (view) {
+      case 'week':
+        return 'This Week';
+      case 'month':
+        return 'This Month';
+      case 'quarter':
+        return 'This Quarter';
+      default:
+        return 'This Month';
+    }
+  };
+  
+  const data = leaveData || generateLeaveData(viewType);
+  const labels = getLabels(viewType);
+  const badgeText = getBadgeText(viewType);
   
   const maxValue = Math.max(...data, 10); // Ensure minimum scale
   const minValue = Math.min(...data);
@@ -100,13 +135,13 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                 />
               ))}
               
-              {/* Vertical grid lines for each day */}
-              {days.map((_, index) => (
+              {/* Vertical grid lines for each label */}
+              {labels.map((_, index) => (
                 <line
                   key={index}
-                  x1={(index * 280) / (days.length - 1)}
+                  x1={(index * 280) / (labels.length - 1)}
                   y1="0"
-                  x2={(index * 280) / (days.length - 1)}
+                  x2={(index * 280) / (labels.length - 1)}
                   y2="160"
                   stroke="rgba(99, 102, 241, 0.25)"
                   strokeWidth="1"
@@ -188,16 +223,20 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
             </svg>
           </div>
           
-          {/* Day labels with enhanced styling */}
-          <div className="grid grid-cols-7 gap-1 mt-3 px-2">
-            {days.map((day, index) => (
-              <div key={day} className="text-center">
+          {/* Dynamic labels with enhanced styling */}
+          <div className={`grid gap-1 mt-3 px-2 ${
+            viewType === 'week' ? 'grid-cols-7' : 
+            viewType === 'month' ? 'grid-cols-4' : 
+            'grid-cols-3'
+          }`}>
+            {labels.map((label, index) => (
+              <div key={label} className="text-center">
                 <span className={`text-xs font-medium ${
-                  index === 0 || index === 6 
+                  viewType === 'week' && (index === 0 || index === 6) 
                     ? 'text-gray-400' 
                     : 'text-gray-600'
                 } tracking-wide`}>
-                  {day}
+                  {label}
                 </span>
                 <div className={`h-1 w-full mt-1 rounded-full ${
                   data[index] > (maxValue * 0.7) 
@@ -212,7 +251,7 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
           
           <div className="flex justify-center mt-3">
             <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-50 to-purple-50 text-gray-600 border-gray-200 px-3 py-1">
-              This Month
+              {badgeText}
             </Badge>
           </div>
         </div>
