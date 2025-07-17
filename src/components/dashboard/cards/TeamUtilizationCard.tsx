@@ -22,12 +22,13 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   const finalStatus = status || utilizationStatus?.status || (utilizationRate && utilizationRate > 100 ? "Over Capacity" : "Optimal");
   const actualUtilizationRate = utilizationRate || 75; // Show a reasonable default while loading
   
-  // Calculate full circle progress (360 degrees)
-  const normalizedRate = Math.min(actualUtilizationRate, 200) / 200; // Cap at 200% for display
+  // Calculate overlapping circles for high utilization
+  const completeCircles = Math.floor(actualUtilizationRate / 100); // How many complete 100% circles
+  const remainderPercent = actualUtilizationRate % 100; // Remaining percentage for partial circle
   const radius = 85;
   const strokeWidth = 20;
-  const circumference = 2 * Math.PI * radius; // Full circle circumference
-  const strokeDashoffset = circumference - (normalizedRate * circumference);
+  const circumference = 2 * Math.PI * radius;
+  const remainderOffset = circumference - (remainderPercent / 100 * circumference);
 
   return (
     <Card className="rounded-2xl bg-card-gradient-1 border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
@@ -86,23 +87,44 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 );
               })}
               
-              {/* Progress circle */}
-              <circle
-                cx="100"
-                cy="100"
-                r={radius}
-                fill="none"
-                stroke="#8b5cf6"
-                strokeWidth={strokeWidth}
-                strokeLinecap="round"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                className="transition-all duration-700 ease-out"
-                transform="rotate(-90 100 100)"
-                style={{
-                  filter: 'drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3))'
-                }}
-              />
+              {/* Complete circles (for each 100% increment) */}
+              {Array.from({ length: completeCircles }, (_, i) => (
+                <circle
+                  key={`complete-${i}`}
+                  cx="100"
+                  cy="100"
+                  r={radius}
+                  fill="none"
+                  stroke="#8b5cf6"
+                  strokeWidth={strokeWidth}
+                  strokeLinecap="round"
+                  strokeOpacity={Math.max(0.3, 1 - i * 0.15)} // Fade each layer
+                  className="transition-all duration-700 ease-out"
+                  style={{
+                    filter: 'drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3))'
+                  }}
+                />
+              ))}
+              
+              {/* Partial circle for remainder percentage */}
+              {remainderPercent > 0 && (
+                <circle
+                  cx="100"
+                  cy="100"
+                  r={radius}
+                  fill="none"
+                  stroke="#8b5cf6"
+                  strokeWidth={strokeWidth}
+                  strokeLinecap="round"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={remainderOffset}
+                  className="transition-all duration-700 ease-out"
+                  transform="rotate(-90 100 100)"
+                  style={{
+                    filter: 'drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3))'
+                  }}
+                />
+              )}
             </svg>
             
             {/* Center content */}
