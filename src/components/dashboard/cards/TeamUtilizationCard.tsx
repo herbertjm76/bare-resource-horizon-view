@@ -22,15 +22,44 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   const finalStatus = status || utilizationStatus?.status || (utilizationRate && utilizationRate > 100 ? "Over Capacity" : "Optimal");
   const actualUtilizationRate = utilizationRate || 75; // Show a reasonable default while loading
   
-  // Calculate overlapping circles for high utilization
-  const completeCircles = Math.floor(actualUtilizationRate / 100); // How many complete 100% circles
-  const remainderPercent = actualUtilizationRate % 100; // Remaining percentage for partial circle
-  const radius = 70;
-  const strokeWidth = 16;
-  const circumference = 2 * Math.PI * radius;
-  const remainderOffset = circumference - (remainderPercent / 100 * circumference);
+  // Multi-ring configuration
+  const rings = [
+    { capacity: 50, radius: 55, color: '#10b981', bgColor: '#dcfce7' }, // Green - Optimal
+    { capacity: 75, radius: 70, color: '#f59e0b', bgColor: '#fef3c7' }, // Amber - Good
+    { capacity: 100, radius: 85, color: '#ef4444', bgColor: '#fee2e2' }, // Red - At capacity
+    { capacity: 150, radius: 100, color: '#8b5cf6', bgColor: '#f3e8ff' }, // Purple - Over capacity
+  ];
+  
+  const strokeWidth = 12;
   const centerPoint = 120;
   const svgSize = 240;
+  
+  // Calculate which rings should be filled and how much
+  const getRingFillData = () => {
+    return rings.map((ring, index) => {
+      const previousCapacity = index > 0 ? rings[index - 1].capacity : 0;
+      const ringCapacityRange = ring.capacity - previousCapacity;
+      
+      let fillPercentage = 0;
+      if (actualUtilizationRate > previousCapacity) {
+        const excessUtilization = Math.min(actualUtilizationRate - previousCapacity, ringCapacityRange);
+        fillPercentage = (excessUtilization / ringCapacityRange) * 100;
+      }
+      
+      const circumference = 2 * Math.PI * ring.radius;
+      const strokeDashoffset = circumference - (fillPercentage / 100 * circumference);
+      
+      return {
+        ...ring,
+        fillPercentage,
+        circumference,
+        strokeDashoffset,
+        isActive: fillPercentage > 0,
+      };
+    });
+  };
+  
+  const ringData = getRingFillData();
 
   return (
     <Card className="rounded-2xl bg-card-gradient-1 border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
@@ -51,87 +80,63 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               viewBox={`0 0 ${svgSize} ${svgSize}`} 
               className="w-full h-full max-w-[240px] max-h-[240px]"
             >
-              {/* Background circle */}
-              <circle
-                cx={centerPoint}
-                cy={centerPoint}
-                r={radius}
-                fill="none"
-                stroke="#e5e7eb"
-                strokeWidth={strokeWidth}
-              />
-              
-              {/* Percentage markers */}
-              {[0, 25, 50, 75, 100].map((percent) => {
-                const angle = (percent / 100) * 360 - 90; // Start from top
-                const x1 = centerPoint + (radius - 8) * Math.cos(angle * Math.PI / 180);
-                const y1 = centerPoint + (radius - 8) * Math.sin(angle * Math.PI / 180);
-                const x2 = centerPoint + (radius + 6) * Math.cos(angle * Math.PI / 180);
-                const y2 = centerPoint + (radius + 6) * Math.sin(angle * Math.PI / 180);
-                const textX = centerPoint + (radius + 18) * Math.cos(angle * Math.PI / 180);
-                const textY = centerPoint + (radius + 18) * Math.sin(angle * Math.PI / 180);
-                
-                return (
-                  <g key={percent}>
-                    <line
-                      x1={x1}
-                      y1={y1}
-                      x2={x2}
-                      y2={y2}
-                      stroke="#8b5cf6"
-                      strokeWidth="2"
+              {/* Multi-ring gauge */}
+              {ringData.map((ring, index) => (
+                <g key={index}>
+                  {/* Background ring */}
+                  <circle
+                    cx={centerPoint}
+                    cy={centerPoint}
+                    r={ring.radius}
+                    fill="none"
+                    stroke={ring.bgColor}
+                    strokeWidth={strokeWidth}
+                  />
+                  
+                  {/* Progress ring */}
+                  {ring.isActive && (
+                    <circle
+                      cx={centerPoint}
+                      cy={centerPoint}
+                      r={ring.radius}
+                      fill="none"
+                      stroke={ring.color}
+                      strokeWidth={strokeWidth}
+                      strokeLinecap="round"
+                      strokeDasharray={ring.circumference}
+                      strokeDashoffset={ring.strokeDashoffset}
+                      transform={`rotate(-90 ${centerPoint} ${centerPoint})`}
+                      className="transition-all duration-1000 ease-out"
+                      style={{
+                        filter: `drop-shadow(0 2px 6px ${ring.color}40)`,
+                        animationDelay: `${index * 200}ms`
+                      }}
                     />
-                    <text
-                      x={textX}
-                      y={textY}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="text-xs font-medium fill-gray-600"
-                    >
-                      {percent}%
-                    </text>
-                  </g>
-                );
-              })}
-              
-              {/* Complete circles (for each 100% increment) */}
-              {Array.from({ length: completeCircles }, (_, i) => (
-                <circle
-                  key={`complete-${i}`}
-                  cx={centerPoint}
-                  cy={centerPoint}
-                  r={radius}
-                  fill="none"
-                  stroke="#8b5cf6"
-                  strokeWidth={strokeWidth}
-                  strokeLinecap="round"
-                  strokeOpacity={Math.max(0.3, 1 - i * 0.15)} // Fade each layer
-                  className="transition-all duration-700 ease-out"
-                  style={{
-                    filter: 'drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3))'
-                  }}
-                />
+                  )}
+                </g>
               ))}
               
-              {/* Partial circle for remainder percentage */}
-              {remainderPercent > 0 && (
-                <circle
-                  cx={centerPoint}
-                  cy={centerPoint}
-                  r={radius}
-                  fill="none"
-                  stroke="#8b5cf6"
-                  strokeWidth={strokeWidth}
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={remainderOffset}
-                  className="transition-all duration-700 ease-out"
-                  transform={`rotate(-90 ${centerPoint} ${centerPoint})`}
-                  style={{
-                    filter: 'drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3))'
-                  }}
-                />
-              )}
+              {/* Capacity markers */}
+              {[50, 75, 100, 150].map((capacity, index) => {
+                const angle = -90; // Top position
+                const ring = rings[index];
+                const markerX = centerPoint + (ring.radius + 15) * Math.cos(angle * Math.PI / 180);
+                const markerY = centerPoint + (ring.radius + 15) * Math.sin(angle * Math.PI / 180);
+                
+                return (
+                  <text
+                    key={capacity}
+                    x={markerX}
+                    y={markerY}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    className="text-xs font-medium"
+                    fill={ring.color}
+                  >
+                    {capacity}%
+                  </text>
+                );
+              })}
             </svg>
             
             {/* Center content */}
