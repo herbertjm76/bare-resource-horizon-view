@@ -1,6 +1,7 @@
 
 import React, { useMemo, useCallback, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Users, Clock, TrendingUp, Calendar } from 'lucide-react';
 import { WeekResourceHeader } from './WeekResourceHeader';
 import { NewResourceTable } from './NewResourceTable';
