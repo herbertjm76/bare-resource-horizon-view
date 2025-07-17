@@ -9,7 +9,7 @@ import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { LoadingDashboard } from './LoadingDashboard';
-import { useDashboardData } from './hooks/useDashboardData';
+import { useUnifiedDashboardData } from './UnifiedDashboardProvider';
 import { TimeRange } from './TimeRangeSelector';
 
 interface DesktopDashboardProps {
@@ -20,7 +20,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   selectedTimeRange
 }) => {
   // Use unified dashboard data to ensure consistency
-  const data = useDashboardData(selectedTimeRange);
+  const data = useUnifiedDashboardData();
   
   // Debug logging for Paul Julius utilization data
   const paulData = data.memberUtilizations?.find(m => 
@@ -28,11 +28,11 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
   );
   
   if (paulData) {
-    console.log('🔍 DESKTOP DASHBOARD - Paul Julius data:', {
+    console.log('🔍 DESKTOP DASHBOARD - Paul Julius optimized data:', {
       memberName: paulData.memberName,
-      utilizationRate: paulData.utilizationRate,
+      utilization: paulData.utilization,
       memberId: paulData.memberId,
-      source: 'standardized memberUtilizations'
+      source: 'optimized memberUtilizations'
     });
   }
 
@@ -67,6 +67,7 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         <TeamLeaveCard 
           teamMembers={data.teamMembers}
           memberUtilizations={data.memberUtilizations}
+          viewType={selectedTimeRange === 'week' ? 'week' : selectedTimeRange === '3months' ? 'quarter' : 'month'}
         />
         <ProjectPipelineCard 
           projects={data.projects}

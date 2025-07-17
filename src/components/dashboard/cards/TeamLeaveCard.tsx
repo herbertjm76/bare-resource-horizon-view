@@ -149,36 +149,74 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                 />
               ))}
               
-              {/* Area fill */}
+              {/* Area fill with S-curve */}
               <path
                 d={`M 0 160 ${data.map((value, index) => {
                   const x = (index * 280) / (data.length - 1);
-                  const y = 160 - ((value - minValue) / (maxValue - minValue)) * 130;
+                  const normalizedValue = (value - minValue) / (maxValue - minValue);
+                  // Create S-curve effect by using cubic-bezier-like calculation
+                  const sCurveValue = normalizedValue < 0.5 
+                    ? 2 * normalizedValue * normalizedValue 
+                    : 1 - 2 * (1 - normalizedValue) * (1 - normalizedValue);
+                  const y = 160 - (sCurveValue * 150); // Use 150 instead of 130 for fuller height
                   return `L ${x} ${y}`;
                 }).join(' ')} L 280 160 Z`}
                 fill="url(#areaGradient)"
                 className="transition-all duration-500"
               />
               
-              {/* Line chart */}
-              <polyline
+              {/* Line chart with S-curve and Bezier smoothing */}
+              <path
                 fill="none"
                 stroke="url(#lineGradient)"
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                points={data.map((value, index) => {
-                  const x = (index * 280) / (data.length - 1);
-                  const y = 160 - ((value - minValue) / (maxValue - minValue)) * 130;
-                  return `${x},${y}`;
-                }).join(' ')}
+                d={(() => {
+                  if (data.length < 2) return '';
+                  
+                  let path = '';
+                  for (let i = 0; i < data.length; i++) {
+                    const x = (i * 280) / (data.length - 1);
+                    const normalizedValue = (data[i] - minValue) / (maxValue - minValue);
+                    // Apply S-curve transformation
+                    const sCurveValue = normalizedValue < 0.5 
+                      ? 2 * normalizedValue * normalizedValue 
+                      : 1 - 2 * (1 - normalizedValue) * (1 - normalizedValue);
+                    const y = 160 - (sCurveValue * 150);
+                    
+                    if (i === 0) {
+                      path += `M ${x} ${y}`;
+                    } else {
+                      // Add smooth curves between points
+                      const prevX = ((i - 1) * 280) / (data.length - 1);
+                      const prevNormalizedValue = (data[i - 1] - minValue) / (maxValue - minValue);
+                      const prevSCurveValue = prevNormalizedValue < 0.5 
+                        ? 2 * prevNormalizedValue * prevNormalizedValue 
+                        : 1 - 2 * (1 - prevNormalizedValue) * (1 - prevNormalizedValue);
+                      const prevY = 160 - (prevSCurveValue * 150);
+                      
+                      const cp1x = prevX + (x - prevX) * 0.3;
+                      const cp1y = prevY;
+                      const cp2x = x - (x - prevX) * 0.3;
+                      const cp2y = y;
+                      
+                      path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${x} ${y}`;
+                    }
+                  }
+                  return path;
+                })()}
                 className="drop-shadow-sm"
               />
               
-              {/* Data points with glow effect */}
+              {/* Data points with glow effect using S-curve */}
               {data.map((value, index) => {
                 const x = (index * 280) / (data.length - 1);
-                const y = 160 - ((value - minValue) / (maxValue - minValue)) * 130;
+                const normalizedValue = (value - minValue) / (maxValue - minValue);
+                const sCurveValue = normalizedValue < 0.5 
+                  ? 2 * normalizedValue * normalizedValue 
+                  : 1 - 2 * (1 - normalizedValue) * (1 - normalizedValue);
+                const y = 160 - (sCurveValue * 150);
                 return (
                   <g key={index}>
                     {/* Glow effect */}
@@ -203,10 +241,14 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                 );
               })}
               
-              {/* Value labels on hover areas */}
+              {/* Value labels using S-curve positioning */}
               {data.map((value, index) => {
                 const x = (index * 280) / (data.length - 1);
-                const y = 160 - ((value - minValue) / (maxValue - minValue)) * 130;
+                const normalizedValue = (value - minValue) / (maxValue - minValue);
+                const sCurveValue = normalizedValue < 0.5 
+                  ? 2 * normalizedValue * normalizedValue 
+                  : 1 - 2 * (1 - normalizedValue) * (1 - normalizedValue);
+                const y = 160 - (sCurveValue * 150);
                 return (
                   <text
                     key={`label-${index}`}

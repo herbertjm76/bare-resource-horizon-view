@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext } from 'react';
-import { useDashboardData, UnifiedDashboardData } from './hooks/useDashboardData';
+import { useOptimizedDashboardData } from './hooks/useOptimizedDashboardData';
+import { UnifiedDashboardData } from './hooks/types/dashboardTypes';
 import { TimeRange } from './TimeRangeSelector';
 
 interface UnifiedDashboardContextType extends UnifiedDashboardData {
@@ -19,7 +20,7 @@ export const UnifiedDashboardProvider: React.FC<UnifiedDashboardProviderProps> =
   children,
   selectedTimeRange
 }) => {
-  const dashboardData = useDashboardData(selectedTimeRange);
+  const dashboardData = useOptimizedDashboardData(selectedTimeRange);
 
   return (
     <UnifiedDashboardContext.Provider value={dashboardData}>
