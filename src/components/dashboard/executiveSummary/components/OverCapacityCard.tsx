@@ -13,20 +13,29 @@ export const OverCapacityCard: React.FC<OverCapacityCardProps> = ({
   timeRange
 }) => {
   return (
-    <Card className="rounded-2xl border border-purple-500/20 shadow-lg hover:shadow-xl transition-shadow" style={{ background: 'linear-gradient(135deg, #AD8DBE, #7060A5, #494D9C, #B18EC2)' }}>
-      <CardContent className="p-4">
+    <Card className="rounded-xl border-0 shadow-sm h-full" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+      <CardContent className="p-3 h-full flex flex-col justify-between">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5 text-white/90" />
+            <span className="text-[10px] font-medium text-white/90 tracking-wider">OVER CAPACITY</span>
+          </div>
+        </div>
+        
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-white mb-1">{overCapacityHours}h</div>
+            <div className="w-16 h-1 bg-white/30 rounded-full mx-auto">
+              <div className="w-3/4 h-1 bg-white rounded-full"></div>
+            </div>
+          </div>
+        </div>
+        
         <div className="flex items-center justify-between">
-          <div className="flex-1 min-w-0 space-y-2">
-            <p className="text-xs font-semibold text-white/90 mb-2 tracking-wide">OVER CAPACITY</p>
-            <p className="text-3xl font-bold text-white mb-2 tracking-tight">{overCapacityHours}h</p>
-            <Badge className="text-xs border-white/20 text-white/90 bg-white/10">
-              Over Capacity
-            </Badge>
-            <p className="text-sm font-medium text-white/80">{timeRange}</p>
-          </div>
-          <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0 ml-3">
-            <Clock className="h-5 w-5 text-white/90" />
-          </div>
+          <Badge className="text-[10px] border-white/30 text-white bg-white/15 px-2 py-0.5">
+            Over Capacity
+          </Badge>
+          <span className="text-[10px] text-white/70">{timeRange}</span>
         </div>
       </CardContent>
     </Card>

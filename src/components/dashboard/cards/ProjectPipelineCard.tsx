@@ -73,20 +73,18 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
   ];
   
   return (
-    <Card className="rounded-2xl border border-purple-500/20 shadow-lg hover:shadow-xl transition-shadow h-full" style={{ background: '#B18EC2' }}>
-      <CardContent className="p-4 h-full flex flex-col">
+    <Card className="rounded-xl border-0 shadow-sm h-full" style={{ background: 'linear-gradient(135deg, #EC4899, #BE185D)' }}>
+      <CardContent className="p-3 h-full flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-white/90" />
-            <span className="text-xs font-semibold text-white/90 tracking-wide">PROJECT PIPELINE</span>
-          </div>
+        <div className="flex items-center gap-1.5 mb-2">
+          <BarChart3 className="h-3.5 w-3.5 text-white/90" />
+          <span className="text-[10px] font-medium text-white/90 tracking-wider">PROJECT PIPELINE</span>
         </div>
         
         {/* Main content - flex-1 to fill remaining space */}
         <div className="flex-1 flex flex-col">
           {/* Bubble Graph and Legend - main content area */}
-          <div className="flex-1 flex items-center justify-between gap-3 mb-3">
+          <div className="flex-1 flex items-center justify-between gap-2">
             <div className="flex-1 h-full flex items-center justify-center">
               <ProjectPipelineBubbleGraph 
                 bubbleData={bubbleData}
@@ -94,28 +92,26 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
               />
             </div>
             
-            {/* Legend - compact side layout */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#FDFDFD', border: '1px solid #E5E7EB' }}></div>
-                <span className="text-xs text-white/80">Active</span>
+            {/* Legend - compact vertical layout */}
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-white"></div>
+                <span className="text-[9px] text-white/80">Active</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
-                <span className="text-xs text-white/80">Planning</span>
+              <div className="flex items-center gap-1">
+                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
+                <span className="text-[9px] text-white/80">Plan</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
-                <span className="text-xs text-white/80">Done</span>
+              <div className="flex items-center gap-1">
+                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
+                <span className="text-[9px] text-white/80">Done</span>
               </div>
             </div>
           </div>
           
           {/* Time range badge at bottom */}
-          <div className="flex justify-center">
-            <Badge variant="outline" className="text-xs border-white/20 text-white/90 bg-white/10">
-              {timeRange}
-            </Badge>
+          <div className="flex justify-center mt-1">
+            <span className="text-[10px] text-white/70">{timeRange}</span>
           </div>
         </div>
       </CardContent>

@@ -45,47 +45,32 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
   const minValue = Math.min(...data);
 
   return (
-    <Card className="rounded-2xl border border-purple-500/20 shadow-lg hover:shadow-xl transition-shadow" style={{ background: '#494D9C' }}>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-white/90" />
-            <span className="text-xs font-semibold text-white/90 tracking-wide">TEAM LEAVE</span>
-          </div>
+    <Card className="rounded-xl border-0 shadow-sm h-full" style={{ background: 'linear-gradient(135deg, #3B82F6, #1D4ED8)' }}>
+      <CardContent className="p-3 h-full flex flex-col">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Calendar className="h-3.5 w-3.5 text-white/90" />
+          <span className="text-[10px] font-medium text-white/90 tracking-wider">TEAM LEAVE</span>
         </div>
         
-        <div className="flex flex-col justify-between h-full">
+        <div className="flex-1 flex flex-col">
           {/* Chart area */}
-          <div className="relative h-32 mt-2">
-            <svg className="w-full h-full" viewBox="0 0 280 128">
-              {/* Grid lines */}
-              {[0, 32, 64, 96].map(y => (
-                <line
-                  key={y}
-                  x1="0"
-                  y1={128 - y}
-                  x2="280"
-                  y2={128 - y}
-                  stroke="rgba(0,0,0,0.1)"
-                  strokeWidth="1"
-                />
-              ))}
-              
+          <div className="relative h-20 flex-1">
+            <svg className="w-full h-full" viewBox="0 0 280 80">
               {/* Define gradient for area fill */}
               <defs>
                 <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3"/>
-                  <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.05"/>
+                  <stop offset="0%" stopColor="rgba(255,255,255,0.4)" stopOpacity="1"/>
+                  <stop offset="100%" stopColor="rgba(255,255,255,0.1)" stopOpacity="0"/>
                 </linearGradient>
               </defs>
               
               {/* Area fill */}
               <path
-                d={`M 0 128 ${data.map((value, index) => {
+                d={`M 0 80 ${data.map((value, index) => {
                   const x = (index * 280) / (data.length - 1);
-                  const y = 128 - ((value - minValue) / (maxValue - minValue)) * 108;
+                  const y = 80 - ((value - minValue) / (maxValue - minValue)) * 60;
                   return `L ${x} ${y}`;
-                }).join(' ')} L 280 128 Z`}
+                }).join(' ')} L 280 80 Z`}
                 fill="url(#areaGradient)"
                 className="transition-all duration-300"
               />
@@ -93,13 +78,13 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
               {/* Line chart */}
               <polyline
                 fill="none"
-                stroke="#3b82f6"
-                strokeWidth="3"
+                stroke="white"
+                strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 points={data.map((value, index) => {
                   const x = (index * 280) / (data.length - 1);
-                  const y = 128 - ((value - minValue) / (maxValue - minValue)) * 108;
+                  const y = 80 - ((value - minValue) / (maxValue - minValue)) * 60;
                   return `${x},${y}`;
                 }).join(' ')}
               />
@@ -107,17 +92,15 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
               {/* Data points */}
               {data.map((value, index) => {
                 const x = (index * 280) / (data.length - 1);
-                const y = 128 - ((value - minValue) / (maxValue - minValue)) * 108;
+                const y = 80 - ((value - minValue) / (maxValue - minValue)) * 60;
                 return (
                   <circle
                     key={index}
                     cx={x}
                     cy={y}
-                    r="4"
-                    fill="#3b82f6"
-                    stroke="white"
-                    strokeWidth="2"
-                    className="hover:r-5 transition-all duration-200"
+                    r="2"
+                    fill="white"
+                    className="drop-shadow-sm"
                   />
                 );
               })}
@@ -125,14 +108,14 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
           </div>
           
           {/* Day labels */}
-          <div className="grid grid-cols-7 gap-1 text-xs text-white/60 text-center">
+          <div className="grid grid-cols-7 gap-0.5 text-[9px] text-white/70 text-center mt-1">
             {days.map(day => (
               <span key={day}>{day}</span>
             ))}
           </div>
           
-          <div className="text-center">
-            <span className="text-xs text-white/60">This Month</span>
+          <div className="text-center mt-1">
+            <span className="text-[10px] text-white/70">This Month</span>
           </div>
         </div>
       </CardContent>
