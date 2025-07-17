@@ -116,15 +116,15 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   const workloadMatrix = generateWorkload();
   
   const getIntensityColor = (intensity: number) => {
-    // Intuitive color mapping: green = good, yellow = caution, red = problematic
+    // Purple for under/over-utilized, green for optimal
     if (intensity <= 0) return 'bg-gray-200'; // No work
-    if (intensity <= 40) return 'bg-red-200'; // Very low utilization - problematic
-    if (intensity <= 60) return 'bg-orange-200'; // Low utilization - needs attention
-    if (intensity <= 80) return 'bg-green-200'; // Good utilization range
-    if (intensity <= 100) return 'bg-green-400'; // Optimal utilization 
-    if (intensity <= 110) return 'bg-yellow-400'; // Slightly over - caution
-    if (intensity <= 130) return 'bg-orange-400'; // Over-utilized - concerning
-    return 'bg-red-500'; // Severely over-utilized - critical
+    if (intensity <= 40) return 'bg-purple-500'; // Very low utilization - problematic
+    if (intensity <= 60) return 'bg-purple-300'; // Low utilization - needs attention
+    if (intensity <= 80) return 'bg-green-300'; // Good utilization range
+    if (intensity <= 100) return 'bg-green-500'; // Optimal utilization 
+    if (intensity <= 110) return 'bg-green-300'; // Slightly over - still good
+    if (intensity <= 130) return 'bg-purple-300'; // Over-utilized - concerning
+    return 'bg-purple-500'; // Severely over-utilized - critical
   };
 
   return (
@@ -186,11 +186,11 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           <div className="flex items-center justify-between text-xs text-gray-500 mt-4 mb-2">
             <span>Under-utilized</span>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-red-200"></div>
-              <div className="w-3 h-3 rounded-sm bg-orange-200"></div>
-              <div className="w-3 h-3 rounded-sm bg-green-400"></div>
-              <div className="w-3 h-3 rounded-sm bg-yellow-400"></div>
-              <div className="w-3 h-3 rounded-sm bg-red-500"></div>
+              <div className="w-3 h-3 rounded-sm bg-purple-500"></div>
+              <div className="w-3 h-3 rounded-sm bg-purple-300"></div>
+              <div className="w-3 h-3 rounded-sm bg-green-500"></div>
+              <div className="w-3 h-3 rounded-sm bg-purple-300"></div>
+              <div className="w-3 h-3 rounded-sm bg-purple-500"></div>
             </div>
             <span>Over-utilized</span>
           </div>
