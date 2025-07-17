@@ -2,10 +2,10 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Donut } from './Donut';
+import { useResourceAllocationData } from './hooks/useResourceAllocationData';
 
 interface AnalyticsSectionProps {
   mockData: {
-    projectsByStatus: { name: string; value: number; }[];
     projectsByStage: { name: string; value: number; color?: string; }[];
     projectsByLocation: { name: string; value: number; color?: string; }[];
     projectsByPM: { name: string; value: number; }[];
@@ -13,8 +13,11 @@ interface AnalyticsSectionProps {
 }
 
 export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) => {
+  // Get resource allocation data
+  const resourceAllocationData = useResourceAllocationData();
+  
   // Validate chart data arrays
-  const hasStatusData = mockData.projectsByStatus?.length > 0;
+  const hasResourceData = resourceAllocationData?.length > 0 && !resourceAllocationData.every(item => item.name === 'No Data Available');
   const hasStageData = mockData.projectsByStage?.length > 0;
   const hasLocationData = mockData.projectsByLocation?.length > 0;
   const hasPMData = mockData.projectsByPM?.length > 0;
@@ -42,21 +45,21 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ mockData }) 
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      {/* Project Status Chart */}
+      {/* Resource Allocation Distribution Chart */}
       <Card className="h-72 shadow-sm hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold text-gray-800">Project Status</CardTitle>
+          <CardTitle className="text-base font-semibold text-gray-800">Resource Allocation</CardTitle>
         </CardHeader>
         <CardContent className="p-4 pt-0">
-          {hasStatusData ? (
+          {hasResourceData ? (
             <Donut 
-              data={mockData.projectsByStatus} 
+              data={resourceAllocationData} 
               title="" 
-              colors={['#10B981', '#3B82F6', '#F59E0B']}
+              colors={resourceAllocationData.map(item => item.color)}
               height={140}
             />
           ) : (
-            <EmptyState title="Project Status" />
+            <EmptyState title="Resource Allocation" />
           )}
         </CardContent>
       </Card>

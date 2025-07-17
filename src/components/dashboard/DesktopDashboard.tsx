@@ -43,7 +43,6 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
 
   // Prepare analytics data for separate section - using the correct property names
   const analyticsData = {
-    projectsByStatus: data.mockData?.projectsByStatus || [],
     projectsByStage: data.mockData?.projectsByStage || [],
     projectsByLocation: data.mockData?.projectsByLocation || [],
     projectsByPM: data.mockData?.projectsByPM || []
