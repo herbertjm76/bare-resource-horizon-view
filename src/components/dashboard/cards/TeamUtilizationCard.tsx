@@ -25,10 +25,12 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   // Calculate overlapping circles for high utilization
   const completeCircles = Math.floor(actualUtilizationRate / 100); // How many complete 100% circles
   const remainderPercent = actualUtilizationRate % 100; // Remaining percentage for partial circle
-  const radius = 85;
-  const strokeWidth = 20;
+  const radius = 70;
+  const strokeWidth = 16;
   const circumference = 2 * Math.PI * radius;
   const remainderOffset = circumference - (remainderPercent / 100 * circumference);
+  const centerPoint = 120;
+  const svgSize = 240;
 
   return (
     <Card className="rounded-2xl bg-card-gradient-1 border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
@@ -40,14 +42,19 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
           </div>
         </div>
         
-        <div className="flex-1 flex flex-col items-center justify-center relative">
+        <div className="flex-1 flex flex-col items-center justify-center relative p-4">
           {/* Full Circle Gauge */}
           <div className="relative flex items-center justify-center w-full h-full">
-            <svg width="200" height="200" viewBox="0 0 200 200" className="w-full h-full max-w-[200px] max-h-[200px]">
+            <svg 
+              width={svgSize} 
+              height={svgSize} 
+              viewBox={`0 0 ${svgSize} ${svgSize}`} 
+              className="w-full h-full max-w-[240px] max-h-[240px]"
+            >
               {/* Background circle */}
               <circle
-                cx="100"
-                cy="100"
+                cx={centerPoint}
+                cy={centerPoint}
                 r={radius}
                 fill="none"
                 stroke="#e5e7eb"
@@ -57,12 +64,12 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               {/* Percentage markers */}
               {[0, 25, 50, 75, 100].map((percent) => {
                 const angle = (percent / 100) * 360 - 90; // Start from top
-                const x1 = 100 + (radius - 10) * Math.cos(angle * Math.PI / 180);
-                const y1 = 100 + (radius - 10) * Math.sin(angle * Math.PI / 180);
-                const x2 = 100 + (radius + 5) * Math.cos(angle * Math.PI / 180);
-                const y2 = 100 + (radius + 5) * Math.sin(angle * Math.PI / 180);
-                const textX = 100 + (radius + 15) * Math.cos(angle * Math.PI / 180);
-                const textY = 100 + (radius + 15) * Math.sin(angle * Math.PI / 180);
+                const x1 = centerPoint + (radius - 8) * Math.cos(angle * Math.PI / 180);
+                const y1 = centerPoint + (radius - 8) * Math.sin(angle * Math.PI / 180);
+                const x2 = centerPoint + (radius + 6) * Math.cos(angle * Math.PI / 180);
+                const y2 = centerPoint + (radius + 6) * Math.sin(angle * Math.PI / 180);
+                const textX = centerPoint + (radius + 18) * Math.cos(angle * Math.PI / 180);
+                const textY = centerPoint + (radius + 18) * Math.sin(angle * Math.PI / 180);
                 
                 return (
                   <g key={percent}>
@@ -91,8 +98,8 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               {Array.from({ length: completeCircles }, (_, i) => (
                 <circle
                   key={`complete-${i}`}
-                  cx="100"
-                  cy="100"
+                  cx={centerPoint}
+                  cy={centerPoint}
                   r={radius}
                   fill="none"
                   stroke="#8b5cf6"
@@ -109,8 +116,8 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               {/* Partial circle for remainder percentage */}
               {remainderPercent > 0 && (
                 <circle
-                  cx="100"
-                  cy="100"
+                  cx={centerPoint}
+                  cy={centerPoint}
                   r={radius}
                   fill="none"
                   stroke="#8b5cf6"
@@ -119,7 +126,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                   strokeDasharray={circumference}
                   strokeDashoffset={remainderOffset}
                   className="transition-all duration-700 ease-out"
-                  transform="rotate(-90 100 100)"
+                  transform={`rotate(-90 ${centerPoint} ${centerPoint})`}
                   style={{
                     filter: 'drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3))'
                   }}
