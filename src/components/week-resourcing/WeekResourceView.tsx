@@ -1,15 +1,11 @@
+
 import React, { useMemo, useCallback, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Search, Filter, X, Calendar, Users, Clock, TrendingUp, Expand, Minimize2 } from 'lucide-react';
-import { WeekStartSelector } from '@/components/workload/WeekStartSelector';
+import { Card, CardContent } from '@/components/ui/card';
+import { Users, Clock, TrendingUp, Calendar } from 'lucide-react';
+import { WeekResourceHeader } from './WeekResourceHeader';
 import { NewResourceTable } from './NewResourceTable';
 import { useStreamlinedWeekResourceData } from './hooks/useStreamlinedWeekResourceData';
 import { Skeleton } from '@/components/ui/skeleton';
-import { format, isThisWeek } from 'date-fns';
 import { calculateMemberProjectHours, calculateUtilizationPercentage } from './utils/utilizationCalculations';
 
 interface WeekResourceViewProps {
@@ -35,14 +31,6 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   // View mode state for expand/collapse functionality
   const [viewMode, setViewMode] = useState<'compact' | 'expanded'>('compact');
   
-  // Debug viewMode changes
-  console.log('WeekResourceView RENDER - Current viewMode:', viewMode);
-  
-  // Add useEffect to track viewMode changes
-  React.useEffect(() => {
-    console.log('WeekResourceView useEffect - viewMode changed to:', viewMode);
-  }, [viewMode]);
-  
   // Stabilize filters to prevent unnecessary re-renders
   const stableFilters = useMemo(() => ({
     office: filters.office,
@@ -64,15 +52,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     error
   } = useStreamlinedWeekResourceData(selectedWeek, stableFilters);
 
-  console.log('WeekResourceView - Data Summary:', {
-    membersCount: allMembers?.length || 0,
-    projectsCount: projects?.length || 0,
-    allocationMapSize: allocationMap?.size || 0,
-    isLoading,
-    hasError: !!error
-  });
-
-  // Filter members based on search term - make this more stable
+  // Filter members based on search term
   const filteredMembers = useMemo(() => {
     if (!allMembers || allMembers.length === 0) {
       return [];
@@ -111,7 +91,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
     filters.searchTerm ? 'search' : ''
   ].filter(Boolean).length, [filters.office, filters.searchTerm]);
 
-  // FINAL STANDARDIZED weekly metrics calculation using the utility functions
+  // Weekly metrics calculation using the utility functions
   const metrics = useMemo(() => {
     if (!filteredMembers || filteredMembers.length === 0 || !allocationMap) {
       return {
@@ -133,11 +113,9 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
       const weeklyCapacity = member.weekly_capacity || 40;
       totalCapacity += weeklyCapacity;
 
-      // Use FINAL STANDARDIZED calculation for project hours
       const memberProjectHours = calculateMemberProjectHours(member.id, allocationMap);
       totalProjectHours += memberProjectHours;
 
-      // Use FINAL STANDARDIZED utilization calculation
       const memberUtilization = calculateUtilizationPercentage(memberProjectHours, weeklyCapacity);
       
       if (memberUtilization > 100) {
@@ -149,16 +127,6 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
 
     const utilizationRate = totalCapacity > 0 ? Math.round((totalProjectHours / totalCapacity) * 100) : 0;
     const availableHours = Math.max(0, totalCapacity - totalProjectHours);
-
-    console.log('FINAL STANDARDIZED Weekly Metrics:', {
-      totalCapacity,
-      totalProjectHours,
-      utilizationRate,
-      overloadedMembers,
-      underUtilizedMembers,
-      availableHours,
-      calculation: `${totalProjectHours} / ${totalCapacity} * 100 = ${utilizationRate}%`
-    });
 
     return {
       totalCapacity,
@@ -190,7 +158,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-32 w-full" />
         <Skeleton className="h-32 w-full" />
         <Skeleton className="h-96 w-full" />
       </div>
@@ -200,78 +168,19 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header Controls */}
-      <Card className="border-none shadow-sm bg-white">
-        <CardContent className="p-4">
-          {/* Row 1: Week Selector */}
-          <div className="flex justify-center mb-4">
-            <WeekStartSelector
-              selectedWeek={selectedWeek}
-              onWeekChange={handleWeekChange}
-            />
-          </div>
+      <WeekResourceHeader
+        selectedWeek={selectedWeek}
+        onWeekChange={handleWeekChange}
+        weekLabel={weekLabel}
+        filters={filters}
+        onFilterChange={onFilterChange}
+        activeFiltersCount={activeFiltersCount}
+        clearFilters={clearFilters}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+      />
 
-          {/* Row 2: Search and Office Filter */}
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-4">
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search members..."
-                value={filters.searchTerm}
-                onChange={(e) => onFilterChange('searchTerm', e.target.value)}
-                className="pl-8 h-8 w-48 text-sm"
-              />
-            </div>
-
-            <Select value={filters.office} onValueChange={(value) => onFilterChange('office', value)}>
-              <SelectTrigger className="w-36 h-8 text-sm">
-                <SelectValue placeholder="Filter by office..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Offices</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Row 3: Clear Filters and View Controls */}
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="flex items-center">
-              {activeFiltersCount > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearFilters}
-                  className="h-8 px-2 text-sm"
-                >
-                  <X className="h-4 w-4" />
-                  Clear ({activeFiltersCount})
-                </Button>
-              )}
-            </div>
-
-            {/* View Controls - Single Toggle Button */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setViewMode(viewMode === 'compact' ? 'expanded' : 'compact')}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-              >
-                {viewMode === 'compact' ? (
-                  <>
-                    <Expand className="w-4 h-4" />
-                    Expand
-                  </>
-                ) : (
-                  <>
-                    <Minimize2 className="w-4 h-4" />
-                    Collapse
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Weekly Summary Stats with FINAL STANDARDIZED calculations */}
+      {/* Weekly Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -340,7 +249,7 @@ export const WeekResourceView: React.FC<WeekResourceViewProps> = ({
             getProjectCount={getProjectCount}
             getWeeklyLeave={getWeeklyLeave}
             updateOtherLeave={updateOtherLeave}
-            viewMode={viewMode} // Debug: {viewMode}
+            viewMode={viewMode}
             selectedWeek={selectedWeek}
           />
         </CardContent>
