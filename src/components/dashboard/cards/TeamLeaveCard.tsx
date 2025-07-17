@@ -57,14 +57,18 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
           {/* Chart area - taking full remaining height */}
           <div className="relative flex-1 min-h-[120px] bg-gradient-to-br from-blue-50/30 to-purple-50/30 rounded-xl border border-gray-100/50 overflow-hidden">
             {/* Background grid pattern */}
-            <div className="absolute inset-0 opacity-20">
+            <div className="absolute inset-0 opacity-30">
               <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 280 160">
                 <defs>
                   <pattern id="grid" width="40" height="32" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 32" fill="none" stroke="rgba(107, 114, 128, 0.3)" strokeWidth="0.5"/>
+                    <path d="M 40 0 L 0 0 0 32" fill="none" stroke="rgba(139, 92, 246, 0.4)" strokeWidth="0.5"/>
+                  </pattern>
+                  <pattern id="colorGrid" width="40" height="32" patternUnits="userSpaceOnUse">
+                    <rect width="40" height="32" fill="rgba(99, 102, 241, 0.08)"/>
+                    <path d="M 40 0 L 0 0 0 32" fill="none" stroke="rgba(139, 92, 246, 0.3)" strokeWidth="0.8"/>
                   </pattern>
                 </defs>
-                <rect width="100%" height="100%" fill="url(#grid)" />
+                <rect width="100%" height="100%" fill="url(#colorGrid)" />
               </svg>
             </div>
 
@@ -90,9 +94,9 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                   y1={line * 32}
                   x2="280"
                   y2={line * 32}
-                  stroke="rgba(107, 114, 128, 0.15)"
+                  stroke="rgba(139, 92, 246, 0.25)"
                   strokeWidth="1"
-                  strokeDasharray="2,2"
+                  strokeDasharray="3,2"
                 />
               ))}
               
@@ -104,9 +108,9 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                   y1="0"
                   x2={(index * 280) / (days.length - 1)}
                   y2="160"
-                  stroke="rgba(107, 114, 128, 0.15)"
+                  stroke="rgba(99, 102, 241, 0.25)"
                   strokeWidth="1"
-                  strokeDasharray="2,2"
+                  strokeDasharray="3,2"
                 />
               ))}
               
