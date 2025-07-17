@@ -21,8 +21,8 @@ export const MobilePerformanceGauge: React.FC<MobilePerformanceGaugeProps> = ({
           <span className="truncate font-medium">Current Performance</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4">
-        <div className="flex flex-col items-center">
+      <CardContent className="p-0 h-full">
+        <div className="flex flex-col items-center justify-center h-full">
           <Gauge
             value={currentUtilizationRate}
             max={100}
@@ -30,9 +30,6 @@ export const MobilePerformanceGauge: React.FC<MobilePerformanceGaugeProps> = ({
             size="lg"
             thresholds={{ good: 60, warning: 80, critical: 90 }}
           />
-          <p className="text-xs text-gray-600 mt-3 text-center">
-            Current week performance vs capacity
-          </p>
         </div>
       </CardContent>
     </Card>
