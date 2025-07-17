@@ -49,16 +49,50 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 cy="100"
                 r={radius}
                 fill="none"
-                stroke="hsl(var(--muted))"
+                stroke="#e5e7eb"
                 strokeWidth={strokeWidth}
               />
+              
+              {/* Percentage markers */}
+              {[0, 25, 50, 75, 100].map((percent) => {
+                const angle = (percent / 100) * 360 - 90; // Start from top
+                const x1 = 100 + (radius - 10) * Math.cos(angle * Math.PI / 180);
+                const y1 = 100 + (radius - 10) * Math.sin(angle * Math.PI / 180);
+                const x2 = 100 + (radius + 5) * Math.cos(angle * Math.PI / 180);
+                const y2 = 100 + (radius + 5) * Math.sin(angle * Math.PI / 180);
+                const textX = 100 + (radius + 15) * Math.cos(angle * Math.PI / 180);
+                const textY = 100 + (radius + 15) * Math.sin(angle * Math.PI / 180);
+                
+                return (
+                  <g key={percent}>
+                    <line
+                      x1={x1}
+                      y1={y1}
+                      x2={x2}
+                      y2={y2}
+                      stroke="#8b5cf6"
+                      strokeWidth="2"
+                    />
+                    <text
+                      x={textX}
+                      y={textY}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      className="text-xs font-medium fill-gray-600"
+                    >
+                      {percent}%
+                    </text>
+                  </g>
+                );
+              })}
+              
               {/* Progress circle */}
               <circle
                 cx="100"
                 cy="100"
                 r={radius}
                 fill="none"
-                stroke="hsl(var(--primary))"
+                stroke="#8b5cf6"
                 strokeWidth={strokeWidth}
                 strokeLinecap="round"
                 strokeDasharray={circumference}
@@ -66,7 +100,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 className="transition-all duration-700 ease-out"
                 transform="rotate(-90 100 100)"
                 style={{
-                  filter: 'drop-shadow(0 4px 8px hsl(var(--primary) / 0.3))'
+                  filter: 'drop-shadow(0 4px 8px rgba(139, 92, 246, 0.3))'
                 }}
               />
             </svg>
