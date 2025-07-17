@@ -80,8 +80,10 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
             </Badge>
           </div>
           
-          <div className="text-center">
-            <span className="text-xs text-gray-500">This Month</span>
+          <div className="flex justify-center">
+            <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
+              This Month
+            </Badge>
           </div>
         </div>
       </CardContent>

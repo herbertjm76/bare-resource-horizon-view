@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Calendar } from 'lucide-react';
 
 interface TeamLeaveCardProps {
@@ -114,8 +115,10 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
             ))}
           </div>
           
-          <div className="text-center mt-1">
-            <span className="text-[10px] text-gray-500">This Month</span>
+          <div className="flex justify-center mt-1">
+            <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
+              This Month
+            </Badge>
           </div>
         </div>
       </CardContent>

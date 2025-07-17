@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Clock } from 'lucide-react';
 import { TimeRange } from '../TimeRangeSelector';
 
@@ -220,8 +221,10 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
             <span>Over-utilized</span>
           </div>
           
-          <div className="text-center">
-            <span className="text-xs text-gray-500">{timeConfig.label}</span>
+          <div className="flex justify-center">
+            <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
+              {timeConfig.label}
+            </Badge>
           </div>
         </div>
       </CardContent>

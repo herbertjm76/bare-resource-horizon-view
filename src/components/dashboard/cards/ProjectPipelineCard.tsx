@@ -109,9 +109,34 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
             </div>
           </div>
           
-          {/* Time range badge at bottom */}
-          <div className="flex justify-center mt-1">
-            <span className="text-[10px] text-gray-500">{timeRange}</span>
+          {/* Enhanced bottom section with KPIs and time badge */}
+          <div className="space-y-2 mt-2">
+            {/* KPI metrics row */}
+            <div className="flex justify-between items-center px-1">
+              <div className="text-center">
+                <div className="text-xs font-semibold text-gray-700">{totalProjects}</div>
+                <div className="text-[8px] text-gray-500">Total</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xs font-semibold text-gray-700">{projectStats.inProgress.count}</div>
+                <div className="text-[8px] text-gray-500">Active</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xs font-semibold text-gray-700">{projectStats.planning.count}</div>
+                <div className="text-[8px] text-gray-500">Planning</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xs font-semibold text-gray-700">{projectStats.complete.count}</div>
+                <div className="text-[8px] text-gray-500">Complete</div>
+              </div>
+            </div>
+            
+            {/* Time range badge */}
+            <div className="flex justify-center">
+              <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
+                {timeRange}
+              </Badge>
+            </div>
           </div>
         </div>
       </CardContent>
