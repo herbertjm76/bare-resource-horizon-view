@@ -16,12 +16,12 @@ export const ProjectPipelineBubbleGraph: React.FC<ProjectPipelineBubbleGraphProp
   bubbleData,
   totalProjects
 }) => {
-  // Calculate bubble sizes based on project count (bigger sizes)
+  // Calculate bubble sizes based on project count (2x bigger sizes)
   const getBubbleSize = (count: number) => {
     if (count === 0) return 0;
-    if (totalProjects === 0) return 40;
-    const minSize = 35;
-    const maxSize = 60;
+    if (totalProjects === 0) return 80; // 2x bigger default
+    const minSize = 70; // 2x bigger minimum (was 35)
+    const maxSize = 120; // 2x bigger maximum (was 60)
     const ratio = count / Math.max(totalProjects, 1);
     return Math.max(minSize, Math.min(maxSize, minSize + (ratio * (maxSize - minSize))));
   };
