@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,15 +23,32 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   const finalStatus = status || utilizationStatus?.status || (utilizationRate && utilizationRate > 100 ? "Over Capacity" : "Optimal");
   const actualUtilizationRate = utilizationRate || 75; // Show a reasonable default while loading
   
-  // Multi-ring configuration
+  // Simplified 3-ring configuration with clearer distinctions
   const rings = [
-    { capacity: 50, radius: 55, color: '#10b981', bgColor: '#dcfce7' }, // Green - Optimal
-    { capacity: 75, radius: 70, color: '#f59e0b', bgColor: '#fef3c7' }, // Amber - Good
-    { capacity: 100, radius: 85, color: '#ef4444', bgColor: '#fee2e2' }, // Red - At capacity
-    { capacity: 150, radius: 100, color: '#8b5cf6', bgColor: '#f3e8ff' }, // Purple - Over capacity
+    { 
+      capacity: 75, 
+      radius: 70, 
+      color: '#10b981', 
+      bgColor: '#dcfce7',
+      label: 'Optimal'
+    }, // Green - Optimal (0-75%)
+    { 
+      capacity: 100, 
+      radius: 85, 
+      color: '#8b5cf6', 
+      bgColor: '#f3e8ff',
+      label: 'At Capacity'
+    }, // Purple - At capacity (75-100%)
+    { 
+      capacity: 150, 
+      radius: 100, 
+      color: '#6b46c1', 
+      bgColor: '#ede9fe',
+      label: 'Over Capacity'
+    }, // Darker Purple - Over capacity (100%+)
   ];
   
-  const strokeWidth = 12;
+  const strokeWidth = 14;
   const centerPoint = 120;
   const svgSize = 240;
   
@@ -115,28 +133,6 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                   )}
                 </g>
               ))}
-              
-              {/* Capacity markers */}
-              {[50, 75, 100, 150].map((capacity, index) => {
-                const angle = -90; // Top position
-                const ring = rings[index];
-                const markerX = centerPoint + (ring.radius + 15) * Math.cos(angle * Math.PI / 180);
-                const markerY = centerPoint + (ring.radius + 15) * Math.sin(angle * Math.PI / 180);
-                
-                return (
-                  <text
-                    key={capacity}
-                    x={markerX}
-                    y={markerY}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    className="text-xs font-medium"
-                    fill={ring.color}
-                  >
-                    {capacity}%
-                  </text>
-                );
-              })}
             </svg>
             
             {/* Center content */}
@@ -146,6 +142,19 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 {finalStatus}
               </Badge>
             </div>
+          </div>
+
+          {/* Simplified Legend */}
+          <div className="flex justify-center gap-4 mt-4">
+            {rings.map((ring, index) => (
+              <div key={index} className="flex items-center gap-1">
+                <div 
+                  className="w-3 h-3 rounded-full" 
+                  style={{ backgroundColor: ring.color }}
+                />
+                <span className="text-xs text-gray-600">{ring.label}</span>
+              </div>
+            ))}
           </div>
         </div>
         
