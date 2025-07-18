@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronLeft, ChevronRight, Play, X, Eye, Users, BarChart3, Calendar, DollarSign, Settings } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, X, Eye, LayoutDashboard, Calendar, GanttChartSquare, UserSquare2, Flag, TrendingUp, FolderKanban, User, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TourStep {
@@ -13,53 +13,89 @@ interface TourStep {
   screenshot: string;
   features: string[];
   icon: React.ReactNode;
+  bgColor: string;
 }
 
 const tourSteps: TourStep[] = [
   {
     id: 1,
-    title: "Dashboard Overview",
-    description: "Get a comprehensive view of your team's performance, project status, and key metrics all in one place.",
+    title: "Dashboard",
+    description: "Get a comprehensive view of your team's performance, project status, and key metrics all in one place with real-time analytics and smart insights.",
     category: "Analytics",
     screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
     features: ["Real-time team utilization", "Project progress tracking", "Smart insights & recommendations"],
-    icon: <BarChart3 className="h-5 w-5" />
+    icon: <LayoutDashboard className="w-16 h-16" />,
+    bgColor: "from-purple-600 to-purple-700"
   },
   {
     id: 2,
-    title: "Team Management",
-    description: "Efficiently manage your team members, track their capacity, and optimize resource allocation.",
-    category: "Team",
+    title: "Weekly Overview",
+    description: "Visual capacity planning and team coordination with intuitive weekly views that help you optimize resource allocation.",
+    category: "Planning",
     screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
-    features: ["Team member profiles", "Capacity planning", "Workload balancing"],
-    icon: <Users className="h-5 w-5" />
+    features: ["Visual capacity planning", "Weekly resource allocation", "Team coordination tools"],
+    icon: <Calendar className="w-16 h-16" />,
+    bgColor: "from-blue-600 to-blue-700"
   },
   {
     id: 3,
-    title: "Project Tracking",
-    description: "Monitor project progress, deadlines, and resource allocation with powerful project management tools.",
-    category: "Projects",
+    title: "Team Workload",
+    description: "Monitor and balance team workloads with comprehensive tracking tools that ensure optimal productivity and prevent burnout.",
+    category: "Team",
     screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
-    features: ["Project timelines", "Resource allocation", "Budget tracking"],
-    icon: <Calendar className="h-5 w-5" />
+    features: ["Workload balancing", "Productivity tracking", "Team performance metrics"],
+    icon: <TrendingUp className="w-16 h-16" />,
+    bgColor: "from-purple-500 to-purple-600"
   },
   {
     id: 4,
-    title: "Financial Overview",
-    description: "Track budgets, expenses, and profitability across all your projects with detailed financial analytics.",
-    category: "Finance",
+    title: "Project Resourcing", 
+    description: "Strategic resource allocation across all your projects with advanced planning tools and timeline management.",
+    category: "Projects",
     screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
-    features: ["Budget vs actual", "Profitability analysis", "Cost tracking"],
-    icon: <DollarSign className="h-5 w-5" />
+    features: ["Strategic resource allocation", "Timeline management", "Project planning tools"],
+    icon: <GanttChartSquare className="w-16 h-16" />,
+    bgColor: "from-violet-600 to-violet-700"
   },
   {
     id: 5,
-    title: "Settings & Configuration",
-    description: "Customize your workspace, manage company settings, and configure the platform to match your workflow.",
+    title: "Annual Leave",
+    description: "Smart vacation planning and leave management that keeps your team balanced while maintaining project continuity.",
+    category: "Leave",
+    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    features: ["Smart vacation planning", "Leave request management", "Team coverage planning"],
+    icon: <Calendar className="w-16 h-16" />,
+    bgColor: "from-blue-500 to-blue-600"
+  },
+  {
+    id: 6,
+    title: "All Projects",
+    description: "Complete project overview with status tracking, budget monitoring, and comprehensive project portfolio management.",
+    category: "Portfolio",
+    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    features: ["Project portfolio view", "Status tracking", "Budget monitoring"],
+    icon: <FolderKanban className="w-16 h-16" />,
+    bgColor: "from-indigo-600 to-indigo-700"
+  },
+  {
+    id: 7,
+    title: "Member Profile",
+    description: "Detailed team member profiles with skills, capacity, and performance tracking for better team management.",
+    category: "Team",
+    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    features: ["Team member profiles", "Skills tracking", "Performance metrics"],
+    icon: <User className="w-16 h-16" />,
+    bgColor: "from-fuchsia-600 to-fuchsia-700"
+  },
+  {
+    id: 8,
+    title: "Office Settings",
+    description: "Complete workspace control with company settings, user management, and platform configuration options.",
     category: "Configuration",
     screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
-    features: ["Company settings", "User permissions", "Integration setup"],
-    icon: <Settings className="h-5 w-5" />
+    features: ["Company settings", "User management", "Platform configuration"],
+    icon: <Flag className="w-16 h-16" />,
+    bgColor: "from-purple-700 to-purple-800"
   }
 ];
 
@@ -107,34 +143,67 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
           </div>
         </div>
         
-        {/* Step indicators */}
-        <div className="flex items-center space-x-2 mb-4">
-          {tourSteps.map((step, index) => (
-            <button
-              key={step.id}
-              onClick={() => handleStepClick(index)}
-              className={cn(
-                "flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all",
-                index === currentStep
-                  ? "bg-blue-100 text-blue-800 border-2 border-blue-200"
-                  : index < currentStep
-                  ? "bg-green-100 text-green-800 border border-green-200"
-                  : "bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200"
+      {/* Beautiful colored tiles for step indicators */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-8">
+        {tourSteps.map((step, index) => (
+          <button
+            key={step.id}
+            onClick={() => handleStepClick(index)}
+            className={cn(
+              "group text-center transition-all duration-300",
+              index === currentStep ? "scale-105" : "hover:scale-102"
+            )}
+          >
+            <div className={cn(
+              "relative mb-3 mx-auto w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm transition-all duration-300",
+              `bg-gradient-to-br ${step.bgColor}`,
+              index === currentStep 
+                ? "shadow-xl ring-4 ring-purple-300/50 scale-110" 
+                : index < currentStep
+                ? "opacity-90 shadow-lg"
+                : "opacity-75 group-hover:opacity-90 group-hover:shadow-xl"
+            )}>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl"></div>
+              <div className="relative text-white transition-all duration-300 group-hover:scale-110">
+                {React.cloneElement(step.icon as React.ReactElement, { 
+                  className: "w-8 h-8 md:w-10 md:h-10" 
+                })}
+              </div>
+              
+              {/* Progress indicator for completed steps */}
+              {index < currentStep && (
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                </div>
               )}
-            >
-              {step.icon}
-              <span className="hidden sm:inline">{step.title}</span>
-            </button>
-          ))}
-        </div>
+              
+              {/* Current step indicator */}
+              {index === currentStep && (
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full animate-pulse"></div>
+              )}
+            </div>
+            
+            <h3 className={cn(
+              "text-xs md:text-sm font-semibold transition-colors",
+              index === currentStep 
+                ? "text-purple-600" 
+                : "text-gray-700 group-hover:text-purple-600"
+            )}>
+              {step.title}
+            </h3>
+          </button>
+        ))}
+      </div>
 
-        {/* Progress bar */}
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((currentStep + 1) / tourSteps.length) * 100}%` }}
-          />
+      {/* Enhanced progress bar with gradient */}
+      <div className="w-full bg-gray-200 rounded-full h-3 mb-8 overflow-hidden">
+        <div 
+          className="bg-gradient-to-r from-purple-500 via-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500 relative"
+          style={{ width: `${((currentStep + 1) / tourSteps.length) * 100}%` }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"></div>
         </div>
+      </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
@@ -162,9 +231,15 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
                   </Button>
                 </div>
 
-                {/* Category badge */}
+                {/* Category badge with matching colors */}
                 <div className="absolute top-4 left-4">
-                  <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm text-gray-900">
+                  <Badge 
+                    variant="secondary" 
+                    className={cn(
+                      "bg-white/95 backdrop-blur-sm text-gray-900 border-0 shadow-md",
+                      "bg-gradient-to-r from-white/95 to-white/90"
+                    )}
+                  >
                     {currentTourStep.category}
                   </Badge>
                 </div>
@@ -173,15 +248,30 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
           </Card>
         </div>
 
-        {/* Content section */}
+        {/* Content section with beautiful header */}
         <div className="space-y-6">
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              {currentTourStep.title}
-            </h3>
-            <p className="text-gray-600 text-lg leading-relaxed">
-              {currentTourStep.description}
-            </p>
+          <div className="flex items-start space-x-4">
+            {/* Large colored icon */}
+            <div className={cn(
+              "relative w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm",
+              `bg-gradient-to-br ${currentTourStep.bgColor}`
+            )}>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl"></div>
+              <div className="relative text-white">
+                {React.cloneElement(currentTourStep.icon as React.ReactElement, { 
+                  className: "w-10 h-10" 
+                })}
+              </div>
+            </div>
+            
+            <div className="flex-1">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                {currentTourStep.title}
+              </h3>
+              <p className="text-gray-600 text-lg leading-relaxed">
+                {currentTourStep.description}
+              </p>
+            </div>
           </div>
 
           {/* Features list */}
@@ -214,7 +304,10 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
                 variant="default"
                 onClick={handleNext}
                 disabled={isLastStep}
-                className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                className={cn(
+                  "flex items-center space-x-2 text-white border-0 shadow-lg",
+                  `bg-gradient-to-r ${currentTourStep.bgColor} hover:opacity-90`
+                )}
               >
                 <span>{isLastStep ? 'Completed' : 'Next'}</span>
                 {!isLastStep && <ChevronRight className="h-4 w-4" />}
