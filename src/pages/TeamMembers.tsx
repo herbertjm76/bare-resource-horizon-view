@@ -6,7 +6,7 @@ import { useTeamMembersPermissions } from '@/hooks/team/useTeamMembersPermission
 import { TeamMembersContent } from '@/components/team-members/TeamMembersContent';
 import { TeamMembersLoadingState } from '@/components/team-members/TeamMembersLoadingState';
 import { TeamMembersPermissionError } from '@/components/team-members/TeamMembersPermissionError';
-import { ModernDashboardHeader } from '@/components/dashboard/ModernDashboardHeader';
+import { ModernTeamMembersHeader } from '@/components/team-members/ModernTeamMembersHeader';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
@@ -97,11 +97,11 @@ const TeamMembersPageContent = () => {
 
   return (
     <>
-      <ModernDashboardHeader
-        totalTeamMembers={totalActiveMembers}
-        totalActiveProjects={activeProjects}
-        totalOffices={totalLocations}
-        utilizationRate={0}
+      <ModernTeamMembersHeader
+        totalMembers={totalMembers}
+        totalActiveMembers={totalActiveMembers}
+        totalDepartments={totalDepartments}
+        totalLocations={totalLocations}
       />
       <TeamMembersContent userId={userId} />
     </>
