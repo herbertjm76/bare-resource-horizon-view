@@ -1,14 +1,23 @@
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
-      });
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const handleSectionClick = (sectionId: string) => {
+    if (location.pathname === '/') {
+      // If on main page, scroll to section
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    } else {
+      // If on different page, navigate to main page with hash
+      navigate(`/#${sectionId}`);
     }
   };
 
@@ -28,7 +37,7 @@ const Navbar = () => {
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8 text-gray-700">
             <button 
-              onClick={() => scrollToSection('features')} 
+              onClick={() => handleSectionClick('features')} 
               className="hover:text-purple-600 transition-colors cursor-pointer"
             >
               Features
@@ -45,17 +54,17 @@ const Navbar = () => {
             >
               App Tour
             </Link>
-            <button 
-              onClick={() => scrollToSection('pricing')} 
+            <Link 
+              to="/pricing"
               className="hover:text-purple-600 transition-colors cursor-pointer"
             >
               Pricing
-            </button>
+            </Link>
           </div>
           
           {/* CTA Button */}
           <button 
-            onClick={() => scrollToSection('signup')}
+            onClick={() => handleSectionClick('signup')}
             className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg text-sm sm:text-base"
           >
             Start Free Trial

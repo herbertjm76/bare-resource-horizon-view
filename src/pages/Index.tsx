@@ -1,4 +1,6 @@
 
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Navbar from '../components/landing/Navbar';
 import Hero from '../components/landing/Hero';
 import ProblemOutcome from '../components/landing/ProblemOutcome';
@@ -13,6 +15,23 @@ import FooterCTA from '../components/landing/FooterCTA';
 import Footer from '../components/landing/Footer';
 
 const Index = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    // Handle hash navigation when coming from other pages
+    if (location.hash) {
+      const sectionId = location.hash.substring(1);
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      }, 100);
+    }
+  }, [location.hash]);
   return (
     <div className="min-h-screen">
       <Navbar />

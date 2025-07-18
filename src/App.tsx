@@ -29,6 +29,7 @@ import ProjectBilling from "./pages/ProjectBilling";
 import AgingInvoices from "./pages/AgingInvoices";
 import SolutionsPage from "./pages/Solutions";
 import AppTourPage from "./pages/AppTour";
+import PricingPage from "./pages/Pricing";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ function App() {
               <Route path="/contact-support" element={<ContactSupport />} />
               <Route path="/solutions" element={<SolutionsPage />} />
               <Route path="/app-tour" element={<AppTourPage />} />
+              <Route path="/pricing" element={<PricingPage />} />
               <Route path="/join" element={<Join />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="*" element={<NotFound />} />
