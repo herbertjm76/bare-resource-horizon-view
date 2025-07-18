@@ -209,8 +209,8 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
 
   const officeOptions = ['All Offices'];
   
-  // Loading state includes ChatGPT loading
-  const isLoading = isChatGPTLoading || isTeamLoading || isProjectsLoading;
+  // Loading state excludes ChatGPT loading when disabled
+  const isLoading = isTeamLoading || isProjectsLoading;
 
   const refetch = async () => {
     await Promise.all([

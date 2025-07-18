@@ -27,30 +27,13 @@ export function ChatGPTInterpretationCard({
   const [error, setError] = useState<string>('');
 
   React.useEffect(() => {
-    if (autoGenerate && summaryData) {
-      generateInterpretation();
-    }
+    // ChatGPT features temporarily disabled for performance
+    setInterpretation('AI interpretation features are temporarily disabled to improve dashboard performance. This feature will be re-enabled soon with performance optimizations.');
+    setError('');
   }, [autoGenerate, summaryData]);
 
   const generateInterpretation = async () => {
-    setLoading(true);
-    setError('');
-    
-    try {
-      const response = await ChatGPTService.interpretSummaryData(summaryData, context);
-      
-      if (response.success) {
-        setInterpretation(response.content);
-        const parsed = ChatGPTService.parseStructuredResponse(response.content);
-        setStructuredData(parsed);
-      } else {
-        setError(response.error || 'Failed to generate interpretation');
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
-    } finally {
-      setLoading(false);
-    }
+    setError('AI interpretation features are temporarily disabled to improve dashboard performance. This feature will be re-enabled soon with performance optimizations.');
   };
 
   const getRiskVariant = (risk: string) => {
@@ -225,13 +208,13 @@ export function ChatGPTInterpretationCard({
         {!interpretation && !loading && !error && (
           <div className="text-center py-12">
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-brand-violet/10 w-fit mx-auto">
-                <Brain className="h-12 w-12 text-brand-violet" />
+              <div className="p-4 rounded-2xl bg-muted/50 w-fit mx-auto">
+                <Brain className="h-12 w-12 text-muted-foreground" />
               </div>
               <div className="space-y-2">
-                <h3 className="font-semibold text-semantic-text-primary">Ready for AI Analysis</h3>
+                <h3 className="font-semibold text-semantic-text-primary">⚡ AI Features Temporarily Disabled</h3>
                 <p className="text-semantic-text-secondary max-w-md mx-auto">
-                  Click "Generate Insights" to get AI-powered analysis and recommendations for your workload data
+                  ChatGPT analysis is temporarily disabled for improved performance. This feature will be re-enabled soon.
                 </p>
               </div>
             </div>

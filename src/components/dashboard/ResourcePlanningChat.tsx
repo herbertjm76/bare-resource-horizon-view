@@ -129,20 +129,18 @@ export const ResourcePlanningChat: React.FC<ResourcePlanningChatProps> = ({
     setInput('');
     setIsTyping(true);
     
-    // Simulate AI thinking time
+    // Show disabled message
     setTimeout(() => {
-      const aiResponse = generateAIResponse(messageToSend);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: aiResponse.content,
+        content: '⚡ AI chat features are temporarily disabled to improve dashboard performance. This feature will be re-enabled soon with performance optimizations.',
         isUser: false,
-        timestamp: new Date(),
-        suggestions: aiResponse.suggestions
+        timestamp: new Date()
       };
       
       setMessages(prev => [...prev, assistantMessage]);
       setIsTyping(false);
-    }, 1000 + Math.random() * 2000); // 1-3 second delay
+    }, 1000);
   };
 
   return (

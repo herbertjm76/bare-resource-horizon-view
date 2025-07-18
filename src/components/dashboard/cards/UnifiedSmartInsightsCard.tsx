@@ -103,44 +103,12 @@ export const UnifiedSmartInsightsCard: React.FC<UnifiedSmartInsightsCardProps> =
   const [useAI, setUseAI] = useState(true);
   const { company } = useCompany();
   
-  // Load AI insights
+  // AI insights temporarily disabled for performance
   useEffect(() => {
-    const loadAIInsights = async () => {
-      if (!company?.id) {
-        setIsLoading(false);
-        return;
-      }
-
-      // Don't reload if we already have insights and AI is disabled
-      if (!useAI && aiInsights.length === 0) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        if (useAI) {
-          setIsLoading(true);
-          const response = await AIInsightsService.generateInsights(company.id, '30d');
-          
-          if (response.success && response.insights.length > 0) {
-            setAiInsights(response.insights);
-          } else {
-            console.log('AI insights failed, falling back to local insights');
-            setUseAI(false);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading AI insights:', error);
-        setUseAI(false);
-        // Provide fallback content to prevent blank state
-        setAiInsights([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadAIInsights();
-  }, [company?.id, useAI]);
+    setUseAI(false);
+    setIsLoading(false);
+    console.log('⚡ AI insights temporarily disabled for performance');
+  }, [company?.id]);
 
   // Use AI insights if available, otherwise fall back to advanced insights
   const insights = useAI && aiInsights.length > 0 ? aiInsights : AdvancedInsightsService.generateAdvancedInsights(data);

@@ -3,13 +3,23 @@ import { useCompany } from '@/context/CompanyContext';
 import { TimeRange } from '../TimeRangeSelector';
 import { ChatGPTDashboardService, ChatGPTDashboardData } from '@/services/chatgptDashboardService';
 
+// Feature flag to temporarily disable ChatGPT features for performance
+const CHATGPT_FEATURES_ENABLED = false;
+
 export const useChatGPTDashboardData = (selectedTimeRange: TimeRange) => {
   const { company } = useCompany();
   const [data, setData] = useState<ChatGPTDashboardData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!CHATGPT_FEATURES_ENABLED) {
+      setIsLoading(false);
+      setError('ChatGPT features temporarily disabled for improved performance');
+      console.log('🤖 ChatGPT features temporarily disabled');
+      return;
+    }
+
     if (!company?.id) {
       setIsLoading(false);
       return;
