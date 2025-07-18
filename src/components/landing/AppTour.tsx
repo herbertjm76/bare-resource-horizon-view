@@ -52,7 +52,7 @@ const AppTour = () => {
       icon: <User className="w-16 h-16" />,
       title: "Member Profile",
       description: "View your own or others' profiles",
-      bgColor: "from-green-600 to-green-700"
+      bgColor: "from-fuchsia-600 to-fuchsia-700"
     },
     {
       icon: <Flag className="w-16 h-16" />,
