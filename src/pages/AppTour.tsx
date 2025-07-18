@@ -1,13 +1,15 @@
 import React from 'react';
 import Navbar from '../components/landing/Navbar';
-import AppTour from '../components/landing/AppTour';
+import { InteractiveAppTour } from '../components/tour/InteractiveAppTour';
 import Footer from '../components/landing/Footer';
 
 const AppTourPage = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <AppTour />
+      <div className="py-12">
+        <InteractiveAppTour />
+      </div>
       <Footer />
     </div>
   );
