@@ -248,30 +248,15 @@ export const InteractiveAppTour: React.FC<InteractiveAppTourProps> = ({ onClose,
           </Card>
         </div>
 
-        {/* Content section with beautiful header */}
+        {/* Content section */}
         <div className="space-y-6">
-          <div className="flex items-start space-x-4">
-            {/* Large colored icon */}
-            <div className={cn(
-              "relative w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg backdrop-blur-sm",
-              `bg-gradient-to-br ${currentTourStep.bgColor}`
-            )}>
-              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl"></div>
-              <div className="relative text-white">
-                {React.cloneElement(currentTourStep.icon as React.ReactElement, { 
-                  className: "w-10 h-10" 
-                })}
-              </div>
-            </div>
-            
-            <div className="flex-1">
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                {currentTourStep.title}
-              </h3>
-              <p className="text-gray-600 text-lg leading-relaxed">
-                {currentTourStep.description}
-              </p>
-            </div>
+          <div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              {currentTourStep.title}
+            </h3>
+            <p className="text-gray-600 text-lg leading-relaxed">
+              {currentTourStep.description}
+            </p>
           </div>
 
           {/* Features list */}
