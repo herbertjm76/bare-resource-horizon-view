@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { VisualCard } from '@/components/common/VisualElements';
-import { LayoutDashboard, Calendar, GanttChartSquare, UserSquare2, Flag, Play, TrendingUp, FolderKanban } from 'lucide-react';
+import { LayoutDashboard, Calendar, GanttChartSquare, UserSquare2, Flag, Play, TrendingUp, FolderKanban, User } from 'lucide-react';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 const AppTour = () => {
@@ -49,6 +49,12 @@ const AppTour = () => {
       bgColor: "from-indigo-600 to-indigo-700"
     },
     {
+      icon: <User className="w-16 h-16" />,
+      title: "Member Profile",
+      description: "View your own or others' profiles",
+      bgColor: "from-green-600 to-green-700"
+    },
+    {
       icon: <Flag className="w-16 h-16" />,
       title: "Office Settings",
       description: "Complete workspace control",
@@ -81,7 +87,7 @@ const AppTour = () => {
           </div>
         </AnimatedSection>
 
-        <div className={`grid gap-8 ${isMainPage ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-6'}`}>
+        <div className={`grid gap-8 ${isMainPage ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-4 lg:grid-cols-4'}`}>
           {displayFeatures.map((feature, index) => (
             <AnimatedSection key={index} animation="fadeInUp" delay={index * 100}>
               <div className="group text-center">
