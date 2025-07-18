@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
+import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { useTeamMembersData } from '@/hooks/useTeamMembersData';
 import { useTeamMembersState } from '@/hooks/useTeamMembersState';
 import { useCompany } from '@/context/CompanyContext';
@@ -58,17 +59,11 @@ const TeamAnnualLeave = () => {
 
   return (
     <StandardLayout>
-      {/* Modern Header Section */}
-      <div className="space-y-6 mb-6">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-              <Calendar className="h-8 w-8 text-brand-violet" />
-              Team Annual Leave
-            </h1>
-          </div>
-        </div>
-      </div>
+      <StandardizedPageHeader
+        title="Team Annual Leave"
+        description="Manage and track annual leave allocations for your team members"
+        icon={Calendar}
+      />
 
       <TeamAnnualLeaveContent
         selectedMonth={selectedMonth}

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
+import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { BookOpen, ExternalLink, ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 
@@ -51,20 +52,11 @@ const Documentation = () => {
   return (
     <StandardLayout>
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header Section */}
-        <div className="space-y-6 mb-6">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                <BookOpen className="h-8 w-8 text-brand-violet" />
-                Documentation
-              </h1>
-              <p className="text-muted-foreground text-lg">
-                Comprehensive guides to help you master resource planning
-              </p>
-            </div>
-          </div>
-        </div>
+        <StandardizedPageHeader
+          title="Documentation"
+          description="Comprehensive guides to help you master resource planning"
+          icon={BookOpen}
+        />
 
         {/* Quick Start Card */}
         <Card className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">

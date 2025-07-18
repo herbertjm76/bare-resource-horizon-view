@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { StandardLayout } from '@/components/layout/StandardLayout';
+import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 import { MessageCircle, Mail, Phone, Clock, Send } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -59,20 +60,11 @@ const ContactSupport = () => {
   return (
     <StandardLayout>
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header Section */}
-        <div className="space-y-6 mb-6">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-                <MessageCircle className="h-8 w-8 text-brand-violet" />
-                Contact Support
-              </h1>
-              <p className="text-muted-foreground text-lg">
-                Get help when you need it. We're here to support your success.
-              </p>
-            </div>
-          </div>
-        </div>
+        <StandardizedPageHeader
+          title="Contact Support"
+          description="Get help when you need it. We're here to support your success."
+          icon={MessageCircle}
+        />
 
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Contact Form */}

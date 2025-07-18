@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Search, X, Expand, Minimize2, Calendar } from 'lucide-react';
 import { WeekStartSelector } from '@/components/workload/WeekStartSelector';
+import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHeader';
 
 interface WeekResourceHeaderProps {
   selectedWeek: Date;
@@ -36,18 +37,12 @@ export const WeekResourceHeader: React.FC<WeekResourceHeaderProps> = ({
 }) => {
   return (
     <div className="space-y-4 mb-6">
-      {/* Main Header Section */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-        <div className="space-y-2">
-          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-brand-primary flex items-center gap-3">
-            <Calendar className="h-8 w-8 text-brand-violet" />
-            Weekly Overview
-          </h1>
-          <p className="text-muted-foreground">
-            View and manage weekly resource allocations for your team
-          </p>
-        </div>
-      </div>
+      {/* Standardized Purple Header */}
+      <StandardizedPageHeader
+        title="Weekly Overview"
+        description="View and manage weekly resource allocations for your team"
+        icon={Calendar}
+      />
       
       {/* Enhanced Controls Section */}
       <Card className="p-4 bg-gradient-to-r from-white to-gray-50/50 border shadow-sm">
