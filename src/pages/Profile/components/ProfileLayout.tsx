@@ -8,11 +8,8 @@ interface ProfileLayoutProps {
 
 export const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
   return (
-    <StandardLayout 
-      className="bg-background" 
-      contentClassName="p-4 sm:p-8"
-    >
-      <div className="max-w-6xl mx-auto space-y-8">
+    <StandardLayout>
+      <div className="max-w-6xl mx-auto px-6 py-6 space-y-8">
         {children}
       </div>
     </StandardLayout>
