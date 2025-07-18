@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { VisualCard } from '@/components/common/VisualElements';
-import { LayoutDashboard, Calendar, GanttChartSquare, UserSquare2, Flag, Play } from 'lucide-react';
+import { LayoutDashboard, Calendar, GanttChartSquare, UserSquare2, Flag, Play, TrendingUp, FolderKanban } from 'lucide-react';
 import { useDemoAuth } from '@/hooks/useDemoAuth';
 
 const AppTour = () => {
@@ -25,8 +25,8 @@ const AppTour = () => {
       bgColor: "from-blue-600 to-blue-700"
     },
     {
-      icon: <UserSquare2 className="w-16 h-16" />,
-      title: "Team Management",
+      icon: <TrendingUp className="w-16 h-16" />,
+      title: "Team Workload",
       description: "Complete team coordination",
       bgColor: "from-purple-500 to-purple-600"
     },
@@ -41,6 +41,12 @@ const AppTour = () => {
       title: "Annual Leave",
       description: "Smart vacation planning",
       bgColor: "from-blue-500 to-blue-600"
+    },
+    {
+      icon: <FolderKanban className="w-16 h-16" />,
+      title: "All Projects",
+      description: "Complete project overview",
+      bgColor: "from-indigo-600 to-indigo-700"
     },
     {
       icon: <Flag className="w-16 h-16" />,
