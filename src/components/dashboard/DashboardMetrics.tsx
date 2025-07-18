@@ -57,7 +57,6 @@ const DashboardContent: React.FC<{
     transformedStaffData,
     utilizationTrends,
     metrics,
-    officeOptions,
     mockData,
     isLoading,
     activeProjects,
@@ -76,11 +75,14 @@ const DashboardContent: React.FC<{
   // Calculate stats for the modern header
   const totalTeamMembers = teamMembers?.length || 0;
   const totalActiveProjects = activeProjects || 0;
-  const totalOffices = officeOptions?.length || 0;
+  const totalOffices = 1; // Default value since officeOptions is no longer used
+
+  // Create proper office options array
+  const officeOptions = [{ value: 'All Offices', label: 'All Offices' }];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
-      {/* Modern Header with stats - no padding */}
+      {/* Modern Header without metrics */}
       <ModernDashboardHeader
         totalTeamMembers={totalTeamMembers}
         totalActiveProjects={totalActiveProjects}
@@ -88,7 +90,7 @@ const DashboardContent: React.FC<{
         utilizationRate={utilizationRate}
       />
 
-      {/* Filters Header - no padding */}
+      {/* Filters Header */}
       <DashboardHeader
         selectedOffice={selectedOffice}
         setSelectedOffice={setSelectedOffice}
@@ -97,7 +99,7 @@ const DashboardContent: React.FC<{
         officeOptions={officeOptions}
       />
 
-      {/* Main Content with no padding */}
+      {/* Main Content */}
       <div className="pb-0">
         {isMobile ? (
           <MobileDashboard

@@ -1,10 +1,5 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { TeamUtilizationKPI } from './kpi/TeamUtilizationKPI';
-import { OverCapacityKPI } from './kpi/OverCapacityKPI';
-import { ActiveProjectsKPI } from './kpi/ActiveProjectsKPI';
-import { TeamSizeKPI } from './kpi/TeamSizeKPI';
 
 interface ModernDashboardHeaderProps {
   totalTeamMembers: number;
@@ -33,21 +28,6 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
         <p className="text-white/90 text-lg">
           Real-time insights into your team and project performance
         </p>
-      </div>
-      
-      <div className="px-6 pb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <TeamUtilizationKPI utilizationRate={utilizationRate} />
-          <OverCapacityKPI overCapacityHours={624} />
-          <ActiveProjectsKPI 
-            activeProjects={totalActiveProjects} 
-            activeResources={totalTeamMembers}
-          />
-          <TeamSizeKPI 
-            teamSize={totalTeamMembers} 
-            recommendHiring={utilizationRate > 100}
-          />
-        </div>
       </div>
     </div>
   );

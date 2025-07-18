@@ -39,8 +39,8 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           
           <div className="flex items-center gap-4">
             <TimeRangeSelector
-              selectedTimeRange={selectedTimeRange}
-              onTimeRangeChange={setSelectedTimeRange}
+              selectedRange={selectedTimeRange}
+              onRangeChange={setSelectedTimeRange}
             />
             <Button variant="outline" size="sm" className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
