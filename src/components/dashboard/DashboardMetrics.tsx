@@ -80,17 +80,15 @@ const DashboardContent: React.FC<{
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
-      {/* Modern Header with stats - removed padding */}
-      <div className="bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
-        <ModernDashboardHeader
-          totalTeamMembers={totalTeamMembers}
-          totalActiveProjects={totalActiveProjects}
-          totalOffices={totalOffices}
-          utilizationRate={utilizationRate}
-        />
-      </div>
+      {/* Modern Header with stats - no padding */}
+      <ModernDashboardHeader
+        totalTeamMembers={totalTeamMembers}
+        totalActiveProjects={totalActiveProjects}
+        totalOffices={totalOffices}
+        utilizationRate={utilizationRate}
+      />
 
-      {/* Filters Header - now positioned after Executive Summary */}
+      {/* Filters Header - no padding */}
       <DashboardHeader
         selectedOffice={selectedOffice}
         setSelectedOffice={setSelectedOffice}
@@ -99,14 +97,14 @@ const DashboardContent: React.FC<{
         officeOptions={officeOptions}
       />
 
-      {/* Main Content with optimized padding */}
-      <div className="pb-4 lg:pb-6">
+      {/* Main Content with no padding */}
+      <div className="pb-0">
         {isMobile ? (
           <MobileDashboard
             selectedTimeRange={selectedTimeRange}
           />
         ) : (
-          <div className="px-2 sm:px-3 lg:px-4">
+          <div className="px-0">
             <DesktopDashboard
               selectedTimeRange={selectedTimeRange}
             />

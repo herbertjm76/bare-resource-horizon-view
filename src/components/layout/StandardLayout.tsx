@@ -16,7 +16,7 @@ interface StandardLayoutProps {
 export const StandardLayout: React.FC<StandardLayoutProps> = ({ 
   children, 
   className = "bg-gray-50",
-  contentClassName = "p-2 sm:p-3 lg:p-4",
+  contentClassName = "p-0",
   title
 }) => {
   return (
@@ -28,7 +28,7 @@ export const StandardLayout: React.FC<StandardLayoutProps> = ({
           <div style={{ height: HEADER_HEIGHT }} />
           <main className={`flex-1 overflow-auto ${contentClassName} min-w-0 max-w-full`}>
             {title && (
-              <div className="mb-4 lg:mb-6">
+              <div className="mb-4 lg:mb-6 px-6">
                 <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900">{title}</h1>
               </div>
             )}
