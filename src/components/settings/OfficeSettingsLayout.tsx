@@ -10,9 +10,11 @@ export const OfficeSettingsLayout: React.FC<OfficeSettingsLayoutProps> = ({ chil
   return (
     <StandardLayout 
       className="bg-background" 
-      contentClassName=""
+      contentClassName="p-0"
     >
-      {children}
+      <div className="px-4 sm:px-8 py-4 sm:py-8">
+        {children}
+      </div>
     </StandardLayout>
   );
 };

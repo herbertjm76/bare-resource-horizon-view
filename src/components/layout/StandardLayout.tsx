@@ -16,7 +16,7 @@ interface StandardLayoutProps {
 export const StandardLayout: React.FC<StandardLayoutProps> = ({ 
   children, 
   className = "bg-gray-50",
-  contentClassName = "p-0",
+  contentClassName = "p-4 sm:p-8",
   title
 }) => {
   return (
