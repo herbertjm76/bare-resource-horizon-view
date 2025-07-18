@@ -73,9 +73,12 @@ export const useTeamMembersRealtime = (
             console.log('Profiles subscription status:', status);
             if (status === 'SUBSCRIBED') {
               console.log('Successfully subscribed to profiles changes');
-            } else if (status === 'TIMED_OUT' || status === 'CHANNEL_ERROR') {
+            } else if (status === 'TIMED_OUT') {
+              console.warn('Profiles subscription timed out, retrying...');
+              // Don't show error toast for timeout - it's expected in some cases
+            } else if (status === 'CHANNEL_ERROR') {
               console.error('Error subscribing to profiles changes:', status);
-              toast.error('Failed to subscribe to team member updates');
+              // Only show error for actual channel errors, not timeouts
             }
           });
           
@@ -99,9 +102,12 @@ export const useTeamMembersRealtime = (
             console.log('Invites subscription status:', status);
             if (status === 'SUBSCRIBED') {
               console.log('Successfully subscribed to invites changes');
-            } else if (status === 'TIMED_OUT' || status === 'CHANNEL_ERROR') {
+            } else if (status === 'TIMED_OUT') {
+              console.warn('Invites subscription timed out, retrying...');
+              // Don't show error toast for timeout - it's expected in some cases
+            } else if (status === 'CHANNEL_ERROR') {
               console.error('Error subscribing to invites changes:', status);
-              toast.error('Failed to subscribe to invite updates');
+              // Only show error for actual channel errors, not timeouts
             }
           });
     

@@ -102,9 +102,9 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
     refetchOnWindowFocus: false,
   });
 
-  // Set up realtime subscriptions only after permissions are confirmed
+  // Set up realtime subscriptions only after permissions are confirmed and user has access
   useTeamMembersRealtime(
-    userProfile?.company_id || company?.id,
+    hasPermission ? (userProfile?.company_id || company?.id) : undefined,
     triggerRefresh,
     forceRefresh
   );
