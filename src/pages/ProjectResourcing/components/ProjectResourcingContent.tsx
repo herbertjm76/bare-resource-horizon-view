@@ -88,7 +88,7 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   }
 
   return (
-    <div className="w-full max-w-full overflow-hidden space-y-6 bg-gray-50">
+    <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
       
       {/* Header with metrics */}
       <ProjectResourcingHeader 
@@ -147,10 +147,8 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
 
 export const ProjectResourcingContent: React.FC<ProjectResourcingContentProps> = (props) => {
   return (
-    <div className="flex flex-col max-w-full bg-gray-50">
-      <OfficeSettingsProvider>
-        <ProjectResourcingInner {...props} />
-      </OfficeSettingsProvider>
-    </div>
+    <OfficeSettingsProvider>
+      <ProjectResourcingInner {...props} />
+    </OfficeSettingsProvider>
   );
 };

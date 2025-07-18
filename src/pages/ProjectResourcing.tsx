@@ -40,11 +40,8 @@ const ProjectResourcing = () => {
   );
 
   return (
-    <StandardLayout 
-      contentClassName="p-6 bg-gray-50 flex flex-col"
-    >
-      <div className="flex-1 flex flex-col" style={{ height: 'calc(100vh - 120px)', overflowY: 'auto' }}>
-        <ProjectResourcingContent
+    <StandardLayout>
+      <ProjectResourcingContent
           selectedMonth={selectedMonth}
           searchTerm={searchTerm}
           filters={filters}
@@ -60,7 +57,6 @@ const ProjectResourcing = () => {
           onDisplayOptionChange={handleDisplayOptionChange}
           onClearFilters={clearFilters}
         />
-      </div>
     </StandardLayout>
   );
 };
