@@ -22,7 +22,7 @@ const tourSteps: TourStep[] = [
     title: "Dashboard",
     description: "Get a comprehensive view of your team's performance, project status, and key metrics all in one place with real-time analytics and smart insights.",
     category: "Analytics",
-    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    screenshot: "/lovable-uploads/1ec9c1fb-a2b7-46f5-8584-89c4034146af.png",
     features: ["Real-time team utilization", "Project progress tracking", "Smart insights & recommendations"],
     icon: <LayoutDashboard className="w-16 h-16" />,
     bgColor: "from-purple-600 to-purple-700"
@@ -32,7 +32,7 @@ const tourSteps: TourStep[] = [
     title: "Weekly Overview",
     description: "Visual capacity planning and team coordination with intuitive weekly views that help you optimize resource allocation.",
     category: "Planning",
-    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",
     features: ["Visual capacity planning", "Weekly resource allocation", "Team coordination tools"],
     icon: <Calendar className="w-16 h-16" />,
     bgColor: "from-blue-600 to-blue-700"
@@ -42,7 +42,7 @@ const tourSteps: TourStep[] = [
     title: "Team Workload",
     description: "Monitor and balance team workloads with comprehensive tracking tools that ensure optimal productivity and prevent burnout.",
     category: "Team",
-    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    screenshot: "/lovable-uploads/69179c95-91ed-42d6-a38b-94114edcf69f.png",
     features: ["Workload balancing", "Productivity tracking", "Team performance metrics"],
     icon: <TrendingUp className="w-16 h-16" />,
     bgColor: "from-purple-500 to-purple-600"
@@ -52,7 +52,7 @@ const tourSteps: TourStep[] = [
     title: "Project Resourcing", 
     description: "Strategic resource allocation across all your projects with advanced planning tools and timeline management.",
     category: "Projects",
-    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    screenshot: "/lovable-uploads/cd9c399d-b5d1-471f-88c9-e013119b3552.png",
     features: ["Strategic resource allocation", "Timeline management", "Project planning tools"],
     icon: <GanttChartSquare className="w-16 h-16" />,
     bgColor: "from-violet-600 to-violet-700"
@@ -62,7 +62,7 @@ const tourSteps: TourStep[] = [
     title: "Annual Leave",
     description: "Smart vacation planning and leave management that keeps your team balanced while maintaining project continuity.",
     category: "Leave",
-    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    screenshot: "/lovable-uploads/5233d4c9-0afd-4df2-b96b-e71ad0acbabc.png",
     features: ["Smart vacation planning", "Leave request management", "Team coverage planning"],
     icon: <Calendar className="w-16 h-16" />,
     bgColor: "from-blue-500 to-blue-600"
@@ -72,7 +72,7 @@ const tourSteps: TourStep[] = [
     title: "All Projects",
     description: "Complete project overview with status tracking, budget monitoring, and comprehensive project portfolio management.",
     category: "Portfolio",
-    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    screenshot: "/lovable-uploads/d6950251-26bd-43bc-8594-4b191fe6c1a7.png",
     features: ["Project portfolio view", "Status tracking", "Budget monitoring"],
     icon: <FolderKanban className="w-16 h-16" />,
     bgColor: "from-indigo-600 to-indigo-700"
@@ -82,7 +82,7 @@ const tourSteps: TourStep[] = [
     title: "Member Profile",
     description: "Detailed team member profiles with skills, capacity, and performance tracking for better team management.",
     category: "Team",
-    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    screenshot: "/lovable-uploads/8f557546-80a9-4628-8a21-7114e11f23dc.png",
     features: ["Team member profiles", "Skills tracking", "Performance metrics"],
     icon: <User className="w-16 h-16" />,
     bgColor: "from-fuchsia-600 to-fuchsia-700"
@@ -92,7 +92,7 @@ const tourSteps: TourStep[] = [
     title: "Office Settings",
     description: "Complete workspace control with company settings, user management, and platform configuration options.",
     category: "Configuration",
-    screenshot: "/api/placeholder/800/500", // Replace with your actual screenshot URL
+    screenshot: "/lovable-uploads/2b26c5c4-10bc-4fcf-b864-ae226aef1708.png",
     features: ["Company settings", "User management", "Platform configuration"],
     icon: <Flag className="w-16 h-16" />,
     bgColor: "from-purple-700 to-purple-800"
