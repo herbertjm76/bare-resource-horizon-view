@@ -60,13 +60,13 @@ const AnimatedLogo = ({ videoUrl, onEditMode }: { videoUrl?: string; onEditMode?
             autoPlay
             loop
             muted
-            className="w-80 h-80 object-contain transition-transform duration-300 hover:scale-105"
+            className="w-96 h-96 object-contain transition-transform duration-300 hover:scale-105"
           />
         ) : (
           <img 
             src="/lovable-uploads/a62ee2a5-631d-44db-b4c6-1dc8b1cd9f5a.png" 
             alt="BareResource Logo" 
-            className="w-80 h-80 object-contain transition-transform duration-300 hover:scale-105"
+            className="w-96 h-96 object-contain transition-transform duration-300 hover:scale-105"
           />
         )}
       </div>
@@ -104,7 +104,7 @@ const Presentation = () => {
   const startPresentation = () => setCurrentSlide(0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
+    <div className="min-h-screen bg-white p-6">
       <div className="max-w-6xl mx-auto">
         {/* Cover Page */}
         {currentSlide === -1 && (
