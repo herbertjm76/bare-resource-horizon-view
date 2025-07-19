@@ -26,9 +26,9 @@ const AnimatedLogo = () => {
     <div className="relative flex justify-center mb-8">
       <div className="animate-[fadeIn_1s_ease-out] hover:animate-[scaleIn_0.3s_ease-out]">
         <img 
-          src="/lovable-uploads/ae5ad8bc-9656-45ab-b07d-96177000a9bc.png" 
+          src="/lovable-uploads/a62ee2a5-631d-44db-b4c6-1dc8b1cd9f5a.png" 
           alt="BareResource Logo" 
-          className="w-48 h-48 object-contain transition-transform duration-300 hover:scale-105"
+          className="w-80 h-80 object-contain transition-transform duration-300 hover:scale-105"
         />
       </div>
     </div>
