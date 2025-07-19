@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { VideoUpload } from '@/components/VideoUpload';
 import { 
   Users, 
   TrendingUp, 
@@ -18,25 +19,72 @@ import {
   CheckCircle,
   AlertCircle,
   Star,
-  Play
+  Play,
+  Settings
 } from 'lucide-react';
 
-const AnimatedLogo = () => {
-  return (
-    <div className="relative flex justify-center mb-8">
-      <div className="animate-[fadeIn_1s_ease-out] hover:animate-[scaleIn_0.3s_ease-out]">
-        <img 
-          src="/lovable-uploads/a62ee2a5-631d-44db-b4c6-1dc8b1cd9f5a.png" 
-          alt="BareResource Logo" 
-          className="w-80 h-80 object-contain transition-transform duration-300 hover:scale-105"
+const AnimatedLogo = ({ videoUrl, onEditMode }: { videoUrl?: string; onEditMode?: () => void }) => {
+  const [showUpload, setShowUpload] = useState(false);
+
+  const handleVideoUploaded = (url: string) => {
+    // In a real app, you'd save this to your database or local storage
+    // For now, we'll just close the upload interface
+    setShowUpload(false);
+    if (onEditMode) onEditMode();
+  };
+
+  if (showUpload) {
+    return (
+      <div className="relative flex flex-col items-center justify-center mb-8 p-6 border-2 border-dashed border-gray-300 rounded-lg">
+        <VideoUpload 
+          onVideoUploaded={handleVideoUploaded}
+          currentVideoUrl={videoUrl}
         />
+        <Button 
+          onClick={() => setShowUpload(false)}
+          variant="ghost"
+          className="mt-4"
+        >
+          Cancel
+        </Button>
       </div>
+    );
+  }
+
+  return (
+    <div className="relative flex justify-center mb-8 group">
+      <div className="animate-[fadeIn_1s_ease-out] hover:animate-[scaleIn_0.3s_ease-out]">
+        {videoUrl ? (
+          <video
+            src={videoUrl}
+            autoPlay
+            loop
+            muted
+            className="w-80 h-80 object-contain transition-transform duration-300 hover:scale-105"
+          />
+        ) : (
+          <img 
+            src="/lovable-uploads/a62ee2a5-631d-44db-b4c6-1dc8b1cd9f5a.png" 
+            alt="BareResource Logo" 
+            className="w-80 h-80 object-contain transition-transform duration-300 hover:scale-105"
+          />
+        )}
+      </div>
+      <Button
+        onClick={() => setShowUpload(true)}
+        variant="ghost"
+        size="sm"
+        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <Settings className="w-4 h-4" />
+      </Button>
     </div>
   );
 };
 
 const Presentation = () => {
   const [currentSlide, setCurrentSlide] = useState(-1); // Start with cover page
+  const [videoLogoUrl, setVideoLogoUrl] = useState<string>(''); // Store video URL
   
   const slides = [
     { id: 'cover', title: 'Cover', icon: Star },
@@ -61,7 +109,10 @@ const Presentation = () => {
         {/* Cover Page */}
         {currentSlide === -1 && (
           <div className="flex flex-col items-center justify-center min-h-screen text-center">
-            <AnimatedLogo />
+            <AnimatedLogo 
+              videoUrl={videoLogoUrl} 
+              onEditMode={() => setVideoLogoUrl('')} 
+            />
             <div className="animate-[fadeInUp_1s_ease-out_0.5s_both] space-y-6">
               <h1 className="text-6xl font-bold text-gray-900 mb-4">
                 Meet BareResource
