@@ -84,7 +84,7 @@ const AnimatedLogo = ({ videoUrl, onEditMode }: { videoUrl?: string; onEditMode?
 
 const Presentation = () => {
   const [currentSlide, setCurrentSlide] = useState(-1); // Start with cover page
-  const [videoLogoUrl, setVideoLogoUrl] = useState<string>(''); // Store video URL
+  const [videoLogoUrl, setVideoLogoUrl] = useState<string>('https://gxebsznewbwtktzqeilg.supabase.co/storage/v1/object/public/videos//0719.mp4'); // Store video URL
   
   const slides = [
     { id: 'cover', title: 'Cover', icon: Star },
