@@ -60,13 +60,13 @@ const AnimatedLogo = ({ videoUrl, onEditMode }: { videoUrl?: string; onEditMode?
             autoPlay
             loop
             muted
-            className="w-96 h-96 object-contain transition-transform duration-300 hover:scale-105"
+            className="w-[600px] h-[600px] object-contain transition-transform duration-300 hover:scale-105"
           />
         ) : (
           <img 
             src="/lovable-uploads/a62ee2a5-631d-44db-b4c6-1dc8b1cd9f5a.png" 
             alt="BareResource Logo" 
-            className="w-96 h-96 object-contain transition-transform duration-300 hover:scale-105"
+            className="w-[600px] h-[600px] object-contain transition-transform duration-300 hover:scale-105"
           />
         )}
       </div>
@@ -84,7 +84,7 @@ const AnimatedLogo = ({ videoUrl, onEditMode }: { videoUrl?: string; onEditMode?
 
 const Presentation = () => {
   const [currentSlide, setCurrentSlide] = useState(-1); // Start with cover page
-  const [videoLogoUrl, setVideoLogoUrl] = useState<string>('https://gxebsznewbwtktzqeilg.supabase.co/storage/v1/object/public/videos//0719.mp4'); // Store video URL
+  const [videoLogoUrl, setVideoLogoUrl] = useState<string>('https://gxebsznewbwtktzqeilg.supabase.co/storage/v1/object/public/videos//0719(1).mp4'); // Store video URL
   
   const slides = [
     { id: 'cover', title: 'Cover', icon: Star },
