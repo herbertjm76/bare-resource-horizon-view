@@ -17,13 +17,29 @@ import {
   BarChart3,
   CheckCircle,
   AlertCircle,
-  Star
+  Star,
+  Play
 } from 'lucide-react';
 
+const AnimatedLogo = () => {
+  return (
+    <div className="relative flex justify-center mb-8">
+      <div className="animate-[fadeIn_1s_ease-out] hover:animate-[scaleIn_0.3s_ease-out]">
+        <img 
+          src="/lovable-uploads/ae5ad8bc-9656-45ab-b07d-96177000a9bc.png" 
+          alt="BareResource Logo" 
+          className="w-48 h-48 object-contain transition-transform duration-300 hover:scale-105"
+        />
+      </div>
+    </div>
+  );
+};
+
 const Presentation = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(-1); // Start with cover page
   
   const slides = [
+    { id: 'cover', title: 'Cover', icon: Star },
     { id: 'problem', title: 'The Problem', icon: AlertCircle },
     { id: 'solution', title: 'Our Solution', icon: Lightbulb },
     { id: 'mvp', title: 'MVP Features', icon: CheckCircle },
@@ -37,49 +53,84 @@ const Presentation = () => {
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  const startPresentation = () => setCurrentSlide(0);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Bareresource
-          </h1>
-          <p className="text-xl text-gray-600 mb-4">
-            Resource Planning for Design Studios
-          </p>
-          <div className="flex justify-center gap-2 mb-6">
-            <Badge variant="secondary">MVP Ready</Badge>
-            <Badge variant="outline">Seeking Co-founders</Badge>
-            <Badge variant="outline">Series A Target</Badge>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex justify-center mb-8">
-          <div className="flex gap-2 bg-white p-2 rounded-lg shadow-sm">
-            {slides.map((slide, index) => (
-              <Button
-                key={slide.id}
-                variant={currentSlide === index ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setCurrentSlide(index)}
-                className="text-xs"
+        {/* Cover Page */}
+        {currentSlide === -1 && (
+          <div className="flex flex-col items-center justify-center min-h-screen text-center">
+            <AnimatedLogo />
+            <div className="animate-[fadeInUp_1s_ease-out_0.5s_both] space-y-6">
+              <h1 className="text-6xl font-bold text-gray-900 mb-4">
+                Meet BareResource
+              </h1>
+              <p className="text-2xl text-gray-600 mb-8">
+                Resource Planning, simplified
+              </p>
+              <div className="flex justify-center gap-3 mb-8">
+                <Badge variant="secondary" className="text-lg px-4 py-2">MVP Ready</Badge>
+                <Badge variant="outline" className="text-lg px-4 py-2">Seeking Co-founders</Badge>
+                <Badge variant="outline" className="text-lg px-4 py-2">Series A Target</Badge>
+              </div>
+              <Button 
+                onClick={startPresentation}
+                size="lg"
+                className="text-lg px-8 py-4 animate-pulse hover:animate-none"
               >
-                <slide.icon className="w-4 h-4 mr-1" />
-                {slide.title}
+                <Play className="w-5 h-5 mr-2" />
+                Start Presentation
               </Button>
-            ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Presentation Content */}
+        {currentSlide >= 0 && (
+          <>
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
+                BareResource
+              </h1>
+              <p className="text-xl text-gray-600 mb-4">
+                Resource Planning for Design Studios
+              </p>
+              <div className="flex justify-center gap-2 mb-6">
+                <Badge variant="secondary">MVP Ready</Badge>
+                <Badge variant="outline">Seeking Co-founders</Badge>
+                <Badge variant="outline">Series A Target</Badge>
+              </div>
+            </div>
+
+            {/* Navigation */}
+            <div className="flex justify-center mb-8">
+              <div className="flex gap-2 bg-white p-2 rounded-lg shadow-sm">
+                {slides.slice(1).map((slide, index) => (
+                  <Button
+                    key={slide.id}
+                    variant={currentSlide === index ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setCurrentSlide(index)}
+                    className="text-xs"
+                  >
+                    <slide.icon className="w-4 h-4 mr-1" />
+                    {slide.title}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Slide Content */}
-        <Card className="min-h-[600px] shadow-lg">
-          <CardContent className="p-8">
-            
-            {/* Slide 1: The Problem */}
-            {currentSlide === 0 && (
+        {currentSlide >= 0 && (
+          <Card className="min-h-[600px] shadow-lg">
+            <CardContent className="p-8">
+              
+              {/* Slide 1: The Problem */}
+              {currentSlide === 0 && (
               <div className="space-y-6">
                 <div className="text-center mb-8">
                   <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
@@ -1111,30 +1162,33 @@ const Presentation = () => {
               </div>
             )}
 
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Navigation Controls */}
-        <div className="flex justify-between items-center mt-6">
-          <Button 
-            onClick={prevSlide} 
-            variant="outline"
-            disabled={currentSlide === 0}
-          >
-            Previous
-          </Button>
-          
-          <div className="text-sm text-gray-500">
-            {currentSlide + 1} of {slides.length}
+        {currentSlide >= 0 && (
+          <div className="flex justify-between items-center mt-6">
+            <Button 
+              onClick={prevSlide} 
+              variant="outline"
+              disabled={currentSlide === 0}
+            >
+              Previous
+            </Button>
+            
+            <div className="text-sm text-gray-500">
+              {currentSlide + 1} of {slides.length - 1}
+            </div>
+            
+            <Button 
+              onClick={nextSlide}
+              disabled={currentSlide === slides.length - 2}
+            >
+              Next
+            </Button>
           </div>
-          
-          <Button 
-            onClick={nextSlide}
-            disabled={currentSlide === slides.length - 1}
-          >
-            Next
-          </Button>
-        </div>
+        )}
       </div>
     </div>
   );
