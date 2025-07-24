@@ -173,7 +173,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     const currentSubdomain = extractSubdomain();
     setSubdomain(currentSubdomain);
-    setLoading(true); // Always start with loading true
     
     if (currentSubdomain) {
       // Subdomain mode
@@ -191,18 +190,11 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       
       // Handle normal auth
       const initAuth = async () => {
-        try {
-          const profile = await fetchUserProfile();
-          if (profile) {
-            await fetchCompanyByProfile(profile);
-          } else {
-            setError("No profile found");
-            setCompany(null);
-            setLoading(false);
-          }
-        } catch (error) {
-          console.error('Error in initAuth:', error);
-          setError("Failed to initialize authentication");
+        const profile = await fetchUserProfile();
+        if (profile) {
+          await fetchCompanyByProfile(profile);
+        } else {
+          setError("No profile found");
           setCompany(null);
           setLoading(false);
         }
