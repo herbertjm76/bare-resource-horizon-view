@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useCompany } from "@/context/CompanyContext";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,14 +12,14 @@ import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 
 export const AppHeader: React.FC = () => {
   const { company } = useCompany();
-  const [user, setUser] = React.useState<User | null>(null);
-  const [loading, setLoading] = React.useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
   const { state } = useSidebar();
 
-  React.useEffect(() => {
+  useEffect(() => {
     let authSubscription: { unsubscribe: () => void } | null = null;
     setLoading(true);
     (async () => {
