@@ -6,7 +6,7 @@ import { useTimeRangeMetrics } from './useTimeRangeMetrics';
 import { useHolidays } from './useHolidays';
 import { useTeamData } from './useTeamData';
 import { useProjectData } from './useProjectData';
-import { useUtilizationData } from './useUtilizationData';
+import { getUtilizationStatus, generateUtilizationTrends } from './utils/utilizationCalculations';
 import { useTeamCompositionData } from './useTeamCompositionData';
 import { useAggregatedData } from './useAggregatedData';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
@@ -117,28 +117,12 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   });
   
   // Extract utilization data from ChatGPT or calculate fallback
-  const { currentUtilizationRate: fallbackUtilizationRate, utilizationStatus: fallbackStatus, utilizationTrends: fallbackTrends } = useUtilizationData(
-    combinedTeamMembers, // Use combined team (active + pending)
-    []  // Empty pre-registered since they're already in combinedTeamMembers
-  );
+  const standardizedCurrentUtilization = standardizedTeamSummary?.teamUtilizationRate ?? 0;
   
-  const currentUtilizationRate = chatGPTData?.teamMetrics.averageUtilization ?? 
-    standardizedTeamSummary?.teamUtilizationRate ?? 
-    fallbackUtilizationRate;
+  const currentUtilizationRate = standardizedCurrentUtilization;
   
-  // Create memberUtilizations array from ChatGPT data or fallback to standardized
+  // Create member utilizations from standardized utilization data
   const memberUtilizations = useMemo(() => {
-    if (chatGPTData) {
-      return chatGPTData.teamMembers.map(member => ({
-        memberId: member.id,
-        memberName: member.name,
-        utilization: member.utilization,
-        totalAllocatedHours: member.totalAllocatedHours,
-        weeklyCapacity: member.weeklyCapacity
-      }));
-    }
-    
-    // Fallback to standardized utilization data with time range awareness
     return standardizedMemberUtilizations.map(member => {
       const teamMember = combinedTeamMembers.find(tm => tm.id === member.id);
       return {
@@ -149,42 +133,13 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
         weeklyCapacity: member.weeklyCapacity
       };
     });
-  }, [chatGPTData, standardizedMemberUtilizations, originalTeamMembers]);
+  }, [standardizedMemberUtilizations, combinedTeamMembers]);
 
-  // Create team summary from ChatGPT data or fallback to standardized
-  const teamSummary = useMemo(() => {
-    if (chatGPTData) {
-      return {
-        teamUtilizationRate: chatGPTData.teamMetrics.averageUtilization,
-        totalMembers: chatGPTData.teamMetrics.totalMembers,
-        totalAllocatedHours: chatGPTData.projectMetrics.totalAllocatedHours,
-        averageCapacity: chatGPTData.teamMembers.reduce((sum, m) => sum + m.weeklyCapacity, 0) / chatGPTData.teamMembers.length
-      };
-    }
-    
-    // Fallback to standardized team summary with time range awareness
-    return standardizedTeamSummary;
-  }, [chatGPTData, standardizedTeamSummary]);
+  const teamSummary = useMemo(() => standardizedTeamSummary, [standardizedTeamSummary]);
 
-  // Generate utilization status and trends from ChatGPT data or fallback
-  const utilizationStatus = useMemo(() => {
-    if (!chatGPTData) return fallbackStatus;
-    const avgUtil = chatGPTData.teamMetrics.averageUtilization;
-    if (avgUtil > 120) return { status: 'overallocated', color: 'red', textColor: 'text-red-600' };
-    if (avgUtil < 60) return { status: 'underutilized', color: 'yellow', textColor: 'text-yellow-600' };
-    return { status: 'optimal', color: 'green', textColor: 'text-green-600' };
-  }, [chatGPTData, fallbackStatus]);
+  const utilizationStatus = useMemo(() => getUtilizationStatus(currentUtilizationRate), [currentUtilizationRate]);
 
-  const utilizationTrends = useMemo(() => {
-    if (!chatGPTData) return fallbackTrends;
-    // Generate trend data based on current utilization
-    const currentUtil = chatGPTData.teamMetrics.averageUtilization;
-    return {
-      days7: Math.max(0, currentUtil + (Math.random() - 0.5) * 10),
-      days30: Math.max(0, currentUtil + (Math.random() - 0.5) * 15),
-      days90: Math.max(0, currentUtil + (Math.random() - 0.5) * 20)
-    };
-  }, [chatGPTData, fallbackTrends]);
+  const utilizationTrends = useMemo(() => generateUtilizationTrends(currentUtilizationRate), [currentUtilizationRate]);
 
   // Use aggregated data hook for non-utilization data - now with real utilization data
   const { transformedStaffData, totalTeamSize, mockData, smartInsightsData } = useAggregatedData(
@@ -227,7 +182,6 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     teamMembersCount: teamMembers.length,
     memberUtilizations: memberUtilizations.length,
     teamSummary: teamSummary ? 'available' : 'null',
-    fallbackUtilizationRate,
     isLoading
   });
 

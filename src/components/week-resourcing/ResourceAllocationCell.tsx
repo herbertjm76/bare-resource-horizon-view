@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
+import { saveResourceAllocation } from '@/hooks/allocations/api';
 
 interface ResourceAllocationCellProps {
   resourceId: string;
@@ -47,33 +48,14 @@ export const ResourceAllocationCell: React.FC<ResourceAllocationCellProps> = ({
     setIsSaving(true);
     
     try {
-      if (hours > 0) {
-        // Update existing allocation
-        const { error } = await supabase
-          .from('project_resource_allocations')
-          .update({ hours: newHours, updated_at: new Date().toISOString() })
-          .eq('project_id', projectId)
-          .eq('resource_id', resourceId)
-          .eq('week_start_date', weekStartDate);
-          
-        if (error) throw error;
-      } else {
-        // Create new allocation
-        const { error } = await supabase
-          .from('project_resource_allocations')
-          .insert({
-            project_id: projectId,
-            resource_id: resourceId,
-            resource_type: 'active',
-            hours: newHours,
-            week_start_date: weekStartDate,
-            company_id: company.id
-          });
-          
-        if (error) throw error;
-      }
-      
-      toast.success('Resource allocation updated');
+      await saveResourceAllocation(
+        projectId,
+        resourceId,
+        'active',
+        weekStartDate,
+        newHours,
+        company.id
+      );
     } catch (error) {
       console.error('Error updating allocation:', error);
       toast.error('Failed to update allocation');
