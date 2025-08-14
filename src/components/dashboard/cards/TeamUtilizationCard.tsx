@@ -51,41 +51,18 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   
   const config = getUtilizationConfig(actualUtilizationRate);
   
-  // Circle configuration for clean design
-  const centerX = 100;
-  const centerY = 100;
-  const baseRadius = 70;
-  const strokeWidth = 8;
-  const circumference = 2 * Math.PI * baseRadius;
+  // Apple Watch style configuration
+  const center = 110;
+  const radius = 85;
+  const strokeWidth = 12;
+  const circumference = 2 * Math.PI * radius;
   
-  // Base progress (0-100%)
-  const baseProgress = Math.min(actualUtilizationRate, 100) / 100;
-  const baseDashOffset = circumference * (1 - baseProgress);
+  // Calculate progress with Apple Watch style logic
+  const normalizedProgress = Math.min(actualUtilizationRate / 100, 1);
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference * (1 - normalizedProgress);
   
-  // Overflow segments for clean layered look
-  const overflowSegments = [];
-  if (actualUtilizationRate > 100) {
-    const overflowAmount = actualUtilizationRate - 100;
-    const numberOfSegments = Math.min(Math.ceil(overflowAmount / 25), 4);
-    
-    for (let i = 0; i < numberOfSegments; i++) {
-      const segmentRadius = baseRadius + (i + 1) * 6;
-      const segmentCircumference = 2 * Math.PI * segmentRadius;
-      const segmentProgress = Math.min(overflowAmount - (i * 25), 25) / 25;
-      const segmentLength = segmentCircumference * segmentProgress * 0.75; // 75% max arc length
-      
-      overflowSegments.push({
-        radius: segmentRadius,
-        progress: segmentProgress,
-        dashArray: `${segmentLength} ${segmentCircumference}`,
-        dashOffset: segmentCircumference * 0.25, // Start from top
-        opacity: 0.8 - (i * 0.15),
-        strokeWidth: strokeWidth - (i * 1),
-        delay: i * 0.2
-      });
-    }
-  }
-
+  // For over 100%, we'll show a full ring with different styling
   const isOverCapacity = actualUtilizationRate > 100;
 
   return (
@@ -107,97 +84,66 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               width="220" 
               height="220" 
               viewBox="0 0 220 220" 
-              className="w-full h-full max-w-[220px] max-h-[220px] drop-shadow-sm"
+              className="w-full h-full max-w-[220px] max-h-[220px]"
             >
-              {/* Gradient Definitions */}
+              {/* Apple Watch style gradient definitions */}
               <defs>
-                <linearGradient id="baseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <linearGradient id="appleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor={config.primaryColor} />
                   <stop offset="100%" stopColor={config.secondaryColor} />
                 </linearGradient>
-                <linearGradient id="overflowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#EF4444" />
-                  <stop offset="50%" stopColor="#F87171" />
-                  <stop offset="100%" stopColor="#FCA5A5" />
+                <linearGradient id="overCapacityGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FF1744" />
+                  <stop offset="100%" stopColor="#FF6B6B" />
                 </linearGradient>
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                  <feMerge> 
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
               </defs>
               
-              {/* Background track */}
+              {/* Background track - Apple Watch style */}
               <circle
-                cx="110"
-                cy="110"
-                r={baseRadius}
+                cx={center}
+                cy={center}
+                r={radius}
                 fill="none"
-                stroke={config.bgColor}
+                stroke="hsl(var(--muted))"
                 strokeWidth={strokeWidth}
-                opacity="0.2"
+                opacity="0.15"
               />
               
-              {/* Main progress arc */}
+              {/* Main progress ring - Apple Watch style */}
               <circle
-                cx="110"
-                cy="110"
-                r={baseRadius}
+                cx={center}
+                cy={center}
+                r={radius}
                 fill="none"
-                stroke="url(#baseGradient)"
+                stroke={isOverCapacity ? "url(#overCapacityGradient)" : "url(#appleGradient)"}
                 strokeWidth={strokeWidth}
                 strokeLinecap="round"
-                strokeDasharray={circumference}
-                strokeDashoffset={baseDashOffset}
-                transform="rotate(-90 110 110)"
+                strokeDasharray={strokeDasharray}
+                strokeDashoffset={strokeDashoffset}
+                transform={`rotate(-90 ${center} ${center})`}
                 className="transition-all duration-1000 ease-out"
                 style={{
-                  filter: "url(#glow)",
+                  filter: "drop-shadow(0 0 8px rgba(0,0,0,0.1))"
                 }}
               />
               
-              {/* Overflow segments with clean layering */}
-              {isOverCapacity && overflowSegments.map((segment, index) => (
+              {/* Overflow indicator - second ring for over 100% */}
+              {isOverCapacity && (
                 <circle
-                  key={index}
-                  cx="110"
-                  cy="110"
-                  r={segment.radius}
+                  cx={center}
+                  cy={center}
+                  r={radius + 16}
                   fill="none"
-                  stroke="url(#overflowGradient)"
-                  strokeWidth={segment.strokeWidth}
+                  stroke="url(#overCapacityGradient)"
+                  strokeWidth={8}
                   strokeLinecap="round"
-                  strokeDasharray={segment.dashArray}
-                  strokeDashoffset={segment.dashOffset}
-                  transform="rotate(-90 110 110)"
-                  opacity={segment.opacity}
-                  className="transition-all duration-1000 ease-out"
-                  style={{
-                    filter: "url(#glow)",
-                    animation: `pulse ${3 + segment.delay}s ease-in-out infinite`
-                  }}
+                  strokeDasharray={2 * Math.PI * (radius + 16)}
+                  strokeDashoffset={2 * Math.PI * (radius + 16) * (1 - Math.min((actualUtilizationRate - 100) / 100, 1))}
+                  transform={`rotate(-90 ${center} ${center})`}
+                  opacity="0.7"
+                  className="transition-all duration-1000 ease-out animate-pulse"
                 />
-              ))}
-              
-              {/* Modern indicator dots */}
-              {isOverCapacity && overflowSegments.map((segment, index) => (
-                segment.progress > 0.2 && (
-                  <circle
-                    key={`dot-${index}`}
-                    cx={110 + segment.radius * Math.cos(-Math.PI/2 + segment.progress * Math.PI * 1.5)}
-                    cy={110 + segment.radius * Math.sin(-Math.PI/2 + segment.progress * Math.PI * 1.5)}
-                    r="2.5"
-                    fill="#EF4444"
-                    className="transition-all duration-1000 ease-out"
-                    style={{
-                      filter: "drop-shadow(0 0 4px #EF4444)",
-                      animation: `pulse ${2 + index * 0.3}s ease-in-out infinite`
-                    }}
-                  />
-                )
-              ))}
+              )}
             </svg>
             
             {/* Center content with better typography */}
