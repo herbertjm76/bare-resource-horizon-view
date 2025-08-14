@@ -53,9 +53,8 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   
   // Calculate circle properties
   const radius = 80;
-  const overflowRadius = 85;
+  const overflowRadii = [85, 88, 91]; // Multiple overflow rings
   const circumference = 2 * Math.PI * radius;
-  const overflowCircumference = 2 * Math.PI * overflowRadius;
   const strokeWidth = 12;
   
   // Base ring calculations (0-100%)
@@ -66,8 +65,25 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   // Overflow ring calculations (100%+)
   const isOverCapacity = actualUtilizationRate > 100;
   const overflowProgress = isOverCapacity ? ((actualUtilizationRate - 100) / 50) * 100 : 0; // Scale to show up to 150% (50% overflow)
-  const overflowStrokeDasharray = `${overflowCircumference * 0.02} ${overflowCircumference * 0.01}`; // Dashed pattern
-  const overflowStrokeDashoffset = overflowCircumference - (Math.min(overflowProgress, 100) / 100) * overflowCircumference;
+  
+  // Calculate overflow rings data
+  const overflowRings = overflowRadii.map((ringRadius, index) => {
+    const ringCircumference = 2 * Math.PI * ringRadius;
+    const ringProgress = Math.max(0, Math.min(overflowProgress - (index * 20), 100)); // Stagger the progress
+    const dashLength = ringCircumference * (0.015 + index * 0.005); // Varying dash patterns
+    const gapLength = ringCircumference * (0.008 + index * 0.003);
+    
+    return {
+      radius: ringRadius,
+      circumference: ringCircumference,
+      progress: ringProgress,
+      strokeDasharray: `${dashLength} ${gapLength}`,
+      strokeDashoffset: ringCircumference - (ringProgress / 100) * ringCircumference,
+      opacity: 0.8 - (index * 0.15), // Decreasing opacity
+      animationDelay: index * 0.2, // Staggered animation
+      strokeWidth: 6 - (index * 1) // Decreasing stroke width
+    };
+  });
 
   return (
     <Card className="rounded-2xl bg-card-gradient-1 border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
@@ -116,26 +132,57 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 }}
               />
               
-              {/* Overflow ring (100%+) - only show when over capacity */}
-              {isOverCapacity && (
-                <circle
-                  cx="100"
-                  cy="100"
-                  r={overflowRadius}
-                  fill="none"
-                  stroke="#ef4444"
-                  strokeWidth={8}
-                  strokeLinecap="round"
-                  strokeDasharray={overflowStrokeDasharray}
-                  strokeDashoffset={overflowStrokeDashoffset}
-                  transform="rotate(-90 100 100)"
-                  className="transition-all duration-1000 ease-out animate-pulse"
-                  style={{
-                    filter: 'drop-shadow(0 2px 8px #ef444480)',
-                    opacity: 0.9
-                  }}
-                />
-              )}
+              {/* Multiple Overflow Rings (100%+) - Enhanced overlapping visualization */}
+              {isOverCapacity && overflowRings.map((ring, index) => (
+                <React.Fragment key={index}>
+                  {/* Gradient Definition */}
+                  <defs>
+                    <linearGradient id={`overflowGradient${index}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#ef4444" stopOpacity={ring.opacity} />
+                      <stop offset="50%" stopColor="#dc2626" stopOpacity={ring.opacity * 0.8} />
+                      <stop offset="100%" stopColor="#991b1b" stopOpacity={ring.opacity * 0.6} />
+                    </linearGradient>
+                  </defs>
+                  
+                  {/* Overflow Ring */}
+                  <circle
+                    cx="100"
+                    cy="100"
+                    r={ring.radius}
+                    fill="none"
+                    stroke={`url(#overflowGradient${index})`}
+                    strokeWidth={ring.strokeWidth}
+                    strokeLinecap="round"
+                    strokeDasharray={ring.strokeDasharray}
+                    strokeDashoffset={ring.strokeDashoffset}
+                    transform="rotate(-90 100 100)"
+                    className="transition-all duration-1000 ease-out"
+                    style={{
+                      filter: `drop-shadow(0 2px 8px #ef444460)`,
+                      opacity: ring.opacity,
+                      animation: `pulse ${2 + index * 0.5}s ease-in-out infinite`,
+                      animationDelay: `${ring.animationDelay}s`,
+                      mixBlendMode: 'multiply'
+                    }}
+                  />
+                  
+                  {/* Moving dots for dynamic effect */}
+                  {ring.progress > 20 && (
+                    <circle
+                      cx={100 + ring.radius * Math.cos(-Math.PI/2 + (ring.progress/100) * 2 * Math.PI)}
+                      cy={100 + ring.radius * Math.sin(-Math.PI/2 + (ring.progress/100) * 2 * Math.PI)}
+                      r="2"
+                      fill="#ef4444"
+                      opacity={ring.opacity * 1.5}
+                      className="transition-all duration-1000 ease-out"
+                      style={{
+                        filter: 'drop-shadow(0 0 4px #ef4444)',
+                        animation: `pulse ${1.5 + index * 0.3}s ease-in-out infinite`
+                      }}
+                    />
+                  )}
+                </React.Fragment>
+              ))}
             </svg>
             
             {/* Center content */}
