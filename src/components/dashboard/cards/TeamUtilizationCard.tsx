@@ -41,8 +41,8 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
     } else {
       return {
         status: 'Over Capacity',
-        primaryColor: '#EF4444',
-        secondaryColor: '#F87171',
+        primaryColor: '#10B981',
+        secondaryColor: '#34D399',
         bgColor: 'hsl(var(--muted))',
         textColor: 'hsl(var(--destructive))'
       };
@@ -59,10 +59,8 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   
   // Calculate progress with Apple Watch style logic
   const normalizedProgress = Math.min(actualUtilizationRate / 100, 1);
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference * (1 - normalizedProgress);
   
-  // For over 100%, we'll show a full ring with different styling
+  // For over 100%, we'll show overflow in the same ring
   const isOverCapacity = actualUtilizationRate > 100;
 
   return (
@@ -78,7 +76,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         </div>
         
         <div className="flex-1 flex flex-col items-center justify-center relative p-6">
-          {/* Modern Circular Progress */}
+          {/* Apple Watch Style Single Ring */}
           <div className="relative flex items-center justify-center w-full h-full">
             <svg 
               width="220" 
@@ -88,17 +86,17 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
             >
               {/* Apple Watch style gradient definitions */}
               <defs>
-                <linearGradient id="appleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <linearGradient id="normalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor={config.primaryColor} />
                   <stop offset="100%" stopColor={config.secondaryColor} />
                 </linearGradient>
-                <linearGradient id="overCapacityGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FF1744" />
+                <linearGradient id="overflowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#FF4444" />
                   <stop offset="100%" stopColor="#FF6B6B" />
                 </linearGradient>
               </defs>
               
-              {/* Background track - Apple Watch style */}
+              {/* Background track */}
               <circle
                 cx={center}
                 cy={center}
@@ -106,20 +104,20 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 fill="none"
                 stroke="hsl(var(--muted))"
                 strokeWidth={strokeWidth}
-                opacity="0.15"
+                opacity="0.1"
               />
               
-              {/* Main progress ring - Apple Watch style */}
+              {/* Main progress ring (0-100%) */}
               <circle
                 cx={center}
                 cy={center}
                 r={radius}
                 fill="none"
-                stroke={isOverCapacity ? "url(#overCapacityGradient)" : "url(#appleGradient)"}
+                stroke="url(#normalGradient)"
                 strokeWidth={strokeWidth}
                 strokeLinecap="round"
-                strokeDasharray={strokeDasharray}
-                strokeDashoffset={strokeDashoffset}
+                strokeDasharray={circumference}
+                strokeDashoffset={circumference * (1 - Math.min(normalizedProgress, 1))}
                 transform={`rotate(-90 ${center} ${center})`}
                 className="transition-all duration-1000 ease-out"
                 style={{
@@ -127,21 +125,23 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 }}
               />
               
-              {/* Overflow indicator - second ring for over 100% */}
+              {/* Overflow ring (100%+ on same track) */}
               {isOverCapacity && (
                 <circle
                   cx={center}
                   cy={center}
-                  r={radius + 16}
+                  r={radius}
                   fill="none"
-                  stroke="url(#overCapacityGradient)"
-                  strokeWidth={8}
+                  stroke="url(#overflowGradient)"
+                  strokeWidth={strokeWidth}
                   strokeLinecap="round"
-                  strokeDasharray={2 * Math.PI * (radius + 16)}
-                  strokeDashoffset={2 * Math.PI * (radius + 16) * (1 - Math.min((actualUtilizationRate - 100) / 100, 1))}
+                  strokeDasharray={circumference}
+                  strokeDashoffset={circumference * (1 - Math.min((actualUtilizationRate - 100) / 100, 1))}
                   transform={`rotate(-90 ${center} ${center})`}
-                  opacity="0.7"
-                  className="transition-all duration-1000 ease-out animate-pulse"
+                  className="transition-all duration-1000 ease-out"
+                  style={{
+                    filter: "drop-shadow(0 0 12px rgba(255, 68, 68, 0.3))"
+                  }}
                 />
               )}
             </svg>
