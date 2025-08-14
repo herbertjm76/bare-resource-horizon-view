@@ -18,7 +18,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   status,
   utilizationStatus
 }) => {
-  const actualUtilizationRate = utilizationRate || 75;
+  const actualUtilizationRate = utilizationRate || 150;
   
   // Define utilization thresholds and colors
   const getUtilizationConfig = (rate: number) => {
