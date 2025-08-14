@@ -53,11 +53,21 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   
   // Calculate circle properties
   const radius = 80;
+  const overflowRadius = 85;
   const circumference = 2 * Math.PI * radius;
+  const overflowCircumference = 2 * Math.PI * overflowRadius;
   const strokeWidth = 12;
-  const normalizedProgress = Math.min((config.progress / config.maxProgress) * 100, 100);
-  const strokeDasharray = circumference;
-  const strokeDashoffset = circumference - (normalizedProgress / 100) * circumference;
+  
+  // Base ring calculations (0-100%)
+  const baseProgress = Math.min(actualUtilizationRate, 100);
+  const baseStrokeDasharray = circumference;
+  const baseStrokeDashoffset = circumference - (baseProgress / 100) * circumference;
+  
+  // Overflow ring calculations (100%+)
+  const isOverCapacity = actualUtilizationRate > 100;
+  const overflowProgress = isOverCapacity ? ((actualUtilizationRate - 100) / 50) * 100 : 0; // Scale to show up to 150% (50% overflow)
+  const overflowStrokeDasharray = `${overflowCircumference * 0.02} ${overflowCircumference * 0.01}`; // Dashed pattern
+  const overflowStrokeDashoffset = overflowCircumference - (Math.min(overflowProgress, 100) / 100) * overflowCircumference;
 
   return (
     <Card className="rounded-2xl bg-card-gradient-1 border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
@@ -70,7 +80,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         </div>
         
         <div className="flex-1 flex flex-col items-center justify-center relative p-4">
-          {/* Single Ring Gauge */}
+          {/* Multi-Lap Ring Gauge */}
           <div className="relative flex items-center justify-center w-full h-full">
             <svg 
               width="200" 
@@ -88,7 +98,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 strokeWidth={strokeWidth}
               />
               
-              {/* Progress circle */}
+              {/* Base progress circle (0-100%) */}
               <circle
                 cx="100"
                 cy="100"
@@ -97,14 +107,35 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 stroke={config.color}
                 strokeWidth={strokeWidth}
                 strokeLinecap="round"
-                strokeDasharray={strokeDasharray}
-                strokeDashoffset={strokeDashoffset}
+                strokeDasharray={baseStrokeDasharray}
+                strokeDashoffset={baseStrokeDashoffset}
                 transform="rotate(-90 100 100)"
                 className="transition-all duration-1000 ease-out"
                 style={{
                   filter: `drop-shadow(0 2px 6px ${config.color}40)`
                 }}
               />
+              
+              {/* Overflow ring (100%+) - only show when over capacity */}
+              {isOverCapacity && (
+                <circle
+                  cx="100"
+                  cy="100"
+                  r={overflowRadius}
+                  fill="none"
+                  stroke="#ef4444"
+                  strokeWidth={8}
+                  strokeLinecap="round"
+                  strokeDasharray={overflowStrokeDasharray}
+                  strokeDashoffset={overflowStrokeDashoffset}
+                  transform="rotate(-90 100 100)"
+                  className="transition-all duration-1000 ease-out animate-pulse"
+                  style={{
+                    filter: 'drop-shadow(0 2px 8px #ef444480)',
+                    opacity: 0.9
+                  }}
+                />
+              )}
             </svg>
             
             {/* Center content */}
