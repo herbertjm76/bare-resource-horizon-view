@@ -146,13 +146,13 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               )}
             </svg>
             
-            {/* Center content with better typography */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="text-5xl font-bold bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            {/* Center content - positioned to avoid ring overlap */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center w-32 h-32">
+              <div className="text-4xl font-bold bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text text-transparent text-center">
                 {Math.round(actualUtilizationRate)}%
               </div>
               <div 
-                className="text-sm font-semibold mt-2 px-3 py-1 rounded-full bg-white/80 backdrop-blur-sm border"
+                className="text-xs font-semibold mt-1 px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm border text-center"
                 style={{ color: config.textColor }}
               >
                 {config.status}
