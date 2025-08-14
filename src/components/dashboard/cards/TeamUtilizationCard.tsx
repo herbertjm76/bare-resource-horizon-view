@@ -18,65 +18,46 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   status,
   utilizationStatus
 }) => {
-  // Determine status and color based on utilization rate, fallback to reasonable default
-  const finalStatus = status || utilizationStatus?.status || (utilizationRate && utilizationRate > 100 ? "Over Capacity" : "Optimal");
-  const actualUtilizationRate = utilizationRate || 75; // Show a reasonable default while loading
+  const actualUtilizationRate = utilizationRate || 75;
   
-  // Simplified 3-ring configuration with clearer distinctions
-  const rings = [
-    { 
-      capacity: 75, 
-      radius: 70, 
-      color: '#10b981', 
-      bgColor: '#dcfce7',
-      label: 'Optimal'
-    }, // Green - Optimal (0-75%)
-    { 
-      capacity: 100, 
-      radius: 85, 
-      color: '#8b5cf6', 
-      bgColor: '#f3e8ff',
-      label: 'At Capacity'
-    }, // Purple - At capacity (75-100%)
-    { 
-      capacity: 150, 
-      radius: 100, 
-      color: '#6b46c1', 
-      bgColor: '#ede9fe',
-      label: 'Over Capacity'
-    }, // Darker Purple - Over capacity (100%+)
-  ];
-  
-  const strokeWidth = 14;
-  const centerPoint = 120;
-  const svgSize = 240;
-  
-  // Calculate which rings should be filled and how much
-  const getRingFillData = () => {
-    return rings.map((ring, index) => {
-      const previousCapacity = index > 0 ? rings[index - 1].capacity : 0;
-      const ringCapacityRange = ring.capacity - previousCapacity;
-      
-      let fillPercentage = 0;
-      if (actualUtilizationRate > previousCapacity) {
-        const excessUtilization = Math.min(actualUtilizationRate - previousCapacity, ringCapacityRange);
-        fillPercentage = (excessUtilization / ringCapacityRange) * 100;
-      }
-      
-      const circumference = 2 * Math.PI * ring.radius;
-      const strokeDashoffset = circumference - (fillPercentage / 100 * circumference);
-      
+  // Define utilization thresholds and colors
+  const getUtilizationConfig = (rate: number) => {
+    if (rate <= 70) {
       return {
-        ...ring,
-        fillPercentage,
-        circumference,
-        strokeDashoffset,
-        isActive: fillPercentage > 0,
+        status: 'Under-utilized',
+        color: '#6b7280', // gray
+        bgColor: '#f3f4f6',
+        progress: rate,
+        maxProgress: 70
       };
-    });
+    } else if (rate <= 100) {
+      return {
+        status: 'Optimal',
+        color: '#10b981', // green
+        bgColor: '#dcfce7',
+        progress: rate,
+        maxProgress: 100
+      };
+    } else {
+      return {
+        status: 'Over Capacity',
+        color: '#ef4444', // red
+        bgColor: '#fee2e2',
+        progress: Math.min(rate, 150), // Cap visual at 150%
+        maxProgress: 150
+      };
+    }
   };
   
-  const ringData = getRingFillData();
+  const config = getUtilizationConfig(actualUtilizationRate);
+  
+  // Calculate circle properties
+  const radius = 80;
+  const circumference = 2 * Math.PI * radius;
+  const strokeWidth = 12;
+  const normalizedProgress = Math.min((config.progress / config.maxProgress) * 100, 100);
+  const strokeDasharray = circumference;
+  const strokeDashoffset = circumference - (normalizedProgress / 100) * circumference;
 
   return (
     <Card className="rounded-2xl bg-card-gradient-1 border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
@@ -89,68 +70,68 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         </div>
         
         <div className="flex-1 flex flex-col items-center justify-center relative p-4">
-          {/* Full Circle Gauge */}
+          {/* Single Ring Gauge */}
           <div className="relative flex items-center justify-center w-full h-full">
             <svg 
-              width={svgSize} 
-              height={svgSize} 
-              viewBox={`0 0 ${svgSize} ${svgSize}`} 
-              className="w-full h-full max-w-[240px] max-h-[240px]"
+              width="200" 
+              height="200" 
+              viewBox="0 0 200 200" 
+              className="w-full h-full max-w-[200px] max-h-[200px]"
             >
-              {/* Multi-ring gauge */}
-              {ringData.map((ring, index) => (
-                <g key={index}>
-                  {/* Background ring */}
-                  <circle
-                    cx={centerPoint}
-                    cy={centerPoint}
-                    r={ring.radius}
-                    fill="none"
-                    stroke={ring.bgColor}
-                    strokeWidth={strokeWidth}
-                  />
-                  
-                  {/* Progress ring */}
-                  {ring.isActive && (
-                    <circle
-                      cx={centerPoint}
-                      cy={centerPoint}
-                      r={ring.radius}
-                      fill="none"
-                      stroke={ring.color}
-                      strokeWidth={strokeWidth}
-                      strokeLinecap="round"
-                      strokeDasharray={ring.circumference}
-                      strokeDashoffset={ring.strokeDashoffset}
-                      transform={`rotate(-90 ${centerPoint} ${centerPoint})`}
-                      className="transition-all duration-1000 ease-out"
-                      style={{
-                        filter: `drop-shadow(0 2px 6px ${ring.color}40)`,
-                        animationDelay: `${index * 200}ms`
-                      }}
-                    />
-                  )}
-                </g>
-              ))}
+              {/* Background circle */}
+              <circle
+                cx="100"
+                cy="100"
+                r={radius}
+                fill="none"
+                stroke={config.bgColor}
+                strokeWidth={strokeWidth}
+              />
+              
+              {/* Progress circle */}
+              <circle
+                cx="100"
+                cy="100"
+                r={radius}
+                fill="none"
+                stroke={config.color}
+                strokeWidth={strokeWidth}
+                strokeLinecap="round"
+                strokeDasharray={strokeDasharray}
+                strokeDashoffset={strokeDashoffset}
+                transform="rotate(-90 100 100)"
+                className="transition-all duration-1000 ease-out"
+                style={{
+                  filter: `drop-shadow(0 2px 6px ${config.color}40)`
+                }}
+              />
             </svg>
             
-            {/* Center content - only percentage */}
+            {/* Center content */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="text-4xl font-bold text-foreground">{Math.round(actualUtilizationRate)}%</div>
+              <div className="text-sm font-medium mt-1" style={{ color: config.color }}>
+                {config.status}
+              </div>
             </div>
           </div>
 
-          {/* Simplified Legend */}
-          <div className="flex justify-center gap-4 mt-4">
-            {rings.map((ring, index) => (
-              <div key={index} className="flex items-center gap-1">
-                <div 
-                  className="w-3 h-3 rounded-full" 
-                  style={{ backgroundColor: ring.color }}
-                />
-                <span className="text-xs text-gray-600">{ring.label}</span>
+          {/* Status indicator */}
+          <div className="flex justify-center mt-4">
+            <div className="flex items-center gap-6 text-xs text-gray-600">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-gray-400" />
+                <span>Under (≤70%)</span>
               </div>
-            ))}
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-green-500" />
+                <span>Optimal (70-100%)</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 rounded-full bg-red-500" />
+                <span>Over (&gt;100%)</span>
+              </div>
+            </div>
           </div>
         </div>
         
