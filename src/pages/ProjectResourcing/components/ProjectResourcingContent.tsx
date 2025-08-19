@@ -7,6 +7,9 @@ import { ProjectResourcingSummaryCards } from './ProjectResourcingSummaryCards';
 import { ModernResourceGrid } from '@/components/resources/modern/ModernResourceGrid';
 import { useProjects } from '@/hooks/useProjects';
 import { GridLoadingState } from '@/components/resources/grid/GridLoadingState';
+import { BurnRateIndicator } from '@/components/resources/financial/BurnRateIndicator';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { DollarSign, TrendingUp, AlertTriangle } from 'lucide-react';
 
 interface ProjectResourcingContentProps {
   selectedMonth: Date;
@@ -101,6 +104,33 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
         selectedMonth={selectedMonth}
         periodToShow={filters.periodToShow}
       />
+
+      {/* Financial Overview - Mock data for demonstration */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <DollarSign className="w-5 h-5" />
+            Financial Overview
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
+            {projects?.slice(0, 3).map((project) => (
+              <BurnRateIndicator
+                key={project.id}
+                projectId={project.id}
+                projectName={project.name}
+                budgetAmount={100000}
+                spentAmount={65000}
+                burnRate={8500}
+                runwayWeeks={6.2}
+                utilizationRate={78}
+                className="h-full"
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Filter Row with expand/collapse controls */}
       <div className="w-full max-w-full overflow-hidden">

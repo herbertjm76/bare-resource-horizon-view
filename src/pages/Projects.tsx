@@ -8,9 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Dialog } from '@/components/ui/dialog';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
-import { WorkflowBreadcrumbs } from '@/components/workflow/WorkflowBreadcrumbs';
+import { EnhancedWorkflowBreadcrumbs } from '@/components/workflow/EnhancedWorkflowBreadcrumbs';
+import { WorkflowActionSection } from '@/components/workflow/WorkflowActionSection';
 import { ProjectSetupWizard } from '@/components/projects/enhanced-wizard/ProjectSetupWizard';
-import { FolderOpen, Plus, ArrowRight } from 'lucide-react';
+import { FolderOpen, Plus, ArrowRight, Settings, Users, BarChart3 } from 'lucide-react';
 
 const Projects = () => {
   const { projects, refetch } = useProjects();
@@ -67,28 +68,46 @@ const Projects = () => {
     refetch();
   };
 
+  const workflowActions = [
+    {
+      title: 'New Project Wizard',
+      description: 'Guided 5-step setup with financial planning and team composition',
+      action: () => setShowWizard(true),
+      icon: Plus,
+      badge: { text: 'Recommended', variant: 'default' as const }
+    },
+    {
+      title: 'Project Configuration',
+      description: 'Advanced project settings and stage management',
+      action: () => console.log('Open config'),
+      icon: Settings,
+      variant: 'outline' as const
+    },
+    {
+      title: 'Team Management',
+      description: 'Manage team composition and resource planning',
+      action: () => console.log('Open team mgmt'),
+      icon: Users,
+      variant: 'outline' as const
+    }
+  ];
+
   return (
     <StandardLayout>
-      <div className="max-w-6xl mx-auto space-y-8">
-        <WorkflowBreadcrumbs />
+      <div className="max-w-6xl mx-auto space-y-6">
+        <EnhancedWorkflowBreadcrumbs />
         
-        <div className="flex justify-between items-start">
-          <StandardizedPageHeader
-            title="Project Setup & Planning"
-            description="Create and manage projects with integrated financial planning and team composition"
-            icon={FolderOpen}
-          />
-          <div className="flex gap-3">
-            <Button onClick={() => setShowWizard(true)} size="lg" className="flex items-center gap-2">
-              <Plus className="w-4 h-4" />
-              New Project Wizard
-            </Button>
-            <Button variant="outline" size="lg" className="flex items-center gap-2">
-              Next: Resource Allocation
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+        <StandardizedPageHeader
+          title="Project Setup & Planning"
+          description="Create and manage projects with integrated financial planning and team composition"
+          icon={FolderOpen}
+        />
+
+        <WorkflowActionSection
+          title="Quick Actions"
+          subtitle="Start a new project or configure existing ones"
+          actions={workflowActions}
+        />
 
         <StandardizedExecutiveSummary
           metrics={metrics}
