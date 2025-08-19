@@ -23,7 +23,7 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
 
   // This effect will rerun when refetchSignal changes, reloading the state if needed.
   // Initialize the stages array from the project data
-  const initialStages = Array.isArray(project.stages) ? project.stages : [];
+  const initialStages = Array.isArray(project?.stages) ? project.stages : [];
 
   // Log for debugging
   console.log('useFormState - initializing with project:', project);
@@ -38,16 +38,16 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
 
   // Make state resettable when refetchSignal or project.id changes
   const [form, setForm] = React.useState<FormState>({
-    code: project.code || "",
-    name: project.name || "",
-    manager: project.project_manager?.id || "",
-    country: project.country || "",
-    profit: project.target_profit_percentage?.toString() || "",
-    avgRate: project.avg_rate?.toString() || "",
-    currency: project.currency || "USD",
-    status: project.status || "",
-    office: project.office?.id || "",
-    current_stage: project.current_stage || "",
+    code: project?.code || "",
+    name: project?.name || "",
+    manager: project?.project_manager?.id || "",
+    country: project?.country || "",
+    profit: project?.target_profit_percentage?.toString() || "",
+    avgRate: project?.avg_rate?.toString() || "",
+    currency: project?.currency || "USD",
+    status: project?.status || "",
+    office: project?.office?.id || "",
+    current_stage: project?.current_stage || "",
     stages: initialStages,
     stageFees: {},
     stageApplicability: initialStageSelections,
@@ -56,19 +56,19 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
   // When refetchSignal or project.id changes, reload the form state to initial values
   React.useEffect(() => {
     setForm({
-      code: project.code || "",
-      name: project.name || "",
-      manager: project.project_manager?.id || "",
-      country: project.country || "",
-      profit: project.target_profit_percentage?.toString() || "",
-      avgRate: project.avg_rate?.toString() || "",
-      currency: project.currency || "USD",
-      status: project.status || "",
-      office: project.office?.id || "",
-      current_stage: project.current_stage || "",
-      stages: Array.isArray(project.stages) ? project.stages : [],
+      code: project?.code || "",
+      name: project?.name || "",
+      manager: project?.project_manager?.id || "",
+      country: project?.country || "",
+      profit: project?.target_profit_percentage?.toString() || "",
+      avgRate: project?.avg_rate?.toString() || "",
+      currency: project?.currency || "USD",
+      status: project?.status || "",
+      office: project?.office?.id || "",
+      current_stage: project?.current_stage || "",
+      stages: Array.isArray(project?.stages) ? project.stages : [],
       stageFees: {},
-      stageApplicability: (Array.isArray(project.stages)
+      stageApplicability: (Array.isArray(project?.stages)
         ? project.stages.reduce((acc: Record<string, boolean>, stageId: string) => {
             acc[stageId] = true;
             return acc;
@@ -76,7 +76,7 @@ export const useFormState = (project: any, officeStages: any = [], refetchSignal
         : {}),
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project.id, refetchSignal]);
+  }, [project?.id, refetchSignal]);
 
   // Load project fees when initializing or refetchSignal changes
   React.useEffect(() => {
