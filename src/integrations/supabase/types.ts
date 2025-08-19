@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -1212,16 +1212,16 @@ export type Database = {
       calculate_project_financial_metrics: {
         Args: { project_uuid: string }
         Returns: {
-          total_budget: number
-          total_spent: number
-          total_revenue: number
-          profit_margin: number
-          budget_variance: number
-          schedule_variance: number
-          consumed_hours: number
-          budget_hours: number
           blended_rate: number
+          budget_hours: number
+          budget_variance: number
           burn_rate: number
+          consumed_hours: number
+          profit_margin: number
+          schedule_variance: number
+          total_budget: number
+          total_revenue: number
+          total_spent: number
         }[]
       }
       get_current_user_company_id: {
@@ -1239,16 +1239,16 @@ export type Database = {
       get_user_profile_by_id: {
         Args: { user_id: string }
         Returns: {
-          id: string
           company_id: string
-          role: string
+          created_at: string
+          department: string
           email: string
           first_name: string
-          last_name: string
+          id: string
           job_title: string
-          department: string
+          last_name: string
           location: string
-          created_at: string
+          role: string
           updated_at: string
         }[]
       }
