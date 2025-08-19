@@ -5,12 +5,16 @@ import { StandardizedPageHeader } from '@/components/layout/StandardizedPageHead
 import { ProjectsList } from '@/components/projects/ProjectsList';
 import { StandardizedExecutiveSummary } from '@/components/dashboard/StandardizedExecutiveSummary';
 import { Button } from '@/components/ui/button';
+import { Dialog } from '@/components/ui/dialog';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
-import { FolderOpen } from 'lucide-react';
+import { WorkflowBreadcrumbs } from '@/components/workflow/WorkflowBreadcrumbs';
+import { ProjectSetupWizard } from '@/components/projects/enhanced-wizard/ProjectSetupWizard';
+import { FolderOpen, Plus, ArrowRight } from 'lucide-react';
 
 const Projects = () => {
-  const { projects } = useProjects();
+  const { projects, refetch } = useProjects();
+  const [showWizard, setShowWizard] = useState(false);
 
   // Calculate statistics
   const totalProjects = projects.length;
@@ -56,14 +60,35 @@ const Projects = () => {
     }
   ];
 
+  const handleWizardSubmit = async (data: any) => {
+    console.log('Project wizard data:', data);
+    // TODO: Implement project creation logic
+    setShowWizard(false);
+    refetch();
+  };
+
   return (
     <StandardLayout>
       <div className="max-w-6xl mx-auto space-y-8">
-        <StandardizedPageHeader
-          title="All Projects"
-          description="View and manage all your ongoing projects across different locations and teams"
-          icon={FolderOpen}
-        />
+        <WorkflowBreadcrumbs />
+        
+        <div className="flex justify-between items-start">
+          <StandardizedPageHeader
+            title="Project Setup & Planning"
+            description="Create and manage projects with integrated financial planning and team composition"
+            icon={FolderOpen}
+          />
+          <div className="flex gap-3">
+            <Button onClick={() => setShowWizard(true)} size="lg" className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              New Project Wizard
+            </Button>
+            <Button variant="outline" size="lg" className="flex items-center gap-2">
+              Next: Resource Allocation
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
 
         <StandardizedExecutiveSummary
           metrics={metrics}
@@ -73,6 +98,13 @@ const Projects = () => {
         <OfficeSettingsProvider>
           <ProjectsList />
         </OfficeSettingsProvider>
+
+        <Dialog open={showWizard} onOpenChange={setShowWizard}>
+          <ProjectSetupWizard
+            onSubmit={handleWizardSubmit}
+            onCancel={() => setShowWizard(false)}
+          />
+        </Dialog>
       </div>
     </StandardLayout>
   );

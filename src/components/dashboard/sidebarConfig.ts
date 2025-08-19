@@ -35,45 +35,55 @@ export const navigationItems = [
     ],
   },
   {
-    label: "PROJECT MANAGEMENT",
+    label: "PROJECT LIFECYCLE",
     items: [
       {
-        title: "Project Resourcing",
+        title: "Project Setup & Planning",
+        url: "/projects",
+        icon: FolderKanban,
+      },
+      {
+        title: "Resource Allocation",
         url: "/project-resourcing",
         icon: GanttChartSquare,
       },
       {
-        title: "All Projects",
-        url: "/projects",
-        icon: FolderKanban,
+        title: "Financial Control",
+        url: "/financial-control",
+        icon: DollarSign,
+      },
+      {
+        title: "Progress Monitoring",
+        url: "/project-monitoring",
+        icon: TrendingUp,
       },
     ],
   },
-  // {
-  //   label: "FINANCIALS",
-  //   items: [
-  //     {
-  //       title: "Financial Overview",
-  //       url: "/financial-overview",
-  //       icon: DollarSign,
-  //     },
-  //     {
-  //       title: "Project Profit Dashboard",
-  //       url: "/project-profit-dashboard",
-  //       icon: TrendingUp,
-  //     },
-  //     {
-  //       title: "Project Billing",
-  //       url: "/project-billing",
-  //       icon: Receipt,
-  //     },
-  //     {
-  //       title: "Aging Invoices",
-  //       url: "/aging-invoices",
-  //       icon: Clock,
-  //     },
-  //   ],
-  // },
+  {
+    label: "FINANCIALS",
+    items: [
+      {
+        title: "Financial Overview",
+        url: "/financial-overview",
+        icon: Receipt,
+      },
+      {
+        title: "Project Profit Dashboard",
+        url: "/project-profit-dashboard",
+        icon: TrendingUp,
+      },
+      {
+        title: "Project Billing",
+        url: "/project-billing",
+        icon: Receipt,
+      },
+      {
+        title: "Aging Invoices",
+        url: "/aging-invoices",
+        icon: Clock,
+      },
+    ],
+  },
   {
     label: "RESOURCES",
     items: [

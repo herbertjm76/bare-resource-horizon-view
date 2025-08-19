@@ -5,6 +5,7 @@ import { ProjectResourcingContent } from './ProjectResourcing/components/Project
 import { useProjectResourcingState } from './ProjectResourcing/hooks/useProjectResourcingState';
 import { useProjectResourcingData } from './ProjectResourcing/hooks/useProjectResourcingData';
 import { calculateActiveFiltersCount, createClearFiltersFunction } from './ProjectResourcing/utils/filterUtils';
+import { WorkflowBreadcrumbs } from '@/components/workflow/WorkflowBreadcrumbs';
 
 const ProjectResourcing = () => {
   const {
@@ -41,7 +42,9 @@ const ProjectResourcing = () => {
 
   return (
     <StandardLayout>
-      <ProjectResourcingContent
+      <div className="max-w-full">
+        <WorkflowBreadcrumbs />
+        <ProjectResourcingContent
           selectedMonth={selectedMonth}
           searchTerm={searchTerm}
           filters={filters}
@@ -57,6 +60,7 @@ const ProjectResourcing = () => {
           onDisplayOptionChange={handleDisplayOptionChange}
           onClearFilters={clearFilters}
         />
+      </div>
     </StandardLayout>
   );
 };
