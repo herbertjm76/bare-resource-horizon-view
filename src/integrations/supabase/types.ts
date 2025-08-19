@@ -796,35 +796,44 @@ export type Database = {
       }
       project_resource_allocations: {
         Row: {
+          allocation_amount: number | null
           company_id: string | null
           created_at: string
           hours: number
           id: string
           project_id: string
+          rate_snapshot: number | null
           resource_id: string
           resource_type: string
+          stage_id: string | null
           updated_at: string
           week_start_date: string
         }
         Insert: {
+          allocation_amount?: number | null
           company_id?: string | null
           created_at?: string
           hours?: number
           id?: string
           project_id: string
+          rate_snapshot?: number | null
           resource_id: string
           resource_type: string
+          stage_id?: string | null
           updated_at?: string
           week_start_date: string
         }
         Update: {
+          allocation_amount?: number | null
           company_id?: string | null
           created_at?: string
           hours?: number
           id?: string
           project_id?: string
+          rate_snapshot?: number | null
           resource_id?: string
           resource_type?: string
+          stage_id?: string | null
           updated_at?: string
           week_start_date?: string
         }
@@ -841,6 +850,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_resource_allocations_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "office_stages"
             referencedColumns: ["id"]
           },
         ]
@@ -897,9 +913,74 @@ export type Database = {
           },
         ]
       }
+      project_stage_team_composition: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          planned_hours_per_person: number
+          planned_quantity: number
+          project_id: string
+          rate_snapshot: number
+          reference_id: string
+          reference_type: string
+          stage_id: string
+          total_budget_amount: number | null
+          total_planned_hours: number | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          planned_hours_per_person?: number
+          planned_quantity?: number
+          project_id: string
+          rate_snapshot?: number
+          reference_id: string
+          reference_type: string
+          stage_id: string
+          total_budget_amount?: number | null
+          total_planned_hours?: number | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          planned_hours_per_person?: number
+          planned_quantity?: number
+          project_id?: string
+          rate_snapshot?: number
+          reference_id?: string
+          reference_type?: string
+          stage_id?: string
+          total_budget_amount?: number | null
+          total_planned_hours?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_stage_team_composition_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_stage_team_composition_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "office_stages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_stages: {
         Row: {
+          allocated_hours: number | null
           billing_month: string | null
+          budget_utilization_percentage: number | null
           budgeted_hours: number | null
           company_id: string | null
           completion_percentage: number | null
@@ -914,12 +995,17 @@ export type Database = {
           invoice_status: string | null
           is_applicable: boolean | null
           project_id: string
+          remaining_hours: number | null
           stage_name: string
+          total_budget_amount: number | null
+          total_budgeted_hours: number | null
           updated_at: string | null
           variance_percentage: number | null
         }
         Insert: {
+          allocated_hours?: number | null
           billing_month?: string | null
+          budget_utilization_percentage?: number | null
           budgeted_hours?: number | null
           company_id?: string | null
           completion_percentage?: number | null
@@ -934,12 +1020,17 @@ export type Database = {
           invoice_status?: string | null
           is_applicable?: boolean | null
           project_id: string
+          remaining_hours?: number | null
           stage_name: string
+          total_budget_amount?: number | null
+          total_budgeted_hours?: number | null
           updated_at?: string | null
           variance_percentage?: number | null
         }
         Update: {
+          allocated_hours?: number | null
           billing_month?: string | null
+          budget_utilization_percentage?: number | null
           budgeted_hours?: number | null
           company_id?: string | null
           completion_percentage?: number | null
@@ -954,7 +1045,10 @@ export type Database = {
           invoice_status?: string | null
           is_applicable?: boolean | null
           project_id?: string
+          remaining_hours?: number | null
           stage_name?: string
+          total_budget_amount?: number | null
+          total_budgeted_hours?: number | null
           updated_at?: string | null
           variance_percentage?: number | null
         }
@@ -1040,6 +1134,7 @@ export type Database = {
           name: string
           office_id: string
           project_manager_id: string | null
+          rate_basis_strategy: string | null
           stages: string[] | null
           status: Database["public"]["Enums"]["project_status"]
           target_profit_percentage: number
@@ -1065,6 +1160,7 @@ export type Database = {
           name: string
           office_id: string
           project_manager_id?: string | null
+          rate_basis_strategy?: string | null
           stages?: string[] | null
           status?: Database["public"]["Enums"]["project_status"]
           target_profit_percentage: number
@@ -1090,6 +1186,7 @@ export type Database = {
           name?: string
           office_id?: string
           project_manager_id?: string | null
+          rate_basis_strategy?: string | null
           stages?: string[] | null
           status?: Database["public"]["Enums"]["project_status"]
           target_profit_percentage?: number
@@ -1268,6 +1365,10 @@ export type Database = {
               requested_role: Database["public"]["Enums"]["user_role"]
             }
         Returns: boolean
+      }
+      update_stage_budgets: {
+        Args: { p_project_id: string; p_stage_id: string }
+        Returns: undefined
       }
       user_has_admin_role: {
         Args: { user_id: string }
