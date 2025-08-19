@@ -6,8 +6,8 @@ import { Dialog } from '@/components/ui/dialog';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
 import { ProjectSetupWizard } from '@/components/projects/enhanced-wizard/ProjectSetupWizard';
-import { StreamlinedProjectHeader } from '@/pages/Projects/components/StreamlinedProjectHeader';
-import { StreamlinedProjectActionBar } from '@/pages/Projects/components/StreamlinedProjectActionBar';
+import { WorkflowProgressHeader } from '@/pages/Projects/components/WorkflowProgressHeader';
+import { ProjectExecutiveSummary } from '@/pages/Projects/components/ProjectExecutiveSummary';
 
 const Projects = () => {
   const { projects, refetch } = useProjects();
@@ -33,28 +33,18 @@ const Projects = () => {
     refetch();
   };
 
-  const handleProjectConfig = () => {
-    console.log('Open config');
-  };
-
-  const handleTeamManagement = () => {
-    console.log('Open team mgmt');
-  };
-
   return (
     <StandardLayout>
       <div className="max-w-6xl mx-auto space-y-6">
-        <StreamlinedProjectHeader
+        <WorkflowProgressHeader
+          onNewProject={() => setShowWizard(true)}
+        />
+
+        <ProjectExecutiveSummary
           totalProjects={totalProjects}
           activeProjects={activeProjects}
           completionRate={completionRate}
           totalOffices={totalOffices}
-          onNewProject={() => setShowWizard(true)}
-        />
-
-        <StreamlinedProjectActionBar
-          onProjectConfig={handleProjectConfig}
-          onTeamManagement={handleTeamManagement}
         />
         
         <OfficeSettingsProvider>
