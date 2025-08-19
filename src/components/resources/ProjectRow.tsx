@@ -6,6 +6,8 @@ import { ProjectHeader } from './components/ProjectHeader';
 import { AddResourceRow } from './components/AddResourceRow';
 import { DailyAllocationCell } from './components/DailyAllocationCell';
 import { useProjectRowData } from './hooks/useProjectRowData';
+import { useProjectStageProgress } from '@/hooks/useProjectStageProgress';
+import { isSameDay, format as formatDate } from 'date-fns';
 
 interface DayInfo {
   date: Date;
@@ -47,6 +49,11 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
     handleAddResource,
     checkResourceInOtherProjects
   } = useProjectRowData(project, days);
+
+  const { stageProgress, isDateInStageTimeline } = useProjectStageProgress(
+    project.id, 
+    project.current_stage || (project.stages?.[0] || '')
+  );
   
   // Base background color for project rows
   const rowBgClass = isEven 
@@ -98,12 +105,20 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
           const dayKey = getDayKey(day.date);
           const projectHours = dailyProjectHours[dayKey] || 0;
           
+          // Check if this day is within the stage timeline
+          const isInStageTimeline = isDateInStageTimeline(day.date);
+          const isStageStart = stageProgress.stageStartDate && isSameDay(day.date, stageProgress.stageStartDate);
+          const isStageEnd = stageProgress.stageEndDate && isSameDay(day.date, stageProgress.stageEndDate);
+          
           return (
             <DailyAllocationCell
               key={dayKey}
               day={day}
               dayKey={dayKey}
               projectHours={projectHours}
+              isInStageTimeline={isInStageTimeline}
+              isStageStart={isStageStart}
+              isStageEnd={isStageEnd}
             />
           );
         })}

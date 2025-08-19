@@ -1,7 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { StageSelector } from './StageSelector';
+import { StageProgressBar } from './StageProgressBar';
+import { useProjectStageProgress } from '@/hooks/useProjectStageProgress';
 
 interface ProjectHeaderProps {
   project: any;
@@ -20,6 +23,14 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
   headerBgClass,
   totalHours = 0
 }) => {
+  const [currentStage, setCurrentStage] = useState(project.current_stage || (project.stages?.[0] || ''));
+  
+  const { stageProgress, isLoading } = useProjectStageProgress(project.id, currentStage);
+
+  const handleStageChange = (newStage: string) => {
+    setCurrentStage(newStage);
+  };
+
   return (
     <>
       {/* Counter column */}
@@ -38,19 +49,42 @@ export const ProjectHeader: React.FC<ProjectHeaderProps> = ({
         </Button>
       </td>
       
-      {/* Project name column */}
+      {/* Project name column with stage controls */}
       <td className={`project-name-column ${headerBgClass} p-2`}>
-        <div className="flex items-center justify-between">
-          <div className="truncate-text">
-            <div className="font-medium text-white text-sm">
-              {project.name}
+        <div className="flex items-center justify-between gap-2">
+          <div className="truncate-text flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="font-medium text-white text-sm truncate">
+                {project.name}
+              </div>
+              <StageSelector
+                projectId={project.id}
+                currentStage={currentStage}
+                availableStages={project.stages || []}
+                onStageChange={handleStageChange}
+              />
             </div>
-            <div className="text-xs text-white/80">
-              {resourceCount} resource{resourceCount !== 1 ? 's' : ''}
-              {totalHours > 0 && (
-                <span className="ml-2">
-                  • {totalHours}h total
-                </span>
+            
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-xs text-white/80">
+                {resourceCount} resource{resourceCount !== 1 ? 's' : ''}
+                {totalHours > 0 && (
+                  <span className="ml-2">
+                    • {totalHours}h total
+                  </span>
+                )}
+              </div>
+              
+              {/* Stage progress bar */}
+              {!isLoading && stageProgress.totalBudgetedHours > 0 && (
+                <div className="flex-1 max-w-32">
+                  <StageProgressBar
+                    allocatedHours={stageProgress.totalAllocatedHours}
+                    budgetedHours={stageProgress.totalBudgetedHours}
+                    progressPercentage={stageProgress.progressPercentage}
+                    isOverAllocated={stageProgress.isOverAllocated}
+                  />
+                </div>
               )}
             </div>
           </div>
