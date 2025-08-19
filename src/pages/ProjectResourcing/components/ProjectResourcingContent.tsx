@@ -1,15 +1,12 @@
 
 import React from 'react';
 import { OfficeSettingsProvider } from '@/context/officeSettings/OfficeSettingsContext';
-import { ProjectResourcingHeader } from './ProjectResourcingHeader';
-import { ProjectResourcingFilterRow } from './ProjectResourcingFilterRow';
-import { ProjectResourcingSummaryCards } from './ProjectResourcingSummaryCards';
+import { StreamlinedProjectResourcingHeader } from './StreamlinedProjectResourcingHeader';
+import { StreamlinedActionBar } from './StreamlinedActionBar';
 import { ModernResourceGrid } from '@/components/resources/modern/ModernResourceGrid';
 import { useProjects } from '@/hooks/useProjects';
 import { GridLoadingState } from '@/components/resources/grid/GridLoadingState';
-import { BurnRateIndicator } from '@/components/resources/financial/BurnRateIndicator';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, TrendingUp, AlertTriangle } from 'lucide-react';
+import { useProjectResourcingSummary } from '../hooks/useProjectResourcingSummary';
 
 interface ProjectResourcingContentProps {
   selectedMonth: Date;
@@ -55,6 +52,12 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   onClearFilters
 }) => {
   const { projects, isLoading } = useProjects();
+  const { 
+    availableThisMonth,
+    multiProjectLoad, 
+    overloadedResources,
+    isLoading: isSummaryLoading 
+  } = useProjectResourcingSummary(selectedMonth, filters.periodToShow);
   const [expandedProjects, setExpandedProjects] = React.useState<string[]>([]);
   
   // Expand all projects
@@ -93,71 +96,39 @@ const ProjectResourcingInner: React.FC<ProjectResourcingContentProps> = ({
   return (
     <div className="max-w-7xl mx-auto px-6 py-6 space-y-6">
       
-      {/* Header with metrics */}
-      <ProjectResourcingHeader 
+      {/* Streamlined Header Section */}
+      <StreamlinedProjectResourcingHeader 
         projectCount={totalProjects}
         periodToShow={filters.periodToShow}
+        availableResources={availableThisMonth.count}
+        overloadedResources={overloadedResources.count}
+        multiProjectResources={multiProjectLoad.count}
       />
 
-      {/* Summary Cards */}
-      <ProjectResourcingSummaryCards 
-        selectedMonth={selectedMonth}
+      {/* Compact Action Bar */}
+      <StreamlinedActionBar
+        selectedDate={selectedMonth}
+        onDateChange={onMonthChange}
         periodToShow={filters.periodToShow}
+        onPeriodChange={onPeriodChange}
+        filters={filters}
+        searchTerm={searchTerm}
+        onFilterChange={onFilterChange}
+        onSearchChange={onSearchChange}
+        officeOptions={officeOptions}
+        countryOptions={countryOptions}
+        managers={managers}
+        activeFiltersCount={activeFiltersCount}
+        displayOptions={displayOptions}
+        onDisplayOptionChange={onDisplayOptionChange}
+        onClearFilters={onClearFilters}
+        onExpandAll={expandAll}
+        onCollapseAll={collapseAll}
+        expandedProjects={expandedProjects}
+        totalProjects={totalProjects}
       />
-
-      {/* Financial Overview - Mock data for demonstration */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <DollarSign className="w-5 h-5" />
-            Financial Overview
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {projects?.slice(0, 3).map((project) => (
-              <BurnRateIndicator
-                key={project.id}
-                projectId={project.id}
-                projectName={project.name}
-                budgetAmount={100000}
-                spentAmount={65000}
-                burnRate={8500}
-                runwayWeeks={6.2}
-                utilizationRate={78}
-                className="h-full"
-              />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Filter Row with expand/collapse controls */}
-      <div className="w-full max-w-full overflow-hidden">
-        <ProjectResourcingFilterRow
-          selectedDate={selectedMonth}
-          onDateChange={onMonthChange}
-          periodToShow={filters.periodToShow}
-          onPeriodChange={onPeriodChange}
-          filters={filters}
-          searchTerm={searchTerm}
-          onFilterChange={onFilterChange}
-          onSearchChange={onSearchChange}
-          officeOptions={officeOptions}
-          countryOptions={countryOptions}
-          managers={managers}
-          activeFiltersCount={activeFiltersCount}
-          displayOptions={displayOptions}
-          onDisplayOptionChange={onDisplayOptionChange}
-          onClearFilters={onClearFilters}
-          onExpandAll={expandAll}
-          onCollapseAll={collapseAll}
-          expandedProjects={expandedProjects}
-          totalProjects={totalProjects}
-        />
-      </div>
       
-      {/* Modern Resource Grid with original styling */}
+      {/* Content-First Main Table */}
       <div className="w-full max-w-full overflow-hidden">
         <ModernResourceGrid
           startDate={selectedMonth}
