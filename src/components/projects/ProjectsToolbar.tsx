@@ -90,27 +90,6 @@ const ProjectsToolbar: React.FC<ProjectsToolbarProps> = ({
           </TooltipContent>
         </Tooltip>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div>
-              <NewProjectDialog 
-                onProjectCreated={onProjectCreated} 
-                trigger={
-                  <Button 
-                    variant="default" 
-                    size={iconOnly ? "icon" : "sm"}
-                  >
-                    <Plus className="h-4 w-4" />
-                    {!iconOnly && <span className="ml-1">New Project</span>}
-                  </Button>
-                }
-              />
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Create new project</p>
-          </TooltipContent>
-        </Tooltip>
       </div>
     </TooltipProvider>
   );
