@@ -50,21 +50,6 @@ const ProjectsOnboarding = () => {
     },
     {
       step: 3,
-      title: 'Financial Control',
-      description: 'Set budgets, track costs, manage billing, and monitor profitability',
-      icon: DollarSign,
-      route: '/financial-control',
-      features: [
-        'Budget planning',
-        'Cost tracking',
-        'Billing management',
-        'Profit analysis'
-      ],
-      color: 'bg-emerald-500',
-      borderColor: 'border-emerald-500/20'
-    },
-    {
-      step: 4,
       title: 'Progress Monitoring',
       description: 'Track project progress, monitor KPIs, and generate comprehensive reports',
       icon: BarChart3,
