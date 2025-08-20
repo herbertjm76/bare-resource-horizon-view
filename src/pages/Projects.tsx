@@ -6,7 +6,8 @@ import { Dialog } from '@/components/ui/dialog';
 import { OfficeSettingsProvider } from '@/context/OfficeSettingsContext';
 import { useProjects } from '@/hooks/useProjects';
 import { ProjectSetupWizard } from '@/components/projects/enhanced-wizard/ProjectSetupWizard';
-import { WorkflowStepsBreadcrumbs } from '@/components/workflow/WorkflowStepsBreadcrumbs';
+import { SimpleBreadcrumbs } from '@/components/navigation/SimpleBreadcrumbs';
+import { ProjectsHeader } from '@/components/projects/ProjectsHeader';
 import { ProjectExecutiveSummary } from '@/pages/Projects/components/ProjectExecutiveSummary';
 
 const Projects = () => {
@@ -36,9 +37,9 @@ const Projects = () => {
   return (
     <StandardLayout>
       <div className="max-w-6xl mx-auto space-y-6">
-        <WorkflowStepsBreadcrumbs
-          onNewProject={() => setShowWizard(true)}
-        />
+        <SimpleBreadcrumbs />
+        
+        <ProjectsHeader onNewProject={() => setShowWizard(true)} />
 
         <ProjectExecutiveSummary
           totalProjects={totalProjects}
