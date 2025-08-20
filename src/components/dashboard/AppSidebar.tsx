@@ -13,7 +13,7 @@ export const AppSidebar: React.FC = () => {
   return (
     <Sidebar 
       collapsible="icon" 
-      className="bg-gradient-to-b from-[#6465F0] to-[#5D3FD3] text-white border-[#6465F0]"
+      className="bg-gradient-to-b from-slate-800 to-slate-900 text-white border-slate-700"
     >
       <SidebarHeader className="p-0">
         <SidebarLogo />
