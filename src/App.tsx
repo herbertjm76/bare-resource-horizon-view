@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import Projects from "./pages/Projects";
+import ProjectsOnboarding from "./pages/ProjectsOnboarding";
 import TeamMembers from "./pages/TeamMembers";
 import TeamMemberDetail from "./pages/TeamMemberDetail";
 import OfficeSettings from "./pages/OfficeSettings";
@@ -48,6 +49,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/projects" element={<Projects />} />
+              <Route path="/projects/onboarding" element={<ProjectsOnboarding />} />
               <Route path="/team-members" element={<TeamMembers />} />
               <Route path="/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/office-settings" element={<OfficeSettings />} />

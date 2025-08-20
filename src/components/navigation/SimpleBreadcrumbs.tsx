@@ -19,6 +19,12 @@ export const SimpleBreadcrumbs: React.FC = () => {
       case '/projects':
         breadcrumbs.push({ label: 'Projects' });
         break;
+      case '/projects/onboarding':
+        breadcrumbs.push(
+          { label: 'Projects', href: '/projects' },
+          { label: 'Workflow Guide' }
+        );
+        break;
       case '/project-resourcing':
         breadcrumbs.push(
           { label: 'Projects', href: '/projects' },
