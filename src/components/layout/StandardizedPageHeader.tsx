@@ -17,7 +17,7 @@ export const StandardizedPageHeader: React.FC<StandardizedPageHeaderProps> = ({
   return (
     <div className="space-y-6 mb-6">
       {/* Main Header Section with Purple Background */}
-      <div className="bg-gradient-to-r from-[#6465F0] via-[#7c6df5] to-[#9c5ef7]">
+      <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-600">
         <div className="text-center py-6">
           <div className="flex items-center justify-center gap-3 mb-2">
             <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
