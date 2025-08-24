@@ -15,7 +15,8 @@ import {
   DollarSign,
   TrendingUp,
   Receipt,
-  Clock
+  Clock,
+  GitBranch
 } from "lucide-react"
 
 export const navigationItems = [
@@ -31,6 +32,11 @@ export const navigationItems = [
         title: "Weekly Overview",
         url: "/weekly-overview",
         icon: Calendar,
+      },
+      {
+        title: "Workflow",
+        url: "/workflow",
+        icon: GitBranch,
       },
     ],
   },
