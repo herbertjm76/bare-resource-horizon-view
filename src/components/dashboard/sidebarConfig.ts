@@ -38,22 +38,22 @@ export const navigationItems = [
     label: "PROJECT LIFECYCLE",
     items: [
       {
-        title: "Project Setup & Planning",
+        title: "Projects",
         url: "/projects",
         icon: FolderKanban,
       },
       {
-        title: "Resource Allocation",
+        title: "Resources",
         url: "/project-resourcing",
         icon: GanttChartSquare,
       },
       {
-        title: "Financial Control",
+        title: "Financials",
         url: "/financial-control",
         icon: DollarSign,
       },
       {
-        title: "Progress Monitoring",
+        title: "Monitoring",
         url: "/project-monitoring",
         icon: TrendingUp,
       },
