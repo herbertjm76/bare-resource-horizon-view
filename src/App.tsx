@@ -33,6 +33,7 @@ import AppTourPage from "./pages/AppTour";
 import PricingPage from "./pages/Pricing";
 import FinancialControl from "./pages/FinancialControl";
 import ProjectMonitoring from "./pages/ProjectMonitoring";
+import { WorkflowPage } from "./pages/WorkflowPage";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ function App() {
               <Route path="/project-resourcing" element={<ProjectResourcing />} />
               <Route path="/financial-control" element={<FinancialControl />} />
               <Route path="/project-monitoring" element={<ProjectMonitoring />} />
+              <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/financial-overview" element={<FinancialOverview />} />
               <Route path="/project-profit-dashboard" element={<ProjectProfitDashboard />} />
               <Route path="/project-billing" element={<ProjectBilling />} />
