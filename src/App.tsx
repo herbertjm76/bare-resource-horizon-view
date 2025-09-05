@@ -34,6 +34,7 @@ import PricingPage from "./pages/Pricing";
 import FinancialControl from "./pages/FinancialControl";
 import ProjectMonitoring from "./pages/ProjectMonitoring";
 import { WorkflowPage } from "./pages/WorkflowPage";
+import WeeklyRundown from "./pages/WeeklyRundown";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +56,7 @@ function App() {
               <Route path="/team-members/:id" element={<TeamMemberDetail />} />
               <Route path="/office-settings" element={<OfficeSettings />} />
               <Route path="/weekly-overview" element={<WeeklyOverview />} />
+              <Route path="/weekly-rundown" element={<WeeklyRundown />} />
               <Route path="/team-workload" element={<TeamWorkload />} />
               <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
               <Route path="/project-resourcing" element={<ProjectResourcing />} />

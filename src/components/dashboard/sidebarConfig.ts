@@ -16,7 +16,8 @@ import {
   TrendingUp,
   Receipt,
   Clock,
-  GitBranch
+  GitBranch,
+  Presentation
 } from "lucide-react"
 
 export const navigationItems = [
@@ -32,6 +33,11 @@ export const navigationItems = [
         title: "Weekly Overview",
         url: "/weekly-overview",
         icon: Calendar,
+      },
+      {
+        title: "Weekly Rundown",
+        url: "/weekly-rundown",
+        icon: Presentation,
       },
       {
         title: "Workflow",
