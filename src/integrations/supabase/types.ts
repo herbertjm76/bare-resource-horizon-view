@@ -483,6 +483,107 @@ export type Database = {
           },
         ]
       }
+      personal_info_access_log: {
+        Row: {
+          access_type: string
+          accessed_at: string
+          accessed_by: string
+          company_id: string
+          id: string
+          ip_address: unknown | null
+          profile_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          access_type: string
+          accessed_at?: string
+          accessed_by: string
+          company_id: string
+          id?: string
+          ip_address?: unknown | null
+          profile_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          access_type?: string
+          accessed_at?: string
+          accessed_by?: string
+          company_id?: string
+          id?: string
+          ip_address?: unknown | null
+          profile_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
+      personal_information: {
+        Row: {
+          address: string | null
+          city: string | null
+          company_id: string
+          country: string | null
+          created_at: string
+          data_sensitivity_level: Database["public"]["Enums"]["data_sensitivity"]
+          date_of_birth: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          id: string
+          phone: string | null
+          postal_code: string | null
+          profile_id: string
+          social_linkedin: string | null
+          social_twitter: string | null
+          state: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          company_id: string
+          country?: string | null
+          created_at?: string
+          data_sensitivity_level?: Database["public"]["Enums"]["data_sensitivity"]
+          date_of_birth?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          id?: string
+          phone?: string | null
+          postal_code?: string | null
+          profile_id: string
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          state?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          company_id?: string
+          country?: string | null
+          created_at?: string
+          data_sensitivity_level?: Database["public"]["Enums"]["data_sensitivity"]
+          date_of_birth?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          id?: string
+          phone?: string | null
+          postal_code?: string | null
+          profile_id?: string
+          social_linkedin?: string | null
+          social_twitter?: string | null
+          state?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personal_information_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
@@ -1366,6 +1467,10 @@ export type Database = {
             }
         Returns: boolean
       }
+      migrate_sensitive_profile_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       update_stage_budgets: {
         Args: { p_project_id: string; p_stage_id: string }
         Returns: undefined
@@ -1388,6 +1493,7 @@ export type Database = {
       }
     }
     Enums: {
+      data_sensitivity: "public" | "internal" | "confidential" | "restricted"
       project_status: "In Progress" | "On Hold" | "Complete" | "Planning"
       user_role: "owner" | "admin" | "member"
     }
@@ -1517,6 +1623,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      data_sensitivity: ["public", "internal", "confidential", "restricted"],
       project_status: ["In Progress", "On Hold", "Complete", "Planning"],
       user_role: ["owner", "admin", "member"],
     },
