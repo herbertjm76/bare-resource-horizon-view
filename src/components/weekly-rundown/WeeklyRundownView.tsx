@@ -3,16 +3,19 @@ import { format, startOfWeek } from 'date-fns';
 import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hooks/useStreamlinedWeekResourceData';
 import { RundownControls } from './RundownControls';
 import { RundownCarousel } from './RundownCarousel';
+import { RundownGridView } from './RundownGridView';
 import { useRundownData } from './hooks/useRundownData';
 import { useCarouselNavigation } from './hooks/useCarouselNavigation';
 
 export type RundownMode = 'people' | 'projects';
 export type SortOption = 'alphabetical' | 'utilization' | 'location';
+export type ViewType = 'carousel' | 'grid';
 
 export const WeeklyRundownView: React.FC = () => {
   const [selectedWeek, setSelectedWeek] = useState<Date>(new Date());
   const [rundownMode, setRundownMode] = useState<RundownMode>('people');
   const [sortOption, setSortOption] = useState<SortOption>('alphabetical');
+  const [viewType, setViewType] = useState<ViewType>('carousel');
   const [isAutoAdvance, setIsAutoAdvance] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -116,6 +119,8 @@ export const WeeklyRundownView: React.FC = () => {
         onModeChange={handleModeChange}
         sortOption={sortOption}
         onSortChange={handleSortChange}
+        viewType={viewType}
+        onViewTypeChange={setViewType}
         isAutoAdvance={isAutoAdvance}
         onAutoAdvanceToggle={handleAutoAdvanceToggle}
         isFullscreen={isFullscreen}
@@ -124,15 +129,23 @@ export const WeeklyRundownView: React.FC = () => {
         totalItems={rundownItems.length}
       />
 
-      <RundownCarousel
-        items={rundownItems}
-        currentIndex={currentIndex}
-        rundownMode={rundownMode}
-        onNext={nextItem}
-        onPrev={prevItem}
-        onGoTo={goToItem}
-        isFullscreen={isFullscreen}
-      />
+      {viewType === 'carousel' ? (
+        <RundownCarousel
+          items={rundownItems}
+          currentIndex={currentIndex}
+          rundownMode={rundownMode}
+          onNext={nextItem}
+          onPrev={prevItem}
+          onGoTo={goToItem}
+          isFullscreen={isFullscreen}
+        />
+      ) : (
+        <RundownGridView
+          items={rundownItems}
+          rundownMode={rundownMode}
+          isFullscreen={isFullscreen}
+        />
+      )}
     </div>
   );
 };

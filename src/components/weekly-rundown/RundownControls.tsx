@@ -2,8 +2,8 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
-import { PlayCircle, PauseCircle, Maximize, Minimize, Users, FolderOpen } from 'lucide-react';
-import { RundownMode, SortOption } from './WeeklyRundownView';
+import { PlayCircle, PauseCircle, Maximize, Minimize, Users, FolderOpen, LayoutGrid, Presentation } from 'lucide-react';
+import { RundownMode, SortOption, ViewType } from './WeeklyRundownView';
 
 interface RundownControlsProps {
   selectedWeek: Date;
@@ -13,6 +13,8 @@ interface RundownControlsProps {
   onModeChange: (mode: RundownMode) => void;
   sortOption: SortOption;
   onSortChange: (sort: SortOption) => void;
+  viewType: ViewType;
+  onViewTypeChange: (view: ViewType) => void;
   isAutoAdvance: boolean;
   onAutoAdvanceToggle: () => void;
   isFullscreen: boolean;
@@ -29,6 +31,8 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
   onModeChange,
   sortOption,
   onSortChange,
+  viewType,
+  onViewTypeChange,
   isAutoAdvance,
   onAutoAdvanceToggle,
   isFullscreen,
@@ -90,6 +94,28 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
           </Button>
         </div>
 
+        {/* View type toggle */}
+        <div className="flex rounded-lg border p-1 bg-muted">
+          <Button
+            variant={viewType === 'carousel' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => onViewTypeChange('carousel')}
+            className="flex items-center gap-2 h-8"
+          >
+            <Presentation className="h-4 w-4" />
+            <span className="hidden sm:inline">Carousel</span>
+          </Button>
+          <Button
+            variant={viewType === 'grid' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => onViewTypeChange('grid')}
+            className="flex items-center gap-2 h-8"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            <span className="hidden sm:inline">Grid</span>
+          </Button>
+        </div>
+
         {/* Sort selector */}
         <Select value={sortOption} onValueChange={onSortChange}>
           <SelectTrigger className="w-[140px] h-9">
@@ -102,16 +128,18 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
           </SelectContent>
         </Select>
 
-        {/* Auto-advance toggle */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onAutoAdvanceToggle}
-          className="flex items-center gap-2 h-9"
-        >
-          {isAutoAdvance ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
-          <span className="hidden sm:inline">Auto</span>
-        </Button>
+        {/* Auto-advance toggle - only show for carousel view */}
+        {viewType === 'carousel' && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onAutoAdvanceToggle}
+            className="flex items-center gap-2 h-9"
+          >
+            {isAutoAdvance ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
+            <span className="hidden sm:inline">Auto</span>
+          </Button>
+        )}
 
         {/* Fullscreen toggle */}
         <Button
