@@ -30,9 +30,9 @@ export const useRundownData = ({
         // Process project allocations
         const projectAllocations = memberTotal?.projectAllocations || [];
         const projects = projectAllocations.map(allocation => ({
-          id: allocation.projectId,
-          name: allocation.projectName,
-          code: allocation.projectCode,
+          projectId: allocation.projectId,
+          projectName: allocation.projectName,
+          projectCode: allocation.projectCode,
           hours: allocation.hours,
           percentage: totalHours > 0 ? (allocation.hours / totalHours) * 100 : 0,
           color: allocation.color
@@ -40,20 +40,17 @@ export const useRundownData = ({
 
         return {
           id: member.id,
-          first_name: member.first_name,
-          last_name: member.last_name,
+          name: `${member.first_name} ${member.last_name}`,
           location: member.location || 'Unknown',
-          avatar_url: member.avatar_url,
-          totalHours,
+          avatar: member.avatar_url,
+          resourcedHours: totalHours,
           capacity,
-          utilizationPercentage,
+          utilization: utilizationPercentage,
           projects,
-          leave: {
-            annualLeave: memberTotal?.annualLeave || 0,
-            vacationLeave: memberTotal?.vacationLeave || 0,
-            medicalLeave: memberTotal?.medicalLeave || 0,
-            publicHoliday: memberTotal?.publicHoliday || 0
-          }
+          annualLeave: memberTotal?.annualLeave || 0,
+          vacationLeave: memberTotal?.vacationLeave || 0,
+          medicalLeave: memberTotal?.medicalLeave || 0,
+          publicHoliday: memberTotal?.publicHoliday || 0
         };
       });
 
@@ -61,9 +58,9 @@ export const useRundownData = ({
       processedPeople.sort((a, b) => {
         switch (sortOption) {
           case 'alphabetical':
-            return (a.first_name + ' ' + a.last_name).localeCompare(b.first_name + ' ' + b.last_name);
+            return a.name.localeCompare(b.name);
           case 'utilization':
-            return b.utilizationPercentage - a.utilizationPercentage;
+            return b.utilization - a.utilization;
           case 'location':
             return a.location.localeCompare(b.location);
           default:
@@ -88,9 +85,8 @@ export const useRundownData = ({
               
               return {
                 id: member.id,
-                first_name: member.first_name,
-                last_name: member.last_name,
-                avatar_url: member.avatar_url,
+                name: `${member.first_name} ${member.last_name}`,
+                avatar: member.avatar_url,
                 location: member.location || 'Unknown',
                 hours: projectAllocation.hours,
                 capacityPercentage
