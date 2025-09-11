@@ -35,9 +35,9 @@ export const navigationItems = [
         icon: Calendar,
       },
       {
-        title: "Workflow",
-        url: "/workflow",
-        icon: GitBranch,
+        title: "Weekly Rundown",
+        url: "/weekly-rundown",
+        icon: Presentation,
       },
     ],
   },
@@ -115,9 +115,9 @@ export const navigationItems = [
     label: "SUPPORT AND SETTINGS",
     items: [
       {
-        title: "Weekly Rundown",
-        url: "/weekly-rundown",
-        icon: Presentation,
+        title: "Workflow",
+        url: "/workflow",
+        icon: GitBranch,
       },
       {
         title: "My Profile",
