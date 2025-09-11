@@ -40,13 +40,24 @@ export const useRundownData = ({
 
         return {
           id: member.id,
+          first_name: member.first_name,
+          last_name: member.last_name,
           name: `${member.first_name} ${member.last_name}`,
           location: member.location || 'Unknown',
+          avatar_url: member.avatar_url,
           avatar: member.avatar_url,
+          totalHours,
           resourcedHours: totalHours,
           capacity,
+          utilizationPercentage,
           utilization: utilizationPercentage,
           projects,
+          leave: {
+            annualLeave: memberTotal?.annualLeave || 0,
+            vacationLeave: memberTotal?.vacationLeave || 0,
+            medicalLeave: memberTotal?.medicalLeave || 0,
+            publicHoliday: memberTotal?.publicHoliday || 0
+          },
           annualLeave: memberTotal?.annualLeave || 0,
           vacationLeave: memberTotal?.vacationLeave || 0,
           medicalLeave: memberTotal?.medicalLeave || 0,
