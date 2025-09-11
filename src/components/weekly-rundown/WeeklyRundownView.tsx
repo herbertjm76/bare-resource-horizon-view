@@ -25,7 +25,7 @@ export const WeeklyRundownView: React.FC = () => {
     projects, 
     isLoading, 
     error,
-    getMemberTotal,
+    getMemberTotalForRundown,
     getProjectCount 
   } = useStreamlinedWeekResourceData(selectedWeek, stableFilters);
 
@@ -35,7 +35,7 @@ export const WeeklyRundownView: React.FC = () => {
     projects,
     rundownMode,
     sortOption,
-    getMemberTotal,
+    getMemberTotal: getMemberTotalForRundown,
     getProjectCount
   });
 

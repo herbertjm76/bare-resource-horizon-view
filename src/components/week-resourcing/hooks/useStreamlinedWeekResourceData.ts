@@ -125,6 +125,35 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     return total;
   }, [memberTotalsMap]);
 
+  // Separate function for rundown data that returns detailed structure
+  const getMemberTotalForRundown = useCallback((memberId: string) => {
+    const total = memberTotalsMap.get(memberId) || 0;
+    
+    // Get project allocations for this member from detailed allocations
+    const memberData = detailedAllocations?.[memberId];
+    const projectAllocations = memberData?.projects?.map(project => {
+      // Find project details to get name and code
+      const projectDetails = projects?.find(p => p.id === project.project_id);
+      return {
+        projectId: project.project_id,
+        projectName: projectDetails?.name || 'Unknown Project',
+        projectCode: projectDetails?.code || 'UNK',
+        hours: project.total_hours,
+        color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
+      };
+    }) || [];
+    
+    // Return the expected structure for rundown data
+    return {
+      resourcedHours: total,
+      projectAllocations,
+      annualLeave: Math.floor(Math.random() * 8), // Mock data for demo
+      vacationLeave: Math.floor(Math.random() * 8), 
+      medicalLeave: Math.floor(Math.random() * 4),
+      publicHoliday: Math.floor(Math.random() * 2) * 8
+    };
+  }, [memberTotalsMap, detailedAllocations, projects]);
+
   const getProjectCount = useCallback((memberId: string) => {
     const count = projectCountMap.get(memberId) || 0;
     console.log(`getProjectCount for ${memberId}:`, count);
@@ -159,7 +188,8 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     isLoading,
     error,
     allocationMap,
-    getMemberTotal,
+    getMemberTotal, // Keep original for table
+    getMemberTotalForRundown, // Detailed version for rundown
     getProjectCount,
     getWeeklyLeave,
     annualLeaveData,
@@ -174,6 +204,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
     error,
     allocationMap,
     getMemberTotal,
+    getMemberTotalForRundown,
     getProjectCount,
     getWeeklyLeave,
     annualLeaveData,
