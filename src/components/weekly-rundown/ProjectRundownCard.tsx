@@ -127,7 +127,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
                    <Avatar className="h-10 w-10 ring-2 ring-white/20 shadow-lg">
                      <AvatarImage src={member.avatar_url} />
                      <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white text-sm backdrop-blur-sm">
-                       {member.first_name.charAt(0)}{member.last_name.charAt(0)}
+                       {(member.first_name || '').charAt(0)}{(member.last_name || '').charAt(0)}
                      </AvatarFallback>
                    </Avatar>
                   
