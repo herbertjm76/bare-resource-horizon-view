@@ -126,7 +126,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
                 <div className="flex items-center gap-4 mb-3">
                    <Avatar className="h-10 w-10 ring-2 ring-white/20 shadow-lg">
                      <AvatarImage src={member.avatar_url} />
-                     <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white text-sm backdrop-blur-sm">
+                     <AvatarFallback className="bg-gradient-to-br from-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary))]/80 text-white text-sm backdrop-blur-sm">
                        {(member.first_name || '').charAt(0)}{(member.last_name || '').charAt(0)}
                      </AvatarFallback>
                    </Avatar>
