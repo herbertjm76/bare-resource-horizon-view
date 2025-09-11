@@ -66,32 +66,36 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className="bg-card border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
-          <div className="flex items-center gap-3 mb-3">
-            <Avatar className="h-10 w-10">
+        <div className="glass-card glass-hover rounded-2xl border-0 p-5 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
+          {/* Gradient overlay */}
+          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-2xl" />
+          <div className="flex items-center gap-3 mb-4 relative z-10">
+            <Avatar className="h-12 w-12 ring-4 ring-white/20 shadow-xl">
               <AvatarImage src={person.avatar} alt={person.name} />
-              <AvatarFallback>{person.name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
+              <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white backdrop-blur-sm">
+                {person.name?.split(' ').map((n: string) => n[0]).join('')}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <h3 className="font-medium truncate">{person.name}</h3>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <h3 className="font-semibold text-base truncate mb-1">{person.name}</h3>
+              <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 <MapPin className="h-3 w-3" />
                 <span className="truncate">{person.location}</span>
               </div>
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3 relative z-10">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Utilization</span>
-              <Badge variant={status.color as any} className="text-xs">
+              <Badge variant={status.color as any} className="text-xs rounded-full px-2 py-1">
                 {Math.round(person.utilization || 0)}%
               </Badge>
             </div>
 
-            <div className="w-full bg-muted rounded-full h-2">
+            <div className="w-full bg-muted/30 rounded-full h-2.5 overflow-hidden">
               <div
-                className="h-2 rounded-full transition-all duration-300"
+                className="h-full rounded-full transition-all duration-500 shadow-sm"
                 style={{
                   width: `${Math.min(person.utilization || 0, 100)}%`,
                   backgroundColor: getUtilizationColor(person.utilization || 0)
@@ -99,14 +103,14 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
               />
             </div>
 
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>{person.resourcedHours || 0}h / {person.capacity || 40}h</span>
-              <span>{person.projects?.length || 0} projects</span>
+            <div className="flex items-center justify-between text-sm text-muted-foreground">
+              <span className="font-medium">{person.resourcedHours || 0}h / {person.capacity || 40}h</span>
+              <span className="font-medium">{person.projects?.length || 0} projects</span>
             </div>
           </div>
         </div>
       </TooltipTrigger>
-      <TooltipContent side="top" className="max-w-sm">
+      <TooltipContent side="top" className="max-w-sm glass-card border-0 shadow-2xl">
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Avatar className="h-8 w-8">
@@ -182,26 +186,43 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className="bg-card border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer">
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex-1 min-w-0">
-              <h3 className="font-medium truncate">{project.name}</h3>
-              <p className="text-sm text-muted-foreground">{project.code}</p>
+        <div className="glass-card glass-hover rounded-2xl border-0 p-5 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
+          {/* Gradient overlay */}
+          <div 
+            className="absolute top-0 right-0 w-16 h-16 rounded-bl-2xl opacity-20"
+            style={{ 
+              background: `linear-gradient(to bottom left, ${project.color || 'hsl(var(--primary))'}, transparent)`
+            }}
+          />
+          <div className="flex items-start justify-between mb-4 relative z-10">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <div 
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-semibold shadow-lg ring-2 ring-white/20"
+                style={{ 
+                  background: `linear-gradient(135deg, ${project.color || 'hsl(var(--primary))'}, ${project.color || 'hsl(var(--primary))'}80)`
+                }}
+              >
+                <Users className="h-5 w-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-base truncate mb-1">{project.name}</h3>
+                <p className="text-sm text-muted-foreground font-medium">{project.code}</p>
+              </div>
             </div>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs rounded-full px-2 py-1">
               {project.status || 'Active'}
             </Badge>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3 relative z-10">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Team Size</span>
-              <span className="text-sm font-medium">{project.teamMembers?.length || 0} members</span>
+              <span className="text-sm font-semibold">{project.teamMembers?.length || 0} members</span>
             </div>
 
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Total Hours</span>
-              <span className="text-sm font-medium">{Math.round(project.totalHours || 0)}h</span>
+              <span className="text-lg font-bold text-primary">{Math.round(project.totalHours || 0)}h</span>
             </div>
 
             {project.teamMembers?.length > 0 && (
@@ -210,15 +231,15 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                   <span className="text-sm text-muted-foreground">Avg Capacity</span>
                   <Badge 
                     variant={averageCapacity > 100 ? 'destructive' : averageCapacity >= 90 ? 'default' : 'secondary'}
-                    className="text-xs"
+                    className="text-xs rounded-full px-2 py-1"
                   >
                     {Math.round(averageCapacity)}%
                   </Badge>
                 </div>
 
-                <div className="w-full bg-muted rounded-full h-2">
+                <div className="w-full bg-muted/30 rounded-full h-2.5 overflow-hidden">
                   <div
-                    className="h-2 rounded-full transition-all duration-300"
+                    className="h-full rounded-full transition-all duration-500 shadow-sm"
                     style={{
                       width: `${Math.min(averageCapacity, 100)}%`,
                       backgroundColor: getCapacityColor(averageCapacity)
@@ -230,7 +251,7 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
           </div>
         </div>
       </TooltipTrigger>
-      <TooltipContent side="top" className="max-w-sm">
+      <TooltipContent side="top" className="max-w-sm glass-card border-0 shadow-2xl">
         <div className="space-y-3">
           <div>
             <h4 className="font-medium">{project.name}</h4>

@@ -43,16 +43,20 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
 
   return (
     <div className={`
-      relative rounded-2xl border-2 bg-gradient-to-br from-card via-card to-card/50 p-8 shadow-xl
-      ${isActive ? 'ring-2 ring-primary border-primary/20' : 'border-border/50'}
+      relative rounded-3xl glass-card glass-hover p-8 shadow-2xl
+      ${isActive ? 'ring-2 ring-primary/50 glass-elevated' : ''}
       ${isFullscreen ? 'min-h-[80vh]' : 'min-h-[500px]'}
-      transition-all duration-300 ease-out hover:shadow-2xl
+      transition-all duration-500 ease-out
+      before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none
+      overflow-hidden
     `}>
       {/* Header */}
-      <div className="flex items-start gap-6 mb-8">
+      <div className="flex items-start gap-6 mb-8 relative z-10">
         <div 
-          className={`${isFullscreen ? 'h-20 w-20' : 'h-16 w-16'} rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg`}
-          style={{ backgroundColor: project.color || 'hsl(var(--primary))' }}
+          className={`${isFullscreen ? 'h-20 w-20' : 'h-16 w-16'} rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-2xl ring-4 ring-white/20 backdrop-blur-sm`}
+          style={{ 
+            background: `linear-gradient(135deg, ${project.color || 'hsl(var(--primary))'}, ${project.color || 'hsl(var(--primary))'}80)`
+          }}
         >
           <FolderOpen className={isFullscreen ? 'h-10 w-10' : 'h-8 w-8'} />
         </div>
@@ -86,7 +90,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       </div>
 
       {/* Project Summary */}
-      <div className="mb-8">
+      <div className="mb-8 relative z-10">
         <div className="flex items-center justify-between mb-4">
           <h2 className={`font-semibold text-foreground ${
             isFullscreen ? 'text-2xl' : 'text-xl'
@@ -109,7 +113,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
 
       {/* Team Members */}
       {project.teamMembers.length > 0 && (
-        <div>
+        <div className="relative z-10">
           <h3 className={`font-semibold text-foreground mb-6 ${
             isFullscreen ? 'text-xl' : 'text-lg'
           }`}>
@@ -118,14 +122,14 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
           
           <div className="space-y-4">
             {sortedMembers.map((member) => (
-              <div key={member.id} className="bg-muted/30 rounded-lg p-4">
+              <div key={member.id} className="glass rounded-xl p-4 hover:glass-elevated transition-all duration-300">
                 <div className="flex items-center gap-4 mb-3">
-                  <Avatar className="h-10 w-10 ring-2 ring-primary/20">
-                    <AvatarImage src={member.avatar_url} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                      {member.first_name.charAt(0)}{member.last_name.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
+                   <Avatar className="h-10 w-10 ring-2 ring-white/20 shadow-lg">
+                     <AvatarImage src={member.avatar_url} />
+                     <AvatarFallback className="bg-gradient-to-br from-primary to-primary/80 text-white text-sm backdrop-blur-sm">
+                       {member.first_name.charAt(0)}{member.last_name.charAt(0)}
+                     </AvatarFallback>
+                   </Avatar>
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
