@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Folder, Layers, MapPin, Briefcase, Currency, Calendar, Building } from 'lucide-react';
+import { Folder, Layers, MapPin, Briefcase, Currency, Calendar, Building, Palette } from 'lucide-react';
 import { CountriesTab } from '@/components/settings/CountriesTab';
 import { StagesTab } from '@/components/settings/StagesTab';
 import { LocationsTab } from '@/components/settings/LocationsTab';
@@ -9,11 +9,12 @@ import { RolesTab } from '@/components/settings/roles/RolesTab';
 import { RatesTab } from '@/components/settings/RatesTab';
 import { HolidaysTab } from '@/components/settings/HolidaysTab';
 import { DepartmentsTab } from '@/components/settings/DepartmentsTab';
+import { ThemeTab } from '@/components/settings/ThemeTab';
 
 export const OfficeSettingsTabs: React.FC = () => {
   return (
     <Tabs defaultValue="locations" className="w-full">
-      <TabsList className="w-full mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-1 h-auto bg-transparent p-1 rounded-lg">
+      <TabsList className="w-full mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-1 h-auto bg-transparent p-1 rounded-lg">
         <TabsTrigger 
           value="locations" 
           className="flex items-center gap-2 px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
@@ -72,6 +73,14 @@ export const OfficeSettingsTabs: React.FC = () => {
           <Calendar className="h-4 w-4 flex-shrink-0" />
           <span>Holidays</span>
         </TabsTrigger>
+        
+        <TabsTrigger 
+          value="theme" 
+          className="flex items-center gap-2 px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+        >
+          <Palette className="h-4 w-4 flex-shrink-0" />
+          <span>Theme</span>
+        </TabsTrigger>
       </TabsList>
       
       <div className="mt-6">
@@ -95,6 +104,9 @@ export const OfficeSettingsTabs: React.FC = () => {
         </TabsContent>
         <TabsContent value="holidays">
           <HolidaysTab />
+        </TabsContent>
+        <TabsContent value="theme">
+          <ThemeTab />
         </TabsContent>
       </div>
     </Tabs>

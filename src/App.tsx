@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CompanyProvider } from "./context/CompanyContext";
+import { useTheme } from "./hooks/useTheme";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
@@ -39,6 +40,8 @@ import WeeklyRundown from "./pages/WeeklyRundown";
 const queryClient = new QueryClient();
 
 function App() {
+  useTheme(); // Load saved theme on app start
+  
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
