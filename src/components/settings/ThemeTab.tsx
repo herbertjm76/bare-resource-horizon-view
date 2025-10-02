@@ -26,8 +26,8 @@ const themes: Theme[] = [
   },
   {
     id: 'corporate',
-    name: 'Corporate Blue (Dark)',
-    description: 'Monochromatic professional blue',
+    name: 'Corporate Blue',
+    description: 'Professional dark blue',
     colors: {
       start: '220 60% 28%',
       mid: '225 65% 32%',
@@ -36,22 +36,12 @@ const themes: Theme[] = [
   },
   {
     id: 'slate',
-    name: 'Monochrome Slate (Dark)',
-    description: 'Neutral greys for a clean look',
+    name: 'Monochrome Slate',
+    description: 'Neutral greys',
     colors: {
       start: '220 8% 14%',
       mid: '220 6% 18%',
       end: '220 5% 24%',
-    },
-  },
-  {
-    id: 'indigo',
-    name: 'Deep Indigo',
-    description: 'Muted indigo gradient',
-    colors: {
-      start: '248 45% 22%',
-      mid: '252 50% 28%',
-      end: '256 55% 34%',
     },
   },
   {
@@ -75,13 +65,13 @@ const themes: Theme[] = [
     },
   },
   {
-    id: 'royal',
-    name: 'Royal Purple (Dark)',
-    description: 'Deep purple to violet',
+    id: 'crimson',
+    name: 'Crimson Red',
+    description: 'Deep red gradient',
     colors: {
-      start: '270 65% 28%',
-      mid: '280 70% 34%',
-      end: '290 65% 38%',
+      start: '345 70% 25%',
+      mid: '355 65% 30%',
+      end: '5 60% 32%',
     },
   },
 ];

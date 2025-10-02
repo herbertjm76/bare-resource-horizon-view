@@ -27,11 +27,6 @@ export const applyThemeById = (themeId: string) => {
       mid: '220 6% 18%',
       end: '220 5% 24%',
     },
-    indigo: {
-      start: '248 45% 22%',
-      mid: '252 50% 28%',
-      end: '256 55% 34%',
-    },
     midnight: {
       start: '230 50% 22%',
       mid: '250 60% 28%',
@@ -42,10 +37,10 @@ export const applyThemeById = (themeId: string) => {
       mid: '160 50% 28%',
       end: '170 45% 32%',
     },
-    royal: {
-      start: '270 65% 28%',
-      mid: '280 70% 34%',
-      end: '290 65% 38%',
+    crimson: {
+      start: '345 70% 25%',
+      mid: '355 65% 30%',
+      end: '5 60% 32%',
     },
   };
 
