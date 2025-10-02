@@ -54,11 +54,11 @@ export const navigationItems = [
         url: "/project-resourcing",
         icon: GanttChartSquare,
       },
-      {
-        title: "Financials",
-        url: "/financial-control",
-        icon: DollarSign,
-      },
+      // {
+      //   title: "Financials",
+      //   url: "/financial-control",
+      //   icon: DollarSign,
+      // },
       {
         title: "Monitoring",
         url: "/project-monitoring",
@@ -66,31 +66,31 @@ export const navigationItems = [
       },
     ],
   },
-  {
-    label: "FINANCIALS",
-    items: [
-      {
-        title: "Financial Overview",
-        url: "/financial-overview",
-        icon: Receipt,
-      },
-      {
-        title: "Project Profit Dashboard",
-        url: "/project-profit-dashboard",
-        icon: TrendingUp,
-      },
-      {
-        title: "Project Billing",
-        url: "/project-billing",
-        icon: Receipt,
-      },
-      {
-        title: "Aging Invoices",
-        url: "/aging-invoices",
-        icon: Clock,
-      },
-    ],
-  },
+  // {
+  //   label: "FINANCIALS",
+  //   items: [
+  //     {
+  //       title: "Financial Overview",
+  //       url: "/financial-overview",
+  //       icon: Receipt,
+  //     },
+  //     {
+  //       title: "Project Profit Dashboard",
+  //       url: "/project-profit-dashboard",
+  //       icon: TrendingUp,
+  //     },
+  //     {
+  //       title: "Project Billing",
+  //       url: "/project-billing",
+  //       icon: Receipt,
+  //     },
+  //     {
+  //       title: "Aging Invoices",
+  //       url: "/aging-invoices",
+  //       icon: Clock,
+  //     },
+  //   ],
+  // },
   {
     label: "RESOURCES",
     items: [
