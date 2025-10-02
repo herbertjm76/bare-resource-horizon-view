@@ -110,21 +110,28 @@ const Auth: React.FC = () => {
 
   if (isCheckingSession) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-4">
-        <div className="flex flex-col items-center bg-white/10 p-6 rounded-lg shadow-lg border border-white/20">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white"></div>
-          <p className="text-white mt-4">Checking login status...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-modern p-4">
+        <div className="flex flex-col items-center glass-card p-8 rounded-2xl shadow-2xl">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white"></div>
+          <p className="text-white mt-4 font-medium">Checking login status...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-blue-500 to-pink-500 p-4">
-      <div className="w-full max-w-xl glass rounded-2xl p-8 shadow-lg border border-white/20">
-        <h1 className="text-3xl font-bold text-white text-center mb-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-mesh p-4 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/5 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-white/5 rounded-full blur-3xl animate-float animation-delay-1000"></div>
+      </div>
+      
+      <div className="w-full max-w-md glass-elevated rounded-3xl p-10 shadow-2xl relative z-10">
+        <h1 className="text-4xl font-bold text-white text-center mb-2 tracking-tight">
           BareResource Pro
         </h1>
+        <p className="text-white/70 text-center mb-8 text-sm">Modern resource management</p>
         
         {error && (
           <Alert variant="destructive" className="mb-6 bg-red-500/10 border-red-500/30 text-white">

@@ -38,7 +38,28 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    /* Enhanced brand colors with CSS custom properties - standardized to #6F4BF6 */
+    /* Modern gradient system - easily customizable */
+    --gradient-start: 220 90% 56%;      /* Modern blue */
+    --gradient-mid: 280 90% 60%;        /* Vibrant purple */
+    --gradient-end: 340 90% 55%;        /* Accent pink */
+    
+    /* Alternative theme options (uncomment to switch) */
+    /* Ocean theme */
+    /* --gradient-start: 200 95% 50%; */  /* Cyan */
+    /* --gradient-mid: 220 85% 55%; */    /* Blue */
+    /* --gradient-end: 250 80% 60%; */    /* Purple */
+    
+    /* Sunset theme */
+    /* --gradient-start: 15 100% 60%; */  /* Orange */
+    /* --gradient-mid: 340 90% 55%; */    /* Pink */
+    /* --gradient-end: 280 85% 60%; */    /* Purple */
+    
+    /* Forest theme */
+    /* --gradient-start: 150 60% 45%; */  /* Emerald */
+    /* --gradient-mid: 180 65% 50%; */    /* Teal */
+    /* --gradient-end: 200 70% 55%; */    /* Blue */
+    
+    /* Enhanced brand colors */
     --brand-primary: 111 75 246;
     --brand-violet: 111 75 246;
     --brand-violet-light: 236 236 251;
@@ -46,10 +67,10 @@
     --brand-border: 240 240 244;
     
     /* Subtle purple gradient backgrounds for dashboard cards */
-    --card-gradient-1: 263 25% 97%;     /* Very light purple */
-    --card-gradient-2: 263 20% 95%;     /* Light purple */
-    --card-gradient-3: 263 15% 93%;     /* Medium light purple */
-    --card-gradient-4: 263 12% 91%;     /* Slightly darker purple */
+    --card-gradient-1: 263 25% 97%;
+    --card-gradient-2: 263 20% 95%;
+    --card-gradient-3: 263 15% 93%;
+    --card-gradient-4: 263 12% 91%;
     
     /* Semantic color tokens */
     --text-primary: 31 41 55;
@@ -67,17 +88,17 @@
     --border-primary: 229 231 235;
     --border-secondary: 209 213 219;
     --border-accent: 111 75 246;
-    --border-focus: 111 75 246; /* Changed from 99 102 241 */
+    --border-focus: 111 75 246;
     
-    /* Liquid Glass Design Tokens */
+    /* Modern glass design tokens */
     --glass-bg: 255 255 255;
-    --glass-bg-opacity: 0.1;
+    --glass-bg-opacity: 0.12;
     --glass-border: 255 255 255;
-    --glass-border-opacity: 0.2;
-    --glass-shadow: 0 8px 32px 0;
-    --glass-shadow-color: 111 75 246;
-    --glass-shadow-opacity: 0.12;
-    --glass-blur: 16px;
+    --glass-border-opacity: 0.25;
+    --glass-shadow: 0 20px 60px 0;
+    --glass-shadow-color: 0 0 0;
+    --glass-shadow-opacity: 0.15;
+    --glass-blur: 20px;
   }
 
   .dark {
@@ -224,7 +245,7 @@
     animation: fadeOut 0.3s ease-out;
   }
 
-  /* Liquid Glass Effects */
+  /* Modern Glass Effects */
   .glass {
     background: rgba(var(--glass-bg), var(--glass-bg-opacity));
     backdrop-filter: blur(var(--glass-blur));
@@ -234,30 +255,48 @@
   }
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 32px 0 rgba(111, 75, 246, 0.1);
-  }
-
-  .glass-elevated {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 12px 40px 0 rgba(111, 75, 246, 0.15);
+    box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  .glass-elevated {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 25px 70px 0 rgba(0, 0, 0, 0.12);
   }
 
   .glass-hover {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .glass-hover:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 16px 48px 0 rgba(111, 75, 246, 0.2);
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 30px 80px 0 rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+  }
+
+  /* Modern gradient background */
+  .bg-gradient-modern {
+    background: linear-gradient(135deg, 
+      hsl(var(--gradient-start)) 0%, 
+      hsl(var(--gradient-mid)) 50%, 
+      hsl(var(--gradient-end)) 100%
+    );
+  }
+
+  .bg-gradient-mesh {
+    background: 
+      radial-gradient(at 0% 0%, hsl(var(--gradient-start)) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, hsl(var(--gradient-end)) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, hsl(var(--gradient-mid)) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--gradient-start)) 0px, transparent 50%),
+      linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)));
   }
 }
 

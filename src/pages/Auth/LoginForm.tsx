@@ -101,72 +101,74 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToSignup }) => {
 
   return (
     <form className="space-y-6" onSubmit={handleLogin}>
-      <div>
-        <h2 className="text-xl font-semibold text-white mb-4">Login</h2>
-        
-        {errorMessage && (
-          <div className="bg-red-500/20 border border-red-500/30 rounded-md p-3 mb-4 flex items-start">
-            <AlertCircle className="h-5 w-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-white text-sm">{errorMessage}</p>
-              {errorMessage.includes('confirm your email') && (
-                <button
-                  type="button"
-                  onClick={handleResendConfirmation}
-                  className="text-blue-300 text-sm underline mt-2 hover:text-blue-200 transition-colors"
-                >
-                  Resend confirmation email
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-        
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="email" className="block text-white font-medium mb-2">Email</label>
-            <Input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-              required
-              autoComplete="email"
-              placeholder="your@email.com"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-white font-medium mb-2">Password</label>
-            <Input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/50"
-              required
-              autoComplete="current-password"
-              placeholder="••••••••"
-            />
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
+        <p className="text-white/60 text-sm">Sign in to your account</p>
+      </div>
+      
+      {errorMessage && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4 flex items-start">
+          <AlertCircle className="h-5 w-5 text-red-300 mr-3 flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-white/90 text-sm">{errorMessage}</p>
+            {errorMessage.includes('confirm your email') && (
+              <button
+                type="button"
+                onClick={handleResendConfirmation}
+                className="text-blue-300 text-sm underline mt-2 hover:text-blue-200 transition-colors"
+              >
+                Resend confirmation email
+              </button>
+            )}
           </div>
         </div>
+      )}
+      
+      <div className="space-y-4">
+        <div>
+          <label htmlFor="email" className="block text-white/90 font-medium mb-2 text-sm">Email</label>
+          <Input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all placeholder:text-white/40"
+            required
+            autoComplete="email"
+            placeholder="your@email.com"
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="block text-white/90 font-medium mb-2 text-sm">Password</label>
+          <Input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all placeholder:text-white/40"
+            required
+            autoComplete="current-password"
+            placeholder="••••••••"
+          />
+        </div>
       </div>
+      
       <Button
         type="submit"
         disabled={loading}
-        className="w-full"
+        className="w-full py-6 text-base font-semibold bg-white text-primary hover:bg-white/90 rounded-xl transition-all shadow-lg hover:shadow-xl"
         isLoading={loading}
       >
-        {loading ? 'Logging in...' : 'Log In'}
+        {loading ? 'Signing in...' : 'Sign In'}
       </Button>
       
-      <div className="text-center">
+      <div className="text-center pt-2">
         <button
           type="button"
           onClick={onSwitchToSignup}
-          className="underline text-white font-medium hover:text-pink-200 focus:outline-none bg-transparent border-none p-0 m-0 text-sm"
+          className="text-white/80 hover:text-white text-sm transition-colors"
         >
-          Need an account? Sign up
+          Need an account? <span className="font-semibold underline">Sign up</span>
         </button>
       </div>
     </form>

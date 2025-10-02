@@ -188,9 +188,11 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSignUp} autoComplete="off">
-      <h2 className="text-2xl font-extrabold text-white mb-1 text-center">Sign Up & Register Company</h2>
-      <p className="text-white/70 text-center mb-6">Get started in seconds - just email, password, and company name.</p>
+    <form className="space-y-6" onSubmit={handleSignUp} autoComplete="off">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-white mb-2">Create Account</h2>
+        <p className="text-white/60 text-sm">Get started in seconds</p>
+      </div>
 
       {signupError && (
         <Alert className="bg-red-500/10 border border-red-500/30 mb-4 text-white">
@@ -221,25 +223,25 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       {/* Simplified owner fields - just email and password */}
       <div className="space-y-4">
         <div>
-          <label htmlFor="ownerEmail" className="block text-white font-medium mb-1">Email</label>
+          <label htmlFor="ownerEmail" className="block text-white/90 font-medium mb-2 text-sm">Email</label>
           <Input
             type="email"
             id="ownerEmail"
             value={ownerEmail}
             onChange={e => setOwnerEmail(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
+            className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all placeholder:text-white/40"
             required
             placeholder="your@email.com"
           />
         </div>
         <div>
-          <label htmlFor="ownerPassword" className="block text-white font-medium mb-1">Password</label>
+          <label htmlFor="ownerPassword" className="block text-white/90 font-medium mb-2 text-sm">Password</label>
           <Input
             type="password"
             id="ownerPassword"
             value={ownerPassword}
             onChange={e => setOwnerPassword(e.target.value)}
-            className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
+            className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all placeholder:text-white/40"
             required
             placeholder="Min. 6 characters"
           />
@@ -255,10 +257,10 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       <Button
         type="submit"
         disabled={loading || showConfirmationInfo}
-        className="w-full mt-4"
+        className="w-full mt-6 py-6 text-base font-semibold bg-white text-primary hover:bg-white/90 rounded-xl transition-all shadow-lg hover:shadow-xl"
         isLoading={loading}
       >
-        Sign Up & Register Company
+        Create Account
       </Button>
       
       {showConfirmationInfo && (
