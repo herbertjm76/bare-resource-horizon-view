@@ -44,18 +44,18 @@ export const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="w-full bg-white border-b border-gray-200 sticky top-0 z-30 h-16">
+    <header className="w-full bg-gradient-modern border-b border-border sticky top-0 z-30 h-16 text-white">
       <div className="h-full px-4 py-2 flex items-center justify-between">
         {/* Left side - Sidebar trigger + Date display */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <SidebarTrigger className="p-2 text-gray-600 hover:bg-gray-100" />
+          <SidebarTrigger className="p-2 text-white hover:bg-white/10" />
           <div className="min-w-0">
             <DateDisplay 
               showIcon={true}
               showTimezone={false}
               allowFormatSelection={!isMobile}
               defaultFormat={isMobile ? "numeric" : "long"}
-              className="text-gray-600"
+              className="text-white/90"
             />
           </div>
         </div>
@@ -67,7 +67,7 @@ export const AppHeader: React.FC = () => {
             asChild 
             variant="ghost" 
             size="sm" 
-            className="text-gray-600 hover:bg-gray-100 hidden sm:flex"
+            className="text-white hover:bg-white/10 hidden sm:flex"
           >
             <Link to="/profile">
               <UserIcon className="mr-2 h-4 w-4" /> 
@@ -80,7 +80,7 @@ export const AppHeader: React.FC = () => {
             asChild 
             variant="ghost" 
             size="sm" 
-            className="text-gray-600 hover:bg-gray-100 sm:hidden"
+            className="text-white hover:bg-white/10 sm:hidden"
           >
             <Link to="/profile">
               <UserIcon className="h-4 w-4" />
@@ -91,7 +91,7 @@ export const AppHeader: React.FC = () => {
           <Button
             variant="ghost"
             size="sm"
-            className="text-gray-600 hover:bg-gray-100 hidden sm:flex"
+            className="text-white hover:bg-white/10 hidden sm:flex"
             onClick={handleLogout}
           >
             <LogOut className="mr-2 h-4 w-4" /> 
@@ -102,7 +102,7 @@ export const AppHeader: React.FC = () => {
           <Button
             variant="ghost"
             size="sm"
-            className="text-gray-600 hover:bg-gray-100 sm:hidden"
+            className="text-white hover:bg-white/10 sm:hidden"
             onClick={handleLogout}
           >
             <LogOut className="h-4 w-4" />
