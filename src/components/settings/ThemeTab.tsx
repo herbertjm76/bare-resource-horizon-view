@@ -16,82 +16,32 @@ type Theme = {
 const themes: Theme[] = [
   {
     id: 'default',
-    name: 'Modern Gradient',
-    description: 'Blue, purple, and pink mesh',
+    name: 'Modern Dark',
+    description: 'Indigo to violet, high contrast',
     colors: {
-      start: '220 100% 60%',
-      mid: '280 100% 70%',
-      end: '340 100% 70%',
-    },
-  },
-  {
-    id: 'ocean',
-    name: 'Ocean',
-    description: 'Deep blue to turquoise',
-    colors: {
-      start: '200 100% 40%',
-      mid: '180 100% 50%',
-      end: '160 100% 60%',
-    },
-  },
-  {
-    id: 'sunset',
-    name: 'Sunset',
-    description: 'Warm orange to pink',
-    colors: {
-      start: '25 100% 60%',
-      mid: '340 100% 65%',
-      end: '320 100% 70%',
-    },
-  },
-  {
-    id: 'forest',
-    name: 'Forest',
-    description: 'Deep green to emerald',
-    colors: {
-      start: '140 60% 40%',
-      mid: '160 70% 45%',
-      end: '180 60% 50%',
-    },
-  },
-  {
-    id: 'royal',
-    name: 'Royal Purple',
-    description: 'Deep purple to violet',
-    colors: {
-      start: '270 80% 50%',
-      mid: '280 85% 60%',
-      end: '290 80% 65%',
-    },
-  },
-  {
-    id: 'midnight',
-    name: 'Midnight',
-    description: 'Dark blue to indigo',
-    colors: {
-      start: '230 50% 30%',
-      mid: '250 60% 40%',
-      end: '270 55% 45%',
+      start: '245 60% 30%',
+      mid: '275 60% 35%',
+      end: '305 60% 38%',
     },
   },
   {
     id: 'corporate',
-    name: 'Corporate Blue',
+    name: 'Corporate Blue (Dark)',
     description: 'Monochromatic professional blue',
     colors: {
-      start: '220 60% 45%',
-      mid: '225 65% 52%',
-      end: '230 70% 60%',
+      start: '220 60% 28%',
+      mid: '225 65% 32%',
+      end: '230 70% 36%',
     },
   },
   {
     id: 'slate',
-    name: 'Monochrome Slate',
+    name: 'Monochrome Slate (Dark)',
     description: 'Neutral greys for a clean look',
     colors: {
-      start: '220 8% 28%',
-      mid: '220 6% 38%',
-      end: '220 5% 50%',
+      start: '220 8% 14%',
+      mid: '220 6% 18%',
+      end: '220 5% 24%',
     },
   },
   {
@@ -99,9 +49,39 @@ const themes: Theme[] = [
     name: 'Deep Indigo',
     description: 'Muted indigo gradient',
     colors: {
-      start: '248 45% 38%',
-      mid: '252 50% 48%',
-      end: '256 55% 58%',
+      start: '248 45% 22%',
+      mid: '252 50% 28%',
+      end: '256 55% 34%',
+    },
+  },
+  {
+    id: 'midnight',
+    name: 'Midnight',
+    description: 'Navy to indigo',
+    colors: {
+      start: '230 50% 22%',
+      mid: '250 60% 28%',
+      end: '270 55% 32%',
+    },
+  },
+  {
+    id: 'forest',
+    name: 'Forest Dark',
+    description: 'Deep green to teal',
+    colors: {
+      start: '150 45% 22%',
+      mid: '160 50% 28%',
+      end: '170 45% 32%',
+    },
+  },
+  {
+    id: 'royal',
+    name: 'Royal Purple (Dark)',
+    description: 'Deep purple to violet',
+    colors: {
+      start: '270 65% 28%',
+      mid: '280 70% 34%',
+      end: '290 65% 38%',
     },
   },
 ];

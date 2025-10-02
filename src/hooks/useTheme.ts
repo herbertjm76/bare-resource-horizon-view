@@ -13,49 +13,39 @@ export const useTheme = () => {
 export const applyThemeById = (themeId: string) => {
   const themes: Record<string, { start: string; mid: string; end: string }> = {
     default: {
-      start: '220 100% 60%',
-      mid: '280 100% 70%',
-      end: '340 100% 70%',
-    },
-    ocean: {
-      start: '200 100% 40%',
-      mid: '180 100% 50%',
-      end: '160 100% 60%',
-    },
-    sunset: {
-      start: '25 100% 60%',
-      mid: '340 100% 65%',
-      end: '320 100% 70%',
-    },
-    forest: {
-      start: '140 60% 40%',
-      mid: '160 70% 45%',
-      end: '180 60% 50%',
-    },
-    royal: {
-      start: '270 80% 50%',
-      mid: '280 85% 60%',
-      end: '290 80% 65%',
-    },
-    midnight: {
-      start: '230 50% 30%',
-      mid: '250 60% 40%',
-      end: '270 55% 45%',
+      start: '245 60% 30%',
+      mid: '275 60% 35%',
+      end: '305 60% 38%',
     },
     corporate: {
-      start: '220 60% 45%',
-      mid: '225 65% 52%',
-      end: '230 70% 60%',
+      start: '220 60% 28%',
+      mid: '225 65% 32%',
+      end: '230 70% 36%',
     },
     slate: {
-      start: '220 8% 28%',
-      mid: '220 6% 38%',
-      end: '220 5% 50%',
+      start: '220 8% 14%',
+      mid: '220 6% 18%',
+      end: '220 5% 24%',
     },
     indigo: {
-      start: '248 45% 38%',
-      mid: '252 50% 48%',
-      end: '256 55% 58%',
+      start: '248 45% 22%',
+      mid: '252 50% 28%',
+      end: '256 55% 34%',
+    },
+    midnight: {
+      start: '230 50% 22%',
+      mid: '250 60% 28%',
+      end: '270 55% 32%',
+    },
+    forest: {
+      start: '150 45% 22%',
+      mid: '160 50% 28%',
+      end: '170 45% 32%',
+    },
+    royal: {
+      start: '270 65% 28%',
+      mid: '280 70% 34%',
+      end: '290 65% 38%',
     },
   };
 
