@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useForm } from "react-hook-form";
 import { Button } from '@/components/ui/button';
-import OwnerInfoFields from "./OwnerInfoFields";
+import { Input } from '@/components/ui/input';
 import CompanyInfoFields from "./CompanyInfoFields";
 import { emptyCompany, CompanyFormData } from '../companyHelpers';
 import { ensureUserProfile } from '@/utils/authHelpers';
@@ -21,9 +21,7 @@ interface SignupFormContainerProps {
 }
 
 const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLogin }) => {
-  // Owner fields matched to profile table
-  const [ownerFirstName, setOwnerFirstName] = useState('');
-  const [ownerLastName, setOwnerLastName] = useState('');
+  // Simplified owner fields - only essential info
   const [ownerEmail, setOwnerEmail] = useState('');
   const [ownerPassword, setOwnerPassword] = useState('');
   const [company, setCompany] = useState<CompanyFormData>(emptyCompany);
@@ -68,10 +66,10 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
     setSignupError(null);
     
     try {
-      // Validate required fields
+      // Validate required fields - simplified to essentials only
       if (
-        !ownerFirstName || !ownerLastName || !ownerEmail || !ownerPassword ||
-        !company.name || !company.subdomain || !company.address || !company.country || !company.city || !company.size || !company.industry
+        !ownerEmail || !ownerPassword ||
+        !company.name || !company.subdomain
       ) {
         setSignupError('Please fill in all required fields.');
         toast.error('Please fill in all required fields.');
@@ -98,26 +96,25 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
 
       console.log('Starting signup process with data:', {
         email: ownerEmail,
-        firstName: ownerFirstName,
-        lastName: ownerLastName,
         company: {
           name: company.name,
           subdomain: company.subdomain
         }
       });
       
-      // 1. Create company first
+      // 1. Create company first - only essential fields
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
           name: company.name,
           subdomain: company.subdomain.toLowerCase(),
           website: company.website || null,
-          address: company.address,
-          size: company.size,
-          city: company.city,
-          country: company.country,
-          industry: company.industry
+          // Optional fields set to null/default - can be filled in later
+          address: company.address || null,
+          size: company.size || null,
+          city: company.city || null,
+          country: company.country || null,
+          industry: company.industry || null
         })
         .select()
         .single();
@@ -132,14 +129,12 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       // Define the role explicitly as a valid UserRole enum value
       const userRole: UserRole = 'owner';
 
-      // 2. Sign up user with Supabase Auth
+      // 2. Sign up user with Supabase Auth - simplified metadata
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: ownerEmail,
         password: ownerPassword,
         options: {
           data: {
-            first_name: ownerFirstName,
-            last_name: ownerLastName,
             company_id: companyData.id,
             role: userRole
           },
@@ -165,8 +160,6 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       // 3. Create profile record manually since the trigger might be failing
       const profileCreated = await ensureUserProfile(authData.user.id, {
         email: ownerEmail,
-        firstName: ownerFirstName,
-        lastName: ownerLastName,
         companyId: companyData.id,
         role: userRole
       });
@@ -181,8 +174,6 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       setShowConfirmationInfo(true);
       
       // Clear form
-      setOwnerFirstName('');
-      setOwnerLastName('');
       setOwnerEmail('');
       setOwnerPassword('');
       setCompany(emptyCompany);
@@ -199,7 +190,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
   return (
     <form className="space-y-4" onSubmit={handleSignUp} autoComplete="off">
       <h2 className="text-2xl font-extrabold text-white mb-1 text-center">Sign Up & Register Company</h2>
-      <p className="text-white/70 text-center mb-6">Complete your details to create your account and register your company in one step.</p>
+      <p className="text-white/70 text-center mb-6">Get started in seconds - just email, password, and company name.</p>
 
       {signupError && (
         <Alert className="bg-red-500/10 border border-red-500/30 mb-4 text-white">
@@ -227,23 +218,37 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         </Alert>
       )}
 
-      <OwnerInfoFields
-        ownerFirstName={ownerFirstName}
-        setOwnerFirstName={setOwnerFirstName}
-        ownerLastName={ownerLastName}
-        setOwnerLastName={setOwnerLastName}
-        ownerEmail={ownerEmail}
-        setOwnerEmail={setOwnerEmail}
-        ownerPassword={ownerPassword}
-        setOwnerPassword={setOwnerPassword}
-      />
+      {/* Simplified owner fields - just email and password */}
+      <div className="space-y-4">
+        <div>
+          <label htmlFor="ownerEmail" className="block text-white font-medium mb-1">Email</label>
+          <Input
+            type="email"
+            id="ownerEmail"
+            value={ownerEmail}
+            onChange={e => setOwnerEmail(e.target.value)}
+            className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
+            required
+            placeholder="your@email.com"
+          />
+        </div>
+        <div>
+          <label htmlFor="ownerPassword" className="block text-white font-medium mb-1">Password</label>
+          <Input
+            type="password"
+            id="ownerPassword"
+            value={ownerPassword}
+            onChange={e => setOwnerPassword(e.target.value)}
+            className="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:outline-none focus:border-white/50"
+            required
+            placeholder="Min. 6 characters"
+          />
+        </div>
+      </div>
 
       <CompanyInfoFields
         company={company}
         handleCompanyChange={handleCompanyChange}
-        watch={watch}
-        setValue={setValue}
-        errors={errors}
         subdomainCheck={subdomainCheck}
       />
 

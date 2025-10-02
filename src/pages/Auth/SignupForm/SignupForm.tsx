@@ -169,9 +169,6 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
       <CompanyInfoFields
         company={company}
         handleCompanyChange={handleCompanyChange}
-        watch={watch}
-        setValue={setValue}
-        errors={errors}
         subdomainCheck={subdomainCheck}
       />
 
