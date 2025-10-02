@@ -11,9 +11,10 @@ export const ProjectDialogTabs: React.FC<ProjectDialogTabsProps> = ({
   onTabChange,
 }) => {
   return (
-    <TabsList className="w-full grid grid-cols-2 px-6">
+    <TabsList className="w-full px-6">
       <TabsTrigger value="info">Project Info</TabsTrigger>
-      <TabsTrigger value="stageFees">Stage Fees</TabsTrigger>
+      {/* Stage Fees tab hidden for MVP */}
+      {/* <TabsTrigger value="stageFees">Stage Fees</TabsTrigger> */}
     </TabsList>
   );
 };

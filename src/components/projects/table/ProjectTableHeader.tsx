@@ -20,9 +20,10 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
         <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>PM</TableHead>
         <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Status</TableHead>
         <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Country</TableHead>
-        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>%Profit</TableHead>
+        {/* <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>%Profit</TableHead> */}
         <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Current Stage</TableHead>
-        {office_stages.map((stage) => (
+        {/* Stage fee columns hidden for MVP */}
+        {/* {office_stages.map((stage) => (
           <TableHead 
             key={stage.id}
             className="text-center px-2 py-4 min-w-[100px]"
@@ -48,7 +49,7 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
               </div>
             </div>
           </TableHead>
-        ))}
+        ))} */}
         {editMode && <TableHead className="w-24" style={{ backgroundColor: '#6465F0', color: 'white' }}>Actions</TableHead>}
       </TableRow>
     </TableHeader>

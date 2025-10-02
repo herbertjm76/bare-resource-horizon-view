@@ -55,7 +55,8 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
         </ScrollArea>
       </TabsContent>
 
-      <TabsContent value="stageFees" className="mt-0">
+      {/* Stage Fees tab content hidden for MVP */}
+      {/* <TabsContent value="stageFees" className="mt-0">
         <ScrollArea className="h-[400px] px-6">
           <ProjectStageFeesTabContent 
             form={form}
@@ -64,7 +65,7 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
             isDataLoaded={isDataLoaded}
           />
         </ScrollArea>
-      </TabsContent>
+      </TabsContent> */}
     </div>
   );
 };

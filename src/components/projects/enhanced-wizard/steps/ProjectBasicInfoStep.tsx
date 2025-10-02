@@ -106,7 +106,8 @@ export const ProjectBasicInfoStep: React.FC<ProjectBasicInfoStepProps> = ({ data
         </CardContent>
       </Card>
 
-      <Card>
+      {/* Financial Information card hidden for MVP */}
+      {/* <Card>
         <CardHeader>
           <CardTitle>Financial Information</CardTitle>
         </CardHeader>
@@ -140,7 +141,7 @@ export const ProjectBasicInfoStep: React.FC<ProjectBasicInfoStepProps> = ({ data
             </Select>
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
   );
 };

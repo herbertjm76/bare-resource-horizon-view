@@ -104,9 +104,9 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           </span>
         </TableCell>
         
-        <TableCell>
+        {/* <TableCell>
           {project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"}
-        </TableCell>
+        </TableCell> */}
         
         <TableCell>
           <span
@@ -120,7 +120,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           </span>
         </TableCell>
         
-        {office_stages.map((stage) => {
+        {/* Stage fees columns hidden for MVP */}
+        {/* {office_stages.map((stage) => {
           const fee = getProjectStageFee(project.id, stage.id);
           return (
             <TableCell 
@@ -141,7 +142,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
               )}
             </TableCell>
           );
-        })}
+        })} */}
         
         {editMode && (
           <TableCell>

@@ -47,7 +47,8 @@ const NewProjectStep2Details: React.FC<Props> = ({
             </SelectContent>
           </Select>
         </div>
-        <div>
+        {/* Profit field hidden for MVP */}
+        {/* <div>
           <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
             <Percent className="w-4 h-4" />Target Profit %<span className="text-destructive">*</span>
           </label>
@@ -59,7 +60,7 @@ const NewProjectStep2Details: React.FC<Props> = ({
             placeholder="Enter % Profit"
             className="text-base"
           />
-        </div>
+        </div> */}
         <div>
           <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
             <CheckSquare className="w-4 h-4" />Project Status<span className="text-destructive">*</span>
@@ -101,7 +102,8 @@ const NewProjectStep2Details: React.FC<Props> = ({
             </p>
           )}
         </div>
-        <div className="sm:col-span-2">
+        {/* Average Rate field hidden for MVP */}
+        {/* <div className="sm:col-span-2">
           <label className="block font-semibold mb-1 flex items-center gap-1 text-sm">
             <Calculator className="w-4 h-4" />Average Rate<span className="text-destructive">*</span>
           </label>
@@ -122,7 +124,7 @@ const NewProjectStep2Details: React.FC<Props> = ({
           <p className="text-xs text-muted-foreground mt-1">
             Click Calculate to use the rate calculator
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
