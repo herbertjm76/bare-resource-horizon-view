@@ -14,7 +14,7 @@ import { ThemeTab } from '@/components/settings/ThemeTab';
 export const OfficeSettingsTabs: React.FC = () => {
   return (
     <Tabs defaultValue="locations" className="w-full">
-      <TabsList className="w-full mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-1 h-auto bg-transparent p-1 rounded-lg">
+      <TabsList className="w-full mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-2 h-auto bg-transparent p-2 rounded-lg">
         <TabsTrigger 
           value="locations" 
           className="flex items-center gap-2 px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
