@@ -47,6 +47,7 @@ export const applyThemeById = (themeId: string) => {
   const theme = themes[themeId];
   if (!theme) return;
 
+  console.log('useTheme: Applying theme on app load:', themeId);
   const root = document.documentElement;
   root.style.setProperty('--gradient-start', theme.start);
   root.style.setProperty('--gradient-mid', theme.mid);
