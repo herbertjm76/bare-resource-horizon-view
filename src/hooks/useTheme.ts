@@ -42,6 +42,21 @@ export const applyThemeById = (themeId: string) => {
       mid: '250 60% 40%',
       end: '270 55% 45%',
     },
+    corporate: {
+      start: '220 60% 45%',
+      mid: '225 65% 52%',
+      end: '230 70% 60%',
+    },
+    slate: {
+      start: '220 8% 28%',
+      mid: '220 6% 38%',
+      end: '220 5% 50%',
+    },
+    indigo: {
+      start: '248 45% 38%',
+      mid: '252 50% 48%',
+      end: '256 55% 58%',
+    },
   };
 
   const theme = themes[themeId];

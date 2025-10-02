@@ -74,6 +74,36 @@ const themes: Theme[] = [
       end: '270 55% 45%',
     },
   },
+  {
+    id: 'corporate',
+    name: 'Corporate Blue',
+    description: 'Monochromatic professional blue',
+    colors: {
+      start: '220 60% 45%',
+      mid: '225 65% 52%',
+      end: '230 70% 60%',
+    },
+  },
+  {
+    id: 'slate',
+    name: 'Monochrome Slate',
+    description: 'Neutral greys for a clean look',
+    colors: {
+      start: '220 8% 28%',
+      mid: '220 6% 38%',
+      end: '220 5% 50%',
+    },
+  },
+  {
+    id: 'indigo',
+    name: 'Deep Indigo',
+    description: 'Muted indigo gradient',
+    colors: {
+      start: '248 45% 38%',
+      mid: '252 50% 48%',
+      end: '256 55% 58%',
+    },
+  },
 ];
 
 export const ThemeTab: React.FC = () => {
@@ -122,7 +152,7 @@ export const ThemeTab: React.FC = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Large Live Preview */}
-        <div key={previewKey} className="relative overflow-hidden rounded-2xl h-64 bg-gradient-modern shadow-2xl">
+        <div key={previewKey} className="relative overflow-hidden rounded-2xl h-64 bg-gradient-modern shadow-2xl" style={{ ['--gradient-start' as any]: themes.find(t => t.id === selectedTheme)?.colors.start, ['--gradient-mid' as any]: themes.find(t => t.id === selectedTheme)?.colors.mid, ['--gradient-end' as any]: themes.find(t => t.id === selectedTheme)?.colors.end }}>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center space-y-2">
               <h3 className="text-4xl font-bold text-white drop-shadow-lg">
