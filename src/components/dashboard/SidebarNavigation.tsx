@@ -83,7 +83,7 @@ export const SidebarNavigation: React.FC = () => {
             </SidebarMenu>
           </SidebarGroupContent>
           {!collapsed && section !== navigationItems[navigationItems.length - 1] && (
-            <div className="border-t border-indigo-600 my-2" />
+            <div className="border-t border-[hsl(var(--theme-border))] my-2 opacity-30" />
           )}
         </SidebarGroup>
       ))}

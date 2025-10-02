@@ -9,7 +9,7 @@ export const SidebarLogo = () => {
   const collapsed = state === "collapsed";
 
   return (
-    <div className="flex items-center justify-between h-[48px] border-b border-slate-600/30 px-4">
+    <div className="flex items-center justify-between h-[48px] border-b border-[hsl(var(--theme-border))] opacity-30 px-4">
       {collapsed ? (
         <div className="w-full flex items-center justify-center">
           <Button 

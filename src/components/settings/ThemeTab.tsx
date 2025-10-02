@@ -97,6 +97,10 @@ export const ThemeTab: React.FC = () => {
     root.style.setProperty('--gradient-mid', theme.colors.mid);
     root.style.setProperty('--gradient-end', theme.colors.end);
     
+    // Set theme color for buttons and UI elements (using mid color)
+    root.style.setProperty('--theme-primary', theme.colors.mid);
+    root.style.setProperty('--theme-border', theme.colors.start);
+    
     // Log to confirm
     console.log('CSS variables set:', {
       start: getComputedStyle(root).getPropertyValue('--gradient-start'),

@@ -52,4 +52,8 @@ export const applyThemeById = (themeId: string) => {
   root.style.setProperty('--gradient-start', theme.start);
   root.style.setProperty('--gradient-mid', theme.mid);
   root.style.setProperty('--gradient-end', theme.end);
+  
+  // Set theme color for buttons and UI elements (using mid color)
+  root.style.setProperty('--theme-primary', theme.mid);
+  root.style.setProperty('--theme-border', theme.start);
 };
