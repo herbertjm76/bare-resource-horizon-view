@@ -14,10 +14,10 @@ import { ThemeTab } from '@/components/settings/ThemeTab';
 export const OfficeSettingsTabs: React.FC = () => {
   return (
     <Tabs defaultValue="locations" className="w-full">
-      <TabsList className="w-full mb-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-2 h-auto bg-transparent p-2 rounded-lg">
+      <TabsList className="w-full mb-6 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 h-auto bg-transparent p-2 rounded-lg">
         <TabsTrigger 
           value="locations" 
-          className="px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+          className="px-2 sm:px-3 py-2.5 sm:py-3 h-auto truncate text-[10px] xs:text-xs sm:text-sm font-medium"
         >
           <span className="hidden xs:inline sm:hidden lg:inline">Office Locations</span>
           <span className="xs:hidden sm:inline lg:hidden">Locations</span>
@@ -25,7 +25,7 @@ export const OfficeSettingsTabs: React.FC = () => {
         
         <TabsTrigger 
           value="areas" 
-          className="px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+          className="px-2 sm:px-3 py-2.5 sm:py-3 h-auto truncate text-[10px] xs:text-xs sm:text-sm font-medium"
         >
           <span className="hidden xs:inline sm:hidden lg:inline">Project Areas</span>
           <span className="xs:hidden sm:inline lg:hidden">Areas</span>
@@ -33,14 +33,14 @@ export const OfficeSettingsTabs: React.FC = () => {
         
         <TabsTrigger 
           value="stages" 
-          className="px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+          className="px-2 sm:px-3 py-2.5 sm:py-3 h-auto truncate text-[10px] xs:text-xs sm:text-sm font-medium"
         >
           <span>Stages</span>
         </TabsTrigger>
         
         <TabsTrigger 
           value="departments" 
-          className="px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+          className="px-2 sm:px-3 py-2.5 sm:py-3 h-auto truncate text-[10px] xs:text-xs sm:text-sm font-medium"
         >
           <span className="hidden xs:inline">Departments</span>
           <span className="xs:hidden">Depts</span>
@@ -48,28 +48,29 @@ export const OfficeSettingsTabs: React.FC = () => {
         
         <TabsTrigger 
           value="roles" 
-          className="px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+          className="px-2 sm:px-3 py-2.5 sm:py-3 h-auto truncate text-[10px] xs:text-xs sm:text-sm font-medium"
         >
           <span>Roles</span>
         </TabsTrigger>
         
         <TabsTrigger 
           value="rates" 
-          className="px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+          className="px-2 sm:px-3 py-2.5 sm:py-3 h-auto truncate text-[10px] xs:text-xs sm:text-sm font-medium"
         >
           <span>Rates</span>
         </TabsTrigger>
         
         <TabsTrigger 
           value="holidays" 
-          className="px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+          className="px-2 sm:px-3 py-2.5 sm:py-3 h-auto truncate text-[10px] xs:text-xs sm:text-sm font-medium"
         >
-          <span>Holidays</span>
+          <span className="hidden xs:inline">Holidays</span>
+          <span className="xs:hidden">Days</span>
         </TabsTrigger>
         
         <TabsTrigger 
           value="theme" 
-          className="px-3 py-3 h-auto whitespace-nowrap text-xs sm:text-sm font-medium"
+          className="px-2 sm:px-3 py-2.5 sm:py-3 h-auto truncate text-[10px] xs:text-xs sm:text-sm font-medium"
         >
           <span>Theme</span>
         </TabsTrigger>
