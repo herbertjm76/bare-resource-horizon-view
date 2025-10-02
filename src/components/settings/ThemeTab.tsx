@@ -125,25 +125,6 @@ export const ThemeTab: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Large Live Preview */}
-        <div key={previewKey} className="relative overflow-hidden rounded-2xl h-64 bg-gradient-modern shadow-2xl" style={{ ['--gradient-start' as any]: themes.find(t => t.id === selectedTheme)?.colors.start, ['--gradient-mid' as any]: themes.find(t => t.id === selectedTheme)?.colors.mid, ['--gradient-end' as any]: themes.find(t => t.id === selectedTheme)?.colors.end }}>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center space-y-2">
-              <h3 className="text-4xl font-bold text-white drop-shadow-lg">
-                {themes.find(t => t.id === selectedTheme)?.name}
-              </h3>
-              <p className="text-white/90 text-lg drop-shadow">
-                Live Preview
-              </p>
-            </div>
-          </div>
-          {/* Animated background elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white/10 rounded-full blur-3xl animate-float"></div>
-            <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-white/10 rounded-full blur-3xl animate-float animation-delay-1000"></div>
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {themes.map((theme) => (
             <button
