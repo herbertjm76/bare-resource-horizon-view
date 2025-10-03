@@ -44,18 +44,18 @@ export const AppHeader: React.FC = () => {
   };
 
   return (
-    <header className="w-full bg-gradient-modern border-b border-border sticky top-0 z-30 h-16 text-white">
-      <div className="h-full px-4 py-2 flex items-center justify-between">
+    <header className="w-full bg-gradient-modern border-b border-white/10 sticky top-0 z-30 h-16 text-white shadow-lg">
+      <div className="h-full px-4 sm:px-6 py-2 flex items-center justify-between">
         {/* Left side - Sidebar trigger + Date display */}
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <SidebarTrigger className="p-2 text-white hover:bg-white/10" />
+          <SidebarTrigger className="p-2 text-white hover:bg-white/10 rounded-lg transition-colors" />
           <div className="min-w-0">
             <DateDisplay 
               showIcon={true}
               showTimezone={false}
               allowFormatSelection={!isMobile}
               defaultFormat={isMobile ? "numeric" : "long"}
-              className="text-white/90"
+              className="text-white font-bold"
             />
           </div>
         </div>
