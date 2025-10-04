@@ -162,25 +162,25 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
 
           {/* Modern status legend */}
           <div className="flex justify-center mt-6">
-            <div className="flex items-center gap-6 text-xs bg-white/60 backdrop-blur-sm rounded-full px-4 py-2 border border-gray-200">
+            <div className="flex items-center gap-6 text-xs bg-card/60 backdrop-blur-sm rounded-full px-4 py-2 border border-border">
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-purple-400 to-purple-500" />
-                <span className="text-gray-600 font-medium">Under</span>
+                <div className="w-2.5 h-2.5 rounded-full bg-gradient-modern opacity-50" />
+                <span className="text-muted-foreground font-medium">Under</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-green-400 to-green-500" />
-                <span className="text-gray-600 font-medium">Optimal</span>
+                <span className="text-muted-foreground font-medium">Optimal</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-red-400 to-red-500" />
-                <span className="text-gray-600 font-medium">Over</span>
+                <span className="text-muted-foreground font-medium">Over</span>
               </div>
             </div>
           </div>
         </div>
         
         <div className="flex justify-center p-6 pt-0">
-          <Badge variant="outline" className="text-xs bg-gradient-to-r from-gray-50 to-white text-gray-600 border-gray-200 shadow-sm">
+          <Badge variant="outline" className="text-xs bg-card text-muted-foreground border-border shadow-sm">
             This Month
           </Badge>
         </div>

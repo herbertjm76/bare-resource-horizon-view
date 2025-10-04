@@ -35,12 +35,16 @@ export const TimeRangeSelector: React.FC<TimeRangeSelectorProps> = ({
         value={selectedRange}
         onValueChange={onRangeChange}
       >
-        <SelectTrigger className="w-full bg-white">
+        <SelectTrigger className="w-full bg-background border-border">
           <SelectValue placeholder="Select time range" />
         </SelectTrigger>
         <SelectContent>
           {timeRangeOptions.map(option => (
-            <SelectItem key={option.value} value={option.value}>
+            <SelectItem 
+              key={option.value} 
+              value={option.value}
+              className="data-[state=checked]:bg-gradient-modern data-[state=checked]:text-white"
+            >
               {option.label}
             </SelectItem>
           ))}

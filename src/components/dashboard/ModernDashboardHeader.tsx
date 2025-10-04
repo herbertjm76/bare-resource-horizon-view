@@ -15,7 +15,7 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
   utilizationRate
 }) => {
   return (
-    <div className="bg-gradient-to-r from-purple-600 to-indigo-700 rounded-lg">
+    <div className="bg-gradient-modern rounded-lg">
       <div className="text-center py-6">
         <div className="flex items-center justify-center gap-3 mb-2">
           <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">

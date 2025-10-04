@@ -13,7 +13,7 @@ export const OverCapacityCard: React.FC<OverCapacityCardProps> = ({
   timeRange
 }) => {
   return (
-    <Card className="rounded-xl border-0 shadow-sm h-full" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+    <Card className="rounded-xl glass-card glass-hover border-white/20 h-full">
       <CardContent className="p-3 h-full flex flex-col justify-between">
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-1.5">
@@ -32,7 +32,7 @@ export const OverCapacityCard: React.FC<OverCapacityCardProps> = ({
         </div>
         
         <div className="flex items-center justify-between">
-          <Badge className="text-[10px] border-white/30 text-white bg-white/15 px-2 py-0.5">
+          <Badge className="text-[10px] glass-card border-white/20 text-white px-2 py-0.5">
             Over Capacity
           </Badge>
           <span className="text-[10px] text-white/70">{timeRange}</span>
