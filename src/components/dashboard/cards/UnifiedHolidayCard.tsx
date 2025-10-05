@@ -43,7 +43,9 @@ export const UnifiedHolidayCard: React.FC<UnifiedHolidayCardProps> = ({ data }) 
         {/* Title inside the card */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
-            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+            <div className="p-1.5 rounded-lg bg-gradient-modern">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+            </div>
             Upcoming Events
           </h2>
           <StandardizedHeaderBadge>

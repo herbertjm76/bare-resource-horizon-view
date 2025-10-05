@@ -90,17 +90,17 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
         
         <div className="flex-1 flex flex-col min-h-0">
           {/* Chart area - taking full remaining height */}
-          <div className="relative flex-1 min-h-[120px] bg-gradient-to-br from-blue-50/30 to-purple-50/30 rounded-xl border border-gray-100/50 overflow-hidden">
+          <div className="relative flex-1 min-h-[120px] bg-card/50 rounded-xl border border-border overflow-hidden">
             {/* Background grid pattern */}
             <div className="absolute inset-0 opacity-30">
               <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 280 160">
                 <defs>
                   <pattern id="grid" width="40" height="32" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 32" fill="none" stroke="rgba(139, 92, 246, 0.4)" strokeWidth="0.5"/>
+                    <path d="M 40 0 L 0 0 0 32" fill="none" stroke="hsl(var(--theme-primary))" strokeWidth="0.5" opacity="0.4"/>
                   </pattern>
                   <pattern id="colorGrid" width="40" height="32" patternUnits="userSpaceOnUse">
-                    <rect width="40" height="32" fill="rgba(99, 102, 241, 0.08)"/>
-                    <path d="M 40 0 L 0 0 0 32" fill="none" stroke="rgba(139, 92, 246, 0.3)" strokeWidth="0.8"/>
+                    <rect width="40" height="32" fill="hsl(var(--theme-primary) / 0.08)"/>
+                    <path d="M 40 0 L 0 0 0 32" fill="none" stroke="hsl(var(--theme-primary))" strokeWidth="0.8" opacity="0.3"/>
                   </pattern>
                 </defs>
                 <rect width="100%" height="100%" fill="url(#colorGrid)" />
@@ -108,16 +108,16 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
             </div>
 
             <svg className="w-full h-full relative z-10" preserveAspectRatio="none" viewBox="0 0 280 160">
-              {/* Define gradients */}
+              {/* Define gradients using theme colors */}
               <defs>
                 <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="rgba(99, 102, 241, 0.6)" stopOpacity="1"/>
-                  <stop offset="50%" stopColor="rgba(139, 92, 246, 0.4)" stopOpacity="1"/>
-                  <stop offset="100%" stopColor="rgba(139, 92, 246, 0.1)" stopOpacity="0"/>
+                  <stop offset="0%" stopColor="hsl(var(--theme-primary))" stopOpacity="0.6"/>
+                  <stop offset="50%" stopColor="hsl(var(--theme-primary))" stopOpacity="0.4"/>
+                  <stop offset="100%" stopColor="hsl(var(--theme-primary))" stopOpacity="0.1"/>
                 </linearGradient>
                 <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="rgb(99, 102, 241)"/>
-                  <stop offset="100%" stopColor="rgb(139, 92, 246)"/>
+                  <stop offset="0%" stopColor="hsl(var(--gradient-start))"/>
+                  <stop offset="100%" stopColor="hsl(var(--gradient-end))"/>
                 </linearGradient>
               </defs>
               
@@ -129,7 +129,8 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                   y1={line * 32}
                   x2="280"
                   y2={line * 32}
-                  stroke="rgba(139, 92, 246, 0.25)"
+                  stroke="hsl(var(--theme-primary))"
+                  opacity="0.25"
                   strokeWidth="1"
                   strokeDasharray="3,2"
                 />
@@ -143,7 +144,8 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                   y1="0"
                   x2={(index * 280) / (labels.length - 1)}
                   y2="160"
-                  stroke="rgba(99, 102, 241, 0.25)"
+                  stroke="hsl(var(--theme-primary))"
+                  opacity="0.25"
                   strokeWidth="1"
                   strokeDasharray="3,2"
                 />
@@ -224,7 +226,8 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                       cx={x}
                       cy={y}
                       r="6"
-                      fill="rgba(139, 92, 246, 0.3)"
+                      fill="hsl(var(--theme-primary))"
+                      opacity="0.3"
                       className="animate-pulse"
                     />
                     {/* Main point */}
@@ -232,7 +235,7 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                       cx={x}
                       cy={y}
                       r="3"
-                      fill="rgb(139, 92, 246)"
+                      fill="hsl(var(--theme-primary))"
                       stroke="white"
                       strokeWidth="2"
                       className="drop-shadow-md"
@@ -282,17 +285,17 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                 </span>
                 <div className={`h-1 w-full mt-1 rounded-full ${
                   data[index] > (maxValue * 0.7) 
-                    ? 'bg-red-200' 
+                    ? 'bg-pink-300' 
                     : data[index] > (maxValue * 0.4) 
-                    ? 'bg-yellow-200' 
-                    : 'bg-green-200'
+                    ? 'bg-gradient-modern opacity-60' 
+                    : 'bg-gradient-modern opacity-40'
                 }`} />
               </div>
             ))}
           </div>
           
           <div className="flex justify-center mt-3">
-            <Badge variant="outline" className="text-xs bg-gradient-to-r from-blue-50 to-purple-50 text-gray-600 border-gray-200 px-3 py-1">
+            <Badge variant="outline" className="text-xs bg-card text-muted-foreground border-border px-3 py-1">
               {badgeText}
             </Badge>
           </div>

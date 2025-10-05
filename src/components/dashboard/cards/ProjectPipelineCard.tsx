@@ -50,24 +50,24 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
   
   const totalProjects = projects.length;
   
-  // Prepare bubble data for the bubble graph
+  // Prepare bubble data for the bubble graph using theme colors
   const bubbleData = [
     {
       label: 'Active',
       count: projectStats.inProgress.count,
-      color: '#FDFDFD',
-      textColor: 'text-gray-900'
+      color: 'hsl(var(--card))',
+      textColor: 'text-foreground'
     },
     {
       label: 'Planning',
       count: projectStats.planning.count,
-      color: '#6B65F7',
+      color: 'hsl(var(--gradient-mid))',
       textColor: 'text-white'
     },
     {
       label: 'Complete',
       count: projectStats.complete.count,
-      color: '#5A68F6',
+      color: 'hsl(var(--gradient-end))',
       textColor: 'text-white'
     }
   ];
@@ -96,22 +96,22 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
             {/* Legend - horizontal layout at bottom */}
             <div className="flex justify-center gap-6">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-white border border-gray-300"></div>
-                <span className="text-sm text-gray-600">Active</span>
+                <div className="w-4 h-4 rounded-full bg-card border border-border"></div>
+                <span className="text-sm text-muted-foreground">Active</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#6B65F7' }}></div>
-                <span className="text-sm text-gray-600">Plan</span>
+                <div className="w-4 h-4 rounded-full bg-gradient-modern"></div>
+                <span className="text-sm text-muted-foreground">Plan</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#5A68F6' }}></div>
-                <span className="text-sm text-gray-600">Done</span>
+                <div className="w-4 h-4 rounded-full" style={{ background: 'hsl(var(--gradient-end))' }}></div>
+                <span className="text-sm text-muted-foreground">Done</span>
               </div>
             </div>
             
             {/* Time range badge */}
             <div className="flex justify-center">
-              <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
+              <Badge variant="outline" className="text-xs bg-card text-muted-foreground border-border">
                 {timeRange}
               </Badge>
             </div>

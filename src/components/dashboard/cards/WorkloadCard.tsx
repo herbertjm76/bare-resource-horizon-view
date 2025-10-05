@@ -116,15 +116,15 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   const workloadMatrix = generateWorkload();
   
   const getIntensityColor = (intensity: number) => {
-    // Purple for under/over-utilized, green for optimal
-    if (intensity <= 0) return 'bg-gray-200'; // No work
-    if (intensity <= 40) return 'bg-purple-500'; // Very low utilization - problematic
-    if (intensity <= 60) return 'bg-purple-300'; // Low utilization - needs attention
-    if (intensity <= 80) return 'bg-green-300'; // Good utilization range
-    if (intensity <= 100) return 'bg-green-500'; // Optimal utilization 
-    if (intensity <= 110) return 'bg-green-300'; // Slightly over - still good
-    if (intensity <= 130) return 'bg-purple-300'; // Over-utilized - concerning
-    return 'bg-purple-500'; // Severely over-utilized - critical
+    // Use theme colors - gray for under/over-utilized, theme gradient for optimal
+    if (intensity <= 0) return 'bg-muted'; // No work
+    if (intensity <= 40) return 'bg-gradient-to-br from-gray-400 to-gray-500'; // Very low utilization
+    if (intensity <= 60) return 'bg-gradient-to-br from-gray-300 to-gray-400'; // Low utilization
+    if (intensity <= 80) return 'bg-gradient-modern opacity-60'; // Good utilization range
+    if (intensity <= 100) return 'bg-gradient-modern'; // Optimal utilization 
+    if (intensity <= 110) return 'bg-gradient-modern opacity-60'; // Slightly over
+    if (intensity <= 130) return 'bg-gradient-to-br from-pink-300 to-pink-400'; // Over-utilized
+    return 'bg-gradient-to-br from-pink-400 to-pink-500'; // Severely over-utilized
   };
 
   return (
@@ -183,20 +183,20 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           </div>
           
           {/* Legend */}
-          <div className="flex items-center justify-between text-xs text-gray-500 mt-4 mb-2">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mt-4 mb-2">
             <span>Under-utilized</span>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-purple-500"></div>
-              <div className="w-3 h-3 rounded-sm bg-purple-300"></div>
-              <div className="w-3 h-3 rounded-sm bg-green-500"></div>
-              <div className="w-3 h-3 rounded-sm bg-purple-300"></div>
-              <div className="w-3 h-3 rounded-sm bg-purple-500"></div>
+              <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-gray-400 to-gray-500"></div>
+              <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-gray-300 to-gray-400"></div>
+              <div className="w-3 h-3 rounded-sm bg-gradient-modern"></div>
+              <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-pink-300 to-pink-400"></div>
+              <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-pink-400 to-pink-500"></div>
             </div>
             <span>Over-utilized</span>
           </div>
           
           <div className="flex justify-center">
-            <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-200">
+            <Badge variant="outline" className="text-xs bg-card text-muted-foreground border-border">
               {timeConfig.label}
             </Badge>
           </div>

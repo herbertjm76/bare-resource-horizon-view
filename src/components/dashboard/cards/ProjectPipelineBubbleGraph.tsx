@@ -55,8 +55,8 @@ export const ProjectPipelineBubbleGraph: React.FC<ProjectPipelineBubbleGraphProp
                 cy={bubblePosition.y}
                 r={size / 2}
                 fill={bubble.color}
-                stroke={bubble.color === '#FDFDFD' ? '#E5E7EB' : 'none'}
-                strokeWidth={bubble.color === '#FDFDFD' ? 1 : 0}
+                stroke={bubble.color.includes('--card') ? 'hsl(var(--border))' : 'none'}
+                strokeWidth={bubble.color.includes('--card') ? 1.5 : 0}
                 opacity="0.9"
                 className="transition-all duration-300 hover:opacity-100"
               />
