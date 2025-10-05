@@ -25,7 +25,7 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = ({
           </Button>
         </Link>
         {onNewProject && (
-          <Button onClick={onNewProject} size="lg" className="bg-brand-violet hover:bg-brand-violet/90 text-white">
+          <Button onClick={onNewProject} size="lg" className="bg-gradient-modern hover:opacity-90 text-white border-transparent">
             <Plus className="h-4 w-4 mr-2" />
             New Project Wizard
           </Button>

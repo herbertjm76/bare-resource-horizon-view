@@ -13,21 +13,21 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
 }) => {
   return (
     <TableHeader>
-      <TableRow style={{ backgroundColor: '#6465F0' }}>
-        {editMode && <TableHead className="w-10" style={{ backgroundColor: '#6465F0', color: 'white' }}><span className="sr-only">Select</span></TableHead>}
-        <TableHead className="w-20" style={{ backgroundColor: '#6465F0', color: 'white' }}>Code</TableHead>
-        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Project Name</TableHead>
-        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>PM</TableHead>
-        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Status</TableHead>
-        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Country</TableHead>
-        {/* <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>%Profit</TableHead> */}
-        <TableHead style={{ backgroundColor: '#6465F0', color: 'white' }}>Current Stage</TableHead>
+      <TableRow style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
+        {editMode && <TableHead className="w-10" style={{ background: 'transparent', color: 'white' }}><span className="sr-only">Select</span></TableHead>}
+        <TableHead className="w-20" style={{ background: 'transparent', color: 'white' }}>Code</TableHead>
+        <TableHead style={{ background: 'transparent', color: 'white' }}>Project Name</TableHead>
+        <TableHead style={{ background: 'transparent', color: 'white' }}>PM</TableHead>
+        <TableHead style={{ background: 'transparent', color: 'white' }}>Status</TableHead>
+        <TableHead style={{ background: 'transparent', color: 'white' }}>Country</TableHead>
+        {/* <TableHead style={{ background: 'transparent', color: 'white' }}>%Profit</TableHead> */}
+        <TableHead style={{ background: 'transparent', color: 'white' }}>Current Stage</TableHead>
         {/* Stage fee columns hidden for MVP */}
         {/* {office_stages.map((stage) => (
           <TableHead 
             key={stage.id}
             className="text-center px-2 py-4 min-w-[100px]"
-            style={{ backgroundColor: '#6465F0' }}
+            style={{ background: 'transparent' }}
           >
             <div className="flex flex-col items-center justify-center h-full">
               <div 
@@ -50,7 +50,7 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
             </div>
           </TableHead>
         ))} */}
-        {editMode && <TableHead className="w-24" style={{ backgroundColor: '#6465F0', color: 'white' }}>Actions</TableHead>}
+        {editMode && <TableHead className="w-24" style={{ background: 'transparent', color: 'white' }}>Actions</TableHead>}
       </TableRow>
     </TableHeader>
   );

@@ -26,8 +26,8 @@ export const StreamlinedProjectHeader: React.FC<StreamlinedProjectHeaderProps> =
         <div className="space-y-2">
           <EnhancedWorkflowBreadcrumbs />
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-brand-violet/10 rounded-lg flex items-center justify-center">
-              <FolderOpen className="h-5 w-5 text-brand-violet" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-modern/10">
+              <FolderOpen className="h-5 w-5" style={{ color: 'hsl(var(--theme-primary))' }} />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
@@ -41,7 +41,7 @@ export const StreamlinedProjectHeader: React.FC<StreamlinedProjectHeaderProps> =
         </div>
         
         {/* Primary action button */}
-        <Button onClick={onNewProject} className="bg-brand-violet hover:bg-brand-violet/90 text-white">
+        <Button onClick={onNewProject} className="bg-gradient-modern hover:opacity-90 text-white border-transparent">
           <Plus className="h-4 w-4 mr-2" />
           New Project Wizard
         </Button>

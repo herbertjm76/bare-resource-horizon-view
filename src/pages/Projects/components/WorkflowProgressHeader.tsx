@@ -13,11 +13,11 @@ export const WorkflowProgressHeader: React.FC<WorkflowProgressHeaderProps> = ({
   return (
     <div className="space-y-4">
       {/* Clean header with integrated CTA */}
-      <div className="bg-gradient-to-r from-brand-violet/5 to-brand-purple/5 border border-brand-violet/10 rounded-lg p-6">
+      <div className="bg-card/50 border border-border rounded-lg p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-brand-violet/10 rounded-lg flex items-center justify-center">
-              <FolderOpen className="h-5 w-5 text-brand-violet" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-modern/10">
+              <FolderOpen className="h-5 w-5" style={{ color: 'hsl(var(--theme-primary))' }} />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
@@ -30,7 +30,7 @@ export const WorkflowProgressHeader: React.FC<WorkflowProgressHeaderProps> = ({
           </div>
           
           {/* Primary CTA integrated into workflow */}
-          <Button onClick={onNewProject} size="lg" className="bg-brand-violet hover:bg-brand-violet/90 text-white">
+          <Button onClick={onNewProject} size="lg" className="bg-gradient-modern hover:opacity-90 text-white border-transparent">
             <Plus className="h-4 w-4 mr-2" />
             New Project Wizard
           </Button>
