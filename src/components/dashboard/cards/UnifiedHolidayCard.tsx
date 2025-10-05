@@ -15,8 +15,10 @@ export const UnifiedHolidayCard: React.FC<UnifiedHolidayCardProps> = ({ data }) 
     return (
       <Card className="rounded-2xl border-2 border-zinc-300 bg-white shadow-sm h-[500px]">
         <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
-          <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2 mb-4">
-            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+          <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2 mb-4" style={{ color: 'hsl(var(--theme-primary))' }}>
+            <div className="p-1.5 rounded-lg bg-gradient-modern">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+            </div>
             Upcoming Events
           </h2>
           <div className="space-y-4 flex-1">
@@ -42,7 +44,7 @@ export const UnifiedHolidayCard: React.FC<UnifiedHolidayCardProps> = ({ data }) 
       <CardContent className="p-3 sm:p-6 h-full overflow-hidden flex flex-col">
         {/* Title inside the card */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg sm:text-xl font-semibold text-brand-primary flex items-center gap-2">
+          <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2" style={{ color: 'hsl(var(--theme-primary))' }}>
             <div className="p-1.5 rounded-lg bg-gradient-modern">
               <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
             </div>
