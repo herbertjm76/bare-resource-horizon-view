@@ -9,7 +9,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[hsl(var(--theme-primary))] text-white hover:bg-[hsl(var(--gradient-start))]",
+        default: "text-white hover:opacity-90" ,
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-[#8E9196] text-white hover:bg-[#7d8086]", 
@@ -38,13 +38,20 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, isLoading, children, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, isLoading, children, style, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
+    
+    // Apply theme background for default variant
+    const defaultStyle = variant === "default" || !variant 
+      ? { background: 'hsl(var(--gradient-start))', ...style }
+      : style;
+    
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         disabled={isLoading || props.disabled}
+        style={defaultStyle}
         {...props}
       >
         {isLoading ? (

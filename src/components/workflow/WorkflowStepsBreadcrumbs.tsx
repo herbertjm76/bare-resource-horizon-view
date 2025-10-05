@@ -164,7 +164,7 @@ export const WorkflowStepsBreadcrumbs: React.FC<WorkflowStepsBreadcrumbsProps> =
           
           {/* CTA Button - only show on projects page */}
           {location.pathname === '/projects' && onNewProject && (
-            <Button onClick={onNewProject} size="lg" className="bg-brand-violet hover:bg-brand-violet/90 text-white">
+            <Button onClick={onNewProject} size="lg">
               <Plus className="h-4 w-4 mr-2" />
               New Project Wizard
             </Button>

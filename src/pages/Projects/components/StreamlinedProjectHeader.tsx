@@ -41,7 +41,7 @@ export const StreamlinedProjectHeader: React.FC<StreamlinedProjectHeaderProps> =
         </div>
         
         {/* Primary action button */}
-        <Button onClick={onNewProject} className="bg-gradient-modern hover:opacity-90 text-white border-transparent">
+        <Button onClick={onNewProject}>
           <Plus className="h-4 w-4 mr-2" />
           New Project Wizard
         </Button>

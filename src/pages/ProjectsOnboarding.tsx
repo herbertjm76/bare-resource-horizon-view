@@ -76,7 +76,7 @@ const ProjectsOnboarding = () => {
           icon={Play}
         >
           <Link to="/projects">
-            <Button size="lg" className="bg-brand-violet hover:bg-brand-violet/90 text-white">
+            <Button size="lg">
               <FolderOpen className="h-4 w-4 mr-2" />
               Go to Projects
             </Button>
@@ -151,7 +151,7 @@ const ProjectsOnboarding = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/projects">
-                <Button size="lg" className="bg-brand-violet hover:bg-brand-violet/90 text-white">
+                <Button size="lg">
                   <FolderOpen className="h-4 w-4 mr-2" />
                   Start with Projects
                 </Button>

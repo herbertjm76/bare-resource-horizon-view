@@ -48,7 +48,7 @@ export const StreamlinedProjectResourcingHeader: React.FC<StreamlinedProjectReso
         </div>
         
         {/* Primary action button */}
-        <Button className="text-white" style={{ background: 'hsl(var(--gradient-start))' }}>
+        <Button>
           <Plus className="h-4 w-4 mr-2" />
           New Project
         </Button>
