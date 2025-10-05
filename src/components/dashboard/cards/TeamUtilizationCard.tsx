@@ -20,29 +20,29 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
 }) => {
   const actualUtilizationRate = utilizationRate || 150;
   
-  // Modern color system with gradients
+  // Modern color system with gradients - using purple/blue/magenta theme
   const getUtilizationConfig = (rate: number) => {
     if (rate <= 70) {
       return {
         status: 'Under-utilized',
-        primaryColor: '#8B5CF6',
-        secondaryColor: '#A78BFA',
+        primaryColor: '#6B7280',
+        secondaryColor: '#9CA3AF',
         bgColor: 'hsl(var(--muted))',
         textColor: 'hsl(var(--muted-foreground))'
       };
     } else if (rate <= 100) {
       return {
         status: 'Optimal',
-        primaryColor: '#10B981',
-        secondaryColor: '#34D399',
+        primaryColor: '#8B5CF6',
+        secondaryColor: '#A78BFA',
         bgColor: 'hsl(var(--muted))',
         textColor: 'hsl(var(--foreground))'
       };
     } else {
       return {
         status: 'Over Capacity',
-        primaryColor: '#10B981',
-        secondaryColor: '#34D399',
+        primaryColor: '#EC4899',
+        secondaryColor: '#F472B6',
         bgColor: 'hsl(var(--muted))',
         textColor: 'hsl(var(--destructive))'
       };
@@ -91,8 +91,8 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                   <stop offset="100%" stopColor={config.secondaryColor} />
                 </linearGradient>
                 <linearGradient id="overflowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#FF4444" />
-                  <stop offset="100%" stopColor="#FF6B6B" />
+                  <stop offset="0%" stopColor="#EC4899" />
+                  <stop offset="100%" stopColor="#F472B6" />
                 </linearGradient>
               </defs>
               
@@ -164,15 +164,15 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
           <div className="flex justify-center mt-6">
             <div className="flex items-center gap-6 text-xs bg-card/60 backdrop-blur-sm rounded-full px-4 py-2 border border-border">
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-gradient-modern opacity-50" />
+                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-gray-400 to-gray-500" />
                 <span className="text-muted-foreground font-medium">Under</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-green-400 to-green-500" />
+                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-purple-400 to-purple-500" />
                 <span className="text-muted-foreground font-medium">Optimal</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-red-400 to-red-500" />
+                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-pink-400 to-pink-500" />
                 <span className="text-muted-foreground font-medium">Over</span>
               </div>
             </div>
