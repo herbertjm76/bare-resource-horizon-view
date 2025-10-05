@@ -61,11 +61,14 @@
 }
 
 /* Header sticky positioning */
+.project-resourcing-table thead tr {
+  background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)));
+}
 .project-resourcing-table thead th {
   position: sticky !important;
   top: 0 !important;
   z-index: 25 !important;
-  background: hsl(var(--gradient-start)) !important;
+  background: transparent !important;
   color: white !important;
   font-weight: 600;
   padding: 8px 4px;
@@ -75,7 +78,7 @@
 .project-resourcing-table thead th.counter-column,
 .project-resourcing-table thead th.project-name-column {
   z-index: 30 !important;
-  background: hsl(var(--gradient-start)) !important;
+  background: transparent !important;
   color: white !important;
 }
 

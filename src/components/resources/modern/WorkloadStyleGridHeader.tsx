@@ -15,7 +15,7 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
         <th 
           className="workload-resource-header project-resource-column"
           style={{ 
-            backgroundColor: 'hsl(var(--gradient-start))',
+            backgroundColor: 'transparent',
             color: 'white',
             width: '250px',
             minWidth: '250px',
@@ -39,12 +39,8 @@ export const WorkloadStyleGridHeader: React.FC<WorkloadStyleGridHeaderProps> = (
           const isFirstOfMonth = day.date.getDate() === 1;
           const isNewMonth = index === 0 || days[index - 1].date.getMonth() !== day.date.getMonth();
           
-          let backgroundColor = 'hsl(var(--gradient-start))';
-          if (isTodayDay) {
-            backgroundColor = '#f6ad55';
-          } else if (day.isWeekend) {
-            backgroundColor = '#4a5568';
-          }
+          let backgroundColor = 'transparent';
+          // Keep text white; special-day highlights handled via borders elsewhere
           
           return (
             <th 
