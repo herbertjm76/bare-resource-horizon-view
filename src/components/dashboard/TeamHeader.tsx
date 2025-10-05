@@ -7,7 +7,7 @@ interface TeamHeaderProps {
 
 const TeamHeader: React.FC<TeamHeaderProps> = ({ title }) => {
   return (
-    <h1 className="text-3xl font-bold tracking-tight text-brand-primary">{title}</h1>
+    <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'hsl(var(--theme-primary))' }}>{title}</h1>
   );
 };
 
