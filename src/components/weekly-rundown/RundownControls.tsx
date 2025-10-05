@@ -75,19 +75,19 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
         {/* Mode toggle */}
         <div className="flex rounded-lg border p-1 bg-muted">
           <Button
-            variant={rundownMode === 'people' ? 'secondary' : 'ghost'}
+            variant={rundownMode === 'people' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => onModeChange('people')}
-            className="flex items-center gap-2 h-8"
+            className={`flex items-center gap-2 h-8 ${rundownMode === 'people' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
           >
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">People</span>
           </Button>
           <Button
-            variant={rundownMode === 'projects' ? 'secondary' : 'ghost'}
+            variant={rundownMode === 'projects' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => onModeChange('projects')}
-            className="flex items-center gap-2 h-8"
+            className={`flex items-center gap-2 h-8 ${rundownMode === 'projects' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
           >
             <FolderOpen className="h-4 w-4" />
             <span className="hidden sm:inline">Projects</span>
@@ -97,19 +97,19 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
         {/* View type toggle */}
         <div className="flex rounded-lg border p-1 bg-muted">
           <Button
-            variant={viewType === 'carousel' ? 'secondary' : 'ghost'}
+            variant={viewType === 'carousel' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => onViewTypeChange('carousel')}
-            className="flex items-center gap-2 h-8"
+            className={`flex items-center gap-2 h-8 ${viewType === 'carousel' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
           >
             <Presentation className="h-4 w-4" />
             <span className="hidden sm:inline">Carousel</span>
           </Button>
           <Button
-            variant={viewType === 'grid' ? 'secondary' : 'ghost'}
+            variant={viewType === 'grid' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => onViewTypeChange('grid')}
-            className="flex items-center gap-2 h-8"
+            className={`flex items-center gap-2 h-8 ${viewType === 'grid' ? 'bg-gradient-modern text-white hover:opacity-90' : ''}`}
           >
             <LayoutGrid className="h-4 w-4" />
             <span className="hidden sm:inline">Grid</span>
