@@ -164,7 +164,7 @@ export const CountriesTab = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle>Project Areas</CardTitle>
+        <CardTitle style={{ color: 'hsl(var(--theme-primary))' }}>Project Areas</CardTitle>
         <div className="flex gap-2">
           <Button 
             size="sm" 

@@ -60,7 +60,7 @@ export const RatesTab = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div>
-            <CardTitle>Office Rates</CardTitle>
+            <CardTitle style={{ color: 'hsl(var(--theme-primary))' }}>Office Rates</CardTitle>
             <p className="text-sm text-muted-foreground mt-1">
               Manage rates for roles and locations across your organization
             </p>

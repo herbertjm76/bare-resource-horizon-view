@@ -49,7 +49,7 @@ export const StagesTab = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle>Project Stages</CardTitle>
+        <CardTitle style={{ color: 'hsl(var(--theme-primary))' }}>Project Stages</CardTitle>
         <div className="flex gap-2">
           <Button 
             size="sm" 

@@ -180,7 +180,7 @@ export const HolidaysTab = () => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 gap-2">
-        <CardTitle>Office Holidays</CardTitle>
+        <CardTitle style={{ color: 'hsl(var(--theme-primary))' }}>Office Holidays</CardTitle>
         <div className="flex gap-2">
           <Button 
             size="sm" 

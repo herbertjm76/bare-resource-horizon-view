@@ -119,7 +119,7 @@ export const ThemeTab: React.FC = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Theme & Appearance</CardTitle>
+        <CardTitle style={{ color: 'hsl(var(--theme-primary))' }}>Theme & Appearance</CardTitle>
         <CardDescription>
           Customize the look and feel of your application with different color themes
         </CardDescription>
