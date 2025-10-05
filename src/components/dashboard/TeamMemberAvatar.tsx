@@ -72,7 +72,7 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({ member }) =>
           }}
         />
       )}
-      <AvatarFallback className="bg-brand-violet text-white">
+      <AvatarFallback className="bg-gradient-modern text-white">
         {initials}
       </AvatarFallback>
     </Avatar>

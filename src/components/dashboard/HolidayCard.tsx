@@ -36,11 +36,11 @@ export const HolidayCard: React.FC = () => {
   };
 
   const getCountdownBadgeStyle = (daysUntil: number) => {
-    if (daysUntil === 0) return { backgroundColor: '#ef4444', color: 'white' };
-    if (daysUntil === 1) return { backgroundColor: '#f97316', color: 'white' };
-    if (daysUntil <= 7) return { backgroundColor: '#eab308', color: 'white' };
-    if (daysUntil <= 30) return { backgroundColor: '#3b82f6', color: 'white' };
-    return { backgroundColor: '#6b7280', color: 'white' };
+    if (daysUntil === 0) return { backgroundColor: 'hsl(var(--gradient-end))', color: 'white' };
+    if (daysUntil === 1) return { backgroundColor: 'hsl(var(--gradient-mid))', color: 'white' };
+    if (daysUntil <= 7) return { backgroundColor: 'hsl(var(--gradient-start))', color: 'white' };
+    if (daysUntil <= 30) return { backgroundColor: 'hsl(var(--theme-primary))', color: 'white', opacity: '0.7' };
+    return { backgroundColor: 'hsl(var(--muted))', color: 'hsl(var(--muted-foreground))' };
   };
 
   const getCountdownText = (daysUntil: number) => {
@@ -56,8 +56,8 @@ export const HolidayCard: React.FC = () => {
       <Card className="h-[320px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
         <CardHeader className="flex-shrink-0 pb-3">
           <CardTitle className="text-lg flex items-center gap-3">
-            <Calendar className="h-4 w-4 text-brand-violet" strokeWidth={1.5} />
-            <span className="text-brand-violet font-semibold">
+            <Calendar className="h-4 w-4" style={{ color: 'hsl(var(--theme-primary))' }} strokeWidth={1.5} />
+            <span className="font-semibold" style={{ color: 'hsl(var(--theme-primary))' }}>
               Upcoming Holidays
             </span>
           </CardTitle>
@@ -77,8 +77,8 @@ export const HolidayCard: React.FC = () => {
       <Card className="h-[320px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
         <CardHeader className="flex-shrink-0 pb-3">
           <CardTitle className="text-lg flex items-center gap-3">
-            <Calendar className="h-4 w-4 text-brand-violet" strokeWidth={1.5} />
-            <span className="text-brand-violet font-semibold">
+            <Calendar className="h-4 w-4" style={{ color: 'hsl(var(--theme-primary))' }} strokeWidth={1.5} />
+            <span className="font-semibold" style={{ color: 'hsl(var(--theme-primary))' }}>
               Upcoming Holidays
             </span>
           </CardTitle>
@@ -98,8 +98,8 @@ export const HolidayCard: React.FC = () => {
     <Card className="h-[320px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
       <CardHeader className="flex-shrink-0 pb-2">
         <CardTitle className="text-lg flex items-center gap-3">
-          <Calendar className="h-4 w-4 text-brand-violet" strokeWidth={1.5} />
-          <span className="text-brand-violet font-semibold">
+          <Calendar className="h-4 w-4" style={{ color: 'hsl(var(--theme-primary))' }} strokeWidth={1.5} />
+          <span className="font-semibold" style={{ color: 'hsl(var(--theme-primary))' }}>
             Upcoming Holidays
           </span>
           {upcomingHolidays.length > 0 && (
@@ -122,7 +122,7 @@ export const HolidayCard: React.FC = () => {
                   <div className="flex items-center gap-2">
                     {/* Compact Date Display */}
                     <div className="flex-shrink-0">
-                      <div className="bg-gradient-to-br from-brand-violet to-purple-600 text-white rounded-md px-1.5 py-1">
+                      <div className="bg-gradient-modern text-white rounded-md px-1.5 py-1">
                         <div className="text-xs font-bold leading-none">
                           {dateInfo.day}
                         </div>
@@ -134,12 +134,12 @@ export const HolidayCard: React.FC = () => {
                     
                     {/* Holiday Information */}
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-gray-900 text-sm leading-tight truncate group-hover:text-brand-violet transition-colors">
+                      <h4 className="font-medium text-gray-900 text-sm leading-tight truncate group-hover:opacity-80 transition-colors" style={{ color: 'hsl(var(--foreground))' }}>
                         {holiday.name}
                       </h4>
                       <div className="flex items-center gap-1 mt-0.5">
-                        <MapPin className="h-3 w-3 text-brand-violet" strokeWidth={1.5} />
-                        <span className="text-xs text-gray-600 truncate">{holiday.office}</span>
+                        <MapPin className="h-3 w-3" style={{ color: 'hsl(var(--theme-primary))' }} strokeWidth={1.5} />
+                        <span className="text-xs text-muted-foreground truncate">{holiday.office}</span>
                       </div>
                     </div>
 
@@ -159,8 +159,8 @@ export const HolidayCard: React.FC = () => {
             
             {upcomingHolidays.length === 0 && (
               <div className="text-center py-6">
-                <div className="p-3 rounded-full bg-brand-violet/10 mx-auto w-12 h-12 flex items-center justify-center mb-3">
-                  <Calendar className="h-6 w-6 text-brand-violet" strokeWidth={1.5} />
+                <div className="p-3 rounded-full bg-muted mx-auto w-12 h-12 flex items-center justify-center mb-3">
+                  <Calendar className="h-6 w-6" style={{ color: 'hsl(var(--theme-primary))' }} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-1">
                   <h3 className="font-medium text-gray-900 text-sm">No Upcoming Holidays</h3>

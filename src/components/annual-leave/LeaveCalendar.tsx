@@ -101,7 +101,7 @@ export const LeaveCalendar: React.FC<LeaveCalendarProps> = ({
                     <div className="flex items-center gap-3">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                        <AvatarFallback className="bg-brand-violet text-white text-sm">
+                        <AvatarFallback className="bg-gradient-modern text-white text-sm">
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>

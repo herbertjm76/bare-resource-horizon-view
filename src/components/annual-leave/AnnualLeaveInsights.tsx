@@ -166,7 +166,7 @@ export const AnnualLeaveInsights: React.FC<AnnualLeaveInsightsProps> = ({
           {membersToShow.map((member) => (
             <Avatar key={member.id} className="h-6 w-6">
               <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-              <AvatarFallback className="bg-brand-violet text-white text-xs">
+              <AvatarFallback className="bg-gradient-modern text-white text-xs">
                 {getUserInitials(member)}
               </AvatarFallback>
             </Avatar>

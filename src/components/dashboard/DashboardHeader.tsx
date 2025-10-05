@@ -25,13 +25,25 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
+              >
                 Week
               </Button>
-              <Button variant="default" size="sm" className="bg-brand-primary">
+              <Button 
+                variant="default" 
+                size="sm" 
+                className="bg-gradient-modern hover:opacity-90 border-transparent"
+              >
                 Month
               </Button>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="hover:bg-gradient-modern hover:text-white hover:border-transparent transition-all"
+              >
                 Quarter
               </Button>
             </div>
