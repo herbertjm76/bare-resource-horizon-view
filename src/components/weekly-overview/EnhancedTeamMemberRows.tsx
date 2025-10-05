@@ -76,7 +76,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                        <AvatarFallback className="bg-brand-violet text-white text-xs">
+                        <AvatarFallback className="bg-gradient-modern text-white text-xs">
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>
