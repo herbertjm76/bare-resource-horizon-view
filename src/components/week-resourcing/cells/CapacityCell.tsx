@@ -117,7 +117,7 @@ export const CapacityCell: React.FC<CapacityCellProps> = ({
   );
 
   return (
-    <TableCell className="border-r p-1 sm:p-2 mobile-capacity-cell bg-gradient-to-br from-emerald-50 to-green-50">
+    <TableCell className="border-r p-1 sm:p-2 mobile-capacity-cell bg-muted/30">
       <div className="hidden sm:block">
         <Tooltip>
           <TooltipTrigger asChild>

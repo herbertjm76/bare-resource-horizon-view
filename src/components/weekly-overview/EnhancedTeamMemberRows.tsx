@@ -76,7 +76,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                        <AvatarFallback className="bg-gradient-modern text-white text-xs">
+                        <AvatarFallback style={{ background: 'hsl(var(--gradient-start))' }} className="text-white text-xs">
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>
@@ -160,7 +160,7 @@ export const EnhancedTeamMemberRows: React.FC<EnhancedTeamMemberRowsProps> = ({
 
                   {/* Annual Leave - READ-ONLY display with gray styling */}
                   <TableCell className="text-center">
-                    <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-medium rounded-lg bg-gradient-to-r from-gray-100 to-gray-200 border-gray-300 text-gray-700 cursor-default">
+                    <div className="inline-flex items-center justify-center w-8 h-6 text-xs font-medium rounded-lg bg-muted text-muted-foreground border border-border cursor-default">
                       {allocation.annualLeave || 0}h
                     </div>
                   </TableCell>

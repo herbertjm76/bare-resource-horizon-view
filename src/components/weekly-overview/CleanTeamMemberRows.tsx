@@ -79,7 +79,7 @@ export const CleanTeamMemberRows: React.FC<CleanTeamMemberRowsProps> = ({
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={getAvatarUrl(member)} alt={getMemberDisplayName(member)} />
-                        <AvatarFallback className="bg-gradient-modern text-white text-xs">
+                        <AvatarFallback style={{ background: 'hsl(var(--gradient-start))' }} className="text-white text-xs">
                           {getUserInitials(member)}
                         </AvatarFallback>
                       </Avatar>

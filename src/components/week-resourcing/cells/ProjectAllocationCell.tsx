@@ -14,9 +14,9 @@ export const ProjectAllocationCell: React.FC<ProjectAllocationCellProps> = ({
   disabled = false 
 }) => {
   return (
-    <TableCell className="border-r p-0.5 sm:p-1 mobile-project-cell bg-gradient-to-br from-gray-50 to-slate-50">
+    <TableCell className="border-r p-0.5 sm:p-1 mobile-project-cell bg-muted/20">
       {readOnly || disabled ? (
-        <span className="inline-flex items-center justify-center w-6 h-5 sm:w-8 sm:h-6 text-xs bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 rounded border border-gray-200 font-medium shadow-sm">
+        <span className="inline-flex items-center justify-center w-6 h-5 sm:w-8 sm:h-6 text-xs bg-muted text-muted-foreground rounded border border-border font-medium shadow-sm">
           {hours || ''}
         </span>
       ) : (

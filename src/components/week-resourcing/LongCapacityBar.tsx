@@ -16,7 +16,7 @@ export const LongCapacityBar: React.FC<LongCapacityBarProps> = ({
   const rate = Math.round(utilization);
 
   // Theme-connected bar background
-  const barBackground = 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))';
+  const barBackground = 'hsl(var(--gradient-start))';
 
   // Compact layout with full-width bar and text inside
   if (compact) {

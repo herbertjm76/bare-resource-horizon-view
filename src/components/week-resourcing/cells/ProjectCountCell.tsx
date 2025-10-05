@@ -24,11 +24,11 @@ export const ProjectCountCell: React.FC<ProjectCountCellProps> = ({ projectCount
   );
 
   return (
-    <TableCell className="text-center border-r mobile-count-cell bg-gradient-to-br from-blue-50 to-indigo-50">
+    <TableCell className="text-center border-r mobile-count-cell bg-muted/20">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="inline-flex items-center justify-center w-6 h-5 sm:w-8 sm:h-6 text-xs bg-gradient-to-br from-gray-100 to-slate-100 text-gray-700 rounded border border-gray-200 font-medium shadow-sm cursor-pointer hover:bg-gradient-to-br hover:from-gray-200 hover:to-slate-200 transition-colors">
+            <span className="inline-flex items-center justify-center w-6 h-5 sm:w-8 sm:h-6 text-xs bg-muted text-muted-foreground rounded border border-border font-medium shadow-sm cursor-pointer hover:bg-muted/80 transition-colors">
               {projectCount}
             </span>
           </TooltipTrigger>

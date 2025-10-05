@@ -66,7 +66,7 @@ export const NameCell: React.FC<NameCellProps> = ({ member, compact = false }) =
                     console.log('NameCell - Avatar image loaded successfully:', avatarUrl);
                   }}
                 />
-                <AvatarFallback className="text-white text-[10px]" style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))' }}>
+                <AvatarFallback className="text-white text-[10px]" style={{ background: 'hsl(var(--gradient-start))' }}>
                   {getUserInitials()}
                 </AvatarFallback>
               </Avatar>
@@ -106,7 +106,7 @@ export const NameCell: React.FC<NameCellProps> = ({ member, compact = false }) =
                     console.log('NameCell - Avatar image loaded successfully:', avatarUrl);
                   }}
                 />
-                <AvatarFallback className="text-white text-xs" style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))' }}>
+                <AvatarFallback className="text-white text-xs" style={{ background: 'hsl(var(--gradient-start))' }}>
                   {getUserInitials()}
                 </AvatarFallback>
               </Avatar>
