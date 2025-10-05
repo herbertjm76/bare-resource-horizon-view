@@ -79,24 +79,24 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
       <div className="overflow-x-auto">
         <Table className={`${tableClassName} min-w-full`}>
           <TableHeader>
-            <TableRow style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }} className="border-b-2 border-slate-200">
+            <TableRow style={{ background: 'hsl(var(--gradient-start))' }} className="border-b-2 border-slate-200">
               {/* Team Member Column */}
-              <TableHead className="text-center font-semibold text-white sticky left-0 z-20 border-r border-white/20 text-sm" style={{ width: 180, minWidth: 180, background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
+              <TableHead className="text-center font-semibold text-white sticky left-0 z-20 border-r border-white/20 text-sm" style={{ width: 180, minWidth: 180, background: 'hsl(var(--gradient-start))' }}>
                 Team Member
               </TableHead>
               
               {/* Utilization Column */}
-              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 200, minWidth: 200, background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
+              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 200, minWidth: 200, background: 'hsl(var(--gradient-start))' }}>
                 Total Utilization (1 week)
               </TableHead>
               
               {/* Leave Column */}
-              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 150, minWidth: 150, background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
+              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 150, minWidth: 150, background: 'hsl(var(--gradient-start))' }}>
                 Leave
               </TableHead>
               
               {/* Project Count Column */}
-              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 35, minWidth: 35, background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
+              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 35, minWidth: 35, background: 'hsl(var(--gradient-start))' }}>
                 Count
               </TableHead>
               
@@ -105,7 +105,7 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
                 <TableHead 
                   key={project.id} 
                   className="text-center font-semibold text-white border-r border-white/20 relative text-sm"
-                  style={{ width: 35, minWidth: 35, height: 120, background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}
+                  style={{ width: 35, minWidth: 35, height: 120, background: 'hsl(var(--gradient-start))' }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div 

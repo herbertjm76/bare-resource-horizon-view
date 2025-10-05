@@ -25,11 +25,11 @@
 
 /* Header Styling - Purple Background */
 .enhanced-weekly-table thead {
-  background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)));
+  background: hsl(var(--gradient-start));
 }
 
 .enhanced-weekly-table thead th {
-  background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end))) !important;
+  background: hsl(var(--gradient-start)) !important;
   color: white !important;
   padding: 12px 8px;
   font-weight: 600;
@@ -43,7 +43,7 @@
 
 /* First column header - Name column */
 .enhanced-weekly-table thead th:first-child {
-  background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end))) !important;
+  background: hsl(var(--gradient-start)) !important;
   color: white !important;
   position: sticky;
   left: 0;
@@ -99,11 +99,11 @@
 
 /* Office header rows */
 .enhanced-weekly-table .office-header-row {
-  background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end))) !important;
+  background: hsl(var(--gradient-start)) !important;
 }
 
 .enhanced-weekly-table .office-header-row td {
-  background: linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end))) !important;
+  background: hsl(var(--gradient-start)) !important;
   color: white !important;
   font-weight: 600;
   padding: 12px 8px;
