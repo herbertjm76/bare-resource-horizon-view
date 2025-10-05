@@ -15,11 +15,8 @@ export const LongCapacityBar: React.FC<LongCapacityBarProps> = ({
   const utilization = totalCapacity > 0 ? (totalUsedHours / totalCapacity) * 100 : 0;
   const rate = Math.round(utilization);
 
-  let barColor = "#6366f1";
-  if (rate > 100) barColor = "#ef4444";
-  else if (rate >= 95) barColor = "#22c55e";
-  else if (rate >= 80) barColor = "#f59e42";
-  else if (rate >= 50) barColor = "#3b82f6";
+  // Theme-connected bar background
+  const barBackground = 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)))';
 
   // Compact layout with full-width bar and text inside
   if (compact) {
@@ -33,7 +30,7 @@ export const LongCapacityBar: React.FC<LongCapacityBarProps> = ({
             className="h-full transition-all duration-300 rounded relative"
             style={{
               width: `${Math.min(utilization, 100)}%`,
-              backgroundColor: barColor
+              background: barBackground
             }}
           />
           {utilization > 100 && (
@@ -67,7 +64,7 @@ export const LongCapacityBar: React.FC<LongCapacityBarProps> = ({
           className="h-full transition-all duration-300 rounded-full"
           style={{
             width: `${Math.min(utilization, 100)}%`,
-            backgroundColor: barColor,
+            background: barBackground,
           }}
         />
         {utilization > 100 && (

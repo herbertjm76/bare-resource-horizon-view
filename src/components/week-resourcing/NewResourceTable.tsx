@@ -79,24 +79,24 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
       <div className="overflow-x-auto">
         <Table className={`${tableClassName} min-w-full`}>
           <TableHeader>
-            <TableRow className="bg-[#6465F0] hover:bg-[#6465F0] border-b-2 border-slate-200">
+            <TableRow style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }} className="border-b-2 border-slate-200">
               {/* Team Member Column */}
-              <TableHead className="text-center font-semibold text-white sticky left-0 bg-[#6465F0] z-20 border-r border-white/20 text-sm" style={{ width: 180, minWidth: 180 }}>
+              <TableHead className="text-center font-semibold text-white sticky left-0 z-20 border-r border-white/20 text-sm" style={{ width: 180, minWidth: 180, background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
                 Team Member
               </TableHead>
               
               {/* Utilization Column */}
-              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20 text-sm" style={{ width: 200, minWidth: 200 }}>
+              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 200, minWidth: 200, background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
                 Total Utilization (1 week)
               </TableHead>
               
               {/* Leave Column */}
-              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20 text-sm" style={{ width: 150, minWidth: 150 }}>
+              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 150, minWidth: 150, background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
                 Leave
               </TableHead>
               
               {/* Project Count Column */}
-              <TableHead className="text-center font-semibold text-white bg-[#6465F0] border-r border-white/20 text-sm" style={{ width: 35, minWidth: 35 }}>
+              <TableHead className="text-center font-semibold text-white border-r border-white/20 text-sm" style={{ width: 35, minWidth: 35, background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
                 Count
               </TableHead>
               
@@ -104,8 +104,8 @@ export const NewResourceTable: React.FC<NewResourceTableProps> = ({
               {projectsWithHours.map((project) => (
                 <TableHead 
                   key={project.id} 
-                  className="text-center font-semibold text-white border-r border-white/20 bg-[#6465F0] relative text-sm"
-                  style={{ width: 35, minWidth: 35, height: 120 }}
+                  className="text-center font-semibold text-white border-r border-white/20 relative text-sm"
+                  style={{ width: 35, minWidth: 35, height: 120, background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div 
