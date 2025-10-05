@@ -72,7 +72,7 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
           <div className="flex items-center gap-3 mb-4 relative z-10">
             <Avatar className="h-12 w-12 ring-4 ring-white/20 shadow-xl">
               <AvatarImage src={person.avatar} alt={person.name} />
-              <AvatarFallback className="bg-gradient-to-br from-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary))]/80 text-white backdrop-blur-sm">
+              <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm">
                 {person.name?.split(' ').map((n: string) => n[0]).join('')}
               </AvatarFallback>
             </Avatar>
@@ -197,10 +197,7 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
           <div className="flex items-start justify-between mb-4 relative z-10">
             <div className="flex items-start gap-3 flex-1 min-w-0">
               <div 
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-semibold shadow-lg ring-2 ring-white/20"
-                style={{ 
-                  background: `linear-gradient(135deg, ${project.color || 'hsl(var(--primary))'}, ${project.color || 'hsl(var(--primary))'}80)`
-                }}
+                className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-semibold shadow-lg ring-2 ring-white/20 bg-gradient-modern"
               >
                 <Users className="h-5 w-5" />
               </div>

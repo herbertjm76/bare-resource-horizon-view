@@ -65,7 +65,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
       <div className="flex items-start gap-6 mb-8 relative z-10">
         <Avatar className={`${isFullscreen ? 'h-24 w-24' : 'h-16 w-16'} ring-4 ring-white/20 shadow-xl`}>
           <AvatarImage src={person.avatar_url} />
-          <AvatarFallback className="text-xl font-semibold bg-gradient-to-br from-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary))]/80 text-white backdrop-blur-sm">
+          <AvatarFallback className="text-xl font-semibold bg-gradient-modern text-white backdrop-blur-sm">
             {person.first_name.charAt(0)}{person.last_name.charAt(0)}
           </AvatarFallback>
         </Avatar>

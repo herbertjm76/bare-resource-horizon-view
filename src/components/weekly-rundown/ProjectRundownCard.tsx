@@ -53,10 +53,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       {/* Header */}
       <div className="flex items-start gap-6 mb-8 relative z-10">
         <div 
-          className={`${isFullscreen ? 'h-20 w-20' : 'h-16 w-16'} rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-2xl ring-4 ring-white/20 backdrop-blur-sm`}
-          style={{ 
-            background: `linear-gradient(135deg, ${project.color || 'hsl(var(--primary))'}, ${project.color || 'hsl(var(--primary))'}80)`
-          }}
+          className={`${isFullscreen ? 'h-20 w-20' : 'h-16 w-16'} rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-2xl ring-4 ring-white/20 backdrop-blur-sm bg-gradient-modern`}
         >
           <FolderOpen className={isFullscreen ? 'h-10 w-10' : 'h-8 w-8'} />
         </div>
@@ -126,7 +123,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
                 <div className="flex items-center gap-4 mb-3">
                    <Avatar className="h-10 w-10 ring-2 ring-white/20 shadow-lg">
                      <AvatarImage src={member.avatar_url} />
-                     <AvatarFallback className="bg-gradient-to-br from-[rgb(var(--brand-primary))] to-[rgb(var(--brand-primary))]/80 text-white text-sm backdrop-blur-sm">
+                     <AvatarFallback className="bg-gradient-modern text-white text-sm backdrop-blur-sm">
                        {(member.first_name || '').charAt(0)}{(member.last_name || '').charAt(0)}
                      </AvatarFallback>
                    </Avatar>
