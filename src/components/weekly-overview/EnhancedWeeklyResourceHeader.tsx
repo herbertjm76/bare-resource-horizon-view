@@ -12,15 +12,15 @@ export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeader
 }) => {
   return (
     <TableHeader>
-      <TableRow className="bg-[#6465F0] hover:bg-[#6465F0]">
-        <TableHead className="bg-[#6465F0]">
+      <TableRow style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
+        <TableHead style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
           <span className="text-white font-bold text-center block">
             TEAM MEMBER
           </span>
         </TableHead>
         
         {projects.map((project) => (
-          <TableHead key={project.id} className="bg-[#6465F0]">
+          <TableHead key={project.id} style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
             <div className="enhanced-project-code-header">
               <span className="text-white font-bold">
                 {project.code}
@@ -29,19 +29,19 @@ export const EnhancedWeeklyResourceHeader: React.FC<EnhancedWeeklyResourceHeader
           </TableHead>
         ))}
         
-        <TableHead className="bg-[#6465F0]">
+        <TableHead style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
           <span className="text-white font-bold">TOTAL</span>
         </TableHead>
-        <TableHead className="bg-[#6465F0]">
+        <TableHead style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
           <span className="text-white font-bold">CAPACITY</span>
         </TableHead>
-        <TableHead className="bg-[#6465F0]">
+        <TableHead style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
           <span className="text-white font-bold">UTILIZATION</span>
         </TableHead>
-        <TableHead className="bg-[#6465F0]">
+        <TableHead style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
           <span className="text-white font-bold">LEAVE</span>
         </TableHead>
-        <TableHead className="bg-[#6465F0]">
+        <TableHead style={{ background: 'linear-gradient(135deg, hsl(var(--gradient-start)), hsl(var(--gradient-mid)), hsl(var(--gradient-end)))' }}>
           <span className="text-white font-bold">REMARKS</span>
         </TableHead>
       </TableRow>
