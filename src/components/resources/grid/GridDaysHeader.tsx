@@ -47,7 +47,7 @@ export const GridDaysHeader: React.FC<GridDaysHeaderProps> = ({ days }) => {
             key={uniqueKey}
             className={headerClasses}
             style={{ 
-              backgroundColor: isTodayDay ? '#a855f7' : isWeekendDay ? '#5a5b8a' : '#6465F0'
+              backgroundColor: isTodayDay ? '#a855f7' : isWeekendDay ? '#5a5b8a' : 'hsl(var(--gradient-start))'
             }}
           >
             <div className="flex flex-col items-center h-full py-2">

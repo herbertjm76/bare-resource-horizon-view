@@ -65,7 +65,7 @@
   position: sticky !important;
   top: 0 !important;
   z-index: 25 !important;
-  background: #6465F0 !important;
+  background: hsl(var(--gradient-start)) !important;
   color: white !important;
   font-weight: 600;
   padding: 8px 4px;
@@ -75,7 +75,7 @@
 .project-resourcing-table thead th.counter-column,
 .project-resourcing-table thead th.project-name-column {
   z-index: 30 !important;
-  background: #6465F0 !important;
+  background: hsl(var(--gradient-start)) !important;
   color: white !important;
 }
 
@@ -95,7 +95,7 @@
 /* Project header rows - special styling for sticky columns */
 .project-resourcing-table tbody tr.project-header-row td.counter-column,
 .project-resourcing-table tbody tr.project-header-row td.project-name-column {
-  background: linear-gradient(135deg, #6465F0 0%, #8b5cf6 100%) !important;
+  background: hsl(var(--gradient-start)) !important;
   color: white !important;
 }
 
