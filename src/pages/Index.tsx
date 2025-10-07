@@ -10,7 +10,6 @@ import AppTour from '../components/landing/AppTour';
 import Pricing from '../components/landing/Pricing';
 import LeadMagnet from '../components/landing/LeadMagnet';
 import FAQ from '../components/landing/FAQ';
-import SignUpSection from '../components/landing/SignUpSection';
 import FooterCTA from '../components/landing/FooterCTA';
 import Footer from '../components/landing/Footer';
 
@@ -49,11 +48,6 @@ const Index = () => {
       
       <LeadMagnet />
       <FAQ />
-      
-      <div id="signup">
-        <SignUpSection />
-      </div>
-      
       <FooterCTA />
       <Footer />
     </div>

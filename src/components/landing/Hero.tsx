@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AnimatedSection } from '@/components/common/AnimatedSection';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { GradientOrbs } from '@/components/common/VisualElements';
@@ -11,10 +12,12 @@ const Hero = () => {
     isVisible: floatingVisible
   } = useScrollAnimation();
 
+  const navigate = useNavigate();
+  
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({
+      element.scrollIntoView({ 
         behavior: 'smooth',
         block: 'start'
       });
@@ -85,7 +88,7 @@ const Hero = () => {
             {/* CTA Buttons */}
             <AnimatedSection animation="fadeInUp" delay={1000}>
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                <button onClick={() => scrollToSection('signup')} className="group bg-white text-purple-600 px-5 py-2.5 rounded-2xl font-semibold hover:bg-purple-50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 shadow-xl hover:shadow-2xl text-sm sm:text-base">
+                <button onClick={() => navigate('/auth')} className="group bg-white text-purple-600 px-5 py-2.5 rounded-2xl font-semibold hover:bg-purple-50 transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 shadow-xl hover:shadow-2xl text-sm sm:text-base">
                   Start 14-Day Trial
                 </button>
                 <button className="group bg-white/15 backdrop-blur-sm text-white px-5 py-2.5 rounded-2xl border border-white/30 hover:bg-white/25 transition-all duration-500 font-semibold flex items-center justify-center gap-3 hover:scale-105 hover:-translate-y-1 hover:shadow-xl text-sm sm:text-base">
