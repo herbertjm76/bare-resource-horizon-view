@@ -64,7 +64,7 @@ const Navbar = () => {
           
           {/* CTA Button */}
           <button 
-            onClick={() => handleSectionClick('signup')}
+            onClick={() => navigate('/auth')}
             className="bg-gradient-to-r from-[#895CF7] via-[#5669F7] to-[#E64FC4] text-white px-4 sm:px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg text-sm sm:text-base"
           >
             Start Free Trial
