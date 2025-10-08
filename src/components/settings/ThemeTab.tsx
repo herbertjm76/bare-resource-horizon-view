@@ -55,23 +55,13 @@ const themes: Theme[] = [
     },
   },
   {
-    id: 'forest',
-    name: 'Forest Dark',
-    description: 'Deep green to teal',
+    id: 'lightgrey',
+    name: 'Light Grey',
+    description: 'Subtle grey gradient',
     colors: {
-      start: '150 45% 22%',
-      mid: '160 50% 28%',
-      end: '170 45% 32%',
-    },
-  },
-  {
-    id: 'crimson',
-    name: 'Crimson Red',
-    description: 'Deep red gradient',
-    colors: {
-      start: '345 70% 25%',
-      mid: '355 65% 30%',
-      end: '5 60% 32%',
+      start: '220 10% 45%',
+      mid: '220 8% 50%',
+      end: '220 6% 55%',
     },
   },
 ];

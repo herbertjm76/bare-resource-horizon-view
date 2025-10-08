@@ -32,15 +32,10 @@ export const applyThemeById = (themeId: string) => {
       mid: '250 60% 28%',
       end: '270 55% 32%',
     },
-    forest: {
-      start: '150 45% 22%',
-      mid: '160 50% 28%',
-      end: '170 45% 32%',
-    },
-    crimson: {
-      start: '345 70% 25%',
-      mid: '355 65% 30%',
-      end: '5 60% 32%',
+    lightgrey: {
+      start: '220 10% 45%',
+      mid: '220 8% 50%',
+      end: '220 6% 55%',
     },
   };
 
