@@ -37,6 +37,11 @@ export const applyThemeById = (themeId: string) => {
       mid: '220 8% 50%',
       end: '220 6% 55%',
     },
+    teal: {
+      start: '180 65% 28%',
+      mid: '185 60% 32%',
+      end: '190 55% 36%',
+    },
   };
 
   const theme = themes[themeId];

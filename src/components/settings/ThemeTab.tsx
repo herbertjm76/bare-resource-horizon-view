@@ -64,6 +64,16 @@ const themes: Theme[] = [
       end: '220 6% 55%',
     },
   },
+  {
+    id: 'teal',
+    name: 'Teal Ocean',
+    description: 'Teal to cyan gradient',
+    colors: {
+      start: '180 65% 28%',
+      mid: '185 60% 32%',
+      end: '190 55% 36%',
+    },
+  },
 ];
 
 export const ThemeTab: React.FC = () => {
