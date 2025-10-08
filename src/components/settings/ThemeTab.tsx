@@ -59,9 +59,9 @@ const themes: Theme[] = [
     name: 'Light Grey',
     description: 'Subtle grey gradient',
     colors: {
-      start: '220 10% 45%',
-      mid: '220 8% 50%',
-      end: '220 6% 55%',
+      start: '220 12% 35%',
+      mid: '220 10% 48%',
+      end: '220 8% 65%',
     },
   },
   {
@@ -69,9 +69,9 @@ const themes: Theme[] = [
     name: 'Teal Ocean',
     description: 'Teal to cyan gradient',
     colors: {
-      start: '180 65% 28%',
-      mid: '185 60% 32%',
-      end: '190 55% 36%',
+      start: '180 70% 22%',
+      mid: '185 65% 32%',
+      end: '190 60% 45%',
     },
   },
 ];
