@@ -30,9 +30,9 @@ export const useRundownData = ({
         // Process project allocations
         const projectAllocations = memberTotal?.projectAllocations || [];
         const projects = projectAllocations.map(allocation => ({
-          projectId: allocation.projectId,
-          projectName: allocation.projectName,
-          projectCode: allocation.projectCode,
+          id: allocation.projectId,
+          name: allocation.projectName,
+          code: allocation.projectCode,
           hours: allocation.hours,
           percentage: totalHours > 0 ? (allocation.hours / totalHours) * 100 : 0,
           color: allocation.color
