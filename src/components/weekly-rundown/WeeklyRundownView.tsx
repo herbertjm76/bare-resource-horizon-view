@@ -138,12 +138,14 @@ export const WeeklyRundownView: React.FC = () => {
           onPrev={prevItem}
           onGoTo={goToItem}
           isFullscreen={isFullscreen}
+          selectedWeek={selectedWeek}
         />
       ) : (
         <RundownGridView
           items={rundownItems}
           rundownMode={rundownMode}
           isFullscreen={isFullscreen}
+          selectedWeek={selectedWeek}
         />
       )}
     </div>

@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Clock, AlertTriangle, CheckCircle, Calendar } from 'lucide-react';
+import { EditableProjectAllocation } from './EditableProjectAllocation';
+import { AddProjectAllocation } from './AddProjectAllocation';
+import { format, startOfWeek } from 'date-fns';
 
 interface PersonRundownCardProps {
   person: {
@@ -31,13 +34,19 @@ interface PersonRundownCardProps {
   };
   isActive: boolean;
   isFullscreen: boolean;
+  selectedWeek?: Date;
+  onDataChange?: () => void;
 }
 
 export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
   person,
   isActive,
-  isFullscreen
+  isFullscreen,
+  selectedWeek = new Date(),
+  onDataChange
 }) => {
+  const [refreshKey, setRefreshKey] = useState(0);
+  
   const getUtilizationStatus = (percentage: number) => {
     if (percentage > 100) return { color: 'destructive', label: 'Overloaded', icon: AlertTriangle };
     if (percentage >= 90) return { color: 'warning', label: 'High Utilization', icon: AlertTriangle };
@@ -51,6 +60,13 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
   const totalLeaveHours = person.leave 
     ? person.leave.annualLeave + person.leave.vacationLeave + person.leave.medicalLeave + person.leave.publicHoliday
     : 0;
+
+  const weekStartDate = format(startOfWeek(selectedWeek, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+  
+  const handleDataChange = () => {
+    setRefreshKey(prev => prev + 1);
+    onDataChange?.();
+  };
 
   return (
     <div className={`
@@ -121,52 +137,38 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
       </div>
 
       {/* Projects */}
-      {person.projects.length > 0 && (
-        <div className="mb-8 relative z-10">
-          <h3 className={`font-semibold text-foreground mb-4 ${
-            isFullscreen ? 'text-xl' : 'text-lg'
-          }`}>
-            Project Allocations
-          </h3>
+      <div className="mb-8 relative z-10">
+        <h3 className={`font-semibold text-foreground mb-4 ${
+          isFullscreen ? 'text-xl' : 'text-lg'
+        }`}>
+          Project Allocations
+        </h3>
+        
+        <div className="space-y-3">
+          {person.projects.map((project) => (
+            <EditableProjectAllocation
+              key={`${project.id}-${refreshKey}`}
+              memberId={person.id}
+              projectId={project.id}
+              projectName={project.name}
+              projectCode={project.code}
+              hours={project.hours}
+              percentage={project.percentage}
+              color={project.color}
+              weekStartDate={weekStartDate}
+              capacity={person.capacity}
+              onUpdate={handleDataChange}
+            />
+          ))}
           
-          <div className="space-y-4">
-            {person.projects.map((project) => (
-              <div key={project.id} className="glass rounded-xl p-4 hover:glass-elevated transition-all duration-300">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-3">
-                    <div 
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: project.color || 'hsl(var(--primary))' }}
-                    />
-                    <div>
-                      <div className="font-medium text-foreground">
-                        {project.name}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {project.code}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <div className="font-semibold text-foreground">
-                      {project.hours}h
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {project.percentage.toFixed(0)}% of total
-                    </div>
-                  </div>
-                </div>
-                
-                <Progress 
-                  value={project.percentage} 
-                  className="h-2"
-                />
-              </div>
-            ))}
-          </div>
+          <AddProjectAllocation
+            memberId={person.id}
+            weekStartDate={weekStartDate}
+            existingProjectIds={person.projects.map(p => p.id)}
+            onAdd={handleDataChange}
+          />
         </div>
-      )}
+      </div>
 
       {/* Leave Information */}
       {totalLeaveHours > 0 && (

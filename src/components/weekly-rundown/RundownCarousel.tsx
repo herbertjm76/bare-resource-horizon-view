@@ -14,6 +14,7 @@ interface RundownCarouselProps {
   onPrev: () => void;
   onGoTo: (index: number) => void;
   isFullscreen: boolean;
+  selectedWeek: Date;
 }
 
 export const RundownCarousel: React.FC<RundownCarouselProps> = ({
@@ -23,7 +24,8 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
   onNext,
   onPrev,
   onGoTo,
-  isFullscreen
+  isFullscreen,
+  selectedWeek
 }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     startIndex: currentIndex,
@@ -144,6 +146,7 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
                     person={item} 
                     isActive={index === currentIndex}
                     isFullscreen={isFullscreen}
+                    selectedWeek={selectedWeek}
                   />
                 ) : (
                   <ProjectRundownCard 

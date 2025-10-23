@@ -9,12 +9,14 @@ interface RundownGridViewProps {
   items: any[];
   rundownMode: RundownMode;
   isFullscreen: boolean;
+  selectedWeek: Date;
 }
 
 export const RundownGridView: React.FC<RundownGridViewProps> = ({
   items,
   rundownMode,
-  isFullscreen
+  isFullscreen,
+  selectedWeek
 }) => {
   if (items.length === 0) {
     return (
