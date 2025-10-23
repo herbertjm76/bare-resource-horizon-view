@@ -34,7 +34,7 @@ export const useRundownData = ({
           name: allocation.projectName,
           code: allocation.projectCode,
           hours: allocation.hours,
-          percentage: totalHours > 0 ? (allocation.hours / totalHours) * 100 : 0,
+          percentage: capacity > 0 ? (allocation.hours / capacity) * 100 : 0,
           color: allocation.color
         }));
 
