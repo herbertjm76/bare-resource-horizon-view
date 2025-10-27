@@ -1,8 +1,8 @@
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Users, Clock, FolderOpen } from 'lucide-react';
+import { MapPin, Users, FolderOpen } from 'lucide-react';
+import { EditableTeamMemberAllocation } from './EditableTeamMemberAllocation';
+import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
 
 interface ProjectRundownCardProps {
   project: {
@@ -15,9 +15,8 @@ interface ProjectRundownCardProps {
     office?: string;
     teamMembers: Array<{
       id: string;
-      first_name: string;
-      last_name: string;
-      avatar_url?: string;
+      name: string;
+      avatar?: string;
       location: string;
       hours: number;
       capacityPercentage: number;
@@ -25,21 +24,22 @@ interface ProjectRundownCardProps {
   };
   isActive: boolean;
   isFullscreen: boolean;
+  selectedWeek: Date;
+  onDataChange: () => void;
 }
 
 export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
   project,
   isActive,
-  isFullscreen
+  isFullscreen,
+  selectedWeek,
+  onDataChange
 }) => {
-  const getCapacityColor = (percentage: number) => {
-    if (percentage > 100) return 'text-destructive';
-    if (percentage >= 90) return 'text-orange-500';
-    if (percentage >= 60) return 'text-green-500';
-    return 'text-muted-foreground';
-  };
-
   const sortedMembers = [...project.teamMembers].sort((a, b) => b.hours - a.hours);
+  
+  const weekStartDate = new Date(selectedWeek);
+  weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay() + 1);
+  const weekStartDateString = weekStartDate.toISOString().split('T')[0];
 
   return (
     <div className={`
@@ -119,52 +119,22 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
           
           <div className="space-y-4">
             {sortedMembers.map((member) => (
-              <div key={member.id} className="glass rounded-xl p-4 hover:glass-elevated transition-all duration-300">
-                <div className="flex items-center gap-4 mb-3">
-                   <Avatar className="h-10 w-10 ring-2 ring-white/20 shadow-lg">
-                     <AvatarImage src={member.avatar_url} />
-                     <AvatarFallback className="bg-gradient-modern text-white text-sm backdrop-blur-sm">
-                       {(member.first_name || '').charAt(0)}{(member.last_name || '').charAt(0)}
-                     </AvatarFallback>
-                   </Avatar>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="font-medium text-foreground">
-                          {member.first_name} {member.last_name}
-                        </div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {member.location}
-                        </div>
-                      </div>
-                      
-                      <div className="text-right">
-                        <div className="font-semibold text-foreground">
-                          {member.hours}h
-                        </div>
-                        <div className={`text-sm font-medium ${getCapacityColor(member.capacityPercentage)}`}>
-                          {member.capacityPercentage.toFixed(0)}% capacity
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <Progress 
-                  value={Math.min(member.capacityPercentage, 100)} 
-                  className="h-2"
-                />
-                
-                {member.capacityPercentage > 100 && (
-                  <div className="flex items-center gap-1 mt-2 text-xs text-destructive">
-                    <Clock className="h-3 w-3" />
-                    Overallocated by {(member.capacityPercentage - 100).toFixed(0)}%
-                  </div>
-                )}
-              </div>
+              <EditableTeamMemberAllocation
+                key={member.id}
+                member={member}
+                projectId={project.id}
+                weekStartDate={weekStartDateString}
+                capacity={40}
+                onUpdate={onDataChange}
+              />
             ))}
+            
+            <AddTeamMemberAllocation
+              projectId={project.id}
+              weekStartDate={weekStartDateString}
+              existingMemberIds={project.teamMembers.map(m => m.id)}
+              onAdd={onDataChange}
+            />
           </div>
         </div>
       )}

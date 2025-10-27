@@ -153,6 +153,8 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
                     project={item} 
                     isActive={index === currentIndex}
                     isFullscreen={isFullscreen}
+                    selectedWeek={selectedWeek}
+                    onDataChange={() => {}}
                   />
                 )}
               </div>
