@@ -2,8 +2,9 @@ import React from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock, Users, Calendar, Building } from 'lucide-react';
+import { MapPin, Clock, Users, Calendar, Building, FolderOpen } from 'lucide-react';
 import { RundownMode } from './WeeklyRundownView';
+import { AvatarWithHourDial } from './AvatarWithHourDial';
 
 interface RundownGridViewProps {
   items: any[];
@@ -105,10 +106,41 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
               />
             </div>
 
-            <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
               <span className="font-medium">{person.resourcedHours || 0}h / {person.capacity || 40}h</span>
               <span className="font-medium">{person.projects?.length || 0} projects</span>
             </div>
+
+            {/* Project Avatars */}
+            {person.projects && person.projects.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">Projects</p>
+                <div className="flex flex-wrap gap-2">
+                  {person.projects.slice(0, 6).map((project: any, idx: number) => (
+                    <Tooltip key={idx}>
+                      <TooltipTrigger>
+                        <AvatarWithHourDial
+                          fallback={project.code?.substring(0, 2) || project.name?.substring(0, 2) || 'P'}
+                          hours={project.hours || 0}
+                          maxHours={person.capacity || 40}
+                          size="sm"
+                          color={project.color || 'hsl(var(--primary))'}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="text-xs">
+                        <p className="font-medium">{project.name}</p>
+                        <p>{project.hours}h ({Math.round((project.hours / (person.capacity || 40)) * 100)}%)</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                  {person.projects.length > 6 && (
+                    <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                      +{person.projects.length - 6}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </TooltipTrigger>
@@ -219,33 +251,41 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
               <span className="text-sm font-semibold">{project.teamMembers?.length || 0} members</span>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-muted-foreground">Total Hours</span>
               <span className="text-lg font-bold text-primary">{Math.round(project.totalHours || 0)}h</span>
             </div>
 
-            {project.teamMembers?.length > 0 && (
-              <>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Avg Capacity</span>
-                  <Badge 
-                    variant={averageCapacity > 100 ? 'destructive' : averageCapacity >= 90 ? 'default' : 'secondary'}
-                    className="text-xs rounded-full px-2 py-1"
-                  >
-                    {Math.round(averageCapacity)}%
-                  </Badge>
+            {/* Team Member Avatars */}
+            {project.teamMembers && project.teamMembers.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">Team Members</p>
+                <div className="flex flex-wrap gap-2">
+                  {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
+                    <Tooltip key={idx}>
+                      <TooltipTrigger>
+                        <AvatarWithHourDial
+                          avatar={member.avatar}
+                          fallback={member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                          hours={member.hours || 0}
+                          maxHours={40}
+                          size="sm"
+                          color={getCapacityColor(member.capacityPercentage || 0)}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="text-xs">
+                        <p className="font-medium">{member.name}</p>
+                        <p>{member.hours}h ({Math.round(member.capacityPercentage || 0)}% capacity)</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                  {project.teamMembers.length > 8 && (
+                    <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                      +{project.teamMembers.length - 8}
+                    </div>
+                  )}
                 </div>
-
-                <div className="w-full bg-muted/30 rounded-full h-2.5 overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500 shadow-sm"
-                    style={{
-                      width: `${Math.min(averageCapacity, 100)}%`,
-                      backgroundColor: getCapacityColor(averageCapacity)
-                    }}
-                  />
-                </div>
-              </>
+              </div>
             )}
           </div>
         </div>
