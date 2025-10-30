@@ -121,73 +121,82 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
 
   return (
     <>
-      <div className="glass rounded-lg p-2 hover:glass-elevated transition-all duration-300 group">
-        <div className="flex items-center justify-between gap-2">
+      <div className="glass rounded-lg p-2.5 hover:glass-elevated transition-all duration-300 group">
+        <div className="flex items-center gap-2.5">
+          {/* Color Pill */}
+          <div 
+            className="w-1 h-6 rounded-full flex-shrink-0"
+            style={{ backgroundColor: color || 'hsl(var(--primary))' }}
+          />
+          
+          {/* Project Info */}
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <div 
-              className="w-2 h-2 rounded-full flex-shrink-0"
-              style={{ backgroundColor: color || 'hsl(var(--primary))' }}
-            />
-            <div className="text-sm font-medium text-muted-foreground">
+            <span className="text-sm font-semibold text-foreground">
               {projectCode}
-            </div>
+            </span>
+            <span className="text-sm text-muted-foreground truncate">
+              {projectName}
+            </span>
           </div>
           
-          <div className="flex items-center gap-2">
-            {isEditing ? (
-              <div className="flex items-center gap-1">
-                <Input
-                  type="number"
-                  value={editedHours}
-                  onChange={(e) => setEditedHours(e.target.value)}
-                  className="w-16 h-7 text-sm text-right"
-                  step="0.5"
-                  min="0"
-                />
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleSave}
-                  disabled={updateMutation.isPending}
-                  className="h-7 w-7 p-0"
-                >
-                  <Check className="h-3 w-3" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleCancel}
-                  className="h-7 w-7 p-0"
-                >
-                  <X className="h-3 w-3" />
-                </Button>
-              </div>
-            ) : (
-              <>
-                <div className="text-sm font-semibold text-foreground">
-                  {hours}h
-                </div>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setIsEditing(true)}
-                    className="h-7 w-7 p-0"
-                  >
-                    <Edit2 className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setShowDeleteDialog(true)}
-                    className="h-7 w-7 p-0 text-destructive"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
+          {/* Hours Badge */}
+          {!isEditing && (
+            <div className="px-2.5 py-1 bg-primary/10 rounded-full">
+              <span className="text-sm font-semibold text-primary">
+                {hours}h
+              </span>
+            </div>
+          )}
+          
+          {/* Edit Controls */}
+          {isEditing ? (
+            <div className="flex items-center gap-1">
+              <Input
+                type="number"
+                value={editedHours}
+                onChange={(e) => setEditedHours(e.target.value)}
+                className="w-16 h-7 text-sm text-right"
+                step="0.5"
+                min="0"
+              />
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleSave}
+                disabled={updateMutation.isPending}
+                className="h-7 w-7 p-0"
+              >
+                <Check className="h-3 w-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleCancel}
+                className="h-7 w-7 p-0"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          ) : (
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setIsEditing(true)}
+                className="h-7 w-7 p-0"
+              >
+                <Edit2 className="h-3 w-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowDeleteDialog(true)}
+                className="h-7 w-7 p-0 text-destructive"
+              >
+                <Trash2 className="h-3 w-3" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
