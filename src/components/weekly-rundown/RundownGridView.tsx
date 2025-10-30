@@ -50,158 +50,88 @@ export const RundownGridView: React.FC<RundownGridViewProps> = ({
 };
 
 const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
-  const getUtilizationColor = (utilization: number) => {
-    if (utilization > 100) return 'hsl(var(--destructive))';
-    if (utilization >= 90) return 'hsl(39, 100%, 50%)';
-    if (utilization >= 75) return 'hsl(120, 100%, 40%)';
-    return 'hsl(var(--muted-foreground))';
-  };
-
-  const getUtilizationStatus = (utilization: number) => {
-    if (utilization > 100) return { label: 'Over', color: 'destructive' };
-    if (utilization >= 90) return { label: 'High', color: 'warning' };
-    if (utilization >= 75) return { label: 'Good', color: 'success' };
-    return { label: 'Low', color: 'secondary' };
-  };
-
-  const status = getUtilizationStatus(person.utilization || 0);
-
+  const capacity = person.capacity || 40;
+  
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="glass-card glass-hover rounded-2xl border-0 p-5 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
-          {/* Gradient overlay */}
-          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-primary/10 to-transparent rounded-bl-2xl" />
-          <div className="flex items-center gap-3 mb-4 relative z-10">
-            <Avatar className="h-12 w-12 ring-4 ring-white/20 shadow-xl">
-              <AvatarImage src={person.avatar} alt={person.name} />
-              <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm">
-                {person.name?.split(' ').map((n: string) => n[0]).join('')}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-base truncate mb-1">{person.name}</h3>
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <MapPin className="h-3 w-3" />
-                <span className="truncate">{person.location}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3 relative z-10">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Utilization</span>
-              <Badge variant={status.color as any} className="text-xs rounded-full px-2 py-1">
-                {Math.round(person.utilization || 0)}%
-              </Badge>
-            </div>
-
-            <div className="w-full bg-muted/30 rounded-full h-2.5 overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500 shadow-sm"
-                style={{
-                  width: `${Math.min(person.utilization || 0, 100)}%`,
-                  backgroundColor: getUtilizationColor(person.utilization || 0)
-                }}
-              />
-            </div>
-
-            <div className="flex items-center justify-between text-sm text-muted-foreground mb-3">
-              <span className="font-medium">{person.resourcedHours || 0}h / {person.capacity || 40}h</span>
-              <span className="font-medium">{person.projects?.length || 0} projects</span>
-            </div>
-
-            {/* Project Avatars */}
-            {person.projects && person.projects.length > 0 && (
-              <div>
-                <p className="text-xs text-muted-foreground mb-2">Projects</p>
-                <div className="flex flex-wrap gap-2">
-                  {person.projects.slice(0, 6).map((project: any, idx: number) => (
-                    <Tooltip key={idx}>
-                      <TooltipTrigger>
-                        <AvatarWithHourDial
-                          fallback={project.code?.substring(0, 2) || project.name?.substring(0, 2) || 'P'}
-                          hours={project.hours || 0}
-                          maxHours={person.capacity || 40}
-                          size="sm"
-                          color={project.color || 'hsl(var(--primary))'}
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="text-xs">
-                        <p className="font-medium">{project.name}</p>
-                        <p>{project.hours}h ({Math.round((project.hours / (person.capacity || 40)) * 100)}%)</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
-                  {person.projects.length > 6 && (
-                    <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                      +{person.projects.length - 6}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+    <div className="glass-card rounded-xl border p-4 hover:shadow-lg transition-all duration-300">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-3">
+        <Avatar className="h-10 w-10 ring-2 ring-primary/20">
+          <AvatarImage src={person.avatar} alt={person.name} />
+          <AvatarFallback className="text-xs bg-gradient-modern text-white">
+            {person.name?.split(' ').map((n: string) => n[0]).join('')}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-sm truncate">{person.name}</h3>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Building className="h-3 w-3" />
+            <span className="truncate">{person.department || 'No Department'}</span>
           </div>
         </div>
-      </TooltipTrigger>
-      <TooltipContent side="top" className="max-w-sm glass-card border-0 shadow-2xl">
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={person.avatar} alt={person.name} />
-              <AvatarFallback>{person.name?.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium">{person.name}</p>
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {person.location}
-              </p>
-            </div>
-          </div>
+        <div className="text-right">
+          <p className="text-xs font-mono font-medium">{person.resourcedHours || 0}h/{capacity}h</p>
+          <p className="text-xs text-muted-foreground">{Math.round(person.utilization || 0)}%</p>
+        </div>
+      </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Weekly Hours:</span>
-              <span className="font-mono">{person.resourcedHours || 0}h / {person.capacity || 40}h</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm">Utilization:</span>
-              <span className="font-mono">{Math.round(person.utilization || 0)}%</span>
-            </div>
-          </div>
-
-          {person.projects && person.projects.length > 0 && (
-            <div>
-              <p className="text-sm font-medium mb-1">Project Allocations:</p>
-              <div className="space-y-1">
-                {person.projects.slice(0, 3).map((project: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between text-xs">
-                    <span className="truncate flex-1">{project.projectName}</span>
-                    <span className="font-mono ml-2">{project.hours}h</span>
-                  </div>
-                ))}
-                {person.projects.length > 3 && (
-                  <p className="text-xs text-muted-foreground">+{person.projects.length - 3} more</p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {(person.annualLeave > 0 || person.vacationLeave > 0 || person.medicalLeave > 0 || person.publicHoliday > 0) && (
-            <div>
-              <p className="text-sm font-medium mb-1">Leave Hours:</p>
-              <div className="space-y-1 text-xs">
-                {person.annualLeave > 0 && <div>Annual: {person.annualLeave}h</div>}
-                {person.vacationLeave > 0 && <div>Vacation: {person.vacationLeave}h</div>}
-                {person.medicalLeave > 0 && <div>Medical: {person.medicalLeave}h</div>}
-                {person.publicHoliday > 0 && <div>Public Holiday: {person.publicHoliday}h</div>}
-              </div>
+      {/* Stacked Bar Graph */}
+      <div className="mb-3">
+        <div className="w-full h-6 bg-muted/30 rounded-lg overflow-hidden flex">
+          {person.projects && person.projects.length > 0 ? (
+            person.projects.map((project: any, idx: number) => {
+              const percentage = (project.hours / capacity) * 100;
+              return (
+                <Tooltip key={idx}>
+                  <TooltipTrigger asChild>
+                    <div
+                      className="h-full transition-all hover:opacity-80 cursor-pointer"
+                      style={{
+                        width: `${percentage}%`,
+                        backgroundColor: project.color || 'hsl(var(--primary))',
+                      }}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">
+                    <p className="font-medium">{project.name}</p>
+                    <p>{project.hours}h ({Math.round(percentage)}%)</p>
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })
+          ) : (
+            <div className="w-full h-full bg-muted/50 flex items-center justify-center">
+              <span className="text-xs text-muted-foreground">No projects</span>
             </div>
           )}
         </div>
-      </TooltipContent>
-    </Tooltip>
+      </div>
+
+      {/* Project List */}
+      {person.projects && person.projects.length > 0 && (
+        <div className="space-y-1.5">
+          {person.projects.slice(0, 5).map((project: any, idx: number) => (
+            <div key={idx} className="flex items-center justify-between text-xs group">
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <div
+                  className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: project.color || 'hsl(var(--primary))' }}
+                />
+                <span className="truncate group-hover:text-primary transition-colors">
+                  {project.name}
+                </span>
+              </div>
+              <span className="font-mono text-muted-foreground ml-2">{project.hours}h</span>
+            </div>
+          ))}
+          {person.projects.length > 5 && (
+            <p className="text-xs text-muted-foreground text-center pt-1">
+              +{person.projects.length - 5} more
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 
