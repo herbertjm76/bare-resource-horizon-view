@@ -71,8 +71,7 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-xs font-mono font-medium">{person.resourcedHours || 0}h/{capacity}h</p>
-          <p className="text-xs text-muted-foreground">{Math.round(person.utilization || 0)}%</p>
+          <p className="text-sm font-semibold">{Math.round(person.utilization || 0)}%</p>
         </div>
       </div>
 
