@@ -145,15 +145,14 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
       )}
 
       {/* Edit Button */}
-      <div className="flex justify-end mt-3 pt-3 border-t">
+      <div className="flex justify-end mt-2">
         <Button 
-          size="sm" 
-          variant="outline"
+          size="icon"
+          variant="ghost"
           onClick={() => setEditDialogOpen(true)}
-          className="gap-2"
+          className="h-7 w-7"
         >
-          <Pencil className="h-3 w-3" />
-          Edit
+          <Pencil className="h-3.5 w-3.5" />
         </Button>
       </div>
     </div>
@@ -235,18 +234,17 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
             )}
 
             {/* Edit Button */}
-            <div className="flex justify-end mt-3 pt-3 border-t">
+            <div className="flex justify-end mt-2">
               <Button 
-                size="sm" 
-                variant="outline"
+                size="icon"
+                variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation();
                   setEditDialogOpen(true);
                 }}
-                className="gap-2"
+                className="h-7 w-7"
               >
-                <Pencil className="h-3 w-3" />
-                Edit
+                <Pencil className="h-3.5 w-3.5" />
               </Button>
             </div>
           </div>
