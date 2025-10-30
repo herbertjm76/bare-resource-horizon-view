@@ -158,13 +158,6 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="glass-card glass-hover rounded-2xl border-0 p-5 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
-          {/* Gradient overlay */}
-          <div 
-            className="absolute top-0 right-0 w-16 h-16 rounded-bl-2xl opacity-20"
-            style={{ 
-              background: `linear-gradient(to bottom left, ${project.color || 'hsl(var(--primary))'}, transparent)`
-            }}
-          />
           <div className="flex items-start justify-between mb-4 relative z-10">
             <div className="flex items-start gap-3 flex-1 min-w-0">
               <div 
@@ -177,10 +170,9 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                 <p className="text-sm text-muted-foreground font-medium">{project.code}</p>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-lg font-bold text-primary">{Math.round(project.totalHours || 0)}h</div>
-              <div className="text-xs text-muted-foreground">{((project.totalHours || 0) / 40).toFixed(1)} FTE</div>
-            </div>
+            <Badge variant="secondary" className="text-sm font-bold px-3 py-1">
+              {((project.totalHours || 0) / 40).toFixed(1)} FTE
+            </Badge>
           </div>
 
           <div className="space-y-3 relative z-10">
