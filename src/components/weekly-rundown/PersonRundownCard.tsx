@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MapPin, Clock, AlertTriangle, CheckCircle, Calendar, TrendingUp } from 'lucide-react';
 import { EditableProjectAllocation } from './EditableProjectAllocation';
 import { AddProjectAllocation } from './AddProjectAllocation';
 import { format, startOfWeek } from 'date-fns';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
+import { generateMonochromaticShades } from '@/utils/themeColorUtils';
 
 interface PersonRundownCardProps {
   person: {
@@ -70,183 +71,218 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
   };
 
   return (
-    <div className={`
-      relative rounded-3xl glass-card glass-hover shadow-2xl
-      ${isActive ? 'ring-2 ring-primary/50 glass-elevated scale-[1.02]' : ''}
-      ${isFullscreen ? 'min-h-[80vh]' : 'min-h-[500px]'}
-      transition-all duration-500 ease-out
-      before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none
-      overflow-hidden
-    `}>
-      {/* Hero Section with Key Metrics */}
-      <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-8 mb-6">
-        <div className="flex items-start gap-6 mb-6">
-          <Avatar className={`${isFullscreen ? 'h-24 w-24' : 'h-20 w-20'} ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
-            <AvatarImage src={person.avatar_url} />
-            <AvatarFallback className="text-2xl font-bold bg-gradient-modern text-white backdrop-blur-sm">
-              {person.first_name.charAt(0)}{person.last_name.charAt(0)}
-            </AvatarFallback>
-          </Avatar>
-          
-          <div className="flex-1 min-w-0">
-            <h1 className={`font-bold text-foreground mb-3 tracking-tight ${
-              isFullscreen ? 'text-5xl' : 'text-4xl'
-            }`}>
-              {person.first_name} {person.last_name}
-            </h1>
+    <TooltipProvider>
+      <div className={`
+        relative rounded-3xl glass-card glass-hover shadow-2xl
+        ${isActive ? 'ring-2 ring-primary/50 glass-elevated scale-[1.02]' : ''}
+        ${isFullscreen ? 'min-h-[80vh]' : 'min-h-[500px]'}
+        transition-all duration-500 ease-out
+        before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none
+        overflow-hidden
+      `}>
+        {/* Hero Section */}
+        <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-8 pb-6">
+          <div className="flex items-start gap-6">
+            <Avatar className={`${isFullscreen ? 'h-24 w-24' : 'h-20 w-20'} ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
+              <AvatarImage src={person.avatar_url} />
+              <AvatarFallback className="text-2xl font-bold bg-gradient-modern text-white backdrop-blur-sm">
+                {person.first_name.charAt(0)}{person.last_name.charAt(0)}
+              </AvatarFallback>
+            </Avatar>
             
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge variant="outline" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
-                <MapPin className="h-3.5 w-3.5" />
-                {person.location}
-              </Badge>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-4 mb-2">
+                <h1 className={`font-bold text-foreground tracking-tight ${
+                  isFullscreen ? 'text-5xl' : 'text-4xl'
+                }`}>
+                  {person.first_name} {person.last_name}
+                </h1>
+                
+                {/* Badges - Upper Right */}
+                <div className="flex flex-col items-end gap-1.5">
+                  <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+                    <MapPin className="h-3 w-3" />
+                    {person.location}
+                  </Badge>
+                  
+                  <Badge 
+                    variant={status.color as any}
+                    className="flex items-center gap-1 px-2 py-0.5 text-xs"
+                  >
+                    <StatusIcon className="h-3 w-3" />
+                    {status.label}
+                  </Badge>
+                </div>
+              </div>
               
-              <Badge 
-                variant={status.color as any}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium"
-              >
-                <StatusIcon className="h-3.5 w-3.5" />
-                {status.label}
-              </Badge>
+              {/* Key Metrics Row */}
+              <div className="flex items-center gap-4 mt-4">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  <span className="text-2xl font-bold text-foreground">
+                    <CountUpNumber end={person.utilizationPercentage} duration={1500} />%
+                  </span>
+                  <span className="text-xs text-muted-foreground">utilization</span>
+                </div>
+                
+                <div className="h-8 w-px bg-border" />
+                
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-primary" />
+                  <span className="text-2xl font-bold text-foreground">
+                    <CountUpNumber end={person.totalHours} duration={1500} />h
+                  </span>
+                  <span className="text-xs text-muted-foreground">/ {person.capacity}h</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Key Metrics Bar */}
-        <div className="grid grid-cols-3 gap-4 mt-6">
-          <div className="bg-background/60 backdrop-blur-sm rounded-xl p-4 border border-border/50">
-            <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Utilization</p>
-            </div>
-            <p className={`font-bold text-foreground ${isFullscreen ? 'text-4xl' : 'text-3xl'}`}>
-              <CountUpNumber end={person.utilizationPercentage} duration={1500} suffix="%" />
-            </p>
-          </div>
-          
-          <div className="bg-background/60 backdrop-blur-sm rounded-xl p-4 border border-border/50">
-            <div className="flex items-center gap-2 mb-1">
-              <Clock className="h-4 w-4 text-primary" />
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Hours Allocated</p>
-            </div>
-            <p className={`font-bold text-foreground ${isFullscreen ? 'text-4xl' : 'text-3xl'}`}>
-              <CountUpNumber end={person.totalHours} duration={1500} suffix="h" />
-            </p>
-          </div>
-          
-          <div className="bg-background/60 backdrop-blur-sm rounded-xl p-4 border border-border/50">
-            <div className="flex items-center gap-2 mb-1">
-              <CheckCircle className="h-4 w-4 text-primary" />
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Projects</p>
-            </div>
-            <p className={`font-bold text-foreground ${isFullscreen ? 'text-4xl' : 'text-3xl'}`}>
-              <CountUpNumber end={person.projects.length} duration={1000} />
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Animated Progress Section */}
-      <div className="px-8 mb-8 relative z-10">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className={`font-semibold text-foreground ${
+        {/* Project Allocation Bar Graph */}
+        <div className="px-8 mb-6 relative z-10">
+          <h2 className={`font-semibold text-foreground mb-3 ${
             isFullscreen ? 'text-xl' : 'text-lg'
           }`}>
-            Weekly Capacity
+            Project Allocations
           </h2>
-          <div className="text-sm text-muted-foreground">
-            <CountUpNumber end={person.totalHours} duration={1500} className="font-semibold text-foreground" />h
-            <span className="mx-1">/</span>
-            {person.capacity}h
-          </div>
-        </div>
-        
-        <Progress 
-          value={Math.min(person.utilizationPercentage, 100)} 
-          className="h-4 transition-all duration-1000 ease-out"
-        />
-      </div>
-
-      {/* Projects */}
-      <div className="px-8 mb-8 relative z-10">
-        <h3 className={`font-semibold text-foreground mb-5 flex items-center gap-2 ${
-          isFullscreen ? 'text-xl' : 'text-lg'
-        }`}>
-          <span>Project Allocations</span>
-          <Badge variant="secondary" className="text-xs">{person.projects.length}</Badge>
-        </h3>
-        
-        <div className="space-y-3">
-          {person.projects.map((project) => (
-            <EditableProjectAllocation
-              key={`${project.id}-${refreshKey}`}
-              memberId={person.id}
-              projectId={project.id}
-              projectName={project.name}
-              projectCode={project.code}
-              hours={project.hours}
-              percentage={project.percentage}
-              color={project.color}
-              weekStartDate={weekStartDate}
-              capacity={person.capacity}
-              onUpdate={handleDataChange}
-            />
-          ))}
           
-          <AddProjectAllocation
-            memberId={person.id}
-            weekStartDate={weekStartDate}
-            existingProjectIds={person.projects.map(p => p.id)}
-            onAdd={handleDataChange}
-          />
+          <div className="w-full h-12 bg-muted/30 rounded-xl overflow-hidden flex shadow-inner">
+            {person.projects && person.projects.length > 0 ? (
+              person.projects.map((project: any, idx: number) => {
+                const percentage = (project.hours / person.capacity) * 100;
+                return (
+                  <Tooltip key={idx}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className="h-full transition-all hover:opacity-80 cursor-pointer relative group"
+                        style={{
+                          width: `${percentage}%`,
+                          backgroundColor: generateMonochromaticShades(idx, person.projects.length),
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="text-sm">
+                      <p className="font-semibold">{project.name}</p>
+                      <p className="text-xs">{project.code}</p>
+                      <p className="text-xs mt-1">{project.hours}h ({Math.round(percentage)}%)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })
+            ) : (
+              <div className="w-full h-full bg-muted/50 flex items-center justify-center">
+                <span className="text-sm text-muted-foreground">No projects allocated</span>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Leave Information */}
-      {totalLeaveHours > 0 && (
-        <div className="mx-8 mb-6 glass rounded-xl p-5 relative z-10 border border-primary/10">
-          <div className="flex items-center gap-2 mb-4">
-            <Calendar className="h-5 w-5 text-primary" />
-            <h4 className="font-semibold text-foreground">Leave This Week</h4>
-            <Badge variant="outline" className="ml-auto"><CountUpNumber end={totalLeaveHours} duration={1000} />h total</Badge>
-          </div>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {person.leave?.annualLeave > 0 && (
-              <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
-                <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
-                  <CountUpNumber end={person.leave.annualLeave} duration={1000} />h
+        {/* Project List */}
+        <div className="px-8 mb-8 relative z-10">
+          <div className="space-y-2.5">
+            {person.projects.map((project, idx) => (
+              <div 
+                key={`${project.id}-${refreshKey}`}
+                className="flex items-center justify-between p-3 rounded-lg bg-background/40 border border-border/30 hover:bg-background/60 transition-colors group"
+              >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <div
+                    className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
+                    style={{ backgroundColor: generateMonochromaticShades(idx, person.projects.length) }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                      {project.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{project.code}</p>
+                  </div>
                 </div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wide">Annual</div>
-              </div>
-            )}
-            {person.leave?.vacationLeave > 0 && (
-              <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
-                <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
-                  <CountUpNumber end={person.leave.vacationLeave} duration={1000} />h
+                
+                <div className="flex items-center gap-3 ml-3">
+                  <div className="text-right">
+                    <p className={`font-bold text-foreground ${isFullscreen ? 'text-xl' : 'text-lg'}`}>
+                      {project.hours}h
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {project.percentage.toFixed(0)}%
+                    </p>
+                  </div>
+                  <EditableProjectAllocation
+                    memberId={person.id}
+                    projectId={project.id}
+                    projectName={project.name}
+                    projectCode={project.code}
+                    hours={project.hours}
+                    percentage={project.percentage}
+                    color={project.color}
+                    weekStartDate={weekStartDate}
+                    capacity={person.capacity}
+                    onUpdate={handleDataChange}
+                  />
                 </div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wide">Vacation</div>
               </div>
-            )}
-            {person.leave?.medicalLeave > 0 && (
-              <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
-                <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
-                  <CountUpNumber end={person.leave.medicalLeave} duration={1000} />h
-                </div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wide">Medical</div>
-              </div>
-            )}
-            {person.leave?.publicHoliday > 0 && (
-              <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
-                <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
-                  <CountUpNumber end={person.leave.publicHoliday} duration={1000} />h
-                </div>
-                <div className="text-xs text-muted-foreground uppercase tracking-wide">Holiday</div>
-              </div>
-            )}
+            ))}
+            
+            <div className="pt-2">
+              <AddProjectAllocation
+                memberId={person.id}
+                weekStartDate={weekStartDate}
+                existingProjectIds={person.projects.map(p => p.id)}
+                onAdd={handleDataChange}
+              />
+            </div>
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Leave Information */}
+        {totalLeaveHours > 0 && (
+          <div className="mx-8 mb-6 glass rounded-xl p-5 relative z-10 border border-primary/10">
+            <div className="flex items-center gap-2 mb-4">
+              <Calendar className="h-5 w-5 text-primary" />
+              <h4 className="font-semibold text-foreground">Leave This Week</h4>
+              <Badge variant="outline" className="ml-auto"><CountUpNumber end={totalLeaveHours} duration={1000} />h total</Badge>
+            </div>
+            
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {person.leave?.annualLeave > 0 && (
+                <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
+                  <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
+                    <CountUpNumber end={person.leave.annualLeave} duration={1000} />h
+                  </div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Annual</div>
+                </div>
+              )}
+              {person.leave?.vacationLeave > 0 && (
+                <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
+                  <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
+                    <CountUpNumber end={person.leave.vacationLeave} duration={1000} />h
+                  </div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Vacation</div>
+                </div>
+              )}
+              {person.leave?.medicalLeave > 0 && (
+                <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
+                  <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
+                    <CountUpNumber end={person.leave.medicalLeave} duration={1000} />h
+                  </div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Medical</div>
+                </div>
+              )}
+              {person.leave?.publicHoliday > 0 && (
+                <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
+                  <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
+                    <CountUpNumber end={person.leave.publicHoliday} duration={1000} />h
+                  </div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Holiday</div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </TooltipProvider>
   );
 };
