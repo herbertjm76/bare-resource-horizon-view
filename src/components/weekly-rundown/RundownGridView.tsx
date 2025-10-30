@@ -70,9 +70,16 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
             <span className="truncate">{person.department || 'No Department'}</span>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-sm font-semibold">{Math.round(person.utilization || 0)}%</p>
-        </div>
+        <Badge 
+          variant={
+            person.utilization >= 100 ? "default" : 
+            person.utilization >= 70 ? "warning" : 
+            "destructive"
+          }
+          className="text-xs font-semibold px-2 py-1"
+        >
+          {Math.round(person.utilization || 0)}%
+        </Badge>
       </div>
 
       {/* Stacked Bar Graph */}
