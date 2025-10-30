@@ -177,21 +177,13 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                 <p className="text-sm text-muted-foreground font-medium">{project.code}</p>
               </div>
             </div>
-            <Badge variant="outline" className="text-xs rounded-full px-2 py-1">
-              {project.status || 'Active'}
-            </Badge>
+            <div className="text-right">
+              <div className="text-lg font-bold text-primary">{Math.round(project.totalHours || 0)}h</div>
+              <div className="text-xs text-muted-foreground">{((project.totalHours || 0) / 40).toFixed(1)} FTE</div>
+            </div>
           </div>
 
           <div className="space-y-3 relative z-10">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Team Size</span>
-              <span className="text-sm font-semibold">{project.teamMembers?.length || 0} members</span>
-            </div>
-
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-muted-foreground">Total Hours</span>
-              <span className="text-lg font-bold text-primary">{Math.round(project.totalHours || 0)}h</span>
-            </div>
 
             {/* Team Member Avatars */}
             {project.teamMembers && project.teamMembers.length > 0 && (
@@ -201,14 +193,17 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                   {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
                     <Tooltip key={idx}>
                       <TooltipTrigger>
-                        <AvatarWithHourDial
-                          avatar={member.avatar}
-                          fallback={member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
-                          hours={member.hours || 0}
-                          maxHours={40}
-                          size="sm"
-                          color={getCapacityColor(member.capacityPercentage || 0)}
-                        />
+                        <div className="relative inline-flex">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={member.avatar} alt={member.name} />
+                            <AvatarFallback className="text-xs bg-gradient-modern text-white">
+                              {member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full px-1.5 py-0.5 shadow-md border border-background">
+                            {Math.round(member.hours || 0)}h
+                          </div>
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent side="bottom" className="text-xs">
                         <p className="font-medium">{member.name}</p>
