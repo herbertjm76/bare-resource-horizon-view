@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Users, FolderOpen } from 'lucide-react';
+import { MapPin, Users } from 'lucide-react';
 import { EditableTeamMemberAllocation } from './EditableTeamMemberAllocation';
 import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
 
@@ -52,12 +52,6 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
     `}>
       {/* Header */}
       <div className="flex items-start gap-6 mb-8 relative z-10">
-        <div 
-          className={`${isFullscreen ? 'h-20 w-20' : 'h-16 w-16'} rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-2xl ring-4 ring-white/20 backdrop-blur-sm bg-gradient-modern`}
-        >
-          <FolderOpen className={isFullscreen ? 'h-10 w-10' : 'h-8 w-8'} />
-        </div>
-        
         <div className="flex-1 min-w-0">
           <h1 className={`font-bold text-foreground mb-2 ${
             isFullscreen ? 'text-4xl' : 'text-3xl'
