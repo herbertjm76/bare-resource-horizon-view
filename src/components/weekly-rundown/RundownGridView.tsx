@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock, Users, Calendar, Building } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MapPin, Clock, Users, Calendar, Building, Pencil } from 'lucide-react';
 import { RundownMode } from './WeeklyRundownView';
 import { AvatarWithHourDial } from './AvatarWithHourDial';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
+import { EditPersonAllocationsDialog } from './EditPersonAllocationsDialog';
+import { EditProjectAllocationsDialog } from './EditProjectAllocationsDialog';
 
 interface RundownGridViewProps {
   items: any[];
@@ -52,9 +55,11 @@ export const RundownGridView: React.FC<RundownGridViewProps> = ({
 
 const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
   const capacity = person.capacity || 40;
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   return (
-    <div className="glass-card rounded-xl border p-4 hover:shadow-lg transition-all duration-300">
+    <>
+      <div className="glass-card rounded-xl border p-4 hover:shadow-lg transition-all duration-300 relative">
       {/* Header */}
       <div className="flex items-center gap-3 mb-3">
         <Avatar className="h-10 w-10 ring-2 ring-primary/20">
@@ -138,11 +143,34 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
           )}
         </div>
       )}
+
+      {/* Edit Button */}
+      <div className="flex justify-end mt-3 pt-3 border-t">
+        <Button 
+          size="sm" 
+          variant="outline"
+          onClick={() => setEditDialogOpen(true)}
+          className="gap-2"
+        >
+          <Pencil className="h-3 w-3" />
+          Edit
+        </Button>
+      </div>
     </div>
+
+    <EditPersonAllocationsDialog
+      open={editDialogOpen}
+      onOpenChange={setEditDialogOpen}
+      person={person}
+      selectedWeek={new Date()}
+    />
+    </>
   );
 };
 
 const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  
   const getCapacityColor = (percentage: number) => {
     if (percentage > 100) return 'hsl(var(--destructive))';
     if (percentage >= 90) return 'hsl(39, 100%, 50%)';
@@ -155,6 +183,7 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
     : 0;
 
   return (
+    <>
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="glass-card glass-hover rounded-2xl border-0 p-5 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
@@ -204,6 +233,22 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                 </div>
               </div>
             )}
+
+            {/* Edit Button */}
+            <div className="flex justify-end mt-3 pt-3 border-t">
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditDialogOpen(true);
+                }}
+                className="gap-2"
+              >
+                <Pencil className="h-3 w-3" />
+                Edit
+              </Button>
+            </div>
           </div>
         </div>
       </TooltipTrigger>
@@ -271,5 +316,13 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
         </div>
       </TooltipContent>
     </Tooltip>
+
+    <EditProjectAllocationsDialog
+      open={editDialogOpen}
+      onOpenChange={setEditDialogOpen}
+      project={project}
+      selectedWeek={new Date()}
+    />
+    </>
   );
 };
