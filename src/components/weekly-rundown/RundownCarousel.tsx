@@ -107,16 +107,16 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
 
   return (
     <div className="relative">
-      {/* Navigation buttons */}
+      {/* Navigation buttons - Enhanced */}
       <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
         <Button
           variant="outline"
           size="icon"
           onClick={onPrev}
           disabled={!canScrollPrev}
-          className="h-12 w-12 rounded-full bg-background/80 backdrop-blur-sm border-2 shadow-lg hover:shadow-xl transition-all duration-200"
+          className="h-14 w-14 rounded-full bg-background/90 backdrop-blur-md border-2 border-primary/20 shadow-2xl hover:shadow-primary/30 hover:scale-110 transition-all duration-300 disabled:opacity-30 disabled:hover:scale-100"
         >
-          <ChevronLeft className="h-6 w-6" />
+          <ChevronLeft className="h-7 w-7" />
         </Button>
       </div>
       
@@ -126,9 +126,9 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
           size="icon"
           onClick={onNext}
           disabled={!canScrollNext}
-          className="h-12 w-12 rounded-full bg-background/80 backdrop-blur-sm border-2 shadow-lg hover:shadow-xl transition-all duration-200"
+          className="h-14 w-14 rounded-full bg-background/90 backdrop-blur-md border-2 border-primary/20 shadow-2xl hover:shadow-primary/30 hover:scale-110 transition-all duration-300 disabled:opacity-30 disabled:hover:scale-100"
         >
-          <ChevronRight className="h-6 w-6" />
+          <ChevronRight className="h-7 w-7" />
         </Button>
       </div>
 
@@ -163,20 +163,32 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
         </div>
       </div>
 
-      {/* Dots indicator */}
+      {/* Enhanced Dots indicator with progress */}
       {items.length > 1 && (
-        <div className="flex justify-center mt-6 gap-2">
+        <div className="flex justify-center items-center mt-8 gap-3">
           {items.map((_, index) => (
             <button
               key={index}
               onClick={() => onGoTo(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-200 ${
+              className={`rounded-full transition-all duration-300 hover:scale-125 ${
                 index === currentIndex 
-                  ? 'bg-primary w-8' 
-                  : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                  ? 'bg-primary w-12 h-3 shadow-lg shadow-primary/30' 
+                  : 'bg-muted-foreground/30 w-3 h-3 hover:bg-muted-foreground/60'
               }`}
+              aria-label={`Go to slide ${index + 1}`}
             />
           ))}
+        </div>
+      )}
+      
+      {/* Keyboard navigation hint */}
+      {items.length > 1 && (
+        <div className="flex justify-center mt-4 text-xs text-muted-foreground">
+          <p className="flex items-center gap-2">
+            <kbd className="px-2 py-1 bg-muted rounded border border-border">←</kbd>
+            <kbd className="px-2 py-1 bg-muted rounded border border-border">→</kbd>
+            <span>Navigate with keyboard</span>
+          </p>
         </div>
       )}
     </div>

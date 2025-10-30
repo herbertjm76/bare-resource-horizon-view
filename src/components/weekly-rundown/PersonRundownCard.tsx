@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock, AlertTriangle, CheckCircle, Calendar } from 'lucide-react';
+import { MapPin, Clock, AlertTriangle, CheckCircle, Calendar, TrendingUp } from 'lucide-react';
 import { EditableProjectAllocation } from './EditableProjectAllocation';
 import { AddProjectAllocation } from './AddProjectAllocation';
 import { format, startOfWeek } from 'date-fns';
+import { CountUpNumber } from '@/components/common/CountUpNumber';
 
 interface PersonRundownCardProps {
   person: {
@@ -70,78 +71,109 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
 
   return (
     <div className={`
-      relative rounded-3xl glass-card glass-hover p-8 shadow-2xl
-      ${isActive ? 'ring-2 ring-primary/50 glass-elevated' : ''}
+      relative rounded-3xl glass-card glass-hover shadow-2xl
+      ${isActive ? 'ring-2 ring-primary/50 glass-elevated scale-[1.02]' : ''}
       ${isFullscreen ? 'min-h-[80vh]' : 'min-h-[500px]'}
       transition-all duration-500 ease-out
       before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none
       overflow-hidden
     `}>
-      {/* Header */}
-      <div className="flex items-start gap-6 mb-8 relative z-10">
-        <Avatar className={`${isFullscreen ? 'h-24 w-24' : 'h-16 w-16'} ring-4 ring-white/20 shadow-xl`}>
-          <AvatarImage src={person.avatar_url} />
-          <AvatarFallback className="text-xl font-semibold bg-gradient-modern text-white backdrop-blur-sm">
-            {person.first_name.charAt(0)}{person.last_name.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-        
-        <div className="flex-1 min-w-0">
-          <h1 className={`font-bold text-foreground mb-2 ${
-            isFullscreen ? 'text-4xl' : 'text-3xl'
-          }`}>
-            {person.first_name} {person.last_name}
-          </h1>
+      {/* Hero Section with Key Metrics */}
+      <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-8 mb-6">
+        <div className="flex items-start gap-6 mb-6">
+          <Avatar className={`${isFullscreen ? 'h-24 w-24' : 'h-20 w-20'} ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
+            <AvatarImage src={person.avatar_url} />
+            <AvatarFallback className="text-2xl font-bold bg-gradient-modern text-white backdrop-blur-sm">
+              {person.first_name.charAt(0)}{person.last_name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
           
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            <Badge variant="outline" className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              {person.location}
-            </Badge>
+          <div className="flex-1 min-w-0">
+            <h1 className={`font-bold text-foreground mb-3 tracking-tight ${
+              isFullscreen ? 'text-5xl' : 'text-4xl'
+            }`}>
+              {person.first_name} {person.last_name}
+            </h1>
             
-            <Badge 
-              variant={status.color as any}
-              className="flex items-center gap-1"
-            >
-              <StatusIcon className="h-3 w-3" />
-              {status.label}
-            </Badge>
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge variant="outline" className="flex items-center gap-1.5 px-3 py-1.5 text-sm">
+                <MapPin className="h-3.5 w-3.5" />
+                {person.location}
+              </Badge>
+              
+              <Badge 
+                variant={status.color as any}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium"
+              >
+                <StatusIcon className="h-3.5 w-3.5" />
+                {status.label}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        {/* Key Metrics Bar */}
+        <div className="grid grid-cols-3 gap-4 mt-6">
+          <div className="bg-background/60 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Utilization</p>
+            </div>
+            <p className={`font-bold text-foreground ${isFullscreen ? 'text-4xl' : 'text-3xl'}`}>
+              <CountUpNumber end={person.utilizationPercentage} duration={1500} suffix="%" />
+            </p>
+          </div>
+          
+          <div className="bg-background/60 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+            <div className="flex items-center gap-2 mb-1">
+              <Clock className="h-4 w-4 text-primary" />
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Hours Allocated</p>
+            </div>
+            <p className={`font-bold text-foreground ${isFullscreen ? 'text-4xl' : 'text-3xl'}`}>
+              <CountUpNumber end={person.totalHours} duration={1500} suffix="h" />
+            </p>
+          </div>
+          
+          <div className="bg-background/60 backdrop-blur-sm rounded-xl p-4 border border-border/50">
+            <div className="flex items-center gap-2 mb-1">
+              <CheckCircle className="h-4 w-4 text-primary" />
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Projects</p>
+            </div>
+            <p className={`font-bold text-foreground ${isFullscreen ? 'text-4xl' : 'text-3xl'}`}>
+              <CountUpNumber end={person.projects.length} duration={1000} />
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Utilization Summary */}
-      <div className="mb-8 relative z-10">
-        <div className="flex items-center justify-between mb-4">
+      {/* Animated Progress Section */}
+      <div className="px-8 mb-8 relative z-10">
+        <div className="flex items-center justify-between mb-3">
           <h2 className={`font-semibold text-foreground ${
-            isFullscreen ? 'text-2xl' : 'text-xl'
+            isFullscreen ? 'text-xl' : 'text-lg'
           }`}>
-            Weekly Utilization
+            Weekly Capacity
           </h2>
-          <div className="text-right">
-            <div className={`font-bold text-foreground ${
-              isFullscreen ? 'text-3xl' : 'text-2xl'
-            }`}>
-              {person.utilizationPercentage.toFixed(0)}%
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {person.totalHours}h of {person.capacity}h capacity
-            </div>
+          <div className="text-sm text-muted-foreground">
+            <CountUpNumber end={person.totalHours} duration={1500} className="font-semibold text-foreground" />h
+            <span className="mx-1">/</span>
+            {person.capacity}h
           </div>
         </div>
         
         <Progress 
           value={Math.min(person.utilizationPercentage, 100)} 
-          className="h-3"
+          className="h-4 transition-all duration-1000 ease-out"
         />
       </div>
 
       {/* Projects */}
-      <div className="mb-8 relative z-10">
-        <h3 className={`font-semibold text-foreground mb-4 ${
+      <div className="px-8 mb-8 relative z-10">
+        <h3 className={`font-semibold text-foreground mb-5 flex items-center gap-2 ${
           isFullscreen ? 'text-xl' : 'text-lg'
         }`}>
-          Project Allocations
+          <span>Project Allocations</span>
+          <Badge variant="secondary" className="text-xs">{person.projects.length}</Badge>
         </h3>
         
         <div className="space-y-3">
@@ -172,35 +204,44 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
 
       {/* Leave Information */}
       {totalLeaveHours > 0 && (
-        <div className="glass rounded-xl p-4 relative z-10">
-          <div className="flex items-center gap-2 mb-3">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <h4 className="font-medium text-foreground">Leave This Week</h4>
+        <div className="mx-8 mb-6 glass rounded-xl p-5 relative z-10 border border-primary/10">
+          <div className="flex items-center gap-2 mb-4">
+            <Calendar className="h-5 w-5 text-primary" />
+            <h4 className="font-semibold text-foreground">Leave This Week</h4>
+            <Badge variant="outline" className="ml-auto"><CountUpNumber end={totalLeaveHours} duration={1000} />h total</Badge>
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {person.leave?.annualLeave > 0 && (
-              <div className="text-center">
-                <div className="font-semibold">{person.leave.annualLeave}h</div>
-                <div className="text-muted-foreground">Annual</div>
+              <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
+                <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
+                  <CountUpNumber end={person.leave.annualLeave} duration={1000} />h
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Annual</div>
               </div>
             )}
             {person.leave?.vacationLeave > 0 && (
-              <div className="text-center">
-                <div className="font-semibold">{person.leave.vacationLeave}h</div>
-                <div className="text-muted-foreground">Vacation</div>
+              <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
+                <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
+                  <CountUpNumber end={person.leave.vacationLeave} duration={1000} />h
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Vacation</div>
               </div>
             )}
             {person.leave?.medicalLeave > 0 && (
-              <div className="text-center">
-                <div className="font-semibold">{person.leave.medicalLeave}h</div>
-                <div className="text-muted-foreground">Medical</div>
+              <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
+                <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
+                  <CountUpNumber end={person.leave.medicalLeave} duration={1000} />h
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Medical</div>
               </div>
             )}
             {person.leave?.publicHoliday > 0 && (
-              <div className="text-center">
-                <div className="font-semibold">{person.leave.publicHoliday}h</div>
-                <div className="text-muted-foreground">Holiday</div>
+              <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
+                <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
+                  <CountUpNumber end={person.leave.publicHoliday} duration={1000} />h
+                </div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Holiday</div>
               </div>
             )}
           </div>
