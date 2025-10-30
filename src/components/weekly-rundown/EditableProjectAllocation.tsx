@@ -121,31 +121,26 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
 
   return (
     <>
-      <div className="glass rounded-xl p-4 hover:glass-elevated transition-all duration-300 group">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-3 flex-1">
+      <div className="glass rounded-lg p-2 hover:glass-elevated transition-all duration-300 group">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
             <div 
-              className="w-3 h-3 rounded-full flex-shrink-0"
+              className="w-2 h-2 rounded-full flex-shrink-0"
               style={{ backgroundColor: color || 'hsl(var(--primary))' }}
             />
-            <div className="min-w-0 flex-1">
-              <div className="font-medium text-foreground truncate">
-                {projectName}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {projectCode}
-              </div>
+            <div className="text-sm font-medium text-muted-foreground">
+              {projectCode}
             </div>
           </div>
           
           <div className="flex items-center gap-2">
             {isEditing ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
                 <Input
                   type="number"
                   value={editedHours}
                   onChange={(e) => setEditedHours(e.target.value)}
-                  className="w-20 h-8 text-right"
+                  className="w-16 h-7 text-sm text-right"
                   step="0.5"
                   min="0"
                 />
@@ -154,35 +149,30 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
                   variant="ghost"
                   onClick={handleSave}
                   disabled={updateMutation.isPending}
-                  className="h-8 w-8 p-0"
+                  className="h-7 w-7 p-0"
                 >
-                  <Check className="h-4 w-4" />
+                  <Check className="h-3 w-3" />
                 </Button>
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={handleCancel}
-                  className="h-8 w-8 p-0"
+                  className="h-7 w-7 p-0"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3 w-3" />
                 </Button>
               </div>
             ) : (
               <>
-                <div className="text-right">
-                  <div className="font-semibold text-foreground">
-                    {hours}h
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {percentage.toFixed(0)}% of total
-                  </div>
+                <div className="text-sm font-semibold text-foreground">
+                  {hours}h
                 </div>
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => setIsEditing(true)}
-                    className="h-8 w-8 p-0"
+                    className="h-7 w-7 p-0"
                   >
                     <Edit2 className="h-3 w-3" />
                   </Button>
@@ -190,7 +180,7 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
                     size="sm"
                     variant="ghost"
                     onClick={() => setShowDeleteDialog(true)}
-                    className="h-8 w-8 p-0 text-destructive"
+                    className="h-7 w-7 p-0 text-destructive"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -199,11 +189,6 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
             )}
           </div>
         </div>
-        
-        <Progress 
-          value={isEditing ? Math.min(calculatedPercentage, 100) : percentage} 
-          className="h-2"
-        />
       </div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
