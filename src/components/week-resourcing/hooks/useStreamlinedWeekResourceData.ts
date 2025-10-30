@@ -138,8 +138,7 @@ export const useStreamlinedWeekResourceData = (selectedWeek: Date, filters: any)
         projectId: project.project_id,
         projectName: projectDetails?.name || 'Unknown Project',
         projectCode: projectDetails?.code || 'UNK',
-        hours: project.total_hours,
-        color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`
+        hours: project.total_hours
       };
     }) || [];
     

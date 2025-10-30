@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Clock, Users, Calendar, Building, FolderOpen } from 'lucide-react';
 import { RundownMode } from './WeeklyRundownView';
 import { AvatarWithHourDial } from './AvatarWithHourDial';
+import { generateMonochromaticShades } from '@/utils/themeColorUtils';
 
 interface RundownGridViewProps {
   items: any[];
@@ -88,7 +89,7 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
                       className="h-full transition-all hover:opacity-80 cursor-pointer"
                       style={{
                         width: `${percentage}%`,
-                        backgroundColor: project.color || 'hsl(var(--primary))',
+                        backgroundColor: generateMonochromaticShades(idx, person.projects.length),
                       }}
                     />
                   </TooltipTrigger>
@@ -115,7 +116,7 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 <div
                   className="w-2 h-2 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: project.color || 'hsl(var(--primary))' }}
+                  style={{ backgroundColor: generateMonochromaticShades(idx, person.projects.length) }}
                 />
                 <span className="truncate group-hover:text-primary transition-colors">
                   {project.name}
