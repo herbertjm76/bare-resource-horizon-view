@@ -184,46 +184,19 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
         <div className="px-8 mb-8 relative z-10">
           <div className="space-y-2.5">
             {person.projects.map((project, idx) => (
-              <div 
+              <EditableProjectAllocation
                 key={`${project.id}-${refreshKey}`}
-                className="flex items-center justify-between p-3 rounded-lg bg-background/40 border border-border/30 hover:bg-background/60 transition-colors group"
-              >
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div
-                    className="w-3 h-3 rounded-full flex-shrink-0 shadow-sm"
-                    style={{ backgroundColor: generateMonochromaticShades(idx, person.projects.length) }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-foreground truncate group-hover:text-primary transition-colors">
-                      {project.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{project.code}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center gap-3 ml-3">
-                  <div className="text-right">
-                    <p className={`font-bold text-foreground ${isFullscreen ? 'text-xl' : 'text-lg'}`}>
-                      {project.hours}h
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {project.percentage.toFixed(0)}%
-                    </p>
-                  </div>
-                  <EditableProjectAllocation
-                    memberId={person.id}
-                    projectId={project.id}
-                    projectName={project.name}
-                    projectCode={project.code}
-                    hours={project.hours}
-                    percentage={project.percentage}
-                    color={project.color}
-                    weekStartDate={weekStartDate}
-                    capacity={person.capacity}
-                    onUpdate={handleDataChange}
-                  />
-                </div>
-              </div>
+                memberId={person.id}
+                projectId={project.id}
+                projectName={project.name}
+                projectCode={project.code}
+                hours={project.hours}
+                percentage={project.percentage}
+                color={generateMonochromaticShades(idx, person.projects.length)}
+                weekStartDate={weekStartDate}
+                capacity={person.capacity}
+                onUpdate={handleDataChange}
+              />
             ))}
             
             <div className="pt-2">
