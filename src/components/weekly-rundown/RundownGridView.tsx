@@ -159,16 +159,9 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
       <TooltipTrigger asChild>
         <div className="glass-card glass-hover rounded-2xl border-0 p-5 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
           <div className="flex items-start justify-between mb-4 relative z-10">
-            <div className="flex items-start gap-3 flex-1 min-w-0">
-              <div 
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-semibold shadow-lg ring-2 ring-white/20 bg-gradient-modern"
-              >
-                <Users className="h-5 w-5" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-base truncate mb-1">{project.name}</h3>
-                <p className="text-sm text-muted-foreground font-medium">{project.code}</p>
-              </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-base truncate mb-1">{project.name}</h3>
+              <p className="text-sm text-muted-foreground font-medium">{project.code}</p>
             </div>
             <Badge variant="secondary" className="text-sm font-bold px-3 py-1">
               {((project.totalHours || 0) / 40).toFixed(1)} FTE
