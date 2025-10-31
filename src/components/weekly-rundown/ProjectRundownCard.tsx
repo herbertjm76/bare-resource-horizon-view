@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Users, Clock, Briefcase } from 'lucide-react';
+import { MapPin, Users, Clock, Briefcase, Activity } from 'lucide-react';
 import { EditableTeamMemberAllocation } from './EditableTeamMemberAllocation';
 import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
@@ -51,76 +51,83 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none
       overflow-hidden
     `}>
-      {/* Hero Section with Key Metrics */}
-      <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-8 mb-6">
-        <div className="flex items-start gap-6 mb-6">
-          <div className={`${isFullscreen ? 'h-24 w-24' : 'h-20 w-20'} rounded-2xl bg-gradient-modern flex items-center justify-center ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
-            <Briefcase className={`${isFullscreen ? 'h-12 w-12' : 'h-10 w-10'} text-white`} />
+      {/* Hero Section */}
+      <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-8 pb-6">
+        <div className="flex items-start gap-6">
+          {/* Large Project Avatar with Hours Badge */}
+          <div className="relative">
+            <div className={`${isFullscreen ? 'h-24 w-24' : 'h-20 w-20'} rounded-2xl bg-gradient-modern flex items-center justify-center ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
+              <Briefcase className={`${isFullscreen ? 'h-12 w-12' : 'h-10 w-10'} text-white`} />
+            </div>
+            {/* Hours Badge on Avatar */}
+            <Badge className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground shadow-lg px-2 py-1 text-xs font-bold">
+              <Clock className="h-3 w-3 mr-1" />
+              {project.totalHours}h
+            </Badge>
           </div>
           
           <div className="flex-1 min-w-0">
-            <h1 className={`font-bold text-foreground mb-3 tracking-tight ${
-              isFullscreen ? 'text-5xl' : 'text-4xl'
-            }`}>
-              {project.name}
-            </h1>
+            <div className="flex items-start justify-between gap-4 mb-2">
+              <h1 className={`font-bold text-foreground tracking-tight ${
+                isFullscreen ? 'text-5xl' : 'text-4xl'
+              }`}>
+                {project.name}
+              </h1>
+              
+              {/* Badges - Upper Right */}
+              <div className="flex flex-col items-end gap-1.5">
+                <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium">
+                  <Activity className="h-3 w-3" />
+                  {project.code}
+                </Badge>
+                {project.office && (
+                  <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+                    <MapPin className="h-3 w-3" />
+                    {project.office}
+                  </Badge>
+                )}
+                {project.status && (
+                  <Badge variant="secondary" className="px-2 py-0.5 text-xs">
+                    {project.status}
+                  </Badge>
+                )}
+              </div>
+            </div>
             
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge variant="outline" className="text-base px-3 py-1.5 font-medium">
-                {project.code}
-              </Badge>
+            {/* Key Metrics Row */}
+            <div className="flex items-center gap-4 mt-4">
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-primary" />
+                <span className="text-2xl font-bold text-foreground">
+                  <CountUpNumber end={project.teamMembers.length} duration={1500} />
+                </span>
+                <span className="text-xs text-muted-foreground">team members</span>
+              </div>
               
-              {project.office && (
-                <Badge variant="outline" className="flex items-center gap-1.5 px-3 py-1.5">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {project.office}
-                </Badge>
-              )}
+              <div className="h-8 w-px bg-border" />
               
-              {project.status && (
-                <Badge variant="secondary" className="px-3 py-1.5">
-                  {project.status}
-                </Badge>
-              )}
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-primary" />
+                <span className="text-2xl font-bold text-foreground">
+                  <CountUpNumber end={project.totalHours} duration={1500} />h
+                </span>
+                <span className="text-xs text-muted-foreground">total</span>
+              </div>
             </div>
-          </div>
-        </div>
-
-        {/* Key Metrics Bar */}
-        <div className="grid grid-cols-2 gap-4 mt-6">
-          <div className="bg-background/60 backdrop-blur-sm rounded-xl p-4 border border-border/50">
-            <div className="flex items-center gap-2 mb-1">
-              <Clock className="h-4 w-4 text-primary" />
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Total Hours</p>
-            </div>
-            <p className={`font-bold text-foreground ${isFullscreen ? 'text-4xl' : 'text-3xl'}`}>
-              <CountUpNumber end={project.totalHours} duration={1500} suffix="h" />
-            </p>
-          </div>
-          
-          <div className="bg-background/60 backdrop-blur-sm rounded-xl p-4 border border-border/50">
-            <div className="flex items-center gap-2 mb-1">
-              <Users className="h-4 w-4 text-primary" />
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Team Members</p>
-            </div>
-            <p className={`font-bold text-foreground ${isFullscreen ? 'text-4xl' : 'text-3xl'}`}>
-              <CountUpNumber end={project.teamMembers.length} duration={1000} />
-            </p>
           </div>
         </div>
       </div>
 
-      {/* Team Members */}
-      {project.teamMembers.length > 0 && (
-        <div className="px-8 relative z-10">
-          <h3 className={`font-semibold text-foreground mb-5 flex items-center gap-2 ${
-            isFullscreen ? 'text-xl' : 'text-lg'
-          }`}>
-            <span>Team Allocation</span>
-            <Badge variant="secondary" className="text-xs">{project.teamMembers.length}</Badge>
-          </h3>
-          
-          <div className="space-y-4">
+      {/* Team Members List */}
+      <div className="px-8 mb-8 relative z-10">
+        <h2 className={`font-semibold text-foreground mb-3 ${
+          isFullscreen ? 'text-xl' : 'text-lg'
+        }`}>
+          Team Allocation
+        </h2>
+        
+        {project.teamMembers.length > 0 ? (
+          <div className="space-y-3">
             {sortedMembers.map((member) => (
               <EditableTeamMemberAllocation
                 key={member.id}
@@ -132,24 +139,24 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
               />
             ))}
             
-            <AddTeamMemberAllocation
-              projectId={project.id}
-              weekStartDate={weekStartDateString}
-              existingMemberIds={project.teamMembers.map(m => m.id)}
-              onAdd={onDataChange}
-            />
+            <div className="mt-3">
+              <AddTeamMemberAllocation
+                projectId={project.id}
+                weekStartDate={weekStartDateString}
+                existingMemberIds={project.teamMembers.map(m => m.id)}
+                onAdd={onDataChange}
+              />
+            </div>
           </div>
-        </div>
-      )}
-
-      {project.teamMembers.length === 0 && (
-        <div className="px-8 text-center py-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted/30 mb-4">
-            <Users className="h-10 w-10 text-muted-foreground" />
+        ) : (
+          <div className="text-center py-8 bg-muted/20 rounded-xl border border-border/30">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/30 mb-3">
+              <Users className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground text-sm">No team members allocated this week</p>
           </div>
-          <p className="text-muted-foreground text-lg">No team members allocated this week</p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
