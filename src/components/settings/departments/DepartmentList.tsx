@@ -2,22 +2,55 @@
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2, Briefcase, Building, Users, Wrench, Heart, GraduationCap, Landmark, ShoppingBag, Truck, Leaf, Coffee, Palette } from "lucide-react";
+import { 
+  Edit, Trash2, Briefcase, Building, Users, Wrench, Heart, GraduationCap, 
+  Landmark, ShoppingBag, Truck, Leaf, Coffee, Palette, Building2, Hammer, 
+  Package, Microscope, Stethoscope, Cpu, Plane, Ship, Train, Factory, Store, 
+  Home, Warehouse, DollarSign, PieChart, TrendingUp, Target, Award, Shield,
+  Zap, Lightbulb, Rocket, Star, Music, Film, BookOpen, Newspaper
+} from "lucide-react";
 import { Department } from "@/context/officeSettings/types";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   'briefcase': Briefcase,
   'building': Building,
+  'building-2': Building2,
   'users': Users,
   'wrench': Wrench,
+  'hammer': Hammer,
   'heart': Heart,
+  'stethoscope': Stethoscope,
   'graduation-cap': GraduationCap,
   'landmark': Landmark,
   'shopping-bag': ShoppingBag,
+  'store': Store,
   'truck': Truck,
+  'plane': Plane,
+  'ship': Ship,
+  'train': Train,
   'leaf': Leaf,
   'coffee': Coffee,
   'palette': Palette,
+  'package': Package,
+  'microscope': Microscope,
+  'cpu': Cpu,
+  'factory': Factory,
+  'warehouse': Warehouse,
+  'home': Home,
+  'dollar-sign': DollarSign,
+  'pie-chart': PieChart,
+  'trending-up': TrendingUp,
+  'target': Target,
+  'award': Award,
+  'shield': Shield,
+  'zap': Zap,
+  'lightbulb': Lightbulb,
+  'rocket': Rocket,
+  'star': Star,
+  'music': Music,
+  'film': Film,
+  'book-open': BookOpen,
+  'newspaper': Newspaper,
 };
 
 interface DepartmentListProps {
