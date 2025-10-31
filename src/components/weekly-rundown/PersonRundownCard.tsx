@@ -15,6 +15,7 @@ interface PersonRundownCardProps {
     first_name: string;
     last_name: string;
     location: string;
+    department?: string;
     avatar_url?: string;
     totalHours: number;
     capacity: number;
@@ -98,11 +99,19 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
                   {person.first_name} {person.last_name}
                 </h1>
                 
-                {/* Location Badge */}
-                <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
-                  <MapPin className="h-3 w-3" />
-                  {person.location}
-                </Badge>
+                {/* Badges - Department and Location */}
+                <div className="flex flex-col items-end gap-1.5">
+                  {person.department && (
+                    <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+                      <TrendingUp className="h-3 w-3" />
+                      {person.department}
+                    </Badge>
+                  )}
+                  <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+                    <MapPin className="h-3 w-3" />
+                    {person.location}
+                  </Badge>
+                </div>
               </div>
               
               {/* Key Metrics Row */}
