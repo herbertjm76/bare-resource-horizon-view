@@ -1,6 +1,7 @@
 import React from 'react';
 import { StandardLayout } from '@/components/layout';
 import { WeeklyRundownView } from '@/components/weekly-rundown/WeeklyRundownView';
+import { OfficeSettingsProvider } from '@/context/officeSettings';
 
 const WeeklyRundown: React.FC = () => {
   return (
@@ -9,7 +10,9 @@ const WeeklyRundown: React.FC = () => {
       className="bg-background"
       contentClassName="p-4 sm:p-6 lg:p-8"
     >
-      <WeeklyRundownView />
+      <OfficeSettingsProvider>
+        <WeeklyRundownView />
+      </OfficeSettingsProvider>
     </StandardLayout>
   );
 };
