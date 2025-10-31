@@ -1,9 +1,10 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Users, Clock, Briefcase, Activity } from 'lucide-react';
-import { EditableTeamMemberAllocation } from './EditableTeamMemberAllocation';
+import { MapPin, Users, Clock, Activity, Briefcase, Building, Palette, Code, Sparkles, Rocket, Target, Zap, TrendingUp } from 'lucide-react';
+import { TeamMemberAvatar } from './TeamMemberAvatar';
 import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
+import * as LucideIcons from 'lucide-react';
 
 interface ProjectRundownCardProps {
   project: {
@@ -14,6 +15,8 @@ interface ProjectRundownCardProps {
     totalHours: number;
     status?: string;
     office?: string;
+    department?: string;
+    department_icon?: string;
     teamMembers: Array<{
       id: string;
       name: string;
@@ -42,6 +45,22 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
   weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay() + 1);
   const weekStartDateString = weekStartDate.toISOString().split('T')[0];
 
+  // Get the icon component for the department
+  const getIconComponent = () => {
+    if (!project.department_icon) return Briefcase;
+    
+    // Convert icon name to PascalCase (e.g., 'briefcase' -> 'Briefcase')
+    const iconName = project.department_icon
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('');
+    
+    const IconComponent = (LucideIcons as any)[iconName];
+    return IconComponent || Briefcase;
+  };
+
+  const ProjectIcon = getIconComponent();
+
   return (
     <div className={`
       relative rounded-3xl glass-card glass-hover shadow-2xl
@@ -57,7 +76,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
           {/* Large Project Avatar with Hours Badge */}
           <div className="relative">
             <div className={`${isFullscreen ? 'h-24 w-24' : 'h-20 w-20'} rounded-2xl bg-gradient-modern flex items-center justify-center ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
-              <Briefcase className={`${isFullscreen ? 'h-12 w-12' : 'h-10 w-10'} text-white`} />
+              <ProjectIcon className={`${isFullscreen ? 'h-12 w-12' : 'h-10 w-10'} text-white`} />
             </div>
             {/* Hours Badge on Avatar */}
             <Badge className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground shadow-lg px-2 py-1 text-xs font-bold">
@@ -76,13 +95,16 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
               
               {/* Badges - Upper Right */}
               <div className="flex flex-col items-end gap-1.5">
+                {project.department && (
+                  <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+                    {project.department}
+                  </Badge>
+                )}
                 <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium">
-                  <Activity className="h-3 w-3" />
                   {project.code}
                 </Badge>
                 {project.office && (
                   <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
-                    <MapPin className="h-3 w-3" />
                     {project.office}
                   </Badge>
                 )}
@@ -118,28 +140,27 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
         </div>
       </div>
 
-      {/* Team Members List */}
+      {/* Team Members Avatars */}
       <div className="px-8 mb-8 relative z-10">
-        <h2 className={`font-semibold text-foreground mb-3 ${
+        <h2 className={`font-semibold text-foreground mb-4 ${
           isFullscreen ? 'text-xl' : 'text-lg'
         }`}>
           Team Allocation
         </h2>
         
         {project.teamMembers.length > 0 ? (
-          <div className="space-y-3">
+          <div className="flex flex-wrap gap-4">
             {sortedMembers.map((member) => (
-              <EditableTeamMemberAllocation
+              <TeamMemberAvatar
                 key={member.id}
                 member={member}
                 projectId={project.id}
                 weekStartDate={weekStartDateString}
-                capacity={40}
                 onUpdate={onDataChange}
               />
             ))}
             
-            <div className="mt-3">
+            <div className="flex items-center">
               <AddTeamMemberAllocation
                 projectId={project.id}
                 weekStartDate={weekStartDateString}
@@ -154,6 +175,14 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
               <Users className="h-8 w-8 text-muted-foreground" />
             </div>
             <p className="text-muted-foreground text-sm">No team members allocated this week</p>
+            <div className="mt-3">
+              <AddTeamMemberAllocation
+                projectId={project.id}
+                weekStartDate={weekStartDateString}
+                existingMemberIds={[]}
+                onAdd={onDataChange}
+              />
+            </div>
           </div>
         )}
       </div>

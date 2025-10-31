@@ -490,7 +490,7 @@ export type Database = {
           accessed_by: string
           company_id: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           profile_id: string
           user_agent: string | null
         }
@@ -500,7 +500,7 @@ export type Database = {
           accessed_by: string
           company_id: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           profile_id: string
           user_agent?: string | null
         }
@@ -510,7 +510,7 @@ export type Database = {
           accessed_by?: string
           company_id?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           profile_id?: string
           user_agent?: string | null
         }
@@ -1230,6 +1230,8 @@ export type Database = {
           created_at: string | null
           currency: string | null
           current_stage: string
+          department: string | null
+          department_icon: string | null
           financial_status: string | null
           id: string
           name: string
@@ -1256,6 +1258,8 @@ export type Database = {
           created_at?: string | null
           currency?: string | null
           current_stage: string
+          department?: string | null
+          department_icon?: string | null
           financial_status?: string | null
           id?: string
           name: string
@@ -1282,6 +1286,8 @@ export type Database = {
           created_at?: string | null
           currency?: string | null
           current_stage?: string
+          department?: string | null
+          department_icon?: string | null
           financial_status?: string | null
           id?: string
           name?: string
@@ -1422,18 +1428,9 @@ export type Database = {
           total_spent: number
         }[]
       }
-      get_current_user_company_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_user_company_id: {
-        Args: { user_id: string }
-        Returns: string
-      }
-      get_user_company_id_safe: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      get_current_user_company_id: { Args: never; Returns: string }
+      get_user_company_id: { Args: { user_id: string }; Returns: string }
+      get_user_company_id_safe: { Args: never; Returns: string }
       get_user_profile_by_id: {
         Args: { user_id: string }
         Returns: {
@@ -1450,43 +1447,25 @@ export type Database = {
           updated_at: string
         }[]
       }
-      get_user_role: {
-        Args: { user_id: string }
-        Returns: string
-      }
-      get_user_role_safe: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      is_company_role: {
-        Args:
-          | Record<PropertyKey, never>
-          | {
+      get_user_role: { Args: { user_id: string }; Returns: string }
+      get_user_role_safe: { Args: never; Returns: string }
+      is_company_role:
+        | {
+            Args: {
               company_uuid: string
               requested_role: Database["public"]["Enums"]["user_role"]
             }
-        Returns: boolean
-      }
-      migrate_sensitive_profile_data: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+            Returns: boolean
+          }
+        | { Args: never; Returns: boolean }
+      migrate_sensitive_profile_data: { Args: never; Returns: undefined }
       update_stage_budgets: {
         Args: { p_project_id: string; p_stage_id: string }
         Returns: undefined
       }
-      user_has_admin_role: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
-      user_has_owner_role: {
-        Args: { user_id: string }
-        Returns: boolean
-      }
-      user_is_admin_safe: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      user_has_admin_role: { Args: { user_id: string }; Returns: boolean }
+      user_has_owner_role: { Args: { user_id: string }; Returns: boolean }
+      user_is_admin_safe: { Args: never; Returns: boolean }
       users_are_in_same_company: {
         Args: { user_id_1: string; user_id_2: string }
         Returns: boolean
