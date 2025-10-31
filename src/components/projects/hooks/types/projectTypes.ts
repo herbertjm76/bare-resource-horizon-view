@@ -23,6 +23,8 @@ export interface FormState {
   stages: string[];
   stageFees: Record<string, StageFee>;
   stageApplicability: Record<string, boolean>;
+  department?: string;
+  department_icon?: string;
   // Enhanced financial tracking fields
   budget_amount?: number;
   budget_hours?: number;
@@ -48,6 +50,8 @@ export interface ProjectData {
   stages?: string[];
   currency?: string;
   average_rate?: number;
+  department?: string;
+  department_icon?: string;
   // Enhanced financial fields
   budget_amount?: number;
   budget_hours?: number;

@@ -21,6 +21,8 @@ export interface ProjectSubmitData {
   stageApplicability: Record<string, boolean>;
   officeStages?: Array<{ id: string; name: string; color?: string }>;
   company_id?: string;
+  department?: string;
+  department_icon?: string;
 }
 
 export interface ProjectUpdateData {
@@ -33,4 +35,6 @@ export interface ProjectUpdateData {
   current_stage: string | null;
   target_profit_percentage: number | null;
   stages: string[];
+  department?: string | null;
+  department_icon?: string | null;
 }

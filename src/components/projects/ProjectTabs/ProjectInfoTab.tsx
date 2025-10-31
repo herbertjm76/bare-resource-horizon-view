@@ -7,6 +7,7 @@ import { ProjectStagesSelector } from './components/ProjectStagesSelector';
 import { ProjectCurrentStageSelector } from './components/ProjectCurrentStageSelector';
 import { RateCalculatorNew } from './components/RateCalculatorNew';
 import { ProjectProfitRate } from './components/ProjectProfitRate';
+import { ProjectDepartmentSelector } from './components/ProjectDepartmentSelector';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useRateCalculator } from '../hooks/useRateCalculator';
 
@@ -23,6 +24,8 @@ interface ProjectForm {
   stages: string[];
   stageFees: Record<string, any>;
   stageApplicability?: Record<string, boolean>;
+  department?: string;
+  department_icon?: string;
 }
 
 interface ProjectInfoTabProps {
@@ -99,6 +102,13 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
         offices={offices}
         onCountryChange={(value) => onChange("country", value)}
         onOfficeChange={(value) => onChange("office", value)}
+      />
+
+      <ProjectDepartmentSelector
+        department={form.department}
+        departmentIcon={form.department_icon}
+        onDepartmentChange={(value) => onChange("department", value)}
+        onIconChange={(value) => onChange("department_icon", value)}
       />
 
       <ProjectProfitRate
