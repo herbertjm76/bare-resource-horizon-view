@@ -173,10 +173,10 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div
-                    className="h-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer hover:brightness-110 transition-all border-r border-white/20"
+                    className="h-full flex items-center justify-center text-muted-foreground font-semibold text-sm cursor-pointer hover:brightness-110 transition-all border-r border-border/30"
                     style={{
                       width: `${(totalLeaveHours / person.capacity) * 100}%`,
-                      backgroundColor: 'hsl(var(--destructive))',
+                      backgroundColor: 'hsl(var(--muted))',
                     }}
                   >
                     <span>🏖️ {totalLeaveHours}h</span>
