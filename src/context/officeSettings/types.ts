@@ -30,6 +30,7 @@ export type Department = {
   id: string;
   name: string;
   company_id: string;
+  icon?: string;
 };
 
 export type ProjectStage = {

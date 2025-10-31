@@ -37,8 +37,7 @@ export const useProjectSubmit = (projectId: string, refetch: () => void, onClose
         current_stage: form.current_stage,
         target_profit_percentage: form.profit ? Number(form.profit) : null,
         stages: selectedStageNames,
-        department: (form as any).department || null,
-        department_icon: (form as any).department_icon || null
+        department: (form as any).department || null
       };
       
       console.log('Project update data:', projectUpdate);

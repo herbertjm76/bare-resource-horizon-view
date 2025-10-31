@@ -104,8 +104,7 @@ export const submitNewProject = async (
       current_stage: currentStage,
       target_profit_percentage: form.profit ? Number(form.profit) : null,
       stages: selectedStageNames,
-      department: form.department || null,
-      department_icon: form.department_icon || null
+      department: form.department || null
     });
 
     const { data, error } = await supabase.from('projects').insert({
@@ -120,8 +119,7 @@ export const submitNewProject = async (
       current_stage: currentStage,
       target_profit_percentage: form.profit ? Number(form.profit) : null,
       stages: selectedStageNames,
-      department: form.department || null,
-      department_icon: form.department_icon || null
+      department: form.department || null
     }).select();
 
     if (error) {

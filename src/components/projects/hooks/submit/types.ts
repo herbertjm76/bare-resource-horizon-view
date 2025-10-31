@@ -22,7 +22,6 @@ export interface ProjectSubmitData {
   officeStages?: Array<{ id: string; name: string; color?: string }>;
   company_id?: string;
   department?: string;
-  department_icon?: string;
 }
 
 export interface ProjectUpdateData {
@@ -36,5 +35,4 @@ export interface ProjectUpdateData {
   target_profit_percentage: number | null;
   stages: string[];
   department?: string | null;
-  department_icon?: string | null;
 }

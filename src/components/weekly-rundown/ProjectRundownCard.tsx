@@ -5,6 +5,7 @@ import { TeamMemberAvatar } from './TeamMemberAvatar';
 import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
 import * as LucideIcons from 'lucide-react';
+import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 
 interface ProjectRundownCardProps {
   project: {
@@ -16,7 +17,6 @@ interface ProjectRundownCardProps {
     status?: string;
     office?: string;
     department?: string;
-    department_icon?: string;
     teamMembers: Array<{
       id: string;
       name: string;
@@ -39,18 +39,23 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
   selectedWeek,
   onDataChange
 }) => {
+  const { departments } = useOfficeSettings();
   const sortedMembers = [...project.teamMembers].sort((a, b) => b.hours - a.hours);
   
   const weekStartDate = new Date(selectedWeek);
   weekStartDate.setDate(weekStartDate.getDate() - weekStartDate.getDay() + 1);
   const weekStartDateString = weekStartDate.toISOString().split('T')[0];
 
-  // Get the icon component for the department
+  // Get the icon component for the department from office settings
   const getIconComponent = () => {
-    if (!project.department_icon) return Briefcase;
+    if (!project.department) return Briefcase;
+    
+    // Find the department in office settings
+    const departmentData = departments.find(d => d.name === project.department);
+    if (!departmentData?.icon) return Briefcase;
     
     // Convert icon name to PascalCase (e.g., 'briefcase' -> 'Briefcase')
-    const iconName = project.department_icon
+    const iconName = departmentData.icon
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join('');

@@ -25,7 +25,6 @@ interface ProjectForm {
   stageFees: Record<string, any>;
   stageApplicability?: Record<string, boolean>;
   department?: string;
-  department_icon?: string;
 }
 
 interface ProjectInfoTabProps {
@@ -108,10 +107,8 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
 
       <ProjectDepartmentSelector
         department={form.department}
-        departmentIcon={form.department_icon}
         departments={departments}
         onDepartmentChange={(value) => onChange("department", value)}
-        onIconChange={(value) => onChange("department_icon", value)}
       />
 
       <ProjectProfitRate
