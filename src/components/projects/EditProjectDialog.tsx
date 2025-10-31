@@ -4,6 +4,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { useProjectForm } from "./hooks/useProjectForm";
 import { useProjectSubmit } from "./hooks/useProjectSubmit";
 import { useCompany } from '@/context/CompanyContext';
+import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { EditProjectContent } from "./dialog/EditProjectContent";
@@ -23,6 +24,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState("info");
   const { company } = useCompany();
+  const { departments } = useOfficeSettings();
   const [loadedProject, setLoadedProject] = useState(project);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -111,6 +113,7 @@ export const EditProjectDialog: React.FC<EditProjectDialogProps> = ({
         countries={countries}
         offices={offices}
         officeStages={officeStages}
+        departments={departments}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         updateStageApplicability={updateStageApplicability}

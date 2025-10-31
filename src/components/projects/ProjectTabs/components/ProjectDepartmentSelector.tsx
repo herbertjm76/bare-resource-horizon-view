@@ -16,22 +16,10 @@ const ICON_OPTIONS = [
   { value: 'bar-chart', label: 'Bar Chart', icon: BarChart }
 ];
 
-const DEPARTMENT_OPTIONS = [
-  'Strategy',
-  'Operations',
-  'Technology',
-  'Marketing',
-  'Sales',
-  'Human Resources',
-  'Finance',
-  'Design',
-  'Product',
-  'Other'
-];
-
 interface ProjectDepartmentSelectorProps {
   department?: string;
   departmentIcon?: string;
+  departments: Array<{ id: string; name: string }>;
   onDepartmentChange: (value: string) => void;
   onIconChange: (value: string) => void;
 }
@@ -39,6 +27,7 @@ interface ProjectDepartmentSelectorProps {
 export const ProjectDepartmentSelector: React.FC<ProjectDepartmentSelectorProps> = ({
   department,
   departmentIcon,
+  departments,
   onDepartmentChange,
   onIconChange
 }) => {
@@ -51,9 +40,9 @@ export const ProjectDepartmentSelector: React.FC<ProjectDepartmentSelectorProps>
             <SelectValue placeholder="Select department" />
           </SelectTrigger>
           <SelectContent>
-            {DEPARTMENT_OPTIONS.map((dept) => (
-              <SelectItem key={dept} value={dept}>
-                {dept}
+            {departments.map((dept) => (
+              <SelectItem key={dept.id} value={dept.name}>
+                {dept.name}
               </SelectItem>
             ))}
           </SelectContent>

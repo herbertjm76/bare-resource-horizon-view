@@ -19,6 +19,7 @@ interface EditProjectContentProps {
   countries: string[];
   offices: Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>;
   officeStages: Array<{ id: string; name: string; color?: string }>;
+  departments: Array<{ id: string; name: string }>;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   updateStageApplicability: (stageId: string, isChecked: boolean) => void;
@@ -37,6 +38,7 @@ export const EditProjectContent: React.FC<EditProjectContentProps> = ({
   countries,
   offices,
   officeStages,
+  departments,
   activeTab,
   setActiveTab,
   updateStageApplicability,
@@ -85,6 +87,7 @@ export const EditProjectContent: React.FC<EditProjectContentProps> = ({
               countries={countries}
               offices={offices}
               officeStages={officeStages}
+              departments={departments}
               updateStageApplicability={updateStageApplicability}
               updateStageFee={updateStageFee}
               handleChange={handleChange}

@@ -12,6 +12,7 @@ interface ProjectDialogContentProps {
   countries: string[];
   offices: Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>;
   officeStages: Array<{ id: string; name: string; color?: string }>;
+  departments: Array<{ id: string; name: string }>;
   updateStageApplicability: (stageId: string, isChecked: boolean) => void;
   updateStageFee: (stageId: string, data: any) => void;
   handleChange: (key: string, value: any) => void;
@@ -26,6 +27,7 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
   countries,
   offices,
   officeStages,
+  departments,
   updateStageApplicability,
   updateStageFee,
   handleChange,
@@ -48,6 +50,7 @@ export const ProjectDialogContent: React.FC<ProjectDialogContentProps> = ({
             countries={countries}
             offices={offices}
             officeStages={officeStages}
+            departments={departments}
             updateStageApplicability={updateStageApplicability}
             handleChange={handleChange}
             projectId={projectId}

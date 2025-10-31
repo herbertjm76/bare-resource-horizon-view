@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProjectDialogActions } from './ProjectDialogActions';
 import { submitNewProject } from './NewProjectSubmit';
 import { useCompany } from '@/context/CompanyContext';
+import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
 
 interface NewProjectDialogContentProps {
   onSuccess?: () => void;
@@ -16,6 +17,7 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
   onSuccess
 }) => {
   const { company } = useCompany();
+  const { departments } = useOfficeSettings();
   const {
     form,
     isLoading,
@@ -73,6 +75,7 @@ export const NewProjectDialogContent: React.FC<NewProjectDialogContentProps> = (
           countries={countries}
           offices={offices}
           officeStages={officeStages}
+          departments={departments}
           updateStageApplicability={updateStageApplicability}
           updateStageFee={updateStageFee}
           handleChange={handleChange}

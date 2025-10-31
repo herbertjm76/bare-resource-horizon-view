@@ -9,6 +9,7 @@ interface ProjectInfoTabContentProps {
   countries: string[];
   offices: Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>;
   officeStages: Array<{ id: string; name: string; color?: string }>;
+  departments: Array<{ id: string; name: string }>;
   updateStageApplicability: (stageId: string, isChecked: boolean) => void;
   handleChange: (key: string, value: any) => void;
   projectId?: string;
@@ -20,6 +21,7 @@ export const ProjectInfoTabContent: React.FC<ProjectInfoTabContentProps> = ({
   countries,
   offices,
   officeStages,
+  departments,
   updateStageApplicability,
   handleChange,
   projectId,
@@ -32,6 +34,7 @@ export const ProjectInfoTabContent: React.FC<ProjectInfoTabContentProps> = ({
         countries={countries}
         offices={offices}
         officeStages={officeStages}
+        departments={departments}
         updateStageApplicability={updateStageApplicability}
         statusOptions={[
           { label: "Not started", value: "Planning" },

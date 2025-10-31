@@ -34,6 +34,7 @@ interface ProjectInfoTabProps {
   countries: string[];
   offices: Array<{ id: string; city: string; country: string; code?: string; emoji?: string }>;
   officeStages: Array<{ id: string; name: string; color?: string }>;
+  departments: Array<{ id: string; name: string }>;
   statusOptions: Array<{ label: string; value: string }>;
   onChange: (key: keyof ProjectForm, value: any) => void;
   updateStageApplicability?: (stageId: string, isChecked: boolean) => void;
@@ -46,6 +47,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
   countries,
   offices,
   officeStages,
+  departments,
   statusOptions,
   onChange,
   updateStageApplicability,
@@ -107,6 +109,7 @@ export const ProjectInfoTab: React.FC<ProjectInfoTabProps> = ({
       <ProjectDepartmentSelector
         department={form.department}
         departmentIcon={form.department_icon}
+        departments={departments}
         onDepartmentChange={(value) => onChange("department", value)}
         onIconChange={(value) => onChange("department_icon", value)}
       />
