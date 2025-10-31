@@ -139,122 +139,89 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
           </div>
         </div>
 
-        {/* Project Allocation Bar Graph */}
-        <div className="px-8 mb-6 relative z-10">
+        {/* Interactive Bar Graph with Inline Editing */}
+        <div className="px-8 mb-8 relative z-10">
           <h2 className={`font-semibold text-foreground mb-3 ${
             isFullscreen ? 'text-xl' : 'text-lg'
           }`}>
-            Project Allocations
+            Weekly Allocation
           </h2>
           
-          <div className="w-full h-12 bg-muted/30 rounded-xl overflow-hidden flex shadow-inner">
-            {person.projects && person.projects.length > 0 ? (
-              person.projects.map((project: any, idx: number) => {
-                const percentage = (project.hours / person.capacity) * 100;
-                return (
-                  <Tooltip key={idx}>
-                    <TooltipTrigger asChild>
-                      <div
-                        className="h-full transition-all hover:opacity-80 cursor-pointer relative group"
-                        style={{
-                          width: `${percentage}%`,
-                          backgroundColor: generateMonochromaticShades(idx, person.projects.length),
-                        }}
-                      >
-                        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="text-sm">
-                      <p className="font-semibold">{project.name}</p>
-                      <p className="text-xs">{project.code}</p>
-                      <p className="text-xs mt-1">{project.hours}h ({Math.round(percentage)}%)</p>
-                    </TooltipContent>
-                  </Tooltip>
-                );
-              })
-            ) : (
-              <div className="w-full h-full bg-muted/50 flex items-center justify-center">
-                <span className="text-sm text-muted-foreground">No projects allocated</span>
-              </div>
+          <div className="w-full h-16 bg-muted/20 rounded-xl overflow-hidden flex shadow-inner border border-border/30">
+            {/* Project Segments */}
+            {person.projects && person.projects.length > 0 && person.projects.map((project: any, idx: number) => {
+              const percentage = (project.hours / person.capacity) * 100;
+              return (
+                <EditableProjectAllocation
+                  key={`${project.id}-${refreshKey}`}
+                  memberId={person.id}
+                  projectId={project.id}
+                  projectName={project.name}
+                  projectCode={project.code}
+                  hours={project.hours}
+                  percentage={percentage}
+                  color={generateMonochromaticShades(idx, person.projects.length)}
+                  weekStartDate={weekStartDate}
+                  capacity={person.capacity}
+                  onUpdate={handleDataChange}
+                />
+              );
+            })}
+            
+            {/* Leave Segment */}
+            {totalLeaveHours > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="h-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer hover:brightness-110 transition-all border-r border-white/20"
+                    style={{
+                      width: `${(totalLeaveHours / person.capacity) * 100}%`,
+                      backgroundColor: 'hsl(var(--destructive))',
+                    }}
+                  >
+                    <span>🏖️ {totalLeaveHours}h</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="font-semibold">Leave</p>
+                  <p className="text-xs">{totalLeaveHours}h total</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+            
+            {/* Unallocated Segment */}
+            {person.totalHours + totalLeaveHours < person.capacity && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    className="h-full flex items-center justify-center text-muted-foreground font-medium text-sm cursor-pointer hover:bg-muted/40 transition-all"
+                    style={{
+                      width: `${((person.capacity - person.totalHours - totalLeaveHours) / person.capacity) * 100}%`,
+                      backgroundColor: 'hsl(var(--muted))',
+                    }}
+                  >
+                    <span>Available {person.capacity - person.totalHours - totalLeaveHours}h</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="font-semibold">Unallocated Hours</p>
+                  <p className="text-xs">{person.capacity - person.totalHours - totalLeaveHours}h available</p>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
-        </div>
-
-        {/* Project Cards */}
-        <div className="px-8 mb-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            {person.projects.map((project, idx) => (
-              <EditableProjectAllocation
-                key={`${project.id}-${refreshKey}`}
-                memberId={person.id}
-                projectId={project.id}
-                projectName={project.name}
-                projectCode={project.code}
-                hours={project.hours}
-                percentage={project.percentage}
-                color={generateMonochromaticShades(idx, person.projects.length)}
-                weekStartDate={weekStartDate}
-                capacity={person.capacity}
-                onUpdate={handleDataChange}
-              />
-            ))}
-            
-            <div className="lg:col-span-2">
-              <AddProjectAllocation
-                memberId={person.id}
-                weekStartDate={weekStartDate}
-                existingProjectIds={person.projects.map(p => p.id)}
-                onAdd={handleDataChange}
-              />
-            </div>
+          
+          {/* Add Project Button */}
+          <div className="mt-3">
+            <AddProjectAllocation
+              memberId={person.id}
+              weekStartDate={weekStartDate}
+              existingProjectIds={person.projects.map(p => p.id)}
+              onAdd={handleDataChange}
+            />
           </div>
         </div>
 
-        {/* Leave Information */}
-        {totalLeaveHours > 0 && (
-          <div className="mx-8 mb-6 glass rounded-xl p-5 relative z-10 border border-primary/10">
-            <div className="flex items-center gap-2 mb-4">
-              <Calendar className="h-5 w-5 text-primary" />
-              <h4 className="font-semibold text-foreground">Leave This Week</h4>
-              <Badge variant="outline" className="ml-auto"><CountUpNumber end={totalLeaveHours} duration={1000} />h total</Badge>
-            </div>
-            
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {person.leave?.annualLeave > 0 && (
-                <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
-                  <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
-                    <CountUpNumber end={person.leave.annualLeave} duration={1000} />h
-                  </div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Annual</div>
-                </div>
-              )}
-              {person.leave?.vacationLeave > 0 && (
-                <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
-                  <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
-                    <CountUpNumber end={person.leave.vacationLeave} duration={1000} />h
-                  </div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Vacation</div>
-                </div>
-              )}
-              {person.leave?.medicalLeave > 0 && (
-                <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
-                  <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
-                    <CountUpNumber end={person.leave.medicalLeave} duration={1000} />h
-                  </div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Medical</div>
-                </div>
-              )}
-              {person.leave?.publicHoliday > 0 && (
-                <div className="text-center bg-background/40 rounded-lg p-3 border border-border/30">
-                  <div className={`font-bold text-foreground mb-1 ${isFullscreen ? 'text-2xl' : 'text-xl'}`}>
-                    <CountUpNumber end={person.leave.publicHoliday} duration={1000} />h
-                  </div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wide">Holiday</div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </TooltipProvider>
   );

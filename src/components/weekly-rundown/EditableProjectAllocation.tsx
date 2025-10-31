@@ -121,83 +121,70 @@ export const EditableProjectAllocation: React.FC<EditableProjectAllocationProps>
 
   return (
     <>
-      <div className="glass rounded-lg p-2.5 hover:glass-elevated transition-all duration-300 group">
-        <div className="flex items-center gap-2.5">
-          {/* Color Pill */}
-          <div 
-            className="w-1 h-6 rounded-full flex-shrink-0"
-            style={{ backgroundColor: color || 'hsl(var(--primary))' }}
-          />
-          
-          {/* Project Info */}
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            <span className="text-sm font-semibold text-foreground">
-              {projectCode}
-            </span>
-            <span className="text-sm text-muted-foreground truncate">
-              {projectName}
-            </span>
+      {/* Bar Segment */}
+      <div
+        className="h-full flex items-center justify-center text-white font-semibold text-sm cursor-pointer hover:brightness-110 transition-all border-r border-white/20 relative group"
+        style={{
+          width: `${percentage}%`,
+          backgroundColor: color || 'hsl(var(--primary))',
+        }}
+        onClick={() => !isEditing && setIsEditing(true)}
+      >
+        {isEditing ? (
+          <div className="flex items-center gap-1 px-2">
+            <Input
+              type="number"
+              value={editedHours}
+              onChange={(e) => setEditedHours(e.target.value)}
+              className="w-14 h-7 text-xs text-center bg-white/90"
+              step="0.5"
+              min="0"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSave();
+                if (e.key === 'Escape') handleCancel();
+              }}
+            />
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSave();
+              }}
+              disabled={updateMutation.isPending}
+              className="h-6 w-6 p-0 bg-white/20 hover:bg-white/30"
+            >
+              <Check className="h-3 w-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCancel();
+              }}
+              className="h-6 w-6 p-0 bg-white/20 hover:bg-white/30"
+            >
+              <X className="h-3 w-3" />
+            </Button>
           </div>
-          
-          {/* Hours Badge */}
-          {!isEditing && (
-            <div className="px-2.5 py-1 bg-primary/10 rounded-full">
-              <span className="text-sm font-semibold text-primary">
-                {hours}h
-              </span>
-            </div>
-          )}
-          
-          {/* Edit Controls */}
-          {isEditing ? (
-            <div className="flex items-center gap-1">
-              <Input
-                type="number"
-                value={editedHours}
-                onChange={(e) => setEditedHours(e.target.value)}
-                className="w-16 h-7 text-sm text-right"
-                step="0.5"
-                min="0"
-              />
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleSave}
-                disabled={updateMutation.isPending}
-                className="h-7 w-7 p-0"
-              >
-                <Check className="h-3 w-3" />
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handleCancel}
-                className="h-7 w-7 p-0"
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </div>
-          ) : (
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setIsEditing(true)}
-                className="h-7 w-7 p-0"
-              >
-                <Edit2 className="h-3 w-3" />
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowDeleteDialog(true)}
-                className="h-7 w-7 p-0 text-destructive"
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
-            </div>
-          )}
-        </div>
+        ) : (
+          <>
+            <span>{projectCode} • {hours}h</span>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowDeleteDialog(true);
+              }}
+              className="absolute right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity bg-destructive/80 hover:bg-destructive"
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          </>
+        )}
       </div>
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
