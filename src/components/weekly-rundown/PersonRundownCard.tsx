@@ -98,21 +98,11 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
                   {person.first_name} {person.last_name}
                 </h1>
                 
-                {/* Badges - Upper Right */}
-                <div className="flex flex-col items-end gap-1.5">
-                  <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
-                    <MapPin className="h-3 w-3" />
-                    {person.location}
-                  </Badge>
-                  
-                  <Badge 
-                    variant={status.color as any}
-                    className="flex items-center gap-1 px-2 py-0.5 text-xs"
-                  >
-                    <StatusIcon className="h-3 w-3" />
-                    {status.label}
-                  </Badge>
-                </div>
+                {/* Location Badge */}
+                <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+                  <MapPin className="h-3 w-3" />
+                  {person.location}
+                </Badge>
               </div>
               
               {/* Key Metrics Row */}

@@ -30,7 +30,9 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     startIndex: currentIndex,
     loop: false,
-    align: 'center'
+    align: 'center',
+    containScroll: false,
+    slidesToScroll: 1
   });
 
   const isInitialized = useRef(false);
@@ -132,34 +134,54 @@ export const RundownCarousel: React.FC<RundownCarouselProps> = ({
         </Button>
       </div>
 
-      {/* Carousel */}
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex">
-          {items.map((item, index) => (
-            <div 
-              key={item.id} 
-              className="flex-[0_0_100%] min-w-0 px-4"
-            >
-              <div className="mx-auto max-w-4xl">
-                {rundownMode === 'people' ? (
-                  <PersonRundownCard 
-                    person={item} 
-                    isActive={index === currentIndex}
-                    isFullscreen={isFullscreen}
-                    selectedWeek={selectedWeek}
-                  />
-                ) : (
-                  <ProjectRundownCard 
-                    project={item} 
-                    isActive={index === currentIndex}
-                    isFullscreen={isFullscreen}
-                    selectedWeek={selectedWeek}
-                    onDataChange={() => {}}
-                  />
-                )}
+      {/* Carousel with iTunes Coverflow Effect */}
+      <div className="overflow-visible perspective-[2000px]" ref={emblaRef}>
+        <div className="flex" style={{ transformStyle: 'preserve-3d' }}>
+          {items.map((item, index) => {
+            const distance = Math.abs(index - currentIndex);
+            const isActive = index === currentIndex;
+            const position = index - currentIndex;
+            
+            return (
+              <div 
+                key={item.id} 
+                className={`
+                  flex-[0_0_60%] min-w-0 px-4
+                  transition-all duration-500 ease-out
+                  ${isActive ? 'z-30' : ''}
+                  ${distance === 1 ? 'z-20' : ''}
+                  ${distance > 1 ? 'z-10' : ''}
+                `}
+                style={{
+                  transform: isActive 
+                    ? 'scale(1) rotateY(0deg) translateZ(0)' 
+                    : distance === 1
+                      ? `scale(0.85) rotateY(${position * 25}deg) translateZ(-150px)`
+                      : `scale(0.7) rotateY(${position * 25}deg) translateZ(-250px)`,
+                  opacity: isActive ? 1 : distance === 1 ? 0.6 : 0.3,
+                }}
+              >
+                <div className="mx-auto max-w-4xl">
+                  {rundownMode === 'people' ? (
+                    <PersonRundownCard 
+                      person={item} 
+                      isActive={index === currentIndex}
+                      isFullscreen={isFullscreen}
+                      selectedWeek={selectedWeek}
+                    />
+                  ) : (
+                    <ProjectRundownCard 
+                      project={item} 
+                      isActive={index === currentIndex}
+                      isFullscreen={isFullscreen}
+                      selectedWeek={selectedWeek}
+                      onDataChange={() => {}}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
