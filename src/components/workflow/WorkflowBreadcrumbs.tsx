@@ -32,14 +32,6 @@ export const WorkflowBreadcrumbs: React.FC = () => {
           { label: 'Financial Control' }
         );
         break;
-      case '/project-monitoring':
-        breadcrumbs.push(
-          { label: 'Project Setup & Planning', href: '/projects' },
-          { label: 'Resource Allocation', href: '/project-resourcing' },
-          { label: 'Financial Control', href: '/financial-control' },
-          { label: 'Progress Monitoring' }
-        );
-        break;
       case '/team-members':
         breadcrumbs.push({ label: 'Team Members' });
         break;

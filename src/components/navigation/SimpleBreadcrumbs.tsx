@@ -37,12 +37,6 @@ export const SimpleBreadcrumbs: React.FC = () => {
           { label: 'Financial Control' }
         );
         break;
-      case '/project-monitoring':
-        breadcrumbs.push(
-          { label: 'Projects', href: '/projects' },
-          { label: 'Progress Monitoring' }
-        );
-        break;
       default:
         return [];
     }

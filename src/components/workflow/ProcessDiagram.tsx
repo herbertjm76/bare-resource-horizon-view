@@ -62,15 +62,6 @@ export const ProcessDiagram: React.FC = () => {
       route: '/financial-control',
       color: 'bg-yellow-500',
       status: 'upcoming'
-    },
-    {
-      id: '5',
-      title: 'Monitor Progress',
-      description: 'Review project health, team workload, and overall performance',
-      icon: TrendingUp,
-      route: '/project-monitoring',
-      color: 'bg-red-500',
-      status: 'upcoming'
     }
   ];
 

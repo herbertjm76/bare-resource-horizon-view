@@ -59,11 +59,6 @@ export const navigationItems = [
       //   url: "/financial-control",
       //   icon: DollarSign,
       // },
-      {
-        title: "Monitoring",
-        url: "/project-monitoring",
-        icon: TrendingUp,
-      },
     ],
   },
   // {

@@ -23,7 +23,7 @@ export const WorkflowBreadcrumbs: React.FC = () => {
     ];
 
     // Only show workflow breadcrumbs for workflow pages
-    const workflowPages = ['/projects', '/project-resourcing', '/financial-control', '/project-monitoring'];
+    const workflowPages = ['/projects', '/project-resourcing', '/financial-control'];
     if (!workflowPages.includes(pathname)) {
       return [];
     }
@@ -44,12 +44,6 @@ export const WorkflowBreadcrumbs: React.FC = () => {
           { label: 'Financial Control' }
         );
         break;
-      case '/project-monitoring':
-        breadcrumbs.push(
-          { label: 'Projects', href: '/projects' },
-          { label: 'Progress Monitoring' }
-        );
-        break;
       default:
         return [];
     }
@@ -63,7 +57,7 @@ export const WorkflowBreadcrumbs: React.FC = () => {
         name: 'Project Setup', 
         href: '/projects',
         status: pathname === '/projects' ? 'current' : 
-                ['/project-resourcing', '/financial-control', '/project-monitoring'].includes(pathname) ? 'completed' : 'upcoming'
+                ['/project-resourcing', '/financial-control'].includes(pathname) ? 'completed' : 'upcoming'
       },
       { 
         name: 'Resource Planning', 
@@ -76,11 +70,6 @@ export const WorkflowBreadcrumbs: React.FC = () => {
         href: '/financial-control',
         status: pathname === '/financial-control' ? 'current' :
                 ['/projects', '/project-resourcing'].includes(pathname) ? 'upcoming' : 'completed'
-      },
-      { 
-        name: 'Progress Monitoring', 
-        href: '/project-monitoring',
-        status: pathname === '/project-monitoring' ? 'current' : 'upcoming'
       }
     ];
 

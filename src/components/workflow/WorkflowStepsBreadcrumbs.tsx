@@ -46,14 +46,6 @@ export const WorkflowStepsBreadcrumbs: React.FC<WorkflowStepsBreadcrumbsProps> =
           { label: 'Financial Control' }
         );
         break;
-      case '/project-monitoring':
-        breadcrumbs.push(
-          { label: 'Project Setup & Planning', href: '/projects' },
-          { label: 'Resource Allocation', href: '/project-resourcing' },
-          { label: 'Financial Control', href: '/financial-control' },
-          { label: 'Progress Monitoring' }
-        );
-        break;
       default:
         return [];
     }
@@ -67,7 +59,7 @@ export const WorkflowStepsBreadcrumbs: React.FC<WorkflowStepsBreadcrumbsProps> =
         name: 'Project Setup', 
         href: '/projects',
         status: pathname === '/projects' ? 'current' : 
-                ['/project-resourcing', '/financial-control', '/project-monitoring'].includes(pathname) ? 'completed' : 'upcoming'
+                ['/project-resourcing', '/financial-control'].includes(pathname) ? 'completed' : 'upcoming'
       },
       { 
         name: 'Resource Planning', 
@@ -80,11 +72,6 @@ export const WorkflowStepsBreadcrumbs: React.FC<WorkflowStepsBreadcrumbsProps> =
         href: '/financial-control',
         status: pathname === '/financial-control' ? 'current' :
                 ['/projects', '/project-resourcing'].includes(pathname) ? 'upcoming' : 'completed'
-      },
-      { 
-        name: 'Progress Monitoring', 
-        href: '/project-monitoring',
-        status: pathname === '/project-monitoring' ? 'current' : 'upcoming'
       }
     ];
 

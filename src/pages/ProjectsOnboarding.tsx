@@ -47,21 +47,6 @@ const ProjectsOnboarding = () => {
       ],
       color: 'bg-blue-500',
       borderColor: 'border-blue-500/20'
-    },
-    {
-      step: 3,
-      title: 'Progress Monitoring',
-      description: 'Track project progress, monitor KPIs, and generate comprehensive reports',
-      icon: BarChart3,
-      route: '/project-monitoring',
-      features: [
-        'Progress tracking',
-        'Performance metrics',
-        'Status reporting',
-        'Analytics dashboard'
-      ],
-      color: 'bg-purple-500',
-      borderColor: 'border-purple-500/20'
     }
   ];
 
