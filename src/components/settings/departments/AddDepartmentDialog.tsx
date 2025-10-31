@@ -3,14 +3,18 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
 import { Department } from "@/context/officeSettings/types";
+import { IconPicker } from "./IconPicker";
 
 interface AddDepartmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   newDepartmentName: string;
   setNewDepartmentName: (name: string) => void;
+  newDepartmentIcon: string;
+  setNewDepartmentIcon: (icon: string) => void;
   onSubmit: () => void;
   editingDepartment: Department | null;
   isSubmitting: boolean;
@@ -22,6 +26,8 @@ export const AddDepartmentDialog: React.FC<AddDepartmentDialogProps> = ({
   onOpenChange,
   newDepartmentName,
   setNewDepartmentName,
+  newDepartmentIcon,
+  setNewDepartmentIcon,
   onSubmit,
   editingDepartment,
   isSubmitting,
@@ -47,12 +53,19 @@ export const AddDepartmentDialog: React.FC<AddDepartmentDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <Input
-            placeholder="Enter department name..."
-            value={newDepartmentName}
-            onChange={(e) => setNewDepartmentName(e.target.value)}
-            onKeyPress={handleKeyPress}
-            autoFocus
+          <div>
+            <Label>Department Name</Label>
+            <Input
+              placeholder="Enter department name..."
+              value={newDepartmentName}
+              onChange={(e) => setNewDepartmentName(e.target.value)}
+              onKeyPress={handleKeyPress}
+              autoFocus
+            />
+          </div>
+          <IconPicker 
+            selectedIcon={newDepartmentIcon}
+            onIconChange={setNewDepartmentIcon}
           />
           <div className="flex gap-2 justify-end">
             <Button variant="outline" onClick={handleCancel}>

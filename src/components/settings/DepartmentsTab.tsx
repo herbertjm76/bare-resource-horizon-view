@@ -18,6 +18,8 @@ export const DepartmentsTab = () => {
     editingDepartment,
     newDepartmentName,
     setNewDepartmentName,
+    newDepartmentIcon,
+    setNewDepartmentIcon,
     editMode,
     selectedDepartments,
     isSubmitting,
@@ -84,6 +86,8 @@ export const DepartmentsTab = () => {
             onOpenChange={(open) => !open && handleCancel()}
             newDepartmentName={newDepartmentName}
             setNewDepartmentName={setNewDepartmentName}
+            newDepartmentIcon={newDepartmentIcon}
+            setNewDepartmentIcon={setNewDepartmentIcon}
             onSubmit={handleSubmit}
             editingDepartment={editingDepartment}
             isSubmitting={isSubmitting}

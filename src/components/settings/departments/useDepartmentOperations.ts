@@ -11,6 +11,7 @@ export const useDepartmentOperations = (
 ) => {
   const [editingDepartment, setEditingDepartment] = useState<Department | null>(null);
   const [newDepartmentName, setNewDepartmentName] = useState("");
+  const [newDepartmentIcon, setNewDepartmentIcon] = useState("briefcase");
   const [editMode, setEditMode] = useState(false);
   const [selectedDepartments, setSelectedDepartments] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +25,10 @@ export const useDepartmentOperations = (
       if (editingDepartment) {
         const { data, error } = await supabase
           .from('office_departments')
-          .update({ name: newDepartmentName.trim() })
+          .update({ 
+            name: newDepartmentName.trim(),
+            icon: newDepartmentIcon
+          })
           .eq('id', editingDepartment.id)
           .select()
           .single();
@@ -40,6 +44,7 @@ export const useDepartmentOperations = (
           .from('office_departments')
           .insert([{
             name: newDepartmentName.trim(),
+            icon: newDepartmentIcon,
             company_id: companyId
           }])
           .select()
@@ -52,6 +57,7 @@ export const useDepartmentOperations = (
       }
 
       setNewDepartmentName("");
+      setNewDepartmentIcon("briefcase");
       setEditingDepartment(null);
       setShowAddForm(false);
     } catch (error) {
@@ -65,6 +71,7 @@ export const useDepartmentOperations = (
   const handleEdit = (department: Department) => {
     setEditingDepartment(department);
     setNewDepartmentName(department.name);
+    setNewDepartmentIcon(department.icon || "briefcase");
     setShowAddForm(true);
   };
 
@@ -121,6 +128,7 @@ export const useDepartmentOperations = (
   const handleCancel = () => {
     setEditingDepartment(null);
     setNewDepartmentName("");
+    setNewDepartmentIcon("briefcase");
     setShowAddForm(false);
   };
 
@@ -131,6 +139,7 @@ export const useDepartmentOperations = (
       setShowAddForm(false);
       setEditingDepartment(null);
       setNewDepartmentName("");
+      setNewDepartmentIcon("briefcase");
     }
   };
 
@@ -139,6 +148,7 @@ export const useDepartmentOperations = (
     if (!showAddForm) {
       setEditingDepartment(null);
       setNewDepartmentName("");
+      setNewDepartmentIcon("briefcase");
     }
   };
 
@@ -146,6 +156,8 @@ export const useDepartmentOperations = (
     editingDepartment,
     newDepartmentName,
     setNewDepartmentName,
+    newDepartmentIcon,
+    setNewDepartmentIcon,
     editMode,
     selectedDepartments,
     isSubmitting,
