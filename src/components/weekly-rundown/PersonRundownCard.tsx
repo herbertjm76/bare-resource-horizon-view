@@ -180,9 +180,9 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
           </div>
         </div>
 
-        {/* Project List */}
+        {/* Project Cards */}
         <div className="px-8 mb-8 relative z-10">
-          <div className="space-y-2.5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {person.projects.map((project, idx) => (
               <EditableProjectAllocation
                 key={`${project.id}-${refreshKey}`}
@@ -199,7 +199,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
               />
             ))}
             
-            <div className="pt-2">
+            <div className="lg:col-span-2">
               <AddProjectAllocation
                 memberId={person.id}
                 weekStartDate={weekStartDate}
