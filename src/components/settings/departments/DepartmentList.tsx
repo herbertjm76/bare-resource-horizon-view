@@ -79,43 +79,45 @@ export const DepartmentList: React.FC<DepartmentListProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
       {departments.map((department) => {
         const IconComponent = ICON_MAP[department.icon || 'briefcase'] || Briefcase;
         
         return (
-          <Card key={department.id} className="p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+          <Card key={department.id} className="p-3 hover:shadow-md transition-shadow group">
+            <div className="flex items-center justify-between gap-2 min-w-0">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
                 {editMode && (
                   <input
                     type="checkbox"
                     checked={selectedDepartments.includes(department.id)}
                     onChange={() => onSelectDepartment(department.id)}
-                    className="rounded"
+                    className="rounded flex-shrink-0"
                   />
                 )}
-                <IconComponent className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium text-sm">{department.name}</span>
+                <IconComponent className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="font-medium text-sm truncate">{department.name}</span>
               </div>
-            {editMode && (
-              <div className="flex gap-1">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onEdit(department)}
-                >
-                  <Edit className="h-3 w-3" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onDelete(department)}
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              </div>
-            )}
+              {editMode && (
+                <div className="flex gap-1 flex-shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => onEdit(department)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => onDelete(department)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              )}
             </div>
           </Card>
         );
