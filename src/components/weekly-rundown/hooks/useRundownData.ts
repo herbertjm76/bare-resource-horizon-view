@@ -117,6 +117,7 @@ export const useRundownData = ({
           totalHours,
           status: project.status,
           office: project.office?.name,
+          department: project.department,
           teamMembers
         };
       })
