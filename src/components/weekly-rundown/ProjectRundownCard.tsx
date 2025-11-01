@@ -77,34 +77,42 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
     `}>
       {/* Hero Section */}
       <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-8 pb-6">
-        <div className="flex items-start gap-6">
-          {/* Simple Line Art Icon */}
+        <div className="flex items-start gap-4">
+          {/* Small Line Art Icon */}
           <div className="relative">
-            <ProjectIcon className={`${isFullscreen ? 'h-16 w-16' : 'h-12 w-12'} text-primary`} />
-            {/* Hours Badge */}
-            <Badge className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground shadow-lg px-2 py-1 text-xs font-bold">
-              <Clock className="h-3 w-3 mr-1" />
-              {project.totalHours}h
-            </Badge>
+            <ProjectIcon className={`${isFullscreen ? 'h-10 w-10' : 'h-8 w-8'} text-primary`} />
           </div>
           
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-4 mb-2">
-              <h1 className={`font-bold text-foreground tracking-tight ${
-                isFullscreen ? 'text-5xl' : 'text-4xl'
-              }`}>
-                {project.name}
-              </h1>
+              <div className="flex-1 min-w-0">
+                {/* Project Code - Large and prominent */}
+                <h1 className={`font-bold text-foreground tracking-tight mb-2 ${
+                  isFullscreen ? 'text-5xl' : 'text-4xl'
+                }`}>
+                  {project.code}
+                </h1>
+                
+                {/* Project Name - Secondary */}
+                <h2 className={`font-semibold text-muted-foreground mb-1 ${
+                  isFullscreen ? 'text-2xl' : 'text-xl'
+                }`}>
+                  {project.name}
+                </h2>
+                
+                {/* Department - Tertiary */}
+                {project.department && (
+                  <p className="text-sm text-muted-foreground">
+                    {project.department}
+                  </p>
+                )}
+              </div>
               
               {/* Badges - Upper Right */}
               <div className="flex flex-col items-end gap-1.5">
-                {project.department && (
-                  <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
-                    {project.department}
-                  </Badge>
-                )}
-                <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium">
-                  {project.code}
+                <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+                  <Clock className="h-3 w-3" />
+                  {project.totalHours}h
                 </Badge>
                 {project.office && (
                   <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">

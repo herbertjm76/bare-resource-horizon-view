@@ -210,14 +210,17 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
       <TooltipTrigger asChild>
         <div className="glass-card glass-hover rounded-2xl border-0 p-5 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
           <div className="flex items-start gap-3 mb-4 relative z-10">
-            {/* Simple Line Art Icon */}
-            <ProjectIcon className="h-8 w-8 text-primary flex-shrink-0" />
+            {/* Small Line Art Icon */}
+            <ProjectIcon className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
             
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-base truncate mb-1">{project.name}</h3>
-              <p className="text-sm text-muted-foreground font-medium">{project.code}</p>
+              {/* Project Code - Large and prominent */}
+              <h3 className="font-bold text-xl truncate mb-1">{project.code}</h3>
+              {/* Project Name - Secondary */}
+              <p className="text-sm text-muted-foreground font-medium truncate mb-0.5">{project.name}</p>
+              {/* Department - Tertiary */}
               {project.department && (
-                <p className="text-xs text-muted-foreground truncate mt-0.5">{project.department}</p>
+                <p className="text-xs text-muted-foreground truncate">{project.department}</p>
               )}
             </div>
             <Badge variant="secondary" className="text-sm font-bold px-3 py-1 flex-shrink-0">
