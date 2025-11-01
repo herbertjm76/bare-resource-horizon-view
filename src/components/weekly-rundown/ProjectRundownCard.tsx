@@ -153,14 +153,8 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
 
       {/* Team Members Avatars */}
       <div className="px-8 mb-8 relative z-10">
-        <h2 className={`font-semibold text-foreground mb-4 ${
-          isFullscreen ? 'text-xl' : 'text-lg'
-        }`}>
-          Team Allocation
-        </h2>
-        
         {project.teamMembers.length > 0 ? (
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 justify-center">
             {sortedMembers.map((member) => (
               <TeamMemberAvatar
                 key={member.id}
