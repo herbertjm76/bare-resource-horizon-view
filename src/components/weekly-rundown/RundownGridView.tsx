@@ -208,22 +208,22 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
     <>
     <Tooltip>
       <TooltipTrigger asChild>
-        <div className="glass-card glass-hover rounded-2xl border-0 p-5 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
-          <div className="flex items-start gap-3 mb-4 relative z-10">
+        <div className="glass-card glass-hover rounded-2xl border-0 p-4 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
+          <div className="flex items-start gap-2.5 mb-3 relative z-10">
             {/* Small Line Art Icon */}
-            <ProjectIcon className="h-6 w-6 text-primary flex-shrink-0 mt-1" />
+            <ProjectIcon className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
             
             <div className="flex-1 min-w-0">
               {/* Project Code - Large and prominent */}
-              <h3 className="font-bold text-xl truncate mb-1">{project.code}</h3>
+              <h3 className="font-bold text-lg truncate mb-0.5">{project.code}</h3>
               {/* Project Name - Secondary */}
-              <p className="text-sm text-muted-foreground font-medium truncate mb-0.5">{project.name}</p>
+              <p className="text-xs text-muted-foreground font-medium truncate mb-0.5">{project.name}</p>
               {/* Department - Tertiary */}
               {project.department && (
-                <p className="text-xs text-muted-foreground truncate">{project.department}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{project.department}</p>
               )}
             </div>
-            <Badge variant="secondary" className="text-sm font-bold px-3 py-1 flex-shrink-0">
+            <Badge variant="secondary" className="text-xs font-bold px-2.5 py-1 flex-shrink-0">
               {((project.totalHours || 0) / 40).toFixed(1)} FTE
             </Badge>
           </div>
@@ -233,8 +233,8 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
             {/* Team Member Avatars */}
             {project.teamMembers && project.teamMembers.length > 0 && (
               <div>
-                <p className="text-xs text-muted-foreground mb-2">Team Members</p>
-                <div className="flex flex-wrap gap-3">
+                <p className="text-[10px] text-muted-foreground mb-2 font-medium">Team</p>
+                <div className="flex flex-wrap gap-3 justify-center">
                   {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
                     <Tooltip key={idx}>
                       <TooltipTrigger>
@@ -246,8 +246,8 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex flex-col items-center gap-0.5">
-                            <p className="text-xs font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
-                            <Badge className="bg-primary text-primary-foreground shadow-md px-2 py-0.5 text-xs font-bold">
+                            <p className="text-[10px] font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
+                            <Badge className="bg-primary text-primary-foreground shadow-md px-2 py-0.5 text-[10px] font-bold">
                               {Math.round(member.hours || 0)}h
                             </Badge>
                           </div>
@@ -267,6 +267,20 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
                 </div>
               </div>
             )}
+
+            {/* Stats Row */}
+            <div className="flex items-center justify-between pt-2 mt-2 border-t border-border/50">
+              <div className="flex items-center gap-1.5">
+                <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold">{project.teamMembers?.length || 0}</span>
+                <span className="text-[10px] text-muted-foreground">team</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold">{project.totalHours || 0}h</span>
+                <span className="text-[10px] text-muted-foreground">total</span>
+              </div>
+            </div>
 
             {/* Edit Button */}
             <div className="flex justify-end mt-2">
