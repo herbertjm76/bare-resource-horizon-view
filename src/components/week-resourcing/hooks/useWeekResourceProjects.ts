@@ -23,7 +23,7 @@ export const useWeekResourceProjects = ({ filters, enabled = true }: UseWeekReso
       
       const { data, error } = await supabase
         .from('projects')
-        .select('id, code, name, status')
+        .select('id, code, name, status, department')
         .eq('company_id', company.id)
         .order('code');
 

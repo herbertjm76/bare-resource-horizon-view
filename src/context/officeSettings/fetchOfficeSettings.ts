@@ -43,7 +43,7 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       // Using 'any' type to bypass TypeScript checking since the table was just created
       const { data, error } = await (supabase
         .from('office_departments' as any)
-        .select('id, name, company_id')
+        .select('id, name, company_id, icon')
         .eq('company_id', companyId) as any);
       
       if (error) throw error;
@@ -104,7 +104,8 @@ export const fetchOfficeSettings = async (companyId: string): Promise<OfficeSett
       ? departmentsData.map((dept: any) => ({
           id: dept.id,
           name: dept.name,
-          company_id: (dept.company_id ?? companyId).toString()
+          company_id: (dept.company_id ?? companyId).toString(),
+          icon: dept.icon || undefined
         }))
       : [];
       

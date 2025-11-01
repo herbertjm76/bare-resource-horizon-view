@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Users, Clock, Activity, Briefcase, Building, Palette, Code, Sparkles, Rocket, Target, Zap, TrendingUp } from 'lucide-react';
+import { MapPin, Users, Clock, Activity, Briefcase, Building, Palette, Code, Sparkles, Rocket, Target, Zap, TrendingUp, Circle } from 'lucide-react';
 import { TeamMemberAvatar } from './TeamMemberAvatar';
 import { AddTeamMemberAllocation } from './AddTeamMemberAllocation';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
@@ -48,20 +48,20 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
 
   // Get the icon component for the department from office settings
   const getIconComponent = () => {
-    if (!project.department) return Briefcase;
+    if (!project.department) return Circle;
     
     // Find the department in office settings
     const departmentData = departments.find(d => d.name === project.department);
-    if (!departmentData?.icon) return Briefcase;
+    if (!departmentData?.icon) return Circle;
     
-    // Convert icon name to PascalCase (e.g., 'briefcase' -> 'Briefcase')
+    // Convert icon name to PascalCase (e.g., 'circle' -> 'Circle')
     const iconName = departmentData.icon
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join('');
     
     const IconComponent = (LucideIcons as any)[iconName];
-    return IconComponent || Briefcase;
+    return IconComponent || Circle;
   };
 
   const ProjectIcon = getIconComponent();
