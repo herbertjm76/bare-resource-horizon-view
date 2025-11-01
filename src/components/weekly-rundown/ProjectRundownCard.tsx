@@ -74,6 +74,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       transition-all duration-500 ease-out
       before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none
       overflow-hidden
+      flex flex-col
     `}>
       {/* Hero Section */}
       <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-6">
@@ -152,32 +153,30 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       </div>
 
       {/* Team Members Avatars */}
-      <div className="px-6 py-6 relative z-10 flex items-center justify-center min-h-[160px]">
+      <div className="px-6 py-8 relative z-10 flex items-center justify-center flex-1">
         {project.teamMembers.length > 0 ? (
-          <>
-            <div className="flex flex-col items-center w-full">
-              <div className="flex flex-wrap gap-4 justify-center">
-                {sortedMembers.map((member) => (
-                  <TeamMemberAvatar
-                    key={member.id}
-                    member={member}
-                    projectId={project.id}
-                    weekStartDate={weekStartDateString}
-                    onUpdate={onDataChange}
-                  />
-                ))}
-              </div>
-              
-              <div className="flex justify-center mt-4">
-                <AddTeamMemberAllocation
+          <div className="flex flex-col items-center justify-center w-full gap-4">
+            <div className="flex flex-wrap gap-4 justify-center">
+              {sortedMembers.map((member) => (
+                <TeamMemberAvatar
+                  key={member.id}
+                  member={member}
                   projectId={project.id}
                   weekStartDate={weekStartDateString}
-                  existingMemberIds={project.teamMembers.map(m => m.id)}
-                  onAdd={onDataChange}
+                  onUpdate={onDataChange}
                 />
-              </div>
+              ))}
             </div>
-          </>
+            
+            <div className="flex justify-center">
+              <AddTeamMemberAllocation
+                projectId={project.id}
+                weekStartDate={weekStartDateString}
+                existingMemberIds={project.teamMembers.map(m => m.id)}
+                onAdd={onDataChange}
+              />
+            </div>
+          </div>
         ) : (
           <div className="text-center py-6 bg-muted/20 rounded-xl border border-border/30">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted/30 mb-2">
