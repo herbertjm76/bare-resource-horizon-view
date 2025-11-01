@@ -118,6 +118,11 @@ export const WeeklyRundownView: React.FC = () => {
 
   return (
     <div className={`space-y-6 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8' : ''}`}>
+      <WeeklySummaryCards 
+        selectedWeek={selectedWeek}
+        memberIds={memberIds}
+      />
+
       <RundownControls
         selectedWeek={selectedWeek}
         onWeekChange={handleWeekChange}
@@ -134,11 +139,6 @@ export const WeeklyRundownView: React.FC = () => {
         onFullscreenToggle={handleFullscreenToggle}
         currentIndex={currentIndex}
         totalItems={rundownItems.length}
-      />
-
-      <WeeklySummaryCards 
-        selectedWeek={selectedWeek}
-        memberIds={memberIds}
       />
 
       {viewType === 'carousel' ? (
