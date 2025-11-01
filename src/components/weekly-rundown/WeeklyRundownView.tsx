@@ -4,6 +4,7 @@ import { useStreamlinedWeekResourceData } from '@/components/week-resourcing/hoo
 import { RundownControls } from './RundownControls';
 import { RundownCarousel } from './RundownCarousel';
 import { RundownGridView } from './RundownGridView';
+import { WeeklySummaryCards } from './WeeklySummaryCards';
 import { useRundownData } from './hooks/useRundownData';
 import { useCarouselNavigation } from './hooks/useCarouselNavigation';
 
@@ -109,6 +110,12 @@ export const WeeklyRundownView: React.FC = () => {
     );
   }
 
+  // Get all member IDs for summary cards
+  const memberIds = useMemo(() => 
+    allMembers.map(m => m.id),
+    [allMembers]
+  );
+
   return (
     <div className={`space-y-6 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8' : ''}`}>
       <RundownControls
@@ -127,6 +134,11 @@ export const WeeklyRundownView: React.FC = () => {
         onFullscreenToggle={handleFullscreenToggle}
         currentIndex={currentIndex}
         totalItems={rundownItems.length}
+      />
+
+      <WeeklySummaryCards 
+        selectedWeek={selectedWeek}
+        memberIds={memberIds}
       />
 
       {viewType === 'carousel' ? (
