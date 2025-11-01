@@ -61,6 +61,12 @@ export const WeeklyRundownView: React.FC = () => {
     return `Week of ${format(weekStart, 'MMM d, yyyy')}`;
   }, [selectedWeek]);
 
+  // Get all member IDs for summary cards
+  const memberIds = useMemo(() => 
+    allMembers.map(m => m.id),
+    [allMembers]
+  );
+
   const handleWeekChange = (date: Date) => {
     setSelectedWeek(date);
   };
@@ -109,12 +115,6 @@ export const WeeklyRundownView: React.FC = () => {
       </div>
     );
   }
-
-  // Get all member IDs for summary cards
-  const memberIds = useMemo(() => 
-    allMembers.map(m => m.id),
-    [allMembers]
-  );
 
   return (
     <div className={`space-y-6 ${isFullscreen ? 'fixed inset-0 z-50 bg-background p-8' : ''}`}>
