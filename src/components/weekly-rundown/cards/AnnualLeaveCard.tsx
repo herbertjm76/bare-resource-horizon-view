@@ -43,6 +43,23 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
     enabled: memberIds.length > 0
   });
 
+  // Fetch pre-registered invites
+  const { data: invites = [] } = useQuery({
+    queryKey: ['member-invites-leave', memberIds],
+    queryFn: async () => {
+      if (memberIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from('invites')
+        .select('id, first_name, last_name')
+        .in('id', memberIds)
+        .eq('invitation_type', 'pre_registered');
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: memberIds.length > 0
+  });
+
   return (
     <Card>
       <CardHeader className="pb-3">
@@ -61,8 +78,10 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
             {memberIds.map((id) => {
               const leaveDays = leaveByMember[id];
               const profile = profiles.find((p: any) => p.id === id);
-              const firstName = profile?.first_name || 'Unknown';
-              const lastName = profile?.last_name || 'User';
+              const invite = invites.find((i: any) => i.id === id);
+              
+              const firstName = profile?.first_name || invite?.first_name || 'Unknown';
+              const lastName = profile?.last_name || invite?.last_name || 'User';
               const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
               const avatarUrl = profile?.avatar_url || '';
               
