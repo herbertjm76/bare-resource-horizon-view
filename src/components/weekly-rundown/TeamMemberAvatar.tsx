@@ -200,9 +200,11 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
                 </div>
                 
                 {/* Name and hours below avatar */}
-                <div className="text-center">
+                <div className="flex flex-col items-center gap-1">
                   <p className="font-semibold text-sm text-foreground">{firstName}</p>
-                  <p className="text-xs text-muted-foreground font-medium">{member.hours}h</p>
+                  <Badge className="bg-primary text-primary-foreground shadow-md px-3 py-1 text-sm font-bold">
+                    {member.hours}h
+                  </Badge>
                 </div>
               </div>
             </TooltipTrigger>

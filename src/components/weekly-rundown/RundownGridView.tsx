@@ -234,19 +234,22 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
             {project.teamMembers && project.teamMembers.length > 0 && (
               <div>
                 <p className="text-xs text-muted-foreground mb-2">Team Members</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-3">
                   {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
                     <Tooltip key={idx}>
                       <TooltipTrigger>
-                        <div className="relative inline-flex">
-                          <Avatar className="h-10 w-10">
+                        <div className="flex flex-col items-center gap-1.5">
+                          <Avatar className="h-12 w-12 ring-2 ring-primary/20 shadow-md">
                             <AvatarImage src={member.avatar} alt={member.name} />
                             <AvatarFallback className="text-xs bg-gradient-modern text-white">
                               {member.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
                             </AvatarFallback>
                           </Avatar>
-                          <div className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold rounded-full px-1.5 py-0.5 shadow-md border border-background">
-                            {Math.round(member.hours || 0)}h
+                          <div className="flex flex-col items-center gap-0.5">
+                            <p className="text-xs font-semibold text-foreground">{member.name?.split(' ')[0]}</p>
+                            <Badge className="bg-primary text-primary-foreground shadow-md px-2 py-0.5 text-xs font-bold">
+                              {Math.round(member.hours || 0)}h
+                            </Badge>
                           </div>
                         </div>
                       </TooltipTrigger>
