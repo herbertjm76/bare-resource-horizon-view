@@ -76,7 +76,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
       <div className={`
         relative rounded-3xl glass-card glass-hover shadow-2xl
         ${isActive ? 'ring-2 ring-primary/50 glass-elevated scale-[1.02]' : ''}
-        ${isFullscreen ? 'h-[80vh]' : 'min-h-[500px]'}
+        ${isFullscreen ? 'h-[60vh]' : 'min-h-[500px]'}
         transition-all duration-500 ease-out
         before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none
         overflow-hidden
