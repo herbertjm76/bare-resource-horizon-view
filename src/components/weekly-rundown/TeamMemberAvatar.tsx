@@ -126,9 +126,9 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
       <div className="relative group">
         {isEditing ? (
           <div className="flex flex-col items-center gap-2 p-2 bg-background/90 backdrop-blur-sm rounded-lg border border-border">
-            <Avatar className="h-16 w-16 ring-2 ring-primary/20 shadow-lg">
+            <Avatar className="h-24 w-24 ring-2 ring-primary/20 shadow-lg">
               <AvatarImage src={member.avatar} />
-              <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm">
+              <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm text-lg">
                 {firstName.charAt(0)}{lastName.charAt(0)}
               </AvatarFallback>
             </Avatar>
@@ -163,41 +163,46 @@ export const TeamMemberAvatar: React.FC<TeamMemberAvatarProps> = ({
         ) : (
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="relative cursor-pointer">
-                <Avatar className="h-16 w-16 ring-2 ring-primary/20 shadow-lg hover:ring-primary/40 transition-all hover:scale-105">
-                  <AvatarImage src={member.avatar} />
-                  <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm">
-                    {firstName.charAt(0)}{lastName.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <Badge className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground shadow-lg px-2 py-0.5 text-xs font-bold">
-                  {member.hours}h
-                </Badge>
+              <div className="relative cursor-pointer flex flex-col items-center gap-2">
+                <div className="relative">
+                  <Avatar className="h-24 w-24 ring-2 ring-primary/20 shadow-lg hover:ring-primary/40 transition-all hover:scale-105">
+                    <AvatarImage src={member.avatar} />
+                    <AvatarFallback className="bg-gradient-modern text-white backdrop-blur-sm text-lg">
+                      {firstName.charAt(0)}{lastName.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  
+                  {/* Edit/Delete buttons on hover */}
+                  <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsEditing(true);
+                      }}
+                      className="h-6 w-6 p-0 rounded-full shadow-lg"
+                    >
+                      <Check className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowDeleteDialog(true);
+                      }}
+                      className="h-6 w-6 p-0 rounded-full shadow-lg"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
                 
-                {/* Edit/Delete buttons on hover */}
-                <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setIsEditing(true);
-                    }}
-                    className="h-6 w-6 p-0 rounded-full shadow-lg"
-                  >
-                    <Check className="h-3 w-3" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowDeleteDialog(true);
-                    }}
-                    className="h-6 w-6 p-0 rounded-full shadow-lg"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
+                {/* Name and hours below avatar */}
+                <div className="text-center">
+                  <p className="font-semibold text-sm text-foreground">{firstName}</p>
+                  <p className="text-xs text-muted-foreground font-medium">{member.hours}h</p>
                 </div>
               </div>
             </TooltipTrigger>
