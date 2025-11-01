@@ -233,7 +233,6 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
             {/* Team Member Avatars */}
             {project.teamMembers && project.teamMembers.length > 0 && (
               <div>
-                <p className="text-[10px] text-muted-foreground mb-2 font-medium">Team</p>
                 <div className="flex flex-wrap gap-3 justify-center">
                   {project.teamMembers.slice(0, 8).map((member: any, idx: number) => (
                     <Tooltip key={idx}>
