@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface LeaveEntry {
   member_id: string;
+  date: string;
   hours: number;
 }
 
@@ -15,14 +16,14 @@ interface AnnualLeaveCardProps {
 }
 
 export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
-  // Group by member_id and sum hours
+  // Group by member_id with dates and hours
   const leaveByMember = leaves.reduce((acc, leave) => {
     if (!acc[leave.member_id]) {
-      acc[leave.member_id] = 0;
+      acc[leave.member_id] = [];
     }
-    acc[leave.member_id] += leave.hours;
+    acc[leave.member_id].push({ date: leave.date, hours: leave.hours });
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<string, Array<{ date: string; hours: number }>>);
 
   const memberIds = Object.keys(leaveByMember);
 
@@ -56,20 +57,33 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
         {memberIds.length === 0 ? (
           <p className="text-sm text-muted-foreground">No annual leave this week</p>
         ) : (
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-col gap-4">
             {memberIds.map((id) => {
-              const hours = leaveByMember[id];
+              const leaveDays = leaveByMember[id];
               const profile = profiles.find((p: any) => p.id === id);
-              const initials = `${profile?.first_name?.[0] || ''}${profile?.last_name?.[0] || ''}`.toUpperCase() || '??';
+              const firstName = profile?.first_name || 'Unknown';
+              const lastName = profile?.last_name || 'User';
+              const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
               const avatarUrl = profile?.avatar_url || '';
               
               return (
-                <div key={id} className="flex flex-col items-center gap-1">
-                  <Avatar className="h-10 w-10">
+                <div key={id} className="flex items-start gap-3">
+                  <Avatar className="h-10 w-10 flex-shrink-0">
                     <AvatarImage src={avatarUrl} />
                     <AvatarFallback className="text-xs">{initials}</AvatarFallback>
                   </Avatar>
-                  <span className="text-xs font-medium text-foreground">{hours}h</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground mb-1">
+                      {firstName} {lastName}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {leaveDays.map((day, idx) => (
+                        <div key={idx} className="text-xs text-muted-foreground">
+                          {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: {day.hours}h
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               );
             })}
