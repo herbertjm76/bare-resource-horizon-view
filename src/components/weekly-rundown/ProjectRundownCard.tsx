@@ -152,28 +152,30 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       </div>
 
       {/* Team Members Avatars */}
-      <div className="px-6 py-6 relative z-10">
+      <div className="px-6 py-6 relative z-10 flex items-center justify-center min-h-[160px]">
         {project.teamMembers.length > 0 ? (
           <>
-            <div className="flex flex-wrap gap-4 justify-center">
-              {sortedMembers.map((member) => (
-                <TeamMemberAvatar
-                  key={member.id}
-                  member={member}
+            <div className="flex flex-col items-center w-full">
+              <div className="flex flex-wrap gap-4 justify-center">
+                {sortedMembers.map((member) => (
+                  <TeamMemberAvatar
+                    key={member.id}
+                    member={member}
+                    projectId={project.id}
+                    weekStartDate={weekStartDateString}
+                    onUpdate={onDataChange}
+                  />
+                ))}
+              </div>
+              
+              <div className="flex justify-center mt-4">
+                <AddTeamMemberAllocation
                   projectId={project.id}
                   weekStartDate={weekStartDateString}
-                  onUpdate={onDataChange}
+                  existingMemberIds={project.teamMembers.map(m => m.id)}
+                  onAdd={onDataChange}
                 />
-              ))}
-            </div>
-            
-            <div className="flex justify-center mt-4">
-              <AddTeamMemberAllocation
-                projectId={project.id}
-                weekStartDate={weekStartDateString}
-                existingMemberIds={project.teamMembers.map(m => m.id)}
-                onAdd={onDataChange}
-              />
+              </div>
             </div>
           </>
         ) : (
