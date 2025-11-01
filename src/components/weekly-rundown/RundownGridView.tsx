@@ -3,12 +3,14 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Clock, Users, Calendar, Building, Pencil } from 'lucide-react';
+import { MapPin, Clock, Users, Calendar, Building, Pencil, Circle } from 'lucide-react';
 import { RundownMode } from './WeeklyRundownView';
 import { AvatarWithHourDial } from './AvatarWithHourDial';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
 import { EditPersonAllocationsDialog } from './EditPersonAllocationsDialog';
 import { EditProjectAllocationsDialog } from './EditProjectAllocationsDialog';
+import { useOfficeSettings } from '@/context/officeSettings/useOfficeSettings';
+import * as LucideIcons from 'lucide-react';
 
 interface RundownGridViewProps {
   items: any[];
@@ -169,6 +171,7 @@ const PersonGridCard: React.FC<{ person: any }> = ({ person }) => {
 
 const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const { departments } = useOfficeSettings();
   
   const getCapacityColor = (percentage: number) => {
     if (percentage > 100) return 'hsl(var(--destructive))';
@@ -181,17 +184,45 @@ const ProjectGridCard: React.FC<{ project: any }> = ({ project }) => {
     ? project.teamMembers.reduce((sum: number, member: any) => sum + (member.capacityPercentage || 0), 0) / project.teamMembers.length 
     : 0;
 
+  // Get the icon component for the department from office settings
+  const getIconComponent = () => {
+    if (!project.department) return Circle;
+    
+    // Find the department in office settings
+    const departmentData = departments.find(d => d.name === project.department);
+    if (!departmentData?.icon) return Circle;
+    
+    // Convert icon name to PascalCase (e.g., 'circle' -> 'Circle')
+    const iconName = departmentData.icon
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join('');
+    
+    const IconComponent = (LucideIcons as any)[iconName];
+    return IconComponent || Circle;
+  };
+
+  const ProjectIcon = getIconComponent();
+
   return (
     <>
     <Tooltip>
       <TooltipTrigger asChild>
         <div className="glass-card glass-hover rounded-2xl border-0 p-5 cursor-pointer overflow-hidden relative shadow-lg hover:shadow-2xl transition-all duration-500">
-          <div className="flex items-start justify-between mb-4 relative z-10">
+          <div className="flex items-start gap-3 mb-4 relative z-10">
+            {/* Department Icon */}
+            <div className="h-12 w-12 rounded-xl bg-gradient-modern flex items-center justify-center ring-2 ring-primary/20 shadow-lg flex-shrink-0">
+              <ProjectIcon className="h-6 w-6 text-white" />
+            </div>
+            
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-base truncate mb-1">{project.name}</h3>
               <p className="text-sm text-muted-foreground font-medium">{project.code}</p>
+              {project.department && (
+                <p className="text-xs text-muted-foreground truncate mt-0.5">{project.department}</p>
+              )}
             </div>
-            <Badge variant="secondary" className="text-sm font-bold px-3 py-1">
+            <Badge variant="secondary" className="text-sm font-bold px-3 py-1 flex-shrink-0">
               {((project.totalHours || 0) / 40).toFixed(1)} FTE
             </Badge>
           </div>
