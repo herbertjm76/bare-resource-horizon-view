@@ -78,12 +78,10 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       {/* Hero Section */}
       <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-8 pb-6">
         <div className="flex items-start gap-6">
-          {/* Large Project Avatar with Hours Badge */}
+          {/* Simple Line Art Icon */}
           <div className="relative">
-            <div className={`${isFullscreen ? 'h-24 w-24' : 'h-20 w-20'} rounded-2xl bg-gradient-modern flex items-center justify-center ring-4 ring-primary/20 shadow-2xl transition-transform hover:scale-105`}>
-              <ProjectIcon className={`${isFullscreen ? 'h-12 w-12' : 'h-10 w-10'} text-white`} />
-            </div>
-            {/* Hours Badge on Avatar */}
+            <ProjectIcon className={`${isFullscreen ? 'h-16 w-16' : 'h-12 w-12'} text-primary`} />
+            {/* Hours Badge */}
             <Badge className="absolute -bottom-2 -right-2 bg-primary text-primary-foreground shadow-lg px-2 py-1 text-xs font-bold">
               <Clock className="h-3 w-3 mr-1" />
               {project.totalHours}h
