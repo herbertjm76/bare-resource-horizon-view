@@ -44,6 +44,7 @@ export const useRundownData = ({
           last_name: member.last_name,
           name: `${member.first_name} ${member.last_name}`,
           location: member.location || 'Unknown',
+          department: member.department || 'Unknown',
           avatar_url: member.avatar_url,
           avatar: member.avatar_url,
           totalHours,
@@ -74,6 +75,8 @@ export const useRundownData = ({
             return b.utilization - a.utilization;
           case 'location':
             return a.location.localeCompare(b.location);
+          case 'department':
+            return (a.department || '').localeCompare(b.department || '');
           default:
             return 0;
         }
@@ -132,6 +135,8 @@ export const useRundownData = ({
             return b.totalHours - a.totalHours;
           case 'location':
             return (a.office || '').localeCompare(b.office || '');
+          case 'department':
+            return (a.department || '').localeCompare(b.department || '');
           default:
             return 0;
         }

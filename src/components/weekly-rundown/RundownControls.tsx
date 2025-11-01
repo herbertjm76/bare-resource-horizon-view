@@ -125,6 +125,7 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
             <SelectItem value="alphabetical">Alphabetical</SelectItem>
             <SelectItem value="utilization">Utilization</SelectItem>
             <SelectItem value="location">Location</SelectItem>
+            <SelectItem value="department">Department</SelectItem>
           </SelectContent>
         </Select>
 

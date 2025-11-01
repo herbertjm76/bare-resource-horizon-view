@@ -8,7 +8,7 @@ import { useRundownData } from './hooks/useRundownData';
 import { useCarouselNavigation } from './hooks/useCarouselNavigation';
 
 export type RundownMode = 'people' | 'projects';
-export type SortOption = 'alphabetical' | 'utilization' | 'location';
+export type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
 export type ViewType = 'carousel' | 'grid';
 
 export const WeeklyRundownView: React.FC = () => {
