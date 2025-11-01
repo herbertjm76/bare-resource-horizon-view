@@ -43,9 +43,9 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     enabled: !!company?.id && memberIds.length > 0
   });
 
-  // Fetch office holidays
+  // Fetch office holidays for the selected week from office_holidays (office settings)
   const { data: holidays = [] } = useQuery({
-    queryKey: ['weekly-summary-holidays', weekStartString, company?.id],
+    queryKey: ['weekly-summary-holidays', weekStartString, weekEndString, company?.id],
     queryFn: async () => {
       if (!company?.id) return [];
 

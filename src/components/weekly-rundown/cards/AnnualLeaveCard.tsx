@@ -57,14 +57,16 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
           <p className="text-sm text-muted-foreground">No annual leave this week</p>
         ) : (
           <div className="flex flex-wrap gap-3">
-            {profiles.map((profile) => {
-              const hours = leaveByMember[profile.id];
-              const initials = `${profile.first_name?.[0] || ''}${profile.last_name?.[0] || ''}`.toUpperCase();
+            {memberIds.map((id) => {
+              const hours = leaveByMember[id];
+              const profile = profiles.find((p: any) => p.id === id);
+              const initials = `${profile?.first_name?.[0] || ''}${profile?.last_name?.[0] || ''}`.toUpperCase() || '??';
+              const avatarUrl = profile?.avatar_url || '';
               
               return (
-                <div key={profile.id} className="flex flex-col items-center gap-1">
+                <div key={id} className="flex flex-col items-center gap-1">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={profile.avatar_url || ''} />
+                    <AvatarImage src={avatarUrl} />
                     <AvatarFallback className="text-xs">{initials}</AvatarFallback>
                   </Avatar>
                   <span className="text-xs font-medium text-foreground">{hours}h</span>
