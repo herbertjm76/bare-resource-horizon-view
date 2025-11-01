@@ -80,6 +80,7 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
         transition-all duration-500 ease-out
         before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none
         overflow-hidden
+        flex flex-col
       `}>
         {/* Hero Section */}
         <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-8 pb-6">
@@ -139,12 +140,13 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
         </div>
 
         {/* Interactive Bar Graph with Inline Editing */}
-        <div className="px-8 mb-8 relative z-10">
-          <h2 className={`font-semibold text-foreground mb-3 ${
-            isFullscreen ? 'text-xl' : 'text-lg'
-          }`}>
-            Weekly Allocation
-          </h2>
+        <div className="px-8 py-8 relative z-10 flex-1 flex flex-col items-center justify-center">
+          <div className="w-full">
+            <h2 className={`font-semibold text-foreground mb-3 ${
+              isFullscreen ? 'text-xl' : 'text-lg'
+            }`}>
+              Weekly Allocation
+            </h2>
           
           <div className="w-full h-16 bg-muted/20 rounded-xl overflow-hidden flex shadow-inner border border-border/30">
             {/* Project Segments */}
@@ -210,14 +212,15 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
             )}
           </div>
           
-          {/* Add Project Button */}
-          <div className="mt-3">
-            <AddProjectAllocation
-              memberId={person.id}
-              weekStartDate={weekStartDate}
-              existingProjectIds={person.projects.map(p => p.id)}
-              onAdd={handleDataChange}
-            />
+            {/* Add Project Button */}
+            <div className="mt-3">
+              <AddProjectAllocation
+                memberId={person.id}
+                weekStartDate={weekStartDate}
+                existingProjectIds={person.projects.map(p => p.id)}
+                onAdd={handleDataChange}
+              />
+            </div>
           </div>
         </div>
 
