@@ -33,6 +33,7 @@ export const ProjectsList = () => {
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [saveSignal, setSaveSignal] = useState(0);
 
   const filteredProjects = useMemo(() => {
     return projects.filter(project => {
@@ -61,6 +62,12 @@ export const ProjectsList = () => {
   };
 
   const handleToggleEditMode = (mode: boolean) => {
+    // If turning off edit mode, trigger a save signal and then refetch
+    if (!mode) {
+      setSaveSignal(prev => prev + 1);
+      // Refetch after a short delay to allow row saves to complete
+      setTimeout(() => refetch(), 400);
+    }
     setEditMode(mode);
     if (!mode) {
       setSelectedProjects([]);
@@ -272,6 +279,7 @@ export const ProjectsList = () => {
             selectedProjects={selectedProjects}
             onSelectProject={handleSelectProject}
             refetch={refetch}
+            saveSignal={saveSignal}
           />
         </CardContent>
 

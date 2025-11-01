@@ -1,11 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2 } from "lucide-react";
 import { EditableProjectField } from '../components/EditableProjectField';
 import { useProjectTableRow } from './hooks/useProjectTableRow';
-import type { ProjectStatus } from '../utils/projectMappings';
 import { EditProjectDialog } from '../EditProjectDialog';
 import { Input } from "@/components/ui/input";
 import {
@@ -26,6 +25,7 @@ interface ProjectTableRowProps {
   office_stages: Array<{ id: string; name: string; color?: string }>;
   getProjectStageFee: (projectId: string, officeStageId: string) => number | null;
   refetch: () => void;
+  saveSignal?: number;
 }
 
 export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
@@ -37,20 +37,20 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
   stageColorMap,
   office_stages,
   getProjectStageFee,
-  refetch
+  refetch,
+  saveSignal
 }) => {
   const [showEditDialog, setShowEditDialog] = useState(false);
 
   const {
     handleFieldUpdate,
-    handleStatusChange,
-    handleStageChange,
     getStatusColor,
     locations,
     editableFields,
     getAreaByCountry,
     departments,
-    updateEditableField
+    updateEditableField,
+    flushPendingUpdates
   } = useProjectTableRow(project, refetch);
 
   const projectArea = getAreaByCountry(project.country);
@@ -68,6 +68,12 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     const stage = office_stages.find(s => s.id === project.current_stage);
     return stage?.color || stageColorMap[project.current_stage] || '#E5DEFF';
   };
+
+  useEffect(() => {
+    if (saveSignal !== undefined) {
+      flushPendingUpdates(project.id);
+    }
+  }, [saveSignal]);
 
   return (
     <>
@@ -93,12 +99,6 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
             <Input
               value={editableFields[project.id]?.name || project.name}
               onChange={(e) => updateEditableField(project.id, 'name', e.target.value)}
-              onBlur={(e) => handleFieldUpdate(project.id, 'name', e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  handleFieldUpdate(project.id, 'name', e.currentTarget.value);
-                }
-              }}
               className="h-8 text-xs"
             />
           ) : (
@@ -111,8 +111,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         <TableCell>
           {editMode ? (
             <Select 
-              value={project.status} 
-              onValueChange={(value) => handleStatusChange(project.id, value as ProjectStatus)}
+              value={editableFields[project.id]?.status || project.status} 
+              onValueChange={(value) => updateEditableField(project.id, 'status', value)}
             >
               <SelectTrigger className="h-8 w-32">
                 <SelectValue />
@@ -152,8 +152,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         <TableCell>
           {editMode ? (
             <Select 
-              value={project.department || ''} 
-              onValueChange={(value) => handleFieldUpdate(project.id, 'department', value)}
+              value={editableFields[project.id]?.department || project.department || ''} 
+              onValueChange={(value) => updateEditableField(project.id, 'department', value)}
             >
               <SelectTrigger className="h-8 w-32">
                 <SelectValue placeholder="Select..." />
@@ -178,8 +178,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         <TableCell>
           {editMode ? (
             <Select 
-              value={project.current_stage || ''} 
-              onValueChange={(value) => handleStageChange(project.id, value)}
+              value={editableFields[project.id]?.current_stage || project.current_stage || ''} 
+              onValueChange={(value) => updateEditableField(project.id, 'current_stage', value)}
             >
               <SelectTrigger className="h-8 w-32">
                 <SelectValue placeholder="Select..." />

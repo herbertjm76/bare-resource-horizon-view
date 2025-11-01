@@ -16,6 +16,7 @@ interface ProjectsTableProps {
   selectedProjects: string[];
   onSelectProject: (projectId: string) => void;
   refetch: () => void;
+  saveSignal?: number;
 }
 
 const ProjectsTable: React.FC<ProjectsTableProps> = ({ 
@@ -26,7 +27,8 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
   onDelete,
   selectedProjects, 
   onSelectProject,
-  refetch
+  refetch,
+  saveSignal
 }) => {
   const { office_stages = [], loading: officeLoading } = useOfficeSettings();
   const stageColorMap = useStageColorMap(office_stages);
@@ -65,6 +67,7 @@ const ProjectsTable: React.FC<ProjectsTableProps> = ({
               office_stages={office_stages}
               getProjectStageFee={getProjectStageFee}
               refetch={refetch}
+              saveSignal={saveSignal}
             />
           ))}
         </TableBody>
