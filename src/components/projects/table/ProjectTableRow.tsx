@@ -7,6 +7,14 @@ import { EditableProjectField } from '../components/EditableProjectField';
 import { useProjectTableRow } from './hooks/useProjectTableRow';
 import type { ProjectStatus } from '../utils/projectMappings';
 import { EditProjectDialog } from '../EditProjectDialog';
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ProjectTableRowProps {
   project: any;
@@ -40,7 +48,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     getStatusColor,
     locations,
     editableFields,
-    getAreaByCountry
+    getAreaByCountry,
+    departments
   } = useProjectTableRow(project, refetch);
 
   const projectArea = getAreaByCountry(project.country);
@@ -77,19 +86,48 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         )}
         
         <TableCell className="font-semibold">{project.code}</TableCell>
-        <TableCell><span className="font-bold">{project.name}</span></TableCell>
+        
+        <TableCell>
+          {editMode && selected ? (
+            <Input
+              value={project.name}
+              onChange={(e) => handleFieldUpdate(project.id, 'name', e.target.value)}
+              className="h-8 text-xs"
+            />
+          ) : (
+            <span className="font-bold">{project.name}</span>
+          )}
+        </TableCell>
+        
         <TableCell>{project.project_manager?.first_name || '-'}</TableCell>
         
         <TableCell>
-          <span 
-            className="inline-block px-2 py-0.5 rounded text-xs"
-            style={{
-              background: getStatusColor(project.status).bg,
-              color: getStatusColor(project.status).text
-            }}
-          >
-            {project.status}
-          </span>
+          {editMode && selected ? (
+            <Select 
+              value={project.status} 
+              onValueChange={(value) => handleStatusChange(project.id, value as ProjectStatus)}
+            >
+              <SelectTrigger className="h-8 w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Planning">Planning</SelectItem>
+                <SelectItem value="In Progress">In Progress</SelectItem>
+                <SelectItem value="Complete">Complete</SelectItem>
+                <SelectItem value="On Hold">On Hold</SelectItem>
+              </SelectContent>
+            </Select>
+          ) : (
+            <span 
+              className="inline-block px-2 py-0.5 rounded text-xs"
+              style={{
+                background: getStatusColor(project.status).bg,
+                color: getStatusColor(project.status).text
+              }}
+            >
+              {project.status}
+            </span>
+          )}
         </TableCell>
         
         <TableCell>
@@ -104,20 +142,60 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
           </span>
         </TableCell>
         
+        <TableCell>
+          {editMode && selected ? (
+            <Select 
+              value={project.department || ''} 
+              onValueChange={(value) => handleFieldUpdate(project.id, 'department', value)}
+            >
+              <SelectTrigger className="h-8 w-32">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.name}>
+                    {dept.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <span className="text-xs">{project.department || '-'}</span>
+          )}
+        </TableCell>
+        
         {/* <TableCell>
           {project.target_profit_percentage != null ? `${project.target_profit_percentage}%` : "--"}
         </TableCell> */}
         
         <TableCell>
-          <span
-            className="inline-block px-2 py-1 rounded text-xs"
-            style={{
-              backgroundColor: getCurrentStageColor(),
-              color: "#212172"
-            }}
-          >
-            {getCurrentStageName()}
-          </span>
+          {editMode && selected ? (
+            <Select 
+              value={project.current_stage || ''} 
+              onValueChange={(value) => handleStageChange(project.id, value)}
+            >
+              <SelectTrigger className="h-8 w-32">
+                <SelectValue placeholder="Select..." />
+              </SelectTrigger>
+              <SelectContent>
+                {office_stages.map((stage) => (
+                  <SelectItem key={stage.id} value={stage.id}>
+                    {stage.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <span
+              className="inline-block px-2 py-1 rounded text-xs"
+              style={{
+                backgroundColor: getCurrentStageColor(),
+                color: "#212172"
+              }}
+            >
+              {getCurrentStageName()}
+            </span>
+          )}
         </TableCell>
         
         {/* Stage fees columns hidden for MVP */}

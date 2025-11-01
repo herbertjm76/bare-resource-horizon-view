@@ -20,6 +20,7 @@ export const ProjectTableHeader: React.FC<ProjectTableHeaderProps> = ({
         <TableHead style={{ background: 'transparent', color: 'white' }}>PM</TableHead>
         <TableHead style={{ background: 'transparent', color: 'white' }}>Status</TableHead>
         <TableHead style={{ background: 'transparent', color: 'white' }}>Country</TableHead>
+        <TableHead style={{ background: 'transparent', color: 'white' }}>Department</TableHead>
         {/* <TableHead style={{ background: 'transparent', color: 'white' }}>%Profit</TableHead> */}
         <TableHead style={{ background: 'transparent', color: 'white' }}>Current Stage</TableHead>
         {/* Stage fee columns hidden for MVP */}

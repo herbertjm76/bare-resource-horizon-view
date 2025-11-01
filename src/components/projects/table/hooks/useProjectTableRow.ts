@@ -7,7 +7,7 @@ import { useProjectStatus } from './useProjectStatus';
 import type { Project } from '../types';
 
 export const useProjectTableRow = (project: Project, refetch: () => void) => {
-  const { locations } = useOfficeSettings();
+  const { locations, departments } = useOfficeSettings();
   const { projectAreas, getAreaByCountry } = useProjectAreas();
   const { editableFields, handleFieldUpdate } = useProjectFields(project, refetch);
   const { handleStatusChange, handleStageChange } = useProjectStatus(refetch);
@@ -18,6 +18,7 @@ export const useProjectTableRow = (project: Project, refetch: () => void) => {
     handleStageChange,
     getStatusColor,
     locations,
+    departments,
     editableFields,
     getAreaByCountry
   };

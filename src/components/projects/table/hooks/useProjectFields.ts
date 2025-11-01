@@ -35,6 +35,9 @@ export const useProjectFields = (project: any, refetch: () => void) => {
         case 'country':
           updateData.country = value;
           break;
+        case 'department':
+          updateData.department = value;
+          break;
         case 'current_stage':
           updateData.current_stage = value;
           setEditableFields(prev => ({
