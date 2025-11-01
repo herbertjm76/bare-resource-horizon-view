@@ -25,22 +25,21 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   // Fetch annual leaves
   const { data: annualLeaves = [] } = useQuery({
-    queryKey: ['weekly-summary-leaves', weekStartString, memberIds, company?.id],
+    queryKey: ['weekly-summary-leaves', weekStartString, weekEndString, company?.id],
     queryFn: async () => {
-      if (!company?.id || memberIds.length === 0) return [];
+      if (!company?.id) return [];
       
       const { data, error } = await supabase
         .from('annual_leaves')
         .select('member_id, date, hours')
         .eq('company_id', company.id)
-        .in('member_id', memberIds)
         .gte('date', weekStartString)
         .lte('date', weekEndString);
       
       if (error) throw error;
       return data || [];
     },
-    enabled: !!company?.id && memberIds.length > 0
+    enabled: !!company?.id
   });
 
   // Fetch office holidays for the selected week from office_holidays (office settings)
