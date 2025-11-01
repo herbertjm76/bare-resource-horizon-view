@@ -1375,6 +1375,39 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_notes: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          description: string
+          end_date: string | null
+          id: string
+          start_date: string
+          updated_at: string | null
+          week_start_date: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          description: string
+          end_date?: string | null
+          id?: string
+          start_date: string
+          updated_at?: string | null
+          week_start_date: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          description?: string
+          end_date?: string | null
+          id?: string
+          start_date?: string
+          updated_at?: string | null
+          week_start_date?: string
+        }
+        Relationships: []
+      }
       weekly_other_leave: {
         Row: {
           company_id: string
