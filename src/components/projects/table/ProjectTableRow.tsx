@@ -88,7 +88,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         <TableCell className="font-semibold">{project.code}</TableCell>
         
         <TableCell>
-          {editMode && selected ? (
+          {editMode ? (
             <Input
               value={project.name}
               onChange={(e) => handleFieldUpdate(project.id, 'name', e.target.value)}
@@ -102,7 +102,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         <TableCell>{project.project_manager?.first_name || '-'}</TableCell>
         
         <TableCell>
-          {editMode && selected ? (
+          {editMode ? (
             <Select 
               value={project.status} 
               onValueChange={(value) => handleStatusChange(project.id, value as ProjectStatus)}
@@ -143,7 +143,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         </TableCell>
         
         <TableCell>
-          {editMode && selected ? (
+          {editMode ? (
             <Select 
               value={project.department || ''} 
               onValueChange={(value) => handleFieldUpdate(project.id, 'department', value)}
@@ -169,7 +169,7 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         </TableCell> */}
         
         <TableCell>
-          {editMode && selected ? (
+          {editMode ? (
             <Select 
               value={project.current_stage || ''} 
               onValueChange={(value) => handleStageChange(project.id, value)}
