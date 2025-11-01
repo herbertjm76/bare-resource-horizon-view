@@ -39,6 +39,7 @@ export const useProjects = () => {
             code,
             status,
             country,
+            department,
             target_profit_percentage,
             current_stage,
             stages,
