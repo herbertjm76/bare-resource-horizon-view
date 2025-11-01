@@ -70,57 +70,57 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
     <div className={`
       relative rounded-3xl glass-card glass-hover shadow-2xl
       ${isActive ? 'ring-2 ring-primary/50 glass-elevated scale-[1.02]' : ''}
-      ${isFullscreen ? 'min-h-[80vh]' : 'min-h-[500px]'}
+      ${isFullscreen ? 'min-h-[70vh]' : 'min-h-[400px]'}
       transition-all duration-500 ease-out
       before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-white/10 before:to-transparent before:pointer-events-none
       overflow-hidden
     `}>
       {/* Hero Section */}
-      <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-8 pb-6">
-        <div className="flex items-start gap-4">
+      <div className="relative z-10 bg-gradient-to-br from-primary/5 via-primary/10 to-transparent rounded-t-3xl p-6">
+        <div className="flex items-start gap-3">
           {/* Small Line Art Icon */}
-          <div className="relative">
-            <ProjectIcon className={`${isFullscreen ? 'h-10 w-10' : 'h-8 w-8'} text-primary`} />
+          <div className="relative flex-shrink-0 mt-1">
+            <ProjectIcon className={`${isFullscreen ? 'h-8 w-8' : 'h-7 w-7'} text-primary`} />
           </div>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-4 mb-2">
+            <div className="flex items-start justify-between gap-3">
               <div className="flex-1 min-w-0">
                 {/* Project Code - Large and prominent */}
-                <h1 className={`font-bold text-foreground tracking-tight mb-2 ${
-                  isFullscreen ? 'text-5xl' : 'text-4xl'
+                <h1 className={`font-bold text-foreground tracking-tight mb-1 ${
+                  isFullscreen ? 'text-4xl' : 'text-3xl'
                 }`}>
                   {project.code}
                 </h1>
                 
                 {/* Project Name - Secondary */}
-                <h2 className={`font-semibold text-muted-foreground mb-1 ${
-                  isFullscreen ? 'text-2xl' : 'text-xl'
+                <h2 className={`font-semibold text-muted-foreground mb-0.5 ${
+                  isFullscreen ? 'text-xl' : 'text-lg'
                 }`}>
                   {project.name}
                 </h2>
                 
                 {/* Department - Tertiary */}
                 {project.department && (
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     {project.department}
                   </p>
                 )}
               </div>
               
               {/* Badges - Upper Right */}
-              <div className="flex flex-col items-end gap-1.5">
-                <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+              <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                <Badge variant="outline" className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold">
                   <Clock className="h-3 w-3" />
                   {project.totalHours}h
                 </Badge>
                 {project.office && (
-                  <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
+                  <Badge variant="outline" className="flex items-center gap-1 px-2.5 py-1 text-xs">
                     {project.office}
                   </Badge>
                 )}
                 {project.status && (
-                  <Badge variant="secondary" className="px-2 py-0.5 text-xs">
+                  <Badge variant="secondary" className="px-2.5 py-1 text-xs">
                     {project.status}
                   </Badge>
                 )}
@@ -128,20 +128,20 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
             </div>
             
             {/* Key Metrics Row */}
-            <div className="flex items-center gap-4 mt-4">
+            <div className="flex items-center gap-4 mt-3">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-primary" />
-                <span className="text-2xl font-bold text-foreground">
+                <span className="text-xl font-bold text-foreground">
                   <CountUpNumber end={project.teamMembers.length} duration={1500} />
                 </span>
-                <span className="text-xs text-muted-foreground">team members</span>
+                <span className="text-xs text-muted-foreground">team</span>
               </div>
               
-              <div className="h-8 w-px bg-border" />
+              <div className="h-6 w-px bg-border" />
               
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-primary" />
-                <span className="text-2xl font-bold text-foreground">
+                <span className="text-xl font-bold text-foreground">
                   <CountUpNumber end={project.totalHours} duration={1500} />h
                 </span>
                 <span className="text-xs text-muted-foreground">total</span>
@@ -152,7 +152,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
       </div>
 
       {/* Team Members Avatars */}
-      <div className="px-8 mb-8 relative z-10">
+      <div className="px-6 py-6 relative z-10">
         {project.teamMembers.length > 0 ? (
           <>
             <div className="flex flex-wrap gap-4 justify-center">
@@ -177,19 +177,17 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
             </div>
           </>
         ) : (
-          <div className="text-center py-8 bg-muted/20 rounded-xl border border-border/30">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted/30 mb-3">
-              <Users className="h-8 w-8 text-muted-foreground" />
+          <div className="text-center py-6 bg-muted/20 rounded-xl border border-border/30">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted/30 mb-2">
+              <Users className="h-7 w-7 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground text-sm">No team members allocated this week</p>
-            <div className="mt-3">
-              <AddTeamMemberAllocation
-                projectId={project.id}
-                weekStartDate={weekStartDateString}
-                existingMemberIds={[]}
-                onAdd={onDataChange}
-              />
-            </div>
+            <p className="text-muted-foreground text-sm mb-3">No team members allocated this week</p>
+            <AddTeamMemberAllocation
+              projectId={project.id}
+              weekStartDate={weekStartDateString}
+              existingMemberIds={[]}
+              onAdd={onDataChange}
+            />
           </div>
         )}
       </div>
