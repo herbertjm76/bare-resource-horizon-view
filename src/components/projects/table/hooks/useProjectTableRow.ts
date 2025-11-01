@@ -9,7 +9,7 @@ import type { Project } from '../types';
 export const useProjectTableRow = (project: Project, refetch: () => void) => {
   const { locations, departments } = useOfficeSettings();
   const { projectAreas, getAreaByCountry } = useProjectAreas();
-  const { editableFields, handleFieldUpdate } = useProjectFields(project, refetch);
+  const { editableFields, handleFieldUpdate, updateEditableField } = useProjectFields(project, refetch);
   const { handleStatusChange, handleStageChange } = useProjectStatus(refetch);
 
   return {
@@ -20,6 +20,7 @@ export const useProjectTableRow = (project: Project, refetch: () => void) => {
     locations,
     departments,
     editableFields,
-    getAreaByCountry
+    getAreaByCountry,
+    updateEditableField
   };
 };

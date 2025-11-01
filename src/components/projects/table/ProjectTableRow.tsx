@@ -49,7 +49,8 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
     locations,
     editableFields,
     getAreaByCountry,
-    departments
+    departments,
+    updateEditableField
   } = useProjectTableRow(project, refetch);
 
   const projectArea = getAreaByCountry(project.country);
@@ -90,8 +91,14 @@ export const ProjectTableRow: React.FC<ProjectTableRowProps> = ({
         <TableCell>
           {editMode ? (
             <Input
-              value={project.name}
-              onChange={(e) => handleFieldUpdate(project.id, 'name', e.target.value)}
+              value={editableFields[project.id]?.name || project.name}
+              onChange={(e) => updateEditableField(project.id, 'name', e.target.value)}
+              onBlur={(e) => handleFieldUpdate(project.id, 'name', e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleFieldUpdate(project.id, 'name', e.currentTarget.value);
+                }
+              }}
               className="h-8 text-xs"
             />
           ) : (

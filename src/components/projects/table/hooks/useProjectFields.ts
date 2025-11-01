@@ -72,5 +72,15 @@ export const useProjectFields = (project: any, refetch: () => void) => {
     }
   };
 
-  return { editableFields, handleFieldUpdate };
+  const updateEditableField = (projectId: string, field: string, value: any) => {
+    setEditableFields(prev => ({
+      ...prev,
+      [projectId]: {
+        ...prev[projectId],
+        [field]: value
+      }
+    }));
+  };
+
+  return { editableFields, handleFieldUpdate, updateEditableField, setEditableFields };
 };
