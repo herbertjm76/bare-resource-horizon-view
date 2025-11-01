@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Umbrella } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -74,7 +75,7 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
         {memberIds.length === 0 ? (
           <p className="text-sm text-muted-foreground">No annual leave this week</p>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-3">
             {memberIds.map((id) => {
               const leaveDays = leaveByMember[id];
               const profile = profiles.find((p: any) => p.id === id);
@@ -85,23 +86,24 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
               const initials = `${firstName[0]}${lastName[0]}`.toUpperCase();
               const avatarUrl = profile?.avatar_url || '';
               
+              const getDayInitial = (dateStr: string) => {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US', { weekday: 'short' })[0];
+              };
+              
               return (
-                <div key={id} className="flex items-start gap-3">
-                  <Avatar className="h-10 w-10 flex-shrink-0">
+                <div key={id} className="flex flex-col items-center gap-1.5">
+                  <Avatar className="h-9 w-9">
                     <AvatarImage src={avatarUrl} />
                     <AvatarFallback className="text-xs">{initials}</AvatarFallback>
                   </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground mb-1">
-                      {firstName} {lastName}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {leaveDays.map((day, idx) => (
-                        <div key={idx} className="text-xs text-muted-foreground">
-                          {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}: {day.hours}h
-                        </div>
-                      ))}
-                    </div>
+                  <span className="text-xs font-medium text-foreground">{firstName}</span>
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {leaveDays.map((day, idx) => (
+                      <Badge key={idx} variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-medium">
+                        {getDayInitial(day.date)}-{day.hours}h
+                      </Badge>
+                    ))}
                   </div>
                 </div>
               );
