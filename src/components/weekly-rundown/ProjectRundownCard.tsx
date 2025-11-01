@@ -89,7 +89,7 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
               <div className="flex-1 min-w-0">
                 {/* Project Code - Large and prominent */}
                 <h1 className={`font-bold text-foreground tracking-tight mb-1 ${
-                  isFullscreen ? 'text-4xl' : 'text-3xl'
+                  isFullscreen ? 'text-5xl' : 'text-4xl'
                 }`}>
                   {project.code}
                 </h1>
@@ -132,17 +132,17 @@ export const ProjectRundownCard: React.FC<ProjectRundownCardProps> = ({
             <div className="flex items-center gap-4 mt-3">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-primary" />
-                <span className="text-xl font-bold text-foreground">
+                <span className="text-2xl font-bold text-foreground">
                   <CountUpNumber end={project.teamMembers.length} duration={1500} />
                 </span>
                 <span className="text-xs text-muted-foreground">team</span>
               </div>
               
-              <div className="h-6 w-px bg-border" />
+              <div className="h-8 w-px bg-border" />
               
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-primary" />
-                <span className="text-xl font-bold text-foreground">
+                <span className="text-2xl font-bold text-foreground">
                   <CountUpNumber end={project.totalHours} duration={1500} />h
                 </span>
                 <span className="text-xs text-muted-foreground">total</span>
