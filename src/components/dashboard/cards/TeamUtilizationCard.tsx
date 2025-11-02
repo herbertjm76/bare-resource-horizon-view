@@ -48,6 +48,65 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   
   const config = getUtilizationConfig(actualUtilizationRate);
   const isOverCapacity = actualUtilizationRate > 100;
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [chartSize, setChartSize] = React.useState({ w: 0, h: 0 });
+  React.useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => setChartSize({ w: el.clientWidth, h: el.clientHeight });
+    update();
+    const ro = new (window as any).ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const renderOverflowCap = () => {
+    if (!isOverCapacity || !chartSize.w || !chartSize.h) return null;
+    const inner = 72; const outer = 92;
+    const minDim = Math.min(chartSize.w, chartSize.h);
+    const R = ((inner + outer) / 2) / 100 * (minDim / 2);
+    const thickness = (outer - inner) / 100 * (minDim / 2);
+    const basePct = Math.min(actualUtilizationRate, 100) / 100;
+    const overflowPct = Math.min(Math.max(actualUtilizationRate - 100, 0), 100) / 100;
+    const startDeg = 90 - basePct * 360;
+    const angleDeg = startDeg - overflowPct * 360;
+    const theta = (Math.PI / 180) * angleDeg;
+    const cx = chartSize.w / 2 + R * Math.cos(theta);
+    const cy = chartSize.h / 2 - R * Math.sin(theta);
+    const r = thickness / 2;
+    return (
+      <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 22 }} width={chartSize.w} height={chartSize.h}>
+        <circle cx={cx} cy={cy} r={r} fill={config.overColor} stroke="rgba(0,0,0,0.6)" strokeWidth={1.5} style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.6))' }} />
+      </svg>
+    );
+  };
+
+  const renderOverflowInnerShadow = () => {
+    if (!isOverCapacity || !chartSize.w || !chartSize.h) return null;
+    const inner = 72; const outer = 92;
+    const minDim = Math.min(chartSize.w, chartSize.h);
+    const thickness = (outer - inner) / 100 * (minDim / 2);
+    const basePct = Math.min(actualUtilizationRate, 100) / 100;
+    const overflowPct = Math.min(Math.max(actualUtilizationRate - 100, 0), 100) / 100;
+    const startDeg = 90 - basePct * 360;
+    const endDeg = startDeg - overflowPct * 360;
+    const r = (inner / 100) * (minDim / 2) + Math.max(1, thickness * 0.25);
+    const sw = Math.max(1, thickness * 0.6);
+    const largeArc = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
+    const cx = chartSize.w / 2; const cy = chartSize.h / 2;
+    const toXY = (deg: number) => {
+      const t = (Math.PI / 180) * deg;
+      return { x: cx + r * Math.cos(t), y: cy + r * Math.sin(t) };
+    };
+    const p0 = toXY(startDeg);
+    const p1 = toXY(endDeg);
+    const d = `M ${p0.x} ${p0.y} A ${r} ${r} 0 ${largeArc} 1 ${p1.x} ${p1.y}`;
+    return (
+      <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 21 }} width={chartSize.w} height={chartSize.h}>
+        <path d={d} fill="none" stroke="rgba(0,0,0,0.5)" strokeWidth={sw} strokeLinecap="round" style={{ filter: 'blur(0.3px)' }} />
+      </svg>
+    );
+  };
   
   // Base ring (0-100%)
   const baseData = [
@@ -78,7 +137,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         </div>
         
         <div className="flex-1 flex flex-col items-center justify-center relative p-6">
-          <div className="relative w-full h-full max-w-[220px] max-h-[220px] mx-auto">
+          <div ref={containerRef} className="relative w-full h-full max-w-[220px] max-h-[220px] mx-auto">
             {/* Base ring (0-100%) */}
             <ResponsiveContainer width="100%" height="100%">
               <RadialBarChart 
@@ -131,7 +190,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 </ResponsiveContainer>
               </div>
             )}
-            
+            {renderOverflowCap()}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center">
               <div className="text-4xl font-bold bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text text-transparent text-center">
                 {Math.round(actualUtilizationRate)}%

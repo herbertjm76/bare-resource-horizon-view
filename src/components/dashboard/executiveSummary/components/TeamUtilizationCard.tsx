@@ -17,6 +17,38 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   utilizationStatus
 }) => {
   const isOverCapacity = utilizationRate > 100;
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [chartSize, setChartSize] = React.useState({ w: 0, h: 0 });
+  React.useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const update = () => setChartSize({ w: el.clientWidth, h: el.clientHeight });
+    update();
+    const ro = new (window as any).ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const renderOverflowCap = () => {
+    if (!isOverCapacity || !chartSize.w || !chartSize.h) return null;
+    const inner = 77; const outer = 97;
+    const minDim = Math.min(chartSize.w, chartSize.h);
+    const R = ((inner + outer) / 2) / 100 * (minDim / 2);
+    const thickness = (outer - inner) / 100 * (minDim / 2);
+    const basePct = Math.min(utilizationRate, 100) / 100;
+    const overflowPct = Math.min(Math.max(utilizationRate - 100, 0), 100) / 100;
+    const startDeg = 90 - basePct * 360;
+    const angleDeg = startDeg - overflowPct * 360;
+    const theta = (Math.PI / 180) * angleDeg;
+    const cx = chartSize.w / 2 + R * Math.cos(theta);
+    const cy = chartSize.h / 2 - R * Math.sin(theta);
+    const r = thickness / 2;
+    return (
+      <svg className="absolute inset-0 pointer-events-none" style={{ zIndex: 22 }} width={chartSize.w} height={chartSize.h}>
+        <circle cx={cx} cy={cy} r={r} fill="#ec4899" stroke="rgba(0,0,0,0.6)" strokeWidth={1.5} style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.6))' }} />
+      </svg>
+    );
+  };
   
   const baseData = [
     {
@@ -45,7 +77,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         </div>
         
         <div className="flex-1 flex flex-col justify-center">
-          <div className="relative w-16 h-16 mx-auto mb-2">
+          <div ref={containerRef} className="relative w-16 h-16 mx-auto mb-2">
             {/* Base ring */}
             <ResponsiveContainer width="100%" height="100%">
               <RadialBarChart 
