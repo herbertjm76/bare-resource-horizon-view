@@ -11,6 +11,7 @@ import { OtherLeaveCard } from './cards/OtherLeaveCard';
 import { NotesCard } from './cards/NotesCard';
 import { AvailableThisWeekCard } from './cards/AvailableThisWeekCard';
 import { CustomRundownCard } from './cards/CustomRundownCard';
+import { WeekInfoCard } from './cards/WeekInfoCard';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { useCardVisibility, CardVisibility } from '@/hooks/useCardVisibility';
 
@@ -117,6 +118,9 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   const cards = useMemo(() => {
     const visibleCards = [];
 
+    // Always show WeekInfoCard first
+    visibleCards.push({ id: 'weekInfo', component: <WeekInfoCard key="weekInfo" selectedWeek={selectedWeek} /> });
+
     if (cardVisibility.holidays) {
       visibleCards.push({ id: 'holidays', component: <HolidaysCard key="holidays" holidays={holidays} /> });
     }
@@ -136,10 +140,11 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       });
     }
 
-    // Add custom cards
+    // Add custom cards (default to visible if not explicitly set)
     customCardTypes.forEach(cardType => {
       const cardKey = `custom_${cardType.id}`;
-      if (cardVisibility[cardKey]) {
+      const isVisible = cardVisibility[cardKey] !== false; // Show by default if undefined
+      if (isVisible) {
         visibleCards.push({
           id: cardKey,
           component: (
@@ -154,7 +159,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     });
 
     return visibleCards;
-  }, [cardVisibility, holidays, annualLeaves, otherLeaves, weeklyNotes, weekStartString, customCardTypes]);
+  }, [selectedWeek, cardVisibility, holidays, annualLeaves, otherLeaves, weeklyNotes, weekStartString, customCardTypes]);
 
   // Handle scroll and show/hide arrows
   const handleScroll = () => {
@@ -185,9 +190,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     }
   }, [cards]);
 
-  if (cards.length === 0) {
-    return null;
-  }
+  // Don't return null as we always want to show the WeekInfoCard
 
   return (
     <div className="relative group mb-6">
