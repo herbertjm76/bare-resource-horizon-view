@@ -126,7 +126,7 @@ export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 flex-1 overflow-y-auto">
+      <CardContent className="pt-4 flex-1 overflow-y-auto scrollbar-grey">
         <div className="flex flex-wrap gap-3">
           {entries.map((entry) => {
             const member = getMemberDetails(entry);

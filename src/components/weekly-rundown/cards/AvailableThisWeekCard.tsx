@@ -139,7 +139,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
           Available This Week
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 flex-1 overflow-x-auto">
+      <CardContent className="pt-4 flex-1 overflow-x-auto scrollbar-grey">
         {availableMembers.length === 0 ? (
           <p className="text-sm text-muted-foreground">All team members fully allocated</p>
         ) : (

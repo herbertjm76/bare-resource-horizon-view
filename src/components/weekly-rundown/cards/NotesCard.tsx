@@ -145,7 +145,7 @@ export const NotesCard: React.FC<NotesCardProps> = ({ notes, weekStartDate }) =>
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 overflow-y-auto">
+        <CardContent className="flex-1 overflow-y-auto scrollbar-grey">
           {notes.length === 0 ? (
             <p className="text-sm text-muted-foreground">No notes this week</p>
           ) : (

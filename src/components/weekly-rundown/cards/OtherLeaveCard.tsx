@@ -69,7 +69,7 @@ export const OtherLeaveCard: React.FC<OtherLeaveCardProps> = ({ leaves }) => {
           <CardTitle className="text-sm font-medium">Other Leave</CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 overflow-y-auto">
+      <CardContent className="flex-1 overflow-y-auto scrollbar-grey">
         {memberIds.length === 0 ? (
           <p className="text-sm text-muted-foreground">No other leave this week</p>
         ) : (
