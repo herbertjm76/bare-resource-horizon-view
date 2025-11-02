@@ -84,8 +84,10 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                       dataKey="value"
                       cornerRadius={8}
                       fill="#ec4899"
+                      stroke="rgba(0,0,0,0.35)"
+                      strokeWidth={2}
                       style={{ 
-                        filter: 'drop-shadow(0 3px 10px rgba(236, 72, 153, 0.6)) drop-shadow(0 0 15px rgba(236, 72, 153, 0.4))'
+                        filter: 'drop-shadow(0 1px 0 rgba(0,0,0,0.5)) drop-shadow(0 4px 10px rgba(0,0,0,0.35)) drop-shadow(0 0 16px rgba(236, 72, 153, 0.45))'
                       }}
                     />
                   </RadialBarChart>
