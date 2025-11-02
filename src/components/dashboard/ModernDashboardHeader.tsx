@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { LayoutDashboard } from 'lucide-react';
 
 interface ModernDashboardHeaderProps {
   totalTeamMembers: number;
@@ -19,7 +19,7 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
       <div className="text-center py-6">
         <div className="flex items-center justify-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}>
-            <span className="text-2xl">📊</span>
+            <LayoutDashboard className="h-5 w-5" style={{ color: 'hsl(var(--theme-primary))' }} />
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: 'hsl(var(--theme-primary))' }}>
             ABC Studios Dashboard
