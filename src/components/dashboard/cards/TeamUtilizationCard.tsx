@@ -25,31 +25,45 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
     if (rate <= 70) {
       return {
         status: 'Under-utilized',
-        fill: 'hsl(var(--muted))',
+        baseColor: '#9ca3af',
+        overColor: '#9ca3af',
         textColor: 'text-muted-foreground'
       };
     } else if (rate <= 100) {
       return {
         status: 'Optimal',
-        fill: 'hsl(var(--brand-violet))',
+        baseColor: '#8b5cf6',
+        overColor: '#8b5cf6',
         textColor: 'text-foreground'
       };
     } else {
       return {
         status: 'Over Capacity',
-        fill: 'hsl(var(--brand-violet) / 0.7)',
+        baseColor: '#8b5cf6',
+        overColor: '#ec4899', // Pink for overflow
         textColor: 'text-destructive'
       };
     }
   };
   
   const config = getUtilizationConfig(actualUtilizationRate);
+  const isOverCapacity = actualUtilizationRate > 100;
   
-  const chartData = [
+  // Base ring (0-100%)
+  const baseData = [
     {
-      name: 'Utilization',
-      value: Math.min(actualUtilizationRate, 150),
-      fill: config.fill
+      name: 'Base',
+      value: Math.min(actualUtilizationRate, 100),
+      fill: config.baseColor
+    }
+  ];
+  
+  // Overflow ring (100%+) - overlaps on top
+  const overflowData = [
+    {
+      name: 'Overflow',
+      value: Math.max(0, actualUtilizationRate - 100),
+      fill: config.overColor
     }
   ];
 
@@ -65,26 +79,54 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         
         <div className="flex-1 flex flex-col items-center justify-center relative p-6">
           <div className="relative w-full h-full max-w-[220px] max-h-[220px] mx-auto">
+            {/* Base ring (0-100%) */}
             <ResponsiveContainer width="100%" height="100%">
               <RadialBarChart 
                 cx="50%" 
                 cy="50%" 
                 innerRadius="60%" 
                 outerRadius="90%" 
-                data={chartData}
+                data={baseData}
                 startAngle={90}
                 endAngle={-270}
               >
-                <PolarAngleAxis type="number" domain={[0, 150]} angleAxisId={0} tick={false} />
+                <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
                 <RadialBar
-                  background={{ fill: 'hsl(var(--muted) / 0.2)' }}
+                  background={{ fill: 'rgba(156, 163, 175, 0.2)' }}
                   dataKey="value"
                   cornerRadius={10}
-                  fill={config.fill}
+                  fill={config.baseColor}
                   animationDuration={1000}
                 />
               </RadialBarChart>
             </ResponsiveContainer>
+            
+            {/* Overflow ring (100%+) - overlaps on top like Apple Watch */}
+            {isOverCapacity && (
+              <div className="absolute inset-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadialBarChart 
+                    cx="50%" 
+                    cy="50%" 
+                    innerRadius="65%" 
+                    outerRadius="95%" 
+                    data={overflowData}
+                    startAngle={90}
+                    endAngle={-270}
+                  >
+                    <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
+                    <RadialBar
+                      background={false}
+                      dataKey="value"
+                      cornerRadius={10}
+                      fill={config.overColor}
+                      animationDuration={1000}
+                      style={{ filter: 'drop-shadow(0 0 8px rgba(236, 72, 153, 0.5))' }}
+                    />
+                  </RadialBarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
             
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center">
               <div className="text-4xl font-bold bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text text-transparent text-center">

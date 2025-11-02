@@ -16,11 +16,21 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   utilizationRate,
   utilizationStatus
 }) => {
-  const chartData = [
+  const isOverCapacity = utilizationRate > 100;
+  
+  const baseData = [
     {
-      name: 'Utilization',
+      name: 'Base',
       value: Math.min(utilizationRate, 100),
-      fill: 'hsl(var(--brand-violet))'
+      fill: 'white'
+    }
+  ];
+  
+  const overflowData = [
+    {
+      name: 'Overflow',
+      value: Math.max(0, utilizationRate - 100),
+      fill: '#ec4899'
     }
   ];
 
@@ -36,13 +46,14 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         
         <div className="flex-1 flex flex-col justify-center">
           <div className="relative w-16 h-16 mx-auto mb-2">
+            {/* Base ring */}
             <ResponsiveContainer width="100%" height="100%">
               <RadialBarChart 
                 cx="50%" 
                 cy="50%" 
                 innerRadius="70%" 
                 outerRadius="100%" 
-                data={chartData}
+                data={baseData}
                 startAngle={90}
                 endAngle={-270}
               >
@@ -54,6 +65,32 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                 />
               </RadialBarChart>
             </ResponsiveContainer>
+            
+            {/* Overflow ring - overlaps like Apple Watch */}
+            {isOverCapacity && (
+              <div className="absolute inset-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadialBarChart 
+                    cx="50%" 
+                    cy="50%" 
+                    innerRadius="75%" 
+                    outerRadius="105%" 
+                    data={overflowData}
+                    startAngle={90}
+                    endAngle={-270}
+                  >
+                    <RadialBar
+                      background={false}
+                      dataKey="value"
+                      cornerRadius={10}
+                      fill="#ec4899"
+                      style={{ filter: 'drop-shadow(0 0 6px rgba(236, 72, 153, 0.6))' }}
+                    />
+                  </RadialBarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+            
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="text-lg font-bold text-white">{Math.round(utilizationRate)}%</span>
             </div>
