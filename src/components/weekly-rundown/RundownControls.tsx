@@ -7,6 +7,7 @@ import { PlayCircle, PauseCircle, Maximize, Minimize, Users, FolderOpen, LayoutG
 import { RundownMode, SortOption, ViewType } from './WeeklyRundownView';
 import { useCardVisibility } from '@/hooks/useCardVisibility';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
+import { ManageCustomCardsDialog } from './ManageCustomCardsDialog';
 
 interface RundownControlsProps {
   selectedWeek: Date;
@@ -183,6 +184,9 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
             )}
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* Manage custom cards button */}
+        <ManageCustomCardsDialog />
 
         {/* Sort selector */}
         <Select value={sortOption} onValueChange={onSortChange}>

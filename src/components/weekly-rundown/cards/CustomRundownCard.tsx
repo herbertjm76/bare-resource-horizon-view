@@ -114,8 +114,8 @@ export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
   };
 
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader style={{ backgroundColor: cardType.color || 'hsl(var(--muted))' }}>
+    <Card className="h-full flex flex-col min-h-[200px]">
+      <CardHeader style={{ backgroundColor: cardType.color || 'hsl(var(--muted))' }} className="flex-shrink-0">
         <CardTitle className="flex items-center justify-between text-base">
           <span className="flex items-center gap-2">
             {cardType.icon && <span>{cardType.icon}</span>}
@@ -126,7 +126,7 @@ export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
           </Badge>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 flex-1">
+      <CardContent className="pt-4 flex-1 overflow-y-auto">
         <div className="flex flex-wrap gap-3">
           {entries.map((entry) => {
             const member = getMemberDetails(entry);

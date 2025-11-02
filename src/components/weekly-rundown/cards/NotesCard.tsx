@@ -126,8 +126,8 @@ export const NotesCard: React.FC<NotesCardProps> = ({ notes, weekStartDate }) =>
 
   return (
     <>
-      <Card>
-        <CardHeader className="pb-3">
+      <Card className="h-full flex flex-col min-h-[200px]">
+        <CardHeader className="pb-3 flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="bg-green-50 dark:bg-green-950/30 p-2 rounded-lg">
@@ -145,7 +145,7 @@ export const NotesCard: React.FC<NotesCardProps> = ({ notes, weekStartDate }) =>
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 overflow-y-auto">
           {notes.length === 0 ? (
             <p className="text-sm text-muted-foreground">No notes this week</p>
           ) : (

@@ -210,7 +210,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {cards.map(card => (
-          <div key={card.id} className="flex-shrink-0 w-[280px] snap-center">
+          <div key={card.id} className="flex-shrink-0 w-[280px] h-[200px] snap-center">
             {card.component}
           </div>
         ))}
