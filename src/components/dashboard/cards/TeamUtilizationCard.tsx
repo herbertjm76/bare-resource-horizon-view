@@ -84,7 +84,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               <RadialBarChart 
                 cx="50%" 
                 cy="50%" 
-                innerRadius="65%" 
+                innerRadius="60%" 
                 outerRadius="80%" 
                 data={baseData}
                 startAngle={90}
@@ -103,13 +103,13 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
             
             {/* Overflow ring (100%+) - overlaps outside like Apple Watch */}
             {isOverCapacity && (
-              <div className="absolute inset-0">
+              <div className="absolute inset-0" style={{ zIndex: 10 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <RadialBarChart 
                     cx="50%" 
                     cy="50%" 
-                    innerRadius="75%" 
-                    outerRadius="90%" 
+                    innerRadius="72%" 
+                    outerRadius="92%" 
                     data={overflowData}
                     startAngle={90}
                     endAngle={-270}
@@ -121,7 +121,9 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                       cornerRadius={10}
                       fill={config.overColor}
                       animationDuration={1000}
-                      style={{ filter: 'drop-shadow(0 0 12px rgba(236, 72, 153, 0.7))' }}
+                      style={{ 
+                        filter: 'drop-shadow(0 4px 12px rgba(236, 72, 153, 0.5)) drop-shadow(0 0 20px rgba(236, 72, 153, 0.3))',
+                      }}
                     />
                   </RadialBarChart>
                 </ResponsiveContainer>

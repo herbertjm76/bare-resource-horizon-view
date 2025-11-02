@@ -51,7 +51,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               <RadialBarChart 
                 cx="50%" 
                 cy="50%" 
-                innerRadius="70%" 
+                innerRadius="65%" 
                 outerRadius="85%" 
                 data={baseData}
                 startAngle={90}
@@ -68,13 +68,13 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
             
             {/* Overflow ring - overlaps outside like Apple Watch */}
             {isOverCapacity && (
-              <div className="absolute inset-0">
+              <div className="absolute inset-0" style={{ zIndex: 10 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <RadialBarChart 
                     cx="50%" 
                     cy="50%" 
-                    innerRadius="80%" 
-                    outerRadius="95%" 
+                    innerRadius="77%" 
+                    outerRadius="97%" 
                     data={overflowData}
                     startAngle={90}
                     endAngle={-270}
@@ -84,14 +84,16 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                       dataKey="value"
                       cornerRadius={8}
                       fill="#ec4899"
-                      style={{ filter: 'drop-shadow(0 0 10px rgba(236, 72, 153, 0.8))' }}
+                      style={{ 
+                        filter: 'drop-shadow(0 3px 10px rgba(236, 72, 153, 0.6)) drop-shadow(0 0 15px rgba(236, 72, 153, 0.4))'
+                      }}
                     />
                   </RadialBarChart>
                 </ResponsiveContainer>
               </div>
             )}
             
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center" style={{ zIndex: 20 }}>
               <span className="text-lg font-bold text-white">{Math.round(utilizationRate)}%</span>
             </div>
           </div>
