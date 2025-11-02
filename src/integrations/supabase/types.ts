@@ -1375,6 +1375,136 @@ export type Database = {
         }
         Relationships: []
       }
+      user_rundown_preferences: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          visible_cards: Json
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          visible_cards?: Json
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          visible_cards?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_rundown_preferences_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weekly_custom_card_entries: {
+        Row: {
+          card_type_id: string
+          company_id: string
+          created_at: string
+          id: string
+          member_id: string
+          member_type: Database["public"]["Enums"]["member_type"]
+          notes: string | null
+          updated_at: string
+          week_start_date: string
+        }
+        Insert: {
+          card_type_id: string
+          company_id: string
+          created_at?: string
+          id?: string
+          member_id: string
+          member_type?: Database["public"]["Enums"]["member_type"]
+          notes?: string | null
+          updated_at?: string
+          week_start_date: string
+        }
+        Update: {
+          card_type_id?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          member_id?: string
+          member_type?: Database["public"]["Enums"]["member_type"]
+          notes?: string | null
+          updated_at?: string
+          week_start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_custom_card_entries_card_type_id_fkey"
+            columns: ["card_type_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_custom_card_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "weekly_custom_card_entries_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      weekly_custom_card_types: {
+        Row: {
+          color: string | null
+          company_id: string
+          created_at: string
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          order_index: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          company_id: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          order_index?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          company_id?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          order_index?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_custom_card_types_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weekly_notes: {
         Row: {
           company_id: string
@@ -1509,6 +1639,7 @@ export type Database = {
     }
     Enums: {
       data_sensitivity: "public" | "internal" | "confidential" | "restricted"
+      member_type: "active" | "pre_registered"
       project_status: "In Progress" | "On Hold" | "Complete" | "Planning"
       user_role: "owner" | "admin" | "member"
     }
@@ -1639,6 +1770,7 @@ export const Constants = {
   public: {
     Enums: {
       data_sensitivity: ["public", "internal", "confidential", "restricted"],
+      member_type: ["active", "pre_registered"],
       project_status: ["In Progress", "On Hold", "Complete", "Planning"],
       user_role: ["owner", "admin", "member"],
     },

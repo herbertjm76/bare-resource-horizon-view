@@ -5,6 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { MapPin, Clock, AlertTriangle, CheckCircle, Calendar, TrendingUp } from 'lucide-react';
 import { EditableProjectAllocation } from './EditableProjectAllocation';
 import { AddProjectAllocation } from './AddProjectAllocation';
+import { OtherLeaveSection } from './OtherLeaveSection';
 import { format, startOfWeek } from 'date-fns';
 import { CountUpNumber } from '@/components/common/CountUpNumber';
 import { generateMonochromaticShades } from '@/utils/themeColorUtils';
@@ -222,6 +223,15 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
               />
             </div>
           </div>
+        </div>
+
+        {/* Other Leave Section */}
+        <div className="px-8 py-4 border-t border-border/30 relative z-10">
+          <OtherLeaveSection
+            memberId={person.id}
+            weekStartDate={weekStartDate}
+            onUpdate={handleDataChange}
+          />
         </div>
 
       </div>

@@ -1,23 +1,34 @@
-import React from 'react';
+import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
+import { Button } from '@/components/ui/button';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { HolidaysCard } from './cards/HolidaysCard';
 import { AnnualLeaveCard } from './cards/AnnualLeaveCard';
 import { OtherLeaveCard } from './cards/OtherLeaveCard';
 import { NotesCard } from './cards/NotesCard';
+import { AvailableThisWeekCard } from './cards/AvailableThisWeekCard';
+import { CustomRundownCard } from './cards/CustomRundownCard';
+import { useCustomCardTypes } from '@/hooks/useCustomCards';
+import { useCardVisibility, CardVisibility } from '@/hooks/useCardVisibility';
 
 interface WeeklySummaryCardsProps {
   selectedWeek: Date;
   memberIds: string[];
+  cardVisibility: CardVisibility;
 }
 
 export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   selectedWeek,
-  memberIds
+  memberIds,
+  cardVisibility
 }) => {
   const { company } = useCompany();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
   const weekStart = startOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(selectedWeek, { weekStartsOn: 1 });
   const weekStartString = format(weekStart, 'yyyy-MM-dd');
@@ -99,12 +110,123 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     enabled: !!company?.id
   });
 
+  // Fetch custom card types
+  const { data: customCardTypes = [] } = useCustomCardTypes();
+
+  // Build card registry based on visibility
+  const cards = useMemo(() => {
+    const visibleCards = [];
+
+    if (cardVisibility.holidays) {
+      visibleCards.push({ id: 'holidays', component: <HolidaysCard key="holidays" holidays={holidays} /> });
+    }
+    if (cardVisibility.annualLeave) {
+      visibleCards.push({ id: 'annualLeave', component: <AnnualLeaveCard key="annualLeave" leaves={annualLeaves} /> });
+    }
+    if (cardVisibility.otherLeave) {
+      visibleCards.push({ id: 'otherLeave', component: <OtherLeaveCard key="otherLeave" leaves={otherLeaves} /> });
+    }
+    if (cardVisibility.notes) {
+      visibleCards.push({ id: 'notes', component: <NotesCard key="notes" notes={weeklyNotes} weekStartDate={weekStartString} /> });
+    }
+    if (cardVisibility.available) {
+      visibleCards.push({ 
+        id: 'available', 
+        component: <AvailableThisWeekCard key="available" weekStartDate={weekStartString} threshold={80} /> 
+      });
+    }
+
+    // Add custom cards
+    customCardTypes.forEach(cardType => {
+      const cardKey = `custom_${cardType.id}`;
+      if (cardVisibility[cardKey]) {
+        visibleCards.push({
+          id: cardKey,
+          component: (
+            <CustomRundownCard
+              key={cardKey}
+              cardType={cardType}
+              weekStartDate={weekStartString}
+            />
+          )
+        });
+      }
+    });
+
+    return visibleCards;
+  }, [cardVisibility, holidays, annualLeaves, otherLeaves, weeklyNotes, weekStartString, customCardTypes]);
+
+  // Handle scroll and show/hide arrows
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    setShowLeftArrow(scrollLeft > 0);
+    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
+  };
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    handleScroll();
+    const ref = scrollRef.current;
+    if (ref) {
+      ref.addEventListener('scroll', handleScroll);
+      return () => ref.removeEventListener('scroll', handleScroll);
+    }
+  }, [cards]);
+
+  if (cards.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <HolidaysCard holidays={holidays} />
-      <AnnualLeaveCard leaves={annualLeaves} />
-      <OtherLeaveCard leaves={otherLeaves} />
-      <NotesCard notes={weeklyNotes} weekStartDate={weekStartString} />
+    <div className="relative group mb-6">
+      {/* Left Arrow */}
+      {showLeftArrow && (
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
+          onClick={scrollLeft}
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+      )}
+      
+      {/* Scrollable Container */}
+      <div 
+        ref={scrollRef}
+        className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-4 pb-2 scrollbar-hide px-1"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {cards.map(card => (
+          <div key={card.id} className="flex-shrink-0 w-[280px] snap-center">
+            {card.component}
+          </div>
+        ))}
+      </div>
+      
+      {/* Right Arrow */}
+      {showRightArrow && (
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm shadow-lg"
+          onClick={scrollRight}
+        >
+          <ChevronRight className="h-5 w-5" />
+        </Button>
+      )}
     </div>
   );
 };

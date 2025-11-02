@@ -1,9 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { WeekSelector } from '@/components/weekly-overview/WeekSelector';
-import { PlayCircle, PauseCircle, Maximize, Minimize, Users, FolderOpen, LayoutGrid, Presentation } from 'lucide-react';
+import { PlayCircle, PauseCircle, Maximize, Minimize, Users, FolderOpen, LayoutGrid, Presentation, Settings } from 'lucide-react';
 import { RundownMode, SortOption, ViewType } from './WeeklyRundownView';
+import { useCardVisibility } from '@/hooks/useCardVisibility';
+import { useCustomCardTypes } from '@/hooks/useCustomCards';
 
 interface RundownControlsProps {
   selectedWeek: Date;
@@ -40,6 +43,9 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
   currentIndex,
   totalItems
 }) => {
+  const { visibility, toggleCard } = useCardVisibility();
+  const { data: customCardTypes = [] } = useCustomCardTypes();
+
   const onPreviousWeek = () => {
     const newDate = new Date(selectedWeek);
     newDate.setDate(newDate.getDate() - 7);
@@ -115,6 +121,68 @@ export const RundownControls: React.FC<RundownControlsProps> = ({
             <span className="hidden sm:inline">Grid</span>
           </Button>
         </div>
+
+        {/* Card visibility menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="h-9">
+              <Settings className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Cards</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>Visible Cards</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            
+            <DropdownMenuCheckboxItem 
+              checked={visibility.holidays} 
+              onCheckedChange={(v) => toggleCard('holidays', v)}
+            >
+              Holidays
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem 
+              checked={visibility.annualLeave} 
+              onCheckedChange={(v) => toggleCard('annualLeave', v)}
+            >
+              Annual Leave
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem 
+              checked={visibility.otherLeave} 
+              onCheckedChange={(v) => toggleCard('otherLeave', v)}
+            >
+              Other Leave
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem 
+              checked={visibility.notes} 
+              onCheckedChange={(v) => toggleCard('notes', v)}
+            >
+              Notes
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem 
+              checked={visibility.available} 
+              onCheckedChange={(v) => toggleCard('available', v)}
+            >
+              Available This Week
+            </DropdownMenuCheckboxItem>
+            
+            {customCardTypes.length > 0 && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>Custom Cards</DropdownMenuLabel>
+                {customCardTypes.map(card => (
+                  <DropdownMenuCheckboxItem 
+                    key={card.id}
+                    checked={visibility[`custom_${card.id}`] || false}
+                    onCheckedChange={(v) => toggleCard(`custom_${card.id}`, v)}
+                  >
+                    {card.icon && <span className="mr-2">{card.icon}</span>}
+                    {card.label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Sort selector */}
         <Select value={sortOption} onValueChange={onSortChange}>

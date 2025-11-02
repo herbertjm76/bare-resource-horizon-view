@@ -7,6 +7,7 @@ import { RundownGridView } from './RundownGridView';
 import { WeeklySummaryCards } from './WeeklySummaryCards';
 import { useRundownData } from './hooks/useRundownData';
 import { useCarouselNavigation } from './hooks/useCarouselNavigation';
+import { useCardVisibility } from '@/hooks/useCardVisibility';
 
 export type RundownMode = 'people' | 'projects';
 export type SortOption = 'alphabetical' | 'utilization' | 'location' | 'department';
@@ -19,6 +20,9 @@ export const WeeklyRundownView: React.FC = () => {
   const [viewType, setViewType] = useState<ViewType>('carousel');
   const [isAutoAdvance, setIsAutoAdvance] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Get card visibility preferences
+  const { visibility: cardVisibility } = useCardVisibility();
 
   // Stable filters for data fetching
   const stableFilters = useMemo(() => ({ office: '' }), []);
@@ -121,6 +125,7 @@ export const WeeklyRundownView: React.FC = () => {
       <WeeklySummaryCards 
         selectedWeek={selectedWeek}
         memberIds={memberIds}
+        cardVisibility={cardVisibility}
       />
 
       <RundownControls
