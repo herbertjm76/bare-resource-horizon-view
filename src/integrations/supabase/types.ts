@@ -1377,6 +1377,7 @@ export type Database = {
       }
       user_rundown_preferences: {
         Row: {
+          card_order: Json | null
           company_id: string
           created_at: string
           id: string
@@ -1385,6 +1386,7 @@ export type Database = {
           visible_cards: Json
         }
         Insert: {
+          card_order?: Json | null
           company_id: string
           created_at?: string
           id?: string
@@ -1393,6 +1395,7 @@ export type Database = {
           visible_cards?: Json
         }
         Update: {
+          card_order?: Json | null
           company_id?: string
           created_at?: string
           id?: string

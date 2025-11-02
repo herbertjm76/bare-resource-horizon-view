@@ -13,20 +13,26 @@ import { AvailableThisWeekCard } from './cards/AvailableThisWeekCard';
 import { CustomRundownCard } from './cards/CustomRundownCard';
 import { WeekInfoCard } from './cards/WeekInfoCard';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
-import { CardVisibility } from '@/hooks/useCardVisibility';
+import { CardVisibility, CardOrder } from '@/hooks/useCardVisibility';
 
 interface WeeklySummaryCardsProps {
   selectedWeek: Date;
   memberIds: string[];
   cardVisibility: CardVisibility;
+  cardOrder: CardOrder;
   toggleCard: (key: string, isVisible: boolean) => void;
+  moveCard: (cardId: string, direction: 'up' | 'down') => void;
+  reorderCards: (newOrder: CardOrder) => void;
 }
 
 export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   selectedWeek,
   memberIds,
   cardVisibility,
-  toggleCard
+  cardOrder,
+  toggleCard,
+  moveCard,
+  reorderCards
 }) => {
   const { company } = useCompany();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -118,54 +124,109 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
 
   // Build card registry based on visibility
   const cards = useMemo(() => {
-    const visibleCards = [];
+    const allCards = [];
 
     console.log('Building cards with visibility:', cardVisibility);
 
-    // Always show WeekInfoCard first
-    visibleCards.push({ id: 'weekInfo', component: <WeekInfoCard key="weekInfo" selectedWeek={selectedWeek} visibility={cardVisibility} onToggle={toggleCard} /> });
+    // Build all available cards
+    allCards.push({ 
+      id: 'weekInfo', 
+      component: <WeekInfoCard key="weekInfo" selectedWeek={selectedWeek} visibility={cardVisibility} onToggle={toggleCard} />,
+      isVisible: true // WeekInfoCard is always visible
+    });
 
-    if (cardVisibility.holidays) {
-      visibleCards.push({ id: 'holidays', component: <HolidaysCard key="holidays" holidays={holidays} /> });
-    }
-    if (cardVisibility.annualLeave) {
-      visibleCards.push({ id: 'annualLeave', component: <AnnualLeaveCard key="annualLeave" leaves={annualLeaves} /> });
-    }
-    if (cardVisibility.otherLeave) {
-      visibleCards.push({ id: 'otherLeave', component: <OtherLeaveCard key="otherLeave" leaves={otherLeaves} /> });
-    }
-    if (cardVisibility.notes) {
-      visibleCards.push({ id: 'notes', component: <NotesCard key="notes" notes={weeklyNotes} weekStartDate={weekStartString} /> });
-    }
-    if (cardVisibility.available) {
-      visibleCards.push({ 
-        id: 'available', 
-        component: <AvailableThisWeekCard key="available" weekStartDate={weekStartString} threshold={80} /> 
+    allCards.push({ 
+      id: 'holidays', 
+      component: <HolidaysCard key="holidays" holidays={holidays} />,
+      isVisible: cardVisibility.holidays 
+    });
+    
+    allCards.push({ 
+      id: 'annualLeave', 
+      component: <AnnualLeaveCard key="annualLeave" leaves={annualLeaves} />,
+      isVisible: cardVisibility.annualLeave 
+    });
+    
+    allCards.push({ 
+      id: 'otherLeave', 
+      component: <OtherLeaveCard key="otherLeave" leaves={otherLeaves} />,
+      isVisible: cardVisibility.otherLeave 
+    });
+    
+    allCards.push({ 
+      id: 'notes', 
+      component: <NotesCard key="notes" notes={weeklyNotes} weekStartDate={weekStartString} />,
+      isVisible: cardVisibility.notes 
+    });
+    
+    allCards.push({ 
+      id: 'available', 
+      component: <AvailableThisWeekCard key="available" weekStartDate={weekStartString} threshold={80} />,
+      isVisible: cardVisibility.available 
+    });
+
+    // Add custom cards
+    customCardTypes.forEach(cardType => {
+      const cardKey = `custom_${cardType.id}`;
+      const isVisible = cardVisibility[cardKey] !== false;
+      console.log(`Custom card ${cardType.label} (${cardKey}): visibility=${cardVisibility[cardKey]}, isVisible=${isVisible}`);
+      
+      allCards.push({
+        id: cardKey,
+        component: (
+          <CustomRundownCard
+            key={cardKey}
+            cardType={cardType}
+            weekStartDate={weekStartString}
+          />
+        ),
+        isVisible
+      });
+    });
+
+    // Filter visible cards
+    const visibleCards = allCards.filter(card => card.isVisible);
+    const visibleCardIds = visibleCards.map(c => c.id);
+    
+    // Sort by cardOrder if available, ensuring all visible cards are in the order
+    if (cardOrder.length > 0) {
+      // Filter out cards that are no longer visible
+      const validOrderedIds = cardOrder.filter(id => visibleCardIds.includes(id));
+      
+      // Add any new cards that aren't in the order yet
+      const newCardIds = visibleCardIds.filter(id => !validOrderedIds.includes(id));
+      const completeOrder = [...validOrderedIds, ...newCardIds];
+      
+      visibleCards.sort((a, b) => {
+        const indexA = completeOrder.indexOf(a.id);
+        const indexB = completeOrder.indexOf(b.id);
+        return indexA - indexB;
       });
     }
 
-    // Add custom cards (show by default if not explicitly set to false)
-    customCardTypes.forEach(cardType => {
-      const cardKey = `custom_${cardType.id}`;
-      // Show if explicitly true OR if undefined (default to visible)
-      const isVisible = cardVisibility[cardKey] !== false;
-      console.log(`Custom card ${cardType.label} (${cardKey}): visibility=${cardVisibility[cardKey]}, isVisible=${isVisible}`);
-      if (isVisible) {
-        visibleCards.push({
-          id: cardKey,
-          component: (
-            <CustomRundownCard
-              key={cardKey}
-              cardType={cardType}
-              weekStartDate={weekStartString}
-            />
-          )
-        });
-      }
-    });
-
     return visibleCards;
-  }, [selectedWeek, cardVisibility, holidays, annualLeaves, otherLeaves, weeklyNotes, weekStartString, customCardTypes]);
+  }, [selectedWeek, cardVisibility, cardOrder, holidays, annualLeaves, otherLeaves, weeklyNotes, weekStartString, customCardTypes, toggleCard]);
+
+  // Ensure cardOrder is populated with current visible cards
+  useEffect(() => {
+    const currentCardIds = cards.map(c => c.id);
+    
+    // If cardOrder is empty or missing cards, initialize/update it
+    const hasAllCards = currentCardIds.every(id => cardOrder.includes(id));
+    const hasOnlyValidCards = cardOrder.every(id => currentCardIds.includes(id));
+    
+    if (!hasAllCards || !hasOnlyValidCards) {
+      // Build a complete order: preserve existing order, add new cards at the end
+      const validOrderedIds = cardOrder.filter(id => currentCardIds.includes(id));
+      const newCardIds = currentCardIds.filter(id => !cardOrder.includes(id));
+      const completeOrder = [...validOrderedIds, ...newCardIds];
+      
+      // Only update if the order actually changed
+      if (JSON.stringify(completeOrder) !== JSON.stringify(cardOrder)) {
+        reorderCards(completeOrder);
+      }
+    }
+  }, [cards, cardOrder, reorderCards]);
 
   // Handle scroll and show/hide arrows
   const handleScroll = () => {
@@ -218,9 +279,35 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
         className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-3 pb-2 scrollbar-hide px-1"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {cards.map(card => (
-          <div key={card.id} className="flex-shrink-0 min-w-fit h-[180px] snap-center">
+        {cards.map((card, index) => (
+          <div key={card.id} className="relative flex-shrink-0 min-w-fit h-[180px] snap-center group/card">
             {card.component}
+            
+            {/* Reorder buttons - show on hover, except for WeekInfoCard */}
+            {card.id !== 'weekInfo' && (
+              <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity z-20">
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-6 w-6 shadow-lg"
+                  onClick={() => moveCard(card.id, 'up')}
+                  disabled={index === 0 || (index === 1 && cards[0].id === 'weekInfo')}
+                  title="Move left"
+                >
+                  <ChevronLeft className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-6 w-6 shadow-lg"
+                  onClick={() => moveCard(card.id, 'down')}
+                  disabled={index === cards.length - 1}
+                  title="Move right"
+                >
+                  <ChevronRight className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
           </div>
         ))}
       </div>

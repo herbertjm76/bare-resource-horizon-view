@@ -22,7 +22,7 @@ export const WeeklyRundownView: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Get card visibility preferences
-  const { visibility: cardVisibility, toggleCard } = useCardVisibility();
+  const { visibility: cardVisibility, cardOrder, toggleCard, moveCard, reorderCards } = useCardVisibility();
 
   // Stable filters for data fetching
   const stableFilters = useMemo(() => ({ office: '' }), []);
@@ -126,7 +126,10 @@ export const WeeklyRundownView: React.FC = () => {
         selectedWeek={selectedWeek}
         memberIds={memberIds}
         cardVisibility={cardVisibility}
+        cardOrder={cardOrder}
         toggleCard={toggleCard}
+        moveCard={moveCard}
+        reorderCards={reorderCards}
       />
 
       <RundownControls
