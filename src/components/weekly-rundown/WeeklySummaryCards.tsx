@@ -207,27 +207,6 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     return visibleCards;
   }, [selectedWeek, cardVisibility, cardOrder, holidays, annualLeaves, otherLeaves, weeklyNotes, weekStartString, customCardTypes, toggleCard]);
 
-  // Ensure cardOrder is populated with current visible cards
-  useEffect(() => {
-    const currentCardIds = cards.map(c => c.id);
-    
-    // If cardOrder is empty or missing cards, initialize/update it
-    const hasAllCards = currentCardIds.every(id => cardOrder.includes(id));
-    const hasOnlyValidCards = cardOrder.every(id => currentCardIds.includes(id));
-    
-    if (!hasAllCards || !hasOnlyValidCards) {
-      // Build a complete order: preserve existing order, add new cards at the end
-      const validOrderedIds = cardOrder.filter(id => currentCardIds.includes(id));
-      const newCardIds = currentCardIds.filter(id => !cardOrder.includes(id));
-      const completeOrder = [...validOrderedIds, ...newCardIds];
-      
-      // Only update if the order actually changed
-      if (JSON.stringify(completeOrder) !== JSON.stringify(cardOrder)) {
-        reorderCards(completeOrder);
-      }
-    }
-  }, [cards, cardOrder, reorderCards]);
-
   // Handle scroll and show/hide arrows
   const handleScroll = () => {
     if (!scrollRef.current) return;
