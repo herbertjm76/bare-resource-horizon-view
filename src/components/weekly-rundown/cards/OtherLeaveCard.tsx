@@ -60,13 +60,11 @@ export const OtherLeaveCard: React.FC<OtherLeaveCardProps> = ({ leaves }) => {
   });
 
   return (
-    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border min-w-[200px] max-w-[240px]">
+    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border border-border bg-card/50 backdrop-blur-sm min-w-[200px] max-w-[240px]">
       <CardHeader className="pb-2 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <div className="bg-purple-50 dark:bg-purple-950/30 p-1.5 rounded-md">
-            <PartyPopper className="h-3.5 w-3.5 text-purple-500" />
-          </div>
-          <CardTitle className="text-xs font-semibold">Other Leave</CardTitle>
+          <PartyPopper className="h-3.5 w-3.5 text-muted-foreground" />
+          <CardTitle className="text-xs font-semibold text-foreground">Other Leave</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto scrollbar-grey">
