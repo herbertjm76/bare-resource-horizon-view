@@ -140,10 +140,11 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       });
     }
 
-    // Add custom cards (default to visible if not explicitly set)
+    // Add custom cards (show by default if not explicitly set to false)
     customCardTypes.forEach(cardType => {
       const cardKey = `custom_${cardType.id}`;
-      const isVisible = cardVisibility[cardKey] !== false; // Show by default if undefined
+      // Show if explicitly true OR if undefined (default to visible)
+      const isVisible = cardVisibility[cardKey] !== false;
       if (isVisible) {
         visibleCards.push({
           id: cardKey,

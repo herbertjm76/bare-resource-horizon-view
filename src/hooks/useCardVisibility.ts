@@ -70,7 +70,8 @@ export const useCardVisibility = () => {
     }
   });
 
-  const visibility = preferences || DEFAULT_VISIBILITY;
+  // Merge saved preferences with defaults
+  const visibility = { ...DEFAULT_VISIBILITY, ...preferences };
 
   const toggleCard = (cardKey: string, isVisible: boolean) => {
     const newVisibility = { ...visibility, [cardKey]: isVisible };
