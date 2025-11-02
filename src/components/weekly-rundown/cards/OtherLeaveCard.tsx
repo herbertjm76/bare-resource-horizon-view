@@ -88,7 +88,7 @@ export const OtherLeaveCard: React.FC<OtherLeaveCardProps> = ({ leaves }) => {
                 <div key={id} className="flex flex-col items-center gap-1">
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={avatarUrl} />
-                    <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                    <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
                   </Avatar>
                   <span className="text-xs font-medium text-foreground">{hours}h</span>
                 </div>

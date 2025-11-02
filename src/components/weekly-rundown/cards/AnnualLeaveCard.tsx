@@ -95,7 +95,7 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
                 <div key={id} className="flex flex-col items-center gap-1.5">
                   <Avatar className="h-9 w-9">
                     <AvatarImage src={avatarUrl} />
-                    <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                    <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
                   </Avatar>
                   <span className="text-xs font-medium text-foreground">{firstName}</span>
                   <div className="flex flex-wrap gap-1 justify-center">

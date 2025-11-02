@@ -146,7 +146,7 @@ export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
                 </Button>
                 <Avatar className="h-9 w-9">
                   <AvatarImage src={member.avatar_url} />
-                  <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+                  <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
                 </Avatar>
                 <span className="text-xs font-medium text-foreground">{member.first_name}</span>
                 {entry.notes && (
