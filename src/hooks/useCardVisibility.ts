@@ -73,8 +73,13 @@ export const useCardVisibility = () => {
   // Merge saved preferences with defaults
   const visibility = { ...DEFAULT_VISIBILITY, ...preferences };
 
+  console.log('Card Visibility State:', visibility);
+  console.log('Preferences from DB:', preferences);
+
   const toggleCard = (cardKey: string, isVisible: boolean) => {
+    console.log(`Toggling ${cardKey} to ${isVisible}`);
     const newVisibility = { ...visibility, [cardKey]: isVisible };
+    console.log('New visibility state:', newVisibility);
     updateMutation.mutate(newVisibility);
   };
 

@@ -118,6 +118,8 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   const cards = useMemo(() => {
     const visibleCards = [];
 
+    console.log('Building cards with visibility:', cardVisibility);
+
     // Always show WeekInfoCard first
     visibleCards.push({ id: 'weekInfo', component: <WeekInfoCard key="weekInfo" selectedWeek={selectedWeek} /> });
 
@@ -145,6 +147,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       const cardKey = `custom_${cardType.id}`;
       // Show if explicitly true OR if undefined (default to visible)
       const isVisible = cardVisibility[cardKey] !== false;
+      console.log(`Custom card ${cardType.label} (${cardKey}): visibility=${cardVisibility[cardKey]}, isVisible=${isVisible}`);
       if (isVisible) {
         visibleCards.push({
           id: cardKey,
