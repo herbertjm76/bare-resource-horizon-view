@@ -154,7 +154,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
                     <AvatarFallback className="bg-gradient-modern text-white text-xs">{initials}</AvatarFallback>
                   </Avatar>
                   <span className="text-xs font-medium text-foreground">{member.firstName}</span>
-                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-medium">
+                  <Badge variant="secondary" className="text-xs px-2 py-0.5 h-5 font-bold">
                     {member.availableHours}h
                   </Badge>
                 </div>

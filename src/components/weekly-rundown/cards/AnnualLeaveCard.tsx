@@ -100,7 +100,7 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
                   <span className="text-xs font-medium text-foreground">{firstName}</span>
                   <div className="flex flex-wrap gap-1 justify-center">
                     {leaveDays.map((day, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-medium">
+                      <Badge key={idx} variant="secondary" className="text-xs px-2 py-0.5 h-5 font-bold">
                         {getDayInitial(day.date)}-{day.hours}h
                       </Badge>
                     ))}
