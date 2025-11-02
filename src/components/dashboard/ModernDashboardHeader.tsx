@@ -15,17 +15,17 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
   utilizationRate
 }) => {
   return (
-    <div className="bg-gradient-modern rounded-lg">
+    <div className="bg-card/50 border border-border rounded-lg shadow-sm">
       <div className="text-center py-6">
         <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">📊</span>
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}>
+            <span className="text-2xl">📊</span>
           </div>
-          <h1 className="text-3xl lg:text-4xl font-bold text-white tracking-tight">
+          <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: 'hsl(var(--theme-primary))' }}>
             ABC Studios Dashboard
           </h1>
         </div>
-        <p className="text-white/90 text-lg">
+        <p className="text-muted-foreground text-lg">
           Real-time insights into your team and project performance
         </p>
       </div>

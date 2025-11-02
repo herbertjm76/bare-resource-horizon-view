@@ -16,18 +16,18 @@ export const StandardizedPageHeader: React.FC<StandardizedPageHeaderProps> = ({
 }) => {
   return (
     <div className="space-y-6 mb-6">
-      {/* Main Header Section with Purple Background */}
-      <div className="bg-gradient-modern rounded-lg">
+      {/* Main Header Section with Subtle Background */}
+      <div className="bg-card/50 border border-border rounded-lg shadow-sm">
         <div className="text-center py-6">
           <div className="flex items-center justify-center gap-3 mb-2">
-            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-              <Icon className="h-5 w-5 text-white" />
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--theme-primary) / 0.1)' }}>
+              <Icon className="h-5 w-5" style={{ color: 'hsl(var(--theme-primary))' }} />
             </div>
-            <h1 className="text-3xl lg:text-4xl font-bold text-white tracking-tight">
+            <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: 'hsl(var(--theme-primary))' }}>
               {title}
             </h1>
           </div>
-          <p className="text-white/90 text-lg">
+          <p className="text-muted-foreground text-lg">
             {description}
           </p>
         </div>
