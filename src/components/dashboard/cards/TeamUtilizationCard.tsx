@@ -162,15 +162,15 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
           <div className="flex justify-center mt-4">
             <div className="flex flex-wrap items-center justify-center gap-3 text-xs bg-card/60 backdrop-blur-sm rounded-full px-3 py-1.5 border border-border max-w-full">
               <div className="flex items-center gap-1.5 whitespace-nowrap">
-                <div className="w-2 h-2 rounded-full bg-gray-400 flex-shrink-0" />
-                <span className="text-muted-foreground font-medium text-[10px]">Under</span>
+                <div className="w-2 h-2 rounded-full bg-muted flex-shrink-0" />
+                <span className="text-muted-foreground font-medium text-[10px]">Low</span>
               </div>
               <div className="flex items-center gap-1.5 whitespace-nowrap">
-                <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0" />
+                <div className="w-2 h-2 rounded-full bg-brand-violet flex-shrink-0" />
                 <span className="text-muted-foreground font-medium text-[10px]">Optimal</span>
               </div>
               <div className="flex items-center gap-1.5 whitespace-nowrap">
-                <div className="w-2 h-2 rounded-full bg-pink-500 flex-shrink-0" />
+                <div className="w-2 h-2 rounded-full bg-brand-violet/70 flex-shrink-0" />
                 <span className="text-muted-foreground font-medium text-[10px]">Over</span>
               </div>
             </div>

@@ -116,15 +116,11 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   const workloadMatrix = generateWorkload();
   
   const getIntensityColor = (intensity: number) => {
-    // Use solid colors - gray for under-utilized, purple for optimal, pink for over-utilized
+    // Minimal theme-based colors: muted for low, purple for optimal, darker purple for over
     if (intensity <= 0) return 'bg-muted'; // No work
-    if (intensity <= 40) return 'bg-gray-400'; // Very low utilization
-    if (intensity <= 60) return 'bg-gray-300'; // Low utilization
-    if (intensity <= 80) return 'bg-purple-400'; // Good utilization range
-    if (intensity <= 100) return 'bg-purple-500'; // Optimal utilization 
-    if (intensity <= 110) return 'bg-purple-400'; // Slightly over
-    if (intensity <= 130) return 'bg-pink-400'; // Over-utilized
-    return 'bg-pink-500'; // Severely over-utilized
+    if (intensity <= 60) return 'bg-muted/60'; // Low utilization
+    if (intensity <= 100) return 'bg-brand-violet'; // Optimal utilization 
+    return 'bg-brand-violet/70'; // Over-utilized
   };
 
   return (
@@ -184,15 +180,13 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           
           {/* Legend */}
           <div className="flex items-center justify-between text-xs text-muted-foreground mt-4 mb-2">
-            <span>Under-utilized</span>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-gray-400"></div>
-              <div className="w-3 h-3 rounded-sm bg-gray-300"></div>
-              <div className="w-3 h-3 rounded-sm bg-purple-500"></div>
-              <div className="w-3 h-3 rounded-sm bg-pink-400"></div>
-              <div className="w-3 h-3 rounded-sm bg-pink-500"></div>
+            <span>Low</span>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-3 rounded-sm bg-muted/60"></div>
+              <div className="w-4 h-3 rounded-sm bg-brand-violet"></div>
+              <div className="w-4 h-3 rounded-sm bg-brand-violet/70"></div>
             </div>
-            <span>Over-utilized</span>
+            <span>Over</span>
           </div>
           
           <div className="flex justify-center">

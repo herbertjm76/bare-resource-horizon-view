@@ -11,19 +11,17 @@ interface WorkloadHeatMapCardProps {
 }
 
 const getWorkloadColor = (utilization: number) => {
-  if (utilization >= 95) return 'bg-red-500';
-  if (utilization >= 85) return 'bg-orange-500';
-  if (utilization >= 70) return 'bg-yellow-500'; 
-  if (utilization >= 50) return 'bg-green-500';
-  return 'bg-gray-300';
+  if (utilization >= 100) return 'bg-brand-violet/70';
+  if (utilization >= 70) return 'bg-brand-violet'; 
+  if (utilization >= 40) return 'bg-brand-violet/50';
+  return 'bg-muted';
 };
 
 const getWorkloadLabel = (utilization: number) => {
-  if (utilization >= 95) return 'Overloaded';
-  if (utilization >= 85) return 'At Capacity';
+  if (utilization >= 100) return 'Over Capacity';
   if (utilization >= 70) return 'Optimal';
-  if (utilization >= 50) return 'Available';
-  return 'Underutilized';
+  if (utilization >= 40) return 'Available';
+  return 'Low';
 };
 
 export const WorkloadHeatMapCard: React.FC<WorkloadHeatMapCardProps> = ({ data, selectedTimeRange }) => {
@@ -118,18 +116,18 @@ export const WorkloadHeatMapCard: React.FC<WorkloadHeatMapCardProps> = ({ data, 
           )}
 
           <div className="mt-4 pt-3 border-t">
-            <div className="flex items-center justify-between text-xs text-gray-600">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-red-500" />
-                <span>Overloaded</span>
+                <div className="w-2 h-2 rounded-full bg-muted" />
+                <span>Low</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-orange-500" />
-                <span>At Capacity</span>
+                <div className="w-2 h-2 rounded-full bg-brand-violet" />
+                <span>Optimal</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span>Available</span>
+                <div className="w-2 h-2 rounded-full bg-brand-violet/70" />
+                <span>Over</span>
               </div>
             </div>
           </div>
