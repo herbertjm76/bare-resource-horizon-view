@@ -139,11 +139,11 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
           Available This Week
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 flex-1 overflow-y-auto">
+      <CardContent className="pt-4 flex-1 overflow-x-auto">
         {availableMembers.length === 0 ? (
           <p className="text-sm text-muted-foreground">All team members fully allocated</p>
         ) : (
-          <div className="flex flex-wrap gap-3">
+          <div className="flex gap-3 pb-2">
             {availableMembers.map((member) => {
               const initials = `${member.firstName[0] || ''}${member.lastName[0] || ''}`.toUpperCase();
               
