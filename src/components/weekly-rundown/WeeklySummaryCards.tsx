@@ -207,6 +207,19 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     return visibleCards;
   }, [selectedWeek, cardVisibility, cardOrder, holidays, annualLeaves, otherLeaves, weeklyNotes, weekStartString, customCardTypes, toggleCard]);
 
+  // Helper: move a card by computing order from currently rendered cards
+  const handleMove = (cardId: string, direction: 'left' | 'right') => {
+    const currentOrder = cards.map(c => c.id);
+    const index = currentOrder.indexOf(cardId);
+    if (index === -1) return;
+    const minIndex = cards[0]?.id === 'weekInfo' ? 1 : 0; // keep WeekInfo pinned first
+    const targetIndex = direction === 'left' ? index - 1 : index + 1;
+    if (targetIndex < minIndex || targetIndex >= currentOrder.length) return;
+    const newOrder = [...currentOrder];
+    [newOrder[index], newOrder[targetIndex]] = [newOrder[targetIndex], newOrder[index]];
+    reorderCards(newOrder);
+  };
+
   // Handle scroll and show/hide arrows
   const handleScroll = () => {
     if (!scrollRef.current) return;
@@ -269,7 +282,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
                   variant="secondary"
                   size="icon"
                   className="h-6 w-6 shadow-lg"
-                  onClick={() => moveCard(card.id, 'up')}
+                  onClick={() => handleMove(card.id, 'left')}
                   disabled={index === 0 || (index === 1 && cards[0].id === 'weekInfo')}
                   title="Move left"
                 >
@@ -279,7 +292,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
                   variant="secondary"
                   size="icon"
                   className="h-6 w-6 shadow-lg"
-                  onClick={() => moveCard(card.id, 'down')}
+                  onClick={() => handleMove(card.id, 'right')}
                   disabled={index === cards.length - 1}
                   title="Move right"
                 >
