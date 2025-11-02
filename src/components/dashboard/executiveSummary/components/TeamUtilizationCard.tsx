@@ -51,16 +51,16 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               <RadialBarChart 
                 cx="50%" 
                 cy="50%" 
-                innerRadius="70%" 
-                outerRadius="100%" 
+                innerRadius="75%" 
+                outerRadius="95%" 
                 data={baseData}
                 startAngle={90}
                 endAngle={-270}
               >
                 <RadialBar
-                  background={{ fill: 'rgba(255,255,255,0.2)' }}
+                  background={{ fill: 'rgba(255,255,255,0.15)' }}
                   dataKey="value"
-                  cornerRadius={10}
+                  cornerRadius={8}
                   fill="white"
                 />
               </RadialBarChart>
@@ -68,13 +68,13 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
             
             {/* Overflow ring - overlaps like Apple Watch */}
             {isOverCapacity && (
-              <div className="absolute inset-0">
+              <div className="absolute inset-0" style={{ transform: 'scale(1.08)' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <RadialBarChart 
                     cx="50%" 
                     cy="50%" 
                     innerRadius="75%" 
-                    outerRadius="105%" 
+                    outerRadius="95%" 
                     data={overflowData}
                     startAngle={90}
                     endAngle={-270}
@@ -82,9 +82,9 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                     <RadialBar
                       background={false}
                       dataKey="value"
-                      cornerRadius={10}
+                      cornerRadius={8}
                       fill="#ec4899"
-                      style={{ filter: 'drop-shadow(0 0 6px rgba(236, 72, 153, 0.6))' }}
+                      style={{ filter: 'drop-shadow(0 0 8px rgba(236, 72, 153, 0.7))' }}
                     />
                   </RadialBarChart>
                 </ResponsiveContainer>
