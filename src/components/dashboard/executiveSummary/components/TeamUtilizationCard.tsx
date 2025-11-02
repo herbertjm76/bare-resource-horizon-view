@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp } from 'lucide-react';
+import { BalancedGauge } from "@/components/dashboard/gauges/BalancedGauge";
 
 interface TeamUtilizationCardProps {
   utilizationRate: number;
@@ -56,48 +57,20 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
           </div>
         </div>
         
-        <div className="flex-1 flex flex-col justify-center">
-          <div className="relative w-16 h-16 mx-auto mb-2">
-            <svg width="64" height="64" viewBox="0 0 64 64">
-              {/* Base ring background */}
-              <path
-                d={createArc(32, 32, 22, 0, 360)}
-                fill="none"
-                stroke="rgba(255,255,255,0.15)"
-                strokeWidth="6"
-                strokeLinecap="round"
-              />
-              
-              {/* Base ring */}
-              <path
-                d={createArc(32, 32, 22, 0, Math.min(utilizationRate, 100) * 3.6)}
-                fill="none"
-                stroke="white"
-                strokeWidth="6"
-                strokeLinecap="round"
-              />
-              
-              {/* Overflow ring */}
-              {isOverCapacity && (
-                <g>
-                  {fullLoops > 0 && renderFullCircle(32, 32, 25, '#ec4899', 7, 0.25)}
-                  {extraDeg > 0 && (
-                    <path
-                      d={createArc(32, 32, 25, baseEnd, baseEnd + extraDeg)}
-                      fill="none"
-                      stroke="#ec4899"
-                      strokeWidth="7"
-                      strokeLinecap="round"
-                      style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.4))' }}
-                    />
-                  )}
-                </g>
-              )}
-            </svg>
-            
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-lg font-bold text-white">{Math.round(utilizationRate)}%</span>
-            </div>
+        <div className="flex-1 flex flex-col justify-center gap-2">
+          <div className="text-center mb-1">
+            <span className="text-xl font-bold text-white">{Math.round(utilizationRate)}%</span>
+          </div>
+          
+          <div className="px-2">
+            <BalancedGauge 
+              value={utilizationRate} 
+              min={0} 
+              mid={100} 
+              max={500} 
+              height={10}
+              showLabels={false}
+            />
           </div>
         </div>
         
