@@ -2,11 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from '@/components/ui/label';
 
 interface OtherLeaveSectionProps {
   memberId: string;
@@ -21,6 +30,7 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
 }) => {
   const { company } = useCompany();
   const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
   const [hours, setHours] = useState<number>(0);
   const [leaveType, setLeaveType] = useState<string>('other');
   const [notes, setNotes] = useState<string>('');
@@ -47,6 +57,10 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
       setHours(Number(otherLeave.hours) || 0);
       setLeaveType(otherLeave.leave_type || 'other');
       setNotes(otherLeave.notes || '');
+    } else {
+      setHours(0);
+      setLeaveType('other');
+      setNotes('');
     }
   }, [otherLeave]);
 
@@ -73,6 +87,7 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
       queryClient.invalidateQueries({ queryKey: ['weekly-summary-other-leaves'] });
       queryClient.invalidateQueries({ queryKey: ['weekly-other-leave'] });
       toast.success('Other leave updated');
+      setOpen(false);
       onUpdate?.();
     },
     onError: (error) => {
@@ -98,6 +113,7 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
       setLeaveType('other');
       setNotes('');
       toast.success('Other leave removed');
+      setOpen(false);
       onUpdate?.();
     },
     onError: (error) => {
@@ -107,67 +123,93 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
   });
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
-        <Calendar className="h-4 w-4" />
-        Other Leave
-      </h3>
-      
-      <div className="flex items-center gap-2 flex-wrap">
-        <Input
-          type="number"
-          placeholder="Hours"
-          value={hours || ''}
-          onChange={(e) => setHours(Number(e.target.value) || 0)}
-          className="w-20"
-          min="0"
-        />
-        
-        <Select value={leaveType} onValueChange={setLeaveType}>
-          <SelectTrigger className="w-32">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="sick">Sick</SelectItem>
-            <SelectItem value="personal">Personal</SelectItem>
-            <SelectItem value="training">Training</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        <Input
-          placeholder="Notes (optional)"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          className="flex-1 min-w-[150px]"
-        />
-        
-        <Button 
-          size="sm" 
-          onClick={() => updateMutation.mutate()}
-          disabled={updateMutation.isPending}
+    <>
+      <div className="flex items-center gap-2">
+        <Button
+          onClick={() => setOpen(true)}
+          variant="outline"
+          className="glass hover:glass-elevated"
         >
-          {otherLeave ? 'Update' : 'Save'}
+          <Plus className="h-4 w-4 mr-2" />
+          Add Other Leave
         </Button>
         
         {otherLeave && (
-          <Button 
-            size="sm" 
-            variant="outline"
-            onClick={() => deleteMutation.mutate()}
-            disabled={deleteMutation.isPending}
-          >
-            Clear
-          </Button>
+          <div className="text-xs text-muted-foreground">
+            {otherLeave.hours}h ({otherLeave.leave_type})
+            {otherLeave.notes && ` - ${otherLeave.notes}`}
+          </div>
         )}
       </div>
-      
-      {otherLeave && (
-        <div className="text-xs text-muted-foreground">
-          Current: {otherLeave.hours}h ({otherLeave.leave_type})
-          {otherLeave.notes && ` - ${otherLeave.notes}`}
-        </div>
-      )}
-    </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{otherLeave ? 'Edit' : 'Add'} Other Leave</DialogTitle>
+            <DialogDescription>
+              {otherLeave ? 'Update' : 'Add'} other leave for the week starting {weekStartDate}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="hours">Hours</Label>
+              <Input
+                id="hours"
+                type="number"
+                placeholder="Hours"
+                value={hours || ''}
+                onChange={(e) => setHours(Number(e.target.value) || 0)}
+                min="0"
+                step="0.5"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="leaveType">Leave Type</Label>
+              <Select value={leaveType} onValueChange={setLeaveType}>
+                <SelectTrigger id="leaveType">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sick">Sick</SelectItem>
+                  <SelectItem value="personal">Personal</SelectItem>
+                  <SelectItem value="training">Training</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="notes">Notes (optional)</Label>
+              <Input
+                id="notes"
+                placeholder="Notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            {otherLeave && (
+              <Button 
+                variant="outline"
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending}
+              >
+                Delete
+              </Button>
+            )}
+            <Button
+              onClick={() => updateMutation.mutate()}
+              disabled={updateMutation.isPending || hours <= 0}
+            >
+              {updateMutation.isPending ? 'Saving...' : (otherLeave ? 'Update' : 'Save')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
