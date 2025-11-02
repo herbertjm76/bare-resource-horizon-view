@@ -124,23 +124,15 @@ export const OtherLeaveSection: React.FC<OtherLeaveSectionProps> = ({
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <Button
-          onClick={() => setOpen(true)}
-          variant="outline"
-          className="glass hover:glass-elevated"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Other Leave
-        </Button>
-        
-        {otherLeave && (
-          <div className="text-xs text-muted-foreground">
-            {otherLeave.hours}h ({otherLeave.leave_type})
-            {otherLeave.notes && ` - ${otherLeave.notes}`}
-          </div>
-        )}
-      </div>
+      <Button
+        onClick={() => setOpen(true)}
+        variant="outline"
+        size="sm"
+        className="glass hover:glass-elevated"
+      >
+        <Plus className="h-3 w-3 mr-1.5" />
+        Add Other Leave
+      </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

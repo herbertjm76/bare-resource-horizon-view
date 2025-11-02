@@ -110,9 +110,10 @@ export const AddProjectAllocation: React.FC<AddProjectAllocationProps> = ({
       <Button
         onClick={() => setOpen(true)}
         variant="outline"
-        className="w-full glass hover:glass-elevated"
+        size="sm"
+        className="glass hover:glass-elevated"
       >
-        <Plus className="h-4 w-4 mr-2" />
+        <Plus className="h-3 w-3 mr-1.5" />
         Add Project
       </Button>
 
