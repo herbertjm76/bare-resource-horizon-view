@@ -155,7 +155,7 @@ export const AvailableThisWeekCard: React.FC<AvailableThisWeekCardProps> = ({
                   </Avatar>
                   <span className="text-xs font-medium text-foreground">{member.firstName}</span>
                   <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 font-medium">
-                    {member.availableHours}h avail
+                    {member.availableHours}h
                   </Badge>
                 </div>
               );
