@@ -115,7 +115,7 @@ export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
 
   return (
     <Card className="h-full flex flex-col min-h-[180px] shadow-sm border min-w-[200px] max-w-[260px]">
-      <CardHeader style={{ backgroundColor: cardType.color || 'hsl(var(--muted))' }} className="flex-shrink-0 pb-2">
+      <CardHeader className="flex-shrink-0 pb-2">
         <CardTitle className="flex items-center justify-between text-xs font-semibold">
           <span className="flex items-center gap-1.5">
             {cardType.icon && <span className="text-sm">{cardType.icon}</span>}

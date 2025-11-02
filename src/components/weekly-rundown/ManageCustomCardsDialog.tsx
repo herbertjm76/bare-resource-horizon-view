@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,8 +20,7 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
   const [dialogOpen, setDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     label: '',
-    icon: '',
-    color: '#e0e7ff'
+    icon: ''
   });
 
   const { data: customCardTypes = [] } = useCustomCardTypes();
@@ -35,7 +34,6 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
           company_id: company.id,
           label: formData.label,
           icon: formData.icon || null,
-          color: formData.color,
           order_index: customCardTypes.length
         })
         .select()
@@ -46,7 +44,7 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['custom-card-types'] });
       toast.success('Card type created');
-      setFormData({ label: '', icon: '', color: '#e0e7ff' });
+      setFormData({ label: '', icon: '' });
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to create card type');
@@ -123,16 +121,7 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                   maxLength={2}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="color">Color</Label>
-                <Input
-                  id="color"
-                  type="color"
-                  value={formData.color}
-                  onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                  className="h-10"
-                />
-              </div>
+              {/* Color removed for transparent cards */}
             </div>
             <Button type="submit" disabled={createMutation.isPending}>
               {createMutation.isPending ? 'Creating...' : 'Create Card Type'}
@@ -152,22 +141,54 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                     className="flex items-center justify-between p-3 border rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <div
-                        className="w-8 h-8 rounded flex items-center justify-center text-sm"
-                        style={{ backgroundColor: cardType.color || '#e0e7ff' }}
-                      >
+                      <div className="w-8 h-8 rounded border flex items-center justify-center text-sm">
                         {cardType.icon || '📋'}
                       </div>
                       <span className="font-medium">{cardType.label}</span>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => deleteMutation.mutate(cardType.id)}
-                      disabled={deleteMutation.isPending}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={async () => {
+                          const idx = customCardTypes.findIndex(c => c.id === cardType.id);
+                          if (idx <= 0) return;
+                          const prev = customCardTypes[idx - 1];
+                          await supabase.from('weekly_custom_card_types').update({ order_index: prev.order_index }).eq('id', cardType.id);
+                          await supabase.from('weekly_custom_card_types').update({ order_index: cardType.order_index }).eq('id', prev.id);
+                          queryClient.invalidateQueries({ queryKey: ['custom-card-types'] });
+                        }}
+                        title="Move up"
+                      >
+                        <ArrowUp className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={async () => {
+                          const idx = customCardTypes.findIndex(c => c.id === cardType.id);
+                          if (idx >= customCardTypes.length - 1) return;
+                          const next = customCardTypes[idx + 1];
+                          await supabase.from('weekly_custom_card_types').update({ order_index: next.order_index }).eq('id', cardType.id);
+                          await supabase.from('weekly_custom_card_types').update({ order_index: cardType.order_index }).eq('id', next.id);
+                          queryClient.invalidateQueries({ queryKey: ['custom-card-types'] });
+                        }}
+                        title="Move down"
+                      >
+                        <ArrowDown className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteMutation.mutate(cardType.id)}
+                        disabled={deleteMutation.isPending}
+                        title="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>

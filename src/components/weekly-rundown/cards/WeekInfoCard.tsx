@@ -25,7 +25,6 @@ export const WeekInfoCard: React.FC<WeekInfoCardProps> = ({ selectedWeek, visibi
 
   return (
     <Card className="h-full border shadow-sm overflow-hidden min-w-[140px] max-w-[160px]">
-      <div className="absolute inset-0 bg-gradient-modern opacity-5"></div>
       <CardContent className="relative p-3 h-full flex flex-col justify-between gap-3">
         <div className="flex flex-col items-center justify-center flex-1 gap-1.5">
           <Calendar className="h-4 w-4 text-primary opacity-70" />
