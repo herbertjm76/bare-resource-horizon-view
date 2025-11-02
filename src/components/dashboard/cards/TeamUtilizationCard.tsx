@@ -111,8 +111,8 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                     innerRadius="72%" 
                     outerRadius="92%" 
                     data={overflowData}
-                    startAngle={90}
-                    endAngle={-270}
+                    startAngle={90 - (Math.min(actualUtilizationRate, 100) / 100) * 360}
+                    endAngle={(90 - (Math.min(actualUtilizationRate, 100) / 100) * 360) - 360}
                   >
                     <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
                     <RadialBar

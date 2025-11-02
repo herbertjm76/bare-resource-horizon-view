@@ -76,8 +76,8 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                     innerRadius="77%" 
                     outerRadius="97%" 
                     data={overflowData}
-                    startAngle={90}
-                    endAngle={-270}
+                    startAngle={90 - (Math.min(utilizationRate, 100) / 100) * 360}
+                    endAngle={(90 - (Math.min(utilizationRate, 100) / 100) * 360) - 360}
                   >
                     <RadialBar
                       background={false}
