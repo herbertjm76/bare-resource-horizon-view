@@ -28,8 +28,14 @@ export const StandardLayout: React.FC<StandardLayoutProps> = ({
           <div style={{ height: HEADER_HEIGHT }} />
           <main className={`flex-1 overflow-auto ${contentClassName} min-w-0 max-w-full`}>
             {title && (
-              <div className="mb-4 lg:mb-6 px-6">
-                <h1 className="text-2xl lg:text-3xl font-bold tracking-tight text-gray-900">{title}</h1>
+              <div className="mb-6">
+                <div className="bg-card/50 border border-border rounded-lg shadow-sm">
+                  <div className="text-center py-6">
+                    <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: 'hsl(var(--theme-primary))' }}>
+                      {title}
+                    </h1>
+                  </div>
+                </div>
               </div>
             )}
             {children}
