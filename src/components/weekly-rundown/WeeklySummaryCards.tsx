@@ -13,18 +13,20 @@ import { AvailableThisWeekCard } from './cards/AvailableThisWeekCard';
 import { CustomRundownCard } from './cards/CustomRundownCard';
 import { WeekInfoCard } from './cards/WeekInfoCard';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
-import { useCardVisibility, CardVisibility } from '@/hooks/useCardVisibility';
+import { CardVisibility } from '@/hooks/useCardVisibility';
 
 interface WeeklySummaryCardsProps {
   selectedWeek: Date;
   memberIds: string[];
   cardVisibility: CardVisibility;
+  toggleCard: (key: string, isVisible: boolean) => void;
 }
 
 export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
   selectedWeek,
   memberIds,
-  cardVisibility
+  cardVisibility,
+  toggleCard
 }) => {
   const { company } = useCompany();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -121,7 +123,7 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
     console.log('Building cards with visibility:', cardVisibility);
 
     // Always show WeekInfoCard first
-    visibleCards.push({ id: 'weekInfo', component: <WeekInfoCard key="weekInfo" selectedWeek={selectedWeek} /> });
+    visibleCards.push({ id: 'weekInfo', component: <WeekInfoCard key="weekInfo" selectedWeek={selectedWeek} visibility={cardVisibility} onToggle={toggleCard} /> });
 
     if (cardVisibility.holidays) {
       visibleCards.push({ id: 'holidays', component: <HolidaysCard key="holidays" holidays={holidays} /> });

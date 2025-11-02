@@ -4,17 +4,18 @@ import { Calendar } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useCardVisibility } from '@/hooks/useCardVisibility';
 import { useCustomCardTypes } from '@/hooks/useCustomCards';
 import { ManageCustomCardsDialog } from '../ManageCustomCardsDialog';
 import { Settings } from 'lucide-react';
+import { CardVisibility } from '@/hooks/useCardVisibility';
 
 interface WeekInfoCardProps {
   selectedWeek: Date;
+  visibility: CardVisibility;
+  onToggle: (key: string, isVisible: boolean) => void;
 }
 
-export const WeekInfoCard: React.FC<WeekInfoCardProps> = ({ selectedWeek }) => {
-  const { visibility, toggleCard } = useCardVisibility();
+export const WeekInfoCard: React.FC<WeekInfoCardProps> = ({ selectedWeek, visibility, onToggle }) => {
   const { data: customCardTypes = [] } = useCustomCardTypes();
   
   const dayName = format(selectedWeek, 'EEE');
@@ -44,37 +45,37 @@ export const WeekInfoCard: React.FC<WeekInfoCardProps> = ({ selectedWeek }) => {
                 <Settings className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-popover z-50">
+            <DropdownMenuContent align="end" className="w-56 bg-popover z-50 pointer-events-auto">
               <DropdownMenuLabel>Visible Cards</DropdownMenuLabel>
               <DropdownMenuSeparator />
               
               <DropdownMenuCheckboxItem 
                 checked={visibility.holidays} 
-                onCheckedChange={(v) => toggleCard('holidays', v)}
+                onCheckedChange={(v) => onToggle('holidays', v)}
               >
                 Holidays
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem 
                 checked={visibility.annualLeave} 
-                onCheckedChange={(v) => toggleCard('annualLeave', v)}
+                onCheckedChange={(v) => onToggle('annualLeave', v)}
               >
                 Annual Leave
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem 
                 checked={visibility.otherLeave} 
-                onCheckedChange={(v) => toggleCard('otherLeave', v)}
+                onCheckedChange={(v) => onToggle('otherLeave', v)}
               >
                 Other Leave
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem 
                 checked={visibility.notes} 
-                onCheckedChange={(v) => toggleCard('notes', v)}
+                onCheckedChange={(v) => onToggle('notes', v)}
               >
                 Notes
               </DropdownMenuCheckboxItem>
               <DropdownMenuCheckboxItem 
                 checked={visibility.available} 
-                onCheckedChange={(v) => toggleCard('available', v)}
+                onCheckedChange={(v) => onToggle('available', v)}
               >
                 Available This Week
               </DropdownMenuCheckboxItem>
@@ -87,7 +88,7 @@ export const WeekInfoCard: React.FC<WeekInfoCardProps> = ({ selectedWeek }) => {
                     <DropdownMenuCheckboxItem 
                       key={card.id}
                       checked={visibility[`custom_${card.id}`] !== false}
-                      onCheckedChange={(v) => toggleCard(`custom_${card.id}`, v)}
+                      onCheckedChange={(v) => onToggle(`custom_${card.id}`, v)}
                     >
                       {card.icon && <span className="mr-2">{card.icon}</span>}
                       {card.label}

@@ -24,6 +24,7 @@ export const useCardVisibility = () => {
   const { company } = useCompany();
   const queryClient = useQueryClient();
   const [userId, setUserId] = useState<string | null>(null);
+  const [localVisibility, setLocalVisibility] = useState<CardVisibility>(DEFAULT_VISIBILITY);
 
   useEffect(() => {
     const getUser = async () => {
@@ -50,6 +51,11 @@ export const useCardVisibility = () => {
     enabled: !!userId && !!company?.id
   });
 
+  // Sync local state when preferences load/change
+  useEffect(() => {
+    setLocalVisibility({ ...DEFAULT_VISIBILITY, ...(preferences || {}) });
+  }, [preferences]);
+
   const updateMutation = useMutation({
     mutationFn: async (visibility: CardVisibility) => {
       if (!userId || !company?.id) throw new Error('Missing user or company');
@@ -70,21 +76,19 @@ export const useCardVisibility = () => {
     }
   });
 
-  // Merge saved preferences with defaults
-  const visibility = { ...DEFAULT_VISIBILITY, ...preferences };
-
-  console.log('Card Visibility State:', visibility);
-  console.log('Preferences from DB:', preferences);
+  console.log('Card Visibility State:', localVisibility);
+  console.log('Preferences from DB:', preferences ?? { _type: 'undefined', value: 'undefined' });
 
   const toggleCard = (cardKey: string, isVisible: boolean) => {
     console.log(`Toggling ${cardKey} to ${isVisible}`);
-    const newVisibility = { ...visibility, [cardKey]: isVisible };
+    const newVisibility = { ...localVisibility, [cardKey]: isVisible };
     console.log('New visibility state:', newVisibility);
+    setLocalVisibility(newVisibility); // Optimistic update for responsive UI
     updateMutation.mutate(newVisibility);
   };
 
   return {
-    visibility,
+    visibility: localVisibility,
     toggleCard,
     isLoading
   };
