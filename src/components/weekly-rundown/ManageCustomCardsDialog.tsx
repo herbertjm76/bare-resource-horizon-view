@@ -10,7 +10,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCompany } from '@/context/CompanyContext';
 import { toast } from 'sonner';
 
-export const ManageCustomCardsDialog: React.FC = () => {
+interface ManageCustomCardsDialogProps {
+  iconOnly?: boolean;
+}
+
+export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = ({ iconOnly = false }) => {
   const { company } = useCompany();
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -78,10 +82,16 @@ export const ManageCustomCardsDialog: React.FC = () => {
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="h-9">
-          <Plus className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Custom Card</span>
-        </Button>
+        {iconOnly ? (
+          <Button variant="outline" size="icon" className="h-7 w-7">
+            <Plus className="h-3.5 w-3.5" />
+          </Button>
+        ) : (
+          <Button variant="outline" size="sm" className="h-9">
+            <Plus className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Custom Card</span>
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>

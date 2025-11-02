@@ -1,6 +1,6 @@
 import React from 'react';
 import { format, getWeek } from 'date-fns';
-import { Calendar, Settings } from 'lucide-react';
+import { Calendar, Settings, Plus } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -17,39 +17,41 @@ export const WeekInfoCard: React.FC<WeekInfoCardProps> = ({ selectedWeek }) => {
   const { data: customCardTypes = [] } = useCustomCardTypes();
   
   const weekNumber = getWeek(selectedWeek, { weekStartsOn: 1 });
-  const formattedDate = format(selectedWeek, 'MMMM d, yyyy');
+  const dayName = format(selectedWeek, 'EEEE');
+  const dayNumber = format(selectedWeek, 'dd');
+  const monthName = format(selectedWeek, 'MMM');
+  const year = format(selectedWeek, 'yyyy');
 
   return (
     <Card className="relative h-full border-2 shadow-md overflow-hidden">
       <div className="absolute inset-0 bg-gradient-modern opacity-10"></div>
-      <CardContent className="relative p-4 h-full flex flex-col">
-        <div className="flex items-center gap-2 mb-3">
-          <Calendar className="h-5 w-5 text-primary" />
-          <h3 className="text-sm font-semibold text-foreground">Week Overview</h3>
+      <CardContent className="relative p-3 h-full flex flex-col justify-between">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex flex-col items-center justify-center flex-1">
+            <Calendar className="h-4 w-4 text-primary mb-1" />
+            <div className="text-center">
+              <p className="text-xs font-medium text-muted-foreground">{dayName}</p>
+              <p className="text-2xl font-bold text-foreground leading-none my-1">{dayNumber}</p>
+              <p className="text-xs font-medium text-muted-foreground">{monthName}</p>
+              <p className="text-xs font-medium text-muted-foreground">{year}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center justify-center flex-1 border-l pl-2">
+            <p className="text-xs text-muted-foreground mb-1">Week</p>
+            <p className="text-3xl font-bold text-primary leading-none">{weekNumber}</p>
+          </div>
         </div>
 
-        <div className="flex-1 space-y-2">
-          <div>
-            <p className="text-xs text-muted-foreground">Today</p>
-            <p className="text-lg font-bold text-foreground">{formattedDate}</p>
-          </div>
-          
-          <div>
-            <p className="text-xs text-muted-foreground">Week Number</p>
-            <p className="text-2xl font-bold text-primary">Week {weekNumber}</p>
-          </div>
-        </div>
-
-        <div className="flex gap-2 mt-4">
+        <div className="flex gap-1.5 justify-center">
           {/* Card visibility menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="flex-1">
-                <Settings className="h-4 w-4 mr-1" />
-                Cards
+              <Button variant="outline" size="icon" className="h-7 w-7">
+                <Settings className="h-3.5 w-3.5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-56 bg-popover z-50">
               <DropdownMenuLabel>Visible Cards</DropdownMenuLabel>
               <DropdownMenuSeparator />
               
@@ -104,7 +106,7 @@ export const WeekInfoCard: React.FC<WeekInfoCardProps> = ({ selectedWeek }) => {
           </DropdownMenu>
 
           {/* Manage custom cards button */}
-          <ManageCustomCardsDialog />
+          <ManageCustomCardsDialog iconOnly />
         </div>
       </CardContent>
     </Card>
