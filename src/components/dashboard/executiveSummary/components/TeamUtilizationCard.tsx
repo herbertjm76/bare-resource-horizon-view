@@ -28,6 +28,24 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
     return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`;
   };
 
+  const baseEnd = Math.min(utilizationRate, 100) * 3.6;
+  const extra = Math.max(utilizationRate - 100, 0);
+  const extraDeg = Math.min(359.999, (extra % 100) * 3.6);
+  const fullLoops = Math.floor(extra / 100);
+
+  const renderFullCircle = (
+    cx: number,
+    cy: number,
+    r: number,
+    stroke: string,
+    strokeWidth: number,
+    opacity = 0.25
+  ) => (
+    <g opacity={opacity}>
+      <path d={createArc(cx, cy, r, 0, 180)} fill="none" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="round" />
+      <path d={createArc(cx, cy, r, 180, 360)} fill="none" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="round" />
+    </g>
+  );
   return (
     <Card className="rounded-xl border-0 shadow-sm h-full" style={{ background: 'linear-gradient(135deg, hsl(var(--brand-violet)), hsl(var(--brand-violet) / 0.8))' }}>
       <CardContent className="p-3 h-full flex flex-col justify-between">
@@ -61,14 +79,19 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               
               {/* Overflow ring */}
               {isOverCapacity && (
-                <path
-                  d={createArc(32, 32, 25, Math.min(utilizationRate, 100) * 3.6, utilizationRate * 3.6)}
-                  fill="none"
-                  stroke="#ec4899"
-                  strokeWidth="7"
-                  strokeLinecap="round"
-                  style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.4))' }}
-                />
+                <g>
+                  {fullLoops > 0 && renderFullCircle(32, 32, 25, '#ec4899', 7, 0.25)}
+                  {extraDeg > 0 && (
+                    <path
+                      d={createArc(32, 32, 25, baseEnd, baseEnd + extraDeg)}
+                      fill="none"
+                      stroke="#ec4899"
+                      strokeWidth="7"
+                      strokeLinecap="round"
+                      style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.4))' }}
+                    />
+                  )}
+                </g>
               )}
             </svg>
             

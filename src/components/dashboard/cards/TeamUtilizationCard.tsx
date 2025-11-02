@@ -44,6 +44,24 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
     return `M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`;
   };
 
+  const baseEnd = Math.min(actualUtilizationRate, 100) * 3.6;
+  const extra = Math.max(actualUtilizationRate - 100, 0);
+  const extraDeg = Math.min(359.999, (extra % 100) * 3.6);
+  const fullLoops = Math.floor(extra / 100);
+
+  const renderFullCircle = (
+    cx: number,
+    cy: number,
+    r: number,
+    stroke: string,
+    strokeWidth: number,
+    opacity = 0.35
+  ) => (
+    <g opacity={opacity}>
+      <path d={createArc(cx, cy, r, 0, 180)} fill="none" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="round" />
+      <path d={createArc(cx, cy, r, 180, 360)} fill="none" stroke={stroke} strokeWidth={strokeWidth} strokeLinecap="round" />
+    </g>
+  );
   return (
     <Card className="rounded-2xl bg-white border border-border shadow-sm hover:shadow-md transition-shadow h-full">
       <CardContent className="p-6 h-full flex flex-col">
@@ -91,15 +109,19 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               
               {/* Overflow ring (>100%) */}
               {isOverCapacity && (
-                <path
-                  d={createArc(100, 100, 78, Math.min(actualUtilizationRate, 100) * 3.6, actualUtilizationRate * 3.6)}
-                  fill="none"
-                  stroke={config.overColor || config.color}
-                  strokeWidth="22"
-                  strokeLinecap="round"
-                  filter="url(#innerShadow)"
-                  style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }}
-                />
+                <g>
+                  {fullLoops > 0 && renderFullCircle(100, 100, 78, (config.overColor || config.color), 22, 0.25)}
+                  {extraDeg > 0 && (
+                    <path
+                      d={createArc(100, 100, 78, baseEnd, baseEnd + extraDeg)}
+                      fill="none"
+                      stroke={config.overColor || config.color}
+                      strokeWidth="22"
+                      strokeLinecap="round"
+                      style={{ filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.4))' }}
+                    />
+                  )}
+                </g>
               )}
             </svg>
             
