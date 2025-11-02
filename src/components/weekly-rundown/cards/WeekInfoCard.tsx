@@ -26,20 +26,13 @@ export const WeekInfoCard: React.FC<WeekInfoCardProps> = ({ selectedWeek }) => {
     <Card className="relative h-full border-2 shadow-md overflow-hidden">
       <div className="absolute inset-0 bg-gradient-modern opacity-10"></div>
       <CardContent className="relative p-3 h-full flex flex-col justify-between">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex flex-col items-center justify-center flex-1">
-            <Calendar className="h-4 w-4 text-primary mb-1" />
-            <div className="text-center">
-              <p className="text-xs font-medium text-muted-foreground">{dayName}</p>
-              <p className="text-2xl font-bold text-foreground leading-none my-1">{dayNumber}</p>
-              <p className="text-xs font-medium text-muted-foreground">{monthName}</p>
-              <p className="text-xs font-medium text-muted-foreground">{year}</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center justify-center flex-1 border-l pl-2">
-            <p className="text-xs text-muted-foreground mb-1">Week</p>
-            <p className="text-3xl font-bold text-primary leading-none">{weekNumber}</p>
+        <div className="flex flex-col items-center justify-center flex-1">
+          <Calendar className="h-5 w-5 text-primary mb-2" />
+          <div className="text-center">
+            <p className="text-xs font-medium text-muted-foreground">{dayName}</p>
+            <p className="text-3xl font-bold text-foreground leading-none my-1">{dayNumber}</p>
+            <p className="text-sm font-medium text-muted-foreground">{monthName}</p>
+            <p className="text-sm font-medium text-muted-foreground">{year}</p>
           </div>
         </div>
 
