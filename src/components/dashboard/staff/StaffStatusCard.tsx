@@ -1,6 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Users, AlertTriangle, Target } from 'lucide-react';
 import { StaffStatusCardProps } from './types';
@@ -44,14 +45,16 @@ export const StaffStatusCard: React.FC<ExtendedStaffStatusCardProps> = ({
   };
 
   return (
-    <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
-      <CardHeader className="flex-shrink-0">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <Users className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
+    <Card className="h-[400px] flex flex-col bg-white border-border shadow-sm">
+      <CardHeader className="flex-shrink-0 pb-4">
+        <CardTitle className="text-lg flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-brand-violet/10">
+            <Users className="h-5 w-5 text-brand-violet" strokeWidth={1.5} />
+          </div>
           <span className="text-brand-violet font-semibold">Staff Status</span>
-          <span className="text-sm font-normal ml-2 bg-gray-100 px-2 py-0.5 rounded">
+          <Badge variant="outline" className="bg-muted text-muted-foreground border-border text-xs">
             {getTimeRangeText()}
-          </span>
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden p-0">

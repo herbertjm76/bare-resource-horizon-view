@@ -81,8 +81,7 @@ const DashboardContent: React.FC<{
   const officeOptions = [{ value: 'All Offices', label: 'All Offices' }];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50/30 to-gray-100/20">
-      {/* Modern Header without metrics */}
+    <div className="min-h-screen bg-background">
       <ModernDashboardHeader
         totalTeamMembers={totalTeamMembers}
         totalActiveProjects={totalActiveProjects}

@@ -128,13 +128,13 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   };
 
   return (
-    <Card className="rounded-2xl bg-card-gradient-2 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+    <Card className="rounded-2xl bg-white border border-border shadow-sm hover:shadow-md transition-shadow">
       <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-gray-600" />
-            <span className="text-xs font-semibold text-gray-700 tracking-wide">WORKLOAD</span>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-brand-violet/10">
+            <Clock className="h-5 w-5 text-brand-violet" />
           </div>
+          <span className="text-lg font-semibold text-brand-violet">Workload</span>
         </div>
         
         <div className="flex flex-col justify-between h-full">

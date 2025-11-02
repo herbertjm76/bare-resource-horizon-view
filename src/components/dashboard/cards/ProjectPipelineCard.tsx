@@ -73,12 +73,13 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
   ];
   
   return (
-    <Card className="rounded-2xl bg-card-gradient-4 border border-gray-200 shadow-sm hover:shadow-md transition-shadow h-full">
-      <CardContent className="p-3 h-full flex flex-col">
-        {/* Header */}
-        <div className="flex items-center gap-1.5 mb-2">
-          <BarChart3 className="h-3.5 w-3.5 text-gray-600" />
-          <span className="text-[10px] font-medium text-gray-700 tracking-wider">PROJECT PIPELINE</span>
+    <Card className="rounded-2xl bg-white border border-border shadow-sm hover:shadow-md transition-shadow h-full">
+      <CardContent className="p-6 h-full flex flex-col">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-brand-violet/10">
+            <BarChart3 className="h-5 w-5 text-brand-violet" />
+          </div>
+          <span className="text-lg font-semibold text-brand-violet">Project Pipeline</span>
         </div>
         
         {/* Main content - flex-1 to fill remaining space */}

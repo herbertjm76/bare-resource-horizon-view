@@ -27,34 +27,34 @@ const getSeverityStyles = (priority: string) => {
   switch (priority) {
     case 'critical': 
       return {
-        card: 'bg-gradient-to-br from-red-50 via-red-50 to-red-100/80 border-red-200/60 hover:border-red-300/80',
-        icon: 'bg-red-100 text-red-600',
-        badge: 'bg-red-500/10 text-red-700 border-red-200'
+        card: 'bg-white border-red-200 hover:border-red-300 hover:shadow-md',
+        icon: 'bg-red-50 text-red-600',
+        badge: 'bg-red-50 text-red-700 border-red-200'
       };
     case 'warning': 
       return {
-        card: 'bg-gradient-to-br from-orange-50 via-orange-50 to-orange-100/80 border-orange-200/60 hover:border-orange-300/80',
-        icon: 'bg-orange-100 text-orange-600',
-        badge: 'bg-orange-500/10 text-orange-700 border-orange-200'
+        card: 'bg-white border-orange-200 hover:border-orange-300 hover:shadow-md',
+        icon: 'bg-orange-50 text-orange-600',
+        badge: 'bg-orange-50 text-orange-700 border-orange-200'
       };
     case 'success': 
       return {
-        card: 'bg-gradient-to-br from-green-50 via-green-50 to-green-100/80 border-green-200/60 hover:border-green-300/80',
-        icon: 'bg-green-100 text-green-600',
-        badge: 'bg-green-500/10 text-green-700 border-green-200'
+        card: 'bg-white border-green-200 hover:border-green-300 hover:shadow-md',
+        icon: 'bg-green-50 text-green-600',
+        badge: 'bg-green-50 text-green-700 border-green-200'
       };
     case 'opportunity':
     case 'info': 
       return {
-        card: 'bg-gradient-to-br from-blue-50 via-blue-50 to-blue-100/80 border-blue-200/60 hover:border-blue-300/80',
-        icon: 'bg-blue-100 text-blue-600',
-        badge: 'bg-blue-500/10 text-blue-700 border-blue-200'
+        card: 'bg-white border-blue-200 hover:border-blue-300 hover:shadow-md',
+        icon: 'bg-blue-50 text-blue-600',
+        badge: 'bg-blue-50 text-blue-700 border-blue-200'
       };
     default: 
       return {
-        card: 'bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100/80 border-gray-200/60 hover:border-gray-300/80',
-        icon: 'bg-gray-100 text-gray-600',
-        badge: 'bg-gray-500/10 text-gray-700 border-gray-200'
+        card: 'bg-white border-border hover:border-gray-300 hover:shadow-md',
+        icon: 'bg-muted text-muted-foreground',
+        badge: 'bg-muted text-foreground border-border'
       };
   }
 };
@@ -121,16 +121,16 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
 
   if (isLoading) {
     return (
-      <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
+      <Card className="h-[400px] flex flex-col bg-white border-border shadow-sm">
         <CardHeader className="flex-shrink-0 pb-4">
           <CardTitle className="text-lg flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
-              <Loader2 className="h-5 w-5 text-white animate-spin" />
+            <div className="p-2 rounded-lg bg-brand-violet/10">
+              <Loader2 className="h-5 w-5 text-brand-violet animate-spin" />
             </div>
             <span className="text-brand-violet font-semibold">
               Smart Insights
             </span>
-            <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
+            <Badge variant="outline" className="bg-muted text-muted-foreground border-border">
               AI-Powered
             </Badge>
           </CardTitle>
@@ -141,9 +141,9 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
               <Loader2 className="h-8 w-8 text-brand-violet animate-spin" />
             </div>
             <div className="space-y-2">
-              <h3 className="font-medium text-gray-900">Analyzing Your Team</h3>
-              <p className="text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
-                Our AI is processing your team data to generate actionable insights.
+              <h3 className="font-medium text-foreground">Analyzing Your Team</h3>
+              <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
+                Processing your team data to generate actionable insights.
               </p>
             </div>
           </div>
@@ -154,16 +154,16 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
 
   if (insights.length === 0) {
     return (
-      <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
+      <Card className="h-[400px] flex flex-col bg-white border-border shadow-sm">
         <CardHeader className="flex-shrink-0 pb-4">
           <CardTitle className="text-lg flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
-              <Brain className="h-5 w-5 text-white" />
+            <div className="p-2 rounded-lg bg-brand-violet/10">
+              <Brain className="h-5 w-5 text-brand-violet" />
             </div>
             <span className="text-brand-violet font-semibold">
               Smart Insights
             </span>
-            <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
+            <Badge variant="outline" className="bg-muted text-muted-foreground border-border">
               AI-Powered
             </Badge>
           </CardTitle>
@@ -174,9 +174,9 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
               <Brain className="h-8 w-8 text-brand-violet" />
             </div>
             <div className="space-y-2">
-              <h3 className="font-medium text-gray-900">Analyzing Your Team</h3>
-              <p className="text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
-                Our AI is gathering insights about your team's performance and capacity to provide actionable recommendations.
+              <h3 className="font-medium text-foreground">Analyzing Your Team</h3>
+              <p className="text-sm text-muted-foreground max-w-xs mx-auto leading-relaxed">
+                Gathering insights about your team's performance and capacity.
               </p>
             </div>
           </div>
@@ -186,16 +186,16 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
   }
 
   return (
-    <Card className="h-[400px] flex flex-col bg-gradient-to-br from-gray-50 to-white border-gray-200/50">
+    <Card className="h-[400px] flex flex-col bg-white border-border shadow-sm">
       <CardHeader className="flex-shrink-0 pb-4">
         <CardTitle className="text-lg flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-gradient-to-br from-brand-violet to-purple-600">
-            <Brain className="h-5 w-5 text-white" />
+          <div className="p-2 rounded-lg bg-brand-violet/10">
+            <Brain className="h-5 w-5 text-brand-violet" />
           </div>
           <span className="text-brand-violet font-semibold">
             Smart Insights
           </span>
-          <Badge variant="outline" className="bg-white/80 text-brand-violet border-brand-violet/20">
+          <Badge variant="outline" className="bg-muted text-muted-foreground border-border">
             {insights.length} Active
           </Badge>
         </CardTitle>
@@ -214,41 +214,29 @@ export const IntelligentInsights: React.FC<IntelligentInsightsProps> = ({
               return (
                 <div 
                   key={index} 
-                  className={`group rounded-xl border-2 p-4 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer ${styles.card}`}
+                  className={`group rounded-lg border p-4 transition-all duration-200 ${styles.card}`}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className={`p-2.5 rounded-xl flex-shrink-0 transition-transform group-hover:scale-110 ${styles.icon}`}>
-                      <IconComponent className="h-5 w-5" />
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg flex-shrink-0 ${styles.icon}`}>
+                      <IconComponent className="h-4 w-4" />
                     </div>
                     
-                    <div className="flex-1 min-w-0 space-y-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-semibold text-gray-900 text-sm leading-tight">
-                              {insight.title}
-                            </h4>
-                            <Badge variant="outline" className={`text-xs px-2 py-0.5 font-medium ${styles.badge}`}>
-                              {insight.category}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-gray-700 leading-relaxed">
-                            {insight.description}
-                          </p>
-                        </div>
-                        
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-500 hover:text-gray-700 flex-shrink-0"
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h4 className="font-semibold text-foreground text-sm leading-tight">
+                          {insight.title}
+                        </h4>
+                        <Badge variant="outline" className={`text-xs px-2 py-0.5 ${styles.badge}`}>
+                          {insight.category}
+                        </Badge>
                       </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {insight.description}
+                      </p>
                       
                       {insight.metric && (
-                        <div className="bg-white/60 rounded-lg px-3 py-2 border border-white/40">
-                          <p className="text-xs font-medium text-gray-800">
+                        <div className="mt-3 bg-muted/50 rounded px-3 py-1.5 border border-border">
+                          <p className="text-xs font-medium text-foreground">
                             {insight.metric}
                           </p>
                         </div>

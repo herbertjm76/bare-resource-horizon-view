@@ -64,15 +64,13 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   const isOverCapacity = actualUtilizationRate > 100;
 
   return (
-    <Card className="rounded-2xl bg-gradient-to-br from-white via-gray-50/50 to-white border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 h-full backdrop-blur-sm">
-      <CardContent className="p-0 h-full flex flex-col">
-        <div className="flex items-center justify-between p-6 pb-0">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
-              <TrendingUp className="h-4 w-4 text-blue-600" />
-            </div>
-            <span className="text-sm font-semibold text-gray-700 tracking-wide">Team Utilization</span>
+    <Card className="rounded-2xl bg-white border border-border shadow-sm hover:shadow-md transition-shadow h-full">
+      <CardContent className="p-6 h-full flex flex-col">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-brand-violet/10">
+            <TrendingUp className="h-5 w-5 text-brand-violet" />
           </div>
+          <span className="text-lg font-semibold text-brand-violet">Team Utilization</span>
         </div>
         
         <div className="flex-1 flex flex-col items-center justify-center relative p-6">
