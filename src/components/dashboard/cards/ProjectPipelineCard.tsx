@@ -50,24 +50,24 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
   
   const totalProjects = projects.length;
   
-  // Prepare bubble data for the bubble graph using theme colors
+  // Prepare bubble data using minimal theme colors
   const bubbleData = [
     {
       label: 'Active',
       count: projectStats.inProgress.count,
-      color: 'hsl(var(--card))',
+      color: 'hsl(var(--muted))',
       textColor: 'text-foreground'
     },
     {
       label: 'Planning',
       count: projectStats.planning.count,
-      color: 'hsl(var(--gradient-mid))',
+      color: 'hsl(var(--brand-violet))',
       textColor: 'text-white'
     },
     {
       label: 'Complete',
       count: projectStats.complete.count,
-      color: 'hsl(var(--gradient-end))',
+      color: 'hsl(var(--brand-violet) / 0.7)',
       textColor: 'text-white'
     }
   ];
@@ -97,15 +97,15 @@ export const ProjectPipelineCard: React.FC<ProjectPipelineCardProps> = ({
             {/* Legend - horizontal layout at bottom */}
             <div className="flex justify-center gap-6">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-card border border-border"></div>
+                <div className="w-4 h-4 rounded-full bg-muted"></div>
                 <span className="text-sm text-muted-foreground">Active</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-gradient-modern"></div>
+                <div className="w-4 h-4 rounded-full bg-brand-violet"></div>
                 <span className="text-sm text-muted-foreground">Plan</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full" style={{ background: 'hsl(var(--gradient-end))' }}></div>
+                <div className="w-4 h-4 rounded-full bg-brand-violet/70"></div>
                 <span className="text-sm text-muted-foreground">Done</span>
               </div>
             </div>

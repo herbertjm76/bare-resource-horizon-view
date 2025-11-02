@@ -287,10 +287,10 @@ export const TeamLeaveCard: React.FC<TeamLeaveCardProps> = ({
                 </span>
                 <div className={`h-1 w-full mt-1 rounded-full ${
                   data[index] > (maxValue * 0.7) 
-                    ? 'bg-pink-300' 
+                    ? 'bg-brand-violet' 
                     : data[index] > (maxValue * 0.4) 
-                    ? 'bg-gradient-modern opacity-60' 
-                    : 'bg-gradient-modern opacity-40'
+                    ? 'bg-brand-violet/60' 
+                    : 'bg-brand-violet/30'
                 }`} />
               </div>
             ))}
