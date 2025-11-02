@@ -155,10 +155,18 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                           const idx = customCardTypes.findIndex(c => c.id === cardType.id);
                           if (idx <= 0) return;
                           const prev = customCardTypes[idx - 1];
-                          await supabase.from('weekly_custom_card_types').update({ order_index: prev.order_index }).eq('id', cardType.id);
-                          await supabase.from('weekly_custom_card_types').update({ order_index: cardType.order_index }).eq('id', prev.id);
+                          
+                          // Swap order indices
+                          const currentOrder = cardType.order_index;
+                          const prevOrder = prev.order_index;
+                          
+                          await supabase.from('weekly_custom_card_types').update({ order_index: prevOrder }).eq('id', cardType.id);
+                          await supabase.from('weekly_custom_card_types').update({ order_index: currentOrder }).eq('id', prev.id);
+                          
                           queryClient.invalidateQueries({ queryKey: ['custom-card-types'] });
+                          toast.success('Card moved up');
                         }}
+                        disabled={customCardTypes.findIndex(c => c.id === cardType.id) === 0}
                         title="Move up"
                       >
                         <ArrowUp className="h-4 w-4" />
@@ -171,10 +179,18 @@ export const ManageCustomCardsDialog: React.FC<ManageCustomCardsDialogProps> = (
                           const idx = customCardTypes.findIndex(c => c.id === cardType.id);
                           if (idx >= customCardTypes.length - 1) return;
                           const next = customCardTypes[idx + 1];
-                          await supabase.from('weekly_custom_card_types').update({ order_index: next.order_index }).eq('id', cardType.id);
-                          await supabase.from('weekly_custom_card_types').update({ order_index: cardType.order_index }).eq('id', next.id);
+                          
+                          // Swap order indices
+                          const currentOrder = cardType.order_index;
+                          const nextOrder = next.order_index;
+                          
+                          await supabase.from('weekly_custom_card_types').update({ order_index: nextOrder }).eq('id', cardType.id);
+                          await supabase.from('weekly_custom_card_types').update({ order_index: currentOrder }).eq('id', next.id);
+                          
                           queryClient.invalidateQueries({ queryKey: ['custom-card-types'] });
+                          toast.success('Card moved down');
                         }}
+                        disabled={customCardTypes.findIndex(c => c.id === cardType.id) === customCardTypes.length - 1}
                         title="Move down"
                       >
                         <ArrowDown className="h-4 w-4" />
