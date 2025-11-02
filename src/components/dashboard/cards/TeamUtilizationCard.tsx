@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp } from 'lucide-react';
+import { RadialBarChart, RadialBar, ResponsiveContainer, PolarAngleAxis } from 'recharts';
 
 interface TeamUtilizationCardProps {
   utilizationRate?: number;
@@ -20,48 +21,37 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
 }) => {
   const actualUtilizationRate = utilizationRate || 150;
   
-  // Modern color system with gradients - using purple/blue/magenta theme
   const getUtilizationConfig = (rate: number) => {
     if (rate <= 70) {
       return {
         status: 'Under-utilized',
-        primaryColor: '#6B7280',
-        secondaryColor: '#9CA3AF',
-        bgColor: 'hsl(var(--muted))',
-        textColor: 'hsl(var(--muted-foreground))'
+        fill: 'hsl(var(--muted))',
+        textColor: 'text-muted-foreground'
       };
     } else if (rate <= 100) {
       return {
         status: 'Optimal',
-        primaryColor: '#8B5CF6',
-        secondaryColor: '#A78BFA',
-        bgColor: 'hsl(var(--muted))',
-        textColor: 'hsl(var(--foreground))'
+        fill: 'hsl(var(--brand-violet))',
+        textColor: 'text-foreground'
       };
     } else {
       return {
         status: 'Over Capacity',
-        primaryColor: '#EC4899',
-        secondaryColor: '#F472B6',
-        bgColor: 'hsl(var(--muted))',
-        textColor: 'hsl(var(--destructive))'
+        fill: 'hsl(var(--brand-violet) / 0.7)',
+        textColor: 'text-destructive'
       };
     }
   };
   
   const config = getUtilizationConfig(actualUtilizationRate);
   
-  // Apple Watch style configuration
-  const center = 110;
-  const radius = 85;
-  const strokeWidth = 12;
-  const circumference = 2 * Math.PI * radius;
-  
-  // Calculate progress with Apple Watch style logic
-  const normalizedProgress = Math.min(actualUtilizationRate / 100, 1);
-  
-  // For over 100%, we'll show overflow in the same ring
-  const isOverCapacity = actualUtilizationRate > 100;
+  const chartData = [
+    {
+      name: 'Utilization',
+      value: Math.min(actualUtilizationRate, 150),
+      fill: config.fill
+    }
+  ];
 
   return (
     <Card className="rounded-2xl bg-white border border-border shadow-sm hover:shadow-md transition-shadow h-full">
@@ -74,85 +64,33 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         </div>
         
         <div className="flex-1 flex flex-col items-center justify-center relative p-6">
-          {/* Apple Watch Style Single Ring */}
-          <div className="relative flex items-center justify-center w-full h-full">
-            <svg 
-              width="220" 
-              height="220" 
-              viewBox="0 0 220 220" 
-              className="w-full h-full max-w-[220px] max-h-[220px]"
-            >
-              {/* Apple Watch style gradient definitions */}
-              <defs>
-                <linearGradient id="normalGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor={config.primaryColor} />
-                  <stop offset="100%" stopColor={config.secondaryColor} />
-                </linearGradient>
-                <linearGradient id="overflowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#EC4899" />
-                  <stop offset="100%" stopColor="#F472B6" />
-                </linearGradient>
-              </defs>
-              
-              {/* Background track */}
-              <circle
-                cx={center}
-                cy={center}
-                r={radius}
-                fill="none"
-                stroke="hsl(var(--muted))"
-                strokeWidth={strokeWidth}
-                opacity="0.1"
-              />
-              
-              {/* Main progress ring (0-100%) */}
-              <circle
-                cx={center}
-                cy={center}
-                r={radius}
-                fill="none"
-                stroke="url(#normalGradient)"
-                strokeWidth={strokeWidth}
-                strokeLinecap="round"
-                strokeDasharray={circumference}
-                strokeDashoffset={circumference * (1 - Math.min(normalizedProgress, 1))}
-                transform={`rotate(-90 ${center} ${center})`}
-                className="transition-all duration-1000 ease-out"
-                style={{
-                  filter: "drop-shadow(0 0 8px rgba(0,0,0,0.1))"
-                }}
-              />
-              
-              {/* Overflow ring (100%+ on same track) */}
-              {isOverCapacity && (
-                <circle
-                  cx={center}
-                  cy={center}
-                  r={radius}
-                  fill="none"
-                  stroke="url(#overflowGradient)"
-                  strokeWidth={strokeWidth}
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  strokeDashoffset={circumference * (1 - Math.min((actualUtilizationRate - 100) / 100, 1))}
-                  transform={`rotate(-90 ${center} ${center})`}
-                  className="transition-all duration-1000 ease-out"
-                  style={{
-                    filter: "drop-shadow(0 0 12px rgba(255, 68, 68, 0.3))"
-                  }}
+          <div className="relative w-full h-full max-w-[220px] max-h-[220px] mx-auto">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadialBarChart 
+                cx="50%" 
+                cy="50%" 
+                innerRadius="60%" 
+                outerRadius="90%" 
+                data={chartData}
+                startAngle={90}
+                endAngle={-270}
+              >
+                <PolarAngleAxis type="number" domain={[0, 150]} angleAxisId={0} tick={false} />
+                <RadialBar
+                  background={{ fill: 'hsl(var(--muted) / 0.2)' }}
+                  dataKey="value"
+                  cornerRadius={10}
+                  fill={config.fill}
+                  animationDuration={1000}
                 />
-              )}
-            </svg>
+              </RadialBarChart>
+            </ResponsiveContainer>
             
-            {/* Center content - positioned to avoid ring overlap */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center w-32 h-32">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center">
               <div className="text-4xl font-bold bg-gradient-to-br from-gray-900 to-gray-600 bg-clip-text text-transparent text-center">
                 {Math.round(actualUtilizationRate)}%
               </div>
-              <div 
-                className="text-xs font-semibold mt-1 px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm border text-center"
-                style={{ color: config.textColor }}
-              >
+              <div className={`text-xs font-semibold mt-1 px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm border text-center ${config.textColor}`}>
                 {config.status}
               </div>
             </div>

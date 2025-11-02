@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp } from 'lucide-react';
+import { RadialBarChart, RadialBar, ResponsiveContainer } from 'recharts';
 
 interface TeamUtilizationCardProps {
   utilizationRate: number;
@@ -15,8 +16,16 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
   utilizationRate,
   utilizationStatus
 }) => {
+  const chartData = [
+    {
+      name: 'Utilization',
+      value: Math.min(utilizationRate, 100),
+      fill: 'hsl(var(--brand-violet))'
+    }
+  ];
+
   return (
-    <Card className="rounded-xl border-0 shadow-sm h-full" style={{ background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)' }}>
+    <Card className="rounded-xl border-0 shadow-sm h-full" style={{ background: 'linear-gradient(135deg, hsl(var(--brand-violet)), hsl(var(--brand-violet) / 0.8))' }}>
       <CardContent className="p-3 h-full flex flex-col justify-between">
         <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-1.5">
@@ -27,20 +36,24 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         
         <div className="flex-1 flex flex-col justify-center">
           <div className="relative w-16 h-16 mx-auto mb-2">
-            <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
-              <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="4"/>
-              <circle 
-                cx="32" 
-                cy="32" 
-                r="24" 
-                fill="none" 
-                stroke="white" 
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeDasharray={`${Math.min(utilizationRate / 100 * 150.8, 150.8)} 150.8`}
-                className="transition-all duration-700"
-              />
-            </svg>
+            <ResponsiveContainer width="100%" height="100%">
+              <RadialBarChart 
+                cx="50%" 
+                cy="50%" 
+                innerRadius="70%" 
+                outerRadius="100%" 
+                data={chartData}
+                startAngle={90}
+                endAngle={-270}
+              >
+                <RadialBar
+                  background={{ fill: 'rgba(255,255,255,0.2)' }}
+                  dataKey="value"
+                  cornerRadius={10}
+                  fill="white"
+                />
+              </RadialBarChart>
+            </ResponsiveContainer>
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="text-lg font-bold text-white">{Math.round(utilizationRate)}%</span>
             </div>

@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock } from 'lucide-react';
 import { TimeRange } from '../TimeRangeSelector';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 
 
 interface WorkloadCardProps {
@@ -116,12 +117,20 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   const workloadMatrix = generateWorkload();
   
   const getIntensityColor = (intensity: number) => {
-    // Minimal theme-based colors: muted for low, purple for optimal, darker purple for over
-    if (intensity <= 0) return 'bg-muted'; // No work
-    if (intensity <= 60) return 'bg-muted/60'; // Low utilization
-    if (intensity <= 100) return 'bg-brand-violet'; // Optimal utilization 
-    return 'bg-brand-violet/70'; // Over-utilized
+    if (intensity <= 0) return 'hsl(var(--muted))';
+    if (intensity <= 60) return 'hsl(var(--muted) / 0.6)';
+    if (intensity <= 100) return 'hsl(var(--brand-violet))';
+    return 'hsl(var(--brand-violet) / 0.7)';
   };
+
+  // Transform data for Recharts
+  const chartData = workloadMatrix.map((periods, resourceIndex) => ({
+    name: teamResources[resourceIndex].split(' ')[0],
+    ...periods.reduce((acc, intensity, periodIndex) => {
+      acc[timeConfig.periods[periodIndex]] = intensity;
+      return acc;
+    }, {} as Record<string, number>)
+  }));
 
   return (
     <Card className="rounded-2xl bg-white border border-border shadow-sm hover:shadow-md transition-shadow">
@@ -133,50 +142,48 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           <span className="text-lg font-semibold text-brand-violet">Workload</span>
         </div>
         
-        <div className="flex flex-col justify-between h-full">
-          {/* Period headers */}
-          <div className={`grid gap-1 mb-2 ${
-            timeConfig.columnCount === 4 ? 'grid-cols-4' :
-            timeConfig.columnCount === 5 ? 'grid-cols-5' :
-            timeConfig.columnCount === 6 ? 'grid-cols-6' :
-            timeConfig.columnCount === 7 ? 'grid-cols-7' : 'grid-cols-5'
-          }`}>
-            <div className="text-xs text-gray-400"></div>
-            {timeConfig.periods.map(period => (
-              <div key={period} className="text-xs text-gray-600 text-center font-medium">
-                {period}
-              </div>
-            ))}
-          </div>
-          
-          {/* Resource rows with workload */}
-          <div className="flex-1 space-y-1">
-            {teamResources.map((resource, resourceIndex) => (
-              <div key={resource} className={`grid gap-1 items-center ${
-                timeConfig.columnCount === 4 ? 'grid-cols-4' :
-                timeConfig.columnCount === 5 ? 'grid-cols-5' :
-                timeConfig.columnCount === 6 ? 'grid-cols-6' :
-                timeConfig.columnCount === 7 ? 'grid-cols-7' : 'grid-cols-5'
-              }`}>
-                <div className="text-xs text-gray-700 font-medium truncate pr-2">
-                  {resource.split(' ')[0]}
-                </div>
-                {workloadMatrix[resourceIndex].map((intensity, periodIndex) => (
-                  <div
-                    key={periodIndex}
-                    className={`h-6 rounded-sm ${getIntensityColor(intensity)} transition-all duration-200 hover:scale-105 relative group`}
-                    title={`${Math.round(intensity)}% utilization`}
-                  >
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-xs text-gray-700 font-medium opacity-0 group-hover:opacity-100">
-                        {Math.round(intensity)}%
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
+        <div className="flex flex-col justify-between h-full min-h-[300px]">
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart 
+              data={chartData} 
+              layout="vertical"
+              margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
+            >
+              <XAxis type="number" domain={[0, 150]} hide />
+              <YAxis 
+                dataKey="name" 
+                type="category" 
+                tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
+                width={70}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px'
+                }}
+                formatter={(value: number) => `${Math.round(value)}%`}
+              />
+              {timeConfig.periods.map((period, index) => (
+                <Bar 
+                  key={period} 
+                  dataKey={period} 
+                  stackId="a" 
+                  radius={[4, 4, 4, 4]}
+                >
+                  {chartData.map((entry, entryIndex) => {
+                    const value = entry[period] as number;
+                    return (
+                      <Cell 
+                        key={`cell-${entryIndex}`} 
+                        fill={getIntensityColor(value)}
+                      />
+                    );
+                  })}
+                </Bar>
+              ))}
+            </BarChart>
+          </ResponsiveContainer>
           
           {/* Legend */}
           <div className="flex items-center justify-between text-xs text-muted-foreground mt-4 mb-2">
