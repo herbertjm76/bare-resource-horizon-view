@@ -16,13 +16,13 @@ interface HolidaysCardProps {
 
 export const HolidaysCard: React.FC<HolidaysCardProps> = ({ holidays }) => {
   return (
-    <Card className="h-full flex flex-col min-h-[200px]">
-      <CardHeader className="pb-3 flex-shrink-0">
+    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border min-w-[200px] max-w-[240px]">
+      <CardHeader className="pb-2 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <div className="bg-blue-50 dark:bg-blue-950/30 p-2 rounded-lg">
-            <Calendar className="h-4 w-4 text-blue-500" />
+          <div className="bg-blue-50 dark:bg-blue-950/30 p-1.5 rounded-md">
+            <Calendar className="h-3.5 w-3.5 text-blue-500" />
           </div>
-          <CardTitle className="text-sm font-medium">Holidays</CardTitle>
+          <CardTitle className="text-xs font-semibold">Holidays</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto scrollbar-grey">

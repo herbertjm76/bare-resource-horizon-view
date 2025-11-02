@@ -114,14 +114,14 @@ export const CustomRundownCard: React.FC<CustomRundownCardProps> = ({
   };
 
   return (
-    <Card className="h-full flex flex-col min-h-[200px]">
-      <CardHeader style={{ backgroundColor: cardType.color || 'hsl(var(--muted))' }} className="flex-shrink-0">
-        <CardTitle className="flex items-center justify-between text-base">
-          <span className="flex items-center gap-2">
-            {cardType.icon && <span>{cardType.icon}</span>}
+    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border min-w-[200px] max-w-[260px]">
+      <CardHeader style={{ backgroundColor: cardType.color || 'hsl(var(--muted))' }} className="flex-shrink-0 pb-2">
+        <CardTitle className="flex items-center justify-between text-xs font-semibold">
+          <span className="flex items-center gap-1.5">
+            {cardType.icon && <span className="text-sm">{cardType.icon}</span>}
             {cardType.label}
           </span>
-          <Badge variant="secondary" className="text-xs">
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
             {entries.length}
           </Badge>
         </CardTitle>

@@ -62,13 +62,13 @@ export const AnnualLeaveCard: React.FC<AnnualLeaveCardProps> = ({ leaves }) => {
   });
 
   return (
-    <Card className="h-full flex flex-col min-h-[200px]">
-      <CardHeader className="pb-3 flex-shrink-0">
+    <Card className="h-full flex flex-col min-h-[180px] shadow-sm border min-w-[200px] max-w-[240px]">
+      <CardHeader className="pb-2 flex-shrink-0">
         <div className="flex items-center gap-2">
-          <div className="bg-orange-50 dark:bg-orange-950/30 p-2 rounded-lg">
-            <Umbrella className="h-4 w-4 text-orange-500" />
+          <div className="bg-orange-50 dark:bg-orange-950/30 p-1.5 rounded-md">
+            <Umbrella className="h-3.5 w-3.5 text-orange-500" />
           </div>
-          <CardTitle className="text-sm font-medium">Annual Leave</CardTitle>
+          <CardTitle className="text-xs font-semibold">Annual Leave</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="flex-1 overflow-y-auto scrollbar-grey">

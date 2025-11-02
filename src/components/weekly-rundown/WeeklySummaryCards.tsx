@@ -209,11 +209,11 @@ export const WeeklySummaryCards: React.FC<WeeklySummaryCardsProps> = ({
       {/* Scrollable Container */}
       <div 
         ref={scrollRef}
-        className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-4 pb-2 scrollbar-hide px-1"
+        className="flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-3 pb-2 scrollbar-hide px-1"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {cards.map(card => (
-          <div key={card.id} className="flex-shrink-0 w-[280px] h-[200px] snap-center">
+          <div key={card.id} className="flex-shrink-0 min-w-fit h-[180px] snap-center">
             {card.component}
           </div>
         ))}
