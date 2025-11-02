@@ -80,7 +80,7 @@ export const WorkloadStyleResourceRow: React.FC<WorkloadStyleResourceRowProps> =
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Avatar style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid rgb(111, 75, 246)' }}>
               <AvatarImage src={resource.avatar_url} alt={displayName} />
-              <AvatarFallback style={{ backgroundColor: 'rgb(111, 75, 246)', color: 'white' }}>
+              <AvatarFallback className="bg-gradient-modern text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>

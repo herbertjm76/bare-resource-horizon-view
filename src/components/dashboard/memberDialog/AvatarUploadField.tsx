@@ -76,7 +76,7 @@ export const AvatarUploadField: React.FC<AvatarUploadFieldProps> = ({
         <div className="relative">
           <Avatar className="h-20 w-20 border-2 border-gray-200">
             <AvatarImage src={previewUrl || undefined} />
-            <AvatarFallback className="text-lg font-semibold">
+            <AvatarFallback className="bg-gradient-modern text-white text-lg font-semibold">
               {getUserInitials()}
             </AvatarFallback>
           </Avatar>

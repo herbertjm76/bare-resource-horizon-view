@@ -84,7 +84,7 @@ export const CompactRowView: React.FC<CompactRowViewProps> = React.memo(({
         <div className="flex items-center gap-1">
           <Avatar className="w-6 h-6">
             <AvatarImage src={getAvatarUrl(member)} alt={displayName} />
-            <AvatarFallback style={{ backgroundColor: '#6366f1', color: 'white', fontSize: '10px' }}>
+            <AvatarFallback className="bg-gradient-modern text-white text-[10px]">
               {initials}
             </AvatarFallback>
           </Avatar>

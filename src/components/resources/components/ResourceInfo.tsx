@@ -41,7 +41,7 @@ export const ResourceInfo: React.FC<ResourceInfoProps> = ({
         <div className="flex items-center space-x-2 min-w-0 flex-grow">
           <Avatar className="h-6 w-6 flex-shrink-0" style={{ border: '2px solid rgb(111, 75, 246)' }}>
             <AvatarImage src={resource.avatar_url} alt={displayName} />
-            <AvatarFallback className="text-xs text-white" style={{ backgroundColor: 'rgb(111, 75, 246)' }}>
+            <AvatarFallback className="bg-gradient-modern text-white text-xs">
               {initials}
             </AvatarFallback>
           </Avatar>

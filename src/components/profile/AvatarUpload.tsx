@@ -157,7 +157,7 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
             setPreviewUrl(null);
           }}
         />
-        <AvatarFallback className="text-lg bg-brand-primary text-white rounded-lg">
+        <AvatarFallback className="bg-gradient-modern text-white text-lg rounded-lg">
           {userInitials}
         </AvatarFallback>
       </Avatar>

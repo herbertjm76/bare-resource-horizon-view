@@ -38,7 +38,7 @@ export const TeamMemberProfileCard: React.FC<TeamMemberProfileCardProps> = ({ me
             <div className="flex-shrink-0">
               <Avatar className="h-24 w-24 border-4 border-white/20">
                 <AvatarImage src={member.avatar_url} />
-                <AvatarFallback className="text-2xl font-bold bg-white/20">
+                <AvatarFallback className="bg-gradient-modern text-white text-2xl font-bold">
                   {getUserInitials()}
                 </AvatarFallback>
               </Avatar>
