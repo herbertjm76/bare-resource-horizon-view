@@ -121,11 +121,10 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
                       cornerRadius={10}
                       fill={config.overColor}
                       animationDuration={1000}
-                      stroke="rgba(0,0,0,0.35)"
-                      strokeWidth={2}
+                      stroke="rgba(0,0,0,0.6)"
+                      strokeWidth={3}
                       style={{ 
-                        filter: 'drop-shadow(0 1px 0 rgba(0,0,0,0.5)) drop-shadow(0 4px 10px rgba(0,0,0,0.35)) drop-shadow(0 0 16px rgba(236, 72, 153, 0.45))',
-                        mixBlendMode: 'normal'
+                        filter: 'drop-shadow(0 -2px 4px rgba(0,0,0,0.7)) drop-shadow(0 0 8px rgba(0,0,0,0.5)) drop-shadow(0 0 20px rgba(236, 72, 153, 0.5))',
                       }}
                     />
                   </RadialBarChart>
