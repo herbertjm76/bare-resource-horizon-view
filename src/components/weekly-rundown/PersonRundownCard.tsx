@@ -213,25 +213,21 @@ export const PersonRundownCard: React.FC<PersonRundownCardProps> = ({
             )}
           </div>
           
-            {/* Add Project Button */}
-            <div className="mt-3">
+            {/* Add Project and Other Leave Buttons */}
+            <div className="mt-3 flex gap-2">
               <AddProjectAllocation
                 memberId={person.id}
                 weekStartDate={weekStartDate}
                 existingProjectIds={person.projects.map(p => p.id)}
                 onAdd={handleDataChange}
               />
+              <OtherLeaveSection
+                memberId={person.id}
+                weekStartDate={weekStartDate}
+                onUpdate={handleDataChange}
+              />
             </div>
           </div>
-        </div>
-
-        {/* Other Leave Section */}
-        <div className="px-8 py-4 border-t border-border/30 relative z-10">
-          <OtherLeaveSection
-            memberId={person.id}
-            weekStartDate={weekStartDate}
-            onUpdate={handleDataChange}
-          />
         </div>
 
       </div>
