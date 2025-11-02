@@ -116,15 +116,15 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
   const workloadMatrix = generateWorkload();
   
   const getIntensityColor = (intensity: number) => {
-    // Use theme colors - gray for under/over-utilized, theme gradient for optimal
+    // Use solid colors - gray for under-utilized, purple for optimal, pink for over-utilized
     if (intensity <= 0) return 'bg-muted'; // No work
-    if (intensity <= 40) return 'bg-gradient-to-br from-gray-400 to-gray-500'; // Very low utilization
-    if (intensity <= 60) return 'bg-gradient-to-br from-gray-300 to-gray-400'; // Low utilization
-    if (intensity <= 80) return 'bg-gradient-modern opacity-60'; // Good utilization range
-    if (intensity <= 100) return 'bg-gradient-modern'; // Optimal utilization 
-    if (intensity <= 110) return 'bg-gradient-modern opacity-60'; // Slightly over
-    if (intensity <= 130) return 'bg-gradient-to-br from-pink-300 to-pink-400'; // Over-utilized
-    return 'bg-gradient-to-br from-pink-400 to-pink-500'; // Severely over-utilized
+    if (intensity <= 40) return 'bg-gray-400'; // Very low utilization
+    if (intensity <= 60) return 'bg-gray-300'; // Low utilization
+    if (intensity <= 80) return 'bg-purple-400'; // Good utilization range
+    if (intensity <= 100) return 'bg-purple-500'; // Optimal utilization 
+    if (intensity <= 110) return 'bg-purple-400'; // Slightly over
+    if (intensity <= 130) return 'bg-pink-400'; // Over-utilized
+    return 'bg-pink-500'; // Severely over-utilized
   };
 
   return (
@@ -186,11 +186,11 @@ export const WorkloadCard: React.FC<WorkloadCardProps> = ({
           <div className="flex items-center justify-between text-xs text-muted-foreground mt-4 mb-2">
             <span>Under-utilized</span>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-gray-400 to-gray-500"></div>
-              <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-gray-300 to-gray-400"></div>
-              <div className="w-3 h-3 rounded-sm bg-gradient-modern"></div>
-              <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-pink-300 to-pink-400"></div>
-              <div className="w-3 h-3 rounded-sm bg-gradient-to-br from-pink-400 to-pink-500"></div>
+              <div className="w-3 h-3 rounded-sm bg-gray-400"></div>
+              <div className="w-3 h-3 rounded-sm bg-gray-300"></div>
+              <div className="w-3 h-3 rounded-sm bg-purple-500"></div>
+              <div className="w-3 h-3 rounded-sm bg-pink-400"></div>
+              <div className="w-3 h-3 rounded-sm bg-pink-500"></div>
             </div>
             <span>Over-utilized</span>
           </div>

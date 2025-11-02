@@ -159,25 +159,25 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
           </div>
 
           {/* Modern status legend */}
-          <div className="flex justify-center mt-6">
-            <div className="flex items-center gap-6 text-xs bg-card/60 backdrop-blur-sm rounded-full px-4 py-2 border border-border">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-gray-400 to-gray-500" />
-                <span className="text-muted-foreground font-medium">Under</span>
+          <div className="flex justify-center mt-4">
+            <div className="flex flex-wrap items-center justify-center gap-3 text-xs bg-card/60 backdrop-blur-sm rounded-full px-3 py-1.5 border border-border max-w-full">
+              <div className="flex items-center gap-1.5 whitespace-nowrap">
+                <div className="w-2 h-2 rounded-full bg-gray-400 flex-shrink-0" />
+                <span className="text-muted-foreground font-medium text-[10px]">Under</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-purple-400 to-purple-500" />
-                <span className="text-muted-foreground font-medium">Optimal</span>
+              <div className="flex items-center gap-1.5 whitespace-nowrap">
+                <div className="w-2 h-2 rounded-full bg-purple-500 flex-shrink-0" />
+                <span className="text-muted-foreground font-medium text-[10px]">Optimal</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-pink-400 to-pink-500" />
-                <span className="text-muted-foreground font-medium">Over</span>
+              <div className="flex items-center gap-1.5 whitespace-nowrap">
+                <div className="w-2 h-2 rounded-full bg-pink-500 flex-shrink-0" />
+                <span className="text-muted-foreground font-medium text-[10px]">Over</span>
               </div>
             </div>
           </div>
         </div>
         
-        <div className="flex justify-center p-6 pt-0">
+        <div className="flex justify-center pt-2">
           <Badge variant="outline" className="text-xs bg-card text-muted-foreground border-border shadow-sm">
             This Month
           </Badge>
