@@ -27,18 +27,26 @@ export const useAuthorization = ({
   const authChecked = useRef(false);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const checkInProgress = useRef(false);
+  const lastCheckStartTime = useRef<number | null>(null);
 
   const checkAuthorization = useCallback(async () => {
-    // Prevent multiple simultaneous checks
+    // Prevent multiple simultaneous checks, but allow restart if stale
     if (checkInProgress.current) {
-      if (import.meta.env.DEV) {
-        console.log("useAuthorization: Check already in progress, skipping...");
+      const elapsed = lastCheckStartTime.current ? Date.now() - lastCheckStartTime.current : 0;
+      if (elapsed < 4500) {
+        if (import.meta.env.DEV) {
+          console.log("useAuthorization: Check in progress (" + elapsed + "ms), skipping...");
+        }
+        return;
+      } else {
+        console.warn("useAuthorization: Previous check seems stale (" + elapsed + "ms). Restarting...");
+        checkInProgress.current = false;
       }
-      return;
     }
 
     try {
       checkInProgress.current = true;
+      lastCheckStartTime.current = Date.now();
       if (import.meta.env.DEV) {
         console.log("useAuthorization: Checking authorization...");
       }
@@ -248,6 +256,16 @@ export const useAuthorization = ({
       }
     });
     
+    // Re-check on focus/visibility after sleep
+    const handleResume = () => {
+      console.log("useAuthorization: Resuming after focus/visibility");
+      authChecked.current = false;
+      setTimeout(() => { if (mounted) checkAuthorization(); }, 0);
+    };
+    window.addEventListener('focus', handleResume);
+    const handleVisibility = () => { if (document.visibilityState === 'visible') handleResume(); };
+    document.addEventListener('visibilitychange', handleVisibility);
+    
     return () => {
       console.log("useAuthorization: Cleanup called");
       mounted = false;
@@ -256,6 +274,9 @@ export const useAuthorization = ({
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
+      
+      window.removeEventListener('focus', handleResume);
+      document.removeEventListener('visibilitychange', handleVisibility);
       
       subscription.unsubscribe();
     };
