@@ -15,13 +15,13 @@ export const AppSidebar: React.FC = () => {
       collapsible="icon" 
       className="bg-gradient-modern text-white border-r border-white/10"
     >
-      <SidebarHeader className="p-0">
+      <SidebarHeader className="p-0 flex-shrink-0">
         <SidebarLogo />
       </SidebarHeader>
-      <SidebarContent className="p-0 overflow-hidden">
+      <SidebarContent className="p-0 overflow-y-auto flex-1">
         <SidebarNavigation />
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter className="flex-shrink-0" />
     </Sidebar>
   );
 };
