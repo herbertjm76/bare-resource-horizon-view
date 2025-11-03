@@ -28,9 +28,6 @@ export const CompanyInfoEditDialog: React.FC<CompanyInfoEditDialogProps> = ({
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: company?.name || '',
-    address: company?.address || '',
-    city: company?.city || '',
-    country: company?.country || '',
   });
 
   const handleSave = async () => {
@@ -48,9 +45,6 @@ export const CompanyInfoEditDialog: React.FC<CompanyInfoEditDialogProps> = ({
         .from('companies')
         .update({
           name: formData.name.trim(),
-          address: formData.address.trim() || null,
-          city: formData.city.trim() || null,
-          country: formData.country.trim() || null,
         })
         .eq('id', company.id);
 
@@ -84,9 +78,9 @@ export const CompanyInfoEditDialog: React.FC<CompanyInfoEditDialogProps> = ({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Company Information</DialogTitle>
+          <DialogTitle>Edit Company Name</DialogTitle>
           <DialogDescription>
-            Update your company's basic information
+            Update your company name
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -97,33 +91,6 @@ export const CompanyInfoEditDialog: React.FC<CompanyInfoEditDialogProps> = ({
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="Enter company name"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="address">Address</Label>
-            <Input
-              id="address"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              placeholder="Enter address"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="city">City</Label>
-            <Input
-              id="city"
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              placeholder="Enter city"
-            />
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="country">Country</Label>
-            <Input
-              id="country"
-              value={formData.country}
-              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-              placeholder="Enter country"
             />
           </div>
         </div>
