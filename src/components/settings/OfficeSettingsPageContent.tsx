@@ -32,6 +32,7 @@ export const OfficeSettingsPageContent: React.FC = () => {
       <OfficeSettingsLoadingState 
         authLoading={authLoading} 
         error={error} 
+        isAuthorized={isAuthorized}
       />
     );
   }

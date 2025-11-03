@@ -28,6 +28,7 @@ export const useAuthorization = ({
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const checkInProgress = useRef(false);
   const lastCheckStartTime = useRef<number | null>(null);
+  const lastCheckCompletedTs = useRef<number>(0);
 
   const checkAuthorization = useCallback(async () => {
     // Prevent multiple simultaneous checks, but allow restart if stale
@@ -188,6 +189,7 @@ export const useAuthorization = ({
         loadingTimeoutRef.current = null;
       }
       checkInProgress.current = false;
+      lastCheckCompletedTs.current = Date.now();
       setLoading(false);
     }
   }, [companyId, navigate, redirectTo, requiredRole, autoRedirect]);
@@ -242,9 +244,19 @@ export const useAuthorization = ({
         if (autoRedirect) {
           navigate('/auth');
         }
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+      } else if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') {
         if (import.meta.env.DEV) {
-          console.log("useAuthorization: User signed in, token refreshed, or initial session");
+          console.log("useAuthorization: Auth event:", event);
+        }
+        // Throttle TOKEN_REFRESHED to avoid loops when already authorized
+        if (event === 'TOKEN_REFRESHED') {
+          const sinceLast = Date.now() - lastCheckCompletedTs.current;
+          if (isAuthorized && sinceLast < 60000) {
+            if (import.meta.env.DEV) {
+              console.log("useAuthorization: Skipping recheck on TOKEN_REFRESHED (", sinceLast, "ms since last check, already authorized)");
+            }
+            return;
+          }
         }
         authChecked.current = false;
         // Use setTimeout to avoid auth deadlocks
@@ -280,7 +292,7 @@ export const useAuthorization = ({
       
       subscription.unsubscribe();
     };
-  }, [checkAuthorization, loading, navigate, autoRedirect]);
+  }, [checkAuthorization, loading, navigate, autoRedirect, isAuthorized]);
 
   return { 
     loading, 

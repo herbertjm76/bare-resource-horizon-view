@@ -6,18 +6,20 @@ import { Button } from '@/components/ui/button';
 interface OfficeSettingsLoadingStateProps {
   authLoading: boolean;
   error: string | null;
+  isAuthorized: boolean;
 }
 
 export const OfficeSettingsLoadingState: React.FC<OfficeSettingsLoadingStateProps> = ({ 
   authLoading, 
-  error 
+  error,
+  isAuthorized
 }) => {
   return (
     <div className="flex justify-center items-center min-h-screen bg-background">
       <div className="flex flex-col items-center gap-2">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <p className="text-sm text-muted-foreground">
-          {authLoading ? "Verifying access..." : "Loading company data..."}
+          {authLoading && !isAuthorized ? "Verifying access..." : "Loading company data..."}
         </p>
         {error && (
           <div className="text-sm text-red-500 mt-2 max-w-md text-center">
