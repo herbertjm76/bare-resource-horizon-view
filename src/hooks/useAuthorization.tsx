@@ -81,7 +81,7 @@ export const useAuthorization = ({
 
       // Get user role using secure RPC and company from profiles
       const [roleResult, profileResult] = await Promise.all([
-        supabase.rpc('get_user_role_secure'),
+        supabase.rpc('get_user_role_safe'),
         supabase.from('profiles').select('company_id').eq('id', sessionData.session.user.id).single()
       ]);
       
