@@ -251,9 +251,9 @@ export const useAuthorization = ({
         // Throttle TOKEN_REFRESHED to avoid loops when already authorized
         if (event === 'TOKEN_REFRESHED') {
           const sinceLast = Date.now() - lastCheckCompletedTs.current;
-          if (isAuthorized && sinceLast < 60000) {
+          if (sinceLast < 60000) {
             if (import.meta.env.DEV) {
-              console.log("useAuthorization: Skipping recheck on TOKEN_REFRESHED (", sinceLast, "ms since last check, already authorized)");
+              console.log("useAuthorization: Skipping recheck on TOKEN_REFRESHED (", sinceLast, "ms since last check)");
             }
             return;
           }
@@ -292,7 +292,7 @@ export const useAuthorization = ({
       
       subscription.unsubscribe();
     };
-  }, [checkAuthorization, loading, navigate, autoRedirect, isAuthorized]);
+  }, [checkAuthorization, navigate, autoRedirect]);
 
   return { 
     loading, 
