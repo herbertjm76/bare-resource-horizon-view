@@ -15,6 +15,9 @@ export const signupSchema = z.object({
     .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
     .regex(/[0-9]/, { message: "Password must contain at least one number" }),
   
+  confirmPassword: z.string()
+    .min(1, { message: "Please confirm your password" }),
+  
   firstName: z.string()
     .trim()
     .max(50, { message: "First name must be less than 50 characters" })
@@ -72,6 +75,9 @@ export const signupSchema = z.object({
     .trim()
     .max(100, { message: "Industry must be less than 100 characters" })
     .optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
 // Validation schema for join form

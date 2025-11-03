@@ -25,6 +25,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
   // Simplified owner fields - only essential info
   const [ownerEmail, setOwnerEmail] = useState('');
   const [ownerPassword, setOwnerPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [company, setCompany] = useState<CompanyFormData>(emptyCompany);
   const [subdomainCheck, setSubdomainCheck] = useState({ isChecking: false, error: '' });
   const [loading, setLoading] = useState(false);
@@ -74,6 +75,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       const validationResult = signupSchema.safeParse({
         email: ownerEmail,
         password: ownerPassword,
+        confirmPassword: confirmPassword,
         firstName: '', // Not collected in signup, will be added later
         lastName: '', // Not collected in signup, will be added later
         companyName: company.name,
@@ -186,6 +188,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       // Clear form
       setOwnerEmail('');
       setOwnerPassword('');
+      setConfirmPassword('');
       setCompany(emptyCompany);
       
     } catch (error: any) {
@@ -253,7 +256,19 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
             onChange={e => setOwnerPassword(e.target.value)}
             className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all placeholder:text-white/40"
             required
-            placeholder="Min. 6 characters"
+            placeholder="Min. 8 characters with uppercase, lowercase & number"
+          />
+        </div>
+        <div>
+          <label htmlFor="confirmPassword" className="block text-white/90 font-medium mb-2 text-sm">Confirm Password</label>
+          <Input
+            type="password"
+            id="confirmPassword"
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl bg-white/10 text-white border border-white/20 focus:outline-none focus:border-white/40 focus:bg-white/15 transition-all placeholder:text-white/40"
+            required
+            placeholder="Re-enter your password"
           />
         </div>
       </div>
