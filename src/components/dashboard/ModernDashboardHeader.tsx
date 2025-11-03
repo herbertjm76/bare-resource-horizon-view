@@ -1,5 +1,6 @@
 import React from 'react';
 import { LayoutDashboard } from 'lucide-react';
+import { useCompany } from '@/context/CompanyContext';
 
 interface ModernDashboardHeaderProps {
   totalTeamMembers: number;
@@ -14,6 +15,8 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
   totalOffices,
   utilizationRate
 }) => {
+  const { company } = useCompany();
+  
   return (
     <div className="bg-card/50 border border-border rounded-lg shadow-sm">
       <div className="text-center py-6">
@@ -22,7 +25,7 @@ export const ModernDashboardHeader: React.FC<ModernDashboardHeaderProps> = ({
             <LayoutDashboard className="h-5 w-5" style={{ color: 'hsl(var(--theme-primary))' }} />
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold tracking-tight" style={{ color: 'hsl(var(--theme-primary))' }}>
-            ABC Studios Dashboard
+            {company?.name || 'Company'} Dashboard
           </h1>
         </div>
         <p className="text-muted-foreground text-lg">
