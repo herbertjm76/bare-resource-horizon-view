@@ -20,7 +20,9 @@ export const useEnhancedDashboardAuth = () => {
 
   const fetchProfileData = async (userId: string) => {
     try {
-      console.log('Dashboard: Fetching profile data for user', userId);
+      if (import.meta.env.DEV) {
+        console.log('Dashboard: Fetching profile data for user', userId);
+      }
       
       const { data, error } = await supabase
         .from('profiles')
@@ -33,7 +35,9 @@ export const useEnhancedDashboardAuth = () => {
         return;
       }
 
-      console.log('Dashboard: Profile data fetched:', data);
+      if (import.meta.env.DEV) {
+        console.log('Dashboard: Profile data fetched:', data);
+      }
       setProfile(data);
 
       // Check if user is admin using secure RPC

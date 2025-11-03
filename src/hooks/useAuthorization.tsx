@@ -29,7 +29,9 @@ export const useAuthorization = ({
 
   const checkAuthorization = useCallback(async () => {
     try {
-      console.log("useAuthorization: Checking authorization...");
+      if (import.meta.env.DEV) {
+        console.log("useAuthorization: Checking authorization...");
+      }
       setLoading(true);
       setError(null);
       
@@ -61,7 +63,9 @@ export const useAuthorization = ({
       }
       
       if (!sessionData.session) {
-        console.log("useAuthorization: No active session");
+        if (import.meta.env.DEV) {
+          console.log("useAuthorization: No active session");
+        }
         setError("No active session");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -71,7 +75,9 @@ export const useAuthorization = ({
         return;
       }
 
-      console.log("useAuthorization: Session found for user", sessionData.session.user.id);
+      if (import.meta.env.DEV) {
+        console.log("useAuthorization: Session found for user", sessionData.session.user.id);
+      }
 
       // Get user role using secure RPC and company from profiles
       const [roleResult, profileResult] = await Promise.all([
@@ -104,11 +110,15 @@ export const useAuthorization = ({
         return;
       }
 
-      console.log("useAuthorization: Profile and role found", { role: userRoleData, company: profile.company_id });
+      if (import.meta.env.DEV) {
+        console.log("useAuthorization: Profile and role found", { role: userRoleData, company: profile.company_id });
+      }
 
       // Set the user's role
       setUserRole(userRoleData as UserRole);
-      console.log("useAuthorization: User role", userRoleData);
+      if (import.meta.env.DEV) {
+        console.log("useAuthorization: User role", userRoleData);
+      }
 
       // Check if company ID is required and matches
       if (companyId && profile.company_id !== companyId) {
@@ -138,7 +148,9 @@ export const useAuthorization = ({
       }
 
       // User is authorized
-      console.log("useAuthorization: User is authorized");
+      if (import.meta.env.DEV) {
+        console.log("useAuthorization: User is authorized");
+      }
       setIsAuthorized(true);
       setError(null);
       authChecked.current = true;
@@ -200,7 +212,9 @@ export const useAuthorization = ({
       }
       
       if (event === 'SIGNED_OUT') {
-        console.log("useAuthorization: User signed out");
+        if (import.meta.env.DEV) {
+          console.log("useAuthorization: User signed out");
+        }
         setIsAuthorized(false);
         setUserRole(null);
         authChecked.current = false;
@@ -208,7 +222,9 @@ export const useAuthorization = ({
           navigate('/auth');
         }
       } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        console.log("useAuthorization: User signed in or token refreshed");
+        if (import.meta.env.DEV) {
+          console.log("useAuthorization: User signed in or token refreshed");
+        }
         authChecked.current = false;
         // Use setTimeout to avoid auth deadlocks
         setTimeout(() => {

@@ -14,9 +14,13 @@ export const useUserSession = () => {
         } = await supabase.auth.getSession();
         if (data.session?.user) {
           setUserId(data.session.user.id);
-          console.log('Session found, user ID:', data.session.user.id);
+          if (import.meta.env.DEV) {
+            console.log('Session found, user ID:', data.session.user.id);
+          }
         } else {
-          console.log('No active session found');
+          if (import.meta.env.DEV) {
+            console.log('No active session found');
+          }
           toast.error("You must be logged in to access this page");
         }
       } catch (error) {

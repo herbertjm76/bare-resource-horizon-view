@@ -51,7 +51,9 @@ const Auth: React.FC = () => {
           if (!mounted) return;
           
           if (event === 'SIGNED_IN' && session) {
-            console.log('Auth page: User signed in, redirecting to dashboard');
+            if (import.meta.env.DEV) {
+              console.log('Auth page: User signed in, redirecting to dashboard');
+            }
             toast.success('Successfully signed in!');
             navigate('/dashboard');
           }
@@ -69,7 +71,9 @@ const Auth: React.FC = () => {
         }
         
         if (sessionData.session) {
-          console.log('Auth page: User already logged in, redirecting to dashboard');
+          if (import.meta.env.DEV) {
+            console.log('Auth page: User already logged in, redirecting to dashboard');
+          }
           navigate('/dashboard');
         } else {
           console.log('Auth page: No active session found');

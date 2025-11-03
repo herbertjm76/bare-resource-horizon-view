@@ -54,7 +54,9 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           }
           
           companyId = profileData?.company_id;
-          console.log('User company ID from query:', companyId);
+          if (import.meta.env.DEV) {
+            console.log('User company ID from query:', companyId);
+          }
         }
         
         if (!companyId) {
@@ -80,7 +82,9 @@ export const useTeamMembersData = (includeInactive: boolean = false) => {
           return [];
         }
 
-        console.log('Fetched profiles:', profiles.length || 0);
+        if (import.meta.env.DEV) {
+          console.log('Fetched profiles:', profiles.length || 0);
+        }
         return profiles as Profile[];
       } catch (fetchError) {
         console.error('Error in team members fetch function:', fetchError);

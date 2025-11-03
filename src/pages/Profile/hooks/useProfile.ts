@@ -20,42 +20,54 @@ export const useProfile = () => {
         navigate("/auth");
         return;
       }
-      const { data, error } = await supabase
+      
+      // Fetch basic profile
+      const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", session.user.id)
         .single();
-      if (error) {
+      
+      if (profileError) {
         setError("Profile not found.");
-      } else {
-        // Ensure all required fields are present with defaults
-        const profileData: Profile = {
-          id: data.id,
-          email: data.email,
-          first_name: data.first_name,
-          last_name: data.last_name,
-          avatar_url: data.avatar_url,
-          phone: data.phone,
-          bio: data.bio,
-          date_of_birth: data.date_of_birth,
-          start_date: data.start_date,
-          manager_id: data.manager_id,
-          emergency_contact_name: data.emergency_contact_name,
-          emergency_contact_phone: data.emergency_contact_phone,
-          social_linkedin: data.social_linkedin,
-          social_twitter: data.social_twitter,
-          address: data.address,
-          city: data.city,
-          state: data.state,
-          postal_code: data.postal_code,
-          country: data.country,
-          job_title: data.job_title,
-          department: data.department,
-          location: data.location,
-          weekly_capacity: data.weekly_capacity || 40,
-        };
-        setProfile(profileData);
+        setLoading(false);
+        return;
       }
+      
+      // Fetch personal information
+      const { data: personalInfo } = await supabase
+        .from("personal_information")
+        .select("*")
+        .eq("profile_id", session.user.id)
+        .maybeSingle();
+      
+      // Combine profile and personal info
+      const completeProfile: Profile = {
+        id: profileData.id,
+        email: profileData.email,
+        first_name: profileData.first_name,
+        last_name: profileData.last_name,
+        avatar_url: profileData.avatar_url,
+        phone: personalInfo?.phone || null,
+        bio: profileData.bio,
+        date_of_birth: personalInfo?.date_of_birth || null,
+        start_date: profileData.start_date,
+        manager_id: profileData.manager_id,
+        emergency_contact_name: personalInfo?.emergency_contact_name || null,
+        emergency_contact_phone: personalInfo?.emergency_contact_phone || null,
+        social_linkedin: personalInfo?.social_linkedin || null,
+        social_twitter: personalInfo?.social_twitter || null,
+        address: personalInfo?.address || null,
+        city: personalInfo?.city || null,
+        state: personalInfo?.state || null,
+        postal_code: personalInfo?.postal_code || null,
+        country: personalInfo?.country || null,
+        job_title: profileData.job_title,
+        department: profileData.department,
+        location: profileData.location,
+        weekly_capacity: profileData.weekly_capacity || 40,
+      };
+      setProfile(completeProfile);
       setLoading(false);
     };
     fetchProfile();
@@ -92,40 +104,65 @@ export const useProfile = () => {
     if (!profile) return;
     setSaving(true);
     
-    const updateData = {
-      first_name: profile.first_name,
-      last_name: profile.last_name,
-      phone: profile.phone,
-      bio: profile.bio,
-      date_of_birth: profile.date_of_birth,
-      start_date: profile.start_date,
-      emergency_contact_name: profile.emergency_contact_name,
-      emergency_contact_phone: profile.emergency_contact_phone,
-      social_linkedin: profile.social_linkedin,
-      social_twitter: profile.social_twitter,
-      address: profile.address,
-      city: profile.city,
-      state: profile.state,
-      postal_code: profile.postal_code,
-      country: profile.country,
-      job_title: profile.job_title,
-      department: profile.department,
-      location: profile.location,
-      weekly_capacity: profile.weekly_capacity,
-    };
+    try {
+      // Get company_id for personal_information
+      const { data: { session } } = await supabase.auth.getSession();
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("company_id")
+        .eq("id", profile.id)
+        .single();
+      
+      // Update basic profile data
+      const profileUpdateData = {
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        bio: profile.bio,
+        start_date: profile.start_date,
+        job_title: profile.job_title,
+        department: profile.department,
+        location: profile.location,
+        weekly_capacity: profile.weekly_capacity,
+      };
 
-    const { error } = await supabase
-      .from("profiles")
-      .update(updateData)
-      .eq("id", profile.id);
-    
-    setSaving(false);
-    if (error) {
-      setError("Update failed. Please try again.");
-      toast.error("Failed to update profile");
-    } else {
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update(profileUpdateData)
+        .eq("id", profile.id);
+      
+      if (profileError) throw profileError;
+      
+      // Update or insert personal information
+      const personalInfoData = {
+        profile_id: profile.id,
+        company_id: profileData?.company_id,
+        phone: profile.phone,
+        date_of_birth: profile.date_of_birth,
+        emergency_contact_name: profile.emergency_contact_name,
+        emergency_contact_phone: profile.emergency_contact_phone,
+        social_linkedin: profile.social_linkedin,
+        social_twitter: profile.social_twitter,
+        address: profile.address,
+        city: profile.city,
+        state: profile.state,
+        postal_code: profile.postal_code,
+        country: profile.country,
+      };
+
+      const { error: personalInfoError } = await supabase
+        .from("personal_information")
+        .upsert(personalInfoData, { onConflict: 'profile_id' });
+      
+      if (personalInfoError) throw personalInfoError;
+      
       setError(null);
       toast.success("Profile updated successfully");
+    } catch (error: any) {
+      setError("Update failed. Please try again.");
+      toast.error("Failed to update profile");
+      console.error("Profile update error:", error);
+    } finally {
+      setSaving(false);
     }
   };
 

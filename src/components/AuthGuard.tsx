@@ -32,7 +32,9 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
           const hasRequiredRole = roles.includes(demoProfile.role);
           
           if (!hasRequiredRole) {
-            console.log("AuthGuard: Demo user doesn't have required role", demoProfile.role, "needs", requiredRole);
+      if (import.meta.env.DEV) {
+        console.log("AuthGuard: Demo user doesn't have required role", demoProfile.role, "needs", requiredRole);
+      }
             toast.error("You don't have permission to access this page");
             setIsLoading(false);
             setIsAuthorized(false);
@@ -41,7 +43,9 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
           }
         }
         
-        console.log("AuthGuard: Demo user is authorized");
+        if (import.meta.env.DEV) {
+          console.log("AuthGuard: Demo user is authorized");
+        }
         setIsAuthorized(true);
         setIsLoading(false);
         setAuthError(null);
@@ -65,7 +69,9 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         }
         
         if (!sessionData.session) {
-          console.log("AuthGuard: No active session, redirecting to auth page");
+          if (import.meta.env.DEV) {
+            console.log("AuthGuard: No active session, redirecting to auth page");
+          }
           setIsLoading(false);
           setIsAuthorized(false);
           navigate('/auth');
@@ -73,7 +79,9 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         }
 
         const user = sessionData.session.user;
-        console.log("AuthGuard: User authenticated", user.id);
+        if (import.meta.env.DEV) {
+          console.log("AuthGuard: User authenticated", user.id);
+        }
 
         // If role check is required
         if (requiredRole) {
@@ -104,10 +112,14 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
           const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
           const hasRequiredRole = roles.includes(userRole);
 
-          console.log("AuthGuard: User role:", userRole, "Required roles:", roles, "Has required role:", hasRequiredRole);
+          if (import.meta.env.DEV) {
+            console.log("AuthGuard: User role:", userRole, "Required roles:", roles, "Has required role:", hasRequiredRole);
+          }
 
           if (!hasRequiredRole) {
-            console.log("AuthGuard: User doesn't have required role", userRole, "needs", requiredRole);
+            if (import.meta.env.DEV) {
+              console.log("AuthGuard: User doesn't have required role", userRole, "needs", requiredRole);
+            }
             toast.error("You don't have permission to access this page");
             setIsLoading(false);
             setIsAuthorized(false);
@@ -115,10 +127,14 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
             return;
           }
           
-          console.log("AuthGuard: User has required role:", userRole);
+          if (import.meta.env.DEV) {
+            console.log("AuthGuard: User has required role:", userRole);
+          }
         }
 
-        console.log("AuthGuard: User is authorized, rendering protected content");
+        if (import.meta.env.DEV) {
+          console.log("AuthGuard: User is authorized, rendering protected content");
+        }
         setIsAuthorized(true);
         setIsLoading(false);
         setAuthError(null);
@@ -160,9 +176,11 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
     // Only set up auth listener if not in demo mode
     let authListener: any = null;
     
-    if (!isDemoMode) {
-      const { data } = supabase.auth.onAuthStateChange((event, session) => {
-        console.log("AuthGuard: Auth state changed:", event);
+      if (!isDemoMode) {
+        const { data } = supabase.auth.onAuthStateChange((event, session) => {
+          if (import.meta.env.DEV) {
+            console.log("AuthGuard: Auth state changed:", event);
+          }
         
         if (!isMounted) return;
         

@@ -23,13 +23,17 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
   useEffect(() => {
     const verifyAccess = async () => {
       if (!userId) {
-        console.log('No user ID available, cannot check permissions');
+        if (import.meta.env.DEV) {
+          console.log('No user ID available, cannot check permissions');
+        }
         return;
       }
       
       // Add a small delay to ensure any session changes are propagated
       setTimeout(async () => {
-        console.log('Verifying access for user:', userId);
+        if (import.meta.env.DEV) {
+          console.log('Verifying access for user:', userId);
+        }
         try {
           const result = await checkUserPermissions();
           console.log('Permission check complete with result:', result);
@@ -90,8 +94,10 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
           throw error;
         }
         
-        console.log('User profile loaded:', data);
-        return data;
+          if (import.meta.env.DEV) {
+            console.log('User profile loaded:', data);
+          }
+          return data;
       } catch (error) {
         console.error('Error fetching user profile:', error);
         return null;
@@ -126,10 +132,12 @@ export const TeamMembersContent: React.FC<TeamMembersContentProps> = ({ userId }
   useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
-      console.log("Current session:", data?.session ? "Active" : "None");
-      if (data?.session?.user) {
-        console.log("Session user:", data.session.user.id);
-        console.log("User metadata:", data.session.user.user_metadata);
+      if (import.meta.env.DEV) {
+        console.log("Current session:", data?.session ? "Active" : "None");
+        if (data?.session?.user) {
+          console.log("Session user:", data.session.user.id);
+          console.log("User metadata:", data.session.user.user_metadata);
+        }
       }
     };
     

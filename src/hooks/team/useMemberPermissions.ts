@@ -17,10 +17,12 @@ export const useMemberPermissions = () => {
    */
   const checkUserPermissions = useCallback(async () => {
     try {
+      if (import.meta.env.DEV) {
+        console.log('Checking user permissions...');
+      }
+      
       setIsChecking(true);
       setPermissionError(null);
-      
-      console.log('Checking user permissions...');
       
       // Get user session first
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -40,7 +42,9 @@ export const useMemberPermissions = () => {
       }
       
       const userId = sessionData.session.user.id;
-      console.log('Current user ID:', userId);
+      if (import.meta.env.DEV) {
+        console.log('Current user ID:', userId);
+      }
       
       // Use secure RPC to check if user is admin
       try {
@@ -53,7 +57,9 @@ export const useMemberPermissions = () => {
           return { hasPermission: false, error: `Error checking user role: ${roleError.message}` };
         }
         
-        console.log('User admin status:', isAdmin);
+        if (import.meta.env.DEV) {
+          console.log('User admin status:', isAdmin);
+        }
         setHasPermission(isAdmin === true);
         
         if (!isAdmin) {

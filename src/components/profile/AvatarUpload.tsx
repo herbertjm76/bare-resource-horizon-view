@@ -48,7 +48,9 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
   const uploadAvatar = async (file: File) => {
     try {
       setUploading(true);
-      console.log('Starting avatar upload for user:', userId);
+      if (import.meta.env.DEV) {
+        console.log('Starting avatar upload for user:', userId);
+      }
 
       // Create a unique file name with timestamp to avoid caching issues
       const fileExt = file.name.split('.').pop();
@@ -116,7 +118,9 @@ export const AvatarUpload: React.FC<AvatarUploadProps> = ({
         throw new Error(`Failed to update profile: ${updateError.message}`);
       }
 
-      console.log('Profile updated successfully');
+      if (import.meta.env.DEV) {
+        console.log('Profile updated successfully');
+      }
       setPreviewUrl(newAvatarUrl);
       onAvatarUpdate(newAvatarUrl);
       toast.success('Avatar updated successfully!');
