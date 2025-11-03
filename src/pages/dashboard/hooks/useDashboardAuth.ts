@@ -34,7 +34,9 @@ export const useDashboardAuth = () => {
       console.log('Dashboard: Profile data fetched:', data);
       setProfile(data);
 
-      if (data.role === 'owner' || data.role === 'admin') {
+      // Check if user is admin using secure RPC
+      const { data: isAdmin } = await supabase.rpc('user_is_admin_safe');
+      if (isAdmin && data.company_id) {
         fetchTeamMembers(data.company_id);
       }
 

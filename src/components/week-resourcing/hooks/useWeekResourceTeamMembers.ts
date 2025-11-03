@@ -23,9 +23,8 @@ export const useWeekResourceTeamMembers = () => {
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, location, weekly_capacity, role, avatar_url')
-        .eq('company_id', company.id)
-        .not('role', 'is', null); // Only get profiles with roles (actual team members)
+        .select('id, first_name, last_name, email, location, weekly_capacity, avatar_url')
+        .eq('company_id', company.id);
         
       if (error) {
         console.error("Error fetching active team members:", error);

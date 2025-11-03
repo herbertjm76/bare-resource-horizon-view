@@ -54,7 +54,7 @@ const MemberDialog: React.FC<MemberDialogProps> = ({
         first_name: member.first_name || '',
         last_name: member.last_name || '',
         email: member.email,
-        role: (member.role as MemberFormData['role']) || 'member',
+        role: 'member', // Default role for form, actual role managed in user_roles table
         department: member.department || '',
         location: member.location || 'Unassigned',
         job_title: member.job_title || '',

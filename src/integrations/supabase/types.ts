@@ -609,7 +609,6 @@ export type Database = {
           manager_id: string | null
           phone: string | null
           postal_code: string | null
-          role: Database["public"]["Enums"]["user_role"]
           social_linkedin: string | null
           social_twitter: string | null
           start_date: string | null
@@ -638,7 +637,6 @@ export type Database = {
           manager_id?: string | null
           phone?: string | null
           postal_code?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
           social_linkedin?: string | null
           social_twitter?: string | null
           start_date?: string | null
@@ -667,7 +665,6 @@ export type Database = {
           manager_id?: string | null
           phone?: string | null
           postal_code?: string | null
-          role?: Database["public"]["Enums"]["user_role"]
           social_linkedin?: string | null
           social_twitter?: string | null
           start_date?: string | null

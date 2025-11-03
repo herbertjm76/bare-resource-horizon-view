@@ -13,14 +13,13 @@ export const useActiveMemberService = (companyId: string | undefined) => {
     try {
       console.log('Updating active member:', memberData.id, memberData);
 
-      // Only update the profiles table, never touch auth.users
+      // Only update the profiles table, never touch auth.users or roles
       const { error } = await supabase
         .from('profiles')
         .update({
           first_name: memberData.first_name,
           last_name: memberData.last_name,
           email: memberData.email,
-          role: memberData.role,
           department: memberData.department,
           location: memberData.location,
           job_title: memberData.job_title,

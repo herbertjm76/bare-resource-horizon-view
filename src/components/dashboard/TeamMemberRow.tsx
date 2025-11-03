@@ -66,8 +66,8 @@ export const TeamMemberRow: React.FC<TeamMemberRowProps> = ({
         </div>
       </td>
       <td className="px-4 py-3">
-        <Badge className={`${getRoleBadgeColor(member.role)} border`}>
-          {member.role?.charAt(0).toUpperCase() + member.role?.slice(1) || 'Member'}
+        <Badge className="bg-gray-100 text-gray-800 border-gray-200 border">
+          Member
         </Badge>
       </td>
       <td className="px-4 py-3">

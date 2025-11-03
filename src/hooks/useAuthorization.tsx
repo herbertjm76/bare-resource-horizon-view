@@ -73,15 +73,17 @@ export const useAuthorization = ({
 
       console.log("useAuthorization: Session found for user", sessionData.session.user.id);
 
-      // Get user profile directly with a single query instead of using RPC
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role, company_id')
-        .eq('id', sessionData.session.user.id)
-        .single();
+      // Get user role using secure RPC and company from profiles
+      const [roleResult, profileResult] = await Promise.all([
+        supabase.rpc('get_user_role_secure'),
+        supabase.from('profiles').select('company_id').eq('id', sessionData.session.user.id).single()
+      ]);
+      
+      const { data: userRoleData, error: roleError } = roleResult;
+      const { data: profile, error: profileError } = profileResult;
 
-      if (profileError) {
-        console.error("useAuthorization: Profile error", profileError);
+      if (roleError || profileError) {
+        console.error("useAuthorization: Error fetching user data", roleError || profileError);
         setError("Error checking authorization");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -91,8 +93,8 @@ export const useAuthorization = ({
         return;
       }
 
-      if (!profile) {
-        console.error("useAuthorization: No profile found");
+      if (!profile || !userRoleData) {
+        console.error("useAuthorization: No profile or role found");
         setError("No user profile found");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -102,11 +104,11 @@ export const useAuthorization = ({
         return;
       }
 
-      console.log("useAuthorization: Profile found", profile);
+      console.log("useAuthorization: Profile and role found", { role: userRoleData, company: profile.company_id });
 
       // Set the user's role
-      setUserRole(profile.role as UserRole);
-      console.log("useAuthorization: User role", profile.role);
+      setUserRole(userRoleData as UserRole);
+      console.log("useAuthorization: User role", userRoleData);
 
       // Check if company ID is required and matches
       if (companyId && profile.company_id !== companyId) {
@@ -122,10 +124,10 @@ export const useAuthorization = ({
 
       // Check if user has required role
       const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-      const hasRequiredRole = roles.includes(profile.role as UserRole);
+      const hasRequiredRole = roles.includes(userRoleData as UserRole);
 
       if (!hasRequiredRole) {
-        console.error("useAuthorization: Role mismatch", profile.role, requiredRole);
+        console.error("useAuthorization: Role mismatch", userRoleData, requiredRole);
         setError("Insufficient permissions");
         setIsAuthorized(false);
         if (autoRedirect) {

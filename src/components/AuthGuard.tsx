@@ -79,15 +79,11 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
         if (requiredRole) {
           console.log("AuthGuard: Checking role requirement:", requiredRole);
           
-          // Get user profile to check role - direct query instead of RPC
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
+          // Get user role using secure RPC
+          const { data: userRole, error: roleError } = await supabase.rpc('get_user_role_secure');
 
-          if (profileError) {
-            console.error("AuthGuard: Error fetching user profile for role check:", profileError);
+          if (roleError) {
+            console.error("AuthGuard: Error fetching user role:", roleError);
             toast.error("Error verifying your account permissions");
             setIsLoading(false);
             setIsAuthorized(false);
@@ -95,9 +91,9 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
             return;
           }
 
-          if (!profile) {
-            console.error("AuthGuard: Profile not found for role check");
-            toast.error("User profile not found");
+          if (!userRole) {
+            console.error("AuthGuard: Role not found for user");
+            toast.error("User role not found");
             setIsLoading(false);
             setIsAuthorized(false);
             navigate('/auth');
@@ -106,12 +102,12 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
 
           // Check if user has required role
           const roles = Array.isArray(requiredRole) ? requiredRole : [requiredRole];
-          const hasRequiredRole = roles.includes(profile.role);
+          const hasRequiredRole = roles.includes(userRole);
 
-          console.log("AuthGuard: User role:", profile.role, "Required roles:", roles, "Has required role:", hasRequiredRole);
+          console.log("AuthGuard: User role:", userRole, "Required roles:", roles, "Has required role:", hasRequiredRole);
 
           if (!hasRequiredRole) {
-            console.log("AuthGuard: User doesn't have required role", profile.role, "needs", requiredRole);
+            console.log("AuthGuard: User doesn't have required role", userRole, "needs", requiredRole);
             toast.error("You don't have permission to access this page");
             setIsLoading(false);
             setIsAuthorized(false);
@@ -119,7 +115,7 @@ const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
             return;
           }
           
-          console.log("AuthGuard: User has required role:", profile.role);
+          console.log("AuthGuard: User has required role:", userRole);
         }
 
         console.log("AuthGuard: User is authorized, rendering protected content");

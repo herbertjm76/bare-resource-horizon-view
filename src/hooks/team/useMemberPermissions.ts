@@ -42,41 +42,27 @@ export const useMemberPermissions = () => {
       const userId = sessionData.session.user.id;
       console.log('Current user ID:', userId);
       
-      // Query only the profiles table to get role information
+      // Use secure RPC to check if user is admin
       try {
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('role, company_id')
-          .eq('id', userId)
-          .maybeSingle();
+        const { data: isAdmin, error: roleError } = await supabase.rpc('user_is_admin_safe');
         
-        if (profileError) {
-          console.error('Error checking user profile:', profileError.message);
-          setPermissionError(profileError.message);
+        if (roleError) {
+          console.error('Error checking user role:', roleError.message);
+          setPermissionError(roleError.message);
           setHasPermission(false);
-          return { hasPermission: false, error: `Error checking user profile: ${profileError.message}` };
+          return { hasPermission: false, error: `Error checking user role: ${roleError.message}` };
         }
         
-        if (profileData) {
-          console.log('User profile from query:', profileData);
-          
-          const canManage = profileData.role === 'admin' || profileData.role === 'owner';
-          
-          setHasPermission(canManage);
-          
-          if (!canManage) {
-            console.warn('User does not have sufficient permissions');
-            setPermissionError('Insufficient permissions');
-            return { hasPermission: false, error: 'User does not have sufficient permissions' };
-          }
-          
-          return { hasPermission: true, error: null };
-        } else {
-          console.error('No profile found for user');
-          setPermissionError('No profile found');
-          setHasPermission(false);
-          return { hasPermission: false, error: 'No profile found' };
+        console.log('User admin status:', isAdmin);
+        setHasPermission(isAdmin === true);
+        
+        if (!isAdmin) {
+          console.warn('User does not have sufficient permissions');
+          setPermissionError('Insufficient permissions');
+          return { hasPermission: false, error: 'User does not have sufficient permissions' };
         }
+        
+        return { hasPermission: true, error: null };
       } catch (queryError: any) {
         console.error('Error in profile query:', queryError.message);
         setPermissionError(`Profile query error: ${queryError.message}`);

@@ -108,7 +108,7 @@ export const useWorkflowData = (): WorkflowData => {
       // Fetch team members (active)
       const { data: activeMembers, error: activeMembersError } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, role, avatar_url')
+        .select('id, first_name, last_name, email, avatar_url')
         .eq('company_id', company.id);
 
       if (activeMembersError) throw activeMembersError;
@@ -129,7 +129,6 @@ export const useWorkflowData = (): WorkflowData => {
         email: member.email,
         status: 'active',
         isPending: false,
-        role: member.role,
         avatar_url: member.avatar_url
       }));
 

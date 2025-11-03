@@ -152,7 +152,7 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       // Fetch team members for active resources count
       const { data: teamMembers, error: teamError } = await supabase
         .from('profiles')
-        .select('id, role')
+        .select('id')
         .eq('company_id', company.id)
         .abortSignal(signal);
 
@@ -203,10 +203,8 @@ export const useTimeRangeMetrics = (selectedTimeRange: TimeRange) => {
       // Calculate metrics based on ALL projects for analytics
       const activeProjects = allProjects?.length || 0;
       
-      // Calculate active resources (exclude non-standard roles)
-      const activeResources = teamMembers?.filter(member => 
-        member.role && ['owner', 'admin', 'member'].includes(member.role)
-      ).length || 0;
+      // Calculate active resources (all team members with profiles)
+      const activeResources = teamMembers?.length || 0;
       
       // Calculate revenue from stages in the time range (time-filtered)
       const totalRevenue = projectStages?.reduce((sum, stage) => sum + (stage.fee || 0), 0) || 0;

@@ -41,19 +41,16 @@ export const TeamMemberDetailContent: React.FC<TeamMemberDetailContentProps> = (
 
       try {
         const { data, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', userId)
-          .abortSignal(controller.signal)
-          .single();
+          .rpc('get_user_role_secure')
+          .abortSignal(controller.signal);
           
         clearTimeout(timeoutId);
         if (error) {
-          console.error('Error fetching user profile:', error);
+          console.error('Error fetching user role:', error);
           return null;
         }
         
-        return data;
+        return { role: data };
       } catch (error) {
         clearTimeout(timeoutId);
         console.error('Error fetching user profile:', error);
