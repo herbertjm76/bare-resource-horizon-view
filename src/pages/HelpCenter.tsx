@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/accordion';
 import { useCompany } from '@/context/CompanyContext';
 import { ProcessDiagram } from '@/components/workflow/ProcessDiagram';
+import { ExcelImportDialog } from '@/components/projects/ExcelImportDialog';
 import { toast } from 'sonner';
 import { 
   HelpCircle, 
@@ -243,32 +244,14 @@ const HelpCenter = () => {
                   Already have your data in Excel? Import your projects, team members, and allocations to get started quickly.
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <Button 
-                    variant="default"
-                    onClick={() => {
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.accept = '.xlsx,.xls,.csv';
-                      input.onchange = (e) => {
-                        const file = (e.target as HTMLInputElement).files?.[0];
-                        if (file) {
-                          toast.success(`Importing ${file.name}... This feature is coming soon!`);
-                        }
-                      };
-                      input.click();
-                    }}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Import Excel File
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
-                      toast.info('Download template feature coming soon!');
-                    }}
-                  >
-                    Download Template
-                  </Button>
+                  <ExcelImportDialog
+                    trigger={
+                      <Button variant="default">
+                        <FileText className="h-4 w-4 mr-2" />
+                        Import Excel File
+                      </Button>
+                    }
+                  />
                 </div>
                 <div className="text-xs text-muted-foreground">
                   Supported formats: .xlsx, .xls, .csv

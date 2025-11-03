@@ -4,17 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowRight, Check } from 'lucide-react';
 import { PROJECT_FIELDS } from './types';
+import { ConfidenceBadge } from './ConfidenceBadge';
 
 interface ColumnMappingCardProps {
   headers: string[];
   mapping: Record<string, string>;
   onMappingChange: (columnIndex: string, projectField: string) => void;
+  confidence?: Record<string, number>;
 }
 
 export const ColumnMappingCard: React.FC<ColumnMappingCardProps> = ({
   headers,
   mapping,
-  onMappingChange
+  onMappingChange,
+  confidence
 }) => {
   const isFieldMapped = (fieldValue: string) => {
     return Object.values(mapping).includes(fieldValue);
@@ -32,6 +35,9 @@ export const ColumnMappingCard: React.FC<ColumnMappingCardProps> = ({
               <span className="text-sm font-medium min-w-0 flex-1 truncate">
                 {header}
               </span>
+              {confidence?.[index.toString()] && (
+                <ConfidenceBadge confidence={confidence[index.toString()]} />
+              )}
               <ArrowRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
             </div>
             <Select

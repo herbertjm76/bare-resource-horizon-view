@@ -74,6 +74,7 @@ export const useColumnMapping = () => {
 
   return {
     mapping,
+    setMapping,
     handleMappingChange,
     validateMapping,
     downloadTemplate

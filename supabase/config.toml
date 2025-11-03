@@ -38,6 +38,9 @@ verify_jwt = true
 [functions.create-subdomain-dns]
 verify_jwt = true
 
+[functions.import-excel-ai]
+verify_jwt = true
+
 [db]
 port = 54322
 shadow_port = 54320
