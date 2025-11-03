@@ -18,6 +18,7 @@ import WeeklyOverview from "./pages/WeeklyOverview";
 import TeamWorkload from "./pages/TeamWorkload";
 import TeamAnnualLeave from "./pages/TeamAnnualLeave";
 import ProjectResourcing from "./pages/ProjectResourcing";
+import HelpCenter from "./pages/HelpCenter";
 import Help from "./pages/Help";
 import FAQ from "./pages/FAQ";
 import Documentation from "./pages/Documentation";
@@ -63,6 +64,7 @@ function App() {
               <Route path="/team-annual-leave" element={<TeamAnnualLeave />} />
               <Route path="/project-resourcing" element={<ProjectResourcing />} />
               <Route path="/financial-control" element={<FinancialControl />} />
+              <Route path="/help-center" element={<HelpCenter />} />
               <Route path="/workflow" element={<WorkflowPage />} />
               <Route path="/financial-overview" element={<FinancialOverview />} />
               <Route path="/project-profit-dashboard" element={<ProjectProfitDashboard />} />
