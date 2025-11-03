@@ -1375,6 +1375,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_rundown_preferences: {
         Row: {
           card_order: Json | null
@@ -1618,6 +1645,14 @@ export type Database = {
       }
       get_user_role: { Args: { user_id: string }; Returns: string }
       get_user_role_safe: { Args: never; Returns: string }
+      get_user_role_secure: { Args: { _user_id: string }; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_company_role:
         | {
             Args: {
@@ -1641,6 +1676,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "owner" | "admin" | "member"
       data_sensitivity: "public" | "internal" | "confidential" | "restricted"
       member_type: "active" | "pre_registered"
       project_status: "In Progress" | "On Hold" | "Complete" | "Planning"
@@ -1772,6 +1808,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["owner", "admin", "member"],
       data_sensitivity: ["public", "internal", "confidential", "restricted"],
       member_type: ["active", "pre_registered"],
       project_status: ["In Progress", "On Hold", "Complete", "Planning"],

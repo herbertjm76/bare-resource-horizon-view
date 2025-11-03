@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ensureUserProfile } from '@/utils/authHelpers';
 import JoinFormFields from './JoinFormFields';
 import JoinAuthToggle from './JoinAuthToggle';
+import { joinSchema, loginSchema } from '@/utils/authValidation';
 
 interface JoinFormProps {
   companyName: string;
@@ -30,33 +31,38 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
 
     const effectiveInviteCode = inviteCode ?? inviteCodeInput;
 
-    // Validate invite code if needed
-    if (!inviteCode && !inviteCodeInput) {
-      toast.error('Please enter an invite code.');
-      setLoading(false);
-      return;
-    }
-
     try {
       if (isSignup) {
-        if (!firstName || !lastName || !email || !password) {
-          toast.error('Please fill in all required fields');
+        // Validate signup inputs
+        const validationResult = joinSchema.safeParse({
+          email,
+          password,
+          firstName,
+          lastName,
+          inviteCode: effectiveInviteCode
+        });
+
+        if (!validationResult.success) {
+          const firstError = validationResult.error.errors[0];
+          toast.error(firstError.message);
           setLoading(false);
           return;
         }
+
+        const validatedData = validationResult.data;
 
         // The invitation code would typically be checked server-side; for now, assume it's valid if present
         // Optionally: fetch company info here using inviteCodeInput
 
         // Register new user as a member of existing company
         const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
+          email: validatedData.email,
+          password: validatedData.password,
           options: {
             data: {
-              first_name: firstName,
-              last_name: lastName,
-              company_id: company?.id, // This should ideally re-fetch company using invite code if not already present
+              first_name: validatedData.firstName,
+              last_name: validatedData.lastName,
+              company_id: company?.id,
               role: 'member'
             }
           }
@@ -66,21 +72,45 @@ const JoinForm: React.FC<JoinFormProps> = ({ companyName, company, inviteCode })
 
         if (data.user) {
           await ensureUserProfile(data.user.id, {
-            email,
-            firstName,
-            lastName,
+            email: validatedData.email,
+            firstName: validatedData.firstName,
+            lastName: validatedData.lastName,
             companyId: company?.id,
             role: 'member'
           });
+          
+          // Add role to user_roles table
+          await supabase
+            .from('user_roles')
+            .insert({
+              user_id: data.user.id,
+              role: 'member',
+              company_id: company?.id
+            });
           
           toast.success('Account created successfully! Please check your email for verification.');
           navigate('/dashboard');
         }
       } else {
+        // Validate login inputs
+        const loginValidation = loginSchema.safeParse({
+          email,
+          password
+        });
+
+        if (!loginValidation.success) {
+          const firstError = loginValidation.error.errors[0];
+          toast.error(firstError.message);
+          setLoading(false);
+          return;
+        }
+
+        const loginData = loginValidation.data;
+
         // Login existing user
         const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+          email: loginData.email,
+          password: loginData.password,
         });
 
         if (error) throw error;

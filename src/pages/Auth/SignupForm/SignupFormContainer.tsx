@@ -12,6 +12,7 @@ import { ensureUserProfile } from '@/utils/authHelpers';
 import { Database } from '@/integrations/supabase/types';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { InfoIcon } from 'lucide-react';
+import { signupSchema } from '@/utils/authValidation';
 
 // Define the specific user role type to match Supabase's enum
 type UserRole = Database['public']['Enums']['user_role'];
@@ -69,27 +70,35 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
     await supabase.auth.signOut();
     
     try {
-      // Validate required fields - simplified to essentials only
-      if (
-        !ownerEmail || !ownerPassword ||
-        !company.name || !company.subdomain
-      ) {
-        setSignupError('Please fill in all required fields.');
-        toast.error('Please fill in all required fields.');
+      // Validate all inputs using zod schema
+      const validationResult = signupSchema.safeParse({
+        email: ownerEmail,
+        password: ownerPassword,
+        firstName: '', // Not collected in signup, will be added later
+        lastName: '', // Not collected in signup, will be added later
+        companyName: company.name,
+        subdomain: company.subdomain,
+        website: company.website || '',
+        address: company.address || '',
+        city: company.city || '',
+        country: company.country || '',
+        size: company.size || '',
+        industry: company.industry || '',
+      });
+
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        setSignupError(firstError.message);
+        toast.error(firstError.message);
         setLoading(false);
         return;
       }
 
-      // Check password strength
-      if (ownerPassword.length < 6) {
-        setSignupError('Password must be at least 6 characters long');
-        toast.error('Password must be at least 6 characters long');
-        setLoading(false);
-        return;
-      }
+      // Use validated data
+      const validatedData = validationResult.data;
 
       // Check subdomain availability
-      const available = await checkSubdomainAvailability(company.subdomain);
+      const available = await checkSubdomainAvailability(validatedData.subdomain);
       if (!available) {
         setSignupError('This subdomain is already taken. Please choose another one.');
         toast.error('This subdomain is already taken. Please choose another one.');
@@ -105,14 +114,14 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
-          name: company.name,
-          subdomain: company.subdomain.toLowerCase(),
-          website: company.website || null,
-          address: company.address || null,
-          size: company.size || null,
-          city: company.city || null,
-          country: company.country || null,
-          industry: company.industry || null
+          name: validatedData.companyName,
+          subdomain: validatedData.subdomain,
+          website: validatedData.website || null,
+          address: validatedData.address || null,
+          size: validatedData.size || null,
+          city: validatedData.city || null,
+          country: validatedData.country || null,
+          industry: validatedData.industry || null
         })
         .select()
         .single();
@@ -126,8 +135,8 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
 
       // 2. Sign up user with company reference in metadata
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: ownerEmail,
-        password: ownerPassword,
+        email: validatedData.email,
+        password: validatedData.password,
         options: {
           data: {
             company_id: companyData.id,
@@ -157,10 +166,18 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         .from('profiles')
         .upsert({
           id: authData.user.id,
-          email: ownerEmail,
-          company_id: companyData.id,
-          role: userRole
+          email: validatedData.email,
+          company_id: companyData.id
         }, { onConflict: 'id' });
+      
+      // 4. Add role to user_roles table
+      await supabase
+        .from('user_roles')
+        .insert({
+          user_id: authData.user.id,
+          role: userRole,
+          company_id: companyData.id
+        });
 
       // Show success message
       toast.success('Account created! Please check your email to confirm, then you can log in.');
