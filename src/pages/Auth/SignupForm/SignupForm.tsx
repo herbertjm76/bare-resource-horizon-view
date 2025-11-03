@@ -56,6 +56,9 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
+    // Ensure no active session so RLS treats this as anon for company creation
+    await supabase.auth.signOut();
     if (
       !ownerFirstName || !ownerLastName || !ownerEmail || !ownerPassword ||
       !company.name || !company.subdomain || !company.address || !company.country || !company.city || !company.size || !company.industry

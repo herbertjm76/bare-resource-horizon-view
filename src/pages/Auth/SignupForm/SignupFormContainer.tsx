@@ -65,6 +65,9 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
     setLoading(true);
     setSignupError(null);
     
+    // Ensure no active session so RLS treats this as anon for company creation
+    await supabase.auth.signOut();
+    
     try {
       // Validate required fields - simplified to essentials only
       if (
