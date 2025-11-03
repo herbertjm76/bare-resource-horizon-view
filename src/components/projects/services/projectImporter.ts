@@ -178,8 +178,7 @@ export class ProjectImporter {
       const { data: managers, error: managersError } = await supabase
         .from('profiles')
         .select('id, first_name, last_name')
-        .eq('company_id', companyId)
-        .in('role', ['owner', 'admin', 'member']);
+        .eq('company_id', companyId);
 
       if (managersError) {
         console.error('Error fetching managers:', managersError);
