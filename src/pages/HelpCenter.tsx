@@ -224,6 +224,51 @@ const HelpCenter = () => {
 
           {/* Getting Started Tab */}
           <TabsContent value="getting-started" className="space-y-6">
+            <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Quick Start: Import Your Data
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Already have your data in Excel? Import your projects, team members, and allocations to get started quickly.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button 
+                    variant="default"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = '.xlsx,.xls,.csv';
+                      input.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          toast.success(`Importing ${file.name}... This feature is coming soon!`);
+                        }
+                      };
+                      input.click();
+                    }}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Import Excel File
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      toast.info('Download template feature coming soon!');
+                    }}
+                  >
+                    Download Template
+                  </Button>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Supported formats: .xlsx, .xls, .csv
+                </div>
+              </CardContent>
+            </Card>
+            
             <ProcessDiagram />
           </TabsContent>
 
