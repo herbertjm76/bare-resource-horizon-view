@@ -20,11 +20,9 @@ import { toast } from 'sonner';
 import { 
   HelpCircle, 
   BookOpen, 
-  MessageCircle, 
+  MessageCircle,
   Send,
   Mail,
-  Phone,
-  Clock,
   FileText,
   Play,
   ExternalLink,
@@ -191,21 +189,7 @@ const HelpCenter = () => {
       title: "Email Support",
       description: "Send us a detailed message",
       contact: "support@bareresource.com",
-      responseTime: "Within 24 hours"
-    },
-    {
-      icon: MessageCircle,
-      title: "Live Chat",
-      description: "Real-time assistance",
-      contact: "Available in-app",
-      responseTime: "Instant response"
-    },
-    {
-      icon: Phone,
-      title: "Phone Support",
-      description: "Speak with our team",
-      contact: "+1 (555) 123-4567",
-      responseTime: "Business hours only"
+      responseTime: "We aim to respond within 24 hours"
     }
   ];
 
@@ -516,35 +500,10 @@ const HelpCenter = () => {
                           <h4 className="font-medium">{channel.title}</h4>
                           <p className="text-sm text-muted-foreground mb-1">{channel.description}</p>
                           <p className="text-sm font-medium text-primary">{channel.contact}</p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <Clock className="h-3 w-3 text-muted-foreground" />
-                            <span className="text-xs text-muted-foreground">{channel.responseTime}</span>
-                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">{channel.responseTime}</p>
                         </div>
                       </div>
                     ))}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Support Hours</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span>Monday - Friday</span>
-                        <span className="font-medium">9:00 AM - 6:00 PM EST</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Saturday</span>
-                        <span className="font-medium">10:00 AM - 2:00 PM EST</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Sunday</span>
-                        <span className="text-muted-foreground">Closed</span>
-                      </div>
-                    </div>
                   </CardContent>
                 </Card>
 
