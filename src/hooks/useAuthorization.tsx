@@ -26,9 +26,19 @@ export const useAuthorization = ({
   const navigate = useNavigate();
   const authChecked = useRef(false);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const checkInProgress = useRef(false);
 
   const checkAuthorization = useCallback(async () => {
+    // Prevent multiple simultaneous checks
+    if (checkInProgress.current) {
+      if (import.meta.env.DEV) {
+        console.log("useAuthorization: Check already in progress, skipping...");
+      }
+      return;
+    }
+
     try {
+      checkInProgress.current = true;
       if (import.meta.env.DEV) {
         console.log("useAuthorization: Checking authorization...");
       }
@@ -40,13 +50,14 @@ export const useAuthorization = ({
         clearTimeout(loadingTimeoutRef.current);
       }
 
-      // Set a new timeout to prevent getting stuck
+      // Set a new timeout to prevent getting stuck (reduced from 8s to 5s)
       loadingTimeoutRef.current = setTimeout(() => {
         console.warn("useAuthorization: Authorization check timed out");
+        checkInProgress.current = false;
         setLoading(false);
         setError("Authorization check timed out. Please try refreshing.");
         toast.error("Authorization check timed out");
-      }, 8000);
+      }, 5000);
       
       // Check if user is authenticated
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -168,6 +179,7 @@ export const useAuthorization = ({
         clearTimeout(loadingTimeoutRef.current);
         loadingTimeoutRef.current = null;
       }
+      checkInProgress.current = false;
       setLoading(false);
     }
   }, [companyId, navigate, redirectTo, requiredRole, autoRedirect]);
@@ -183,14 +195,15 @@ export const useAuthorization = ({
       authChecked: authChecked.current
     });
     
-    // Set a safety timeout
+    // Set a safety timeout (reduced from 10s to 6s)
     const safetyTimeout = setTimeout(() => {
       if (mounted && loading) {
         console.warn("useAuthorization: Safety timeout triggered");
+        checkInProgress.current = false;
         setLoading(false);
         setError("Authorization check timed out");
       }
-    }, 10000);
+    }, 6000);
     
     // Only run checkAuthorization if it hasn't been checked yet
     if (!authChecked.current) {
