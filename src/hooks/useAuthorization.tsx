@@ -221,9 +221,9 @@ export const useAuthorization = ({
         if (autoRedirect) {
           navigate('/auth');
         }
-      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
         if (import.meta.env.DEV) {
-          console.log("useAuthorization: User signed in or token refreshed");
+          console.log("useAuthorization: User signed in, token refreshed, or initial session");
         }
         authChecked.current = false;
         // Use setTimeout to avoid auth deadlocks
