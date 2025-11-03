@@ -46,6 +46,15 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations, company }) => {
         let centerLng = -74.006;
         let zoomLevel = 2;
 
+        // Check if we have company address to display
+        const hasCompanyAddress = company?.city && company?.country;
+        let companyCoords = null;
+
+        if (hasCompanyAddress) {
+          companyCoords = getCoordinatesForLocation(company.city, company.country);
+          console.log(`Company address: ${company.city}, ${company.country}`, companyCoords);
+        }
+
         // If we have locations, center the map on them
         if (locations && locations.length > 0) {
           console.log('Office locations to map:', locations);
@@ -64,16 +73,26 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations, company }) => {
             bounds.extend([location.lat, location.lng]);
           });
 
-          if (locationCoords.length === 1) {
+          // Include company address in bounds if available
+          if (companyCoords) {
+            bounds.extend([companyCoords.lat, companyCoords.lng]);
+          }
+
+          if (locationCoords.length === 1 && !companyCoords) {
             centerLat = locationCoords[0].lat;
             centerLng = locationCoords[0].lng;
             zoomLevel = 10;
-          } else if (locationCoords.length > 1) {
+          } else {
             const center = bounds.getCenter();
             centerLat = center.lat;
             centerLng = center.lng;
-            zoomLevel = 4;
+            zoomLevel = locationCoords.length === 1 ? 12 : 4;
           }
+        } else if (companyCoords) {
+          // No office locations, just show company address
+          centerLat = companyCoords.lat;
+          centerLng = companyCoords.lng;
+          zoomLevel = 13;
         }
 
         // Create map
@@ -83,6 +102,46 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations, company }) => {
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+
+        // Add marker for company headquarters if address is available
+        if (companyCoords) {
+          // Create a custom icon for company HQ
+          const hqIcon = L.divIcon({
+            className: 'company-hq-marker',
+            html: `
+              <div style="
+                background-color: #6366f1;
+                border: 3px solid white;
+                border-radius: 50%;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+              ">🏛️</div>
+            `,
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+          });
+
+          const hqMarker = L.marker([companyCoords.lat, companyCoords.lng], {
+            icon: hqIcon
+          }).addTo(map);
+          
+          const hqPopupContent = `
+            <div style="text-align: center; padding: 8px;">
+              <div style="font-size: 18px; margin-bottom: 4px;">🏛️</div>
+              <strong>${company?.name || 'Company'} HQ</strong>
+              <br />
+              ${company?.address ? `<span style="color: #666;">${company.address}</span><br />` : ''}
+              <span style="color: #666;">${company?.city}, ${company?.country}</span>
+            </div>
+          `;
+          
+          hqMarker.bindPopup(hqPopupContent);
+        }
 
         // Add markers for each office location
         if (locations && locations.length > 0) {
@@ -101,20 +160,23 @@ const MapComponent: React.FC<MapComponentProps> = ({ locations, company }) => {
                 <br />
                 <span style="color: #666;">${location.city}, ${location.country}</span>
                 <br />
-                <small style="color: #999;">${company?.name || 'Office Location'}</small>
+                <small style="color: #999;">Office Location</small>
               </div>
             `;
             
             marker.bindPopup(popupContent);
           });
 
-          // Fit map to show all markers if multiple locations
-          if (locationCoords.length > 1) {
+          // Fit map to show all markers if multiple locations or company HQ
+          if (locationCoords.length > 1 || (locationCoords.length > 0 && companyCoords)) {
             const bounds = L.latLngBounds([]);
             locationCoords.forEach(location => {
               bounds.extend([location.lat, location.lng]);
             });
-            map.fitBounds(bounds, { padding: [30, 30] });
+            if (companyCoords) {
+              bounds.extend([companyCoords.lat, companyCoords.lng]);
+            }
+            map.fitBounds(bounds, { padding: [50, 50] });
           }
         }
 
