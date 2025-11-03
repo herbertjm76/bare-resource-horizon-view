@@ -17,15 +17,17 @@ export const signupSchema = z.object({
   
   firstName: z.string()
     .trim()
-    .min(1, { message: "First name is required" })
     .max(50, { message: "First name must be less than 50 characters" })
-    .regex(/^[a-zA-Z\s'-]+$/, { message: "First name can only contain letters, spaces, hyphens and apostrophes" }),
+    .regex(/^[a-zA-Z\s'-]*$/, { message: "First name can only contain letters, spaces, hyphens and apostrophes" })
+    .optional()
+    .or(z.literal('')),
   
   lastName: z.string()
     .trim()
-    .min(1, { message: "Last name is required" })
     .max(50, { message: "Last name must be less than 50 characters" })
-    .regex(/^[a-zA-Z\s'-]+$/, { message: "Last name can only contain letters, spaces, hyphens and apostrophes" }),
+    .regex(/^[a-zA-Z\s'-]*$/, { message: "Last name can only contain letters, spaces, hyphens and apostrophes" })
+    .optional()
+    .or(z.literal('')),
   
   companyName: z.string()
     .trim()
