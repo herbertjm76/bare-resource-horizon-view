@@ -248,6 +248,13 @@ export const useAuthorization = ({
         if (import.meta.env.DEV) {
           console.log("useAuthorization: Auth event:", event);
         }
+        // Avoid re-checking on redundant INITIAL_SESSION events
+        if (event === 'INITIAL_SESSION' && authChecked.current) {
+          if (import.meta.env.DEV) {
+            console.log('useAuthorization: Skipping recheck on redundant INITIAL_SESSION');
+          }
+          return;
+        }
         // Throttle TOKEN_REFRESHED to avoid loops when already authorized
         if (event === 'TOKEN_REFRESHED') {
           const sinceLast = Date.now() - lastCheckCompletedTs.current;

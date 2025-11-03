@@ -15,7 +15,7 @@ export const OfficeSettingsPageContent: React.FC = () => {
     redirectTo: '/dashboard'
   });
   
-  const isLoading = authLoading || (companyLoading && !company);
+  const isLoading = (!isAuthorized && authLoading) || (companyLoading && !company);
   const error = authError || companyError;
   
   const handleRefresh = () => {
