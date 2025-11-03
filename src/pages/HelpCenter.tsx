@@ -223,7 +223,14 @@ const HelpCenter = () => {
           </TabsList>
 
           {/* Getting Started Tab */}
-          <TabsContent value="getting-started" className="space-y-6">
+          <TabsContent value="getting-started" className="space-y-8">
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl font-bold">Get Started</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Choose how you'd like to begin: import existing data or follow our step-by-step workflow
+              </p>
+            </div>
+
             <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -268,6 +275,15 @@ const HelpCenter = () => {
                 </div>
               </CardContent>
             </Card>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or follow the workflow</span>
+              </div>
+            </div>
             
             <ProcessDiagram />
           </TabsContent>
