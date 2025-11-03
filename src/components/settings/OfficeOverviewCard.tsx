@@ -24,6 +24,7 @@ export const OfficeOverviewCard = () => {
             <CompanyInfoDisplay
               company={company}
               locations={locations}
+              onUpdate={refreshCompany}
             />
           </div>
         </div>

@@ -1,20 +1,26 @@
 
 import React from 'react';
+import { CompanyInfoEditDialog } from './CompanyInfoEditDialog';
 
 interface CompanyInfoDisplayProps {
   company: any;
   locations: any[] | null;
+  onUpdate: () => void;
 }
 
 export const CompanyInfoDisplay: React.FC<CompanyInfoDisplayProps> = ({
   company,
-  locations
+  locations,
+  onUpdate
 }) => {
   return (
     <div className="text-center">
-      <h2 className="text-lg font-semibold text-black leading-tight">
-        {company?.name || 'Your Company'}
-      </h2>
+      <div className="flex items-center justify-center gap-2">
+        <h2 className="text-lg font-semibold text-black leading-tight">
+          {company?.name || 'Your Company'}
+        </h2>
+        <CompanyInfoEditDialog company={company} onUpdate={onUpdate} />
+      </div>
       <p className="text-xs text-black/80 mt-1">
         {company?.address ? `${company.address}` : 'Address not set'}
       </p>
