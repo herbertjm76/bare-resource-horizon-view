@@ -94,22 +94,54 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         return;
       }
 
-      console.log('Starting signup process with data:', {
+      
+      // Define the role explicitly as a valid UserRole enum value
+      const userRole: UserRole = 'owner';
+
+      // 1. Sign up user first to get an authenticated session
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: ownerEmail,
-        company: {
-          name: company.name,
-          subdomain: company.subdomain
+        password: ownerPassword,
+        options: {
+          data: {
+            role: userRole
+          },
+          emailRedirectTo: window.location.origin + '/auth'
         }
       });
+
+      if (signUpError) {
+        console.error('Signup error:', signUpError);
+        throw signUpError;
+      }
+
+      if (!authData.user) {
+        console.error('No user returned from signup');
+        throw new Error('Failed to create user account');
+      }
+
+      // Check if we have a session (for immediate confirmation without email)
+      const { data: sessionData } = await supabase.auth.getSession();
       
-      // 1. Create company first - only essential fields
+      if (!sessionData.session) {
+        // Email confirmation required - user needs to verify email first
+        toast.success('Please check your email to confirm your account before logging in.');
+        setShowConfirmationInfo(true);
+        setOwnerEmail('');
+        setOwnerPassword('');
+        setCompany(emptyCompany);
+        return;
+      }
+
+      console.log('User created successfully with ID:', authData.user.id);
+
+      // 2. Create company now that we're authenticated (RLS will allow it)
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
           name: company.name,
           subdomain: company.subdomain.toLowerCase(),
           website: company.website || null,
-          // Optional fields set to null/default - can be filled in later
           address: company.address || null,
           size: company.size || null,
           city: company.city || null,
@@ -126,52 +158,18 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
 
       console.log('Company created successfully with ID:', companyData.id);
 
-      // Define the role explicitly as a valid UserRole enum value
-      const userRole: UserRole = 'owner';
+      // 3. Create/update profile record to link user to company
+      await supabase
+        .from('profiles')
+        .upsert({
+          id: authData.user.id,
+          email: ownerEmail,
+          company_id: companyData.id,
+          role: userRole
+        }, { onConflict: 'id' });
 
-      // 2. Sign up user with Supabase Auth - simplified metadata
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: ownerEmail,
-        password: ownerPassword,
-        options: {
-          data: {
-            company_id: companyData.id,
-            role: userRole
-          },
-          emailRedirectTo: window.location.origin + '/auth'
-        }
-      });
-
-      if (signUpError) {
-        // If auth fails, clean up by deleting the company
-        console.error('Signup error:', signUpError);
-        await supabase.from('companies').delete().eq('id', companyData.id);
-        throw signUpError;
-      }
-
-      if (!authData.user) {
-        console.error('No user returned from signup');
-        await supabase.from('companies').delete().eq('id', companyData.id);
-        throw new Error('Failed to create user account');
-      }
-
-      console.log('User created successfully with ID:', authData.user.id);
-
-      // 3. Create profile record manually since the trigger might be failing
-      const profileCreated = await ensureUserProfile(authData.user.id, {
-        email: ownerEmail,
-        companyId: companyData.id,
-        role: userRole
-      });
-
-      if (!profileCreated) {
-        console.warn('Warning: Could not ensure profile creation through helper function');
-        // We'll continue anyway since the database trigger should handle this
-      }
-
-      // Show success message and confirmation info
-      toast.success('Sign up successful! Please check your email to confirm your account.');
-      setShowConfirmationInfo(true);
+      // Show success message
+      toast.success('Account created and company registered successfully!');
       
       // Clear form
       setOwnerEmail('');
