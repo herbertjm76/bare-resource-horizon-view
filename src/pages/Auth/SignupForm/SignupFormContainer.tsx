@@ -113,9 +113,11 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       const userRole: UserRole = 'owner';
 
       // 1. Create company FIRST (as anon user, before signup - RLS now allows this)
-      const { data: companyData, error: companyError } = await supabase
+      const companyId = crypto.randomUUID();
+      const { error: companyError } = await supabase
         .from('companies')
         .insert({
+          id: companyId,
           name: validatedData.companyName,
           subdomain: validatedData.subdomain,
           website: validatedData.website || null,
@@ -124,16 +126,14 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
           city: validatedData.city || null,
           country: validatedData.country || null,
           industry: validatedData.industry || null
-        })
-        .select()
-        .single();
+        });
 
       if (companyError) {
         console.error('Company creation error:', companyError);
         throw companyError;
       }
 
-      console.log('Company created successfully with ID:', companyData.id);
+      console.log('Company created successfully with ID:', companyId);
 
       // 2. Sign up user with company reference in metadata
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
@@ -141,7 +141,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         password: validatedData.password,
         options: {
           data: {
-            company_id: companyData.id,
+            company_id: companyId,
             role: userRole
           },
           emailRedirectTo: window.location.origin + '/auth'
@@ -151,13 +151,13 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       if (signUpError) {
         console.error('Signup error:', signUpError);
         // Clean up company if signup fails
-        await supabase.from('companies').delete().eq('id', companyData.id);
+        await supabase.from('companies').delete().eq('id', companyId);
         throw signUpError;
       }
 
       if (!authData.user) {
         console.error('No user returned from signup');
-        await supabase.from('companies').delete().eq('id', companyData.id);
+        await supabase.from('companies').delete().eq('id', companyId);
         throw new Error('Failed to create user account');
       }
 
@@ -169,7 +169,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         .upsert({
           id: authData.user.id,
           email: validatedData.email,
-          company_id: companyData.id
+          company_id: companyId
         }, { onConflict: 'id' });
       
       // 4. Add role to user_roles table
@@ -178,7 +178,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         .insert({
           user_id: authData.user.id,
           role: userRole,
-          company_id: companyData.id
+          company_id: companyId
         });
 
       // Show success message
