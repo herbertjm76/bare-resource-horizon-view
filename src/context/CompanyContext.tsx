@@ -67,6 +67,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const fetchCompanyBySubdomain = async (subdomainValue: string) => {
     try {
+      console.log('CompanyProvider: fetchCompanyBySubdomain start', subdomainValue);
       setLoading(true);
       setError(null);
       
@@ -85,12 +86,14 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
 
       setCompany(data);
+      console.log('CompanyProvider: fetchCompanyBySubdomain success', data?.id);
     } catch (error: any) {
       console.error('Error in fetchCompanyBySubdomain:', error);
       setCompany(null);
       setError(error.message || 'Failed to fetch company data');
     } finally {
       setLoading(false);
+      console.log('CompanyProvider: fetchCompanyBySubdomain end -> loading=false');
     }
   };
 
@@ -103,6 +106,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
     
     try {
+      console.log('CompanyProvider: fetchCompanyByProfile start', profile.company_id);
       setLoading(true);
       setError(null);
       
@@ -119,6 +123,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       } else {
         setCompany(companyData);
         setError(null);
+        console.log('CompanyProvider: fetchCompanyByProfile success', companyData?.id);
       }
     } catch (error: any) {
       console.error('Error in fetchCompanyByProfile:', error);
@@ -126,6 +131,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setError(error.message || 'Failed to fetch company data');
     } finally {
       setLoading(false);
+      console.log('CompanyProvider: fetchCompanyByProfile end -> loading=false');
     }
   };
 
@@ -204,6 +210,16 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [isDemoMode, demoProfile]);
 
+  // Safety timeout to avoid indefinite loading states
+  useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => {
+      console.warn('CompanyProvider: safety timeout -> forcing loading=false');
+      setLoading(false);
+    }, 6000);
+    return () => clearTimeout(t);
+  }, [loading]);
+ 
   return (
     <CompanyContext.Provider value={{ 
       company, 
