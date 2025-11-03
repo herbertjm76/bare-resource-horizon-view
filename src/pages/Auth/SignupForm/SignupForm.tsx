@@ -73,36 +73,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
     }
 
     try {
-      // 1) Sign up the user first so we get an authenticated session
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: ownerEmail,
-        password: ownerPassword,
-        options: {
-          data: {
-            first_name: ownerFirstName,
-            last_name: ownerLastName,
-            role: 'owner'
-          },
-          emailRedirectTo: window.location.origin + '/auth'
-        }
-      });
-
-      if (signUpError) throw signUpError;
-
-      // If email confirmation is required, there will be no session yet
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        toast.success('Please confirm your email. After logging in, you can complete company setup.');
-        setOwnerFirstName('');
-        setOwnerLastName('');
-        setOwnerEmail('');
-        setOwnerPassword('');
-        setCompany(emptyCompany);
-        onSwitchToLogin();
-        return;
-      }
-
-      // 2) Create the company now that we are authenticated (RLS will allow it)
+      // 1) Create company FIRST (as anon user, before signup)
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
@@ -120,20 +91,46 @@ const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
 
       if (companyError) throw companyError;
 
-      // 3) Ensure profile exists and link it to the company as owner
-      const userId = sessionData.session.user.id;
-      await supabase
-        .from('profiles')
-        .upsert({
-          id: userId,
-          email: ownerEmail,
-          first_name: ownerFirstName,
-          last_name: ownerLastName,
-          company_id: companyData.id,
-          role: 'owner'
-        }, { onConflict: 'id' });
+      console.log('Company created:', companyData.id);
 
-      toast.success('Account created and company registered!');
+      // 2) Sign up the user with company reference in metadata
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: ownerEmail,
+        password: ownerPassword,
+        options: {
+          data: {
+            first_name: ownerFirstName,
+            last_name: ownerLastName,
+            company_id: companyData.id,
+            role: 'owner'
+          },
+          emailRedirectTo: window.location.origin + '/auth'
+        }
+      });
+
+      if (signUpError) {
+        // Clean up company if signup fails
+        await supabase.from('companies').delete().eq('id', companyData.id);
+        throw signUpError;
+      }
+
+      console.log('User signed up:', signUpData.user?.id);
+
+      // 3) The trigger will create the profile, but we'll ensure it's linked
+      if (signUpData.user) {
+        await supabase
+          .from('profiles')
+          .upsert({
+            id: signUpData.user.id,
+            email: ownerEmail,
+            first_name: ownerFirstName,
+            last_name: ownerLastName,
+            company_id: companyData.id,
+            role: 'owner'
+          }, { onConflict: 'id' });
+      }
+
+      toast.success('Account created! Please check your email to confirm your account, then you can log in.');
       setOwnerFirstName('');
       setOwnerLastName('');
       setOwnerEmail('');

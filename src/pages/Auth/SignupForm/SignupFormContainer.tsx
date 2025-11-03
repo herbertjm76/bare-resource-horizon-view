@@ -98,44 +98,7 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
       // Define the role explicitly as a valid UserRole enum value
       const userRole: UserRole = 'owner';
 
-      // 1. Sign up user first to get an authenticated session
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: ownerEmail,
-        password: ownerPassword,
-        options: {
-          data: {
-            role: userRole
-          },
-          emailRedirectTo: window.location.origin + '/auth'
-        }
-      });
-
-      if (signUpError) {
-        console.error('Signup error:', signUpError);
-        throw signUpError;
-      }
-
-      if (!authData.user) {
-        console.error('No user returned from signup');
-        throw new Error('Failed to create user account');
-      }
-
-      // Check if we have a session (for immediate confirmation without email)
-      const { data: sessionData } = await supabase.auth.getSession();
-      
-      if (!sessionData.session) {
-        // Email confirmation required - user needs to verify email first
-        toast.success('Please check your email to confirm your account before logging in.');
-        setShowConfirmationInfo(true);
-        setOwnerEmail('');
-        setOwnerPassword('');
-        setCompany(emptyCompany);
-        return;
-      }
-
-      console.log('User created successfully with ID:', authData.user.id);
-
-      // 2. Create company now that we're authenticated (RLS will allow it)
+      // 1. Create company FIRST (as anon user, before signup - RLS now allows this)
       const { data: companyData, error: companyError } = await supabase
         .from('companies')
         .insert({
@@ -158,7 +121,35 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
 
       console.log('Company created successfully with ID:', companyData.id);
 
-      // 3. Create/update profile record to link user to company
+      // 2. Sign up user with company reference in metadata
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: ownerEmail,
+        password: ownerPassword,
+        options: {
+          data: {
+            company_id: companyData.id,
+            role: userRole
+          },
+          emailRedirectTo: window.location.origin + '/auth'
+        }
+      });
+
+      if (signUpError) {
+        console.error('Signup error:', signUpError);
+        // Clean up company if signup fails
+        await supabase.from('companies').delete().eq('id', companyData.id);
+        throw signUpError;
+      }
+
+      if (!authData.user) {
+        console.error('No user returned from signup');
+        await supabase.from('companies').delete().eq('id', companyData.id);
+        throw new Error('Failed to create user account');
+      }
+
+      console.log('User created successfully with ID:', authData.user.id);
+
+      // 3. Ensure profile is linked to company (trigger should do this, but we'll make sure)
       await supabase
         .from('profiles')
         .upsert({
@@ -169,7 +160,8 @@ const SignupFormContainer: React.FC<SignupFormContainerProps> = ({ onSwitchToLog
         }, { onConflict: 'id' });
 
       // Show success message
-      toast.success('Account created and company registered successfully!');
+      toast.success('Account created! Please check your email to confirm, then you can log in.');
+      setShowConfirmationInfo(true);
       
       // Clear form
       setOwnerEmail('');
