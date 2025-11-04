@@ -12,7 +12,8 @@ export const OfficeSettingsPageContent: React.FC = () => {
   const navigate = useNavigate();
   const { loading: authLoading, error: authError, isAuthorized } = useAuthorization({
     requiredRole: ['owner', 'admin'], 
-    redirectTo: '/dashboard'
+    redirectTo: '/dashboard',
+    recheckOnFocus: false,
   });
   
   const isLoading = (!isAuthorized && authLoading) || (companyLoading && !company);

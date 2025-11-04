@@ -11,6 +11,7 @@ interface UseAuthorizationProps {
   redirectTo?: string;
   companyId?: string;
   autoRedirect?: boolean;
+  recheckOnFocus?: boolean; // re-verify on window focus/visibility
 }
 
 export const useAuthorization = ({
@@ -18,6 +19,7 @@ export const useAuthorization = ({
   redirectTo = '/dashboard',
   companyId,
   autoRedirect = false,
+  recheckOnFocus = true,
 }: UseAuthorizationProps = {}) => {
   const [loading, setLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -273,26 +275,32 @@ export const useAuthorization = ({
       }
     });
     
-    // Re-check on focus/visibility after sleep
-    const handleResume = () => {
-      console.log("useAuthorization: Resuming after focus/visibility");
-      authChecked.current = false;
-      setTimeout(() => { if (mounted) checkAuthorization(); }, 0);
-    };
-    window.addEventListener('focus', handleResume);
-    const handleVisibility = () => { if (document.visibilityState === 'visible') handleResume(); };
-    document.addEventListener('visibilitychange', handleVisibility);
+    // Optional re-check on focus/visibility after sleep
+    let handleResume: (() => void) | null = null;
+    let handleVisibility: (() => void) | null = null;
+    if (recheckOnFocus) {
+      handleResume = () => {
+        console.log("useAuthorization: Resuming after focus/visibility");
+        authChecked.current = false;
+        setTimeout(() => { if (mounted) checkAuthorization(); }, 0);
+      };
+      window.addEventListener('focus', handleResume);
+      handleVisibility = () => { if (document.visibilityState === 'visible' && handleResume) handleResume(); };
+      document.addEventListener('visibilitychange', handleVisibility);
+    }
     
     return () => {
       console.log("useAuthorization: Cleanup called");
       mounted = false;
-      
-      window.removeEventListener('focus', handleResume);
-      document.removeEventListener('visibilitychange', handleVisibility);
-      
+
+      if (recheckOnFocus) {
+        if (handleResume) window.removeEventListener('focus', handleResume);
+        if (handleVisibility) document.removeEventListener('visibilitychange', handleVisibility);
+      }
+
       subscription.unsubscribe();
     };
-  }, [checkAuthorization, navigate, autoRedirect]);
+  }, [checkAuthorization, navigate, autoRedirect, recheckOnFocus]);
 
   return { 
     loading, 
