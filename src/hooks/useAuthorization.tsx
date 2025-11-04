@@ -241,16 +241,16 @@ export const useAuthorization = ({
           console.log("useAuthorization: Auth event:", event);
         }
         
-        // Skip if already authorized and recently checked
-        const sinceLast = Date.now() - lastCheckCompletedTs.current;
-        if (authChecked.current && isAuthorized && sinceLast < 30000) {
+        // CRITICAL: If already authorized, NEVER re-check on these events
+        // This prevents the endless "Access Denied" loop when returning to the window
+        if (authChecked.current && isAuthorized) {
           if (import.meta.env.DEV) {
-            console.log(`useAuthorization: Skipping recheck on ${event} (already authorized, ${sinceLast}ms since last check)`);
+            console.log(`useAuthorization: Already authorized, skipping recheck on ${event}`);
           }
           return;
         }
         
-        // Avoid re-checking on redundant INITIAL_SESSION events
+        // Skip INITIAL_SESSION if already checked (even if not authorized)
         if (event === 'INITIAL_SESSION' && authChecked.current) {
           if (import.meta.env.DEV) {
             console.log('useAuthorization: Skipping recheck on redundant INITIAL_SESSION');
@@ -258,13 +258,15 @@ export const useAuthorization = ({
           return;
         }
         
-        authChecked.current = false;
-        // Use setTimeout to avoid auth deadlocks
-        setTimeout(() => {
-          if (mounted) {
-            checkAuthorization();
-          }
-        }, 0);
+        // Only re-check if not yet authorized and not yet checked
+        if (!authChecked.current) {
+          authChecked.current = false;
+          setTimeout(() => {
+            if (mounted) {
+              checkAuthorization();
+            }
+          }, 0);
+        }
       }
     });
     
