@@ -25,7 +25,6 @@ export const useAuthorization = ({
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const authChecked = useRef(false);
-  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const checkInProgress = useRef(false);
   const lastCheckStartTime = useRef<number | null>(null);
   const lastCheckCompletedTs = useRef<number>(0);
@@ -54,19 +53,7 @@ export const useAuthorization = ({
       setLoading(true);
       setError(null);
       
-      // Clear any existing timeout
-      if (loadingTimeoutRef.current) {
-        clearTimeout(loadingTimeoutRef.current);
-      }
-
-      // Set a new timeout to prevent getting stuck (reduced from 8s to 5s)
-      loadingTimeoutRef.current = setTimeout(() => {
-        console.warn("useAuthorization: Authorization check timed out");
-        checkInProgress.current = false;
-        setLoading(false);
-        setError("Authorization check timed out. Please try refreshing.");
-        toast.error("Authorization check timed out");
-      }, 5000);
+      // Removed artificial timeout; rely on actual async completion
       
       // Check if user is authenticated
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
@@ -79,6 +66,7 @@ export const useAuthorization = ({
           toast.error('Session error. Please sign in again.');
           navigate('/auth');
         }
+        authChecked.current = true;
         return;
       }
       
@@ -92,6 +80,7 @@ export const useAuthorization = ({
           toast.error('You must be logged in to access this page');
           navigate('/auth');
         }
+        authChecked.current = true;
         return;
       }
 
@@ -116,6 +105,7 @@ export const useAuthorization = ({
           toast.error('Error checking authorization');
           navigate('/auth');
         }
+        authChecked.current = true;
         return;
       }
 
@@ -127,6 +117,7 @@ export const useAuthorization = ({
           toast.error('User profile not found');
           navigate('/auth');
         }
+        authChecked.current = true;
         return;
       }
 
@@ -149,6 +140,7 @@ export const useAuthorization = ({
           toast.error('You do not have access to this company');
           navigate('/dashboard');
         }
+        authChecked.current = true;
         return;
       }
 
@@ -164,6 +156,7 @@ export const useAuthorization = ({
           toast.error('You do not have permission to access this page');
           navigate(redirectTo);
         }
+        authChecked.current = true;
         return;
       }
 
@@ -183,11 +176,7 @@ export const useAuthorization = ({
         navigate('/auth');
       }
     } finally {
-      // Clear the timeout
-      if (loadingTimeoutRef.current) {
-        clearTimeout(loadingTimeoutRef.current);
-        loadingTimeoutRef.current = null;
-      }
+      // Finalize
       checkInProgress.current = false;
       lastCheckCompletedTs.current = Date.now();
       setLoading(false);
@@ -205,15 +194,7 @@ export const useAuthorization = ({
       authChecked: authChecked.current
     });
     
-    // Set a safety timeout (reduced from 10s to 6s)
-    const safetyTimeout = setTimeout(() => {
-      if (mounted && loading) {
-        console.warn("useAuthorization: Safety timeout triggered");
-        checkInProgress.current = false;
-        setLoading(false);
-        setError("Authorization check timed out");
-      }
-    }, 6000);
+    // Removed safety timeout to avoid premature failures
     
     // Only run checkAuthorization if it hasn't been checked yet
     if (!authChecked.current) {
@@ -288,11 +269,6 @@ export const useAuthorization = ({
     return () => {
       console.log("useAuthorization: Cleanup called");
       mounted = false;
-      clearTimeout(safetyTimeout);
-      
-      if (loadingTimeoutRef.current) {
-        clearTimeout(loadingTimeoutRef.current);
-      }
       
       window.removeEventListener('focus', handleResume);
       document.removeEventListener('visibilitychange', handleVisibility);
