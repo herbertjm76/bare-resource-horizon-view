@@ -234,18 +234,21 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Listen for auth state changes and refetch company
   useEffect(() => {
     console.log('CompanyProvider: Setting up auth listener');
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('CompanyProvider: Auth state changed:', event, session?.user?.id);
       
-      // Only refetch on SIGNED_IN or INITIAL_SESSION with valid session
-      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+      // Only refetch on SIGNED_IN / INITIAL_SESSION / TOKEN_REFRESHED with valid session
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session?.user) {
         const currentSubdomain = extractSubdomain();
         if (!currentSubdomain) {
-          console.log('CompanyProvider: Auth changed, refetching profile and company...');
-          const profile = await fetchUserProfile();
-          if (profile) {
-            await fetchCompanyByProfile(profile);
-          }
+          console.log('CompanyProvider: Auth changed, scheduling profile/company refetch...');
+          // Defer Supabase calls to avoid auth deadlocks
+          setTimeout(async () => {
+            const profile = await fetchUserProfile();
+            if (profile) {
+              await fetchCompanyByProfile(profile);
+            }
+          }, 0);
         }
       }
     });
