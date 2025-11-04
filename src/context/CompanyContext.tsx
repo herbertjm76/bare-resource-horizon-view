@@ -256,19 +256,6 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   }, []);
 
-  // Extended safety timeout (30s instead of 6s)
-  useEffect(() => {
-    if (!loading) return;
-    const t = setTimeout(() => {
-      console.error('CompanyProvider: Safety timeout (30s) reached - forcing loading=false');
-      console.error('CompanyProvider: Current state:', { company: company?.id, error, subdomain, isSubdomainMode });
-      setLoading(false);
-      if (!company && !error) {
-        setError('Timeout loading company data. Please refresh the page.');
-      }
-    }, 30000);
-    return () => clearTimeout(t);
-  }, [loading]);
  
   return (
     <CompanyContext.Provider value={{ 

@@ -302,6 +302,21 @@ export const useAuthorization = ({
     };
   }, [checkAuthorization, navigate, autoRedirect, recheckOnFocus]);
 
+  // Safety: avoid endless "Verifying access" states
+  useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => {
+      console.warn('useAuthorization: Safety timeout triggered, forcing loading=false');
+      checkInProgress.current = false;
+      authChecked.current = true;
+      setLoading(false);
+      if (!isAuthorized && !error) {
+        setError('Verification timed out. Please try again.');
+      }
+    }, 8000);
+    return () => clearTimeout(t);
+  }, [loading, isAuthorized, error]);
+
   return { 
     loading, 
     isAuthorized, 
