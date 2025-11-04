@@ -40,30 +40,17 @@ export const useAuthorization = ({
       return;
     }
 
+    checkInProgress.current = true;
+    setLoading(true);
+    setError(null);
+
     try {
-      checkInProgress.current = true;
-      lastCheckStartTime.current = Date.now();
       if (import.meta.env.DEV) {
         console.log("useAuthorization: Checking authorization...");
       }
-      setLoading(true);
-      setError(null);
       
-      // Helper to timeout async operations
-      const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> => {
-        return Promise.race([
-          promise,
-          new Promise<T>((_, reject) => 
-            setTimeout(() => reject(new Error('Operation timed out')), ms)
-          )
-        ]);
-      };
-      
-      // Check if user is authenticated (with timeout)
-      const { data: sessionData, error: sessionError } = await withTimeout(
-        supabase.auth.getSession(),
-        5000
-      );
+      // Check if user is authenticated
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
         console.error("useAuthorization: Session error", sessionError);
@@ -95,14 +82,11 @@ export const useAuthorization = ({
         console.log("useAuthorization: Session found for user", sessionData.session.user.id);
       }
 
-      // Get user role using secure RPC and company from profiles (with timeout)
-      const [roleResult, profileResult] = await withTimeout(
-        Promise.all([
-          supabase.rpc('get_user_role_safe'),
-          supabase.from('profiles').select('company_id').eq('id', sessionData.session.user.id).single()
-        ]),
-        5000
-      );
+      // Get user role using secure RPC and company from profiles
+      const [roleResult, profileResult] = await Promise.all([
+        supabase.rpc('get_user_role_safe'),
+        supabase.from('profiles').select('company_id').eq('id', sessionData.session.user.id).single()
+      ]);
       
       const { data: userRoleData, error: roleError } = roleResult;
       const { data: profile, error: profileError } = profileResult;
@@ -315,14 +299,14 @@ export const useAuthorization = ({
   useEffect(() => {
     if (!loading) return;
     const t = setTimeout(() => {
-      console.warn('useAuthorization: Safety timeout triggered, forcing loading=false');
+      console.error('useAuthorization: Safety timeout - check never completed');
       checkInProgress.current = false;
       authChecked.current = true;
       setLoading(false);
       if (!isAuthorized && !error) {
-        setError('Verification timed out. Please refresh the page.');
+        setError('Authorization check timed out');
       }
-    }, 6000); // Reduced to 6s since operations now have individual 5s timeouts
+    }, 3000); // Aggressive 3s timeout
     return () => clearTimeout(t);
   }, [loading, isAuthorized, error]);
 
