@@ -99,6 +99,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const fetchCompanyByProfile = async (profile: any) => {
     if (!profile?.company_id) {
+      console.error('CompanyProvider: No company_id in profile', profile);
       setError("Your account is not associated with any company");
       setCompany(null);
       setLoading(false);
@@ -106,7 +107,7 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
     
     try {
-      console.log('CompanyProvider: fetchCompanyByProfile start', profile.company_id);
+      console.log('CompanyProvider: fetchCompanyByProfile start - company_id:', profile.company_id);
       setLoading(true);
       setError(null);
       
@@ -114,24 +115,37 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .from('companies')
         .select('*')
         .eq('id', profile.company_id)
-        .single();
+        .maybeSingle();
         
       if (companyError) {
-        console.error('Error fetching company by profile:', companyError);
-        setError("Failed to fetch company data");
+        console.error('CompanyProvider: Error fetching company by profile:', {
+          error: companyError,
+          code: companyError.code,
+          message: companyError.message,
+          details: companyError.details,
+          hint: companyError.hint
+        });
+        setError(`Failed to fetch company data: ${companyError.message}`);
+        setCompany(null);
+      } else if (!companyData) {
+        console.error('CompanyProvider: No company found for id:', profile.company_id);
+        setError(`Company not found for id: ${profile.company_id}`);
         setCompany(null);
       } else {
         setCompany(companyData);
         setError(null);
-        console.log('CompanyProvider: fetchCompanyByProfile success', companyData?.id);
+        console.log('CompanyProvider: fetchCompanyByProfile success - company:', {
+          id: companyData.id,
+          name: companyData.name
+        });
       }
     } catch (error: any) {
-      console.error('Error in fetchCompanyByProfile:', error);
+      console.error('CompanyProvider: Exception in fetchCompanyByProfile:', error);
       setCompany(null);
       setError(error.message || 'Failed to fetch company data');
     } finally {
       setLoading(false);
-      console.log('CompanyProvider: fetchCompanyByProfile end -> loading=false');
+      console.log('CompanyProvider: fetchCompanyByProfile end -> loading=false, company=', company?.id || 'null');
     }
   };
 
@@ -177,29 +191,36 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Update company data when auth changes
   useEffect(() => {
+    console.log('CompanyProvider: Main useEffect triggered');
     const currentSubdomain = extractSubdomain();
     setSubdomain(currentSubdomain);
     
     if (currentSubdomain) {
       // Subdomain mode
+      console.log('CompanyProvider: Using subdomain mode:', currentSubdomain);
       setIsSubdomainMode(true);
       fetchCompanyBySubdomain(currentSubdomain);
     } else {
       // User profile mode
+      console.log('CompanyProvider: Using profile mode');
       setIsSubdomainMode(false);
       
       // Handle demo mode
       if (isDemoMode && demoProfile) {
+        console.log('CompanyProvider: Using demo profile');
         fetchCompanyByProfile(demoProfile);
         return;
       }
       
       // Handle normal auth
       const initAuth = async () => {
+        console.log('CompanyProvider: Initializing auth...');
         const profile = await fetchUserProfile();
         if (profile) {
+          console.log('CompanyProvider: Profile fetched, loading company...');
           await fetchCompanyByProfile(profile);
         } else {
+          console.error('CompanyProvider: No profile found after fetch');
           setError("No profile found");
           setCompany(null);
           setLoading(false);
@@ -210,13 +231,42 @@ export const CompanyProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [isDemoMode, demoProfile]);
 
-  // Safety timeout to avoid indefinite loading states
+  // Listen for auth state changes and refetch company
+  useEffect(() => {
+    console.log('CompanyProvider: Setting up auth listener');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('CompanyProvider: Auth state changed:', event, session?.user?.id);
+      
+      // Only refetch on SIGNED_IN or INITIAL_SESSION with valid session
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+        const currentSubdomain = extractSubdomain();
+        if (!currentSubdomain) {
+          console.log('CompanyProvider: Auth changed, refetching profile and company...');
+          const profile = await fetchUserProfile();
+          if (profile) {
+            await fetchCompanyByProfile(profile);
+          }
+        }
+      }
+    });
+
+    return () => {
+      console.log('CompanyProvider: Cleaning up auth listener');
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // Extended safety timeout (30s instead of 6s)
   useEffect(() => {
     if (!loading) return;
     const t = setTimeout(() => {
-      console.warn('CompanyProvider: safety timeout -> forcing loading=false');
+      console.error('CompanyProvider: Safety timeout (30s) reached - forcing loading=false');
+      console.error('CompanyProvider: Current state:', { company: company?.id, error, subdomain, isSubdomainMode });
       setLoading(false);
-    }, 6000);
+      if (!company && !error) {
+        setError('Timeout loading company data. Please refresh the page.');
+      }
+    }, 30000);
     return () => clearTimeout(t);
   }, [loading]);
  
