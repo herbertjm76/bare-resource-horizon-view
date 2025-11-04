@@ -295,20 +295,6 @@ export const useAuthorization = ({
     };
   }, [checkAuthorization, navigate, autoRedirect, recheckOnFocus]);
 
-  // Safety: avoid endless "Verifying access" states
-  useEffect(() => {
-    if (!loading) return;
-    const t = setTimeout(() => {
-      console.error('useAuthorization: Safety timeout - check never completed');
-      checkInProgress.current = false;
-      authChecked.current = true;
-      setLoading(false);
-      if (!isAuthorized && !error) {
-        setError('Authorization check timed out');
-      }
-    }, 3000); // Aggressive 3s timeout
-    return () => clearTimeout(t);
-  }, [loading, isAuthorized, error]);
 
   return { 
     loading, 
