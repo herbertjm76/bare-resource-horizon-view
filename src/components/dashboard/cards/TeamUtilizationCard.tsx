@@ -28,7 +28,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         gradient: 'from-gray-400 to-gray-500',
         bgGradient: 'from-gray-50 to-gray-100',
         icon: TrendingDown,
-        message: 'Below optimal capacity'
+        message: 'Below capacity'
       };
     } else if (rate <= 100) {
       return { 
@@ -37,7 +37,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         gradient: 'from-green-400 to-emerald-500',
         bgGradient: 'from-green-50 to-emerald-50',
         icon: Activity,
-        message: 'Perfect utilization'
+        message: 'Perfect balance'
       };
     } else {
       return { 
@@ -46,7 +46,7 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
         gradient: 'from-purple-500 via-pink-500 to-red-500',
         bgGradient: 'from-purple-50 via-pink-50 to-red-50',
         icon: TrendingUp,
-        message: 'Exceeding capacity'
+        message: 'Exceeding limit'
       };
     }
   };
@@ -65,23 +65,21 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
       {/* Animated background gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
-      <CardContent className="relative p-8 h-full flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-2xl bg-gradient-to-br ${config.gradient} shadow-lg`}>
-              <Users className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-foreground">Team Utilization</h3>
-              <p className="text-xs text-muted-foreground">{config.message}</p>
-            </div>
+      <CardContent className="relative p-4 sm:p-6 lg:p-8 h-full flex flex-col">
+        {/* Header - Responsive */}
+        <div className="flex items-start sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+          <div className={`flex-shrink-0 p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-gradient-to-br ${config.gradient} shadow-lg`}>
+            <Users className="h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 text-white" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm sm:text-base lg:text-lg font-bold text-foreground truncate">Team Utilization</h3>
+            <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{config.message}</p>
           </div>
         </div>
         
-        {/* Circular Progress Gauge */}
-        <div className="flex-1 flex items-center justify-center py-4">
-          <div className="relative w-64 h-64">
+        {/* Circular Progress Gauge - Fully Responsive */}
+        <div className="flex-1 flex items-center justify-center py-2 sm:py-4">
+          <div className="relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64">
             {/* SVG Circle */}
             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 200 200">
               {/* Background circle */}
@@ -132,38 +130,38 @@ export const TeamUtilizationCard: React.FC<TeamUtilizationCardProps> = ({
               />
             </svg>
             
-            {/* Center content */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className={`mb-2 p-3 rounded-full bg-gradient-to-br ${config.gradient} shadow-lg animate-pulse`}>
-                <StatusIcon className="h-6 w-6 text-white" />
+            {/* Center content - Responsive sizing */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center px-2">
+              <div className={`mb-1 sm:mb-2 p-1.5 sm:p-2 lg:p-3 rounded-full bg-gradient-to-br ${config.gradient} shadow-lg animate-pulse flex-shrink-0`}>
+                <StatusIcon className="h-3 w-3 sm:h-4 sm:w-4 lg:h-6 lg:w-6 text-white" />
               </div>
-              <div className="text-5xl font-bold bg-gradient-to-br bg-clip-text text-transparent" style={{
+              <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-br bg-clip-text text-transparent leading-none" style={{
                 backgroundImage: `linear-gradient(135deg, ${config.color}, ${config.color})`
               }}>
                 {Math.round(actualUtilizationRate)}%
               </div>
-              <div className="mt-2 text-sm font-semibold text-muted-foreground">
+              <div className="mt-1 sm:mt-2 text-[10px] sm:text-xs lg:text-sm font-semibold text-muted-foreground text-center">
                 Utilization Rate
               </div>
             </div>
           </div>
         </div>
         
-        {/* Footer metrics */}
-        <div className="grid grid-cols-2 gap-4 mt-6">
-          <div className="flex flex-col items-center p-4 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/40 shadow-sm">
-            <Badge className={`mb-2 text-xs font-bold border-0 bg-gradient-to-r ${config.gradient} text-white shadow-lg`}>
+        {/* Footer metrics - Responsive grid */}
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4 mt-4 sm:mt-6">
+          <div className="flex flex-col items-center p-2 sm:p-3 lg:p-4 rounded-xl sm:rounded-2xl bg-white/60 backdrop-blur-sm border border-white/40 shadow-sm">
+            <Badge className={`mb-1 sm:mb-2 text-[10px] sm:text-xs font-bold border-0 bg-gradient-to-r ${config.gradient} text-white shadow-lg whitespace-nowrap px-2 py-0.5`}>
               {config.status}
             </Badge>
-            <span className="text-xs text-muted-foreground">Current Status</span>
+            <span className="text-[10px] sm:text-xs text-muted-foreground text-center">Status</span>
           </div>
           
-          <div className="flex flex-col items-center p-4 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/40 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <Activity className="h-4 w-4 text-brand-violet" />
-              <span className="text-sm font-bold text-foreground">This Month</span>
+          <div className="flex flex-col items-center p-2 sm:p-3 lg:p-4 rounded-xl sm:rounded-2xl bg-white/60 backdrop-blur-sm border border-white/40 shadow-sm">
+            <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+              <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-brand-violet flex-shrink-0" />
+              <span className="text-[10px] sm:text-xs lg:text-sm font-bold text-foreground whitespace-nowrap">This Month</span>
             </div>
-            <span className="text-xs text-muted-foreground">Time Period</span>
+            <span className="text-[10px] sm:text-xs text-muted-foreground text-center">Period</span>
           </div>
         </div>
       </CardContent>
