@@ -97,8 +97,8 @@ export const useAuthorization = ({
       const { data: userRoleData, error: roleError } = roleResult;
       const { data: profile, error: profileError } = profileResult;
 
-      if (roleError || profileError) {
-        console.error("useAuthorization: Error fetching user data", roleError || profileError);
+      if (roleError) {
+        console.error("useAuthorization: Error fetching user role", roleError);
         setError("Error checking authorization");
         setIsAuthorized(false);
         if (autoRedirect) {
@@ -109,8 +109,25 @@ export const useAuthorization = ({
         return;
       }
 
-      if (!profile || !userRoleData) {
-        console.error("useAuthorization: No profile or role found");
+      if (profileError) {
+        // Non-fatal when no specific companyId is required
+        console.warn("useAuthorization: Profile fetch error - continuing without profile as no companyId is required", profileError);
+      }
+
+      if (!userRoleData) {
+        console.error("useAuthorization: No user role found");
+        setError("No user role found");
+        setIsAuthorized(false);
+        if (autoRedirect) {
+          toast.error('User role not found');
+          navigate('/auth');
+        }
+        authChecked.current = true;
+        return;
+      }
+
+      if (companyId && !profile) {
+        console.error("useAuthorization: No profile found but companyId is required");
         setError("No user profile found");
         setIsAuthorized(false);
         if (autoRedirect) {
