@@ -1,16 +1,28 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { TimeRange } from '../TimeRangeSelector';
-import { dashboardDataService } from '@/services/dashboardDataService';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { UnifiedDashboardData } from './types/dashboardTypes';
+import {
+  useDashboardTeamMembers,
+  useDashboardPreRegistered,
+  useDashboardProjects,
+  useDashboardTeamComposition,
+  useDashboardHolidays,
+  useDashboardMetrics
+} from '@/hooks/queries/useDashboardQueries';
 
 export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
   const { company } = useCompany();
-  const [dashboardData, setDashboardData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
+
+  // Use React Query hooks - single source of truth
+  const { data: teamMembers = [], isLoading: isTeamLoading, refetch: refetchTeam } = useDashboardTeamMembers(company?.id);
+  const { data: preRegisteredMembers = [], refetch: refetchPreReg } = useDashboardPreRegistered(company?.id);
+  const { data: projects = [], refetch: refetchProjects } = useDashboardProjects(company?.id);
+  const { data: teamComposition = [] } = useDashboardTeamComposition(company?.id);
+  const { data: holidays = [] } = useDashboardHolidays(company?.id);
+  const { data: metrics, isLoading: metricsLoading } = useDashboardMetrics(company?.id, selectedTimeRange);
 
   // Calculate time range for utilization
   const timeRangeForUtilization = useMemo(() => {
@@ -43,43 +55,10 @@ export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
     return { startDate, endDate: now };
   }, [selectedTimeRange]);
 
-  // Fetch dashboard data
-  const fetchData = useCallback(async () => {
-    if (!company?.id) {
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      const data = await dashboardDataService.fetchAllDashboardData({
-        companyId: company.id,
-        timeRange: selectedTimeRange
-      });
-
-      setDashboardData(data);
-    } catch (err) {
-      console.error('Error fetching dashboard data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [company?.id, selectedTimeRange]);
-
-  // Initial fetch
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
   // Combined team members for utilization calculations
   const combinedTeamMembers = useMemo(() => {
-    if (!dashboardData) return [];
-    return [...dashboardData.teamMembers, ...dashboardData.preRegisteredMembers];
-  }, [dashboardData]);
-
-  const enhancedTeamMembers = dashboardData?.teamMembers || [];
+    return [...teamMembers, ...preRegisteredMembers];
+  }, [teamMembers, preRegisteredMembers]);
 
   // Standardized utilization data
   const { 
@@ -132,40 +111,35 @@ export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
   }, [currentUtilizationRate]);
 
   // Calculate metrics
-  const metrics = useMemo(() => {
-    if (!dashboardData) return { activeProjects: 0, activeResources: 0 };
-    
+  const calculatedMetrics = useMemo(() => {
     return {
-      activeProjects: dashboardData.projects?.filter(p => p.status === 'In Progress').length || 0,
-      activeResources: enhancedTeamMembers.length + dashboardData.preRegisteredMembers.length
+      activeProjects: metrics?.activeProjects || 0,
+      activeResources: combinedTeamMembers.length
     };
-  }, [dashboardData, enhancedTeamMembers]);
+  }, [metrics, combinedTeamMembers]);
 
-  const refetch = useCallback(async () => {
-    if (company?.id) {
-      dashboardDataService.clearCache(company.id);
-      await fetchData();
-    }
-  }, [company?.id, fetchData]);
+  const refetch = async () => {
+    await Promise.all([refetchTeam(), refetchPreReg(), refetchProjects()]);
+  };
 
-  const finalLoading = isLoading || isStandardizedLoading;
+  const finalLoading = isTeamLoading || metricsLoading || isStandardizedLoading;
 
   const unifiedData: UnifiedDashboardData & { 
     setSelectedOffice: (office: string) => void;
     refetch: () => Promise<void>;
   } = {
     // Team data
-    teamMembers: enhancedTeamMembers,
-    preRegisteredMembers: dashboardData?.preRegisteredMembers || [],
-    transformedStaffData: enhancedTeamMembers,
+    teamMembers,
+    preRegisteredMembers,
+    transformedStaffData: teamMembers,
     totalTeamSize: combinedTeamMembers.length,
     
     // Project data
-    projects: dashboardData?.projects || [],
-    activeProjects: metrics.activeProjects,
+    projects,
+    activeProjects: calculatedMetrics.activeProjects,
     
     // Team composition data
-    teamComposition: dashboardData?.teamComposition || [],
+    teamComposition,
     isTeamCompositionLoading: false,
     
     // Utilization data
@@ -178,7 +152,7 @@ export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
     teamSummary,
     
     // Holiday data
-    holidays: dashboardData?.holidays || [],
+    holidays,
     isHolidaysLoading: false,
     
     // Smart insights data
@@ -190,9 +164,9 @@ export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
     
     // Meta data
     isLoading: finalLoading,
-    metrics,
+    metrics: calculatedMetrics,
     mockData: null,
-    activeResources: metrics.activeResources,
+    activeResources: calculatedMetrics.activeResources,
 
     // Actions
     setSelectedOffice,

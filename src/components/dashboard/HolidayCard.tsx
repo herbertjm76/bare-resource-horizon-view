@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar, MapPin } from 'lucide-react';
-import { useHolidays } from './hooks/useHolidays';
+import { useDashboardHolidays } from '@/hooks/queries/useDashboardQueries';
+import { useCompany } from '@/context/CompanyContext';
 import { StandardizedHeaderBadge } from './mobile/components/StandardizedHeaderBadge';
 import { StandardizedBadge } from "@/components/ui/standardized-badge";
 
@@ -16,7 +16,8 @@ interface Holiday {
 }
 
 export const HolidayCard: React.FC = () => {
-  const { holidays: upcomingHolidays, isLoading, error } = useHolidays();
+  const { company } = useCompany();
+  const { data: upcomingHolidays = [], isLoading, error } = useDashboardHolidays(company?.id);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -74,7 +75,7 @@ export const HolidayCard: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error || !upcomingHolidays) {
     return (
       <Card className="h-[320px] flex flex-col bg-white border-border shadow-sm">
         <CardHeader className="flex-shrink-0 pb-3">
@@ -91,7 +92,7 @@ export const HolidayCard: React.FC = () => {
           <div className="text-center text-muted-foreground">
             <Calendar className="h-6 w-6 mx-auto mb-2 text-muted" />
             <p className="text-sm font-medium mb-1">Unable to Load Holidays</p>
-            <p className="text-xs">{error}</p>
+            <p className="text-xs">{String(error)}</p>
           </div>
         </CardContent>
       </Card>

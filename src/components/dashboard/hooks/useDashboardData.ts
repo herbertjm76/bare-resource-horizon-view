@@ -1,47 +1,45 @@
-
 import { useState, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { TimeRange } from '../TimeRangeSelector';
-import { useTimeRangeMetrics } from './useTimeRangeMetrics';
-import { useHolidays } from './useHolidays';
-import { useTeamData } from './useTeamData';
-import { useProjectData } from './useProjectData';
 import { getUtilizationStatus, generateUtilizationTrends } from './utils/utilizationCalculations';
-import { useTeamCompositionData } from './useTeamCompositionData';
 import { useAggregatedData } from './useAggregatedData';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { UnifiedDashboardData } from './types/dashboardTypes';
+import { 
+  useDashboardTeamMembers, 
+  useDashboardPreRegistered, 
+  useDashboardProjects, 
+  useDashboardTeamComposition, 
+  useDashboardHolidays,
+  useDashboardMetrics 
+} from '@/hooks/queries/useDashboardQueries';
 
 export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboardData & {
   setSelectedOffice: (office: string) => void;
   refetch: () => Promise<void>;
 } => {
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
-  
   const { company } = useCompany();
-  
-  const { metrics: timeRangeMetrics, isLoading: metricsLoading } = useTimeRangeMetrics(selectedTimeRange);
-  const { holidays, isLoading: isHolidaysLoading } = useHolidays();
-  
-  const { 
-    teamMembers: originalTeamMembers, 
-    preRegisteredMembers, 
-    isLoading: isTeamLoading, 
-    refetch: refetchTeam 
-  } = useTeamData(company?.id);
-  
-  const { 
-    projects, 
-    isLoading: isProjectsLoading, 
-    refetch: refetchProjects 
-  } = useProjectData(company?.id);
 
-  const { 
-    teamComposition, 
-    isLoading: isTeamCompositionLoading 
-  } = useTeamCompositionData(company?.id);
-
-  const teamMembers = originalTeamMembers;
+  // Single source of truth: React Query hooks
+  const { data: teamMembers = [], isLoading: isTeamLoading, refetch: refetchTeam } = useDashboardTeamMembers(company?.id);
+  const { data: preRegisteredMembers = [], refetch: refetchPreReg } = useDashboardPreRegistered(company?.id);
+  const { data: projects = [], isLoading: isProjectsLoading, refetch: refetchProjects } = useDashboardProjects(company?.id);
+  const { data: teamComposition = [], isLoading: isTeamCompositionLoading } = useDashboardTeamComposition(company?.id);
+  const { data: holidays = [], isLoading: isHolidaysLoading } = useDashboardHolidays(company?.id);
+  const { data: metrics, isLoading: metricsLoading } = useDashboardMetrics(company?.id, selectedTimeRange);
+  
+  const timeRangeMetrics = metrics || {
+    activeProjects: 0,
+    activeResources: 0,
+    utilizationTrends: { days7: 0, days30: 0, days90: 0 },
+    projectsByStatus: [],
+    projectsByStage: [],
+    projectsByLocation: [],
+    projectsByPM: [],
+    totalRevenue: 0,
+    avgProjectValue: 0
+  };
 
   // Combine active and pending members for utilization calculations
   const combinedTeamMembers = useMemo(() => {
@@ -125,24 +123,26 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   );
 
   console.log('🔄 DASHBOARD DATA FLOW:', {
-    originalTeamMembers: originalTeamMembers.length,
+    teamMembers: teamMembers.length,
     preRegisteredMembers: preRegisteredMembers.length,
     combinedTeamMembers: combinedTeamMembers.length,
     transformedStaffData: transformedStaffData.length,
     memberUtilizations: memberUtilizations.length,
     currentUtilizationRate,
     teamNames: combinedTeamMembers.map(m => 
-      'first_name' in m ? `${m.first_name} ${m.last_name}` : m.name || 'Unknown'
+      `${m.first_name} ${m.last_name}`
     )
   });
 
   const officeOptions = ['All Offices'];
   
-  const isLoading = isTeamLoading || isProjectsLoading;
+  // Single consolidated loading state
+  const isLoading = isTeamLoading || isProjectsLoading || metricsLoading;
 
   const refetch = async () => {
     await Promise.all([
       refetchTeam(), 
+      refetchPreReg(),
       refetchProjects()
     ]);
   };

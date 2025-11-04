@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
-import { useTeamData } from './useTeamData';
-import { useProjectData } from './useProjectData';
+import { useDashboardTeamMembers, useDashboardProjects } from '@/hooks/queries/useDashboardQueries';
 import { useCompany } from '@/context/CompanyContext';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,8 +12,8 @@ interface ResourceAllocation {
 
 export const useResourceAllocationData = () => {
   const { company } = useCompany();
-  const { teamMembers } = useTeamData(company?.id);
-  const { projects } = useProjectData(company?.id);
+  const { data: teamMembers = [] } = useDashboardTeamMembers(company?.id);
+  const { data: projects = [] } = useDashboardProjects(company?.id);
 
   // Fetch project resource allocations
   const { data: allocations = [] } = useQuery({
