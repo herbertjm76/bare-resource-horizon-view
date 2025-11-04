@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useCompany } from '@/context/CompanyContext';
 import { TimeRange } from '../TimeRangeSelector';
 import { dashboardDataService } from '@/services/dashboardDataService';
-import { useChatGPTDashboardData } from './useChatGPTDashboardData';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { UnifiedDashboardData } from './types/dashboardTypes';
 
@@ -12,13 +11,6 @@ export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedOffice, setSelectedOffice] = useState('All Offices');
-
-  // ChatGPT data for enhanced calculations
-  const { 
-    data: chatGPTData, 
-    isLoading: isChatGPTLoading,
-    error: chatGPTError 
-  } = useChatGPTDashboardData(selectedTimeRange);
 
   // Calculate time range for utilization
   const timeRangeForUtilization = useMemo(() => {
@@ -87,25 +79,9 @@ export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
     return [...dashboardData.teamMembers, ...dashboardData.preRegisteredMembers];
   }, [dashboardData]);
 
-  // Enhanced team members with ChatGPT data
-  const enhancedTeamMembers = useMemo(() => {
-    if (!dashboardData?.teamMembers) return [];
-    if (!chatGPTData) return dashboardData.teamMembers;
-    
-    return dashboardData.teamMembers.map(member => {
-      const chatGPTMember = chatGPTData.teamMembers.find(cgm => cgm.id === member.id);
-      if (chatGPTMember) {
-        return {
-          ...member,
-          availability: chatGPTMember.availability,
-          weekly_capacity: chatGPTMember.weeklyCapacity
-        };
-      }
-      return member;
-    });
-  }, [chatGPTData, dashboardData?.teamMembers]);
+  const enhancedTeamMembers = dashboardData?.teamMembers || [];
 
-  // Standardized utilization data for fallback
+  // Standardized utilization data
   const { 
     memberUtilizations: standardizedMemberUtilizations,
     teamSummary: standardizedTeamSummary,
@@ -118,23 +94,11 @@ export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
 
   // Calculate current utilization rate
   const currentUtilizationRate = useMemo(() => {
-    return chatGPTData?.teamMetrics.averageUtilization ?? 
-           standardizedTeamSummary?.teamUtilizationRate ?? 
-           75; // Fallback value
-  }, [chatGPTData, standardizedTeamSummary]);
+    return standardizedTeamSummary?.teamUtilizationRate ?? 75;
+  }, [standardizedTeamSummary]);
 
   // Calculate member utilizations
   const memberUtilizations = useMemo(() => {
-    if (chatGPTData) {
-      return chatGPTData.teamMembers.map(member => ({
-        memberId: member.id,
-        memberName: member.name,
-        utilization: member.utilization,
-        totalAllocatedHours: member.totalAllocatedHours,
-        weeklyCapacity: member.weeklyCapacity
-      }));
-    }
-    
     return standardizedMemberUtilizations.map(member => {
       const teamMember = combinedTeamMembers.find(tm => tm.id === member.id);
       return {
@@ -145,21 +109,9 @@ export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
         weeklyCapacity: member.weeklyCapacity
       };
     });
-  }, [chatGPTData, standardizedMemberUtilizations, combinedTeamMembers]);
+  }, [standardizedMemberUtilizations, combinedTeamMembers]);
 
-  // Calculate team summary
-  const teamSummary = useMemo(() => {
-    if (chatGPTData) {
-      return {
-        teamUtilizationRate: chatGPTData.teamMetrics.averageUtilization,
-        totalMembers: chatGPTData.teamMetrics.totalMembers,
-        totalAllocatedHours: chatGPTData.projectMetrics.totalAllocatedHours,
-        averageCapacity: chatGPTData.teamMembers.reduce((sum, m) => sum + m.weeklyCapacity, 0) / chatGPTData.teamMembers.length
-      };
-    }
-    
-    return standardizedTeamSummary;
-  }, [chatGPTData, standardizedTeamSummary]);
+  const teamSummary = standardizedTeamSummary;
 
   // Calculate utilization status
   const utilizationStatus = useMemo(() => {
@@ -196,11 +148,7 @@ export const useOptimizedDashboardData = (selectedTimeRange: TimeRange) => {
     }
   }, [company?.id, fetchData]);
 
-  const finalLoading = isLoading || isChatGPTLoading || isStandardizedLoading;
-
-  if (chatGPTError) {
-    console.warn('⚠️ ChatGPT Dashboard Service failed, using fallback calculations:', chatGPTError);
-  }
+  const finalLoading = isLoading || isStandardizedLoading;
 
   const unifiedData: UnifiedDashboardData & { 
     setSelectedOffice: (office: string) => void;

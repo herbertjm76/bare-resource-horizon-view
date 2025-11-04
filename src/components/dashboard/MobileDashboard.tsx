@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { WorkloadHeatMapCard } from './cards/WorkloadHeatMapCard';
@@ -38,13 +37,6 @@ export const MobileDashboard: React.FC<MobileDashboardProps> = ({
   return (
     <div className="w-full min-h-screen bg-gray-50/30">
       <div className="max-w-sm mx-auto px-3 py-4 space-y-4">
-        {/* Smart Insights */}
-        <div className="w-full">
-          <UnifiedSmartInsightsCard
-            data={data}
-          />
-        </div>
-        
         {/* Team Status */}
         <div className="w-full">
           <UnifiedStaffStatusCard

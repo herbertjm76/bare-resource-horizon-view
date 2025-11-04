@@ -5,7 +5,6 @@ import { WorkloadCard } from './cards/WorkloadCard';
 import { TeamLeaveCard } from './cards/TeamLeaveCard';
 import { ProjectPipelineCard } from './cards/ProjectPipelineCard';
 import { UnifiedStaffStatusCard } from './cards/UnifiedStaffStatusCard';
-import { UnifiedSmartInsightsCard } from './cards/UnifiedSmartInsightsCard';
 import { UnifiedHolidayCard } from './cards/UnifiedHolidayCard';
 import { AnalyticsSection } from './AnalyticsSection';
 import { LoadingDashboard } from './LoadingDashboard';
@@ -73,14 +72,11 @@ export const DesktopDashboard: React.FC<DesktopDashboardProps> = ({
         />
       </div>
 
-      {/* Second Row: The 3 Dashboard Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Second Row: The 2 Dashboard Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <UnifiedStaffStatusCard 
           data={data}
           selectedTimeRange={selectedTimeRange}
-        />
-        <UnifiedSmartInsightsCard 
-          data={data}
         />
         <UnifiedHolidayCard 
           data={data}

@@ -1,5 +1,4 @@
 import { WorkloadBreakdown } from '@/components/workload/hooks/types';
-import { AISummaryData } from './aiSummaryService';
 
 export interface PreparedSummaryData {
   overview: {
@@ -173,43 +172,6 @@ export class SummaryDataPreparationService {
     };
   }
 
-  static prepareAIInsightsData(aiSummary: AISummaryData): PreparedSummaryData {
-    return {
-      overview: {
-        totalResources: 0, // Not available in AI summary
-        activeProjects: 0, // Not available in AI summary
-        utilizationRate: this.parseUtilizationFromTrend(aiSummary.utilizationTrend),
-        capacityHours: this.parseCapacityFromStatus(aiSummary.capacityStatus),
-        timeframe: 'AI Analysis Period'
-      },
-      utilization: {
-        overloaded: aiSummary.capacityStatus === 'overloaded' ? 1 : 0,
-        underutilized: aiSummary.capacityStatus === 'underutilized' ? 1 : 0,
-        optimal: aiSummary.capacityStatus === 'optimized' ? 1 : 0,
-        averageUtilization: this.parseUtilizationFromTrend(aiSummary.utilizationTrend)
-      },
-      workload: {
-        totalAllocated: 0,
-        totalCapacity: 0,
-        availableHours: 0,
-        demandVsCapacity: 1
-      },
-      trends: {
-        direction: aiSummary.utilizationTrend === 'improving' ? 'increasing' : 
-                  aiSummary.utilizationTrend === 'declining' ? 'decreasing' : 'stable'
-      },
-      risks: {
-        burnoutRisk: this.mapRiskLevel(aiSummary.riskLevel),
-        underutilizationRisk: aiSummary.capacityStatus === 'underutilized' ? 70 : 20,
-        capacityGaps: [aiSummary.topRecommendation]
-      },
-      metadata: {
-        generatedAt: new Date().toISOString(),
-        dataSource: 'ai-insights',
-        confidence: 75
-      }
-    };
-  }
 
   private static calculateWorkloadMetrics(
     workloadData: Record<string, Record<string, WorkloadBreakdown>>,

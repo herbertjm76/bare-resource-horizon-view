@@ -11,7 +11,6 @@ import { useTeamCompositionData } from './useTeamCompositionData';
 import { useAggregatedData } from './useAggregatedData';
 import { useStandardizedUtilizationData } from '@/hooks/useStandardizedUtilizationData';
 import { UnifiedDashboardData } from './types/dashboardTypes';
-import { useChatGPTDashboardData } from './useChatGPTDashboardData';
 
 export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboardData & {
   setSelectedOffice: (office: string) => void;
@@ -21,15 +20,6 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
   
   const { company } = useCompany();
   
-  // 🤖 USE CHATGPT TO GOVERN ALL CALCULATIONS
-  const { 
-    data: chatGPTData, 
-    isLoading: isChatGPTLoading, 
-    error: chatGPTError,
-    refetch: refetchChatGPT 
-  } = useChatGPTDashboardData(selectedTimeRange);
-
-  // Keep original hooks for fallback/compatibility but prioritize ChatGPT data
   const { metrics: timeRangeMetrics, isLoading: metricsLoading } = useTimeRangeMetrics(selectedTimeRange);
   const { holidays, isLoading: isHolidaysLoading } = useHolidays();
   
@@ -51,23 +41,7 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
     isLoading: isTeamCompositionLoading 
   } = useTeamCompositionData(company?.id);
 
-  // Transform ChatGPT data to match existing interface
-  const teamMembers = useMemo(() => {
-    if (!chatGPTData) return originalTeamMembers;
-    
-    // Enhance original team members with ChatGPT calculations
-    return originalTeamMembers.map(member => {
-      const chatGPTMember = chatGPTData.teamMembers.find(cgm => cgm.id === member.id);
-      if (chatGPTMember) {
-        return {
-          ...member,
-          availability: chatGPTMember.availability,
-          weekly_capacity: chatGPTMember.weeklyCapacity
-        };
-      }
-      return member;
-    });
-  }, [chatGPTData, originalTeamMembers]);
+  const teamMembers = originalTeamMembers;
 
   // Combine active and pending members for utilization calculations
   const combinedTeamMembers = useMemo(() => {
@@ -164,26 +138,14 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
 
   const officeOptions = ['All Offices'];
   
-  // Loading state excludes ChatGPT loading when disabled
   const isLoading = isTeamLoading || isProjectsLoading;
 
   const refetch = async () => {
     await Promise.all([
       refetchTeam(), 
-      refetchProjects(), 
-      refetchChatGPT()
+      refetchProjects()
     ]);
   };
-
-  console.log('🤖 Dashboard Data State:', {
-    chatGPTData: chatGPTData ? 'loaded' : 'loading',
-    chatGPTError,
-    currentUtilizationRate,
-    teamMembersCount: teamMembers.length,
-    memberUtilizations: memberUtilizations.length,
-    teamSummary: teamSummary ? 'available' : 'null',
-    isLoading
-  });
 
   // Debug Paul Julius data consistency across all sources
   const paulMemberUtilization = memberUtilizations.find(m => 
@@ -200,11 +162,6 @@ export const useDashboardData = (selectedTimeRange: TimeRange): UnifiedDashboard
       transformedStaffData_Paul: paulTransformedStaff,
       shouldMatch: 'Both should show same utilization/availability for Paul Julius'
     });
-  }
-
-  // Error handling for ChatGPT failure
-  if (chatGPTError) {
-    console.warn('⚠️ ChatGPT Dashboard Service failed, using fallback calculations:', chatGPTError);
   }
 
   const unifiedData: UnifiedDashboardData = {
