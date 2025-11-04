@@ -32,18 +32,12 @@ export const useAuthorization = ({
   const lastCheckCompletedTs = useRef<number>(0);
 
   const checkAuthorization = useCallback(async () => {
-    // Prevent multiple simultaneous checks, but allow restart if stale
+    // Prevent multiple simultaneous checks
     if (checkInProgress.current) {
-      const elapsed = lastCheckStartTime.current ? Date.now() - lastCheckStartTime.current : 0;
-      if (elapsed < 4500) {
-        if (import.meta.env.DEV) {
-          console.log("useAuthorization: Check in progress (" + elapsed + "ms), skipping...");
-        }
-        return;
-      } else {
-        console.warn("useAuthorization: Previous check seems stale (" + elapsed + "ms). Restarting...");
-        checkInProgress.current = false;
+      if (import.meta.env.DEV) {
+        console.log("useAuthorization: Check already in progress, skipping...");
       }
+      return;
     }
 
     try {
@@ -55,10 +49,21 @@ export const useAuthorization = ({
       setLoading(true);
       setError(null);
       
-      // Removed artificial timeout; rely on actual async completion
+      // Helper to timeout async operations
+      const withTimeout = <T,>(promise: Promise<T>, ms: number): Promise<T> => {
+        return Promise.race([
+          promise,
+          new Promise<T>((_, reject) => 
+            setTimeout(() => reject(new Error('Operation timed out')), ms)
+          )
+        ]);
+      };
       
-      // Check if user is authenticated
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      // Check if user is authenticated (with timeout)
+      const { data: sessionData, error: sessionError } = await withTimeout(
+        supabase.auth.getSession(),
+        5000
+      );
       
       if (sessionError) {
         console.error("useAuthorization: Session error", sessionError);
@@ -90,11 +95,14 @@ export const useAuthorization = ({
         console.log("useAuthorization: Session found for user", sessionData.session.user.id);
       }
 
-      // Get user role using secure RPC and company from profiles
-      const [roleResult, profileResult] = await Promise.all([
-        supabase.rpc('get_user_role_safe'),
-        supabase.from('profiles').select('company_id').eq('id', sessionData.session.user.id).single()
-      ]);
+      // Get user role using secure RPC and company from profiles (with timeout)
+      const [roleResult, profileResult] = await withTimeout(
+        Promise.all([
+          supabase.rpc('get_user_role_safe'),
+          supabase.from('profiles').select('company_id').eq('id', sessionData.session.user.id).single()
+        ]),
+        5000
+      );
       
       const { data: userRoleData, error: roleError } = roleResult;
       const { data: profile, error: profileError } = profileResult;
@@ -248,6 +256,16 @@ export const useAuthorization = ({
         if (import.meta.env.DEV) {
           console.log("useAuthorization: Auth event:", event);
         }
+        
+        // Skip if already authorized and recently checked
+        const sinceLast = Date.now() - lastCheckCompletedTs.current;
+        if (authChecked.current && isAuthorized && sinceLast < 30000) {
+          if (import.meta.env.DEV) {
+            console.log(`useAuthorization: Skipping recheck on ${event} (already authorized, ${sinceLast}ms since last check)`);
+          }
+          return;
+        }
+        
         // Avoid re-checking on redundant INITIAL_SESSION events
         if (event === 'INITIAL_SESSION' && authChecked.current) {
           if (import.meta.env.DEV) {
@@ -255,16 +273,7 @@ export const useAuthorization = ({
           }
           return;
         }
-        // Throttle TOKEN_REFRESHED to avoid loops when already authorized
-        if (event === 'TOKEN_REFRESHED') {
-          const sinceLast = Date.now() - lastCheckCompletedTs.current;
-          if (sinceLast < 60000) {
-            if (import.meta.env.DEV) {
-              console.log("useAuthorization: Skipping recheck on TOKEN_REFRESHED (", sinceLast, "ms since last check)");
-            }
-            return;
-          }
-        }
+        
         authChecked.current = false;
         // Use setTimeout to avoid auth deadlocks
         setTimeout(() => {
@@ -311,9 +320,9 @@ export const useAuthorization = ({
       authChecked.current = true;
       setLoading(false);
       if (!isAuthorized && !error) {
-        setError('Verification timed out. Please try again.');
+        setError('Verification timed out. Please refresh the page.');
       }
-    }, 8000);
+    }, 6000); // Reduced to 6s since operations now have individual 5s timeouts
     return () => clearTimeout(t);
   }, [loading, isAuthorized, error]);
 
