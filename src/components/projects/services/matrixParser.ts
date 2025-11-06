@@ -11,6 +11,14 @@ export interface MatrixParseResult {
   }>;
   people: string[];
   dateRange?: string;
+  detectedStructure?: {
+    peopleRow: number;
+    projectColumn: number;
+    statusColumn: number;
+    fteColumn: number;
+    dataStartRow: number;
+    peopleStartColumn: number;
+  };
 }
 
 interface MatrixStructure {
@@ -62,6 +70,7 @@ export class MatrixParser {
             const structure: MatrixStructure = analysisResult.structure;
             console.log('AI detected structure:', structure);
             result = this.parseWithStructure(jsonData, structure);
+            result.detectedStructure = structure;
           }
           
           resolve(result);

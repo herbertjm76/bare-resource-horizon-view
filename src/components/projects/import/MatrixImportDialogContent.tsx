@@ -60,84 +60,75 @@ export const MatrixImportDialogContent: React.FC<MatrixImportDialogContentProps>
     </div>
   );
 
-  const renderPreviewStep = () => (
-    <div className="space-y-4">
-      <Alert>
-        <AlertDescription>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="text-primary">✓</span>
-              <strong>AI Analysis Complete</strong>
-            </div>
-            <div className="text-sm space-y-1">
-              <p>Found <strong>{matrixData?.projects.length}</strong> projects and <strong>{matrixData?.people.length}</strong> people</p>
-              {matrixData?.dateRange && <p>Date range: {matrixData.dateRange}</p>}
-            </div>
-          </div>
-        </AlertDescription>
-      </Alert>
+  const renderPreviewStep = () => {
+    const structure = matrixData?.detectedStructure;
+    const columnLetter = (idx: number) => String.fromCharCode(65 + idx);
 
-      {matrixData && matrixData.people.length > 0 && (
-        <div className="border rounded-lg p-4">
-          <h4 className="font-medium mb-2 text-sm">Detected People:</h4>
-          <div className="flex flex-wrap gap-2">
-            {matrixData.people.map((person, idx) => (
-              <span key={idx} className="text-xs bg-secondary px-2 py-1 rounded">
-                {person}
-              </span>
-            ))}
+    return (
+      <div className="space-y-4">
+        <Alert>
+          <AlertDescription>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-primary text-xl">✓</span>
+                <strong>AI Detection Complete</strong>
+              </div>
+              
+              {structure && (
+                <div className="space-y-2 text-sm">
+                  <p className="font-medium">Detected Structure:</p>
+                  <ul className="space-y-1 ml-4">
+                    <li>• People names in <strong>Row {structure.peopleRow + 1}</strong>, starting from <strong>Column {columnLetter(structure.peopleStartColumn)}</strong></li>
+                    <li>• Project codes in <strong>Column {columnLetter(structure.projectColumn)}</strong></li>
+                    <li>• Status in <strong>Column {columnLetter(structure.statusColumn)}</strong></li>
+                    <li>• FTE in <strong>Column {columnLetter(structure.fteColumn)}</strong></li>
+                    <li>• Data starts at <strong>Row {structure.dataStartRow + 1}</strong></li>
+                  </ul>
+                </div>
+              )}
+
+              <div className="pt-2 border-t">
+                <p className="text-sm">
+                  Found <strong>{matrixData?.projects.length}</strong> projects and <strong>{matrixData?.people.length}</strong> people
+                </p>
+                {matrixData?.people && matrixData.people.length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    People: {matrixData.people.slice(0, 5).join(', ')}
+                    {matrixData.people.length > 5 && ` and ${matrixData.people.length - 5} more`}
+                  </p>
+                )}
+              </div>
+            </div>
+          </AlertDescription>
+        </Alert>
+
+        <div className="space-y-2">
+          <Label htmlFor="week-start">Week Start Date</Label>
+          <div className="flex gap-2">
+            <Calendar className="h-4 w-4 text-muted-foreground mt-2" />
+            <Input
+              id="week-start"
+              type="date"
+              value={weekStartDate}
+              onChange={(e) => setWeekStartDate(e.target.value)}
+            />
           </div>
+          <p className="text-xs text-muted-foreground">
+            Allocations will be recorded for the week starting on this date
+          </p>
         </div>
-      )}
 
-      <div className="space-y-2">
-        <Label htmlFor="week-start">Week Start Date</Label>
         <div className="flex gap-2">
-          <Calendar className="h-4 w-4 text-muted-foreground mt-2" />
-          <Input
-            id="week-start"
-            type="date"
-            value={weekStartDate}
-            onChange={(e) => setWeekStartDate(e.target.value)}
-          />
+          <Button onClick={() => resetDialog()} variant="outline" className="flex-1">
+            Cancel
+          </Button>
+          <Button onClick={startImport} className="flex-1">
+            Looks Good - Import
+          </Button>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Allocations will be recorded for the week starting on this date
-        </p>
       </div>
-
-      {matrixData && (
-        <div className="border rounded-lg p-4 max-h-64 overflow-y-auto">
-          <h4 className="font-medium mb-2">Projects to Import:</h4>
-          <ul className="text-sm space-y-1">
-            {matrixData.projects.slice(0, 10).map((project, idx) => (
-              <li key={idx} className="flex justify-between">
-                <span className="font-mono text-xs">{project.code}</span>
-                <span className="truncate ml-2">{project.name}</span>
-                <span className="text-muted-foreground ml-2">
-                  ({Object.keys(project.allocations).length} allocations)
-                </span>
-              </li>
-            ))}
-            {matrixData.projects.length > 10 && (
-              <li className="text-muted-foreground">
-                ... and {matrixData.projects.length - 10} more
-              </li>
-            )}
-          </ul>
-        </div>
-      )}
-
-      <div className="flex gap-2">
-        <Button onClick={() => resetDialog()} variant="outline" className="flex-1">
-          Cancel
-        </Button>
-        <Button onClick={startImport} className="flex-1">
-          Confirm & Import
-        </Button>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderProgressStep = () => (
     <div className="space-y-4">
