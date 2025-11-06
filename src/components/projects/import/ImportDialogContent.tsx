@@ -23,6 +23,7 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
     importSuggestions,
     handleFileUpload,
     handleDetection,
+    refineDetection,
     confirmAndImport,
     downloadTemplate,
     setCurrentStep
@@ -54,6 +55,7 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
           location={detectionResult.location}
           onConfirm={confirmAndImport}
           onCancel={() => setCurrentStep('detection')}
+          onRefine={refineDetection}
         />
       ) : null;
 

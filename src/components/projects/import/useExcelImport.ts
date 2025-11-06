@@ -74,6 +74,26 @@ export const useExcelImport = (onImportComplete: () => void) => {
     }
   };
 
+  const refineDetection = async (message: string, currentList: any[]) => {
+    const { data: aiResult, error } = await supabase.functions.invoke('refine-detection', {
+      body: { 
+        detectionType,
+        message,
+        currentList,
+        allData: excelData
+      }
+    });
+
+    if (error || !aiResult) {
+      throw new Error('Failed to refine detection');
+    }
+
+    return {
+      detected: aiResult.detected || currentList,
+      message: aiResult.message || 'Updated the list based on your request.'
+    };
+  };
+
   const confirmAndImport = async (finalList: any[]) => {
     setCurrentStep('progress');
     toast.info('Starting import...');
@@ -125,6 +145,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
     importSuggestions,
     handleFileUpload,
     handleDetection,
+    refineDetection,
     confirmAndImport,
     downloadTemplate,
     resetDialog,
