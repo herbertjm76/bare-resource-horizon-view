@@ -40,7 +40,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
     }
   };
 
-  const handleDetection = async (type: 'people' | 'projects', examples: string[]) => {
+  const handleDetection = async (type: 'people' | 'projects', examples: string[], explanation: string) => {
     setDetectionType(type);
     toast.info('AI analyzing data...');
 
@@ -49,6 +49,7 @@ export const useExcelImport = (onImportComplete: () => void) => {
         body: { 
           detectionType: type,
           examples,
+          explanation,
           allData: excelData
         }
       });

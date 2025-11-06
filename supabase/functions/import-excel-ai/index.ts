@@ -7,7 +7,7 @@ serve(async (req) => {
   }
 
   try {
-    const { detectionType, examples, allData } = await req.json();
+    const { detectionType, examples, explanation, allData } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -37,6 +37,7 @@ Return a JSON object with:
 ${JSON.stringify(allData.slice(0, 50))}
 
 ${examples && examples.length > 0 ? `Examples of names to look for: ${examples.join(", ")}` : ""}
+${explanation ? `\n\nAdditional context: ${explanation}` : ""}
 
 Return ONLY the JSON object, no markdown.`;
 
@@ -62,6 +63,7 @@ Return a JSON object with:
 ${JSON.stringify(allData.slice(0, 50))}
 
 ${examples && examples.length > 0 ? `Examples of project codes to look for: ${examples.join(", ")}` : ""}
+${explanation ? `\n\nAdditional context: ${explanation}` : ""}
 
 Return ONLY the JSON object, no markdown.`;
     } else {
