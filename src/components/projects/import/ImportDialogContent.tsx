@@ -1,9 +1,8 @@
-
 import React from 'react';
-import { ColumnMappingInterface } from '../ColumnMappingInterface';
 import { ImportProgressTracker } from '../ImportProgressTracker';
 import { ImportUploadStep } from './ImportUploadStep';
 import { ImportCompleteStep } from './ImportCompleteStep';
+import { ImportPreviewStep } from './ImportPreviewStep';
 import { useExcelImport } from './useExcelImport';
 
 interface ImportDialogContentProps {
@@ -15,14 +14,14 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
 }) => {
   const {
     currentStep,
-    excelData,
     headers,
+    aiAnalysis,
     importProgress,
     importErrors,
     importWarnings,
     importSuggestions,
     handleFileUpload,
-    handleMappingComplete,
+    confirmAndImport,
     downloadTemplate,
     setCurrentStep
   } = useExcelImport(onComplete);
@@ -36,12 +35,12 @@ export const ImportDialogContent: React.FC<ImportDialogContentProps> = ({
         />
       );
 
-    case 'mapping':
+    case 'preview':
       return (
-        <ColumnMappingInterface
+        <ImportPreviewStep
           headers={headers}
-          sampleData={excelData.slice(0, 3)}
-          onMappingComplete={handleMappingComplete}
+          aiAnalysis={aiAnalysis}
+          onConfirm={confirmAndImport}
           onCancel={() => setCurrentStep('upload')}
         />
       );
