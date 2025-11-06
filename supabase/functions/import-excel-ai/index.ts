@@ -27,7 +27,20 @@ Available target fields:
 - project_manager_name: Project Manager Name (optional) - full name
 - office_name: Office Name (optional) - office location
 
-Return ONLY a JSON object with this structure:
+SPECIAL CASE - Matrix Format Detection:
+If the first column contains project codes (patterns like "00120.068" or similar numbering) 
+followed by project names in the same cell, this is a PROJECT MATRIX format.
+
+For matrix format, return:
+{
+  "mappings": {
+    "0": "code_and_name"
+  },
+  "confidence": { "0": 0.95 },
+  "suggestions": ["Detected project matrix format. Column 0 contains project codes and names that will be split automatically."]
+}
+
+For standard format, return:
 {
   "mappings": {
     "columnIndex": "targetField"
@@ -45,7 +58,12 @@ Return ONLY a JSON object with this structure:
 Headers: ${JSON.stringify(headers)}
 Sample Data (first 3 rows): ${JSON.stringify(sampleData)}
 
-Provide intelligent mappings based on column names and data patterns. Consider variations like:
+DETECTION RULES:
+1. Check if column 0 has values matching pattern: number/code followed by text (e.g., "00120.068 Regional SE Asia Admin")
+2. If YES → return "code_and_name" mapping for column 0
+3. If NO → provide standard column mappings
+
+Standard mapping variations:
 - "Proj Code", "Project ID", "Code" → code
 - "Project Title", "Name", "Project" → name
 - "PM", "Manager", "Lead" → project_manager_name

@@ -26,10 +26,46 @@ export class ExcelParser {
             return;
           }
           
-          const headers = jsonData[0] as string[];
-          const rows = jsonData.slice(1).filter(row => 
-            Array.isArray(row) && row.some(cell => cell !== null && cell !== undefined && cell !== '')
-          ) as any[][];
+          // Detect matrix format: look for project codes in first column
+          let startRowIndex = 0;
+          let isMatrixFormat = false;
+          
+          // Check if first column contains project codes (pattern: numbers.numbers)
+          for (let i = 0; i < Math.min(10, jsonData.length); i++) {
+            const firstCell = String(jsonData[i]?.[0] || '').trim();
+            if (/^\d+\.\d+/.test(firstCell)) {
+              isMatrixFormat = true;
+              startRowIndex = i;
+              break;
+            }
+          }
+          
+          let headers: string[];
+          let rows: any[][];
+          
+          if (isMatrixFormat) {
+            // For matrix format, use column indices as headers
+            const maxColumns = Math.max(...jsonData.map(row => row?.length || 0));
+            headers = Array.from({ length: maxColumns }, (_, i) => `Column ${i}`);
+            
+            // Start from the row where project codes begin
+            rows = jsonData.slice(startRowIndex).filter(row => {
+              const firstCell = String(row?.[0] || '').trim();
+              // Only include rows that start with project codes or are data rows
+              return Array.isArray(row) && 
+                     row.some(cell => cell !== null && cell !== undefined && cell !== '') &&
+                     firstCell !== '' &&
+                     firstCell !== 'ACTIVE PROJECTS' &&
+                     firstCell !== 'Enterprise' &&
+                     firstCell !== 'CATEGORY';
+            }) as any[][];
+          } else {
+            // Standard format: first row is headers
+            headers = jsonData[0] as string[];
+            rows = jsonData.slice(1).filter(row => 
+              Array.isArray(row) && row.some(cell => cell !== null && cell !== undefined && cell !== '')
+            ) as any[][];
+          }
           
           resolve({ 
             headers, 

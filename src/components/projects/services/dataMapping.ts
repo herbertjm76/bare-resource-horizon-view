@@ -29,6 +29,17 @@ export class DataMapping {
         if (value === '') return;
 
         switch (projectField) {
+          case 'code_and_name':
+            // Special handling for matrix format where code and name are in same cell
+            const match = value.match(/^([\d.]+)\s+(.+)$/);
+            if (match) {
+              project.code = match[1].trim();
+              project.name = match[2].trim();
+            } else {
+              // Fallback if pattern doesn't match
+              project.name = value;
+            }
+            break;
           case 'target_profit_percentage':
             const numValue = this.parseNumber(value);
             if (!isNaN(numValue) && numValue >= 0 && numValue <= 100) {
