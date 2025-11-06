@@ -45,13 +45,13 @@ export class MatrixImporter {
         .eq('company_id', companyId);
 
       // Get offices to assign a default office
-      const officesResult = await supabase
+      const { data: office } = await supabase
         .from('offices')
         .select('id')
-        .eq('company_id', companyId)
-        .limit(1);
+        .limit(1)
+        .maybeSingle();
 
-      const defaultOfficeId = officesResult.data?.[0]?.id as string | undefined;
+      const defaultOfficeId = office?.id;
       if (!defaultOfficeId) {
         throw new Error('No office found. Please create at least one office first.');
       }
