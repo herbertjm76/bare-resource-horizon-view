@@ -41,6 +41,9 @@ verify_jwt = true
 [functions.import-excel-ai]
 verify_jwt = true
 
+[functions.analyze-matrix-structure]
+verify_jwt = true
+
 [db]
 port = 54322
 shadow_port = 54320

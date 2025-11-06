@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface MatrixParseResult {
   projects: Array<{
@@ -12,12 +13,21 @@ export interface MatrixParseResult {
   dateRange?: string;
 }
 
+interface MatrixStructure {
+  peopleRow: number;
+  projectColumn: number;
+  statusColumn: number;
+  fteColumn: number;
+  dataStartRow: number;
+  peopleStartColumn: number;
+}
+
 export class MatrixParser {
   static async parseMatrixFile(file: File): Promise<MatrixParseResult> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
           const fileData = e.target?.result;
           if (!fileData) {
@@ -34,6 +44,38 @@ export class MatrixParser {
             reject(new Error('Excel file is empty'));
             return;
           }
+
+          // Get first 20 rows as preview for AI analysis
+          const preview = jsonData.slice(0, 20);
+          
+          console.log('Calling AI to analyze matrix structure...');
+          const { data: analysisResult, error } = await supabase.functions.invoke('analyze-matrix-structure', {
+            body: { preview }
+          });
+
+          let result: MatrixParseResult;
+          
+          if (error || !analysisResult?.structure) {
+            console.warn('AI analysis failed, using heuristics fallback:', error);
+            result = this.parseWithHeuristics(jsonData);
+          } else {
+            const structure: MatrixStructure = analysisResult.structure;
+            console.log('AI detected structure:', structure);
+            result = this.parseWithStructure(jsonData, structure);
+          }
+          
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsBinaryString(file);
+    });
+  }
+
+  private static parseWithHeuristics(jsonData: any[][]): MatrixParseResult {
           
           // Find the date range row (usually first row with date pattern)
           let dateRange: string | undefined;
@@ -66,8 +108,7 @@ export class MatrixParser {
           }
           
           if (peopleRowIndex === -1 || dataStartIndex === -1) {
-            reject(new Error('Could not detect matrix format. Please ensure the file has a header row with people names and project rows starting with codes.'));
-            return;
+            throw new Error('Could not detect matrix format. Please ensure the file has a header row with people names and project rows starting with codes.');
           }
           
           // Extract people names (starting from column 3, after code/status/FTE)
@@ -135,18 +176,95 @@ export class MatrixParser {
           }
           
           if (projects.length === 0) {
-            reject(new Error('No valid project rows found in the matrix'));
-            return;
+            throw new Error('No valid project rows found in the matrix');
           }
           
-          resolve({ projects, people, dateRange });
-        } catch (error) {
-          reject(error);
-        }
-      };
+          return { projects, people, dateRange };
+  }
+
+  private static parseWithStructure(jsonData: any[][], structure: MatrixStructure): MatrixParseResult {
+    const peopleRow = jsonData[structure.peopleRow];
+    const people: string[] = [];
+    
+    // Extract people names starting from the specified column
+    for (let i = structure.peopleStartColumn; i < peopleRow.length; i++) {
+      const name = String(peopleRow[i] || '').trim();
+      if (name && name.length > 0) {
+        people.push(name);
+      }
+    }
+
+    const projects: MatrixParseResult['projects'] = [];
+
+    // Process data rows
+    for (let rowIdx = structure.dataStartRow; rowIdx < jsonData.length; rowIdx++) {
+      const row = jsonData[rowIdx];
+      const projectCell = String(row[structure.projectColumn] || '').trim();
       
-      reader.onerror = () => reject(new Error('Failed to read file'));
-      reader.readAsBinaryString(file);
-    });
+      if (!projectCell) continue;
+      
+      // Skip header/category rows
+      if (projectCell.toLowerCase().includes('project') || 
+          projectCell.toLowerCase().includes('category') ||
+          !projectCell.match(/^\d+\.\d+/)) {
+        continue;
+      }
+
+      // Extract code and name
+      const match = projectCell.match(/^([\d.]+)\s+(.+)$/);
+      if (!match) continue;
+
+      const code = match[1].trim();
+      const name = match[2].trim();
+      const status = String(row[structure.statusColumn] || 'Active').trim();
+      const fteStr = String(row[structure.fteColumn] || '0').trim();
+      const fte = parseFloat(fteStr) || 0;
+
+      // Extract allocations
+      const allocations: Record<string, number> = {};
+      for (let i = 0; i < people.length; i++) {
+        const colIdx = structure.peopleStartColumn + i;
+        const cellValue = String(row[colIdx] || '').trim();
+        
+        if (cellValue) {
+          let hours = 0;
+          
+          // Parse percentage or hours
+          if (cellValue.includes('%')) {
+            const percentage = parseFloat(cellValue.replace('%', '')) || 0;
+            hours = (percentage / 100) * 40;
+          } else {
+            const value = parseFloat(cellValue);
+            if (!isNaN(value)) {
+              // If value is between 0 and 1, treat as percentage
+              if (value > 0 && value <= 1) {
+                hours = value * 40;
+              } else if (value > 1 && value <= 100) {
+                hours = (value / 100) * 40;
+              } else {
+                hours = value;
+              }
+            }
+          }
+          
+          if (hours > 0) {
+            allocations[people[i]] = hours;
+          }
+        }
+      }
+
+      projects.push({
+        code,
+        name,
+        status,
+        fte,
+        allocations
+      });
+    }
+
+    return {
+      projects,
+      people
+    };
   }
 }
