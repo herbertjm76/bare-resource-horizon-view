@@ -34,14 +34,10 @@ export const MatrixImportDialogContent: React.FC<MatrixImportDialogContentProps>
     <div className="space-y-4">
       <Alert>
         <AlertDescription>
-          Upload your project matrix Excel file. The file should have:
-          <ul className="list-disc ml-6 mt-2 space-y-1">
-            <li>Project codes and names in the first column (e.g., "00120.068 Project Name")</li>
-            <li>Status in the second column</li>
-            <li>FTE in the third column</li>
-            <li>People names in the header row (starting from column 4)</li>
-            <li>Allocation percentages or hours in the data cells</li>
-          </ul>
+          <div className="space-y-2">
+            <p className="font-medium">Upload your project matrix Excel file</p>
+            <p className="text-sm">AI will automatically detect the structure, including project codes, people names, and allocations.</p>
+          </div>
         </AlertDescription>
       </Alert>
 
@@ -68,10 +64,31 @@ export const MatrixImportDialogContent: React.FC<MatrixImportDialogContentProps>
     <div className="space-y-4">
       <Alert>
         <AlertDescription>
-          Preview: Found <strong>{matrixData?.projects.length}</strong> projects and <strong>{matrixData?.people.length}</strong> people.
-          {matrixData?.dateRange && ` Date range: ${matrixData.dateRange}`}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-primary">✓</span>
+              <strong>AI Analysis Complete</strong>
+            </div>
+            <div className="text-sm space-y-1">
+              <p>Found <strong>{matrixData?.projects.length}</strong> projects and <strong>{matrixData?.people.length}</strong> people</p>
+              {matrixData?.dateRange && <p>Date range: {matrixData.dateRange}</p>}
+            </div>
+          </div>
         </AlertDescription>
       </Alert>
+
+      {matrixData && matrixData.people.length > 0 && (
+        <div className="border rounded-lg p-4">
+          <h4 className="font-medium mb-2 text-sm">Detected People:</h4>
+          <div className="flex flex-wrap gap-2">
+            {matrixData.people.map((person, idx) => (
+              <span key={idx} className="text-xs bg-secondary px-2 py-1 rounded">
+                {person}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-2">
         <Label htmlFor="week-start">Week Start Date</Label>
@@ -116,7 +133,7 @@ export const MatrixImportDialogContent: React.FC<MatrixImportDialogContentProps>
           Cancel
         </Button>
         <Button onClick={startImport} className="flex-1">
-          Import Projects & Allocations
+          Confirm & Import
         </Button>
       </div>
     </div>
